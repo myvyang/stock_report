@@ -46,3 +46,17 @@ PDF 使用 Git LFS 管理；原始 JSON 和分析 JSON 直接进入 Git。生成
 5. 资金类资产和经营类资产是主表；投资类和其他类金额超过总资产 10% 时必须单独解释。
 
 详细数据契约见 [docs/data-model.md](docs/data-model.md)。
+
+## 运行
+
+```bash
+python -m venv .venv
+.venv/bin/pip install -e .
+
+stock-report import-universe /path/to/roic_top50.csv
+stock-report import-annual /path/to/annual_reports
+stock-report run-latest --year 2026 --code 002315.SZ
+stock-report run-latest --year 2026
+```
+
+`run-latest` 会从巨潮资讯保存官方季度 PDF，从东方财富结构化接口保存未经改名的资产负债表响应，随后生成标准化事实、逐项目分类及汇总 CSV。季度主表没有附注依据的混合项目会留在“其他资产”，等待年报附注复核。
