@@ -89,6 +89,35 @@ class StockReportPipeline:
             )
         return counts
 
+    def import_annual_reviews(self) -> Dict[str, int]:
+        counts = {"copied": 0, "missing": 0}
+        for company in self.load_universe():
+            run_dir = Path(company["source_run_dir"])
+            source_result = run_dir / "outputs/result.json"
+            source_report = run_dir / "outputs/report.md"
+            destination = self.root / f"data/analysis/annual_review/{company['code']}/2025-12-31"
+            if not source_result.exists():
+                counts["missing"] += 1
+                continue
+            destination.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source_result, destination / "result.json")
+            if source_report.exists():
+                shutil.copy2(source_report, destination / "report.md")
+            write_json(
+                destination / "metadata.json",
+                {
+                    "company": {"code": company["code"], "name": company["name"]},
+                    "analysis_period": "2025-12-31",
+                    "analysis_type": "annual_roic_verification",
+                    "result_sha256": sha256_file(destination / "result.json"),
+                    "imported_at": now_beijing(),
+                    "import_origin": run_dir.name,
+                    "note": "既有年报核对证据，供最新季报资产性质复核引用；并非最新季报资产分类结果",
+                },
+            )
+            counts["copied"] += 1
+        return counts
+
     def fetch_latest_for_company(self, company: Dict[str, Any], year: int) -> Dict[str, Any]:
         code = company["code"]
         announcement = CninfoClient().latest_interim_report(code, year)
@@ -131,6 +160,7 @@ class StockReportPipeline:
             "quarterly_statement": str(raw_path.relative_to(self.root)),
             "quarterly_filing": f"data/raw/filings/{company['code']}/{period}/metadata.json",
             "annual_filing": f"data/raw/filings/{company['code']}/2025-12-31/metadata.json",
+            "annual_review": f"data/analysis/annual_review/{company['code']}/2025-12-31/result.json",
         }
         result["generated_at"] = now_beijing()
         output = self.root / f"data/analysis/asset_structure/{company['code']}/{period}.json"

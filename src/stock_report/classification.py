@@ -89,7 +89,13 @@ def classify_balance_row(code: str, name: str, period: str, row: Dict[str, Any])
             }
         )
     unresolved_ratio = abs(residual) / total_assets if total_assets else None
-    status = "review_required" if unresolved_ratio is None or unresolved_ratio > 0.05 else "provisional"
+    status = (
+        "review_required"
+        if unresolved_ratio is None
+        or unresolved_ratio > 0.05
+        or (totals["other"] / total_assets if total_assets else 1.0) > 0.10
+        else "provisional"
+    )
     return {
         "company": {"code": code, "name": name},
         "period": period,

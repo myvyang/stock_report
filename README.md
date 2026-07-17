@@ -55,6 +55,7 @@ python -m venv .venv
 
 stock-report import-universe /path/to/roic_top50.csv
 stock-report import-annual /path/to/annual_reports
+stock-report import-annual-reviews
 stock-report run-latest --year 2026 --code 002315.SZ
 stock-report run-latest --year 2026
 ```

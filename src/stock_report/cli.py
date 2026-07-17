@@ -18,6 +18,8 @@ def parser() -> argparse.ArgumentParser:
     import_annual = commands.add_parser("import-annual")
     import_annual.add_argument("source_directory", type=Path)
 
+    commands.add_parser("import-annual-reviews")
+
     run = commands.add_parser("run-latest")
     run.add_argument("--year", type=int, default=2026)
     run.add_argument("--code", action="append", dest="codes")
@@ -31,6 +33,8 @@ def main() -> None:
         output = {"companies": len(pipeline.import_universe(arguments.source_csv))}
     elif arguments.command == "import-annual":
         output = pipeline.import_annual_reports(arguments.source_directory)
+    elif arguments.command == "import-annual-reviews":
+        output = pipeline.import_annual_reviews()
     else:
         results = pipeline.run_latest(arguments.year, arguments.codes)
         output = {"companies": len(results), "periods": sorted({item["period"] for item in results})}
