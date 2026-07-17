@@ -169,14 +169,36 @@ class StockReportPipeline:
 
     def run_latest(self, year: int, codes: Optional[Iterable[str]] = None) -> List[Dict[str, Any]]:
         selected = set(codes or [])
+        known = {company["code"] for company in self.load_universe()}
+        unknown = selected - known
+        if unknown:
+            raise ValueError(f"Codes not in universe: {', '.join(sorted(unknown))}")
         results = []
+        errors = []
         for company in self.load_universe():
             if selected and company["code"] not in selected:
                 continue
-            latest = self.fetch_latest_for_company(company, year)
-            analysis = self.analyze_company(company, latest["period"])
-            results.append(analysis)
+            try:
+                latest = self.fetch_latest_for_company(company, year)
+                analysis = self.analyze_company(company, latest["period"])
+                results.append(analysis)
+                print(f"[{len(results):02d}] {company['code']} {company['name']} {latest['period']} ok", flush=True)
+            except Exception as error:  # preserve completed companies in a long batch
+                errors.append(
+                    {
+                        "code": company["code"],
+                        "name": company["name"],
+                        "error_type": type(error).__name__,
+                        "error": str(error),
+                    }
+                )
+                print(f"[--] {company['code']} {company['name']} error: {error}", flush=True)
         self.write_summary(results)
+        write_json(
+            self.root / "data/outputs/roic_top50_latest_asset_structure_errors.json",
+            {"generated_at": now_beijing(), "count": len(errors), "errors": errors},
+        )
+        self.last_errors = errors
         return results
 
     def write_summary(self, results: List[Dict[str, Any]]) -> None:

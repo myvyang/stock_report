@@ -37,7 +37,11 @@ def main() -> None:
         output = pipeline.import_annual_reviews()
     else:
         results = pipeline.run_latest(arguments.year, arguments.codes)
-        output = {"companies": len(results), "periods": sorted({item["period"] for item in results})}
+        output = {
+            "companies": len(results),
+            "errors": len(pipeline.last_errors),
+            "periods": sorted({item["period"] for item in results}),
+        }
     print(json.dumps(output, ensure_ascii=False, indent=2))
 
 
