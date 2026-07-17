@@ -5,6 +5,7 @@ import json
 import shutil
 import subprocess
 import tempfile
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -44,7 +45,7 @@ class AssetReviewAgentRunner:
         self._materialize(run_dir, company, period)
         prompt = self._prompt(run_dir)
         outputs = run_dir / "outputs"
-        work_root = Path(tempfile.gettempdir()) / "stock_report_asset_review"
+        work_root = Path(tempfile.gettempdir()) / "stock_report_asset_review" / run_dir.name
         work_root.mkdir(parents=True, exist_ok=True)
         command = [
             "codex",
@@ -163,7 +164,10 @@ class AssetReviewAgentRunner:
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run the asset-structure review agent")
     parser.add_argument("--root", type=Path, default=Path.cwd())
-    parser.add_argument("--code", action="append", required=True)
+    parser.add_argument("--code", action="append")
+    parser.add_argument("--review-required", action="store_true")
+    parser.add_argument("--workers", type=int, default=1)
+    parser.add_argument("--resume", action="store_true")
     parser.add_argument("--period", default="2026-03-31")
     parser.add_argument("--model", default=DEFAULT_MODEL)
     parser.add_argument("--timeout", type=int, default=1800)
@@ -171,11 +175,39 @@ def main() -> None:
     pipeline = StockReportPipeline(arguments.root)
     companies = {company["code"]: company for company in pipeline.load_universe()}
     runner = AssetReviewAgentRunner(arguments.root, arguments.model, arguments.timeout)
-    for code in arguments.code:
+    codes = list(arguments.code or [])
+    if arguments.review_required:
+        for code, company in companies.items():
+            preliminary = arguments.root / f"data/analysis/asset_structure/{code}/{arguments.period}.json"
+            if preliminary.exists() and _load(preliminary).get("status") == "review_required":
+                codes.append(code)
+    codes = list(dict.fromkeys(codes))
+    if not codes:
+        raise SystemExit("Provide --code or --review-required")
+    if arguments.workers < 1:
+        raise SystemExit("--workers must be at least 1")
+    pending = []
+    for code in codes:
         if code not in companies:
             raise SystemExit(f"Code not in universe: {code}")
-        result = runner.run(companies[code], arguments.period)
-        print(json.dumps({"company": result["company"], "status": result["status"]}, ensure_ascii=False))
+        reviewed = arguments.root / f"data/analysis/asset_structure/{code}/{arguments.period}-reviewed.json"
+        if arguments.resume and reviewed.exists():
+            result = _load(reviewed)
+            print(json.dumps({"company": result["company"], "status": "existing"}, ensure_ascii=False), flush=True)
+        else:
+            pending.append(code)
+    with ThreadPoolExecutor(max_workers=min(arguments.workers, len(pending) or 1)) as executor:
+        futures = {
+            executor.submit(runner.run, companies[code], arguments.period): code for code in pending
+        }
+        for future in as_completed(futures):
+            code = futures[future]
+            try:
+                result = future.result()
+                output = {"company": result["company"], "status": result["status"]}
+            except Exception as error:
+                output = {"company": companies[code], "status": "error", "error": str(error)}
+            print(json.dumps(output, ensure_ascii=False), flush=True)
 
 
 if __name__ == "__main__":
