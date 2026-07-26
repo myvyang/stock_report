@@ -1,0 +1,76 @@
+stock-research trace for 000726.SZ / 鲁泰A / 2025-12-31 annual
+
+1. Skill and contracts
+- Read /workspace/.agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md and references/report-contract.md as requested.
+- Also read references/data-reuse.md to confirm reuse boundaries.
+
+2. Inputs and reusable data
+- Read config/input.json.
+- Found annual fact pack:
+  stock_report/data/analysis/annual_review/000726.SZ/2025-12-31/facts.json
+  stock_report/data/analysis/annual_review/000726.SZ/2025-12-31/annual_facts.md
+  stock_report/data/analysis/annual_review/000726.SZ/2025-12-31/extraction_trace.txt
+- Found raw filing metadata and source PDF:
+  stock_report/data/raw/filings/000726.SZ/2025-12-31/metadata.json
+  https://static.cninfo.com.cn/finalpage/2026-04-17/1225112669.PDF
+
+3. Protocol CLI
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Wrote fields using protocol set commands.
+- Validated with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok.
+
+4. Market data
+- config/input.json had market_cap.amount = null.
+- Used web search on 2026-07-26.
+- Sina Finance and Xueqiu snippets showed 2026-07-24 around close:
+  price 5.76, total market cap 47.09 billion yuan, PE TTM 8.74.
+- Set valuation.market_cap = 4,709,000,000 yuan.
+- Set valuation.market_cap_date = 2026-07-24.
+- Set valuation.pe_ttm = 8.74.
+
+5. Financial facts reused
+- Revenue: 5,904,308,724.88 yuan.
+- Cost of sales: 4,546,124,192.37 yuan.
+- Gross profit: 1,358,184,532.51 yuan.
+- Parent net profit: 593,586,067.81 yuan.
+- Deducted parent net profit: 388,173,537.09 yuan.
+- Operating cash flow: 712,497,388.09 yuan.
+- Capital expenditure: 189,053,073.76 yuan.
+- Operating free cash flow: 523,444,314.33 yuan.
+- Total assets: 14,106,762,900.07 yuan.
+- Total liabilities: 3,976,667,307.79 yuan.
+- Parent equity: 9,811,054,187.05 yuan.
+
+6. Key calculations
+- Gross margin = 1,358,184,532.51 / 5,904,308,724.88 = 0.2300327770.
+- Net margin = 593,586,067.81 / 5,904,308,724.88 = 0.1005343886.
+- Forecast cash dividend = 122,628,841.05 yuan from 2025 profit distribution plan.
+- Forecast dividend yield = 122,628,841.05 / 4,709,000,000 = 0.0260413763.
+- Financing liabilities deducted from net cash:
+  652,836,872.89 + 315,426,401.72 + 1,539,049,797.44 + 247,912,723.61 = 2,755,225,795.66 yuan.
+- Necessary operating cash retained:
+  2025 operating cash outflow subtotal 5,102,795,781.43 yuan / 12 * 2 = 850,465,963.57 yuan.
+- Discounted detachable net cash:
+  cash equivalents 2,033,439,469.50
+  + short-term deposits 337,219,678.81
+  + long-term deposits 460,000,000.00
+  + trading debt instruments 684,327,576.29 * 0.9
+  + trading equity instruments 409,094,411.86 * 0.5
+  + other non-current financial assets 88,360,000.00 * 0.5
+  - necessary operating cash 850,465,963.57
+  - financing liabilities 2,755,225,795.66
+  = 95,956,745.09 yuan.
+- Discounted sustainable cash profit selected: 350,000,000 yuan.
+- Operating business price = 4,709,000,000 - 95,956,745.09 = 4,613,043,254.91 yuan.
+- Owner earnback years = 4,613,043,254.91 / 350,000,000 = 13.1801235855.
+- Market cap to cash profit = 4,709,000,000 / 350,000,000 = 13.4542857143.
+
+7. Main limitations
+- Trading financial assets are not disclosed by individual product at period end.
+- Cash is not disclosed by entity, geography, or operating necessity.
+- Maintenance capex is not separately disclosed.
+- Market cap and PE are from reproducible quote pages, not company filings.
