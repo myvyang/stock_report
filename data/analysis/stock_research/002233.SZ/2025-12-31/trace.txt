@@ -1,0 +1,86 @@
+task: stock_research
+company: 002233.SZ 塔牌集团
+period: 2025-12-31
+report_type: annual
+generated_at: 2026-07-27 Asia/Shanghai
+
+skill_used:
+- stock-research
+
+contracts_read:
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+input_read:
+- config/input.json
+
+local_sources_read:
+- stock_report/data/analysis/annual_review/002233.SZ/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/002233.SZ/2025-12-31/annual_facts.md
+- stock_report/data/analysis/stock_research/002233.SZ/2025-12-31/result.json
+- stock_report/data/analysis/stock_research/002233.SZ/2025-12-31/report.md
+- stock_report/data/analysis/stock_research/002233.SZ/2025-12-31/trace.txt
+- stock_report/data/raw/filings/002233.SZ/2025-12-31/002233_2025_annual_report.txt
+
+protocol_cli:
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Validated outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: {"status":"ok","errors":[]}
+
+reuse_boundary:
+- Reused annual fact pack as the primary source for core financial statements, asset/liability items, business summary, and cash conversion.
+- Reused prior stock_research output only for verifiable owner_earnback split, prior external-source trail, and previously extracted operating details.
+- Did not reuse prior investment_case_type/liquidation_watch label because the current result contract prohibits list labels in final structured output.
+- Did not re-extract full 8-10 year cement-cycle history; used 2023-2025 deducted nonrecurring parent net profit series from the fact pack/prior research.
+
+market_data:
+- market_cap: 8501000000.000001 CNY
+- market_cap_date: 2026-07-24
+- pe_ttm: 13.41
+- source: AH Note published stock payload from config/input.json.
+
+key_financials:
+- revenue: 4106877852.48
+- cost_of_sales: 3100366380.44
+- gross_profit: 1006511472.04
+- gross_margin: 0.24507947598982105
+- parent_net_profit: 634042181.17
+- net_margin: 0.15438544898215661
+- operating_cash_flow: 778436676.10
+- capital_expenditure: 343396731.15
+- operating_free_cash_flow: 435039944.95
+
+owner_earnback_formula:
+- discounted_detachable_net_cash: 4053517533.1195
+- operating_business_price = market_cap - discounted_detachable_net_cash = 4447482466.880501
+- discounted_sustainable_cash_profit: 245085250.5595
+- owner_earnback_years = operating_business_price / discounted_sustainable_cash_profit = 18.14667531696598
+- market_cap_to_cash_profit = market_cap / discounted_sustainable_cash_profit = 34.6858898305518
+- discounted_net_cash_to_market_cap = discounted_detachable_net_cash / market_cap = 0.47682831821191624
+
+cash_profit_basis:
+- 2023 deducted nonrecurring parent net profit: 639629613.06
+- 2024 deducted nonrecurring parent net profit: 341231854.06
+- 2025 deducted nonrecurring parent net profit: 377054231.63
+- median: 377054231.63
+- haircut: 0.65
+- discounted_sustainable_cash_profit: 245085250.5595
+- rationale: avoid double counting financial-asset returns after deducting discounted detachable financial assets from market capitalization.
+
+dividend:
+- 2025 annual report profit distribution proposal: cash dividend 563592243.84 CNY.
+- other cash distribution/buyback amount disclosed: 54095268.22 CNY.
+- forecast_dividend_yield = 563592243.84 / 8501000000.000001 = 0.06629717019644747.
+
+main_limitations:
+- Market cap is from batch input snapshot, not an annual-report field.
+- Public annual report does not allow full item-by-item mapping from wealth-management products to every balance-sheet account.
+- Trust products, other non-current financial assets, and part of trading financial assets cannot be publicly verified item by item for final exit price and timing.
+- No full 8-10 year cement-cycle dataset was re-extracted in this task.
+
+outputs:
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt
