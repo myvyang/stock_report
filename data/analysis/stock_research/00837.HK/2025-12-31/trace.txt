@@ -1,0 +1,65 @@
+stock-research trace for 00837.HK / 谭木匠 / 2025-12-31 annual
+
+Protocol and contracts:
+- Read /workspace/.agents/skills/stock-research/SKILL.md.
+- Read /workspace/.agents/skills/stock-research/references/result-contract.md.
+- Read /workspace/.agents/skills/stock-research/references/report-contract.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields through repeated protocol CLI set calls, using a Python subprocess wrapper only to avoid shell quoting errors.
+- Validated with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+  Result: {"status": "ok", "errors": []}
+
+Inputs reused:
+- config/input.json for company identity, report period, market cap, PE TTM and source paths.
+- stock_report/data/raw/filings/00837.HK/2025-12-31/metadata.json for HKEX annual report identity.
+- stock_report/data/analysis/annual_review/00837.HK/2025-12-31/facts.json for extracted financial statement facts, asset/liability categories, cash flow and evidence page references.
+- stock_report/data/analysis/annual_review/00837.HK/2025-12-31/annual_facts.md for human-readable fact-pack cross-check.
+- stock_report/data/raw/filings/00837.HK/2025-12-31/2025-annual-report-hkex-2026041701755.txt for dividend, channel and financial-summary line checks.
+- stock_report/data/notes/user_stock_evaluations.md was read. The user note for 00837.HK was treated only as background, not as financial evidence.
+
+Core reported figures converted from RMB'000 to yuan:
+- Revenue: 558,223,000.
+- Cost of sales: 212,921,000.
+- Gross profit: 345,302,000.
+- Operating profit: 217,150,000.
+- Parent net profit: 171,027,000.
+- Total assets: 1,119,459,000.
+- Total liabilities: 149,255,000.
+- Parent equity: 970,204,000.
+- Operating cash flow: 177,450,000.
+- Capital expenditure: 18,775,000.
+- 2025 operating free cash flow after capex: 158,675,000.
+- 2024 operating free cash flow after capex: 113,306,000.
+- Proposed 2025 final dividend: 85,657,000.
+
+Formula checks:
+- Gross margin = 345,302,000 / 558,223,000 = 0.6185735808.
+- Net margin = 171,027,000 / 558,223,000 = 0.3063775588.
+- Forecast dividend yield = 85,657,000 / 1,329,000,000 = 0.0644522197.
+- Discounted funds assets before tax deduction:
+  cash 79,739,000 * 90% = 71,765,100
+  short fixed deposits 10,000,000 * 95% = 9,500,000
+  long fixed deposits 336,000,000 * 80% = 268,800,000
+  principal-guaranteed bank wealth management products 80,669,000 * 85% = 68,568,650
+  subtotal = 418,633,750
+- Deducted current income tax payable: 40,349,000.
+- Discounted detachable net cash = 378,284,750.
+- Operating business price = 1,329,000,000 - 378,284,750 = 950,715,250.
+- Two-year average operating free cash flow after capex = (158,675,000 + 113,306,000) / 2 = 135,990,500.
+- Discounted sustainable cash profit = 135,990,500 * 85% = 115,591,925.
+- Owner earnback years = 950,715,250 / 115,591,925 = 8.2247548866.
+- Market cap to cash profit = 1,329,000,000 / 115,591,925 = 11.4973429156.
+
+Key assumptions and limitations:
+- Cash, deposits and FVTPL principal-guaranteed wealth management products were discounted for PRC bank placement, long deposit maturity, Level 3 valuation/redeemability and unknown parent/subsidiary distribution layers.
+- Investment properties were not counted as detachable net cash.
+- Lease liabilities were treated as operating burden rather than financing debt because they relate to warehouses, stores and production complex land.
+- Cash profit uses only 2024-2025 free cash flow after capex because 2023 cash flow/capex detail was not extracted in the fact pack.
+- Market cap and PE were not re-queried online; they are from the provided input snapshot.
+
+Outputs:
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

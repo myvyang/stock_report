@@ -1,0 +1,43 @@
+stock-research trace for 01339.HK / 中国人民保险集团 / 2025-12-31 annual
+
+1. Read required instructions:
+   - /workspace/.agents/skills/stock-research/SKILL.md
+   - /workspace/.agents/skills/stock-research/references/result-contract.md
+   - /workspace/.agents/skills/stock-research/references/report-contract.md
+   - /workspace/.agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized structured result with protocol CLI:
+   - PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reused local fact sources:
+   - config/input.json
+   - stock_report/data/raw/filings/01339.HK/2025-12-31/metadata.json
+   - stock_report/data/analysis/annual_review/01339.HK/2025-12-31/facts.json
+   - stock_report/data/analysis/annual_review/01339.HK/2025-12-31/annual_facts.md
+   - stock_report/data/analysis/stock_research/01339.HK/2025-12-31/result.json
+   - stock_report/data/analysis/stock_research/01339.HK/2025-12-31/report.md
+
+4. Core source decisions:
+   - H-share official annual report and annual results announcement are present locally, but the existing fact pack records that their PDF text layer did not reliably expose numeric tables.
+   - Core financial statement numbers were reused from the annual fact pack, which states they were checked against same-company same-period A-share annual report page images.
+   - Existing stock_research output was used as a clue only; the new outputs/result.json follows stock-research-result-v1 and removes non-contract list/tag fields.
+
+5. Main calculations:
+   - Market cap: 199,223,000,000 yuan from config/input.json, as of 2026-07-24.
+   - Insurance service gross spread: 570,717,000,000 - 527,170,000,000 = 43,547,000,000 yuan.
+   - Gross margin metric: 43,547,000,000 / 570,717,000,000 = 0.0763022654. This is an insurance service spread ratio, not ordinary manufacturing gross margin.
+   - Net margin metric: 46,646,000,000 / 570,717,000,000 = 0.0817322771.
+   - Discounted detachable net cash: 0 yuan, because insurance funds and investment assets support insurance liabilities, solvency and the investment business.
+   - Sustainable cash profit: 2023-2025 parent net profit median 42,869,000,000 * 0.60 = 25,721,400,000 yuan.
+   - Operating business price: 199,223,000,000 - 0 = 199,223,000,000 yuan.
+   - Owner earnback years: 199,223,000,000 / 25,721,400,000 = 7.7454182121.
+   - Forecast dividend yield: 9,729,000,000 / 199,223,000,000 = 0.0488347229, using 2025 full-year cash dividend as a conservative next-year proxy.
+
+6. Data limitations kept in result/report:
+   - Subsidiary-level legal dividend capacity, solvency surplus extraction and cash upstream path were not available in public fact sources.
+   - Insurance operating cash flow is not treated as ordinary distributable free cash flow.
+   - Financial investments are not treated as detachable excess cash.
+
+7. Validation:
+   - PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Result: {"status": "ok", "errors": []}
