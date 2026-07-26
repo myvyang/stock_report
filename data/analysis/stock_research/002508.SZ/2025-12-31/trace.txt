@@ -1,0 +1,53 @@
+stock-research trace
+
+Task:
+- Company: 老板电器 / 002508.SZ
+- Market: A share
+- Period: 2025-12-31 annual
+- Required outputs: outputs/result.json, outputs/report.md, outputs/trace.txt
+
+Protocol and contracts:
+- Read /workspace/.agents/skills/stock-research/SKILL.md.
+- Read /workspace/.agents/skills/stock-research/references/result-contract.md.
+- Read /workspace/.agents/skills/stock-research/references/report-contract.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated outputs/result.json through protocol CLI set/append commands from a local Python subprocess driver.
+- Validated with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: ok.
+
+Local sources reused:
+- config/input.json
+- stock_report/data/analysis/annual_review/002508.SZ/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/002508.SZ/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/002508.SZ/2025-12-31/extraction_trace.txt
+- stock_report/data/normalized/facts/002508.SZ/2025-12-31/annual-facts.json
+- stock_report/data/raw/filings/002508.SZ/2025-12-31/metadata.json
+- stock_report/data/raw/filings/002508.SZ/2025-12-31/1225237757.PDF
+- stock_report/data/analysis/stock_research/002508.SZ/2025-12-31/result.json
+- stock_report/data/analysis/stock_research/002508.SZ/2025-12-31/report.md
+
+Additional local verification:
+- Converted official PDF to temporary text with pdftotext at /tmp/002508_2025.txt.
+- Searched for profit distribution, cash dividend, channel revenue, gross margin, sales/production/inventory and receivables terms.
+- Confirmed 2025年度利润分配预案: 944,938,916 shares, RMB 5 per 10 shares, total cash dividend RMB 472,469,458.
+- Confirmed 2024年度 and 2025中期 each disclosed RMB 472,469,458 cash dividend.
+- Confirmed channel and operating details used in report: 2025 engineering channel revenue RMB 1,074,797,193.30 and down 35.84%; direct gross margin 53.55%; agency gross margin 48.76%; sales volume down 11.77%, production volume down 7.95%, inventory volume up 13.95%.
+
+Core calculations:
+- Gross margin = 5,077,431,807.01 / 10,116,069,396.20 = 0.5019174551.
+- Net margin = 1,255,879,806.22 / 10,116,069,396.20 = 0.1241470137.
+- Forecast dividend yield = 472,469,458 / 14,788,000,000 = 0.0319495170.
+- Discounted net cash / market cap = 6,400,317,559.909 / 14,788,000,000 = 0.4328048120.
+- Operating business price = 14,788,000,000 - 6,400,317,559.909 = 8,387,682,440.091.
+- Owner earnback years = 8,387,682,440.091 / 816,925,806.390225 = 10.2673735785.
+- Market cap to cash profit = 14,788,000,000 / 816,925,806.390225 = 18.1020110815.
+
+Data quality notes:
+- Market cap and PE are from config/input.json batch input as of 2026-07-24, not annual report data.
+- Core financial statement numbers use the annual fact pack extracted from the official CNINFO annual report PDF.
+- Historical stock_research result contained an old classification field; the new outputs do not carry classification labels and keep only sortable metrics, explanations and data quality.
+- Other non-current financial assets of RMB 800.45 million lack public look-through disclosure of underlying assets, redemption terms and exit timing.
+- Necessary operating cash is not disclosed by management; the cash deduction follows the reused owner earnback assumption.
+- 2023 capital expenditure was not extracted in the fact pack, so multi-year free cash flow validation remains incomplete.
