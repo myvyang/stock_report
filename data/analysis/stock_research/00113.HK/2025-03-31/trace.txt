@@ -1,0 +1,78 @@
+Task: stock research outputs for 00113.HK / 迪生创建, annual period 2025-03-31.
+
+Protocol and contracts:
+- Read /workspace/.agents/skills/stock-research/SKILL.md.
+- Read /workspace/.agents/skills/stock-research/references/result-contract.md.
+- Read /workspace/.agents/skills/stock-research/references/report-contract.md.
+- Also read data-reuse.md after discovering no reusable facts existed locally.
+
+Local reuse check:
+- Checked config/input.json.
+- Checked stock_report paths referenced by input; annual facts and normalized facts did not exist in this workspace.
+- Searched workspace for 00113.HK / 迪生 / Dickson Concepts; no prior company facts or stock research result existed.
+
+Protocol initialization:
+- Ran:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+Primary sources gathered:
+- Downloaded HKEXnews annual report PDF:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2025/0624/2025062400297.pdf
+- Saved to:
+  stock_report/data/raw/filings/00113.HK/2025-03-31/annual_report_2025.pdf
+- Converted to text:
+  stock_report/data/raw/filings/00113.HK/2025-03-31/annual_report_2025.txt
+- Created simple local filing metadata:
+  stock_report/data/raw/filings/00113.HK/2025-03-31/metadata.json
+
+Exchange rate:
+- Used 1 HKD = 0.9323 CNY for 2025-03-31 based on exchange-rates.org HKD/CNY history.
+- All financial statement HKD amounts were multiplied by 1000 and by 0.9323 to store RMB absolute yuan in result.json.
+- Input market cap was already normalized to CNY and was not converted again.
+
+Core annual report facts extracted:
+- Revenue HK$1,921.768m.
+- Cost of sales HK$1,062.672m.
+- Gross profit HK$859.096m.
+- Operating profit HK$268.489m.
+- Profit attributable to equity shareholders HK$198.012m.
+- Total assets HK$4,883.737m.
+- Total liabilities HK$1,349.926m.
+- Equity attributable to shareholders HK$3,533.811m.
+- Cash and bank balances HK$3,275.825m.
+- Bank loans HK$605.309m.
+- Net liquid financial resources HK$2,670.5m disclosed by management.
+- Other financial assets HK$1,078.495m, including listed debt securities HK$504.531m and unlisted equity/non-equity securities HK$573.964m.
+- Inventories HK$177.733m.
+- Operating cash flow HK$-188.902m.
+- Purchase of property, plant and equipment HK$24.929m.
+- Financing cash flow HK$-618.145m.
+- Dividends paid HK$177.358m.
+- Share repurchases cash out HK$40.065m.
+- Luxury goods segment revenue HK$1,806.187m and profit HK$138.669m.
+- Securities investment segment revenue HK$115.581m and profit HK$59.343m.
+- FY2025 dividend attributable to year: interim HK$0.10/share, HK$39.387m; no final dividend proposed.
+
+Owner earnback assumptions:
+- Cash and bank balances counted at 100%.
+- Listed debt financial assets counted at 80%.
+- Unlisted equity and non-equity securities counted at 50%.
+- Short-term bank loans deducted at 100%.
+- Discounted detachable net cash = cash + 80% listed debt + 50% unlisted securities - bank loans = RMB 3,133,574,786.44.
+- Operating business price = input market cap RMB 2,177,000,000 - discounted detachable net cash = RMB -956,574,786.44.
+- Sustainable operating cash profit was not based on reported operating cash flow because operating cash flow included a HK$516.529m increase in securities held for trading.
+- Used luxury goods segment profit HK$138.669m, converted to RMB, then applied a 75% sustainability discount because Hong Kong/Taiwan demand was weak and brand direct operation is a structural pressure.
+- Discounted sustainable cash profit = RMB 96,960,831.53.
+- Owner earnback years = -9.865579.
+- Market cap / cash profit = 22.452365.
+
+Result update and validation:
+- Populated outputs/result.json through the stock_research protocol CLI set command, starting from the initialized skeleton.
+- Ran:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok.
+
+Limitations:
+- No local annual facts package was available, so this run returned to the annual report PDF.
+- Investment asset discounts are research assumptions, not company-disclosed liquidation values.
+- FY2025 dividend was affected by the then-current privatization proposal; dividend yield should not be read as a stable forward policy.
