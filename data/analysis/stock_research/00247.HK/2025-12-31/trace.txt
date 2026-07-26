@@ -1,0 +1,124 @@
+Stock research trace
+
+Task:
+- Company: 00247.HK TST PROPERTIES
+- Requested period in config/input.json: 2025-12-31
+- Actual annual report used: year ended 2025-06-30
+- Report type: annual
+- Timezone: Asia/Shanghai
+
+Protocol and contracts:
+- Read /workspace/.agents/skills/stock-research/SKILL.md
+- Read /workspace/.agents/skills/stock-research/references/result-contract.md
+- Read /workspace/.agents/skills/stock-research/references/report-contract.md
+- Read /workspace/.agents/skills/stock-research/references/data-reuse.md
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Filled outputs/result.json with protocol set/append commands.
+- Validated outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok.
+
+Local sources read:
+- config/input.json
+- stock_report/data/raw/filings/00247.HK/2025-12-31/metadata.json
+- stock_report/data/raw/filings/00247.HK/2025-12-31/annual_report_2025.txt
+- stock_report/data/analysis/annual_review/00247.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/00247.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/00247.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/analysis/stock_research/00247.HK/2025-12-31/result.json
+- stock_report/data/analysis/stock_research/00247.HK/2025-12-31/report.md
+- stock_report/data/analysis/stock_research/00247.HK/2025-12-31/trace.txt
+
+Reuse decisions:
+- Reused annual facts because they contained business segments, three statements, asset/liability categories, cash-flow history, capex proxy, evidence and gaps.
+- Checked the existing stock_research result. It failed the current protocol validation because it used an older schema and included deprecated case labels. It was used only as a line of evidence for the historical owner_earnback decomposition and narrative context, not copied as the final result.
+- No need to re-download the annual report because HKEX PDF, text extraction and metadata already existed locally.
+
+External cross-check:
+- Used web search to verify the HKD/CNY presentation rate around the market-cap date.
+- Investing.com historical HKD/CNY data showed 2026-07-24 price 0.8635.
+- XE search snapshot showed 1 HKD = 0.86365 CNY around 2026-07-24.
+- Output used 1 HKD = RMB0.8635.
+
+Core annual report facts used:
+- Annual report source: HKEX Annual Report 2025, https://www.hkexnews.hk/listedco/listconews/sehk/2025/0925/2025092501389.pdf
+- Reporting currency/unit: HKD, HK$ million.
+- Revenue HK$8,236m.
+- Cost of sales HK$1,824m.
+- Gross profit HK$3,912m.
+- Profit before tax / operating_profit field HK$4,510m.
+- Profit for the year HK$4,036m.
+- Parent net profit HK$2,331m.
+- Total assets HK$185,514m.
+- Total liabilities HK$14,707m.
+- Total equity HK$170,807m.
+- Parent equity HK$98,515m.
+- Minority interest HK$72,292m.
+- Operating cash flow HK$3,832m.
+- Capital expenditure proxy HK$427m.
+- Financing cash flow HK$-1,110m.
+
+Business facts used:
+- Property sales external revenue HK$2,912m.
+- Property rental external revenue HK$2,802m.
+- Property management and other services external revenue HK$1,414m.
+- Hotel operations external revenue HK$950m.
+- Securities investment external revenue HK$68m.
+- Financing external revenue HK$90m.
+- Property rental subsidiary segment result HK$2,178m plus associates/JVs share HK$637m.
+
+Asset and liability facts used:
+- Time deposits HK$49,853m.
+- Bank balances and cash HK$2,403m.
+- Funds assets total HK$52,256m.
+- Cash held by stakeholders HK$1,151m.
+- Charged time deposits HK$156m.
+- Investment properties HK$66,044m.
+- Properties under development HK$9,963m.
+- Stocks of completed properties HK$4,721m.
+- Associates and joint ventures HK$23,896m.
+- Equity and debt instruments HK$1,630m.
+- Long-term loans receivable and current portion HK$2,827m.
+- Bank borrowings HK$1,799m.
+- Other loan HK$884m.
+- Lease liabilities HK$50m.
+- Trade and other payables HK$4,130m.
+- Contract liabilities HK$329m.
+- Amounts due to associates and non-controlling interests HK$3,067m.
+
+Dividend facts used:
+- Interim dividend for FY2025: HK15 cents per share, HK$325m.
+- Proposed final dividend for FY2025: HK43 cents per share, HK$940m based on 2,186,420,279 shares.
+- Total nominal FY2025 dividend per share: HK58 cents.
+- 2025 dividends recognized as distribution during the year: HK$1,237m.
+- 2024 dividends recognized as distribution during the year: HK$1,201m.
+- Scrip dividend alternatives were offered; actual cash dividends were much lower than nominal distribution value.
+
+Currency conversion and formulas:
+- FX: 0.8635 CNY/HKD.
+- Market cap: RMB37,387,000,000 from config/input.json.
+- Revenue: HK$8,236m * 0.8635 = RMB7,111,786,000.
+- Gross profit: HK$3,912m * 0.8635 = RMB3,378,012,000.
+- Parent net profit: HK$2,331m * 0.8635 = RMB2,012,818,500.
+- Gross margin: 3,912 / 8,236 = 0.4749878582.
+- Net margin: 2,331 / 8,236 = 0.2830257407.
+- Discounted detachable net cash: HK$21,289.5m * 0.8635 = RMB18,383,483,250.
+- Discounted sustainable cash profit: HK$818.4m * 0.8635 = RMB706,688,400.
+- Operating business price: RMB37,387,000,000 - RMB18,383,483,250 = RMB19,003,516,750.
+- Owner earnback years: RMB19,003,516,750 / RMB706,688,400 = 26.8909419625.
+- Market cap / cash profit: RMB37,387,000,000 / RMB706,688,400 = 52.9045050124.
+- Forecast dividend: HK$0.58 * 2,186,420,279 shares * 0.8635 = RMB1,092,775,500.
+- Forecast dividend yield: RMB1,092,775,500 / RMB37,387,000,000 = 0.0292681281.
+
+Limitations recorded:
+- Market cap comes from config/input.json screening snapshot and was not independently repriced.
+- Annual report does not fully disclose cash by parent/subsidiary/geography/project company/minority-shareholder attribution.
+- Maintenance capex and growth capex are not separately disclosed.
+- Dividend yield is based on nominal dividend per share; scrip dividend elections can make actual cash outflow materially lower.
+- Owner_earnback cash and profit discounts are conservative judgement parameters, not directly audited figures.
+
+Files written:
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt
