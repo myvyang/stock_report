@@ -1,0 +1,92 @@
+stock-research trace
+
+Task:
+- Company: 000521.SZ 长虹美菱
+- Period: 2025-12-31
+- Report type: annual
+- Input: config/input.json
+- Output files: outputs/result.json, outputs/report.md, outputs/trace.txt
+
+Skill and contracts read:
+- /workspace/.agents/skills/stock-research/SKILL.md
+- /workspace/.agents/skills/stock-research/references/result-contract.md
+- /workspace/.agents/skills/stock-research/references/report-contract.md
+- /workspace/.agents/skills/stock-research/references/data-reuse.md
+
+Protocol CLI:
+- Initialized result with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result with protocol set commands, using annual facts, historical stock_research owner_earnback summary, dividend facts from PDF text, and evidence from prior research output.
+- Validated result with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: ok, errors: []
+
+Primary local sources read:
+- config/input.json
+- stock_report/data/raw/filings/000521.SZ/2025-12-31/metadata.json
+- stock_report/data/raw/filings/000521.SZ/2025-12-31/2025-annual-report.pdf
+- stock_report/data/analysis/annual_review/000521.SZ/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/000521.SZ/2025-12-31/annual_facts.md
+- stock_report/data/analysis/stock_research/000521.SZ/2025-12-31/result.json
+- stock_report/data/analysis/stock_research/000521.SZ/2025-12-31/report.md
+- stock_report/data/analysis/stock_research/000521.SZ/2025-12-31/trace.txt
+
+Key reused annual facts:
+- Revenue: 30,407,926,517.70 yuan
+- Cost of sales: 27,214,612,134.10 yuan
+- Gross profit: 3,193,314,383.60 yuan
+- Parent net profit: 410,409,936.09 yuan
+- Deducted non-recurring parent net profit: 337,402,364.91 yuan
+- Operating cash flow: 860,090,506.71 yuan
+- Capital expenditure: 426,184,027.69 yuan
+- Operating free cash flow: 433,906,479.02 yuan
+- Total assets: 22,302,792,548.16 yuan
+- Total liabilities: 15,811,520,163.84 yuan
+- Parent equity: 6,083,548,865.34 yuan
+- Monetary funds: 10,186,661,869.94 yuan
+- Finance company deposits inside monetary funds: 4,306,957,481.67 yuan
+- Restricted funds identified in facts: 416,234,428.12 yuan
+- Interest-bearing debt: 921,298,606.97 yuan
+
+Dividend extraction:
+- Used pdftotext on the local annual report PDF and searched for 分红, 利润分配, 现金红利, 每10股.
+- 2025 profit distribution plan: cash dividend of 2.10 yuan per 10 shares, expected cash dividend not exceeding 211,831,650.45 yuan.
+- 2024 distribution implemented during 2025: 339,874,825.95 yuan.
+
+Owner earnback reuse:
+- The workspace did not contain a separate stock_report/data/analysis/owner_earnback directory for 000521.SZ.
+- Reused the historical stock_research result values:
+  discounted detachable net cash: 6,861,881,593.4222 yuan
+  discounted sustainable cash profit: 162,500,000.00 yuan
+  operating business price: -1,856,881,593.4222 yuan
+  owner earnback years: -11.4269636518
+  market cap to cash profit: 30.8
+- Removed old non-contract label fields from the new result; result.json does not include investment_case_type or any ranking label.
+
+Formula checks:
+- gross_margin = gross_profit / revenue = 0.1050158544
+- net_margin = parent_net_profit / revenue = 0.013497
+- discounted_net_cash_to_market_cap = 6,861,881,593.4222 / 5,005,000,000 = 1.371005
+- operating_business_price = 5,005,000,000 - 6,861,881,593.4222 = -1,856,881,593.4222
+- owner_earnback_years = -1,856,881,593.4222 / 162,500,000 = -11.4269636518
+- market_cap_to_cash_profit = 5,005,000,000 / 162,500,000 = 30.8
+- forecast_dividend_yield = 211,831,650.45 / 5,005,000,000 = 0.042323
+
+External industry sources retained from prior research evidence:
+- 电器杂志/中国家用电器协会信息咨询部：2025年中国家电行业运行情况（内销篇）
+  https://www.dianqizazhi.com/2026/04/16/72189.html
+- 新华网转商务部：2025年以旧换新相关商品销售额超2.6万亿元
+  https://www.news.cn/fortune/20260101/2bdb07c2deb948dd98e71886e61be9d7/c.html
+- 中国机电产品进出口商会：十四五中国家电（白电）产品出口分析
+  https://www.cccme.org.cn/news/details.aspx?classid=7685F2FA1E54A7F5&id=ED60FD1B4D3E74BFF63E04A93CF68C38&xgid=F868932F64EB7AAF
+- 我的钢铁网转国家统计局：2025年中国四大家电产量出炉
+  https://news.mysteel.com/a/26012210/D6712AAEE85C91C6.html
+- 证券时报：铝代铜引发热议
+  https://www.stcn.com/article/detail/3552984.html
+
+Limitations:
+- Owner_earnback original source files were not available in this workspace; only the historical stock_research summary was available.
+- Annual facts did not fully classify every operating and other asset line; report uses only the important extracted line items.
+- 2023 capital expenditure was missing from the annual fact pack.
+- Finance company deposits, note pool guarantees, and receivable financing pledges cannot be matched item by item from public disclosures.
+- Market cap is from the 2026-07-24 input snapshot and was not refreshed.
