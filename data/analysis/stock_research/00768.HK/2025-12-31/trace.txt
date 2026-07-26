@@ -1,0 +1,105 @@
+stock-research trace for 00768.HK / 开明投资
+
+Run context:
+- Workspace: /workspace
+- Input: config/input.json
+- Required outputs: outputs/result.json, outputs/report.md, outputs/trace.txt
+- Current task date/timezone from input: 2026-07-27, Asia/Shanghai
+
+Protocol and contract files read:
+- /workspace/.agents/skills/stock-research/SKILL.md
+- /workspace/.agents/skills/stock-research/references/result-contract.md
+- /workspace/.agents/skills/stock-research/references/report-contract.md
+
+Protocol CLI usage:
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields using repeated:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol set ...
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol append ...
+- Validated outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors []
+
+Local sources read and reused:
+- stock_report/data/analysis/annual_review/00768.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/00768.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/00768.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/00768.HK/2025-12-31/metadata.json
+- stock_report/data/raw/filings/00768.HK/2025-12-31/annual_report_2025.txt
+- stock_report/data/analysis/stock_research/00768.HK/2025-12-31/result.json
+- stock_report/data/analysis/stock_research/00768.HK/2025-12-31/report.md
+- stock_report/data/analysis/stock_research/00768.HK/2025-12-31/trace.txt
+- config/input.json
+
+Data reuse decisions:
+- Reused the annual fact pack because it already extracted the audited annual report, core financial statements, business segment, cash flow, FVTPL assets, related-party balances, dividend disclosure and evidence.
+- Reused prior stock research narrative only as background; the previous result file used an older schema and contained a disallowed category label, so outputs/result.json was rebuilt under stock-research-result-v1.
+- No fresh quote was pulled. Market cap and PE came from config/input.json: market cap CNY 34,000,000 as of 2026-07-24, PE TTM 4.18.
+- No security-by-security post-year-end portfolio revaluation was performed.
+
+Primary filing identity:
+- Requested period: 2025-12-31
+- Actual annual report period: 2025-03-31
+- Report title: Annual Report 2025
+- Source URL: https://www.uba.com.hk/hkexphpClient/pdfFile/00768/2025072400724.pdf
+- Local PDF in metadata: /root/aicode/stock_report/data/raw/filings/00768.HK/2025-12-31/annual_report_2025.pdf
+- Local text referenced by facts: /root/aicode/stock_report/data/raw/filings/00768.HK/2025-12-31/annual_report_2025.txt
+
+Key extracted facts used:
+- Business: single investment-holding segment.
+- Revenue: HK$5.042m dividend income from listed equity securities.
+- FVTPL gain: HK$10.228m net fair value / realised investment gain.
+- Bank interest income: HK$0.310m.
+- Loss on disposal of subsidiaries: HK$0.185m.
+- Administrative and other operating expenses: HK$5.124m.
+- Profit before tax / net profit / parent net profit: HK$10.271m.
+- Tax: HK$0.
+- Total assets: HK$93.378m.
+- Total liabilities: HK$0.392m.
+- Total equity / parent equity: HK$92.986m.
+- Cash and cash equivalents: HK$30.578m.
+- Amounts due from related companies: HK$0.169m.
+- Deposits: HK$0.066m.
+- FVTPL listed equity securities: HK$62.565m.
+- Operating cash flow: HK$24.531m.
+- FVTPL financial assets decrease in operating cash flow: HK$24.456m.
+- Capital expenditure: HK$0.
+- Dividend paid or proposed: nil.
+
+Currency and formula handling:
+- Result contract requires CNY absolute yuan.
+- HKD filing figures were mechanically translated using the existing stock research trace rate: 1 HKD = 0.86637 CNY.
+- Input market cap was already CNY and was not converted.
+- Net margin = parent net profit / revenue = 2.037088. This is economically unusual because revenue is dividend income while FVTPL gains are outside revenue.
+- Gross margin = null because the company is an investment company and the annual report does not disclose ordinary sales cost or gross profit.
+- Forecast dividend yield = 0 because no dividend was paid/proposed and no special dividend or liquidation commitment was found.
+
+Owner earnback handling:
+- Discounted detachable net cash / assets: CNY 51,746,114.17, reused from prior owner_earnback-derived stock research trace.
+- Operating business price: CNY 34,000,000.00 market cap minus CNY 51,746,114.17 discounted detachable net cash = CNY -17,746,114.17.
+- Discounted sustainable cash profit: null.
+- Owner earnback years: null.
+- Market cap to cash profit: null.
+- Reason: cash and listed securities are already deducted as detachable assets; their dividend, interest, fair value and disposal gains cannot be fully counted again as sustainable cash profit.
+- Cash breakdown reconciliation: discounted cash, related-company balance and listed securities sum to CNY 57,824,176.22 before additional deductions; the final CNY 51,746,114.17 figure therefore includes CNY 6,078,062.05 of payables, operating cash reserve, disposal/distribution friction and portfolio concentration deductions.
+
+Evidence written into outputs/result.json:
+- Annual facts package and metadata for actual report period.
+- Annual report note 7 for investment holding segment and dividend income.
+- Annual report balance sheet for total assets, liabilities and equity.
+- Annual report notes 17 and 18 for FVTPL assets and cash.
+- Annual report profit or loss and notes 7-10 for profit bridge.
+- Annual report cash flow statement for OCF and FVTPL asset decrease.
+- Annual report note 15 for nil dividends.
+- config/input.json for market cap and PE.
+
+Data quality status:
+- status: complete
+- Limitations recorded:
+  1. Requested period 2025-12-31 differs from actual annual report period 2025-03-31.
+  2. Filing currency is HKD and result uses a mechanical HKD/CNY translation.
+  3. Market cap is from config/input.json and was not refreshed.
+  4. No post-year-end security-by-security portfolio update was performed.
+  5. Gross margin is null by business nature.
+  6. Cash profit and earnback years are null because the profit source overlaps with deducted asset principal.

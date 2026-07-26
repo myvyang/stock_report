@@ -1,0 +1,77 @@
+stock_research trace
+
+task:
+- company: 01063.HK 新确科技 / SUNCORP TECH
+- period: 2025-12-31
+- report_type: annual
+- generated_at: 2026-07-27 Asia/Shanghai
+
+protocol:
+- read skill: /workspace/.agents/skills/stock-research/SKILL.md
+- read contract: /workspace/.agents/skills/stock-research/references/result-contract.md
+- read contract: /workspace/.agents/skills/stock-research/references/report-contract.md
+- read reuse guide: /workspace/.agents/skills/stock-research/references/data-reuse.md
+- initialized result with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- updated result fields through protocol set commands
+- validated result with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- validation status: ok
+
+input and reused local sources:
+- config/input.json
+- stock_report/data/analysis/annual_review/01063.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/01063.HK/2025-12-31/annual_facts.md
+- stock_report/data/normalized/facts/01063.HK/2025-12-31/annual-facts.json
+- stock_report/data/raw/filings/01063.HK/2025-12-31/metadata.json
+- stock_report/data/raw/filings/01063.HK/2025-12-31/01063_annual_report_2025.txt
+- stock_report/data/analysis/stock_research/01063.HK/2025-12-31/report.md
+- stock_report/data/analysis/stock_research/01063.HK/2025-12-31/result.json
+- stock_report/data/analysis/stock_research/01063.HK/2025-12-31/trace.txt
+
+key extraction checks:
+- profit or loss statement around Annual Report 2025 pp.65-66: revenue, cost of sales, gross profit, operating profit, finance costs, tax, net profit and parent net profit.
+- segment note around Annual Report 2025 note 10 pp.134-137: trading revenue/profit, securities revenue/loss, money lending revenue/loss.
+- dividend note around Annual Report 2025 note 16 p.148: no dividend paid or proposed for 2025.
+- distributable reserves disclosure: no reserve available for distribution to shareholders at 2025-12-31.
+- annual fact pack asset/liability categories: cash split, broker deposit, FVTPL assets, loan receivables, payables, bond and lease liabilities.
+
+currency and valuation:
+- annual report source currency: HKD, HK$000.
+- output currency: CNY, absolute yuan.
+- conversion rate used: 0.8988 CNY per HKD, reused from prior stock_research trace for 2025-12-31.
+- market capitalization: CNY 61,000,000 from config/input.json, as of 2026-07-24.
+- PE TTM: null because no reliable source was provided in the input or reused fact package.
+
+calculation summary:
+- revenue: HK$50,281k -> CNY 45,192,562.80.
+- gross profit: HK$10,897k -> CNY 9,794,223.60.
+- gross margin: 0.21672202223503909.
+- parent net profit: HK$30,330k -> CNY 27,260,604.00.
+- net margin: 0.6032099600246614.
+- operating cash flow: HK$-5,698k -> CNY -5,121,362.40.
+- FVTPL gains: HK$59,220k -> CNY 53,226,936.00.
+- discounted detachable net cash: CNY 78,664,369.14, reused from prior stock_research/owner_earnback-style calculation and reconciled to current facts.
+- operating business price: CNY -17,664,369.14.
+- discounted sustainable cash profit: CNY 0.00.
+- owner_earnback_years: null because the cash profit denominator is not positive.
+- market_cap_to_cash_profit: null because the cash profit denominator is not positive.
+
+judgement boundaries:
+- FVTPL gains were excluded from sustainable cash profit because the related listed equity principal is already included in detachable assets after haircut.
+- client segregated cash was excluded from detachable cash because it is securities client money and not available for group obligations.
+- loan receivables were treated as operating assets, not detachable cash, because they are money lending assets with unsecured exposure and ECL uncertainty.
+- forecast dividend was set to zero because no 2025 dividend was paid/proposed, the company had no distributable reserve, and operating cash flow was negative.
+- no buy/sell advice, target price or certainty statement was produced.
+- no list-style investment label was used in final outputs.
+
+unresolved limitations:
+- FVTPL listed equity holdings, concentration and post-year-end price/liquidity were not disclosed in the annual fact package or annual report extraction.
+- parent-company standalone cash and subsidiary-to-parent distribution path were not sufficiently disclosed.
+- loan-by-loan collateral, borrower credit profile and post-year-end collection status were not publicly available in reused materials.
+- market capitalization was not independently refreshed online; it follows the batch input payload.
+
+written outputs:
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

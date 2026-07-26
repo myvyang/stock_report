@@ -1,0 +1,84 @@
+Task: stock research for 01225.HK 隆成金融, annual period 2025-12-31.
+
+Protocol and contracts read:
+- /workspace/.agents/skills/stock-research/SKILL.md
+- /workspace/.agents/skills/stock-research/references/result-contract.md
+- /workspace/.agents/skills/stock-research/references/report-contract.md
+
+Initialization:
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initial skeleton created with schema_version stock-research-result-v1 and CNY/yuan analysis currency.
+
+Reused local source material:
+- config/input.json
+- stock_report/data/raw/filings/01225.HK/2025-12-31/metadata.json
+- stock_report/data/raw/filings/01225.HK/2025-12-31/2025-annual-report.txt
+- stock_report/data/analysis/annual_review/01225.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/01225.HK/2025-12-31/annual_facts.md
+- stock_report/data/normalized/facts/01225.HK/2025-12-31/annual-facts.json
+
+Primary source:
+- HKEXnews 2025 Annual Report, release time 2026-04-29 17:33.
+- URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042902274.pdf
+
+Currency handling:
+- Annual report amounts are HKD.
+- result.json requires CNY absolute yuan.
+- Used the input valuation's implied conversion rate to keep financials and PE internally consistent:
+  CNY market cap 51,000,000 / (HKD parent net profit 82,800,000 * PE 0.67) = 0.9193164611723988 CNY per HKD.
+- This is documented in result.json data_quality.limitations and analysis.currency_conversion.
+
+Key reported facts used:
+- Revenue HKD 117,397,000.
+- Gross profit HKD 51,496,000.
+- Parent net profit HKD 82,800,000.
+- Operating cash flow HKD 283,522,000.
+- Capital expenditure HKD 4,015,000.
+- Total assets HKD 602,220,000.
+- Total liabilities HKD 268,561,000.
+- Parent equity HKD 333,659,000.
+- Own cash/general bank balances HKD 58,267,000.
+- Client trust/segregated money HKD 18,220,000, excluded from detachable cash.
+- FVTPL financial assets HKD 185,812,000, including listed HK equities HKD 175,191,000.
+- Investment properties HKD 20,826,000.
+- Bonds HKD 50,000,000, all due within one year.
+- Loan receivables net HKD 170,856,000; gross HKD 779,336,000; ECL HKD 608,480,000.
+- 2025 final dividend: directors do not recommend payment.
+
+Business interpretation:
+- Manufacturing revenue HKD 83,736,000, segment loss HKD 13,102,000.
+- Securities brokerage and asset management revenue HKD 1,768,000, segment loss HKD 3,188,000.
+- Money lending and other financial services revenue HKD 31,893,000, segment profit HKD 72,906,000.
+- Profit source is not primarily recurring product/fee profit; 2025 earnings depend heavily on FVTPL gains and impairment reversals.
+
+Profit quality adjustment:
+- Start with parent net profit HKD 82,800,000.
+- Deduct FVTPL fair value gains HKD 47,602,000.
+- Deduct reversal of impairment loss on financial assets at amortised cost HKD 49,791,000.
+- Deduct gain on disposal of subsidiaries HKD 1,532,000.
+- Add back loss on early redemption of bonds HKD 1,418,000.
+- Adjusted profit observation = HKD -14,707,000, or CNY -13,520,387.19.
+- Therefore discounted sustainable cash profit is set to null, and owner earnback years / market cap to cash profit are null.
+
+Detachable net cash assumptions:
+- Own cash/general bank balances: CNY 53,565,812.24, 70% included = CNY 37,496,068.57.
+- Client trust/segregated money: excluded.
+- FVTPL listed HK equities: CNY 161,055,970.15, 50% included = CNY 80,527,985.08.
+- FVTPL unlisted debt securities and unlisted equity fund: excluded due to unclear liquidity/recovery.
+- Investment properties: CNY 19,145,684.62, 30% included = CNY 5,743,705.39.
+- Bonds: CNY 45,965,823.06, deducted in full.
+- Discounted detachable net cash = CNY 77,801,935.98.
+- Operating business price = CNY market cap 51,000,000.00 - discounted detachable net cash 77,801,935.98 = CNY -26,801,935.98.
+
+Protocol updates:
+- Populated outputs/result.json using repeated `PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol set` commands.
+- Did not write result.json as a complex JSON object from scratch.
+
+Validation:
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status": "ok", "errors": []}
+
+Output files:
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

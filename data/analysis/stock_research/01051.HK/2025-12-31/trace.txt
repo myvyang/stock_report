@@ -1,0 +1,81 @@
+Task: stock research output for 01051.HK 国际资源
+Period: 2025-12-31 annual
+Timezone: Asia/Shanghai
+Created: 2026-07-27
+
+Protocol:
+- Read /workspace/.agents/skills/stock-research/SKILL.md.
+- Read /workspace/.agents/skills/stock-research/references/result-contract.md.
+- Read /workspace/.agents/skills/stock-research/references/report-contract.md.
+- Read /workspace/.agents/skills/stock-research/references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Filled the initialized skeleton, preserving the stock-research-result-v1 structure.
+
+Input files read:
+- config/input.json
+- stock_report/data/analysis/annual_review/01051.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/01051.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/01051.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/normalized/facts/01051.HK/2025-12-31/annual-facts.json
+- stock_report/data/raw/filings/01051.HK/2025-12-31/metadata.json
+- stock_report/data/raw/filings/01051.HK/2025-12-31/2025-annual-report.txt
+- stock_report/data/analysis/stock_research/01051.HK/2025-12-31/result.json
+- stock_report/data/analysis/stock_research/01051.HK/2025-12-31/report.md
+- stock_report/data/analysis/stock_research/01051.HK/2025-12-31/trace.txt
+
+Reuse decision:
+- Annual fact pack was sufficiently clear for business, statements, asset/liability categories and cash-flow conversion.
+- Existing stock_research files were reused only as historical research evidence and owner earnback clues.
+- No separate owner_earnback directory existed in this workspace, so the reusable stock_research output/report were used to recover the discounted net cash line and then formulas were recalculated under the current protocol.
+
+Key source facts:
+- Annual report source: HKEXnews 2026042800512.pdf.
+- Reporting currency/unit: USD'000.
+- Revenue: USD 31,059k.
+- Profit before taxation: USD 99,698k.
+- Profit attributable to owners: USD 98,671k.
+- Operating cash flow: USD 8,680k.
+- Capital expenditure: USD 5k.
+- Cash and cash equivalents: USD 498,422k.
+- Time deposits over three months: USD 152,000k.
+- Bank trust accounts: USD 32,974k, treated as customer money and excluded from detachable cash.
+- FVTPL financial assets: USD 663,792k.
+- Debt instruments at amortised cost: USD 246,040k.
+- Investment properties: USD 48,400k.
+- Perpetual notes at FVTOCI: USD 3,187k.
+- Total liabilities: USD 37,435k, with no bank borrowings.
+- Dividend: HKD 0.18 per share for 2025, payout ratio 10.5%; equity movement recognized USD 6.9m dividend payable.
+
+Currency and valuation:
+- USD/CNY conversion rate used: 7.1875.
+- Rate source carried from reusable research: Federal Reserve G.5A / FRED annual exchange rate table, 2025 Chinese Yuan Renminbi to One U.S. Dollar.
+- Input market cap used without refresh: CNY 3,455,000,000 as of 2026-07-24 from config/input.json.
+
+Owner earnback calculations:
+- Reused discounted detachable net cash clue: USD 584,663,450.
+- Converted discounted detachable net cash: CNY 4,202,268,546.88.
+- Operating business price: CNY 3,455,000,000.00 - CNY 4,202,268,546.88 = CNY -747,268,546.88.
+- Discounted net cash to market cap: 1.216286120658466.
+- Discounted sustainable cash profit: null.
+- Owner earnback years: null.
+- Market cap to cash profit: null.
+- Reason: profit is dominated by investment fair value changes, and returns from assets whose principal has already been deducted cannot be double-counted as operating cash profit.
+
+Data gaps:
+- No parent/subsidiary split of cash, deposits or listed securities.
+- No disclosed absolute minimum liquid capital requirement for licensed financial subsidiaries.
+- No ordinary cost of sales or gross profit structure.
+- No public borrower names or underlying collateral loan portfolio quality for the three fintech borrowers.
+- Market cap was not refreshed from live market data.
+
+Output files:
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt
+
+Validation:
+- Ran:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result:
+  {"status": "ok", "errors": []}

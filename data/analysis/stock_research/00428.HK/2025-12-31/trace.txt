@@ -1,0 +1,55 @@
+Task: stock research output creation for 00428.HK, period 2025-12-31 annual.
+
+Protocol and instructions read:
+- /workspace/.agents/skills/stock-research/SKILL.md
+- /workspace/.agents/skills/stock-research/references/result-contract.md
+- /workspace/.agents/skills/stock-research/references/report-contract.md
+- /workspace/.agents/skills/stock-research/references/data-reuse.md
+
+Input read:
+- config/input.json
+- market cap from input: CNY 31,000,000, as of 2026-07-24, source described in input payload.
+
+Reused local sources:
+- stock_report/data/raw/filings/00428.HK/2025-12-31/metadata.json
+- stock_report/data/analysis/annual_review/00428.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/00428.HK/2025-12-31/annual_facts.md
+- stock_report/data/normalized/facts/00428.HK/2025-12-31/annual-facts.json
+- stock_report/data/analysis/stock_research/00428.HK/2025-12-31/result.json
+- stock_report/data/analysis/stock_research/00428.HK/2025-12-31/report.md
+
+External sources checked or reused as context:
+- HKEXnews Annual Report 2025 PDF: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042403195.pdf
+- Yahoo Finance HKDCNY=X historical quote page; search result showed 2025-12-31 HKD/CNY close 0.8991.
+- IFEC Listed investment companies page for Chapter 21 business context.
+- FINRA Low-Priced Stocks Can Spell Big Problems for OTC/low-priced securities risk context.
+
+Protocol CLI actions:
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated outputs/result.json using repeated:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol set --result outputs/result.json --path <path> --json <json>
+- Validated outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].
+
+Currency and formula choices:
+- Result protocol requires CNY absolute yuan.
+- Annual report facts are HKD; converted annual-report-derived HKD amounts to CNY at 1 HKD = 0.8991 CNY, using 2025-12-31 HKD/CNY historical quote.
+- Input market cap already stated as normalized to CNY, so market_cap stayed CNY 31,000,000.
+- Gross margin = HKD gross profit / HKD revenue = 1.0 because revenue is dividend income and cost of sales is not separately applicable.
+- Net margin = HKD parent net profit / HKD revenue = 30.68652; marked through report text as not economically comparable to product-company margin.
+- Discounted net cash reused from prior owner_earnback clue: HKD 58,891,500, converted to CNY 52,949,347.65.
+- Operating business price = CNY 31,000,000 - CNY 52,949,347.65 = CNY -21,949,347.65.
+- Discounted sustainable cash profit set to null because investment assets are the principal business assets and were already included in detachable cash analysis. Related dividends, disposal gains and fair value movements cannot be counted again as sustainable distributable cash profit.
+- Owner earnback years and market cap to cash profit set to null because denominator is null.
+
+Key unresolved items:
+- Real exit price, tax/friction cost and timing for OTC and unlisted investments.
+- Perfect Path mining licence status, sale path and realizable value.
+- Three-year ordinary operating profit median, because 2023 annual report was not extracted in the reused fact package.
+
+Outputs written:
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt
