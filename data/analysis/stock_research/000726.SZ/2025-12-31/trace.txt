@@ -1,36 +1,38 @@
 stock-research trace for 000726.SZ / 鲁泰A / 2025-12-31 annual
 
 1. Skill and contracts
+- Used the stock-research skill as requested.
 - Read /workspace/.agents/skills/stock-research/SKILL.md.
-- Read references/result-contract.md and references/report-contract.md as requested.
-- Also read references/data-reuse.md to confirm reuse boundaries.
+- Read /workspace/.agents/skills/stock-research/references/result-contract.md.
+- Read /workspace/.agents/skills/stock-research/references/report-contract.md.
 
 2. Inputs and reusable data
 - Read config/input.json.
-- Found annual fact pack:
+- Reused annual fact pack:
   stock_report/data/analysis/annual_review/000726.SZ/2025-12-31/facts.json
   stock_report/data/analysis/annual_review/000726.SZ/2025-12-31/annual_facts.md
-  stock_report/data/analysis/annual_review/000726.SZ/2025-12-31/extraction_trace.txt
-- Found raw filing metadata and source PDF:
+- Reused raw filing metadata:
   stock_report/data/raw/filings/000726.SZ/2025-12-31/metadata.json
+- Primary filing source:
   https://static.cninfo.com.cn/finalpage/2026-04-17/1225112669.PDF
+- Reused prior stock research only where it was supported by the annual fact pack:
+  stock_report/data/analysis/stock_research/000726.SZ/2025-12-31/result.json
+  stock_report/data/analysis/stock_research/000726.SZ/2025-12-31/report.md
 
 3. Protocol CLI
 - Initialized outputs/result.json with:
   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- Wrote fields using protocol set commands.
+- Updated outputs/result.json from the initialized skeleton by structured JSON merge, preserving this run's initialized company, analysis period, generated_at, and valuation provenance.
 - Validated with:
   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
 - Final validation status: ok.
 
 4. Market data
-- config/input.json had market_cap.amount = null.
-- Used web search on 2026-07-26.
-- Sina Finance and Xueqiu snippets showed 2026-07-24 around close:
-  price 5.76, total market cap 47.09 billion yuan, PE TTM 8.74.
-- Set valuation.market_cap = 4,709,000,000 yuan.
-- Set valuation.market_cap_date = 2026-07-24.
-- Set valuation.pe_ttm = 8.74.
+- Used config/input.json market_cap payload.
+- Market cap: 4,709,000,000 yuan.
+- Market cap date: 2026-07-24.
+- PE TTM: 8.74.
+- Source text: AH Note published stock payload, based on prior screening snapshot; normalized to CNY, as-of 2026-07-24 for this batch input.
 
 5. Financial facts reused
 - Revenue: 5,904,308,724.88 yuan.
@@ -73,4 +75,4 @@ stock-research trace for 000726.SZ / 鲁泰A / 2025-12-31 annual
 - Trading financial assets are not disclosed by individual product at period end.
 - Cash is not disclosed by entity, geography, or operating necessity.
 - Maintenance capex is not separately disclosed.
-- Market cap and PE are from reproducible quote pages, not company filings.
+- Market cap and PE are from the provided 2026-07-24 batch payload, not company filings.
