@@ -1,0 +1,57 @@
+Task: stock research for 01900.HK / 中国智能交通, annual period 2025-12-31.
+Run date: 2026-07-27 Asia/Shanghai.
+
+Protocol and contracts read:
+- /workspace/.agents/skills/stock-research/SKILL.md
+- /workspace/.agents/skills/stock-research/references/result-contract.md
+- /workspace/.agents/skills/stock-research/references/report-contract.md
+
+Input and reused local sources:
+- config/input.json
+- stock_report/data/raw/filings/01900.HK/2025-12-31/metadata.json
+- stock_report/data/raw/filings/01900.HK/2025-12-31/2025_annual_results_announcement.txt
+- stock_report/data/analysis/annual_review/01900.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/01900.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/stock_research/01900.HK/2025-12-31/result.json
+- stock_report/data/analysis/stock_research/01900.HK/2025-12-31/report.md
+
+Primary source:
+- HKEX Audited Annual Results Announcement for the Year Ended December 31, 2025.
+- URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0331/2026033104529.pdf
+- Local text: stock_report/data/raw/filings/01900.HK/2025-12-31/2025_annual_results_announcement.txt
+
+Protocol CLI usage:
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields using repeated:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol set --result outputs/result.json --path ... --json ...
+- Validated outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+Key conversions and formulas:
+- Annual announcement unit RMB'000 converted to absolute yuan by multiplying by 1,000.
+- Revenue: 927,849,000.
+- Gross profit: 325,151,000.
+- Parent net profit: 70,488,000.
+- Gross margin = 325,151,000 / 927,849,000 = 0.3504352540.
+- Net margin = 70,488,000 / 927,849,000 = 0.0759692579.
+- Market cap from input: 269,000,000 as of 2026-07-24.
+- Discounted detachable net cash reused: 75,998,550.
+- Discounted sustainable distributable cash profit reused: 11,250,000.
+- Operating business price = 269,000,000 - 75,998,550 = 193,001,450.
+- Owner earnback years = 193,001,450 / 11,250,000 = 17.1556844444.
+- Market cap to cash profit = 269,000,000 / 11,250,000 = 23.9111111111.
+- Discounted net cash to market cap = 75,998,550 / 269,000,000 = 0.2825224907.
+- Forecast dividend yield set to 0 because the board did not recommend a final dividend for 2025.
+
+Important judgement boundaries:
+- No buy/sell recommendation, target price, or unsupported certainty is included.
+- Old stock_research output contained a prior classification-style field; the new result.json omits any ranking label and keeps only sortable numbers, explanations, and data quality status.
+- Complete data_quality status means the result is structurally consumable and evidenced; limitations remain because the full 2025 annual report PDF and complete consolidated cash flow statement were not available.
+
+Unresolved data gaps:
+- Full 2025 annual report PDF was not obtained; audited annual results announcement is the main source.
+- Full consolidated cash flow statement was not disclosed in the announcement.
+- Cash and equivalents were not split by parent/subsidiary, currency, geography, restriction, or remittance ability.
+- Myanmar power project contract text, settlement currency, and payment protection terms were not independently obtained.
+- FOSS standalone order book, customer concentration, and cash flow were not publicly available in the reused source set.

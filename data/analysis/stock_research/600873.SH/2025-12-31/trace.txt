@@ -1,0 +1,67 @@
+stock-research trace
+
+task:
+- company: 600873.SH 梅花生物
+- period: 2025-12-31
+- report_type: annual
+- requested outputs: outputs/result.json, outputs/report.md, outputs/trace.txt
+
+protocol:
+- read skill: /workspace/.agents/skills/stock-research/SKILL.md
+- read contract: /workspace/.agents/skills/stock-research/references/result-contract.md
+- read contract: /workspace/.agents/skills/stock-research/references/report-contract.md
+- read reuse guidance: /workspace/.agents/skills/stock-research/references/data-reuse.md
+- initialized result with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- populated result fields using protocol set commands driven from annual facts and prior research aggregate fields
+- validated result with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- validation status: ok
+
+local inputs used:
+- config/input.json
+- stock_report/data/raw/filings/600873.SH/2025-12-31/metadata.json
+- stock_report/data/raw/filings/600873.SH/2025-12-31/2025_annual_report.txt
+- stock_report/data/analysis/annual_review/600873.SH/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/600873.SH/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/600873.SH/2025-12-31/extraction_trace.txt
+- stock_report/data/analysis/stock_research/600873.SH/2025-12-31/result.json
+- stock_report/data/analysis/stock_research/600873.SH/2025-12-31/report.md
+
+key source facts:
+- 2025 revenue: 24,208,675,106.70 yuan
+- 2025 cost of sales: 19,609,399,374.08 yuan
+- 2025 gross profit: 4,599,275,732.62 yuan
+- 2025 parent net profit: 3,280,879,912.10 yuan
+- 2025 operating cash flow: 4,009,259,646.23 yuan
+- 2025 capital expenditure: 2,085,097,608.71 yuan
+- 2025 operating free cash flow: 1,924,162,037.52 yuan
+- 2024 operating free cash flow reused from fact pack: 2,622,291,684.78 yuan
+- 2025 total assets: 25,915,976,725.38 yuan
+- 2025 total liabilities: 9,568,406,309.82 yuan
+- 2025 parent equity: 16,347,570,415.56 yuan
+- market cap input: 23,640,000,000.00 yuan as of 2026-07-24
+- PE TTM input: 7.21
+- 2025 proposed cash dividend: 1,199,935,002.04 yuan
+- 2025 buyback counted as cash dividend: 204,301,265.44 yuan
+
+calculations:
+- gross_margin = gross_profit / revenue = 0.1899846114
+- net_margin = parent_net_profit / revenue = 0.1355249677
+- forecast_dividend_yield = 1,199,935,002.04 / 23,640,000,000.00 = 0.0507586718
+- discounted_net_cash reused from prior stock_research aggregate and formula checked: -696,588,588.0105004 yuan
+- discounted_cash_profit = average(2025 FCF 1,924,162,037.52, 2024 FCF 2,622,291,684.78) * 0.75 = 1,704,920,145.8625002 yuan
+- operating_business_price = market_cap - discounted_net_cash = 24,336,588,588.0105 yuan
+- owner_earnback_years = operating_business_price / discounted_cash_profit = 14.2743275379
+- market_cap_to_cash_profit = market_cap / discounted_cash_profit = 13.8657520456
+
+reuse decisions:
+- Annual fact pack was sufficient for core financial statements, business segments, asset/liability explanations, cash flow, non-recurring income and evidence.
+- Prior stock_research result was reused only as an aggregate owner_earnback source because no standalone owner_earnback result file was present in /workspace.
+- External industry facts from the prior stock_research report were retained as background evidence because they directly explain raw material cost, feed demand and lysine trade-barrier risk.
+
+limitations:
+- Detailed maturity, underlying assets and all restriction terms for wealth management products, long-term wealth products and large certificates of deposit were not available in the fact pack.
+- Necessary operating cash of 1.50 billion yuan and tax/FX/dividend friction of 0.10 billion yuan are analysis estimates, not company disclosed line items.
+- 2023 capital expenditure was not extracted in the 2025 annual fact pack, so sustainable cash profit uses the 2024 and 2025 operating free cash flow average.
+- Market cap is from the supplied batch input snapshot, not a live quote.
