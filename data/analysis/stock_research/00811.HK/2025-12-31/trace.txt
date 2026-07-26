@@ -1,0 +1,55 @@
+Run: 2026-07-27T00:54:17+08:00 stock research
+Timezone: Asia/Shanghai
+Company: 新华文轩 / 00811.HK / HK
+Period: 2025-12-31 annual
+
+Required instructions read:
+- /workspace/.agents/skills/stock-research/SKILL.md
+- /workspace/.agents/skills/stock-research/references/result-contract.md
+- /workspace/.agents/skills/stock-research/references/report-contract.md
+- /workspace/.agents/skills/stock-research/references/data-reuse.md
+
+Protocol CLI usage:
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated outputs/result.json with repeated protocol set commands through a deterministic Python driver that called:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol set --result outputs/result.json --path <path> --json <json>
+- Validated outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+Local sources reused:
+- config/input.json
+- stock_report/data/normalized/facts/00811.HK/2025-12-31/annual-facts.json
+- stock_report/data/analysis/annual_review/00811.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/00811.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/00811.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/analysis/stock_research/00811.HK/2025-12-31/result.json
+- stock_report/data/analysis/stock_research/00811.HK/2025-12-31/report.md
+- stock_report/data/analysis/stock_research/00811.HK/2025-12-31/trace.txt
+- stock_report/data/raw/filings/00811.HK/2025-12-31/imported_from_agent_runs/357ab2a76bdc-xinhua_winshare_2025_annual_report_hkex_en.txt
+
+Market data:
+- Market cap RMB9,903,000,000 and PE TTM 6.31 were taken from config/input.json.
+- Market cap date: 2026-07-24.
+- Market cap source: AH Note published stock payload, based on prior screening snapshot; normalized to CNY, as-of 2026-07-24 for this batch input.
+
+Core calculations:
+- Gross margin = RMB4,176,498,997.95 / RMB11,731,677,466.92 = 0.3560018598982576.
+- Net margin = RMB1,568,450,497.66 / RMB11,731,677,466.92 = 0.13369362583335462.
+- Operating free cash flow = RMB1,508,458,892.06 - RMB178,961,810.43 = RMB1,329,497,081.63.
+- Discounted detachable net cash reused from prior stock_research/owner_earnback trace: RMB6,591,729,332.937.
+- Discounted sustainable distributable cash profit reused from prior stock_research/owner_earnback trace: RMB977,500,000.
+- Operating business price = RMB9,903,000,000 - RMB6,591,729,332.937 = RMB3,311,270,667.063.
+- Owner earnback years = RMB3,311,270,667.063 / RMB977,500,000 = 3.387489173465984.
+- Market cap to cash profit = RMB9,903,000,000 / RMB977,500,000 = 10.130946291560102.
+- Forecast dividend yield = RMB789,862,434.94 / RMB9,903,000,000 = 0.07975991466626275.
+
+Report generation:
+- outputs/report.md was created from the existing 2025 stock_research report because it already follows the report contract, explains the operating story, and cites the same source chain.
+- Removed no substantive report content; the result JSON was updated to the current result-contract shape and does not carry the legacy investment_case_type ranking label.
+
+Unresolved limitations:
+- This workspace does not contain a separate stock_report/data/analysis/owner_earnback/00811.HK/2025-12-31 directory. Owner-earnback figures are therefore reused from the previous stock_research result and trace, which state they reused owner_earnback output.
+- Public annual-report material does not disclose cash ownership split among listed parent, Hong Kong/offshore entities and PRC operating subsidiaries. This affects confidence in discounted detachable net cash.
+- Local filing metadata did not include an HKEX original URL; annual-report evidence uses local imported filing text/PDF paths and normalized annual facts.
+- Forecast dividend yield is based on observed 2025 cash paid to shareholders as a proxy, not a future dividend commitment.
