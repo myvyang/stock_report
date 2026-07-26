@@ -1,0 +1,42 @@
+stock-research trace for 01217.HK / 2025-12-31
+
+Protocol and instructions
+- Read /workspace/.agents/skills/stock-research/SKILL.md.
+- Read /workspace/.agents/skills/stock-research/references/result-contract.md.
+- Read /workspace/.agents/skills/stock-research/references/report-contract.md.
+- Also read data-reuse.md to confirm reuse boundary.
+
+Initialization and validation
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated the initialized skeleton from annual fact pack, annual_facts.md, raw annual report text, config/input.json market cap, and prior stock_research result as owner-earnback evidence trail.
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: {"status": "ok", "errors": []}
+
+Primary reused sources
+- config/input.json: company identity, period, market cap RMB 118,000,000 as of 2026-07-24, PE TTM 2.26.
+- stock_report/data/analysis/annual_review/01217.HK/2025-12-31/facts.json: annual fact pack from 2025 annual report.
+- stock_report/data/analysis/annual_review/01217.HK/2025-12-31/annual_facts.md: narrative fact pack and gaps.
+- stock_report/data/raw/filings/01217.HK/2025-12-31/01217_2025_annual_report.txt: dividend and note checks.
+- stock_report/data/analysis/stock_research/01217.HK/2025-12-31/result.json: prior research trail for owner_earnback discounted detachable net cash.
+
+Key transformations
+- Annual report source currency is HKD and unit is HK$'000.
+- RMB output uses FX rate HKD/CNY 0.9219, matching the prior research basis.
+- Converted annual facts to RMB absolute yuan by HK$'000 * 1000 * 0.9219.
+- Used input market cap directly rather than the slightly different historical converted market cap.
+- discounted_detachable_net_cash = HK$144,486,900 * 0.9219 = RMB 133,202,473.
+- operating_business_price = RMB 118,000,000 - RMB 133,202,473 = RMB -15,202,473.
+- discounted_net_cash_to_market_cap = 133,202,473 / 118,000,000 = 1.1288345169.
+- net_margin = parent_net_profit RMB 52,244,073 / revenue RMB 64,238,914 = 0.8132776497.
+
+Judgement calls
+- cost_of_sales, gross_profit and gross_margin are null because the company is a Chapter 21 investment company and revenue is investment income, not ordinary product/service sales.
+- discounted_sustainable_cash_profit is null because cash, securities-account cash and listed securities principal are already treated as detachable assets; counting their interest, dividends, disposal gains or fair-value gains again as cash profit would double count the same asset base.
+- owner_earnback_years and market_cap_to_cash_profit are null because the cash profit denominator is not valid.
+- forecast_cash_dividend and forecast_dividend_yield are null because directors did not recommend dividends for 2025 or 2024 and there is no stable cash dividend basis.
+- data_quality.status set to complete because the result is structurally valid and evidence is sufficient for consumption, with limitations explicitly recorded.
+
+Known limitations
+- Market cap is from the supplied batch input and was not refreshed in this run.
+- Public materials do not fully disclose cash jurisdiction, parent/custody account split, or every brokerage-account restriction.
+- Unlisted FVOCI investments lack observable exit price and timetable, so they are not included in the main detachable net cash measure.
