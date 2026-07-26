@@ -1,0 +1,58 @@
+运行时间：2026-07-26 +08:00
+公司：01527.HK 天洁环境
+报告期：2025-12-31
+
+已按 stock-research skill 要求读取：
+- /workspace/.agents/skills/stock-research/SKILL.md
+- /workspace/.agents/skills/stock-research/references/result-contract.md
+- /workspace/.agents/skills/stock-research/references/report-contract.md
+
+协议 CLI：
+- 已运行 PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- 已使用 protocol set 填充 outputs/result.json 的核心字段、资产负债分类、owner_earnback、分红、业务、风险、证据和数据质量字段。
+- 已运行 PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- 校验结果：status ok，errors 为空。
+
+读取和复用的本地资料：
+- config/input.json
+- stock_report/data/raw/filings/01527.HK/2025-12-31/metadata.json
+- stock_report/data/analysis/annual_review/01527.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/01527.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/stock_research/01527.HK/2025-12-31/result.json
+- stock_report/data/analysis/stock_research/01527.HK/2025-12-31/report.md
+- stock_report/data/analysis/stock_research/01527.HK/2025-12-31/trace.txt
+
+未重新读取或未使用：
+- 未读取大型 events.jsonl。
+- 未扫描全市场数据或无关公司报告。
+- 未重新下载 HKEX 年报 PDF；本地 metadata 和年度事实包已经明确来源为 HKEXnews 2025 年报。
+- 未重新联网获取实时行情；市值和 PE 使用 config/input.json 中 2026-07-24 批处理快照。
+
+关键数据处理：
+- 年报列报单位为 RMB'000，输出 result.json 金额统一写人民币绝对元。
+- 市值使用本次输入的 190,000,000 元，而不是既有研究中的 189,903,144.64867115 元。
+- 毛利率按 258,704,000 / 753,750,000 = 0.34322255389718076。
+- 净利率按 81,446,000 / 753,750,000 = 0.10805439469320066。
+- 折后可剥离净现金复用既有研究 owner_earnback 口径：272,024,400 元。
+- 折后可持续可分配现金利润复用既有研究 owner_earnback 口径：37,036,450 元。
+- 经营业务购买价按 190,000,000 - 272,024,400 = -82,024,400 元。
+- 控股回本年数按 -82,024,400 / 37,036,450 = -2.214693902898361。
+- 市值/现金利润按 190,000,000 / 37,036,450 = 5.130081311788792。
+- 预测现金分红按 0 元处理，因为 2025 年董事不建议派息且公开资料不能确认现金可快速分红路径。
+
+核查问题和结论：
+- 公司主业：项目制大气污染防治设备，主要收入来自环保设备，尤其静电除尘器；事实来自年度事实包和年报。
+- 资产质量：现金规模大，但合同负债、存货、应收和预付款也大；现金不能全额视为可剥离。
+- 利润质量：2025 年经营现金流高于归母净利润，但主要受应收回款、合同负债、存货和预付款等项目节点影响，不宜机械外推。
+- 回本结论：折后净现金高于输入市值，导致经营业务购买价为负；这只表示折扣后净现金覆盖市值，不等于现金可立即分红。
+- 风险：现金可剥离性、客户集中和应收减值、合同负债交付、毛利率持续性、非主业投资回报。
+
+仍无法公开确认：
+- 现金所在主体、境内外分布、期限和可快速分红路径。
+- 五大客户具体名单、信用质量和项目验收节点。
+- 2023 年经营现金流和资本开支未在本次事实包中补抽。
+
+输出文件：
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

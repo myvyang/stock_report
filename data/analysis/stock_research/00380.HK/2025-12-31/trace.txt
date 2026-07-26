@@ -1,0 +1,32 @@
+运行时间：2026-07-26 Asia/Shanghai
+公司：00380.HK 中国管业
+报告期：2025-12-31 annual
+
+协议工具：
+- 已运行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- 已运行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- 校验结果：status=ok，errors=[]
+
+读取的协议和写作要求：
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+复用的数据：
+- config/input.json：公司、报告期、市值和PE输入。
+- stock_report/data/analysis/annual_review/00380.HK/2025-12-31/facts.json：年度事实包、三张表、资产负债拆分、业务和证据。
+- stock_report/data/analysis/annual_review/00380.HK/2025-12-31/annual_facts.md：年度事实摘要。
+- stock_report/data/analysis/stock_research/00380.HK/2025-12-31/result.json：既有人民币折算、owner_earnback拆分、风险核查和外部来源。
+- stock_report/data/analysis/stock_research/00380.HK/2025-12-31/report.md：既有人读报告，按本次输入市值和协议禁用榜单标签要求做了更新。
+- stock_report/data/raw/filings/00380.HK/2025-12-31/china-pipe-2025-annual-report.txt：定向核查股息披露。
+
+关键处理：
+- 原年报金额为港元千元；结构化结果沿用既有研究的香港税务局2025年12月汇率1港元=0.916403人民币，输出为人民币绝对元。
+- 市值采用本次输入2026-07-24人民币143,000,000元，PE采用2.79；由此重算折后净现金/市值、经营业务购买价、owner_earnback_years和market_cap_to_cash_profit。
+- 删除既有研究中的legacy investment_case_type标签，不在outputs/result.json中输出任何榜单标签。
+- 股息字段按年报披露设置为0：董事会不建议派付2025年末期股息，2024年亦为无。
+
+仍无法公开确认：
+- 年报未拆母公司和各子公司的现金、定期存款及可分派储备，影响可剥离净现金精确性。
+- 未来公共工程订单实际进入中国管业收入的比例，政府资料只能支持行业方向，不能证明公司份额。

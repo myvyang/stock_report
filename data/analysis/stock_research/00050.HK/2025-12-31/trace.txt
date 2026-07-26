@@ -1,0 +1,72 @@
+stock-research trace
+
+task:
+- company: 00050.HK 香港小轮(集团)
+- period: 2025-12-31
+- report_type: annual
+- created_at input: 2026-07-26T23:32:25+08:00
+- timezone: Asia/Shanghai
+
+protocol:
+- read skill: /workspace/.agents/skills/stock-research/SKILL.md
+- read result contract: /workspace/.agents/skills/stock-research/references/result-contract.md
+- read report contract: /workspace/.agents/skills/stock-research/references/report-contract.md
+- read data reuse reference: /workspace/.agents/skills/stock-research/references/data-reuse.md
+- initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- populated outputs/result.json using protocol set/append commands, not by hand-writing a full complex JSON object
+- validated outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+primary local sources reused:
+- config/input.json
+- stock_report/data/raw/filings/00050.HK/2025-12-31/metadata.json
+- stock_report/data/raw/filings/00050.HK/2025-12-31/annual_report_2025.pdf
+- stock_report/data/raw/filings/00050.HK/2025-12-31/annual_report_2025.txt
+- stock_report/data/analysis/annual_review/00050.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/00050.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/00050.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/normalized/facts/00050.HK/2025-12-31/annual-facts.json
+- stock_report/data/analysis/stock_research/00050.HK/2025-12-31/result.json
+- stock_report/data/analysis/stock_research/00050.HK/2025-12-31/report.md
+- stock_report/data/analysis/stock_research/00050.HK/2025-12-31/trace.txt
+
+core extraction and reuse:
+- annual report source URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042903713.pdf
+- annual report currency/unit: HKD, HK$'000
+- RMB conversion used: 1 HKD = RMB 0.89871 as of 2025-12-31, reused from prior research evidence
+- valuation input: market cap RMB 1,553,000,000 as of 2026-07-24; PE TTM 5.15
+- balance sheet: total assets HK$7,651.788m; total liabilities HK$341.423m; parent equity HK$7,320.439m
+- income statement: revenue HK$427.252m; cost of sales HK$264.176m; gross profit HK$163.076m; operating profit HK$166.078m; parent net profit HK$335.366m
+- cash flow: operating cash flow HK$69.927m; PPE purchases HK$7.242m; financing cash flow HK$-97.082m
+- dividends: interim HK$0.10/share and proposed final HK$0.15/share; total HK$89.068m per annual report note 9
+
+asset and liability checks:
+- cash and bank balances HK$2,111.073m, including deposits over three months HK$1,979.551m and cash equivalents HK$131.522m
+- no borrowings at 2025-12-31 per management discussion
+- other financial assets HK$160.919m, comprising listed Hong Kong bank shares and listed unit trust
+- investment properties HK$4,555.511m; 2025 valuation gain HK$50.301m
+- The Symphonie reclassified from completed properties held for sale to investment properties; leased to Tung Wah Group of Hospitals for youth hostel use; URA sharing arrangement noted in annual report
+- trade and other receivables, inventories, PPE/right-of-use assets, leasehold land, payables, leases, tax and long-service-payment liabilities reused from normalized annual facts
+
+owner earnback treatment:
+- discounted detachable net cash reused from prior stock research / owner earnback work: RMB 1,662,738,205
+- discounted sustainable cash profit reused: RMB 20,928,259.77
+- operating business price recalculated with current input market cap: RMB -109,738,205
+- owner earnback years recalculated: -5.24354180452721
+- market cap to discounted cash profit recalculated: 74.20588319656547
+- no榜单标签 used in final result; conclusion expressed only as sortable numbers, explanation, and data quality
+
+external/background sources retained as context only:
+- Hong Kong Rating and Valuation Department Property Market Statistics: https://www.rvd.gov.hk/en/publications/property_market_statistics.html
+- The Standard, 2026-01-28, citing official Hong Kong residential price index changes: https://www.thestandard.com.hk/property/article/322872/Hong-Kong-home-prices-jump-over-3pc-in-2025-ending-three-year-losing-streak
+- Hong Kong Transport Department vehicular ferry services EOI: https://www.td.gov.hk/filemanager/tc/content_734/invitation_of_eoi.pdf
+- HKSAR government press release on cross-boundary healthcare services, 2026-02-25: https://www.info.gov.hk/gia/general/202602/25/P2026022500444.htm
+- HKFYG Youth I.D.E.A.S. cross-border health services report, 2024-12: https://yrc.hkfyg.org.hk/wp-content/uploads/sites/56/2024/12/YI079_Executive-Summary-Eng-for-web.pdf
+
+limitations:
+- market cap was not refreshed during this run; used the input snapshot dated 2026-07-24
+- annual report does not split cash by parent company and subsidiaries; detachable cash therefore uses discounts and operating cash reserve
+- annual report does not disclose maintenance capex separately; sustainable cash profit uses prior three-year PPE purchase median estimate
+- investment property valuation and rent outlook were not independently revalued
+- public information cannot confirm whether the medical, healthcare and beauty segment will sustainably turn profitable
