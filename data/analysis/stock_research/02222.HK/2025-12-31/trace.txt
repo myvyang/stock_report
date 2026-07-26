@@ -1,0 +1,84 @@
+Run: stock research
+Company: 02222.HK 雷士国际
+Period: 2025-12-31
+Report type: annual
+Timezone: Asia/Shanghai
+Created/updated by agent at: 2026-07-26 +08:00
+
+Protocol:
+- Read stock-research skill: /workspace/.agents/skills/stock-research/SKILL.md
+- Read result contract: /workspace/.agents/skills/stock-research/references/result-contract.md
+- Read report contract: /workspace/.agents/skills/stock-research/references/report-contract.md
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated outputs/result.json through protocol CLI set commands.
+- Validated outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+Files read:
+- config/input.json
+- stock_report/data/raw/filings/02222.HK/2025-12-31/metadata.json
+- stock_report/data/analysis/annual_review/02222.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/02222.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/02222.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/normalized/facts/02222.HK/2025-12-31/annual-facts.json
+- stock_report/data/analysis/stock_research/02222.HK/2025-12-31/result.json
+- stock_report/data/analysis/stock_research/02222.HK/2025-12-31/report.md
+- stock_report/data/analysis/stock_research/02222.HK/2025-12-31/trace.txt
+- stock_report/data/raw/filings/02222.HK/2025-12-31/2025-full-annual-report.txt
+
+Core sources:
+- Primary filing: NVC International Holdings Limited 2025 Annual Report
+  URL: https://nvc-international.com/cdn/shop/files/ew_02222AR-27032026.pdf?v=8153751536801495756
+  Local text: stock_report/data/raw/filings/02222.HK/2025-12-31/2025-full-annual-report.txt
+- Auxiliary filing: 2025 annual results announcement
+  URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0327/2026032702980.pdf
+- Market cap input: config/input.json, 305,000,000 CNY, date 2026-07-24, PE TTM 3.64.
+
+Data reuse:
+- Annual financial statement facts reused from the 2025 annual fact pack.
+- Historical stock_research result was used only as a reusable source for explicit owner_earnback values because no separate local owner_earnback directory was found in /workspace.
+- Reused values:
+  discounted_detachable_net_cash = 509,767,937.28 CNY
+  discounted_sustainable_cash_profit = 34,792,560.00 CNY
+- Market-cap-dependent formulas were recomputed using current input market cap:
+  operating_business_price = 305,000,000.00 - 509,767,937.28 = -204,767,937.28 CNY
+  owner_earnback_years = -204,767,937.28 / 34,792,560.00 = -5.885394385466317
+  market_cap_to_cash_profit = 305,000,000.00 / 34,792,560.00 = 8.766241978170045
+
+FX:
+- Output currency: CNY absolute yuan.
+- Filing currency: USD, unit US$'000.
+- FX used: 1 USD = 7.0288 CNY.
+- FX source carried from historical research: Xinhua / China Foreign Exchange Trade System central parity, 2025-12-31.
+
+Key extracted facts:
+- Revenue: US$222.898m.
+- Cost of sales: US$146.461m.
+- Gross profit: US$76.437m.
+- Parent net profit: US$11.917m.
+- Operating cash flow: US$25.527m.
+- Capital expenditure: US$10.621m.
+- Free cash flow after capex: US$14.906m.
+- Total assets: US$593.748m.
+- Total liabilities: US$117.475m.
+- Parent equity: US$473.036m.
+- Cash and cash equivalents: US$124.449m.
+- FVTPL financial assets: US$51.965m.
+- Borrowings: US$13.542m.
+- Ordinary shareholder dividend: no dividend paid or proposed for 2025 and 2024; no dividend proposed after period end.
+
+Limitations:
+- Market cap was not refreshed; it is the supplied 2026-07-24 batch input.
+- No separate local owner_earnback result/report/trace directory was found, so owner_earnback values were reused from historical stock_research output.
+- Annual report does not split cash by parent, Hong Kong/offshore, Mainland China and Singapore entities.
+- Restricted cash and cash upstreaming path cannot be fully confirmed from public filings.
+- R&D expense is not separately disclosed as a profit-and-loss line.
+
+Validation result:
+- outputs/result.json protocol validation status: ok, errors: [].
+
+Outputs written:
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

@@ -1,0 +1,67 @@
+stock-research trace
+
+Task:
+- Company: 00882.HK 天津发展
+- Period: 2025-12-31
+- Report type: annual
+- Created at from input: 2026-07-26T23:16:04+08:00
+- Workspace: /workspace
+
+Skill and protocol:
+- Read /workspace/.agents/skills/stock-research/SKILL.md
+- Read /workspace/.agents/skills/stock-research/references/result-contract.md
+- Read /workspace/.agents/skills/stock-research/references/report-contract.md
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Validation command run after writing:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+Local sources read:
+- config/input.json
+- stock_report/data/analysis/annual_review/00882.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/00882.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/stock_research/00882.HK/2025-12-31/result.json
+- stock_report/data/analysis/stock_research/00882.HK/2025-12-31/report.md
+- stock_report/data/analysis/stock_research/00882.HK/2025-12-31/trace.txt
+- stock_report/data/raw/filings/00882.HK/2025-12-31/annual_report_2025.txt
+
+Public web checks:
+- Tianjin Development annual reports page / issuer annual report source located through Cre8IR/company IR search.
+- 国家医保局《第十一批国家组织药品集采开标 中选产品满足临床和患者多元需求》，2025-10-28, https://www.nhsa.gov.cn/art/2025/10/28/art_14_18369.html
+- 国家医保局《国家组织药品联合采购办公室关于发布<全国药品集中采购文件（GY-YD2025-1）>的公告》，2025-09-20, https://www.nhsa.gov.cn/art/2025/9/20/art_109_17970.html
+- Hong Kong Tourism Board 2025 full-year visitor arrivals press release, 2026-01-19, https://www.discoverhongkong.com/content/dam/dhk/intl/corporate/newsroom/press-release/hktb/2026/01-2025-Full-Year-Visitor-Arrivals-E.pdf
+- DATA.GOV.HK Average achieved hotel room rate in Hong Kong dataset, https://data.gov.hk/en-data/dataset/hk-cstb-cstb_tc-tc-average-achieved-hotel-room-rate
+
+Data reuse:
+- Core financial statement facts reused from the annual fact pack because it already captured the annual report identity, segment revenue/profit, balance sheet, income statement, cash flow, funds assets, financing liabilities and cash-conversion gaps.
+- Existing stock_research result/report/trace were used as prior research context.
+- Existing result contained investment_case_type/profit_cheap language, which is not allowed by the current result contract, so outputs/result.json was rebuilt from the protocol skeleton and no ranking label was carried over.
+- Current workspace did not contain stock_report/data/analysis/owner_earnback/00882.HK/2025-12-31. Therefore discounted detachable net cash and discounted sustainable cash profit were reused from the prior stock_research result where it explicitly stated that those numbers came from owner_earnback. Formulas were recalculated using the current input market cap of CNY 2,047,000,000.
+
+Currency and formula notes:
+- Financial report currency: HKD, annual report unit: HK$000.
+- RMB conversion rate used: HKD/CNY 0.9219, consistent with prior stock_research result.
+- market_cap: CNY 2,047,000,000 from config/input.json, date 2026-07-24.
+- gross_margin = gross_profit / revenue = 864,744,965.70 / 2,946,575,858.10 = 29.35%.
+- net_margin = parent_net_profit / revenue = 394,519,729.80 / 2,946,575,858.10 = 13.39%.
+- operating_business_price = market_cap - discounted_detachable_net_cash = 2,047,000,000 - 3,282,890,002.46 = -1,235,890,002.46.
+- owner_earnback_years = operating_business_price / discounted_sustainable_cash_profit = -1,235,890,002.46 / 178,387,650 = -6.93.
+- market_cap_to_cash_profit = market_cap / discounted_sustainable_cash_profit = 11.47.
+- forecast_dividend_yield = forecast_cash_dividend / market_cap. Forecast cash dividend uses 2025 full-year HK14 cents/share and Note 11 distribution around HK$150.187m, converted to CNY 138,457,395.30 by 0.9219.
+
+Key judgments:
+- Tianjin Development is a holding platform, not a single operating business.
+- Funds assets are large enough that the owner-earnback operating business price is negative under the reused haircut case.
+- This is a numerical result, not a buy/sell recommendation and not a ranking label.
+- Profit is not treated as fully distributable cash because 2025 operating cash flow was weak, operating free cash flow was negative, 2023-2024 operating cash flow was also negative, and reported profit includes one-off or investment-related income.
+- FVTOCI dividends, FVTPL gains and Tasly Bio-Medicine special dividend are separated from sustainable cash-profit interpretation to avoid double counting funds/investment assets already considered in detachable net cash.
+
+Unresolved limitations:
+- Public annual report does not fully split cash among listed parent, offshore subsidiaries and PRC operating subsidiaries.
+- Public annual report does not provide a complete maturity ladder, early termination terms and financial institution concentration for all time deposits over three months.
+- Owner_earnback raw directory was unavailable in this workspace; reused owner_earnback values should be treated as prior-research-derived rather than freshly recomputed from raw owner_earnback files.
+
+Outputs written:
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

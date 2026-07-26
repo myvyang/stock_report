@@ -1,0 +1,68 @@
+stock-research trace
+运行时间：2026-07-26 +08:00
+公司：02210.HK 京城佳业
+报告期：2025-12-31 annual
+
+执行的协议命令：
+- PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- 通过 PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol set/append 分段写入 outputs/result.json
+- PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- 校验结果：status=ok, errors=[]
+
+读取的技能和契约：
+- /workspace/.agents/skills/stock-research/SKILL.md
+- /workspace/.agents/skills/stock-research/references/result-contract.md
+- /workspace/.agents/skills/stock-research/references/report-contract.md
+
+读取和复用的本地资料：
+- config/input.json
+- stock_report/data/analysis/annual_review/02210.HK/2025-12-31/annual_facts.md
+- stock_report/data/normalized/facts/02210.HK/2025-12-31/annual-facts.json
+- stock_report/data/analysis/stock_research/02210.HK/2025-12-31/result.json
+- stock_report/data/analysis/stock_research/02210.HK/2025-12-31/report.md
+- stock_report/data/analysis/stock_research/02210.HK/2025-12-31/trace.txt
+- stock_report/data/raw/filings/02210.HK/2025-12-31/2025-annual-report-hkex.txt
+
+核心来源：
+- Annual report 2025 HKEX PDF: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042900711.pdf
+- 年度事实包：stock_report/data/normalized/facts/02210.HK/2025-12-31/annual-facts.json
+- 本次市值输入：config/input.json, market_cap=RMB238,000,000, date=2026-07-24
+
+关键抽取字段：
+- 年报 MD&A 文本行约 650-760：分部收入、分部毛利、分部毛利率、总收入增长、成本增长、毛利率下降原因。
+- 年报利润表文本行约 3800-3840：收入、成本、毛利、经营利润、净利润、归母净利润。
+- 年报现金流量表文本行约 4090-4145：经营现金流、投资现金流、融资现金流、资本开支、向权益股东支付股息。
+- 年报股息披露文本行约 2624-2631 和 6899-6912：2025 年度拟派末期股息每股 RMB0.0969，合计 RMB14.212m，拟派息率约30%，须股东大会批准。
+- 年报现金和应付款附注：现金及现金等价物、受限现金、定存、业主维修资金、代收款、押金和住房维修资金 payable。
+
+本次公式：
+- 毛利率 = 318,364,000 / 2,292,046,000 = 0.1388994811
+- 归母净利率 = 51,975,000 / 2,292,046,000 = 0.0226762465
+- 经营自由现金流 = 71,301,000 - 12,129,000 = 59,172,000
+- 经营业务购买价 = 238,000,000 - 486,638,100 = -248,638,100
+- 控股回本年数 = -248,638,100 / 39,000,000 = -6.3753358974
+- 市值/现金利润 = 238,000,000 / 39,000,000 = 6.1025641026
+- 折后净现金/市值 = 486,638,100 / 238,000,000 = 2.0446978992
+- 预测分红率 = 14,212,000 / 238,000,000 = 0.0597142857
+
+复用 owner_earnback 口径：
+- 折后可剥离净现金：RMB486,638,100
+- 折后可持续可分配现金利润：RMB39,000,000
+- 现金折扣逻辑：现金剔除业主维修资金后按0.70折；6-12个月定存按0.85折；三年定存按0.65折；受限现金和业主维修资金按0折；扣必要经营现金、客户资金义务和税汇分红摩擦。
+- 本次市值采用 config/input.json 的 RMB238,000,000，因此回本指标相对上一版轻微重算。
+- 移除了旧结果中的 investment_case_type 等榜单标签，按 result-contract 只输出可排序数字、解释和数据质量状态。
+
+外部行业资料：
+- 中指物业云 / 中指研究院物业研究，https://m.cih-index.com/wy/industrynews/news/53947929.html，访问 2026-07-26，用于第三方拓展、存量竞争、收缴和利润率压力背景。
+- 国家统计局《2025 年全国房地产市场基本情况》，https://www.stats.gov.cn/sj/zxfb/202601/t20260119_1962324.html，发布 2026-01-19，访问 2026-07-26，用于房地产开发投资和商品房销售面积下行背景。
+
+未解决限制：
+- PE 没有可靠来源，outputs/result.json 保留为 null。
+- 市值来自本次输入快照，未重新抓取实时行情或汇率。
+- 公开年报未披露全部现金在母公司、香港主体、境内子公司和项目账户之间的分布及快速分红上翻路径。
+- 维持性资本开支未单独披露，经营自由现金流使用购买 PPE 和无形资产现金流近似。
+
+写入文件：
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt
