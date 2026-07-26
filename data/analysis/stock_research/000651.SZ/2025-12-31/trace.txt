@@ -1,0 +1,50 @@
+运行时间：2026-07-27 +08:00
+公司：000651.SZ 格力电器
+报告期：2025-12-31 年报
+
+使用的技能和协议：
+- 已读取 /workspace/.agents/skills/stock-research/SKILL.md
+- 已读取 /workspace/.agents/skills/stock-research/references/result-contract.md
+- 已读取 /workspace/.agents/skills/stock-research/references/report-contract.md
+- 使用协议CLI初始化 outputs/result.json：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+读取和复用的输入：
+- config/input.json：公司识别、报告期、市值、PE和同步路径。
+- stock_report/data/analysis/annual_review/000651.SZ/2025-12-31/facts.json：2025年报事实包，作为核心财报数字来源。
+- stock_report/data/analysis/annual_review/000651.SZ/2025-12-31/annual_facts.md：事实包摘要和缺口。
+- stock_report/data/normalized/facts/000651.SZ/2025-12-31/annual-facts.json：与annual_review facts.json一致的归一化事实包。
+- stock_report/data/raw/filings/000651.SZ/2025-12-31/000651_2025_annual_report.txt：核对分红预案、净利润、现金流和未分配利润附注。
+- stock_report/data/raw/filings/000651.SZ/2025-12-31/metadata.json：年报来源URL和本地文件信息。
+- stock_report/data/analysis/stock_research/000651.SZ/2025-12-31/result.json：复用已完成行业核查、风险核查和控股回本拆分；新版输出未保留旧版排序标签字段。
+- stock_report/data/analysis/stock_research/000651.SZ/2025-12-31/report.md：复用经营故事素材并按当前报告协议重写。
+- stock_report/data/analysis/stock_research/000651.SZ/2025-12-31/trace.txt：确认历史核查路径和外部来源。
+
+关键核对：
+- 营业收入170,447,058,533.57元、营业成本119,641,353,216.21元、毛利50,805,705,317.36元、归母净利润29,003,103,411.66元：来自事实包和年报。
+- 经营现金流46,383,114,754.02元、资本开支1,717,311,068.10元：来自事实包和年报现金流量表。
+- 2025年度利润分配预案：每10股派发现金红利20元，以5,585,138,741股为基数，合计11,170,277,482.00元；年报说明预案尚待股东大会批准。
+- 资金类、经营类、投资类资产和融资/经营负债分类：来自年度事实包。
+- 折后可剥离净现金27,831,118,708.94元、折后可持续可分配现金利润20,400,000,000.00元：复用历史stock_research/owner_earnback口径，并用事实包中的资金资产、有息融资、受限资产和利润现金化说明交叉核对。
+
+公式：
+- 毛利率 = 50,805,705,317.36 / 170,447,058,533.57 = 0.2980732302127331
+- 净利率 = 29,003,103,411.66 / 170,447,058,533.57 = 0.1701590139553377
+- 预测分红率 = 11,170,277,482.00 / 227,249,000,000.00 = 0.04915435263521512
+- 折后净现金/市值 = 27,831,118,708.94 / 227,249,000,000.00 = 0.12246970815686758
+- 经营业务购买价 = 227,249,000,000.00 - 27,831,118,708.94 = 199,417,881,291.06
+- 控股回本年数 = 199,417,881,291.06 / 20,400,000,000.00 = 9.775386337797057
+- 市值/现金利润 = 227,249,000,000.00 / 20,400,000,000.00 = 11.139656862745097
+
+仍无法公开确认的事项：
+- 逐笔定期存款、货币性投资产品和债权投资的主体、期限、收益率、提前变现条款及与质押债务的对应关系。
+- 2026年及以后补贴退坡、渠道库存和价格战对格力销量及毛利的实际影响。
+- 当前/workspace副本没有单独的owner_earnback原始目录，本次复用已落地stock_research历史结果中的相关拆分。
+
+输出文件：
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt
+
+完成前校验：
+- 已运行 jq . outputs/result.json 进行JSON解析检查。
+- 已运行 PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json。

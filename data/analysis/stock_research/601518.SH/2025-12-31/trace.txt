@@ -1,0 +1,46 @@
+吉林高速 601518.SH 2025 stock research trace
+
+1. 已按用户要求读取 stock-research skill：
+   - /workspace/.agents/skills/stock-research/SKILL.md
+   - /workspace/.agents/skills/stock-research/references/result-contract.md
+   - /workspace/.agents/skills/stock-research/references/report-contract.md
+   - 额外读取 data-reuse.md 以确认复用边界。
+
+2. 初始化结构化结果：
+   - 命令：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - 初始化后 result.json 为 stock-research-result-v1 骨架，市值字段来自 config/input.json。
+
+3. 复用数据来源：
+   - config/input.json
+   - stock_report/data/analysis/annual_review/601518.SH/2025-12-31/facts.json
+   - stock_report/data/analysis/annual_review/601518.SH/2025-12-31/annual_facts.md
+   - stock_report/data/normalized/facts/601518.SH/2025-12-31/annual-facts.json
+   - stock_report/data/raw/filings/601518.SH/2025-12-31/metadata.json
+   - stock_report/data/raw/filings/601518.SH/2025-12-31/601518_2025_annual.txt
+
+4. 补充核对：
+   - 用 rg 在 2025 年报文本中核对合并净利润、归母净利润和少数股东损益行。
+   - 合并净利润 536,574,130.66 元；归母净利润 490,835,494.88 元；少数股东损益约 45,738,635.78 元。
+
+5. 核心公式：
+   - 毛利率 = 740,328,372.82 / 1,367,908,842.39 = 0.5412117751402965
+   - 净利率 = 490,835,494.88 / 1,367,908,842.39 = 0.35882178670796215
+   - 折后可剥离净现金 = 2,279,621,369.25 - 245,771,911.97 - 15,825,206.00 - 250,000,000.00 = 1,768,024,251.28
+   - 经营业务购买价 = 5,237,000,000.00 - 1,768,024,251.28 = 3,468,975,748.72
+   - 折后可持续现金利润 = (466,175,497.78 - 18,101,768.71) * 0.90 = 403,266,356.163
+   - 控股回本年 = 3,468,975,748.72 / 403,266,356.163 = 8.602194791865658
+   - 市值/现金利润 = 5,237,000,000.00 / 403,266,356.163 = 12.986454039531153
+   - 预测分红率 = 245,771,911.97 / 5,237,000,000.00 = 0.04692990490166126
+
+6. result.json 写入方式：
+   - 使用 stock_analysis.stock_research.protocol set/append 命令写入字段。
+   - 未手写复杂 JSON 文件。
+
+7. 校验：
+   - 命令：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - 结果：{"status":"ok","errors":[]}
+
+8. 输出文件：
+   - outputs/result.json
+   - outputs/report.md
+   - outputs/trace.txt
