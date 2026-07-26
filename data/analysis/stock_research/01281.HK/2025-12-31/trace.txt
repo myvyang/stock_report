@@ -1,0 +1,50 @@
+stock-research trace for 01281.HK 鑫达投资控股
+Generated at: 2026-07-27T04:29:12+08:00
+Period: 2025-12-31 annual
+
+Protocol steps:
+1. Read /workspace/.agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Filled the initialized skeleton from local fact packs and prior research, then validated with protocol CLI.
+
+Primary local sources reused:
+- config/input.json: company identity, market-cap snapshot, period and path metadata.
+- stock_report/data/analysis/annual_review/01281.HK/2025-12-31/facts.json: annual fact pack extracted from HKEXnews 2025 annual report.
+- stock_report/data/analysis/annual_review/01281.HK/2025-12-31/annual_facts.md: human-readable annual facts.
+- stock_report/data/analysis/annual_review/01281.HK/2025-12-31/extraction_trace.txt: extraction provenance and missing fields.
+- stock_report/data/analysis/stock_research/01281.HK/2025-12-31/result.json and report.md: prior stock research; reused only for conservative cash-detachability and cash-profit estimates plus industry/risk verification. Removed non-protocol ranking labels.
+- stock_report/data/raw/filings/01281.HK/2025-12-31/metadata.json and annual report text/PDF: filing source and dividend text checks.
+
+Core computations, all amounts in RMB yuan:
+- market_cap = 118,000,000 from config/input.json, dated 2026-07-24.
+- revenue = 140,000,000; gross_profit = 26,300,000; parent_net_profit = 12,909,000 from Annual Report 2025 p.75/facts.json.
+- gross_margin = 26,300,000 / 140,000,000 = 0.18785714285714286.
+- net_margin = 12,909,000 / 140,000,000 = 0.09220714285714286.
+- operating_cash_flow = 87,992,000; capex = 850,000; operating_free_cash_flow = 87,142,000.
+- discounted_detachable_net_cash = 37,867,900, reused from prior conservative earnback work.
+- discounted_sustainable_cash_profit = 3,600,000, reused from prior conservative earnback work.
+- operating_business_price = 118,000,000 - 37,867,900 = 80,132,100.
+- owner_earnback_years = 80,132,100 / 3,600,000 = 22.258916666666668.
+- market_cap_to_cash_profit = 118,000,000 / 3,600,000 = 32.77777777777778.
+- forecast_cash_dividend = 0 because Annual Report 2025 says the Board does not recommend a final dividend and Note 34 says no dividends were declared to shareholders for the year.
+- forecast_dividend_yield = 0 / 118,000,000 = 0.
+
+Evidence checked in annual report text:
+- Final dividends: lines around "FINAL DIVIDENDS" state no final dividend recommended for the year ended 31 Dec 2025.
+- Note 34: no dividends declared to shareholders for the year.
+- Notes 28-30: restricted cash, time deposits and cash currency split.
+- Note 35(a): contract assets and trade/other receivables drove operating cash-flow release.
+
+Important judgement boundaries:
+- This report does not give a buy/sell recommendation or target price.
+- PE TTM remains null because no independent TTM market-data source was available in the provided local data.
+- Prior stock research referenced an owner_earnback output path under /root/aicode, but this workspace only contains the annual_review and stock_research copies; therefore the earnback estimate is treated as reused prior research, not independently regenerated in this turn.
+- 2023 operating cash flow and capex remain missing from the extracted fact pack.
+- Cash/time-deposit entity split, exact required operating cash, and public-infrastructure customer payment schedule remain unresolved.
+
+Outputs written:
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

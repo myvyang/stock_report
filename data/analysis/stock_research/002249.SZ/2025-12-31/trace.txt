@@ -1,0 +1,58 @@
+大洋电机 002249.SZ 2025 股票研究 trace
+生成时间：2026-07-27 Asia/Shanghai
+
+本次任务输入：
+- config/input.json
+
+已按 stock-research skill 要求读取：
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+协议 CLI 使用记录：
+- PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- 多次使用 protocol set 写入 outputs/result.json 的 financials、metrics、asset_analysis、owner_earnback、dividend、business、risks、evidence、data_quality 字段。
+- PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- 最终校验结果：status ok，errors []
+
+读取和复用的本地资料：
+- stock_report/data/analysis/annual_review/002249.SZ/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/002249.SZ/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/002249.SZ/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/002249.SZ/2025-12-31/metadata.json
+- stock_report/data/raw/filings/002249.SZ/2025-12-31/002249_2025_annual_report.txt
+- stock_report/data/analysis/stock_research/002249.SZ/2025-12-31/result.json
+- stock_report/data/analysis/stock_research/002249.SZ/2025-12-31/report.md
+- stock_report/data/analysis/stock_research/002249.SZ/2025-12-31/trace.txt
+
+关键数据来源和处理：
+- 三张表核心数字来自年度事实包 facts.json，源头为中山大洋电机股份有限公司 2025 年年度报告。
+- 市值 172.20 亿元、PE TTM 15.9 使用 config/input.json 中的批次输入快照，日期 2026-07-24。
+- 毛利率按 2025 年毛利 2,730,490,873.54 元 / 营收 12,221,287,989.74 元计算。
+- 净利率按 2025 年归母净利润 1,082,717,150.84 元 / 营收 12,221,287,989.74 元计算。
+- 经营自由现金流按经营现金流 1,993,209,708.24 元 - 资本开支 739,899,274.82 元计算。
+- 预测现金分红 481,797,924.10 元来自 2025 年报利润分配预案，每 10 股派 1.96 元。
+- 预测分红率按 481,797,924.10 元 / 17,220,000,000 元计算。
+- 折后可剥离净现金 4,376,899,385.5235 元、折后可持续可分配现金利润 680,000,000 元复用既有 stock_research 结果中的 owner_earnback 数值，并按当前 result-contract 公式重新复核。
+- 经营业务购买价按市值 - 折后可剥离净现金计算。
+- 控股回本年按经营业务购买价 / 折后可持续可分配现金利润计算。
+- 市值/折后现金利润按市值 / 折后可持续可分配现金利润计算。
+
+已核查的年报位置：
+- 利润分配预案：raw filing text lines around 154-156 and 3276-3287。
+- 报告期内分红：raw filing text lines around 3249-3253。
+- 分配股利、利润或偿付利息支付的现金：raw filing text lines around 5313-5364。
+- 业务、三张表、资金类资产、经营资产、投资资产、负债分类、利润现金转化：annual_review facts.json。
+
+数据缺口和限制：
+- 年度事实包覆盖核心三张表和重要资产负债项目，但未完整重分类所有资产科目；报告只解释已抽取的重要项目。
+- 本工作区未发现独立 owner_earnback 目录，折后净现金和折后现金利润来自既有 stock_research 结构化结果，并用当前协议公式复核。
+- 年报未逐笔披露全部大额存单银行、期限、提前支取条款和集团内资金调拨路径，影响折后可剥离净现金精度。
+- 年报未完整拆出投资收益中来自大额存单本金的精确金额，影响资金收益双算剔除精度。
+- 市值和 PE 来自输入快照，本次未重新联网抓取行情。
+
+输出文件：
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt
