@@ -1,0 +1,70 @@
+02165.HK stock-research trace
+Generated at: 2026-07-27 Asia/Shanghai
+
+Protocol and contracts
+- Used stock-research skill.
+- Read .agents/skills/stock-research/SKILL.md.
+- Read .agents/skills/stock-research/references/result-contract.md.
+- Read .agents/skills/stock-research/references/report-contract.md.
+- Read .agents/skills/stock-research/references/data-reuse.md for reuse boundary.
+
+Initialization
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Filled initialized result schema rather than hand-writing a complex JSON object from scratch.
+
+Inputs reused
+- config/input.json
+- stock_report/data/analysis/annual_review/02165.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/02165.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/02165.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/normalized/facts/02165.HK/2025-12-31/annual-facts.json
+- Existing stock research result/report/trace under stock_report/data/analysis/stock_research/02165.HK/2025-12-31 were used only as prior reasoning clues and cross-checks.
+
+Primary filing
+- HKEXnews Annual Report 2025
+- URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0420/2026042001760.pdf
+- Annual fact pack reports currency/unit as RMB'000; outputs/result.json converts amounts to RMB absolute yuan.
+
+Core extracted facts
+- 2025 revenue: RMB664.471m.
+- 2025 gross profit: RMB203.543m.
+- 2025 parent net profit: RMB79.418m.
+- 2025 operating cash flow: RMB110.273m.
+- 2025 capex proxy: RMB2.689m.
+- Total assets: RMB1,048.423m.
+- Total liabilities: RMB338.625m.
+- Parent equity: RMB696.023m.
+- Cash and bank balances: RMB823.786m.
+- Restricted cash: RMB0.002m.
+- Pledged deposits: RMB0.100m.
+- Interest-bearing borrowings: nil.
+- Trade receivables: RMB114.351m net of RMB78.604m allowance.
+- Trade receivable impairment in profit or loss: RMB56.838m.
+
+Calculations
+- Market cap: RMB392.000m, from config/input.json market_cap payload as of 2026-07-24.
+- Gross margin = 203.543 / 664.471 = 30.6323%.
+- Net margin = 79.418 / 664.471 = 11.9521%.
+- Detachable cash before haircut = 823.786m - 0.002m - 0.100m = RMB823.684m.
+- Cash haircut = 0.65 because annual report does not disclose parent/offshore/PRC cash split.
+- Discounted cash = 823.684m * 0.65 = RMB535.3946m.
+- Retained contract liabilities = RMB148.247m.
+- Retained utility receipts = RMB23.239m.
+- Discounted detachable net cash = 535.3946m - 148.247m - 23.239m = RMB363.9086m.
+- Discounted net cash / market cap = 363.9086m / 392.0000m = 92.8338%.
+- Discounted sustainable cash profit = RMB56.9975625m, reusing prior owner-earnback reasoning: profit base adjusted for bank interest double count and 0.75 quality haircut.
+- Operating business price = 392.0000m - 363.9086m = RMB28.0914m.
+- Owner earnback years = 28.0914m / 56.9975625m = 0.4928526549 years.
+- Market cap / discounted cash profit = 392.0000m / 56.9975625m = 6.8774870855 years.
+- Forecast cash dividend = 0 because 2025 annual report did not propose final dividend and no normalized payout basis was available.
+- Forecast dividend yield = 0 / 392.0000m = 0.
+
+Data quality limitations
+- Market cap was not refreshed in real time; it uses the input snapshot.
+- Annual report does not disclose consolidated cash location by holding level or subsidiary geography.
+- Maintenance capex is not separately disclosed; total PPE and intangible purchases are used as proxy.
+- Future related-party framework renewals and project delivery quality cannot be confirmed from 2025 annual-report public facts.
+
+Validation
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status ok, errors [].

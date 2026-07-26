@@ -1,0 +1,87 @@
+Task: stock research output generation for 01627.HK 安保工程控股
+Created at: 2026-07-27 Asia/Shanghai
+
+Protocol and contracts read:
+- /workspace/.agents/skills/stock-research/SKILL.md
+- /workspace/.agents/skills/stock-research/references/result-contract.md
+- /workspace/.agents/skills/stock-research/references/report-contract.md
+- /workspace/.agents/skills/stock-research/references/data-reuse.md
+
+Input read:
+- config/input.json
+
+Reused local sources:
+- stock_report/data/analysis/annual_review/01627.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/01627.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/01627.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/normalized/facts/01627.HK/2025-12-31/annual-facts.json
+- stock_report/data/raw/filings/01627.HK/2025-12-31/metadata.json
+- stock_report/data/raw/filings/01627.HK/2025-12-31/annual_report_2024_2025.pdf
+- stock_report/data/analysis/stock_research/01627.HK/2025-12-31/result.json
+- stock_report/data/analysis/stock_research/01627.HK/2025-12-31/report.md
+- stock_report/data/analysis/stock_research/01627.HK/2025-12-31/trace.txt
+
+Protocol CLI usage:
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated outputs/result.json using repeated protocol set commands through python subprocess wrappers.
+- Validated outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].
+
+Period and currency handling:
+- Requested period: 2025-12-31.
+- Actual annual report period used: 2025-03-31.
+- Annual report original currency and unit: HKD, HK$000.
+- Output currency and unit: CNY absolute yuan.
+- FX conversion used: 1 HKD = 0.9323 CNY, reused from prior stock research/fact pack presentation basis.
+
+Core figures used:
+- Market cap: CNY 932,000,000 from config/input.json, as of 2026-07-24.
+- PE TTM: 4.38 from config/input.json.
+- FY2025 revenue: HKD 7,968,813,000 = CNY 7,429,324,359.90.
+- FY2025 gross profit: HKD 582,497,000 = CNY 543,061,953.10.
+- FY2025 parent net profit: HKD 228,562,000 = CNY 213,088,352.60.
+- FY2025 operating cash flow: HKD 652,741,000 = CNY 608,550,434.30.
+- FY2025 capital expenditure: HKD 353,972,000 = CNY 330,008,095.60.
+- FY2025 operating free cash flow: CNY 278,542,338.70.
+- FY2025 cash dividend cash outflow: HKD 100,000,000 = CNY 93,230,000.00.
+
+Owner earnback calculation:
+- Discounted detachable net cash: CNY 877,363,383.43, reused from prior owner_earnback discount logic.
+- Discounted sustainable cash profit: CNY 115,372,125.00, reused from prior owner_earnback discount logic.
+- Operating business price = market cap - discounted detachable net cash = CNY 54,636,616.57.
+- Owner earnback years = operating business price / discounted sustainable cash profit = 0.4735686074.
+- Market cap to cash profit = market cap / discounted sustainable cash profit = 8.0782077993.
+- Discounted net cash to market cap = 0.9413770208.
+
+Business facts used:
+- Single reportable segment: construction.
+- FY2025 revenue derived solely from Hong Kong customers.
+- Business includes building construction, RMAA works, piling works and supply/sales of prefabricated construction units.
+- Construction revenue is generally recognized over time; payment is generally due within 30 days after payment certificate issuance; part of payment can be retained for quality assurance.
+- Unsatisfied performance obligations at 2025-03-31: HKD 27,122,782,000.
+
+Asset and liability facts used:
+- Cash and bank balances: HKD 991,755,000.
+- Time deposits: HKD 749,277,000.
+- Restricted cash: HKD 0.
+- Accounts receivable: HKD 245,964,000.
+- Contract assets: HKD 1,248,021,000.
+- Property, plant and equipment: HKD 1,788,769,000.
+- Interest-bearing bank loans: HKD 6,008,000.
+- Lease liabilities: HKD 91,528,000.
+- Accounts payable: HKD 1,998,882,000.
+- Provision for contract works: HKD 1,174,371,000.
+- Performance bond guarantees: HKD 563,367,000.
+
+Judgement boundaries:
+- No buy/sell recommendation, target price or certainty claim was made.
+- External industry sources were reused only for background and risk context, not for core financial statement figures.
+- Final result excludes old stock_report field investment_case_type and any榜单标签.
+
+Known limitations:
+- The annual report does not disclose parent/subsidiary cash distribution, cash upstreaming restrictions or immediately distributable cash.
+- The annual report does not split maintenance capex from growth/redevelopment capex.
+- Market cap is from the batch input snapshot and was not independently verified against exchange data.
+- Requested period differs from actual available annual report period.

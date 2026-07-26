@@ -1,0 +1,76 @@
+首都信息 01075.HK stock-research trace
+生成时间：2026-07-27 Asia/Shanghai
+
+协议与初始化：
+- 已读取 /workspace/.agents/skills/stock-research/SKILL.md
+- 已读取 /workspace/.agents/skills/stock-research/references/result-contract.md
+- 已读取 /workspace/.agents/skills/stock-research/references/report-contract.md
+- 使用协议 CLI 初始化 outputs/result.json：
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+输入：
+- config/input.json
+- 公司：01075.HK / 首都信息 / HK
+- 报告期：2025-12-31 annual
+- 市值：428000000.0 元，日期 2026-07-24
+- PE TTM：3.45
+
+本地事实与披露来源：
+- stock_report/data/analysis/annual_review/01075.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/01075.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/01075.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/normalized/facts/01075.HK/2025-12-31/annual-facts.json
+- stock_report/data/raw/filings/01075.HK/2025-12-31/metadata.json
+- stock_report/data/raw/filings/01075.HK/2025-12-31/capinfo-2025-annual-report.txt
+- stock_report/data/analysis/stock_research/01075.HK/2025-12-31/result.json：历史研究结果，仅复用其中可核对的 owner_earnback 线索；未沿用旧 schema，未沿用榜单标签。
+
+metadata 记录来源：
+- 2025 年报公开镜像 PDF：https://stockn.xueqiu.com/01075/20260424521566.pdf
+- HKEX 2025 年度业绩公告：https://www.hkexnews.hk/listedco/listconews/sehk/2026/0331/2026033103089.pdf
+- HKEX 2024 年报：https://www.hkexnews.hk/listedco/listconews/sehk/2025/0429/2025042904412.pdf
+
+年报文本定向核查：
+- 财务摘要：2021-2025 年收入、归母利润、每股股息、资产和流动比率。
+- 董事会报告：2025 年末期股息每股人民币 7 分，合计约人民币 20.29 百万元。
+- 历年派息表：2021、2022、2023、2024、2025 分红历史及 2025 分红占归母净利润 16.38%。
+- 业务描述：电子政务、智慧城市、医保、接诉即办、住房公积金、政务云等服务场景。
+- 合并资产负债表：货币资金、应收账款、合同资产、存货、长期股权投资、其他非流动金融资产、投资性房地产、固定资产、在建工程、使用权资产、无形资产、总资产、总负债、归母权益、少数股东权益。
+- 合并利润表：收入、成本、销售费用、管理费用、研发费用、财务费用、投资收益、公允价值变动收益、信用减值、资产减值、营业利润、净利润、归母净利润、终止经营净利润。
+- 合并现金流量表：经营现金流、购建长期资产现金支出、投资活动现金流、筹资活动现金流、股利/利息现金支出。
+- 附注五37：分业务收入和成本。
+- 附注五22及事实包：受限货币资金和冻结其他非流动资产。
+- 重大事项：融通信息破产清算、不再纳入合并范围及原收购争议诉讼。
+
+关键计算：
+- 毛利率 = 401250588.56 / 1669813188.14 = 0.2402966939
+- 净利率 = 123845243.49 / 1669813188.14 = 0.0741671250
+- 经营自由现金流 = 393942095.60 - 116937573.98 = 277004521.62
+- 预测分红率 = 20290000.0 / 428000000.0 = 0.0474065421
+- 折后可剥离净现金复用历史 owner_earnback 数字：442843792.8454999
+- 折后可持续现金利润复用历史 owner_earnback 数字：25000000.0
+- 经营业务购买价 = 428000000.0 - 442843792.8454999 = -14843792.845499873
+- 控股回本年 = -14843792.845499873 / 25000000.0 = -0.5937517138
+- 市值/现金利润 = 428000000.0 / 25000000.0 = 17.12
+
+写入 outputs/result.json 的主要内容：
+- financials.balance_sheet / income_statement / cash_flow
+- metrics 核心排序字段
+- asset_analysis.assets / liabilities
+- owner_earnback 现金拆分、利润调整和解释
+- dividend forecast 与历史
+- business 主业、利润来源、模式和行业位置
+- risks 真实风险
+- evidence 来源证据
+- data_quality.status = complete
+
+不可公开确认或限制：
+- 2025 年报 PDF 主来源为公开镜像，metadata 同时记录 HKEX 2025 年度业绩公告和 2024 年报作为辅助官方来源；本次未重新联网取得稳定 HKEX 2025 年报直链。
+- 市值和 PE 沿用 config/input.json 中 2026-07-24 的批量输入快照，未按当前实时行情重估。
+- 货币资金和存单在母公司、上市主体、各经营子公司之间的完整分布及可上翻路径，公开资料未完整披露。
+- 资本开支中维持性和增长性金额的精确拆分，公开资料未披露。
+- 折后现金利润 2500 万元为控股回本分析估算，不是公司披露数；2025 年单年经营现金流不能机械年化。
+
+最终校验：
+- 已运行协议 validate：
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- 校验结果：{"status": "ok", "errors": []}
