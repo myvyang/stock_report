@@ -1,0 +1,100 @@
+stock-research run trace for 02598.HK / 连连数字
+
+Input:
+- config/input.json
+- Company: 02598.HK, 连连数字, HK
+- Period: 2025-12-31 annual
+- Market cap: CNY 3,897,000,000 as of 2026-07-24 from input payload
+- PE TTM: 2.34 from input payload
+
+Protocol and contracts:
+- Read /workspace/.agents/skills/stock-research/SKILL.md
+- Read /workspace/.agents/skills/stock-research/references/result-contract.md
+- Read /workspace/.agents/skills/stock-research/references/report-contract.md
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+Primary reused sources:
+- stock_report/data/raw/filings/02598.HK/2025-12-31/metadata.json
+- stock_report/data/raw/filings/02598.HK/2025-12-31/2025-annual-report.txt
+- stock_report/data/analysis/annual_review/02598.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/02598.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/02598.HK/2025-12-31/extraction_trace.txt
+
+Source identity:
+- HKEXnews Annual Report 2025
+- URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0422/2026042201133.pdf
+- Downloaded_at in metadata: 2026-07-23T11:48:40+08:00
+
+Unit normalization:
+- Annual facts are in RMB'000.
+- outputs/result.json uses CNY yuan.
+- Converted each financial amount by multiplying by 1,000.
+
+Core facts used:
+- Revenue: RMB 1,733,801,000
+- Gross profit: RMB 873,451,000
+- Parent net profit: RMB 1,663,754,000
+- Operating profit: RMB 2,210,191,000
+- Total assets: RMB 22,941,714,000
+- Total liabilities: RMB 19,869,840,000
+- Parent equity: RMB 3,074,786,000
+- Operating cash flow: RMB 112,387,000
+- Capital expenditure: RMB -18,111,000
+- Operating free cash flow: RMB 94,276,000
+- Cash used in operations: RMB -97,179,000
+- Interest received: RMB 223,047,000
+
+Business facts:
+- 2025 global payment revenue: RMB 1,044,586,000
+- 2025 domestic payment revenue: RMB 405,437,000
+- 2025 value-added services revenue: RMB 264,886,000
+- 2025 other revenue: RMB 18,892,000
+- Global payment TPV: RMB 452.4 billion
+
+Profit-quality facts:
+- Disposal gain on LianTong equity interest: RMB 1,601,460,000
+- Dilution gain from deemed disposal of associates: RMB 453,156,000
+- Gain on disposal/deconsolidation of DFX: RMB 347,972,000
+- FVPL fair value loss: RMB -42,560,000
+- Judgment: 2025 parent net profit is dominated by one-off gains and is not a sustainable cash-profit base.
+
+Cash and balance-sheet classification:
+- Cash and cash equivalents: RMB 1,627,606,000, discounted at 80%, discounted amount RMB 1,302,084,800
+- Funds segregated for customers and restricted cash: RMB 19,483,847,000, discounted at 0%, discounted amount RMB 0
+- Current treasury investments at FVPL: RMB 112,223,000, discounted at 80%, discounted amount RMB 89,778,400
+- Long-term investments measured at amortized cost: RMB 102,102,000, discounted at 80%, discounted amount RMB 81,681,600
+- Bank borrowings: RMB 148,017,000, deducted at 100%, discounted amount RMB -148,017,000
+- Payables to merchants and other customers: RMB 19,245,599,000, treated as customer/operating liability matching segregated funds
+
+Owner-earnback formulas:
+- Gross margin = 873,451,000 / 1,733,801,000 = 0.5037770199734595
+- Net margin = 1,663,754,000 / 1,733,801,000 = 0.9595991718753144
+- Discounted detachable net cash =
+  1,302,084,800 + 89,778,400 + 81,681,600 - 148,017,000 = 1,325,527,800
+- Discounted net cash / market cap =
+  1,325,527,800 / 3,897,000,000 = 0.34014056966897613
+- Operating business price =
+  3,897,000,000 - 1,325,527,800 = 2,571,472,200
+- Discounted sustainable cash profit = null
+- Owner earnback years = null because the denominator is not established
+- Market cap to cash profit = null because the denominator is not established
+
+Dividend:
+- Annual report states no dividend was paid or declared for 2025 and 2024.
+- Board did not recommend any payment of dividends for the reporting period.
+- Forecast cash dividend set to 0.
+- Forecast dividend yield set to 0.
+
+Data-quality judgment:
+- status: complete
+- Reason: core financial statements, business facts, cash classification, one-off profit adjustments, market-cap input, and dividend evidence are available.
+- Limitations:
+  1. Self-owned cash distribution across parent/offshore/Mainland/payment-license entities is not disclosed.
+  2. Service fees inside segregated accounts not yet withdrawn are not quantified.
+  3. 2025 profit contains major one-off gains, so sustainable cash profit cannot be reliably calculated from this year alone.
+  4. Market cap and PE come from the input snapshot and were not refreshed against live market data.
+
+Validation:
+- Final validation performed with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

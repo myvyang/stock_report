@@ -1,0 +1,62 @@
+Run: 2026-07-27T05:15:07+08:00
+Company: 00559.HK 德泰新能源集团
+Requested period: 2025-12-31
+Audited annual period used: 2025-06-30
+Timezone: Asia/Shanghai
+
+Skill and protocol:
+- Read /workspace/.agents/skills/stock-research/SKILL.md.
+- Read /workspace/.agents/skills/stock-research/references/result-contract.md.
+- Read /workspace/.agents/skills/stock-research/references/report-contract.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Updated initialized result fields through protocol set commands.
+- Validated outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].
+
+Files read:
+- config/input.json
+- stock_report/data/analysis/annual_review/00559.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/00559.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/00559.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/analysis/stock_research/00559.HK/2025-12-31/result.json
+- stock_report/data/analysis/stock_research/00559.HK/2025-12-31/report.md
+- stock_report/data/analysis/stock_research/00559.HK/2025-12-31/trace.txt
+
+Primary evidence reused:
+- HKEX Annual Report 2025 PDF: https://www.hkexnews.hk/listedco/listconews/sehk/2025/1031/2025103100751.pdf
+- Annual Report 2025 pp.115-116: revenue 34,038, cost of sales 18,270, gross profit 15,768, FVTPL fair value gain 35,064, profit before tax 32,832, parent net profit 33,614, all HK$'000.
+- Annual Report 2025 pp.117-118 and notes 22-23: total assets 555,733, total liabilities 65,705, total equity 490,028, FVTPL assets 166,390, deposits in a financial institution 101,825, bank balances and cash 11,996, pledged bank balances 652, all HK$'000.
+- Annual Report 2025 notes 26-27: secured bank borrowings 20,623 and lease liabilities 666, all HK$'000.
+- Annual Report 2025 cash flow statement pp.121-123: operating cash flow -8,259, PPE purchases 1,268, financing cash flow -6,959, all HK$'000.
+- Annual Report 2025 note 6(b): segment revenue and segment result for hotel, money lending, liquor and listed securities investment.
+- Annual Report 2025 note 21: gross loan principal and interest receivables 242,263 HK$'000, fully impaired, carrying value nil.
+
+Inputs and conversions:
+- Market cap: CNY 57,000,000 from config/input.json, as of 2026-07-24.
+- PE TTM: null because no reliable source was provided.
+- FX conversion: reused prior stock research trace rate, 1 HKD = 0.8664 CNY, cited to Bank of China exchange rate on 2026-07-26 05:30.
+- All result money fields are written as CNY absolute yuan.
+
+Key calculations:
+- Gross margin = 15,768 / 34,038 = 0.4632469593.
+- Net margin = 33,614 / 34,038 = 0.9875433339.
+- Funds assets = (166,390 + 101,825 + 11,996) HK$'000 * 0.8664 = CNY 242,774,810.
+- Discounted detachable net cash reused from prior research = CNY 148,085,218.
+- Discounted net cash / market cap = 148,085,218 / 57,000,000 = 2.5979862807.
+- Operating business price = 57,000,000 - 148,085,218 = CNY -91,085,218.
+- Discounted sustainable cash profit = 0 because securities and deposit principal are treated as detachable assets and the remaining operating businesses did not produce positive cash profit.
+- owner_earnback_years = null and market_cap_to_cash_profit = null because the cash profit denominator is zero.
+
+Judgement notes:
+- The company has positive reported net profit in FY2025, but the profit is mainly from listed securities fair value gain, listed securities dividends and interest income.
+- Avoided double counting: securities and deposits are included in detachable net cash after haircut, so related dividends, interest and fair value gains are not counted as sustainable operating cash profit.
+- Loans receivable were not treated as hidden assets because gross principal and interest were fully impaired.
+- Hotel PPE was treated as operating asset, not detachable cash, because the hotel CGU was loss-making and had low occupancy indicators.
+
+Remaining limitations:
+- Input period 2025-12-31 differs from audited annual report period 2025-06-30.
+- Cash and deposit entity-level ownership, remittance path and distributability are not fully disclosed.
+- Maintenance capex is not separately disclosed; PPE purchases were used as a conservative capex proxy.
+- Three-year owner earnings median was not rebuilt in this run; available fact pack covers 2025 and 2024 comparative cash flow.
