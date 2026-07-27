@@ -1,0 +1,70 @@
+Run: 2026-07-23T14-50-58+08-00-02324-hk-capital-vc
+Company: 02324.HK CAPITAL VC
+Requested period: 2025-12-31
+Actual annual report period used: year ended 2025-09-30
+
+Inputs read:
+- config/input.json
+- config/output-schema.json
+
+Existing stock_report fact pack:
+- annual_facts_json: missing before this run
+- annual_facts_md: missing before this run
+- normalized_facts_json: missing before this run
+
+Raw filing search and reuse:
+- raw_filing_dir initially had no files.
+- Downloaded Annual Report 2024/25 from https://doc.irasia.com/listco/hk/capitalvc/annual/2025/ar2025.pdf
+- Saved to /root/aicode/stock_report/data/raw/filings/02324.HK/2025-12-31/ar2025.pdf
+- Converted with pdftotext -layout to ar2025.txt
+- Downloaded Annual Report 2023/24 from https://doc.irasia.com/listco/hk/capitalvc/annual/2024/ar2024.pdf only to obtain 2023 comparative profit/cash-flow figures.
+- Saved to /root/aicode/stock_report/data/raw/filings/02324.HK/2025-12-31/ar2024.pdf and ar2024.txt
+
+Key annual report locations used:
+- ar2025.txt lines 4049-4139: consolidated profit or loss and statement of financial position.
+- ar2025.txt lines 4223-4360: consolidated cash flow and cash balance representation.
+- ar2025.txt lines 6260-6506: segment results, assets and liabilities.
+- ar2025.txt lines 6925-7235: prepayments/deposits/other receivables and FVTPL assets.
+- ar2025.txt lines 7235-7595: amortised-cost financial assets and bond details.
+- ar2025.txt lines 7595-7785: cash and borrowings.
+- ar2024.txt lines 4021-4285: 2023 comparative profit, balance sheet and cash flow.
+
+Rough-screen fields used only as lines:
+- market_cap HK$99,028,216
+- market_pe 0.76
+- rough funds_assets HK$408,462,390
+- rough financing_liabilities HK$35,078,847
+- rough net_funds HK$373,383,543
+
+Important extracted facts:
+- Cash and cash equivalents: HK$38,258,394 at 2025-09-30.
+- FVTPL financial assets: HK$257,938,698, including HK-listed equities HK$245,247,287 and US-listed equities HK$12,691,411.
+- FVTPL assets pledged for margin financing: HK$82,429,137.
+- Amortised-cost financial assets: HK$169,452,748 after ECL allowance, current HK$112,265,298 and non-current HK$57,187,450.
+- Prepayments, deposits and other receivables: HK$9,253,181; investment disposal consideration receivable net exposure included at HK$7,345,817.
+- Borrowings: HK$35,078,847, comprising margin financing HK$34,848,847 and other loan HK$230,000.
+- 2025 reported profit attributable to equity holders: HK$131,088,977.
+- 2025 FVTPL net gain: HK$125,276,732; management discussion says realised gain about HK$40.6m and unrealised gain about HK$84.6m.
+- 2025 bond investment interest income: HK$20,567,476.
+- Operating cash flow: 2025 HK$22,181,623, 2024 HK$-10,680,520, 2023 HK$-19,296,476.
+
+Haircut decisions:
+- Cash 0.95: demand deposits of HK-listed/Cayman group, but no parent/subsidiary restriction split.
+- Listed securities 0.55: saleable in principle but concentrated in small-cap/GEM/NASDAQ names with large unrealised gains and pledged assets.
+- Current amortised-cost financial assets 0.50: near-term maturity but issuer credit/ECL and early-redemption limits.
+- Non-current amortised-cost financial assets 0.30: long-term unlisted credit assets with no active market.
+- Investment disposal receivable 0.30: collection risk and ECL history.
+- Borrowings 1.00 deduction.
+- Necessary operating cash HK$12m retained.
+- Transaction/tax/FX/distribution friction HK$5m retained.
+
+Unresolved gaps:
+- No independent market capitalisation refresh; input market cap used.
+- No line-by-line trading liquidity model for each listed security.
+- No collateral/recovery schedules for amortised-cost bond investments beyond annual report ECL and issuer descriptions.
+- No parent/subsidiary unrestricted cash split.
+
+Final classification:
+- liquidation_watch
+- earnback_unavailable
+- owner_earnback_years_after_haircut null because investment-company profits would double-count returns from assets already included in the detachable/liquidation asset pool.

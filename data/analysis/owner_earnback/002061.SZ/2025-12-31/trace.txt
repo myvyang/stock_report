@@ -1,0 +1,39 @@
+run_dir: /root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T08-13-31+08-00-002061-sz-浙江交科
+input: config/input.json
+
+1. 读取输入
+- 公司：浙江交科，002061.SZ，A股。
+- 请求期：2025-12-31，annual。
+- 粗筛市值：9,547,000,000元，quote_time=20260723161448，quote_source=Tencent qt.gtimg.cn。
+- stock_report_paths 存在，要求生成年度事实包和专题结果。
+
+2. 复用检查
+- /root/aicode/stock_report/data/analysis/annual_review/002061.SZ/2025-12-31/facts.json 不存在。
+- /root/aicode/stock_report/data/analysis/annual_review/002061.SZ/2025-12-31/annual_facts.md 不存在。
+- /root/aicode/stock_report/data/raw/filings/002061.SZ/2025-12-31 初始未发现原始年报。
+
+3. 原始材料
+- 2025年报来源页：https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12234981&stockid=002061
+- PDF：http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESZ_STOCK/2026/2026-4/2026-04-28/12234981.PDF
+- 保存：/root/aicode/stock_report/data/raw/filings/002061.SZ/2025-12-31/002061_2025_annual_report.pdf
+- 文本：/root/aicode/stock_report/data/raw/filings/002061.SZ/2025-12-31/002061_2025_annual_report.txt
+- 2024年报用于补2023资本开支，保存到本次work：work/002061_2024_annual_report.pdf 和 txt。
+
+4. 抽取位置
+- 2025年报第8页：2023-2025营业收入、归母净利、扣非归母净利、经营现金流。
+- 2025年报第27页：资产权利受限情况。
+- 2025年报第92-94页：合并资产负债表。
+- 2025年报第97-100页：合并利润表和合并现金流量表。
+- 2025年报第197-203页：财务费用、投资收益、现金流附注、受限现金和现金等价物构成。
+- 2024年报合并现金流量表：2023年购建长期资产现金支出。
+
+5. 仍缺失或估算
+- 年报未逐项拆分普通银行存款、项目保证金、募集资金、境外现金和经营周转现金，现金折扣用0.70。
+- 年报未拆维持性资本开支和增长性资本开支，使用三年购建长期资产现金支出中位数近似。
+- 必要经营现金无法精确测算，按约1个月经营现金流出4.2亿元估算。
+
+6. 输出
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt
+- 同步写入 stock_report_paths 指定年度事实包和owner_earnback专题文件。

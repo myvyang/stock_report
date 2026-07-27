@@ -1,0 +1,46 @@
+run_dir: /root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T14-36-20+08-00-301339-sz-通行宝
+company: 301339.SZ 通行宝
+period: 2025-12-31
+
+1. 读取输入
+- config/input.json: 市值 6,121,000,000 元，quote_time=20260723161451，粗筛资金类资产 3,533,923,205.03 元，粗筛融资负债 31,720,521.36 元。
+- output schema: config/output-schema.json。
+
+2. 复用检查
+- annual_facts_json 不存在。
+- annual_facts_md 不存在。
+- raw_filing_dir 不存在。
+
+3. 原始年报
+- 搜索到深交所披露 PDF:
+  https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-03-28/09fa9723-9c22-49c0-8e03-c7c50eef3d0d.PDF
+- 保存:
+  /root/aicode/stock_report/data/raw/filings/301339.SZ/2025-12-31/301339_2025_annual_report.pdf
+- pdftotext:
+  /root/aicode/stock_report/data/raw/filings/301339.SZ/2025-12-31/301339_2025_annual_report.txt
+- pdfinfo: 222 pages。
+
+4. 关键抽取路径
+- 主要会计数据: text lines 249-282。
+- 业务说明: text lines 398-535。
+- 资产负债表: text lines 5013-5115。
+- 利润表: text lines 5235-5325。
+- 现金流量表: text lines 5375-5455。
+- 现金流分析: text lines 1420-1498。
+- 资金和受限资产: text lines 7908-7948, 9112-9145。
+- 其他应付款: text lines 9198-9245。
+- 现金流量补充资料和资本开支: text lines 9810-9990。
+- 公允价值估值说明: text lines 10420-10570。
+
+5. 本次主要判断
+- 可剥离资金池纳入普通现金、存放财务公司款项、理财产品、大额定期存单。
+- 保证金 13,384,252.82 元按受限资金 0 折扣。
+- ETC 预存充值款和清分通行费合计 2,462,180,447.72 元视为客户/路网结算义务，从可剥离资金中扣回。
+- 短期借款、长期借款、应付债券无余额。
+- 租赁负债合计 31,720,521.36 元是经营场所租赁，未机械扣现金，在利润折扣体现。
+- 利润分母剔除已扣资金本金对应的理财收益和利息收入，避免双算。
+
+6. 仍缺失字段
+- 未披露理财产品逐笔期限、保本条款、交易对手和赎回限制。
+- 未披露大额定期存单逐笔到期日和质押情况；仅能确认列示为其他非流动资产。
+- 未披露维持性资本开支和成长性资本开支拆分。

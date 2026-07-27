@@ -1,0 +1,22 @@
+run_dir=/root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T05-09-06+08-00-603053-sh-成都燃气
+input=/root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T05-09-06+08-00-603053-sh-成都燃气/config/input.json
+
+1. 读取 input.json 和 output-schema.json。
+2. stock_report_paths 指定的 annual_facts_json、annual_facts_md 和 raw_filing_dir 初始不存在可复用事实。
+3. 从公开披露来源下载成都燃气2025年年度报告PDF：
+   https://stockmc.xueqiu.com/202604/603053_20260418_44Y2.pdf
+   保存到 /root/aicode/stock_report/data/raw/filings/603053.SH/2025-12-31/603053_2025_annual_report.pdf
+4. 使用 pdfinfo 确认PDF为206页；使用 pdftotext -layout 抽取文本到 work/603053_2025_annual_report.txt。
+5. 定位并摘录：
+   - 第6-8页：近三年主要会计数据、非经常性损益、公允价值计量项目。
+   - 第9-13页：主营业务、经营区域、经营模式和分产品收入成本。
+   - 第57-66页：合并资产负债表、合并利润表、合并现金流量表。
+   - 第95页：货币资金和交易性金融资产附注。
+   - 第137-138页：一年内到期非流动负债、长期借款、租赁负债。
+   - 第144-150页：收入分解、财务费用、投资收益、现金流量表项目。
+6. 关键缺口：
+   - 定期存款逐笔期限未完整披露，折扣按0.85处理。
+   - 未取得公司月度经营现金需求，必要经营现金按经营现金流出估算。
+   - 2023年资本开支未补齐到与2025/2024同等颗粒度。
+7. 已写入 outputs/result.json、outputs/report.md、outputs/trace.txt。
+8. 已同步写入 stock_report_paths 指定的年度事实包、标准化事实包和 owner_earnback 专题结果。

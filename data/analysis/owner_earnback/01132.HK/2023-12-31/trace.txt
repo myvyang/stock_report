@@ -1,0 +1,57 @@
+run_dir: /root/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-22T23-13-10+08-00-01132-hk-orange-sky-g-h
+input_json: /root/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-22T23-13-10+08-00-01132-hk-orange-sky-g-h/config/input.json
+
+1. Read input and schema.
+   Company: 01132.HK ORANGE SKY G H.
+   Requested period: 2023-12-31 annual.
+   Rough screen: market-cap-only, CNY 176,554,680.6464715 with HKD/CNY 0.9039300084114075.
+   Converted market cap to HKD 195,318,972.7120065 for metrics.
+
+2. Checked stock_report paths.
+   No existing annual facts or raw filing were found for the target path before extraction.
+
+3. Located and downloaded annual report.
+   IRAsia annual report index: https://www.irasia.com/listco/hk/goldenharvest/annual/index.htm
+   Annual report PDF: https://doc.irasia.com/listco/hk/goldenharvest/annual/2023/ar2023.pdf
+   Saved PDF: /root/aicode/stock_report/data/raw/filings/01132.HK/2023-12-31/ar2023.pdf
+   Saved metadata: /root/aicode/stock_report/data/raw/filings/01132.HK/2023-12-31/metadata.json
+   Converted text: /root/aicode/stock_report/data/raw/filings/01132.HK/2023-12-31/ar2023.txt
+
+4. Key extracted evidence.
+   Consolidated income statement: revenue HK$799.757m, operating loss HK$45.560m, parent net loss HK$90.398m.
+   Consolidated financial position: total assets HK$3,427.268m, total liabilities HK$1,965.962m, parent equity HK$1,462.552m.
+   Note 19(a): deposits and cash HK$160.280m; pledged deposits HK$35.507m; Mainland China deposits/cash HK$12.396m subject to FX controls.
+   Note 20(a): bank loans HK$439.384m.
+   Note 22: lease liabilities HK$554.614m.
+   Cash flow statement: operating cash flow HK$145.737m, PPE purchases HK$86.811m, intangible purchases HK$30.040m.
+   Auditor report and note 2(b): material uncertainty related to going concern.
+
+5. Main assumptions.
+   Pledged bank deposits have haircut factor 0.
+   Mainland China cash has haircut factor 0.60.
+   Other unpledged cash has haircut factor 0.85 because ownership/extraction path is not proven and the operating group has liquidity stress.
+   Bank loans are deducted at 100%.
+   Ordinary operating lease liabilities are not mechanically deducted from detachable net cash; their burden is reflected in profit quality.
+   Necessary operating cash reserve estimated at HK$80m due to cinema operations, net current liabilities and going-concern warning.
+   Tax, FX and distribution friction reserve set at HK$5m.
+
+6. Calculation.
+   Discounted detachable cash assets = 112.377m * 0.85 + 12.396m * 0.60 = HK$102.95805m.
+   Discounted detachable net cash = 102.95805m - 439.384m - 80m - 5m = HK$-421.42595m.
+   Operating business price = 195.318972712m - (-421.42595m) = HK$616.744922712m.
+   Sustainable distributable cash profit = 0 due to recurring losses and going-concern uncertainty.
+   Owner earnback years = null because denominator is zero.
+
+7. Outputs written.
+   /root/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-22T23-13-10+08-00-01132-hk-orange-sky-g-h/outputs/result.json
+   /root/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-22T23-13-10+08-00-01132-hk-orange-sky-g-h/outputs/report.md
+   /root/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-22T23-13-10+08-00-01132-hk-orange-sky-g-h/outputs/trace.txt
+   /root/aicode/stock_report/data/analysis/annual_review/01132.HK/2023-12-31/facts.json
+   /root/aicode/stock_report/data/analysis/annual_review/01132.HK/2023-12-31/annual_facts.md
+   /root/aicode/stock_report/data/analysis/annual_review/01132.HK/2023-12-31/extraction_trace.txt
+   /root/aicode/stock_report/data/normalized/facts/01132.HK/2023-12-31/annual-facts.json
+
+8. Remaining limitations.
+   Cash ownership and extraction path are not fully disclosed.
+   Necessary operating cash is estimated, not company-disclosed.
+   2021 cash flow and capex were not separately extracted in this run.

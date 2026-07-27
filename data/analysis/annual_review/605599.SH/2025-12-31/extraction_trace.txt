@@ -1,0 +1,42 @@
+A股控股回本分析 trace
+
+对象：605599.SH 菜百股份，period=2025-12-31。
+输入：/root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T00-32-49+08-00-605599-sh-菜百股份/config/input.json
+输出 schema：/root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T00-32-49+08-00-605599-sh-菜百股份/config/output-schema.json
+
+查找路径：
+1. 读取 config/input.json，确认 run_dir、rough_screen_row 和 stock_report_paths。
+2. 固定检查 /root/aicode/stock_report/data/analysis/annual_review/605599.SH/2025-12-31，发现已有 ROIC result/report，但缺少 annual-fact-pack-v1 facts.json。
+3. 复用 raw_filing_dir 中 annual-report.pdf；没有重新下载。
+4. 使用 pdftotext 转出 /root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T00-32-49+08-00-605599-sh-菜百股份/work/annual-report.txt。
+
+关键来源：
+- 巨潮资讯年报 URL：https://static.cninfo.com.cn/finalpage/2026-04-29/1225249338.PDF
+- 近三年主要会计数据：PDF page 6。
+- 合并资产负债表：PDF pages 82-84。
+- 合并利润表：PDF pages 86-88。
+- 合并现金流量表：PDF pages 90-91。
+- 货币资金与受限资金附注：PDF page 125、现金等价物构成 pages 174-175。
+- 交易性金融资产附注：PDF page 125。
+- 交易性金融负债附注：PDF page 159。
+- 投资收益和公允价值变动收益：PDF pages 167-168。
+
+补抽字段：
+- 现金及现金等价物、受限货币资金构成、浮动收益理财产品。
+- 银行黄金租借形成的交易性金融负债。
+- 三年经营现金流、归母净利润、扣非归母净利润。
+- 2024-2025 年购建长期资产现金支出。
+
+仍缺失/限制：
+- 2023 年资本开支未在本次 2025 年报三年摘要中直接披露。
+- 理财产品期限、保本条款和逐项赎回安排未完全披露。
+- 必要经营现金按经营现金流出半个月估算，不是公司披露的精确最低现金需求。
+
+计算摘要：
+折后可剥离资金类资产=2259254486.38
+扣黄金租借交易性金融负债=3704620000.00
+扣必要经营现金=1352821138.71
+折后可剥离净资金=-2798186652.33
+折后可持续可分配现金利润=488213691.11
+控股回本年数=30.2167
+分类=liquidation_watch，earnback_quality_flag=earnback_over_20_years

@@ -1,0 +1,51 @@
+run_dir=/root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T16-50-24+08-00-600566-sh-济川药业
+input_json=/root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T16-50-24+08-00-600566-sh-济川药业/config/input.json
+company=600566.SH 济川药业
+period=2025-12-31
+
+复用检查：
+- /root/aicode/stock_report/data/analysis/annual_review/600566.SH/2025-12-31 初始无 facts.json/annual_facts.md。
+- /root/aicode/stock_report/data/raw/filings/600566.SH/2025-12-31 初始无原始年报。
+
+原始材料：
+- 下载 2025 年报 PDF 到 stock_report_paths.raw_filing_dir。
+- URL=https://stockmc.xueqiu.com/202604/600566_20260424_S29U.pdf
+- metadata.json 已写入 raw_filing_dir。
+- pdftotext 输出 10232 行文本。
+- 为核对 2023 年资本开支，下载 2024 年报 PDF 到本次 run work 目录，不写入 stock_report 非指定年份目录。
+
+主要证据路径：
+- 2025 年报第7页：三年主要会计数据，含收入、归母净利润、扣非归母净利润、经营现金流。
+- 2025 年报第9页：非经常性损益。
+- 2025 年报第15页：主营业务和经营模式。
+- 2025 年报第20页：主营业务分行业和分产品。
+- 2025 年报第38页：以公允价值计量金融资产。
+- 2025 年报第69页：委托理财总体表。
+- 2025 年报第95-96页：合并资产负债表。
+- 2025 年报第99-100页：合并利润表。
+- 2025 年报第103-104页：现金流量表。
+- 2025 年报第140页：货币资金、交易性金融资产附注。
+- 2025 年报第156页：其他非流动金融资产附注。
+- 2025 年报第173-176页：短期借款、一年内到期非流动负债、长期借款、应付债券、租赁负债。
+- 2024 年报第129页：2023/2024 年资本开支交叉核对。
+
+计算口径：
+- 市值采用 input.json rough_screen_row.market_cap=24,905,000,000 元，quote_time=20260723161439。
+- 货币资金中库存现金及银行存款按 0.90 折扣；其他货币资金因性质未拆清按 0。
+- 交易性金融资产按委托理财风险等级拆分：R1 0.80、R2 0.65、R3 0.40，未拆清差额 0.50。
+- 其他非流动金融资产按非上市权益/基金投资 0.20。
+- 融资负债按 100% 扣除。
+- 必要经营现金保留 12.00 亿元；税费/汇兑/分红摩擦准备 3.00 亿元。
+- 折前可分配现金利润采用 2025 年经营自由现金流 1,102,435,536.86 元。
+- 利润现金化折扣 0.75，折后可持续可分配现金利润 826,826,652.65 元。
+
+输出：
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt
+- stock_report owner_earnback result/report/trace 将与 outputs 同步。
+
+限制：
+- 货币资金附注未进一步披露受限资金；其他货币资金保守不扣。
+- 委托理财总体表未完全勾稽到交易性金融资产余额；差额保守折扣。
+- 维持性资本开支未单独披露。

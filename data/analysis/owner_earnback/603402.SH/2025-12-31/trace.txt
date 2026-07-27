@@ -1,0 +1,34 @@
+run_dir: /root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T07-46-24+08-00-603402-sh-陕西旅游
+input_json: /root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T07-46-24+08-00-603402-sh-陕西旅游/config/input.json
+output_schema: /root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T07-46-24+08-00-603402-sh-陕西旅游/config/output-schema.json
+
+1. 读取 input.json，确认公司为 603402.SH 陕西旅游，报告期 2025-12-31，市场 A，粗筛市值 6,355,000,000 元，行情时间 20260723161456。
+2. 检查 stock_report_paths：annual_facts_json 与 annual_facts_md 不存在；raw_filing_dir 存在 annual-report.pdf 与 metadata.json。
+3. 复用原始 PDF：/root/aicode/stock_report/data/raw/filings/603402.SH/2025-12-31/annual-report.pdf；metadata 来源为巨潮资讯 https://static.cninfo.com.cn/finalpage/2026-04-20/1225123877.PDF，sha256=bb59b93bc2ed72f2b538b81b089b22ebe8ffb694eafc2905801bd3cd82ae6993。
+4. 使用 pdftotext -layout 转出全文到 work/annual-report.txt；pdfinfo 显示 229 页。
+5. 核对主要页码：
+   - PDF page 7：三年营业收入、利润总额、归母净利润、扣非归母净利润、经营活动现金流。
+   - PDF page 9-10：非经常性损益项目与合计。
+   - PDF page 22：主要资产负债变化，货币资金增加来自募集资金和经营积累；在建工程、无形资产、合同负债变动说明。
+   - PDF page 74：募集资金使用进展，IPO 募集资金净额 1,521,926,929.58 元，年末累计投入为 0。
+   - PDF page 91-92：合并资产负债表。
+   - PDF page 96-97：合并利润表。
+   - PDF page 100-101：合并现金流量表。
+   - PDF page 136：货币资金附注。
+   - PDF page 174：一年内到期非流动负债。
+   - PDF page 190：现金及现金等价物构成、受限现金和非现金等价物货币资金。
+6. 补抽并生成 annual-fact-pack-v1 年度事实包：facts.json、annual_facts.md、normalized annual-facts.json。
+7. 控股回本主口径：
+   - 货币资金原值 2,763,925,329.57 元。
+   - 拆为普通经营积累现金 1,241,998,399.99 元，折扣 0.90；IPO 募集资金 1,521,926,929.58 元，折扣 0.55。
+   - 必要经营现金按 2025 年经营活动现金流出 534,290,930.41 元的 25% = 133,572,732.60 元。
+   - 有息融资负债 212,049,959.56 元，100% 扣除。
+   - 税费、分红和治理摩擦准备按折后可剥离资金类资产 2% = 39,097,167.43 元。
+   - 折后可剥离净资金 1,570,138,511.67 元。
+   - 折前可分配现金利润用 2025 年 OCF 515,071,746.47 - capex 116,926,700.26 = 398,145,046.21 元。
+   - 现金利润折扣 0.75，折后可持续可分配现金利润 298,608,784.66 元。
+   - 折后经营业务购买价 4,784,861,488.33 元，控股回本 16.02 年。
+8. 未补齐字段：
+   - 2023 年资本开支未从本次 2025 年 PDF 中直接取得。
+   - 募集资金专户、后续理财或专户监管细节未在本次事实包中进一步拆到银行账号层面。
+   - 维护性资本开支和成长性资本开支无法精确区分，主口径全额扣除 2025 年购建长期资产现金支出。

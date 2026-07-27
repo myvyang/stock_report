@@ -1,0 +1,71 @@
+Run dir:
+/root/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-23T10-38-55+08-00-00428-hk-cocoon-holdings
+
+Input:
+/root/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-23T10-38-55+08-00-00428-hk-cocoon-holdings/config/input.json
+
+Company:
+00428.HK COCOON HOLDINGS
+
+Source lookup:
+- Existing annual_facts_json/annual_facts_md not found at input stock_report_paths.
+- Existing raw_filing_dir not found.
+- Located HKEXnews Annual Report 2025 PDF:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042403195.pdf
+- Downloaded to:
+  /root/aicode/stock_report/data/raw/filings/00428.HK/2025-12-31/2025-annual-report.pdf
+- Converted text with pdftotext -layout:
+  /root/aicode/stock_report/data/raw/filings/00428.HK/2025-12-31/2025-annual-report.txt
+
+Evidence used:
+- Profit/loss statement, annual report page 66.
+- Financial position statement, annual report page 67.
+- Cash flow statement, annual report pages 69-70.
+- Management Discussion and Analysis, pages 6-9.
+- Note 9 revenue, page 102.
+- Note 10 other gains/losses, page 102.
+- Note 19 FVTPL financial assets and no pledged trading securities, pages 108-113.
+- Note 20 FVTOCI financial asset, pages 114-115.
+- Note 21 broker balances, page 116.
+- Note 23 other payables, page 116.
+- Note 24 promissory notes, pages 116-119.
+- Fair value disclosure for level 3 / unobservable inputs, page 132.
+
+Calculation notes:
+- All metrics in outputs/result.json are converted from HK$'000 annual report figures to HKD absolute amounts.
+- Market cap is taken from config/input.json rough_screen_row: HKD30,851,648.
+- Detachable/liquidation asset pool excludes deposits/prepayments/other receivables, but includes cash, broker balances, FVTPL investments and FVTOCI investment.
+- Haircuts:
+  cash 0.95;
+  broker balances 0.85;
+  HK listed equities 0.70;
+  U.S. listed/OTC equities 0.50;
+  FVTPL unlisted equities 0.20;
+  FVTOCI unlisted equity 0.20.
+- Deductions:
+  promissory notes HKD2,081,000;
+  other payables HKD3,348,000;
+  necessary operating cash reserve HKD2,000,000;
+  tax/FX/dividend/liquidation friction reserve HKD3,500,000.
+- Discounted detachable net cash:
+  HKD69,820,500 - HKD10,929,000 = HKD58,891,500.
+- Operating business price:
+  HKD30,851,648 - HKD58,891,500 = -HKD28,039,852.
+
+Profit denominator:
+- Set to null.
+- Reason: company is a Chapter 21 investment company. Investment assets are the principal business assets; after deducting those assets as liquidation/detachable value, their dividends, realised disposal gains and fair value movements cannot also be counted as sustainable operating cash profit.
+
+Outputs written:
+- /root/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-23T10-38-55+08-00-00428-hk-cocoon-holdings/outputs/result.json
+- /root/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-23T10-38-55+08-00-00428-hk-cocoon-holdings/outputs/report.md
+- /root/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-23T10-38-55+08-00-00428-hk-cocoon-holdings/outputs/trace.txt
+- /root/aicode/stock_report/data/analysis/annual_review/00428.HK/2025-12-31/facts.json
+- /root/aicode/stock_report/data/analysis/annual_review/00428.HK/2025-12-31/annual_facts.md
+- /root/aicode/stock_report/data/analysis/annual_review/00428.HK/2025-12-31/extraction_trace.txt
+- /root/aicode/stock_report/data/normalized/facts/00428.HK/2025-12-31/annual-facts.json
+
+Remaining limitations:
+- The market cap was not refreshed from a live market data source; this run uses the provided input value.
+- 2023 annual report was not extracted.
+- OTC and unlisted investment realisability remains uncertain; reflected through haircuts and friction reserve.

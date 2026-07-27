@@ -1,0 +1,51 @@
+Run dir:
+/root/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-22T18-02-25+08-00-00458-hk-tristate-hold
+
+Input:
+- Company: 00458.HK TRISTATE HOLD
+- Period: 2024-12-31
+- Rough screen: market_cap CNY 626,892,227.755, signal date 2025-05-26, close HK$2.5, HKD/CNY 0.9198669791221619.
+- Converted market cap: HKD 681,503,132.5.
+
+Fact reuse:
+- No pre-existing facts.json / annual_facts.md found in specified stock_report_paths.
+
+Sources used:
+- 2024 annual report, HKEXnews:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2025/0424/2025042401517.pdf
+- 2023 annual report, HKEXnews, saved only in run work directory for 2022 cash flow comparative:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2024/0425/2024042501766.pdf
+- Input market cap and monthly return link from config/input.json.
+
+Key extracted locations:
+- 2024 annual report five-year financial summary: revenue, parent profit, total assets/liabilities/equity.
+- 2024 annual report consolidated income statement: revenue, gross profit, operating profit, finance costs, tax, parent profit.
+- 2024 annual report consolidated balance sheet: cash, inventories, receivables, payables, leases, borrowings, licence fees payable.
+- 2024 annual report Note 22: cash and bank balances breakdown and pledged deposits.
+- 2024 annual report Note 25: bank borrowings.
+- 2024 annual report Note 36: cash flow reconciliation and lease cash outflow.
+- 2023 annual report cash flow statement: 2022 operating cash flow, capex and lease principal.
+
+Haircut choices:
+- Cash at bank and on hand: 0.75. Group-level cash, multi-jurisdiction and RMB remittance constraints; parent cash alone is small.
+- Short-term bank deposits: 0.85. Low-risk deposit but group-level control path not proven.
+- FVTPL financial assets: 0.50. Small amount; detailed product terms not extracted.
+- Pledged deposits: 0.00. Secures bank facilities.
+- Necessary operating cash reserve: HK$250m. Manufacturing plus brand retail working capital and lease/store operating needs.
+- Tax/FX/dividend friction reserve: HK$15m.
+- Bank borrowings: 100% deduction, but 2024 year-end balance is zero.
+
+Calculation:
+- Discounted cash assets = 296.804m * 0.75 + 159.114m * 0.85 + 6.033m * 0.50 = HK$360.8664m.
+- Discounted detachable net cash = 360.8664m - 250.0m - 15.0m = HK$95.8664m.
+- Operating business price = 681.5031325m - 95.8664m = HK$585.6367325m.
+- Pre-haircut distributable cash profit = HK$108.0m, based on median-like 2024/2023/2022 operating cash flow after PPE purchase and lease principal.
+- Profit haircut = 0.75.
+- Discounted sustainable distributable cash profit = HK$81.0m.
+- Owner earnback years = 585.6367325m / 81.0m = 7.2300831173 years.
+
+Unresolved limitations:
+- Parent/subsidiary/jurisdiction cash ownership and remittance path not fully disclosed.
+- FVTPL investment terms not fully disclosed.
+- Maintenance versus growth capex not split.
+- Market cap is historical signal-date market cap, not current market cap.

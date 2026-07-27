@@ -1,0 +1,57 @@
+A股控股回本分析 trace
+
+1. 输入
+- input_json: /root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-23T18-20-51+08-00-600551-sh-时代出版/config/input.json
+- company: 600551.SH 时代出版
+- period: 2025-12-31
+- rough market_cap: 4604000000.0 CNY, quote_time=20260723161452
+
+2. 复用/生成事实包
+- stock_report_paths 下未发现既有 annual_facts_json / annual_facts_md。
+- 已创建 raw_filing_dir: /root/aicode/stock_report/data/raw/filings/600551.SH/2025-12-31
+- 下载年报全文: https://pdf.dfcfw.com/pdf/H2_AN202604221821456051_1.pdf
+- 年报本地 PDF: /root/aicode/stock_report/data/raw/filings/600551.SH/2025-12-31/600551_2025_annual_report.pdf
+- 转文本: /root/aicode/stock_report/data/raw/filings/600551.SH/2025-12-31/600551_2025_annual_report.txt
+- 下载问询回复辅助核对贸易/坏账/存货: https://pdf.dfcfw.com/pdf/H2_AN202607131826931652_1.pdf
+- 补下载 2024 年年报只用于取得 2023 年资本开支对比: /root/aicode/stock_report/data/raw/filings/600551.SH/2025-12-31/600551_2024_annual_report_for_2023_comparison.txt
+
+3. 抽取字段
+- 三张表：2025 年报第63-70页。
+- 近三年利润、扣非利润、经营现金流：2025 年报第6页。
+- 非经常性损益：2025 年报第7页。
+- 资金类资产：货币资金、交易性金融资产、一年内到期大额存单、其他流动资产、其他非流动资产，见第18页、第24页、第51-52页、第63页、第119-120页。
+- 融资负债：短期借款、一年内到期非流动负债、租赁负债，见第63-64页。
+- 受限资金：年报第18页披露主要资产受限情况不适用。
+- 贸易业务和坏账说明：问询回复第2-5页。
+
+4. 折扣和扣除
+- 必要经营现金：600000000.0，按2025年经营现金流出约72.11亿元的约1个月估算。
+- 货币资金可剥离部分折扣0.90。
+- 一年内大额存单和短期大额存单折扣0.90。
+- 保本固定收益证券理财折扣0.80。
+- 交易性金融资产中上市股票折扣0.70，其余理财等折扣0.75。
+- 长期大额存单等折扣0.70。
+- 其他非流动金融资产折扣0.20。
+- 短期借款100%扣除，税费/汇兑/分红摩擦准备100000000.0。
+
+5. 利润分母
+- 以2025年扣非归母净利润320556659.88为近三年中位数基础。
+- 剔除利息收入约38526403.86，避免已扣本金对应收益进入分母。
+- 折前可分配现金利润取285000000.0。
+- 因低毛利贸易、坏账计提、存货跌价和税费返还影响，利润现金化折扣取0.75。
+
+6. 仍缺失字段
+- 货币资金逐项权属/期限/保证金明细缺失。
+- 长期大额存单逐笔期限和提前支取条款缺失。
+- 非流动金融资产逐项退出路径缺失。
+
+7. 输出
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt
+- annual_facts_json: /root/aicode/stock_report/data/analysis/annual_review/600551.SH/2025-12-31/facts.json
+- annual_facts_md: /root/aicode/stock_report/data/analysis/annual_review/600551.SH/2025-12-31/annual_facts.md
+- normalized_facts_json: /root/aicode/stock_report/data/normalized/facts/600551.SH/2025-12-31/annual-facts.json
+- owner_earnback_result_json: /root/aicode/stock_report/data/analysis/owner_earnback/600551.SH/2025-12-31/result.json
+- owner_earnback_report_md: /root/aicode/stock_report/data/analysis/owner_earnback/600551.SH/2025-12-31/report.md
+- owner_earnback_trace: /root/aicode/stock_report/data/analysis/owner_earnback/600551.SH/2025-12-31/trace.txt

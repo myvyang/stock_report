@@ -1,0 +1,44 @@
+Run: 2026-07-23T10-46-43+08-00-01508-hk-china-re
+Company: 01508.HK CHINA RE
+Period: 2025-12-31
+
+Input:
+- Read config/input.json.
+- Rough screen rank 8; rough screen flags: 金融/类金融, 地产/建设.
+- Market cap used from rough_screen_row: CNY 43,625,491,500.52222.
+
+Reuse check:
+- annual_facts_json did not exist under /root/aicode/stock_report/data/analysis/annual_review/01508.HK/2025-12-31/facts.json.
+- annual_facts_md did not exist under /root/aicode/stock_report/data/analysis/annual_review/01508.HK/2025-12-31/annual_facts.md.
+- raw_filing_dir initially had no annual report file.
+
+Raw filing:
+- Source page found by web search: China Reinsurance (Group) financial reports page.
+- Primary PDF URL: https://eng.chinare.com.cn/zzywwzgb/articleFileDir/2026-04/29/636c9611fc4c4532b30c8a00265f733b.pdf
+- curl normal TLS failed because certificate host name did not match eng.chinare.com.cn; retried with -k and saved PDF.
+- PDF saved to /root/aicode/stock_report/data/raw/filings/01508.HK/2025-12-31/china-re-2025-annual-report.pdf.
+- Converted text with pdftotext -layout to /root/aicode/stock_report/data/raw/filings/01508.HK/2025-12-31/china-re-2025-annual-report.txt.
+- pdfinfo: 370 pages, created 2026-04-24, PDF 1.7.
+
+Extraction paths and key lines:
+- Consolidated profit or loss around text lines 6080-6145: insurance revenue, interest income, investment income, profit before tax, net profit, parent net profit.
+- Consolidated financial position around lines 6170-6275: cash, financial assets, time deposits, statutory deposits, insurance contract liabilities, investment contract liabilities, repo liabilities, notes and bonds payable, equity.
+- Consolidated cash flows around lines 6435-6518: operating cash flow, capex, investment purchases/disposals, financing flows, cash equivalents.
+- Note 20 around lines 9850-9905: restricted cash and short-term deposits.
+- Management discussion investment portfolio around lines 1749-1796: total investment assets RMB462,063m and repo financing note.
+- Solvency table around lines 2000-2075: group and major subsidiaries solvency.
+- Note 44 around lines 9400-9485: cash generated from operations adjustments.
+
+Judgment:
+- Insurance/reinsurance group: ordinary enterprise cash stripping formula is not directly applicable.
+- Financial and investment assets behind insurance contract liabilities and investment contract liabilities were assigned haircut_factor 0.00.
+- Restricted cash and statutory deposits were assigned haircut_factor 0.00.
+- Only non-restricted cash and short-term time deposits were assigned haircut_factor 0.20 due to inability to split parent/subsidiary/insurance operating liquidity.
+- Repo financing and notes/bonds payable were deducted at 100%.
+- Sustainable profit uses 2025 parent net profit as pre-haircut base and applies 0.60 cash profit haircut due to insurance/investment cycle and regulatory capital constraints.
+
+Gaps:
+- Did not split listed parent cash versus insurance subsidiary cash.
+- Did not fetch separate subsidiary solvency filings.
+- Did not independently refresh market capitalization after rough screen.
+- Did not fetch full 2023 annual report cash flow; current report provides 2025/2024 cash flows and 2023 summary net profit.

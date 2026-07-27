@@ -1,0 +1,10 @@
+A股控股回本分析 trace
+
+1. 读取输入：/root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T21-40-46+08-00-002395-sz-双象股份/config/input.json。公司002395.SZ 双象股份，period=2025-12-31，粗筛市值30.92亿元。
+2. 检查 stock_report 目标：annual_facts_json、annual_facts_md、raw_filing_dir 初始无可复用文件。
+3. 搜索并下载年报全文：新浪财经公告页给出附件 http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESZ_STOCK/2026/2026-4/2026-04-14/12085820.PDF；保存到 /root/aicode/stock_report/data/raw/filings/002395.SZ/2025-12-31/12085820.PDF。另下载到1225099918.PDF的是7页摘要，未作为主证据。
+4. 使用 pdfinfo 确认全文 PDF 147页，pdftotext -layout 转为 /root/aicode/stock_report/data/raw/filings/002395.SZ/2025-12-31/12085820.txt。
+5. 抽取字段：主要会计数据、合并资产负债表、合并利润表、合并现金流量表、货币资金附注、受限资产、短期借款、租赁负债、非经常性损益。
+6. 补抽缺口：未找到2023年资本开支，未披露最低经营现金和保证金逐笔期限。
+7. 计算：未受限现金0.85折扣；受限资金0折扣；短期借款100%扣除；必要经营现金8,000万元；摩擦准备500万元；利润主口径1.50亿元×0.75。
+8. 输出 result/report/trace，并同步到 stock_report owner_earnback 目录。

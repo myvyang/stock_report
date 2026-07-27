@@ -1,0 +1,56 @@
+run_dir: /root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-23T18-12-02+08-00-601686-sh-友发集团
+input_json: /root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-23T18-12-02+08-00-601686-sh-友发集团/config/input.json
+
+1. 读取输入
+- 公司：友发集团 601686.SH，A股。
+- 报告期：2025-12-31，annual。
+- 粗筛市值：7,589,000,000元，quote_time=20260723161445，来源 Tencent qt.gtimg.cn。
+- 粗筛异常点：rough_funds_assets=10,833,910,957.79元、rough_net_cash=7,875,756,102.66元，需核对货币资金受限和票据保证金。
+
+2. 事实包复用
+- 未发现既有 annual_facts_json 或 annual_facts_md。
+- 未发现既有 raw_filing_dir 原始年报。
+
+3. 原始年报
+- 下载来源：https://static.cninfo.com.cn/finalpage/2026-04-23/1225157466.PDF
+- 保存PDF：/root/aicode/stock_report/data/raw/filings/601686.SH/2025-12-31/601686_2025_annual_report.pdf
+- 保存metadata：/root/aicode/stock_report/data/raw/filings/601686.SH/2025-12-31/metadata.json
+- 使用pdfinfo确认PDF为223页。
+- 使用pdftotext -layout转换文本：/root/aicode/stock_report/data/raw/filings/601686.SH/2025-12-31/601686_2025_annual_report.txt
+
+4. 关键来源
+- 第6页：近三年营业收入、归母净利润、扣非归母净利润、经营活动现金流。
+- 第8-9页：非经常性损益项目和金额。
+- 第20页：截至报告期末主要资产受限情况。
+- 第79-81页：合并资产负债表。
+- 第84-85页：合并利润表。
+- 第87-89页：合并现金流量表。
+- 第120页：货币资金、交易性金融资产附注。
+- 第156页：短期借款、应付票据附注。
+- 第163-165页：长期借款、应付债券、租赁负债附注。
+- 第179页：现金及现金等价物构成、不属于现金及现金等价物的货币资金。
+
+5. 专题口径
+- 现金及现金等价物1,822,889,673.78元，haircut_factor=0.85。
+- 基金投资273,263,693.42元，haircut_factor=0.45。
+- 权益工具投资158,686.40元，haircut_factor=0.60。
+- 衍生金融资产39,339.77元，haircut_factor=0。
+- 受限货币资金8,574,521,563.81元，haircut_factor=0，其中银行承兑汇票保证金7,785,085,436.65元、大额存单462,296,416.67元。
+- 融资债务扣除2,958,154,855.13元。
+- 必要经营现金估算1,000,000,000元。
+- 2025年折前可分配现金利润=经营活动现金流1,111,891,178.30元-购建长期资产现金支出583,132,675.05元=528,758,503.25元。
+- 利润现金化折扣=0.65。
+
+6. 结果
+- 折后可剥离净资金=-2,285,639,758.538元。
+- 经营业务购买价=9,874,639,758.538元。
+- 折后可持续可分配现金利润=343,693,027.1125元。
+- 控股回本年数=28.73098660598012年。
+- investment_case_type=liquidation_watch。
+- earnback_quality_flag=earnback_over_20_years。
+
+7. 缺口
+- 未穿透交易性金融资产基金投资底层资产和赎回限制。
+- 必要经营现金为估算值，不是公司披露值。
+- 未拆分维持性资本开支与增长性资本开支。
+- 未补抽2023年资本开支。

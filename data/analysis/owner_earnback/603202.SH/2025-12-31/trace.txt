@@ -1,0 +1,44 @@
+run_dir: /root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T00-08-18+08-00-603202-sh-天有为
+input_json: config/input.json
+company: 603202.SH 天有为
+period: 2025-12-31
+
+1. 输入读取
+- 读取 config/input.json，确认粗筛市值 8,258,000,000 元，quote_time=20260723161436。
+- 读取 config/output-schema.json，确认 result.json 必填 metrics 和现金拆分字段。
+
+2. stock_report 复用检查
+- 指定 raw_filing_dir 不存在。
+- 指定 annual_facts_json / annual_facts_md 不存在。
+- 指定 owner_earnback 结果目录不存在。
+
+3. 原始年报获取
+- 先下载巨潮/披露云摘要 PDF：2025-annual-report-summary.pdf。
+- 年报摘要不足以抽取附注，改用公开 PDF 全文：
+  https://file.finance.sina.com.cn/211.154.219.97%3A9494/MRGG/CNSESH_STOCK/2026/2026-4/2026-04-24/12161936.PDF
+- 保存到 /root/aicode/stock_report/data/raw/filings/603202.SH/2025-12-31/2025-annual-report.pdf。
+- pdfinfo 显示 289 页；pdftotext 转为 2025-annual-report.txt，共 13258 行。
+
+4. 关键抽取路径
+- 近三年主要数据：文本 250-390 行，对应年报第8-11页。
+- 管理层讨论和主营业务：文本 660-890 行，对应年报第17-20页。
+- 募集资金整体使用和募投明细：文本 3990-4265 行，对应年报第105-110页。
+- 合并资产负债表：文本 5118-5222 行，对应年报第128-130页。
+- 合并利润表：文本 5360-5450 行，对应年报第133-134页。
+- 合并现金流量表：文本 5598-5820 行，对应年报第138-141页。
+- 货币资金附注：文本 7988-8025 行，对应年报第191页。
+- 其他流动资产和委托理财：文本 9050-9095、3928-3965 行，对应年报第209页、第103页。
+- 短期借款、一年内到期非流动负债、长期借款、租赁负债：文本 10000-10370 行，对应年报第226-234页。
+- 受限资产：文本 9928-9970、11160-11205 行，对应年报第224页、第249页。
+- 现金流量表补充资料：文本 10988-11140 行，对应年报第246-249页。
+
+5. 仍缺失字段
+- 定期存款逐笔期限、自有资金/募集资金映射、理财产品逐笔期限未披露。
+- 2023年完整现金流资本开支未在本次下载的2025年报中完整列示，未另行下载招股书或历史报告。
+- 市值未重新抓取最新行情，使用输入粗筛值。
+
+6. 写入文件
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt
+- stock_report annual facts/result/report/trace/normalized facts

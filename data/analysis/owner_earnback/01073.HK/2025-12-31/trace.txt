@@ -1,0 +1,45 @@
+run_dir: /root/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-23T15-42-14+08-00-01073-hk-da-yu-fin
+input_json: config/input.json
+
+1. 输入读取
+- 公司：01073.HK / DA YU FIN / HK
+- 期间：2025-12-31 annual
+- 粗筛市值：HKD 355,471,040
+- 粗筛异常：business_flags 标记为金融/类金融、投资控股；粗筛 funds_assets 可能混入客户信托资金和金融业务资产。
+
+2. 复用检查
+- /root/aicode/stock_report/data/analysis/annual_review/01073.HK/2025-12-31 不存在可复用 facts.json 或 annual_facts.md。
+- /root/aicode/stock_report/data/raw/filings/01073.HK/2025-12-31 初始无原始年报。
+
+3. 原始材料
+- 使用 IR Asia 报告列表接口找到 2025 年报： https://doc.irasia.com/listco/hk/dayufinancial/annual/2025/ar2025.pdf
+- 已写入 raw_filing_dir: ar2025.pdf、ar2025.txt、metadata.json。
+- PDF 页数：200；pdftotext 转出 11752 行。
+- 为三年现金流比较，只在本次 work/ 下载 2024 年报文本，使用其中 2024/2023 比较数。
+
+4. 关键抽取位置
+- 2025 年报目录：财务报表页 99-105，附注从 106 页起。
+- 业务：MD&A 第 12-18 页；附注 6 分部资料。
+- 利润表：第 99 页；收入附注 5；其他财务收益附注 7。
+- 资产负债表：第 101-102 页。
+- 现金流量表：第 104-105 页。
+- 租赁：附注 18。
+- 按揭贷款：附注 19。
+- 保证金贷款：附注 24。
+- FVPL 金融资产：附注 26。
+- 客户信托银行结余：附注 27。
+- 现金及等价物：附注 28。
+- 客户应付款：附注 29。
+- 供股用途：MD&A 第 25 页。
+
+5. 未确认和保守假设
+- 年报未披露现金按母公司、经营子公司、受规管业务主体的完整拆分；现金和短期定存按 0.80 折扣。
+- 年报未披露 FVPL 每只证券的交易量和信用评级；按类别使用 0.20-0.60 折扣。
+- 必要经营现金按员工、行政、租赁、监管金融业务流动性和供股未用资金用途估算为 HKD 45m。
+- 税费/汇兑/分红摩擦准备估算为 HKD 10m。
+- 市值沿用粗筛输入，未另行实时行情复核。
+
+6. 输出
+- outputs/result.json 已生成。
+- outputs/report.md 已生成。
+- stock_report facts/result/report/trace 将同步写入指定路径。

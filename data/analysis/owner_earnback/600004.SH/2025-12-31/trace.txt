@@ -1,0 +1,22 @@
+run_dir: /root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T09-10-38+08-00-600004-sh-白云机场
+input_json: /root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T09-10-38+08-00-600004-sh-白云机场/config/input.json
+
+1. 读取 input.json，确认公司 600004.SH 白云机场，报告期 2025-12-31，粗筛市值 20,515,000,000 元。
+2. 检查 stock_report_paths 指定目录，未发现既有 annual_facts_json / annual_facts_md / 原始年报。
+3. 从上海证券交易所披露 URL 下载 2025 年年度报告 PDF：
+   https://big5.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-30/600004_20260430_ZSRN.pdf
+4. 保存原始文件：
+   /root/aicode/stock_report/data/raw/filings/600004.SH/2025-12-31/600004_2025_annual_report.pdf
+5. 使用 pdfinfo 确认 PDF 215 页；使用 pdftotext -layout 转文本到本次 run work 目录。
+6. 抽取字段：
+   - 近三年主要会计数据：营业收入、归母净利润、扣非归母净利润、经营现金流。
+   - 货币资金附注：银行存款、其他货币资金、受限货币资金明细。
+   - 其他流动资产附注：银行大额存单。
+   - 合并资产负债表：总资产、总负债、所有者权益、租赁负债、一年内到期非流动负债、其他应付款。
+   - 合并利润表：投资收益、公允价值变动、资产处置收益、营业外收入、财务费用。
+   - 合并现金流量表：经营现金流、购建长期资产现金支出、购买大额存单、租赁费现金支出。
+7. 缺口：
+   - 大额存单未披露逐笔期限。
+   - 必要经营现金为估算，不是公司披露项目。
+   - 租赁负债是否应在清算口径全额扣除，需要另行清算假设；本次持续经营口径不机械扣除。
+8. 写入 outputs/result.json、outputs/report.md、outputs/trace.txt，并同步写入 stock_report_paths 指定的年度事实包和专题结果。

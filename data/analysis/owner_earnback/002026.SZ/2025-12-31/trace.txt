@@ -1,0 +1,43 @@
+run_dir=/root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T19-04-47+08-00-002026-sz-山东威达
+input_json=/root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T19-04-47+08-00-002026-sz-山东威达/config/input.json
+
+1. 读取输入
+- 公司：002026.SZ 山东威达，A股，报告期2025-12-31。
+- 粗筛：市值4,189,000,000元；资金类资产1,756,879,276.99元；融资负债104,568,703.72元；经营自由现金流198,080,000元。
+- stock_report_paths存在，需要生成年度事实包和控股回本专题输出。
+
+2. 复用检查
+- annual_facts_json、annual_facts_md、raw_filing_dir 初始无可复用事实包或原始年报。
+
+3. 原始年报
+- 通过巨潮资讯接口查到 2026-04-21 披露的公告 1225125599，标题：山东威达：2025年年度报告。
+- 下载到 /root/aicode/stock_report/data/raw/filings/002026.SZ/2025-12-31/002026_2025_annual_report.pdf。
+- metadata写入 /root/aicode/stock_report/data/raw/filings/002026.SZ/2025-12-31/metadata.json。
+- pdfinfo显示174页；pdftotext转出 /root/aicode/stock_report/data/raw/filings/002026.SZ/2025-12-31/002026_2025_annual_report.txt。
+
+4. 抽取证据
+- 主要业务：第三节“报告期内公司从事的主要业务”。
+- 三年利润和经营现金流：第二节“主要会计数据和财务指标”。
+- 收入分行业：第三节“营业收入构成”。
+- 三张表：第十节合并资产负债表、合并利润表、合并现金流量表。
+- 资金资产：货币资金附注、交易性金融资产附注、一年内到期其他债权投资附注、其他流动资产附注、其他债权投资附注、资产权利受限情况。
+- 融资负债：短期借款附注、一年内到期非流动负债附注、租赁负债附注。
+- 现金利润：合并现金流量表、现金流量表补充资料、非经常性损益表。
+
+5. 关键判断
+- 受限货币资金29,024,357.77元和质押其他债权投资10,838,222.30元不进入可剥离资金。
+- 交易性金融资产理财产品1,021,266,234.67元按0.70折价，原因是虽披露低风险但未逐笔说明期限和底层资产。
+- 可转让大额定期存单按期限分为0.90、0.85、0.75折价。
+- 必要经营现金保留250,000,000元，约1.7个月经营现金流出。
+- 已扣理财和存单本金，其金融资产收益不计入可持续现金利润。
+
+6. 输出
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt
+- stock_report年度事实包和normalized facts
+- stock_report owner_earnback result/report/trace
+
+7. 缺口
+- 未完整抽取2023年资本开支明细。
+- 理财产品缺逐笔期限、底层资产和赎回限制。

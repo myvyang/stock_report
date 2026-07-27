@@ -1,0 +1,36 @@
+run_dir: /root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T14-19-15+08-00-603766-sh-隆鑫通用
+input_json: config/input.json
+company: 603766.SH 隆鑫通用
+period: 2025-12-31
+
+读取与复用:
+- 读取 config/input.json 和 config/output-schema.json。
+- stock_report_paths.raw_filing_dir 已存在 annual-report.pdf 和 metadata.json，复用本地 PDF，未重新下载。
+- stock_report annual_review 目录已有 ROIC 核对 result.json/report.md，但没有 annual_facts_json/annual_facts_md，故从 PDF 补抽年度事实包。
+
+原始材料:
+- /root/aicode/stock_report/data/raw/filings/603766.SH/2025-12-31/annual-report.pdf
+- 巨潮 URL: https://static.cninfo.com.cn/finalpage/2026-04-18/1225117448.PDF
+- pdftotext 转文本到 work/annual-report.txt。
+
+关键定位:
+- 合并资产负债表: PDF 第65-67页，文本约3331-3458行。
+- 合并利润表: PDF 第70页，文本约3566-3655行。
+- 合并现金流量表: PDF 第73-74页，文本约3758-3885行。
+- 受限资产: PDF 第23页，文本约1204-1224行。
+- 现金及现金等价物: PDF 第167页，文本约8630-8658行。
+- 债务与票据融资款: PDF 第143、148、150页，并结合既有 ROIC 核对结果。
+- 业务概览: PDF 第11-13页，文本约514-565行。
+
+口径说明:
+- 年报单位为人民币元，outputs/result.json metrics 均写绝对元。
+- 市值使用 input rough_screen_row.market_cap，未联网更新。
+- 必要经营现金按经营活动现金流出 25%估算。
+- 受限定期存款、保证金、冻结资金折扣为 0。
+- 国债逆回购按低风险短期投资折扣 0.85。
+- 票据融资款 10亿元纳入融资负债，粗筛未纳入。
+
+仍缺失或限制:
+- 未完整抽取 2023 年年报，三年利润中位数无法严格计算。
+- 资本开支未能拆分维持性与增长性。
+- 受限定期存款和票据、保证金的逐笔配套关系无法完全净额核对，已保守不扣受限资金。

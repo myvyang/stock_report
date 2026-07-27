@@ -1,0 +1,49 @@
+2026-07-23T23:20:00+08:00
+
+本次任务：
+- 对 config/input.json 指定的 603187.SH 海容冷链做 A 股控股回本分析。
+- run_dir=/root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-23T22-56-11+08-00-603187-sh-海容冷链
+
+读取输入：
+- 市值 4,598,000,000 元，quote_source=Tencent qt.gtimg.cn，quote_time=20260723161437。
+- 粗筛资金类资产 2,233,444,192.89 元，融资债 19,796,152.33 元，粗筛净现金 2,213,648,040.56 元，粗筛现金调整回本 6.42 年。
+
+stock_report 路径：
+- raw_filing_dir=/root/aicode/stock_report/data/raw/filings/603187.SH/2025-12-31
+- annual_facts_json=/root/aicode/stock_report/data/analysis/annual_review/603187.SH/2025-12-31/facts.json
+- annual_facts_md=/root/aicode/stock_report/data/analysis/annual_review/603187.SH/2025-12-31/annual_facts.md
+- normalized_facts_json=/root/aicode/stock_report/data/normalized/facts/603187.SH/2025-12-31/annual-facts.json
+- owner_earnback_result_json=/root/aicode/stock_report/data/analysis/owner_earnback/603187.SH/2025-12-31/result.json
+
+复用和获取：
+- 指定 annual_facts_json/annual_facts_md 初始不存在。
+- 指定 raw_filing_dir 初始无原始年报。
+- 通过上交所 queryCompanyBulletin.do 定位到官方 2025 年年度报告 URL。
+- static.sse.com.cn 下载受到防护影响，实际 PDF 从公司官网同名年报下载。
+- PDF 已保存并用 pdftotext -layout 转为文本。
+
+关键来源：
+- 年报第7页：2023-2025 营收、归母净利润、扣非归母净利润、经营现金流、总资产和归母净资产。
+- 年报第56-58页：委托理财未到期余额及风险特征。
+- 年报第76-78页：合并资产负债表。
+- 年报第81-85页：合并利润表和合并现金流量表。
+- 年报第117页：货币资金和交易性金融资产附注。
+- 年报第132页：一年内到期的大额存单。
+- 年报第151页、第171页：受限货币资金、短期借款。
+- 年报第155-156页：一年内到期租赁负债、长期借款/应付债券不适用、租赁负债。
+- 年报第170页：现金流补充资料和营运资金变化。
+
+计算口径：
+- 可剥离资产包括现金及现金等价物、一年内到期大额存单、理财产品本金和理财公允价值增值。
+- 受限银行承兑保证金和保函保证金 haircut=0，不进入可剥离净资金。
+- 保留必要经营现金 300,000,000 元。
+- 保留税费/分红/汇兑摩擦准备 30,000,000 元。
+- 融资负债扣除短期借款、租赁负债和一年内到期租赁负债，合计 10,411,735.49 元。
+- 一年内到期非流动负债中的预计负债 12,038,100.70 元不是融资债，未按融资负债扣除。
+- 利润分母以扣非归母、经营现金流和资本开支校验；折前可分配现金利润取 320,000,000 元，profit_haircut_factor=0.75。
+
+仍无法确认或保守处理：
+- 2023 年资本开支未补抽，利润折扣中反映。
+- 长期应收款 228,390,568.03 元未拆清，不作为可剥离资金扣除。
+- 必要经营现金为估算值，不是公司披露的最低经营现金。
+- 市值使用输入粗筛行情，未重新抓取实时行情。

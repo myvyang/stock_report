@@ -1,0 +1,51 @@
+run_dir: /root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T02-28-57+08-00-002081-sz-金-螳-螂
+input_json: config/input.json
+company: 002081.SZ 金 螳 螂
+period: 2025-12-31
+
+1. Reuse check
+- stock_report annual_facts_json did not exist at task start.
+- stock_report annual_facts_md did not exist at task start.
+- raw_filing_dir did not contain the 2025 annual report at task start.
+
+2. Source acquisition
+- Search located Sina/CNINFO mirrored announcement page for 金螳螂：2025年年度报告.
+- Downloaded PDF from:
+  http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESZ_STOCK/2026/2026-4/2026-04-29/12254751.PDF
+- Saved PDF:
+  /root/aicode/stock_report/data/raw/filings/002081.SZ/2025-12-31/002081_2025_annual_report.pdf
+- Converted text:
+  work/002081_2025_annual_report.txt
+  /root/aicode/stock_report/data/raw/filings/002081.SZ/2025-12-31/002081_2025_annual_report.txt
+- Wrote metadata:
+  /root/aicode/stock_report/data/raw/filings/002081.SZ/2025-12-31/metadata.json
+
+3. Extracted evidence
+- Main accounting data: annual report p.6, revenue, parent net profit, deducted parent net profit, operating cash flow, three-year comparisons.
+- Balance sheet: annual report p.75-p.76, cash, trading financial assets, receivables, contract assets, inventory, current assets, debt and equity.
+- Income statement: annual report p.79-p.80.
+- Cash flow statement: annual report p.82-p.83.
+- Restricted asset note: annual report p.27 and p.175.
+- Cash note: annual report p.145.
+- Debt note: annual report p.179-p.180.
+- Cash flow supplementary note: annual report p.190-p.192.
+
+4. Main assumptions
+- Domestic unrestricted cash = total cash 5,272,844,789.94 - frozen cash 191,040,105.60 - guarantee deposits 323,090,173.88 - overseas cash 847,769,336.33 = 3,910,945,174.13.
+- Necessary operating cash = 1,500,000,000.00, estimated at about one month of 2025 operating cash outflows.
+- Friction reserve = 150,000,000.00 for tax, FX, dividend and disposal friction.
+- Bank debt deduction = 547,617,806.39, long-term borrowings including current portion and interest.
+- Ordinary lease liabilities were checked but not deducted mechanically from detachable cash; reflected in profit quality.
+- Pre-haircut sustainable cash profit uses 2025 deducted parent net profit 333,338,864.52 because non-recurring receivable impairment reversal is material.
+- Profit haircut factor = 0.55 due project receivables, contract assets, impairment pressure and only medium cash conversion quality.
+
+5. Remaining gaps
+- Trading financial assets were not broken down by specific product term, issuer or guaranteed principal status in the extracted note.
+- Overseas cash was not broken down by jurisdiction, currency or remittance path.
+- 2023 capital expenditure was not extracted from an older annual report; three-year profit quality uses disclosed three-year net profit and operating cash flow from the 2025 annual report.
+
+6. Outputs
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt
+- stock_report annual facts/result/report/trace files under paths specified by config/input.json

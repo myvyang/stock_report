@@ -1,0 +1,28 @@
+输入与边界：
+- run_dir: /root/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-22T23-07-03+08-00-01397-hk-baguio-green
+- input_json 指定公司 01397.HK BAGUIO GREEN，period 2023-12-31，report_type annual。
+- 只写入 run_dir 的 outputs/work，以及 input_json.stock_report_paths 指定目标文件。
+
+来源：
+- HKEXnews 2023 annual report PDF: https://www1.hkexnews.hk/listedco/listconews/sehk/2024/0425/2024042501246.pdf
+- 公司 IR 页面用于定位历史年报：https://www.baguio.com.hk/en/investor/financial/
+- 2022 annual report 仅保存到本次 work，用于抽 2021 对比经营现金流和购买 PPE。
+
+关键抽取：
+- 2023 年报 p.48: revenue HK$2,327.489m, operating profit HK$76.251m, parent net profit HK$47.111m。
+- 2023 年报 p.49: cash HK$41.425m, pledged bank deposits HK$7.211m, bank borrowings HK$182.664m, lease liabilities current/non-current HK$8.343m/HK$28.278m。
+- 2023 年报 p.51: OCF HK$96.265m, PPE purchase HK$43.572m, intangible acquisition HK$8.200m, financing cash flow HK$-34.364m。
+- MDA pp.13-14: available cash HK$41.4m, bank borrowings HK$182.7m, lease liabilities HK$36.6m, NCI shareholder loan HK$1.6m, pledged bank deposits HK$7.2m, pledged cash HK$51k, pledged receivables HK$160.2m。
+- 2023 年报 p.114: 2021-2023 parent net profit HK$12.847m/HK$53.709m/HK$47.111m。
+- 2022 年报 comparative cash flow: 2021 OCF HK$87.990m, PPE purchase HK$76.270m。
+
+计算口径：
+- result.json metrics 统一为 CNY 绝对金额；HK$'000 年报金额乘 1,000，再按 HKD/CNY 0.9039300084114075 换算。
+- 现金及现金等价物 haircut 0.85；质押存款、质押现金、寿险保单主口径不扣。
+- 银行借款和 NCI 股东贷款 100% 扣除；必要经营现金估算 HK$30m。
+- 折前利润使用 2021-2023 归母净利润中位数 HK$47.111m；利润现金折扣 0.45。
+
+缺口：
+- 未披露现金 parent/subsidiary/PRC 拆分。
+- 未披露精确必要经营现金。
+- 银行借款与质押资产逐笔匹配关系不足，采用总额保守扣除。

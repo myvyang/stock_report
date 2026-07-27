@@ -1,0 +1,31 @@
+输入与路径
+- input_json: /root/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-22T16-29-19+08-00-01425-hk-justin-allen-h/config/input.json
+- output_schema: /root/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-22T16-29-19+08-00-01425-hk-justin-allen-h/config/output-schema.json
+- raw_filing_dir: /root/aicode/stock_report/data/raw/filings/01425.HK/2024-12-31
+- annual_facts_json: /root/aicode/stock_report/data/analysis/annual_review/01425.HK/2024-12-31/facts.json
+- owner_earnback_result_json: /root/aicode/stock_report/data/analysis/owner_earnback/01425.HK/2024-12-31/result.json
+
+来源
+- 2024 年报 PDF/TXT 来自同公司 raw cache 中已存在的 2024 Annual Report 文件；复制到本次指定 raw_filing_dir。
+- 未使用全市场数据文件，未读取大型 events.jsonl。
+- 市值采用 input_json 粗筛线索：CNY 889,856,916.31，按 hkd_cny_rate 0.919048011302948 转为 HKD 968,237,682.21。
+
+关键抽取
+- 年报 page 48-54：利润表、资产负债表、现金流量表。
+- Note 21：FVTPL 金融资产拆分。
+- Note 22：现金及银行结余和币种说明。
+- Note 24：租赁负债。
+- Note 26：母公司单体现金。
+- MD&A page 7：无年末银行贷款、现金与银行结余、已质押资产。
+- Note 6：主要客户收入。
+
+折扣与限制
+- 集团现金未拆法律实体，且母公司现金很小，现金 haircut 使用 0.60。
+- FVTPL 投资按上市债券 0.70、债券基金 0.55、投资基金 0.35。
+- 必要经营现金 HK$100m、拟派末期股息 HK$70m、摩擦准备 HK$10m 从折后资金池扣除。
+- 租赁负债为继续经营租赁，不作为现金池 100% 债务扣除；在利润现金化折扣中体现。
+- 利润分母使用 HK$140m 折前可分配现金利润和 0.70 现金利润折扣。
+
+无法确认
+- 现金账户限制、子公司分红路径、基金赎回条款。
+- 2022 年 OCF/capex 未从单独 2022 年报补抽。

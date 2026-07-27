@@ -1,0 +1,33 @@
+A股控股回本分析 trace
+
+对象：002249.SZ 大洋电机，2025-12-31 annual。
+输入：/root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T23-28-29+08-00-002249-sz-大洋电机/config/input.json。
+输出 schema：/root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T23-28-29+08-00-002249-sz-大洋电机/config/output-schema.json。
+
+查找路径：
+1. 检查 stock_report_paths 指定 annual_facts_json/annual_facts_md：不存在，需要新建。
+2. 检查 raw_filing_dir：不存在原始年报，下载 2025 年报全文 PDF 到 /root/aicode/stock_report/data/raw/filings/002249.SZ/2025-12-31/002249_2025_annual_report.pdf，转文本到 /root/aicode/stock_report/data/raw/filings/002249.SZ/2025-12-31/002249_2025_annual_report.txt。
+3. 为补 2023 年资本开支，下载 2024 年报全文到 /root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T23-28-29+08-00-002249-sz-大洋电机/work/002249_2024_annual_report.pdf，仅用于本次 work。
+
+关键来源：
+- 2025年报主要会计数据：营收、归母净利、扣非归母净利、经营现金流。
+- 2025年报合并资产负债表：货币资金、债权投资、借款、租赁负债、权益。
+- 2025年报附注七、1：货币资金构成及外汇/票据保证金。
+- 2025年报附注七、12/14：一年内到期大额存单与非流动大额存单。
+- 2025年报资产权利受限情况：受限货币资金及质押一年内到期非流动资产。
+- 2025年报附注七、32/43/45/47：短期借款、一年内到期非流动负债、长期借款、租赁负债。
+- 2024年报合并现金流量表：补充 2023 年资本开支 477,736,176.15 元。
+
+折扣口径：
+- 现金及现金等价物 0.85：普通制造业现金，但境外资金占比较高。
+- 一年内大额存单 0.90：扣除受限0.80亿元后，短期存单。
+- 长期大额存单 0.70：期限超过1年。
+- 受限保证金和质押资产 0。
+- 银行借款 100%扣除；租赁负债作为持续经营负担，不从现金池机械全扣。
+- 必要经营现金 9.00亿元；摩擦准备2.50亿元。
+- 利润分母折扣 0.85，折前取8.00亿元，折后6.80亿元。
+
+仍缺失：
+- 全部大额存单逐笔明细。
+- 精确必要经营现金。
+- 投资收益中已扣资金本金对应收益的完整拆分。

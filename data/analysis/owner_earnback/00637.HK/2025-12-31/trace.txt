@@ -1,0 +1,63 @@
+Run dir: /root/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-21T10-41-56+08-00-00637-hk-lee-kee
+Input: /root/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-21T10-41-56+08-00-00637-hk-lee-kee/config/input.json
+
+Company:
+- 00637.HK LEE KEE, HK market.
+
+Input and period:
+- input period: 2025-12-31.
+- Lee Kee Holdings uses 31 March fiscal year end.
+- HKEX 2025/2026 annual report dated 2026-07-10 was used because the rough_screen_row amounts match that filing: revenue HKD1,965.571m, profit HKD5.723m, cash HKD232.787m, total debt HKD16.282m.
+- result period is therefore 2026-03-31, while files are written to the input-specified 2025-12-31 stock_report paths.
+
+Reuse and update:
+- Existing stock_report facts, annual_facts.md, normalized facts and owner_earnback result were found before this run.
+- Existing facts contained the required numeric evidence but facts.json did not use annual-fact-pack-v1 top-level structure.
+- This run reused local raw annual reports and existing extracted facts, then rewrote facts.json and normalized facts JSON into annual-fact-pack-v1.
+- No internet download was needed in this run.
+
+Sources used:
+- HKEXnews 2025/2026 annual report: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0710/2026071000267.pdf
+- Local raw filing: /root/aicode/stock_report/data/raw/filings/00637.HK/2025-12-31/lee-kee-annual-report-2025-2026.pdf
+- Prior-year annual reports stored locally for three-year profit and cash-flow context.
+- Market cap source: config/input.json rough_screen_row, HKD143,373,744.
+
+Key extracted amounts:
+- Cash and bank balances: HKD232.787m.
+- Bank deposits over three months included in the above: HKD41.074m.
+- Bank borrowings: HKD11.290m.
+- Lease liabilities: HKD4.992m.
+- Investment properties: HKD97.700m.
+- FVOCI financial assets: HKD3.227m.
+- Inventory: HKD206.805m.
+- Trade receivables: HKD258.789m.
+- Trade and other payables/accruals: HKD41.131m.
+- Contract liabilities: HKD0.842m.
+- Profit attributable to owners: HKD5.723m.
+- Net operating cash flow: HKD-1.153m.
+- Capex proxy: HKD4.585m.
+
+Haircut logic:
+- Cash excluding >3 month deposits: 0.65, because group-level cash is not split by parent/subsidiary and the metal trading business has high working-capital needs.
+- Bank deposits over three months: 0.75, because short-term deposit but location/entity and financing matching are not disclosed.
+- FVOCI listed equity: 0.60, because liquid but strategic and mark-to-market risk remains.
+- Investment properties: 0.25, because potentially detachable but non-cash and disposal/tax/use constraints are not fully known.
+- Bank borrowings: 100% deducted.
+- Lease liabilities: not mechanically deducted from detachable cash under going-concern owner-earnback; reflected in profit quality.
+- Necessary operating cash: HKD60m, approximately 3% of annual revenue, retained for inventory, receivables and commodity-price working capital.
+- Tax/FX/dividend friction: HKD5m.
+
+Calculation:
+- Pre-haircut asset pool: 191.713 + 41.074 + 3.227 + 97.700 = HKD333.714m.
+- Discounted asset pool: 124.61345 + 30.8055 + 1.9362 + 24.425 = HKD181.78015m.
+- Pre-haircut detachable net cash: 333.714 - 11.290 - 60.000 - 5.000 = HKD257.424m.
+- Discounted detachable net cash: 181.78015 - 11.290 - 60.000 - 5.000 = HKD105.49015m.
+- Operating business price after haircut: 143.373744 - 105.49015 = HKD37.883594m.
+- Discounted sustainable distributable cash profit: HKD0, because three-year median attributable profit and operating free cash flow do not support a positive cash denominator.
+- Owner earnback years: null because denominator is zero.
+
+Unconfirmed items:
+- Parent/subsidiary cash ownership and dividend path.
+- Restricted cash schedule beyond disclosed cash note.
+- Maintenance/growth split of capex.
+- Whether investment properties can be sold without disrupting operating arrangements.

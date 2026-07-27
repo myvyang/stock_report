@@ -1,0 +1,57 @@
+03662.HK STARJOY W&T owner earnback trace
+
+Run dir:
+- /root/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-23T11-01-01+08-00-03662-hk-starjoy-w-t
+
+Inputs:
+- config/input.json read.
+- Company: 03662.HK STARJOY W&T, HK.
+- Requested period: 2025-12-31 annual.
+- Rough screen market cap: RMB 238,166,397.5766487.
+
+Fact reuse:
+- Specified annual_facts_json and annual_facts_md did not exist before this run.
+- Raw filing did not exist in specified raw_filing_dir before this run.
+
+Official filing used:
+- HKEXnews Annual Report 2025.
+- URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0422/2026042200424.pdf
+- Release time observed in HKEXnews title search: 2026-04-14 16:31.
+- Local PDF saved to stock_report raw_filing_dir.
+- Text extracted with pdftotext and saved in work/ and raw_filing_dir.
+
+Key source locations:
+- Profit or loss: annual report pp.86-87.
+- Financial position: pp.88-89.
+- Cash flows: pp.92-93.
+- Segment revenue and results: note 5, pp.147-152.
+- Other income and finance costs: notes 6-7, p.153.
+- Receivables and aging: notes 24-25, pp.179-183.
+- Restricted deposits and cash: note 26, p.184.
+- Payables, contract liabilities, lease liabilities, borrowings: notes 27-30, pp.184-188.
+- Financing reconciliation and non-cash transactions: notes 38-39, pp.204-207.
+- Company-only statement of financial position: note 43, p.229.
+
+Calculation choices:
+- Amounts in outputs/result.json are absolute RMB, converted from RMB'000 by multiplying 1,000.
+- Market cap is reused from rough_screen_row; no live quote refresh was performed.
+- Company-level cash RMB516.387m haircut at 0.90 due disclosed parent cash but large amounts due to subsidiaries.
+- Remaining group cash RMB453.889m haircut at 0.65 due PRC operating subsidiaries and no full cash-location/remittance split.
+- Restricted bank deposits RMB36.154m haircut at 0.
+- Unlisted FVTPL/FVTOCI investments haircut at 0 for detachable cash.
+- Borrowings RMB35.000m deducted at 100%.
+- Lease liabilities RMB30.262m not deducted from net cash mechanically; reflected in profit quality because leases are operating-required.
+- Necessary operating cash RMB250.000m retained for contract liabilities, resident receipts, deposits and operating volatility.
+- Tax/FX/dividend friction RMB60.000m retained.
+- Pre-haircut distributable cash profit RMB45.000m; profit haircut 0.45; discounted cash profit RMB20.250m.
+
+Main formulas:
+- discounted_detachable_net_cash = 759.77615m - 35.000m - 250.000m - 60.000m = RMB414.77615m.
+- operating_business_price_after_haircut = 238.1663975766487m - 414.77615m = RMB -176.6097524233513m.
+- owner_earnback_years_after_haircut = -176.6097524233513m / 20.250m = -8.721469255474139.
+- market_profit_payback_years = 238.1663975766487m / 20.250m = 11.761303584032035.
+
+Limitations:
+- Full cash by subsidiary/bank account and immediate dividend remittance path not disclosed.
+- Only 2025/2024 cash-flow comparatives extracted from 2025 annual report; 2023 annual report not extracted in this run.
+- Maintenance capex not separately disclosed.

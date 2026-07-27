@@ -1,0 +1,42 @@
+A股控股回本分析 trace
+company: 000921.SZ 海信家电
+period: 2025-12-31
+
+输入读取:
+- /root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-23T21-20-34+08-00-000921-sz-海信家电/config/input.json
+- /root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-23T21-20-34+08-00-000921-sz-海信家电/config/output-schema.json
+
+复用与抽取:
+- raw_filing_dir 已有 annual-report.pdf 和 metadata.json，未重复下载。
+- 原 annual_review/result.json、report.md 只作为线索；本次生成 facts.json、annual_facts.md、normalized facts。
+- pdftotext -layout 转出 work/annual-report.txt。
+
+关键来源:
+- 合并资产负债表: 年报第96-97页。
+- 货币资金与交易性金融资产附注: 年报第140页。
+- 一年内到期定期存款、其他流动资产定期存款: 年报第150页。
+- 其他非流动资产定期存款、受限资产: 年报第175页。
+- 合并利润表: 年报第100-101页。
+- 合并现金流量表: 年报第104页。
+- 筹资活动负债变动表: 年报第177页。
+
+补抽字段:
+- 交易性金融资产理财/股票基金等 19,129,043,706.26 元。
+- 一年内到期定期存款 5,358,503,333.34 元。
+- 其他流动资产定期存款及利息 1,346,154,726.55 元。
+- 其他非流动资产定期存款及利息 4,118,541,736.10 元。
+- 受限货币资金 1,082,841,550.96 元。
+- 融资负债合计 4,612,545,757.17 元。
+
+缺口与假设:
+- 交易性金融资产底层保本/非保本/股票基金比例未完整披露，按 0.55 折扣。
+- 必要经营现金按 2025 年经营现金流出 15% 估算，为 11,877,209,999.59 元。
+- 2023 年资本开支未在 2025 年报同表披露；主分母使用三年扣非归母净利润中位数，并用 2025/2024 OCF 与资本开支交叉验证。
+
+计算摘要:
+- discounted_detachable_cash_assets=21616518114.75
+- discounted_detachable_net_cash=5126762357.99
+- operating_business_price_after_haircut=30118237642.01
+- discounted_sustainable_net_profit=2078146232.82
+- owner_earnback_years_after_haircut=14.492838
+- investment_case_type=liquidation_watch

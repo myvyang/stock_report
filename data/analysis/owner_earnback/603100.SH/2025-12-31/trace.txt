@@ -1,0 +1,48 @@
+run_dir=/root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T19-38-38+08-00-603100-sh-川仪股份
+input_json=/root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T19-38-38+08-00-603100-sh-川仪股份/config/input.json
+output_schema=/root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T19-38-38+08-00-603100-sh-川仪股份/config/output-schema.json
+
+1. 读取输入
+- 公司：603100.SH 川仪股份，A股。
+- 报告期：2025-12-31，annual。
+- 粗筛市值：9,011,000,000元，quote_time=20260723161457，来源 Tencent qt.gtimg.cn。
+- 粗筛异常点：rough_net_cash=3,044,740,265.44元、rough_cash_adjusted_payback_years=13.00年，可能未扣必要经营现金和资产折扣。
+
+2. 事实包复用
+- annual_facts_json 不存在。
+- annual_facts_md 不存在。
+- raw_filing_dir 初始无原始年报。
+
+3. 原始年报
+- 下载 2025 年报 PDF 到 raw_filing_dir。
+- 下载 URL：https://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESH_STOCK/2026/2026-4/2026-04-17/12103996.PDF
+- 使用 pdfinfo 确认为 260 页 PDF。
+- 使用 pdftotext -layout 转为 TXT。
+- 另下载 2024 年报到本次 work/，只为核对 2023 年现金流和资本开支。
+
+4. 关键来源位置
+- 2025年报第9-10页：近三年收入、归母净利润、扣非归母净利润、经营现金流、非经常性损益。
+- 2025年报第94-95页：合并资产负债表。
+- 2025年报第99页：合并利润表。
+- 2025年报第103-104页：合并现金流量表。
+- 2025年报第146页：货币资金、受限货币资金、交易性金融资产。
+- 2025年报第154页：应收款项融资及已质押银行承兑汇票。
+- 2025年报第173页：其他非流动金融资产。
+- 2025年报第185-187页：一年内到期非流动负债、长期借款、租赁负债。
+- 2025年报第228-229页：现金流量表补充资料、现金及现金等价物构成。
+- 2024年报第126页：2023 年经营现金流和资本开支。
+
+5. 主口径
+- 折后可剥离资产：现金及现金等价物28.41亿元*0.90 + 交易性金融资产0.02亿元*0.60 + 银行股权2.39亿元*0.55 = 26.90亿元。
+- 扣除：有息借款1.81亿元、必要经营现金8.00亿元、摩擦准备0.50亿元。
+- 折后可剥离净资金：16.58亿元。
+- 折前可分配现金利润：4.30亿元。
+- 利润折扣：0.75。
+- 折后可持续可分配现金利润：3.225亿元。
+- 控股回本年数：22.8年。
+- 分类：liquidation_watch。
+
+6. 缺口
+- 未逐笔拆分银行存款期限。
+- 未精确拆分维持性/增长性资本开支。
+- 未核验银行股权限售和实际出售路径。

@@ -1,0 +1,32 @@
+run_dir: /root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T21-07-42+08-00-603987-sh-康德莱
+company: 603987.SH 康德莱
+period: 2025-12-31
+
+1. 读取 config/input.json 和 config/output-schema.json。
+2. 检查 stock_report_paths 指定目录：annual_facts_json、annual_facts_md、normalized_facts_json、owner_earnback_result_json 均不存在，需要从原始年报抽取。
+3. 下载/保存原始年报：
+   - 公司 IR PDF: https://www.kdlchina.cn/static/upload/file/20260421/1776754274118218.pdf
+   - 镜像 PDF: https://stockmc.xueqiu.com/202604/603987_20260421_063P.pdf
+   - 上交所公告摘要页确认披露日期和标题: https://www.sse.com.cn/disclosure/listedinfo/summaries/indexDetail.shtml?SEQ=334619772
+4. 使用 pdfinfo 确认公司 IR PDF 252页，使用 pdftotext -layout 转为 raw_filing_dir/603987_2025_annual_report_company_ir.txt。
+5. 抽取事实：
+   - 业务：年报第10页，医用穿刺针、医用输注器械等医疗器械研发、生产、销售和服务。
+   - 三年主要数据：第6页，2025/2024/2023营收、利润总额、归母净利润、扣非归母净利润、经营现金流。
+   - 资产负债表：第97-98页，货币资金、应收账款、存货、其他权益工具投资、总资产、短期借款、一年内到期非流动负债、租赁负债。
+   - 受限资产：第31页，受限货币资金19,866,127.11元。
+   - 利润表：第101-102页，投资收益、权益法投资收益、归母净利润。
+   - 现金流量表：第105-106页，经营现金流、投资现金流、筹资现金流、购建长期资产现金支出。
+   - 现金流补充资料：第207页，现金及现金等价物余额、营运资金变化。
+   - 其他权益工具投资：第169-171页，非交易性权益工具投资明细。
+6. 仍缺失字段：
+   - 2023年资本开支未在2025年报对比列直接披露。
+   - 必要经营现金无公司披露口径，本次按约1个月现金经营支出估计。
+   - 其他权益工具投资、长期股权投资未逐项做可交易清算估值。
+7. 计算结果：
+   - 折后可剥离净资金 = 472,100,949.05 * 0.90 - 556,900,605.16 - 150,000,000 = -282,009,751.01元。
+   - 折后可持续可分配现金利润 = 180,000,000 * 0.80 = 144,000,000元。
+   - 经营业务购买价 = 3,158,000,000 - (-282,009,751.01) = 3,440,009,751.01元。
+   - 控股回本年数 = 3,440,009,751.01 / 144,000,000 = 23.89年。
+8. 分类：
+   - market_cap / discounted_sustainable_net_profit = 21.93年，超过15年，不进入profit_cheap。
+   - 折后可剥离净资金为负，归入liquidation_watch。

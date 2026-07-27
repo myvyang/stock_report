@@ -1,0 +1,24 @@
+输入：/root/aicode/stock_analysis/data/outputs/a_share_owner_earnback_agent_runs/2026-07-24T10-14-54+08-00-600398-sh-海澜之家/config/input.json
+公司：600398.SH 海澜之家，期间：2025-12-31。
+
+查找路径：
+1. 检查 stock_report 指定 annual_facts_json/annual_facts_md：未发现可复用事实包。
+2. 检查 raw_filing_dir：初始无 PDF。
+3. 公司官网 https://www.hla.com.cn/s/ 前端脚本定位 /api/article/lists，cate=5 定期公告。
+4. /api/article/detail?id=1129&lang=zh-cn 返回《海澜之家集团股份有限公司2025年年度报告》PDF 链接。
+5. PDF 保存至 /root/aicode/stock_report/data/raw/filings/600398.SH/2025-12-31/2025-annual-report.pdf，pdftotext 转为 /root/aicode/stock_report/data/raw/filings/600398.SH/2025-12-31/2025-annual-report.txt。
+
+抽取字段：
+- 近三年主要会计数据：营收、利润总额、归母净利润、扣非归母净利润、经营现金流。
+- 合并资产负债表：货币资金、交易性金融资产、定期存款、一年内到期非流动资产、其他非流动资产、借款、租赁负债、应付票据、权益。
+- 附注：货币资金受限情况、定期存款和质押定存、短期/长期借款、应付债券、租赁负债、现金流量表补充资料。
+
+仍缺失：
+- 定期存款逐笔银行、利率、单笔到期日。
+- 2023 年资本开支未补抽。
+
+主口径：
+- 折后可剥离净资金 6,831,678,473.45 元。
+- 折后可持续可分配现金利润 1,591,229,255.13 元。
+- owner_earnback_years_after_haircut 13.7864。
+- investment_case_type liquidation_watch，原因是 market_cap / discounted_sustainable_net_profit = 18.0797 > 15。

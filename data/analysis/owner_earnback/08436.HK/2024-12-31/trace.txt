@@ -1,0 +1,61 @@
+Run directory:
+/root/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-22T12-48-48+08-00-08436-hk-takbo-group
+
+Inputs:
+- config/input.json
+- config/output-schema.json
+
+Company:
+- 08436.HK TAKBO GROUP
+- Requested period: 2024-12-31 annual
+
+Allowed write targets used:
+- run outputs directory
+- run work directory
+- stock_report_paths raw_filing_dir
+- stock_report_paths annual_facts_json
+- stock_report_paths annual_facts_md
+- stock_report_paths annual_extraction_trace
+- stock_report_paths normalized_facts_json
+- stock_report_paths owner_earnback_result_json
+- stock_report_paths owner_earnback_report_md
+- stock_report_paths owner_earnback_trace
+
+Source lookup:
+- Existing annual fact pack was absent.
+- Downloaded 2024 annual report from HKEXnews:
+  https://www1.hkexnews.hk/listedco/listconews/gem/2025/0327/2025032702875.pdf
+- Downloaded 2022 annual report from company website mirror for third-year profit/cash-flow checks:
+  https://www.takbogroup.com/s/2023033102063.pdf
+
+Extraction tools:
+- pdfinfo
+- pdftotext -layout
+- rg and sed with bounded searches around statements and notes
+
+Key evidence:
+- Annual Report 2024 pp.79-84: profit or loss, financial position and cash flow.
+- Annual Report 2024 note 28 pp.136-137: cash, time deposits, currency split and PRC RMB cash.
+- Annual Report 2024 note 6(e) p.112: financial assets and financial liabilities.
+- Annual Report 2024 Management Discussion p.7: no outstanding borrowing or other indebtedness.
+- Annual Report 2024 note 19 and note 31: lease liabilities and leased offices/factories.
+- Annual Report 2022 pp.81 and 86: 2022 profit, operating cash flow and capex.
+
+Calculation notes:
+- Metrics are absolute HKD, not HK$'000.
+- Rough-screen market cap was provided in CNY. It was converted back to HKD using the input HKD/CNY rate 0.9393230080604553 because the annual report is in HKD.
+- Discounted detachable cash assets = HKD 165.524m.
+- Necessary operating cash = HKD 46.962m, estimated as 90 days of 2024 cost of sales plus administrative expenses plus selling/distribution expenses.
+- Tax/FX/dividend friction reserve = HKD 5.000m.
+- Non-lease financing debt deduction = HKD 0.
+- Lease liabilities were not mechanically deducted because they relate to ongoing offices and factories.
+- Discounted detachable net cash = HKD 113.562m.
+- Operating business price after haircut = HKD -35.562m.
+- Discounted sustainable distributable cash profit = HKD 2.500m.
+- Owner earnback years = -14.22.
+
+Remaining limitations:
+- Parent/subsidiary cash split is not disclosed.
+- Restricted cash was not separately disclosed, but absence of a restricted-cash line does not prove every group cash balance is immediately distributable.
+- Maintenance capex and normal working-capital reinvestment are not separately disclosed.
+- Market cap is a historical rough-screen value as of 2025-04-28, not a refreshed current quotation.
