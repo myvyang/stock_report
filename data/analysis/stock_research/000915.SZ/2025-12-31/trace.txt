@@ -1,16 +1,15 @@
-华特达因 000915.SZ 股票研究报告 trace
-运行时间：2026-07-27 Asia/Shanghai
+华特达因 000915.SZ 股票研究 trace
+运行时间：2026-07-28 Asia/Shanghai
 
 执行协议：
+- 已读取 /workspace/.agents/skills/stock-research/SKILL.md。
+- 已读取 /workspace/.agents/skills/stock-research/references/result-contract.md。
+- 已读取 /workspace/.agents/skills/stock-research/references/report-contract.md。
+- 补充读取 /workspace/.agents/skills/stock-research/references/data-reuse.md，用于判断事实包和历史研究结果复用边界。
 - 已运行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- 已按 stock-research-result-v1 骨架填充新版字段，未沿用旧版 investment_case_type 等榜单标签。
-- 写入完成后运行 protocol validate。
-
-读取的协议和说明：
-- /workspace/.agents/skills/stock-research/SKILL.md
-- /workspace/.agents/skills/stock-research/references/result-contract.md
-- /workspace/.agents/skills/stock-research/references/report-contract.md
-- /workspace/.agents/skills/stock-research/references/data-reuse.md
+- 已使用 protocol set 写入 analysis、valuation、metrics、financials、asset_analysis、owner_earnback、dividend、business、risks、evidence、data_quality。
+- 已运行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- 校验结果：{"status":"ok","errors":[]}
 
 读取的输入和本地来源：
 - /workspace/config/input.json
@@ -24,8 +23,9 @@
 
 关键复用判断：
 - 年度事实包足够覆盖业务、三张表、资金资产、经营资产、负债、现金流和主要证据。
-- 旧 stock_research 结果作为核查线索和报告底稿复用，但新版 result.json 去除榜单标签，仅保留可排序数字、解释和数据质量。
-- 市值使用 config/input.json：5,971,000,000 元，日期 2026-07-24，PE TTM 11.16。
+- 既有 stock_research 结果作为核查线索和字段来源复用；本次 outputs/result.json 仍通过 stock-research 协议 CLI 初始化和填充。
+- 本次输入的 market_cap.amount 为 5,971,000,000 元；market_cap.date 为空，pe_ttm 为 null。
+- 因 result-contract 的 complete 门槛要求市值日期和 PE TTM 明确，本次 data_quality.status 写为 partial，不进入正式排序。
 
 核心公式落地：
 - 毛利率 = 1,896,597,492.53 / 2,228,386,030.26 = 85.11%。
@@ -35,13 +35,8 @@
 - 市值/现金利润 = 5,971,000,000.00 / 441,830,475.81 = 13.51 年。
 - 预测分红率 = 468,662,970.00 / 5,971,000,000.00 = 7.85%。
 
-外部行业来源沿用旧研究核查：
-- 国家统计局，2026-01-19，2025 年出生人口 792 万人：https://www.stats.gov.cn/sj/sjjd/202601/t20260119_1962338.html
-- 国家中医药管理局/国家卫健委，2025-06-25，“儿科和精神卫生服务年”行动（2025-2027年）：https://www.natcm.gov.cn/yizhengsi/zhengcewenjian/2025-06-25/36513.html
-- 新华网客户端/健康报，2026-01-28，2025 年规模以上医药制造业利润总额 3490 亿元、同比增长 2.7%：https://app.xinhuanet.com/news/article.html?articleId=a08bc84f30aceae9b13ec9814f3e675f
-- 财联社/科创板日报，2026-02-19，零售药店数量见顶回落、2025 年三季度净减少约 8800 家：https://www.cls.cn/detail/2291689
-- 华福证券，2025-01-23，华特达因公司深度研究，伊可新历史市占率和收入占比交叉印证：https://pdf.dfcfw.com/pdf/H3_AP202501231642485149_1.pdf
-
-仍无法公开确认的项目：
+仍无法公开确认或本次输入缺失的项目：
+- 市值日期缺失；本次输入 market_cap.date 为空。
+- PE TTM 缺失；本次输入 market_cap.pe_ttm 为 null。
 - 结构性存款逐笔期限、挂钩标的和提前赎回条款；结果沿用 0.75 折扣。
 - 伊可新 2025 年单品收入；年报未披露单品金额，报告只写大单品依赖。

@@ -1,0 +1,71 @@
+Task: stock research for 002563.SZ / 森马服饰, period 2025-12-31 annual.
+Created at input: 2026-07-28T20:33:40+08:00, timezone Asia/Shanghai.
+
+Protocol and contracts:
+- Read /workspace/.agents/skills/stock-research/SKILL.md.
+- Read /workspace/.agents/skills/stock-research/references/result-contract.md.
+- Read /workspace/.agents/skills/stock-research/references/report-contract.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Wrote result fields using the protocol CLI set/append commands via a local Python subprocess driver.
+- Validated result with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+  Final validation status: ok.
+
+Sources reused:
+- config/input.json for company identity, period, market capitalization, market cap timestamp and PE TTM.
+- stock_report/data/analysis/annual_review/002563.SZ/2025-12-31/annual_facts.md.
+- stock_report/data/analysis/annual_review/002563.SZ/2025-12-31/facts.json.
+- stock_report/data/normalized/facts/002563.SZ/2025-12-31/annual-facts.json.
+- stock_report/data/analysis/annual_review/002563.SZ/2025-12-31/extraction_trace.txt.
+- stock_report/data/raw/filings/002563.SZ/2025-12-31/002563_2025_annual_report.txt.
+
+Primary filing:
+- 浙江森马服饰股份有限公司2025年年度报告全文.
+- SZSE PDF URL recorded in fact pack:
+  https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-03-31/dcc46cfb-850d-4672-b681-7aa559abb75b.PDF
+
+Key source checks:
+- Business and segment revenue checked against annual report text around the revenue composition table:
+  revenue 15,089,844,116.68 yuan; casual apparel 4,054,958,459.50 yuan; children's apparel 10,800,469,872.91 yuan; online 6,972,340,079.88 yuan; direct 2,015,809,078.41 yuan; franchise 5,769,223,989.01 yuan.
+- Balance sheet checked against annual report text:
+  total assets 18,653,395,821.39 yuan; total liabilities 7,275,623,764.22 yuan; parent equity 11,390,946,973.54 yuan; monetary funds 5,836,811,962.07 yuan; trading financial assets 1,198,965,470.28 yuan; inventory 3,178,200,989.58 yuan.
+- Cash and restrictions checked against notes:
+  cash and cash equivalents 5,628,294,761.71 yuan; non-cash-equivalent monetary funds 208,517,200.36 yuan; restricted closed wealth-management products 562,941,500.81 yuan.
+- Income and cash flow checked against annual report and fact pack:
+  gross profit 6,805,948,825.30 yuan; parent net profit 892,415,746.62 yuan; deducted non-recurring parent net profit approximately 842,959,657.06 yuan; operating cash flow 1,729,689,105.85 yuan; capex 613,809,179.45 yuan.
+- Dividend checked against annual report profit distribution section:
+  2025 distribution plan: every 10 shares cash dividend 1.5 yuan; base 2,694,090,160 shares; cash dividend 404,113,524.00 yuan.
+- Market data reused from input:
+  market capitalization 16,084,000,000.00 yuan at 20260728161409 from Tencent qt.gtimg.cn; PE TTM 16.26.
+
+Analysis model decision:
+- Classified as ordinary_operating.
+- Reason: reported business is branded apparel product sales through online, direct, franchise and associate channels; assets and liabilities are normal retail operating assets, cash/wealth-management products, supplier payables, small borrowings and lease liabilities.
+- No evidence of bank, brokerage, insurance, real-estate development, construction project, utility concession or investment-holding model.
+- owner_earnback_applicability: applicable.
+
+Calculations:
+- Gross margin = 6,805,948,825.30 / 15,089,844,116.68 = 0.4510284382445572.
+- Net margin = 892,415,746.62 / 15,089,844,116.68 = 0.059140156765008736.
+- Operating free cash flow = 1,729,689,105.85 - 613,809,179.45 = 1,115,879,926.40 yuan.
+- Necessary operating cash is an analytical estimate, not a disclosed field. This report retained 1,500,000,000 yuan for inventory purchases, channel expenses and daily working capital.
+- Discounted detachable net cash:
+  cash and cash equivalents after necessary operating cash = (5,628,294,761.71 - 1,500,000,000.00) * 95% = 3,921,880,023.6245 yuan.
+  restricted monetary funds = 208,517,200.36 * 50% = 104,258,600.18 yuan.
+  non-closed wealth-management products = (1,198,965,470.28 - 562,941,500.81) * 90% = 572,421,572.523 yuan.
+  closed wealth-management products = 562,941,500.81 * 70% = 394,059,050.5669999 yuan.
+  deduct borrowings and lease liabilities = 300,000,000.00 + 237,353,013.58 + 285,862,008.45 = 823,215,022.03 yuan.
+  discounted detachable net cash = 4,169,404,224.864499 yuan.
+- Discounted sustainable cash profit:
+  2025 operating free cash flow 1,115,879,926.40 yuan * 85% = 948,497,937.44 yuan.
+  The 85% haircut reflects lower 2025 deducted profit and apparel inventory/channel reinvestment needs.
+- Operating business price = 16,084,000,000.00 - 4,169,404,224.864499 = 11,914,595,775.135502 yuan.
+- Owner earnback years = 11,914,595,775.135502 / 948,497,937.44 = 12.561541048041759.
+- Market cap to cash profit = 16,084,000,000.00 / 948,497,937.44 = 16.957337876148458.
+- Forecast dividend yield = 404,113,524.00 / 16,084,000,000.00 = 0.025125188012932106.
+
+Data quality:
+- status: complete.
+- Limitations recorded in result.json:
+  necessary operating cash is estimated; wealth-management product details are aggregated; 2023 capex is not available in the 2025 annual report three-year summary.

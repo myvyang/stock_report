@@ -1,0 +1,50 @@
+stock-research trace for 600861.SH 北京人力, period 2025-12-31
+
+1. Read skill and protocol references:
+   - /workspace/.agents/skills/stock-research/SKILL.md
+   - /workspace/.agents/skills/stock-research/references/result-contract.md
+   - /workspace/.agents/skills/stock-research/references/report-contract.md
+   - /workspace/.agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reused annual fact pack:
+   - stock_report/data/analysis/annual_review/600861.SH/2025-12-31/facts.json
+   - stock_report/data/analysis/annual_review/600861.SH/2025-12-31/annual_facts.md
+   - stock_report/data/normalized/facts/600861.SH/2025-12-31/annual-facts.json
+   - stock_report/data/raw/filings/600861.SH/2025-12-31/metadata.json
+
+4. Checked original filing text for fields not explicit in fact pack:
+   - 2025 net profit 1,450,744,123.07 yuan
+   - parent net profit 1,169,842,477.89 yuan
+   - minority profit 280,901,645.18 yuan
+   - 2025 cash dividend proposal 584,964,271.51 yuan, payout ratio 50.00%
+
+5. Analysis model decision:
+   - statement_model: ordinary_operating
+   - owner_earnback_applicability: applicable
+   - Reason: company is an HR services operating company, not bank, broker, insurer, real estate developer, construction contractor, utility concession, or investment holding platform.
+   - Special handling: agency/proxy business creates large other receivables and other payables, so matching obligations were retained and not treated as detachable cash.
+
+6. Main calculations:
+   - gross_margin = 2,490,876,053.13 / 45,185,228,612.85 = 0.05512589245640405
+   - net_margin = 1,169,842,477.89 / 45,185,228,612.85 = 0.025889931594975144
+   - operating_free_cash_flow = 1,279,841,662.90 - 12,271,402.18 = 1,267,570,260.72
+   - forecast_dividend_yield = 584,964,271.51 / 7,563,000,000 = 0.07734553371810128
+   - discounted_detachable_net_cash = 7,513,262,554.54 - 820,403,965.94 - 66,315,168.79 - 4,772,581,010.07 - 157,004,200.00 + 1,025,858,970.38 * 0.95 + 5,438,374.39 * 0.50 = 2,674,243,418.796001
+   - discounted_sustainable_cash_profit = 500,000,000.00
+   - operating_business_price = 7,563,000,000.00 - 2,674,243,418.796001 = 4,888,756,581.203999
+   - owner_earnback_years = 4,888,756,581.203999 / 500,000,000.00 = 9.777513162407997
+   - market_cap_to_cash_profit = 7,563,000,000.00 / 500,000,000.00 = 15.126
+
+7. Wrote result fields with protocol CLI set commands, not by hand-writing a complete JSON object from scratch.
+
+8. Validation:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: {"status":"ok","errors":[]}
+
+Data limitations retained in result:
+- 2023 capital expenditure was not extracted as a line item in the fact pack.
+- Cash was not split account-by-account against agency/proxy obligations.
+- 2025 reported profit included large non-recurring gains and subsidies, so owner earnback uses discounted sustainable cash profit instead of reported parent net profit.

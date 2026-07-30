@@ -1,0 +1,57 @@
+stock-research trace
+company=002423.SZ 中粮资本
+period=2025-12-31
+generated_at=2026-07-29T19:44:31+08:00
+
+1. Protocol
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md and references/report-contract.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reused sources
+- config/input.json: company identity, market cap CNY 20,806,000,000, quote timestamp 20260728161415, PE TTM 20.58.
+- stock_report/data/analysis/annual_review/002423.SZ/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/002423.SZ/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/002423.SZ/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/002423.SZ/2025-12-31/002423_2025_annual_report.txt
+- No new filing download was required.
+
+3. Primary filing checks
+- Business and segment revenue: annual report text lines 672-693 and 810-855.
+- Main financial indicators and restated 2024 comparison: lines 276-306.
+- Consolidated balance sheet: lines 4300-4435.
+- Consolidated income statement: lines 4568-4640.
+- Consolidated cash flow statement: lines 4690-4740.
+- Restricted assets: lines 9954-9975.
+- Customer margin liabilities: lines 9308-9340.
+- Segment assets, liabilities and profit: lines 10200-10235.
+- Dividend policy, 2024 distribution and 2025 proposal: lines 2232-2278.
+
+4. Model decision
+- Input hint ordinary_operating/applicable was rejected after filing review.
+- Actual model set to platform_financial_mixed/requires_special_model.
+- Reason: insurance revenue was 75.02% of 2025 operating revenue; investment assets support insurance contract liabilities; futures customer margins are client funds; regulated subsidiaries require solvency/net-capital buffers.
+- Per result contract, discounted net cash, discounted cash profit, operating business price, owner earnback years and market-cap-to-cash-profit remain null.
+
+5. Calculations
+- net_margin = 1,132,767,734.56 / 9,594,271,277.59 = 0.1180713097.
+- minority_interest_ratio = 13,322,890,974.25 / 36,069,707,285.87 = 0.3693656443.
+- financial investment assets = 26,764,519,668.21 + 12,600,197,059.74 + 70,438,159,323.85 + 17,164,222,556.06 = 126,967,098,607.86.
+- customer fund liabilities = 21,121,005,459.27 + 193,943,146.97 = 21,314,948,606.24.
+- specified financing liabilities = 491,145,121.88 + 850,000,000 + 3,426,917,149.01 + 2,038,133,932.78 = 6,806,196,203.67.
+- forecast dividend yield = 341,007,625.10 / 20,806,000,000 = 0.0163895571.
+- Gross margin and operating free cash flow remain null because ordinary-company definitions are not economically comparable for this mixed financial group.
+
+6. Data quality
+- Status complete under the special-model minimum threshold.
+- Key limitation: filing does not fully disclose distributable excess capital/net capital for every regulated subsidiary or ownership of each cash balance.
+- 2024 comparisons use figures restated for the new insurance contract standard.
+- Quote fields are an external market snapshot and were not reconstructed from exchange ticks.
+
+7. Output assembly and validation
+- outputs/result.json was populated through protocol CLI set commands using initialized schema paths.
+- outputs/report.md and outputs/trace.txt were written from the reviewed facts.
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Outcome: {"status":"ok","errors":[]}

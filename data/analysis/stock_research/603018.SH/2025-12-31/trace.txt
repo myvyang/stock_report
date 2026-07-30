@@ -1,0 +1,52 @@
+stock-research trace for 603018.SH / 华设集团 / 2025-12-31 annual
+
+Protocol:
+- Read stock-research SKILL.md.
+- Read result-contract.md and report-contract.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated initialized protocol skeleton, then validated with protocol CLI.
+
+Primary local sources:
+- config/input.json: company identity, market cap 4,202,000,000.00 yuan, PE TTM 14.77, market cap timestamp 20260728161442, source Tencent qt.gtimg.cn.
+- stock_report/data/raw/filings/603018.SH/2025-12-31/metadata.json: annual report identity, source URL https://stockmc.xueqiu.com/202604/603018_20260420_YQVD.pdf.
+- stock_report/data/analysis/annual_review/603018.SH/2025-12-31/facts.json and annual_facts.md: extracted financials and asset/liability categories.
+- stock_report/data/raw/filings/603018.SH/2025-12-31/603018_2025_annual_report.txt: checked business description, segment table, dividend plan, cash notes, risk discussion and cash-flow details.
+
+Analysis model:
+- Confirmed ordinary_operating.
+- Rationale: annual report says the group belongs to engineering consulting, with core engineering survey/design and project service revenue. No bank/broker/insurance/property developer/utility concession balance-sheet model identified.
+- Special handling inside ordinary model: accounts receivable, contract assets, payables and contract liabilities are operating project balances, not detachable cash.
+
+Formula inputs:
+- Revenue = 4,109,885,023.41.
+- Cost of sales = 2,745,353,502.67.
+- Gross profit = 1,364,531,520.74.
+- Parent net profit = 274,270,150.96.
+- OCF = 373,328,811.71.
+- Capex = 105,150,763.03.
+- Operating FCF = 268,178,048.68.
+- Non-GAAP parent net profit = 246,452,234.16.
+- Cash and equivalents = 2,100,615,464.89.
+- Structured deposits = 269,891,771.68.
+- Short borrowings = 167,818,857.05.
+- Convertible bond liability = 401,406,280.59.
+- Forecast dividend = 85,474,550.38.
+
+Haircuts and estimates:
+- Required operating cash estimated at 500,000,000 yuan, roughly 1.5 months of operating cash outflow plus project-service payment volatility. This is not directly disclosed.
+- Excess cash = cash/equivalents 2,100,615,464.89 - required operating cash 500,000,000.00 = 1,600,615,464.89; haircut 85%; discounted value 1,360,523,145.1565.
+- Structured deposit discounted at 65%; discounted value 175,429,651.592.
+- Financing debt fully deducted: short borrowing + convertible bond liability = 569,225,137.64.
+- Discounted detachable net cash = 966,727,659.1085.
+- Cash profit base = min(operating FCF 268,178,048.68, non-GAAP parent profit 246,452,234.16) = 246,452,234.16.
+- Receivable/contract-asset risk haircut = 85%; discounted sustainable cash profit = 209,484,399.036.
+- Operating business price = market cap 4,202,000,000.00 - discounted net cash 966,727,659.1085 = 3,235,272,340.8915.
+- Owner earnback years = 3,235,272,340.8915 / 209,484,399.036 = 15.443976.
+- Market cap / cash profit = 4,202,000,000.00 / 209,484,399.036 = 20.058772.
+- Forecast dividend yield = 85,474,550.38 / 4,202,000,000.00 = 0.020341.
+
+Known limitations:
+- Structured deposit maturity, underlying exposure and redemption terms were not expanded in the fact pack.
+- Required operating cash is estimated, not a directly disclosed value.
+- 2023 capex was not back-extracted, so multi-year FCF evidence is incomplete; 2025/2024 capex and three-year profit/OCF direction were used instead.

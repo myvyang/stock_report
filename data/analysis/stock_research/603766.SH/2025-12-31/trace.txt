@@ -1,0 +1,72 @@
+task: stock research for 603766.SH 隆鑫通用
+period: 2025-12-31
+generated_at: 2026-07-29T14:09:43+08:00
+
+1. Read skill instructions:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized outputs/result.json with the required protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reused existing official-filing-derived data:
+   - stock_report/data/analysis/annual_review/603766.SH/2025-12-31/facts.json
+   - stock_report/data/analysis/annual_review/603766.SH/2025-12-31/annual_facts.md
+   - stock_report/data/analysis/annual_review/603766.SH/2025-12-31/result.json
+   - stock_report/data/raw/filings/603766.SH/2025-12-31/annual-report.pdf
+   - stock_report/data/raw/filings/603766.SH/2025-12-31/metadata.json
+
+4. Verified missing business, segment, dividend and risk passages directly against the local annual-report PDF. The environment lacked pdftotext and PDF Python libraries, so a temporary virtual environment with pypdf was used for read-only extraction. No source file was modified.
+
+5. Confirmed analysis model:
+   ordinary_operating / applicable.
+   Reason: revenue comes from manufacturing and selling motorcycles, engines and general machinery; no special financial-statement structure. Restricted deposits and guarantees were excluded from detachable cash, and RMB 1.0 billion bill financing was treated as financing debt.
+
+6. Core calculations:
+   gross_margin = 3,640,676,477.37 / 19,135,154,464.95 = 0.1902611491
+   net_margin = 1,647,750,370.76 / 19,135,154,464.95 = 0.0861111612
+   operating_fcf = 2,876,130,710.51 - 329,997,722.01 = 2,546,132,988.50
+
+   required_operating_cash = 15,125,742,981.91 * 25% = 3,781,435,745.48
+   excess_cash = 7,270,430,054.01 - 3,781,435,745.48 = 3,488,994,308.53
+   discounted_net_cash =
+     excess_cash * 70%
+     + (reverse repo + policy account) 953,862,849.85 * 90%
+     - financing debt 1,335,640,459.45
+     = 1,965,132,121.39
+
+   adjusted_parent_profit =
+     1,647,750,370.76
+     - other income 95,708,343.51
+     - impairment reversal 22,173,837.12
+     - asset disposal gain 4,426,293.68
+     = 1,525,441,896.45
+   discounted_sustainable_cash_profit = 1,525,441,896.45 * 85% = 1,296,625,611.98
+
+   operating_business_price = 29,181,000,000.00 - 1,965,132,121.39 = 27,215,867,878.61
+   owner_earnback_years = 27,215,867,878.61 / 1,296,625,611.98 = 20.9898
+   market_cap_to_cash_profit = 29,181,000,000.00 / 1,296,625,611.98 = 22.5053
+   forecast_dividend_yield = 1,437,479,295.00 / 29,181,000,000.00 = 0.0492607962
+
+7. Used protocol CLI set/append commands to populate result.json; the complex result object was not handwritten from scratch.
+
+8. Validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+9. Principal evidence:
+   - Annual report PDF pages 65-74: balance sheet, income statement and cash flow statement.
+   - PDF page 156: segment revenue and cost.
+   - PDF pages 107 and 167: monetary funds, restrictions, cash and cash equivalents.
+   - PDF pages 143, 148 and 150: financing debt and bill financing.
+   - PDF pages 2, 51 and 193: 2025-attributable cash dividends.
+   - PDF page 197: related-party asset-swap plan and horizontal competition.
+
+10. Known limitations:
+   - Complete 2023 annual data was not extracted, so sustainable cash profit is not a three-year median.
+   - Maintenance and growth capex were not separately disclosed.
+   - Interest income could not be matched precisely to each cash pool.
+   - The RMB 1,026,770,925 annual dividend proposal still required shareholder approval at the annual-report date.
+   - Market cap and PE were accepted from the supplied Tencent snapshot.

@@ -1,0 +1,70 @@
+stock-research trace
+company=300577.SZ 开润股份
+period=2025-12-31
+generated_for_input=2026-07-29T17:07:44+08:00
+
+1. 按用户要求完整读取：
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md（由技能引用，确定复用边界）
+
+2. 检查并复用长期研究材料：
+   - stock_report/data/analysis/annual_review/300577.SZ/2025-12-31/facts.json
+   - stock_report/data/analysis/annual_review/300577.SZ/2025-12-31/annual_facts.md
+   - stock_report/data/analysis/annual_review/300577.SZ/2025-12-31/extraction_trace.txt
+   - stock_report/data/normalized/facts/300577.SZ/2025-12-31/annual-facts.json
+   - stock_report/data/raw/filings/300577.SZ/2025-12-31/metadata.json
+   - stock_report/data/raw/filings/300577.SZ/2025-12-31/300577_2025_annual_report.pdf
+   - stock_report/data/raw/filings/300577.SZ/2025-12-31/300577_2025_annual_report.txt
+
+3. 在本地年报文本复核：
+   - 2025 年利润分配预案：每10股2.60元，合计62,151,702.60元，尚待股东大会审议。
+   - 2025 年实际支付：2024年度分红45,395,188.70元；2025年中期分红37,351,521.08元。
+   - 收入地区与销售模式：境外78.18%，代加工销售86.70%。
+   - 前五大客户占比61.20%，印尼基地贡献70%以上产能。
+   - 核心三张表和附注数字与年度事实包一致。
+
+4. 财报模型复核：
+   statement_model=ordinary_operating
+   owner_earnback_applicability=applicable
+   reason=公司通过制造和品牌销售取得收入，资产负债是应收、存货、生产设备、供应商结算和银行融资等普通经营结构，不符合特殊财报模型边界。
+
+5. 使用协议 CLI 初始化：
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+6. 使用协议 CLI 的 set/append 命令逐字段填充 outputs/result.json，没有从空文件手写复杂 JSON。
+
+7. 关键计算：
+   gross_margin=1,170,871,107.65/4,891,639,568.28=0.2393616887
+   net_margin=331,081,726.74/4,891,639,568.28=0.0676831811
+   operating_free_cash_flow=576,081,259.30-255,448,179.79=320,633,079.51
+   included_cash=1,148,703,393.97*70%=804,092,375.779
+   interest_bearing_debt=1,507,662,851.69+212,454,970.69+112,000,000=1,832,117,822.38
+   discounted_detachable_net_cash=804,092,375.779-1,832,117,822.38-394,128,588.68=-1,422,154,035.281
+   discounted_sustainable_cash_profit=291,051,029.19*85%=247,393,374.8115
+   operating_business_price=4,166,000,000-(-1,422,154,035.281)=5,588,154,035.281
+   owner_earnback_years=5,588,154,035.281/247,393,374.8115=22.5881313093
+   market_cap_to_cash_profit=4,166,000,000/247,393,374.8115=16.8395778714
+   forecast_dividend_yield=62,151,702.60/4,166,000,000=0.0149187956
+
+8. 折扣判断：
+   - 现金等价物只纳入70%，30%用于经营必要现金、境外调度和披露不足缓冲。
+   - 有息债务与股权收购应付款100%扣除。
+   - 现金利润从三年扣非归母中位数出发，因2024年自由现金流波动、维持性资本开支未拆分和客户集中打85折。
+   这些属于研究判断，已与财报事实分开，并在 result.json/report.md 披露。
+
+9. 行情输入：
+   market_cap=4,165,999,999.9999995
+   market_cap_date=20260728161454
+   market_cap_source=Tencent qt.gtimg.cn
+   pe_ttm=12.09
+
+10. 协议验证命令：
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    首次完成后结果：{"status":"ok","errors":[]}
+
+11. 数据质量：
+    status=complete
+    incomplete_reasons=[]
+    limitations=维持性资本开支未拆分、境外及子公司现金上划信息不足、原始公告由Sina定位、市值和PE来自任务输入行情快照。

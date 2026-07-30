@@ -1,0 +1,62 @@
+task: stock research
+company: 300144.SZ 宋城演艺
+period: 2025-12-31
+report_type: annual
+created_at: 2026-07-28T23:49:02+08:00
+
+protocol:
+- Read /workspace/.agents/skills/stock-research/SKILL.md.
+- Read /workspace/.agents/skills/stock-research/references/result-contract.md.
+- Read /workspace/.agents/skills/stock-research/references/report-contract.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Updated initialized result by protocol set commands.
+- Validated outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok.
+
+source_files_used:
+- config/input.json
+- stock_report/data/raw/filings/300144.SZ/2025-12-31/metadata.json
+- stock_report/data/raw/filings/300144.SZ/2025-12-31/300144_2025_annual_report.txt
+- stock_report/data/analysis/annual_review/300144.SZ/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/300144.SZ/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/300144.SZ/2025-12-31/extraction_trace.txt
+
+model_decision:
+- analysis_model.statement_model = ordinary_operating.
+- owner_earnback_applicability = applicable.
+- Reason: 2025 annual report describes the company as operating live performance, theme park/scenic area and tourism service businesses. Assets are cash, time deposits, wealth management products, scenic-area fixed assets, construction in progress, right-of-use assets, intangible assets, long-term prepaid expenses and investment assets. Liabilities are mainly contract liabilities, accounts payable, deferred income, lease liabilities and a small one-year portion of long-term borrowings. This is not a bank, brokerage, insurer, real estate developer, construction contractor, utility concession or investment holding model.
+
+key_extractions:
+- Revenue 2,257,598,020.98 yuan; cost of sales 795,681,788.70 yuan; gross profit 1,461,916,232.28 yuan.
+- Parent net profit 817,670,474.31 yuan; net profit 851,252,880.53 yuan; non-recurring difference versus deducted parent net profit 33,128,931.55 yuan.
+- Operating cash flow 1,545,931,208.00 yuan; capex 267,554,801.13 yuan; operating free cash flow 1,278,376,406.87 yuan.
+- Total assets 10,239,050,631.02 yuan; total liabilities 1,488,185,557.09 yuan; total equity 8,750,865,073.93 yuan; parent equity 8,437,361,753.12 yuan.
+- Cash and cash equivalents 2,490,536,641.14 yuan; time deposits 450,000,000.00 yuan; deposit accrued interest 1,715,960.80 yuan; wealth management products 1,617,821,920.21 yuan.
+- 2025 proposed cash dividend 654,182,079.00 yuan, based on 2.50 yuan per 10 shares and the buyback account count as of 2026-04-23.
+- Market cap 15,758,000,000.00 yuan and PE TTM 20.2 from Tencent qt.gtimg.cn in config/input.json, timestamp 20260728161442.
+
+calculation_notes:
+- gross_margin = 1,461,916,232.28 / 2,257,598,020.98 = 0.6475538243.
+- net_margin = 817,670,474.31 / 2,257,598,020.98 = 0.3621860343.
+- forecast_dividend_yield = 654,182,079.00 / 15,758,000,000.00 = 0.0415142835.
+- Discounted detachable net cash:
+  cash 2,490,536,641.14 less necessary operating cash 300,000,000.00
+  plus time deposits 450,000,000.00 * 95%
+  plus deposit accrued interest 1,715,960.80 * 100%
+  plus wealth management products 1,617,821,920.21 * 85%
+  less one-year portion of long-term borrowings 67,581,732.30
+  = 3,927,319,501.82 yuan.
+- Discounted sustainable cash profit = 780,000,000.00 yuan. This is anchored to 2025 deducted parent net profit of 784,541,542.76 yuan and cross-checked against positive 2023-2025 operating free cash flow, but it does not capitalize the 2025 working-capital release.
+- Operating business price = 15,758,000,000.00 - 3,927,319,501.82 = 11,830,680,498.18 yuan.
+- owner_earnback_years = 11,830,680,498.18 / 780,000,000.00 = 15.1675391002.
+- market_cap_to_cash_profit = 15,758,000,000.00 / 780,000,000.00 = 20.2025641026.
+
+data_quality:
+- status = complete.
+- Limitations recorded in result.json:
+  1. Wealth management products were not disclosed item by item by principal protection, maturity, issuer or underlying risk, so a 85% discount was used.
+  2. Necessary operating cash was not directly disclosed by management; this run estimated 300 million yuan.
+  3. Lease liabilities were not broken down by site and exit cost; this run treated them as continuing operating constraints rather than ordinary financial debt fully deducted from net cash.
+  4. The 2025 dividend proposal still requires shareholder approval and may change with share capital and buyback share count before implementation.

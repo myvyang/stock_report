@@ -1,0 +1,54 @@
+建发合诚 603909.SH 股票研究追踪记录
+生成日期：2026-07-29（Asia/Shanghai）
+
+1. 协议与初始化
+- 完整读取 .agents/skills/stock-research/SKILL.md。
+- 完整读取 result-contract.md、report-contract.md 和 data-reuse.md。
+- 使用协议 CLI：
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. 复用资料
+- 年度事实包：
+  stock_report/data/analysis/annual_review/603909.SH/2025-12-31/facts.json
+- 年度事实摘要：
+  stock_report/data/analysis/annual_review/603909.SH/2025-12-31/annual_facts.md
+- 原始年报文本：
+  stock_report/data/raw/filings/603909.SH/2025-12-31/603909_2025_annual_report.txt
+- 原始年报 PDF：
+  stock_report/data/raw/filings/603909.SH/2025-12-31/603909_2025_annual_report.pdf
+- 官方披露 URL：
+  https://static.cninfo.com.cn/finalpage/2026-03-21/1225021025.PDF
+- 行情：config/input.json 中 Tencent qt.gtimg.cn 快照，市值 2,153,000,000 元，时间 2026-07-28 16:14:44，PE TTM 18.85。
+
+3. 财报模型复核
+- 输入提示为 ordinary_operating/applicable。
+- 年报显示建筑施工收入 6,674,805,166.14 元，占营业收入 87.42%。
+- 年末合同资产 2,771,128,652.65 元、应收账款 1,213,501,708.00 元、应付账款 4,156,761,255.15 元。
+- 经营性应收增加 1,145,241,013.68 元，经营性应付增加 1,340,325,105.32 元。
+- 据此覆盖输入提示，分类为 construction_project/requires_special_model。
+- 普通控股回本字段保持 null；未将货币资金当作可剥离现金，未将单年经营现金流当作可持续现金利润。
+
+4. 关键计算
+- 毛利率 = 401,019,649.66 / 7,635,418,116.91 = 0.05252098097573337。
+- 归母净利率 = 109,194,107.94 / 7,635,418,116.91 = 0.014300999142164868。
+- 经营自由现金流（展示值）= 420,983,127.36 - 12,875,170.19 = 408,107,957.17 元。
+- 预测分红率 = 39,100,971 / 2,153,000,000 = 0.018161156990246168。
+- 分红为董事会预案，尚须股东会审议。
+
+5. 补充核验
+- 年报第 18 页：分产品收入、成本和毛利率。
+- 年报第 20 页附近：前五大客户占 91.17%，建发集团及所属单位占 89.60%。
+- 年报建筑业经营信息：累计新签施工项目 30 个、93.06 亿元；期末在手订单 160.47 亿元。
+- 年报第 47-48 页：2025 年度拟现金分红 39,100,971 元，分红比例 35.81%。
+- 年报第 187 页：经营性应收、应付变动。
+- 年报附注：2025 年合同资产减值损失 37,659,118.97 元。
+
+6. 数据限制
+- 年报未披露项目现金可由控股股东自由调拨的比例。
+- 缺少逐项目毛利、回款账龄和剩余履约现金流。
+- 2025 年度分红为预案；市值日期与财报期末不同。
+
+7. 输出与验证
+- outputs/result.json 由协议 CLI init 后逐字段 set 完成，未从头手写复杂 JSON。
+- outputs/report.md 按工程施工专项模型编写。
+- 最终执行协议 validate，并进行 JSON 解析、关键 null 规则及文件存在性检查。

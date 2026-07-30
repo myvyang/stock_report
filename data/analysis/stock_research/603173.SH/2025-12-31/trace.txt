@@ -1,0 +1,64 @@
+福斯达 603173.SH 股票研究追踪记录
+生成日期：2026-07-29 Asia/Shanghai
+
+1. 已读取并遵循：
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. 输入与复用：
+   - 输入：config/input.json
+   - 复用事实包：stock_report/data/analysis/annual_review/603173.SH/2025-12-31/facts.json
+   - 复用事实摘要：stock_report/data/analysis/annual_review/603173.SH/2025-12-31/annual_facts.md
+   - 复用抽取记录：stock_report/data/analysis/annual_review/603173.SH/2025-12-31/extraction_trace.txt
+   - 原始转载全文：stock_report/data/raw/filings/603173.SH/2025-12-31/sina_12160893_utf8.html
+   - 官方公告链接：https://www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-24/603173_20260424_E6MU.pdf
+   - 行情：任务输入提供的 Tencent qt.gtimg.cn 快照，市值 5,016,000,000 元，时点 2026-07-28 16:14:42，PE TTM 12.6
+
+3. 财报模型判断：
+   - statement_model=ordinary_operating
+   - owner_earnback_applicability=applicable
+   - 理由：主营深冷非标成套装备设计制造销售，属于普通经营公司；合同负债、存货、预付、合同资产和应收款为项目营运结构，现金需保留履约缓冲。
+
+4. 关键公式：
+   - gross_margin = 789,995,099.93 / 3,002,902,194.41 = 0.2630771308
+   - net_margin = 421,348,835.38 / 3,002,902,194.41 = 0.1403138658
+   - operating_free_cash_flow = 912,062,581.04 - 113,303,884.17 = 798,758,696.87
+   - forecast_dividend_yield = 129,901,530 / 5,016,000,000 = 0.0258974334
+
+5. 折后可剥离净现金：
+   - 货币资金：1,623,002,595.10 × 50% = 811,501,297.55
+   - 交易性金融资产：261,430,455.57 × 80% = 209,144,364.456
+   - 其他非流动金融资产：7,115,274.25 × 30% = 2,134,582.275
+   - 有息金融负债：0
+   - 合计：1,022,780,244.281 元
+   - 折扣理由：合同负债 1,981,538,596.77 元代表未来履约义务；项目生产周期跨年，资金需覆盖采购、制造、交付、调试和质保。未将全部现金当作可剥离资产。
+
+6. 可持续现金利润：
+   - 2023 扣非归母净利润：171,780,431.18 元
+   - 2024 扣非归母净利润：233,849,743.06 元
+   - 2025 扣非归母净利润：410,197,449.93 元
+   - 三年算术均值：271,942,541.39 元
+   - 未采用 2025 经营自由现金流 798,758,696.87 元作为持续值，因为当年经营性应收减少释放约 552,000,000 元，现金流受项目节点显著影响。
+
+7. 控股回本：
+   - operating_business_price = 5,016,000,000 - 1,022,780,244.281 = 3,993,219,755.719 元
+   - owner_earnback_years = 3,993,219,755.719 / 271,942,541.39 = 14.68405554
+   - market_cap_to_cash_profit = 5,016,000,000 / 271,942,541.39 = 18.44507290
+
+8. 抽取复核与修正：
+   - 年度事实包 business_overview.segments 中“其他”收入 178,785,088.43 元与合并主营业务分产品收入合计不符。
+   - 回查年报管理层讨论“主营业务分产品情况”，确认：空分设备 1,995,399,397.49 元；天然气处理及液化装置 967,854,035.85 元；其他 22,222,195.63 元；合计 2,985,475,628.97 元。
+   - result.json 与 report.md 使用回查后的主营业务分产品口径；合并营业收入仍为 3,002,902,194.41 元。
+
+9. 协议操作：
+   - 使用 PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init 初始化 outputs/result.json。
+   - 使用 protocol set 逐字段写入结果，未手写复杂 JSON 文件。
+   - 使用 protocol validate 验证结构。
+
+10. 数据限制：
+   - 上交所 PDF 正文请求曾返回反爬页面，财务数字来自新浪财经转载的完整年报 HTML，并保留官方公告链路。
+   - 货币资金未拆到母子公司与账户级可动用路径。
+   - 2025 分红为董事会预案，尚需股东会审议。
+   - 行业地位表述来自公司年报，缺少独立市场份额验证。

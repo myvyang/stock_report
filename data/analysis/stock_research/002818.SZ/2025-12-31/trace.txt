@@ -1,0 +1,81 @@
+stock-research trace for 002818.SZ 富森美, period 2025-12-31
+
+Instructions read:
+- /workspace/.agents/skills/stock-research/SKILL.md
+- /workspace/.agents/skills/stock-research/references/result-contract.md
+- /workspace/.agents/skills/stock-research/references/report-contract.md
+- /workspace/.agents/skills/stock-research/references/data-reuse.md
+
+Protocol:
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Updated a generated skeleton rather than hand-writing a complex JSON object from scratch.
+- Corrected one nested reason string through protocol set:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol set --result outputs/result.json --path owner_earnback.profit_adjustments.2.reason --json ...
+- Validated final result with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+  Result: {"status": "ok", "errors": []}
+
+Source reuse:
+- Reused annual fact pack:
+  stock_report/data/analysis/annual_review/002818.SZ/2025-12-31/facts.json
+  stock_report/data/analysis/annual_review/002818.SZ/2025-12-31/annual_facts.md
+  stock_report/data/analysis/annual_review/002818.SZ/2025-12-31/extraction_trace.txt
+- Reused raw filing metadata:
+  stock_report/data/raw/filings/002818.SZ/2025-12-31/metadata.json
+- Re-read local PDF text via pdftotext for dividend and cash-flow cross-checks:
+  stock_report/data/raw/filings/002818.SZ/2025-12-31/002818-2025-annual-report.pdf
+
+Model decision:
+- analysis_model.statement_model = ordinary_operating.
+- Reason: annual report describes the company as a home furnishing/building materials market operator and platform service provider. Revenue is mainly market leasing and services from self-operated/self-owned marketplaces.
+- Special handling retained inside the ordinary model: small-loan/factoring receivables and financial investments are not treated as plain cash; they are discounted or excluded depending on liquidity and business substance. Investment property used by marketplaces is operating asset, not detachable cash.
+
+Key extracted facts:
+- Revenue: 1,199,167,708.57 yuan.
+- Cost of sales: 444,186,733.07 yuan.
+- Gross profit: 754,980,975.50 yuan.
+- Parent net profit: 555,491,289.89 yuan.
+- Net profit: 568,033,295.79 yuan.
+- Operating cash flow: 1,246,341,794.27 yuan.
+- Capital expenditure: 34,649,920.74 yuan.
+- Financing cash flow: -790,628,185.60 yuan.
+- Dividend/interest cash out line: 785,661,991.95 yuan.
+- Total assets: 6,699,753,150.24 yuan.
+- Total liabilities: 881,120,754.50 yuan.
+- Parent equity: 5,589,242,586.53 yuan.
+- Market cap: 8,046,000,000 yuan from config/input.json, Tencent qt.gtimg.cn, timestamp 20260728161406.
+- PE TTM: 10.12 from config/input.json.
+
+Dividend checks:
+- 2025 annual profit distribution proposal: 748,458,940 shares, 3.10 yuan per 10 shares, total cash dividend 232,022,271.40 yuan.
+- Dividends implemented during 2025: 508,952,079.20 yuan for 2024 annual distribution and 269,445,218.40 yuan for 2025 interim distribution, total 778,397,297.60 yuan.
+- Forecast dividend yield = 232,022,271.40 / 8,046,000,000 = 0.0288369713.
+
+Owner earnback calculations:
+- Gross margin = 754,980,975.50 / 1,199,167,708.57 = 0.6295874798.
+- Net margin = 555,491,289.89 / 1,199,167,708.57 = 0.4632306940.
+- Reported operating FCF = 1,246,341,794.27 - 34,649,920.74 = 1,211,691,873.53 yuan.
+- Adjusted operating FCF before final haircut = 1,246,341,794.27 - 607,000,000.00 small-loan/factoring net recovery - 34,649,920.74 capex = 604,691,873.53 yuan.
+- Discounted sustainable distributable cash profit selected: 400,000,000 yuan, reflecting revenue/profit decline and financial-investment quality.
+
+Discounted detachable net cash:
+- Cash and cash equivalents: 213,988,106.81 * 100% = 213,988,106.81.
+- Restricted pledged deposit: 1,980,000.00 * 0% = 0.
+- Wealth management and transferable large CDs: 1,311,611,930.56 * 90% = 1,180,450,737.504.
+- Trading equity instruments: 205,085,911.52 * 50% = 102,542,955.76.
+- Long-term equity investment: 507,275,434.24 * 50% = 253,637,717.12.
+- Other non-current financial assets: 414,971,077.49 * 40% = 165,988,430.996.
+- Small-loan/factoring receivables: 84,680,279.09 * 30% = 25,404,083.727.
+- Short-term borrowing: -10,000,000.00.
+- Total discounted detachable net cash = 1,932,012,031.917 yuan.
+- Discounted net cash / market cap = 0.2401208093.
+- Operating business price = 8,046,000,000 - 1,932,012,031.917 = 6,113,987,968.083 yuan.
+- Owner earnback years = 6,113,987,968.083 / 400,000,000 = 15.2849699202.
+- Market cap / cash profit = 8,046,000,000 / 400,000,000 = 20.115.
+
+Data limitations:
+- metadata notes that the saved annual report PDF is a Tonghuashun announcement mirror; the CNINFO annual-report direct PDF was not obtained in the annual fact extraction run.
+- Wealth management products lack item-by-item maturity, underlying asset and redemption terms.
+- Equity instruments, long-term equity investment and other non-current financial assets lack item-by-item exit plans, taxes and realizable value estimates.
+- Other payables were not fully decomposed in the annual fact pack.

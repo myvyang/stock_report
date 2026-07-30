@@ -1,0 +1,51 @@
+Task: stock research for 920121.BJ / 江天科技, period 2025-12-31 annual.
+
+Protocol and contracts:
+- Read /workspace/.agents/skills/stock-research/SKILL.md.
+- Read /workspace/.agents/skills/stock-research/references/result-contract.md.
+- Read /workspace/.agents/skills/stock-research/references/report-contract.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+Data reused:
+- config/input.json for company identity, market cap, PE TTM and market data timestamp.
+- stock_report/data/raw/filings/920121.BJ/2025-12-31/metadata.json for annual report identity and source URL.
+- stock_report/data/analysis/annual_review/920121.BJ/2025-12-31/facts.json for financial statements, business facts, asset/liability categories and evidence.
+- stock_report/data/analysis/annual_review/920121.BJ/2025-12-31/annual_facts.md for human-readable annual fact summary.
+- stock_report/data/raw/filings/920121.BJ/2025-12-31/2025-annual-report.txt was searched for dividend/profit distribution disclosures.
+
+Key checks:
+- Confirmed company is an ordinary operating manufacturer: label printing products, mainly thin-film and paper adhesive labels. No bank, brokerage, insurance, real estate developer, construction project, utility concession or investment holding model indicators found in the reused annual facts.
+- Found 2025 profit distribution proposal in annual report: 66,068,183 shares, RMB 5.00 per 10 shares, expected cash dividend RMB 33,034,091.50.
+- Confirmed annual fact pack limitations: 2023 capex detail not extracted; IPO proceeds / fundraising account constraints not penetrated item by item.
+
+Core calculations:
+- Gross margin = 174,870,103.06 / 607,417,038.80 = 0.2878913364.
+- Net margin = 109,523,242.75 / 607,417,038.80 = 0.1803097967.
+- Operating FCF = 121,410,611.75 - 11,461,619.65 = 109,948,992.10.
+- Forecast dividend yield = 33,034,091.50 / 1,792,000,000.00 = 0.0184342028.
+- Cash and CDs book amount = 285,989,205.16 + 64,018,680.57 + 239,707,874.99 = 589,715,760.72.
+- Discounted detachable net cash:
+  - cash and equivalents: (285,989,205.16 - 30,000,000.00) * 0.60 = 153,593,523.096
+  - one-year CD: 64,018,680.57 * 0.85 = 54,415,878.4845
+  - long-term CD: 239,707,874.99 * 0.70 = 167,795,512.493
+  - restricted monetary funds: 8,932,786.52 * 0 = 0
+  - total = 375,804,914.0735
+- Discounted sustainable cash profit = (104,285,621.38 - 6,132,126.76) * 0.85 = 83,430,470.427.
+- Operating business price = 1,792,000,000.00 - 375,804,914.0735 = 1,416,195,085.9265.
+- Owner earnback years = 1,416,195,085.9265 / 83,430,470.427 = 16.9745547242.
+- Market cap to cash profit = 1,792,000,000.00 / 83,430,470.427 = 21.4789631513.
+
+Output creation:
+- Populated outputs/result.json through stock_analysis.stock_research.protocol set/append commands from a short Python orchestration script. The file was not hand-written from scratch.
+- Wrote outputs/report.md from the completed result and reused annual facts.
+- Wrote this trace file.
+
+Validation:
+- Ran:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: {"status": "ok", "errors": []}
+
+Data quality status:
+- outputs/result.json data_quality.status = complete.
+- Remaining limitations are recorded in data_quality.limitations: fundraising cash constraints not fully penetrated, 2023 capex detail missing, and market cap/PE TTM sourced from Tencent quote snapshot rather than exchange official day-end data.

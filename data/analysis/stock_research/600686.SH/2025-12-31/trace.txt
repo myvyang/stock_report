@@ -1,0 +1,72 @@
+金龙汽车 600686.SH 2025 年股票研究 trace
+
+任务输入
+- input: config/input.json
+- company: 金龙汽车（600686.SH）
+- period: 2025-12-31
+- market cap: 7,916,000,000.00 元
+- market cap timestamp: 2026-07-28 16:14:45
+- market source: Tencent qt.gtimg.cn
+- PE TTM: 13.85
+
+协议与技能
+- 已完整读取 .agents/skills/stock-research/SKILL.md
+- 已完整读取 references/result-contract.md
+- 已完整读取 references/report-contract.md
+- 已读取 references/data-reuse.md
+- 用 `PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init` 初始化 outputs/result.json
+- 用协议 CLI 的 set/append 命令逐字段填充，没有从空文件手写复杂 JSON
+- 最终用协议 CLI validate 校验
+
+复用资料
+- stock_report/data/analysis/annual_review/600686.SH/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/600686.SH/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/600686.SH/2025-12-31/extraction_trace.txt
+- stock_report/data/analysis/annual_review/600686.SH/2025-12-31/result.json（仅复用资金资产、融资负债、利息和资本开支核对线索）
+- stock_report/data/raw/filings/600686.SH/2025-12-31/annual-report.pdf
+- official filing URL: https://static.cninfo.com.cn/finalpage/2026-04-25/1225186471.PDF
+
+补充核对
+- 官方年报第2页：2025年中期分红21,511,422.51元，年末拟分红143,409,483.40元，全年合计164,920,905.91元，占归母净利润35.21%。
+- 官方年报第8-15页：主营客车、销售模式、行业销量、公司销量、海外/国内收入和毛利率。
+- 官方年报第63-64页：利润表及费用。
+- 官方年报第171-176页：金融资产收益、减值、营运资金变化、现金及现金等价物。
+- 本地环境无 pdftotext 和常见 Python PDF 包，因此缺口通过官方在线PDF可检索文本核对；核心三张表仍复用本地事实包。
+
+分析模型
+- statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- 原因：收入来自客车和车身件制造销售；资产负债体现制造业营运资金、产能和融资结构，不属于金融、地产、工程、收费权或投资控股特殊模型。
+
+关键公式
+- gross_margin = 3,123,190,466.53 / 24,546,774,098.41 = 0.1272342530
+- net_margin = 468,335,968.18 / 24,546,774,098.41 = 0.0190793286
+- operating_free_cash_flow = 1,663,628,959.76 - 331,711,005.20 = 1,331,917,954.56
+- discounted detachable net cash
+  = 1,586,916,399.68 × 0.80
+  + (2,880,515,875.09 - 190,000,000.00) × 0.90
+  - 4,570,117,728.39
+  = -879,120,321.065
+- discounted sustainable cash profit
+  = 198,686,410.64 × 0.70
+  = 139,080,487.448
+- operating business price
+  = 7,916,000,000.00 - (-879,120,321.065)
+  = 8,795,120,321.065
+- owner earnback years
+  = 8,795,120,321.065 / 139,080,487.448
+  = 63.2376293932
+- market cap to cash profit
+  = 7,916,000,000.00 / 139,080,487.448
+  = 56.9166828881
+- forecast dividend yield
+  = 164,920,905.91 / 7,916,000,000.00
+  = 0.0208338689
+
+判断与限制
+- 现金及现金等价物52.86亿元低于全年经营现金流出25%估算的必要营运现金62.52亿元，未视为超额现金。
+- 其他货币资金12.72亿元主要为保证金、冻结和专户资金，未视为可剥离现金。
+- 银行理财按80%计入；未质押大额存单按90%计入；融资负债全额扣除。
+- 现金利润以2025年扣非归母1.99亿元为锚，再按70%计入。原因是2023和2024年扣非归母为负，且2025经营现金流受经营性应付款增加17.09亿元支撑。
+- 银行理财和大额存单的折扣、必要营运现金比例、现金利润七折均为分析假设，不是财报披露值。
+- 2025分红是已披露方案口径，不代表未来年度承诺。

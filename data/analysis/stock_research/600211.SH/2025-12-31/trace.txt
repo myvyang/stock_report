@@ -1,0 +1,74 @@
+stock-research task trace
+
+Input:
+- config/input.json
+- Query/company: 600211.SH / 西藏药业
+- Period/report_type: 2025-12-31 / annual
+- Market cap: 12,068,000,000 yuan from Tencent qt.gtimg.cn at 20260728161456
+
+Protocol:
+- Read skill: /workspace/.agents/skills/stock-research/SKILL.md
+- Read result contract: /workspace/.agents/skills/stock-research/references/result-contract.md
+- Read report contract: /workspace/.agents/skills/stock-research/references/report-contract.md
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Validated outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: ok, no errors.
+
+Sources reused:
+- stock_report/data/analysis/annual_review/600211.SH/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/600211.SH/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/600211.SH/2025-12-31/result.json
+- stock_report/data/raw/filings/600211.SH/2025-12-31/metadata.json
+- stock_report/data/raw/filings/600211.SH/2025-12-31/annual-report.pdf
+
+Additional local extraction:
+- Used pdftotext against the local annual-report.pdf to verify dividend, business model, product concentration, industry position, related-party promotion arrangements, and financing/dividend cash-flow lines.
+
+Analysis model:
+- Confirmed ordinary_operating.
+- Reason: annual report identifies the company as pharmaceutical manufacturing, with revenue from drug production/sales and promotion channels. No bank, brokerage, insurance, real estate development, construction project, utility concession, investment holding, or platform-financial mixed model was identified.
+- owner_earnback_applicability: applicable.
+
+Core facts:
+- Revenue: 2,981,538,230.43
+- Cost of sales: 172,474,862.95
+- Gross profit: 2,809,063,367.48
+- Parent net profit: 937,931,435.32
+- Deducted non-recurring parent net profit: 871,408,061.70
+- Operating cash flow: 1,004,750,805.92
+- Capital expenditure: 15,957,010.34
+- Operating free cash flow: 988,793,795.58
+- Total assets: 6,267,387,167.91
+- Total liabilities: 2,129,905,953.93
+- Total equity: 4,137,481,213.98
+- Parent equity: 3,798,429,273.30
+
+Owner earnback assumptions:
+- Required operating cash retained: 568,873,749.31
+- Excess cash included: 1,007,626,570.17 at 100%
+- Term deposits and interest included: 660,185,004.57 at 100%
+- Short-term bank wealth products included: 1,107,426,746.60 at 95%
+- Listed equity investment included: 15,265,379.79 at 70%
+- Other non-current financial assets included: 12,559,946.75 at 20%
+- Restricted cash excluded: 90,781,171.89 at 0%
+- Financing liabilities deducted: 1,237,329,206.60 at 100%
+- Discounted detachable net cash: 1,495,735,532.6155
+- Discounted sustainable cash profit: 850,000,000.00
+- Operating business price: 10,572,264,467.3845
+- Owner earnback years: 12.4379581969
+- Market cap to cash profit: 14.1976470588
+
+Dividend:
+- Forecast cash dividend: 562,810,776.57
+- Basis: 2025 annual report profit distribution proposal, 60% of parent net profit.
+- Forecast dividend yield: 0.0466366238
+
+Data quality:
+- status: complete
+- limitations retained in outputs/result.json:
+  1. Long-term payable contract terms for Accuredit/Ruizheng Gene related minority preferred shareholder investment were not fully expanded; treated conservatively as financing debt.
+  2. Interest income was not precisely split by operating cash, excess cash, and term deposits; profit quality was cross-checked with deducted profit, ROIC adjustments, and FCF.
+  3. Financial asset haircuts are analytical estimates, not directly disclosed facts.
+  4. Market-cap-dependent metrics use the input market snapshot and will change with price.

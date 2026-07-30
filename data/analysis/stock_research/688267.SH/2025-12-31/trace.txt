@@ -1,0 +1,55 @@
+stock_research_protocol=stock-research-result-v1
+company=688267.SH 中触媒
+period=2025-12-31
+generated_at=2026-07-29T16:51:32+08:00
+
+skill_and_contracts:
+- read .agents/skills/stock-research/SKILL.md
+- read references/result-contract.md
+- read references/report-contract.md
+- read references/data-reuse.md
+
+initialization:
+- command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- result: initialized successfully
+
+reused_sources:
+- stock_report/data/analysis/annual_review/688267.SH/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/688267.SH/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/688267.SH/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/688267.SH/2025-12-31/2025-annual-report.txt
+- config/input.json market-cap snapshot
+
+model_check:
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- reason=product manufacturing and direct sales; ordinary inventory, receivables, plant and equipment; wealth-management assets are treasury management; no interest-bearing debt
+
+core_formulas:
+- gross_margin=(845770578.06-473188469.55)/845770578.06=0.4405238467441327
+- net_margin=204847696.88/845770578.06=0.242202439046618
+- operating_free_cash_flow=345325484.90-100491022.10=244834462.80
+- necessary_operating_cash=845770578.06/6=140961763.01
+- discounted_net_cash=350282534.35-140961763.01+370002000*0.95+630000000*0.90+3000000*0.80=1130222671.34
+- favorable_working_capital_release=40223240.19-51451405.17+40370268.78=29142103.80
+- pre_haircut_cash_profit=345325484.90-29142103.80-80000000=236183381.10
+- discounted_cash_profit=236183381.10*0.85=200755873.935
+- operating_business_price=4325000000-1130222671.34=3194777328.66
+- owner_earnback_years=3194777328.66/200755873.935=15.9137427266
+- market_cap_to_cash_profit=4325000000/200755873.935=21.5435788514
+- forecast_dividend_yield=86560490.50/4325000000=0.02001398624
+
+judgment_boundaries:
+- necessary operating cash is an estimate equal to roughly two months of revenue
+- wealth-management products are discounted by disclosed risk class because underlying terms and redemption limits are incomplete
+- maintenance capex of 80000000 is inherited from the annual fact pack; 2023 capex remains missing
+- 15% final cash-profit haircut covers customer concentration, cyclicality and capex uncertainty
+- dividend forecast is a flat carry-forward of 2025 total cash dividends, not guidance
+
+protocol_updates:
+- all result fields were written with protocol CLI set commands after initialization
+- no complex result JSON was authored from scratch
+
+validation:
+- command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- result: status=ok, errors=[]

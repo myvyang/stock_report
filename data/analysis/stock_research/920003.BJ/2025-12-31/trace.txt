@@ -1,0 +1,92 @@
+task=stock_research
+company=中诚咨询
+code=920003.BJ
+period=2025-12-31
+report_type=annual
+generated_timezone=Asia/Shanghai
+
+[protocol]
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+mutation=all structured result fields were written through protocol set commands after initialization
+validation=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_result=ok
+
+[sources_read]
+1=config/input.json
+  use=company identity, report period, market cap 1476000000, market cap timestamp 20260728153545, PE TTM 13.68
+2=stock_report/data/analysis/annual_review/920003.BJ/2025-12-31/facts.json
+  use=reused annual fact pack for statements, asset categories, three-year cash conversion and evidence locations
+3=stock_report/data/raw/filings/920003.BJ/2025-12-31/920003_2025_annual_report.txt
+  use=verified business model, segments, statements, cash flow, receivables, wealth products, fundraising and dividends
+4=stock_report/data/raw/filings/920003.BJ/2025-12-31/920003_2025_annual_report.pdf
+  use=primary filing represented by extracted text; PDF URL and identity recorded in facts.json/metadata
+
+[key_evidence_locations]
+business_model=annual_report.txt:480-510, 766 onward
+industry_and_operations=annual_report.txt:547-747
+segment_and_region=annual_report.txt:1011-1127
+wealth_products=annual_report.txt:1195-1256
+dividend=annual_report.txt:2869-2950
+balance_sheet=annual_report.txt:4380-4488
+income_statement=annual_report.txt:4580-4688
+cash_flow=annual_report.txt:4733-4798
+cash_and_financial_assets=annual_report.txt:6631-6657
+receivables=annual_report.txt:6708-6960
+revenue_cost_notes=annual_report.txt:7526-7545
+
+[model_classification]
+input_hint=ordinary_operating/applicable
+verified_statement_model=ordinary_operating
+verified_owner_earnback_applicability=applicable
+reason=company provides engineering consulting services through professional staff and contract fees; it has no construction inventory, contract assets, project borrowing, short-term borrowing or long-term borrowing. It is economically a light-asset consulting operator rather than a construction contractor.
+
+[statement_values_cny]
+total_assets=850962812.37
+total_liabilities=212211589.19
+total_equity=638751223.18
+parent_equity=638751223.18
+revenue=369492413.83
+cost_of_sales=186258593.24
+gross_profit=183233820.59
+operating_profit=115955126.32
+parent_net_profit=101492989.38
+operating_cash_flow=96384789.87
+capital_expenditure=5041359.22
+operating_free_cash_flow=91343430.65
+
+[formula_checks]
+gross_margin=183233820.59/369492413.83=0.49590685419133984
+net_margin=101492989.38/369492413.83=0.27468220071954164
+
+[discounted_cash_cny]
+unrestricted_bank_deposit=167071322.79*1.00=167071322.79
+trust_wealth_products=326049243.90*0.75=244536932.925
+bank_wealth_products=86157651.37*0.90=77541886.233
+lease_liabilities=-12938372.60
+ipo_net_proceeds_with_committed_uses=-173163984.97
+discounted_detachable_net_cash=303047784.378
+note=restricted guarantee deposit excluded because unrestricted bank deposit amount was used
+
+[cash_profit_cny]
+parent_net_profit=101492989.38
+less_after_tax_non_recurring_items=-8742154.50
+less_capital_expenditure=-5041359.22
+discounted_sustainable_cash_profit=87709475.66
+cross_check_operating_fcf=96384789.87-5041359.22=91343430.65
+
+[owner_earnback]
+market_cap=1476000000
+operating_business_price=1476000000-303047784.378=1172952215.622
+owner_earnback_years=1172952215.622/87709475.66=13.373152749981909
+market_cap_to_cash_profit=1476000000/87709475.66=16.82828438881127
+discounted_net_cash_to_market_cap=303047784.378/1476000000=0.20531692708536578
+
+[dividend]
+forecast_basis=2025 annual distribution proposal, cash CNY 1.00 per share on approximately 64714286 shares
+forecast_cash_dividend=64714286
+forecast_dividend_yield=64714286/1476000000=0.04384436720867209
+not_double_counted=2025 interim cash dividend 25885714.40 implemented 2026-02-10
+
+[data_quality]
+status=complete
+limitations=wealth-product underlying assets/terms not itemized; IPO proceeds not individually mapped to year-end cash products; sustainable cash profit is not a full-cycle average; market quote not independently web-verified

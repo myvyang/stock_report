@@ -1,0 +1,60 @@
+stock-research trace
+company: 厦门象屿 (600057.SH)
+period: 2025-12-31
+generated_at: 2026-07-29T21:01:35+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read .agents/skills/stock-research/references/result-contract.md in full.
+- Read .agents/skills/stock-research/references/report-contract.md in full.
+- Read .agents/skills/stock-research/references/data-reuse.md because the skill directs reuse of existing annual facts.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reused source material
+- stock_report/data/analysis/annual_review/600057.SH/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/600057.SH/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/600057.SH/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/600057.SH/2025-12-31/metadata.json
+- stock_report/data/raw/filings/600057.SH/2025-12-31/600057_2025_annual_report.txt
+- config/input.json
+
+The local PDF is the 319-page 2025 annual report. Metadata says it was downloaded from a Xueqiu mirror and that the same annual report is available through the Shanghai Stock Exchange. Core financial facts were checked against the converted annual-report text, not inferred from the mirror metadata.
+
+3. Annual-report locations checked
+- Business and operating volume: text lines 516-598.
+- Three-year financial highlights and perpetual-note interest note: lines 223-263.
+- Balance sheet: lines 4678-4780.
+- Income statement: lines 4888-5018.
+- Cash-flow statement: lines 5165-5275.
+- Cash and cash-equivalent notes: lines 7866-7881 and 11071-11132.
+- Borrowing and liability notes: lines 9800-10285.
+- Dividend plan and three-year dividend disclosure: lines 2170-2268.
+
+4. Analysis-model decision
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: revenue and profit arise from commodity supply-chain trading, logistics and manufacturing rather than a bank, insurer, property developer, concession or investment-holding balance-sheet model.
+- Special handling: the company is a low-margin, high-turnover supply-chain operator. Cash, bills, inventory, prepayments, receivables, derivatives and trade finance form one operating funding system. Cash cannot be treated as detachable merely because it appears in monetary funds.
+
+5. Key calculations
+- Gross margin = 8,523,150,961.34 / 410,291,222,808.49 = 0.02077341772753037.
+- Net margin = 1,292,994,120.12 / 410,291,222,808.49 = 0.003151405753380022.
+- Operating free cash flow = 10,097,343,712.94 - 1,281,895,191.96 = 8,815,448,520.98.
+- Ordinary-shareholder profit anchor = 1,292,994,120.12 - 507,000,000.00 perpetual-note interest = 785,994,120.12.
+- Discounted detachable net cash = 0. Cash was fully haircutted because unrestricted surplus above operating liquidity and financing needs could not be established.
+- Operating business price = 18,226,000,000.00 - 0 = 18,226,000,000.00.
+- Owner earnback years = 18,226,000,000.00 / 785,994,120.12 = 23.188468632840898.
+- Forecast dividend yield = 624,929,654.58 / 18,226,000,000.00 = 0.03428781161966422.
+
+6. Judgment boundaries
+- The 2025 operating free cash flow was not used as sustainable cash profit because working-capital release and settlement timing dominate commodity supply-chain cash flow.
+- Non-recurring loss of 492,092,337.51 was not mechanically added back because commodity and FX derivatives are economically linked to physical trading.
+- The forecast dividend is a baseline scenario using the disclosed 2025 total cash dividend. The 698,531,745 yuan share repurchase was excluded because the shares were intended for equity incentives rather than cancellation.
+- Industry leadership and segment share statements are attributed to company disclosure; no independent precise market-share dataset was available in the reused material.
+- Market cap and PE were taken from the supplied Tencent snapshot and were not independently browsed.
+
+7. Protocol population and validation
+- Populated initialized result fields using repeated protocol `set` commands; result was not authored as a new JSON document from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report handoff: status=ok, errors=[].

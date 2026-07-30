@@ -1,0 +1,64 @@
+stock-research trace
+
+task
+- company: 002236.SZ 大华股份
+- period: 2025-12-31
+- report_type: annual
+- generated_for_input: config/input.json
+
+protocol
+- initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- populated initialized paths with protocol set commands; did not construct result.json from scratch.
+- final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- validation result: status=ok, errors=[]
+
+sources reused
+- stock_report/data/analysis/annual_review/002236.SZ/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/002236.SZ/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/002236.SZ/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/002236.SZ/2025-12-31/metadata.json
+- stock_report/data/raw/filings/002236.SZ/2025-12-31/大华股份_2025年年度报告.txt
+- primary filing URL: https://static.cninfo.com.cn/finalpage/2026-04-18/1225122378.PDF
+- market data: input market_cap snapshot, Tencent qt.gtimg.cn, 2026-07-28 16:14:33
+
+model decision
+- statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- reason: revenue comes from products, software and solutions; receivables, inventory and fixed assets are ordinary operating assets. Cash/deposits are not paired with customer funds, insurance reserves, regulated presale cash or equivalent special-model liabilities.
+
+verified filing locations
+- annual report pp.12-13: revenue, parent net profit, deducted parent net profit, non-recurring items.
+- annual report pp.84-85: segment/region revenue and margins.
+- annual report pp.105-106: dividend history and 2025 annual proposal.
+- annual report pp.147-155: consolidated statements and cash flow.
+- annual report pp.190-214: cash, financial assets, deposits, restricted assets, borrowings and leases.
+
+calculation
+- gross_margin = 13,301,227,521.03 / 32,743,783,343.80 = 0.4062214614
+- net_margin = 3,857,923,611.86 / 32,743,783,343.80 = 0.1178215593
+- operating_fcf = 3,907,798,165.28 - 673,228,356.90 = 3,234,569,808.38
+- discounted detachable net cash:
+  cash above 4.5bn operating reserve 4,053,198,661.72
+  + short deposits/reverse repo 324,754,157.73
+  + non-current deposits * 75% 5,242,312,186.41
+  + wealth management * 60% 151,213,150.686
+  + equity instruments * 50% 28,567,977.045
+  - short borrowings 203,714,311.58
+  = 9,596,331,822.011002
+- sustainable cash profit:
+  three-year median deducted parent profit 2,729,580,707.49
+  reduced to pre-distribution cash profit 2,500,000,000
+  less 20% distribution/sustainability discount
+  = 2,000,000,000
+- operating business price = 53,518,000,000 - 9,596,331,822.011002 = 43,921,668,177.98899
+- owner earnback years = 43,921,668,177.98899 / 2,000,000,000 = 21.960834089
+- market cap / cash profit = 53,518,000,000 / 2,000,000,000 = 26.759
+- forecast dividend yield = 1,202,293,715.01 / 53,518,000,000 = 0.0224652213
+
+limitations
+- non-current deposit maturity, pledges and early withdrawal friction are not itemized.
+- 4.5bn operating cash reserve is an analyst assumption, approximately 1.5 months of cash operating outflow.
+- 2.0bn discounted sustainable cash profit is an analyst assumption and should be refreshed with future working-capital and cash-flow data.
+- industry position is primarily company disclosure; no independent market-share evidence was used.

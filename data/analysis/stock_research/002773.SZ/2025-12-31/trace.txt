@@ -1,0 +1,51 @@
+康弘药业 002773.SZ 2025 年度 stock-research trace
+
+1. 协议与输入
+- 使用 stock-research skill。
+- 已读取 .agents/skills/stock-research/references/result-contract.md。
+- 已读取 .agents/skills/stock-research/references/report-contract.md。
+- 输入文件：config/input.json。
+- 按协议 CLI 初始化：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json。
+
+2. 复用资料
+- 年报事实包：stock_report/data/analysis/annual_review/002773.SZ/2025-12-31/facts.json。
+- 人读事实包：stock_report/data/analysis/annual_review/002773.SZ/2025-12-31/annual_facts.md。
+- 年报抽取 trace：stock_report/data/analysis/annual_review/002773.SZ/2025-12-31/extraction_trace.txt。
+- 原始披露元数据：stock_report/data/raw/filings/002773.SZ/2025-12-31/metadata.json。
+- 原始年报文本：stock_report/data/raw/filings/002773.SZ/2025-12-31/002773_2025_annual_report.txt。
+- 未找到可复用的既有 stock_research 结果；user_stock_evaluations.md 中未匹配到康弘药业/002773。
+
+3. 年报定位
+- 业务说明：年报文本行 423-540，对应年报第 10-11 页附近。
+- 收入构成和产品毛利率：年报文本行 1175-1268，对应年报第 22-23 页。
+- 利润分配预案：年报文本行 2954-2978，对应年报第 48 页。
+- 合并利润表：年报文本行 5347-5485，对应年报第 86-88 页。
+- 合并现金流量表：年报文本行 5567-5644，对应年报第 90-91 页。
+- 资产负债表、现金及现金等价物、受限资金等字段复用 annual_facts.md 和 facts.json 中的年报页码标注。
+
+4. 模型判断
+- 输入 hint 为 ordinary_operating。
+- 用年报业务和三张表复核后确认：公司收入来自药品及眼科医疗器械研发、生产与销售，资产端主要为现金、制药固定资产、存货、应收款和研发相关资产，负债端以经营负债为主，普通控股回本口径适用。
+
+5. 核心计算
+- 毛利率 = 4,119,719,195.46 / 4,585,133,789.58 = 0.8984948715830968。
+- 净利率 = 1,162,966,864.98 / 4,585,133,789.58 = 0.2536385890468265。
+- 经营自由现金流 = 1,503,648,452.72 - 262,480,608.58 = 1,241,167,844.14。
+- 预测分红率 = 644,924,667.80 / 19,633,000,000 = 0.03284900066215046。
+- 折后可剥离净现金 = 6,383,703,498.90 * 0.85 + 51,638,110.34 * 0.70 - 1,000,000,000 - 3,507,196.87 = 4,458,787,454.433。
+- 折后可持续可分配现金利润 = 2025 年扣非归母净利润 1,117,941,258.68 * 0.95 = 1,062,044,195.746。
+- 经营业务购买价 = 19,633,000,000 - 4,458,787,454.433 = 15,174,212,545.567001。
+- 控股回本年 = 15,174,212,545.567001 / 1,062,044,195.746 = 14.287741137654207。
+- 全市值/折后现金利润 = 19,633,000,000 / 1,062,044,195.746 = 18.486048018189496。
+
+6. 数据质量限制
+- 货币资金未按主体、期限和银行账户属性完整拆分，现金可剥离金额采用折扣和经营现金储备估算。
+- 2023 年资本开支未在事实包中完整取得，现金利润判断主要依赖 2025/2024 经营自由现金流和 2023 经营现金流辅助。
+- 市值来自 2026-07-28 16:14:06 腾讯行情快照，市值变化会直接改变回本年和分红率。
+
+7. 输出与验证
+- 已创建/更新 outputs/result.json。
+- 已创建/更新 outputs/report.md。
+- 已创建/更新 outputs/trace.txt。
+- 已执行协议校验：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json。
+- 校验结果：status ok，errors []。

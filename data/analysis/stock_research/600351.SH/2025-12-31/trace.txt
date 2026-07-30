@@ -1,0 +1,71 @@
+stock-research trace
+company=600351.SH 亚宝药业
+period=2025-12-31
+generated_for_input=2026-07-29T14:57:04+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md.
+- Read references/report-contract.md.
+- Read references/data-reuse.md because an annual fact pack and raw filing were available.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reused sources
+- stock_report/data/analysis/annual_review/600351.SH/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/600351.SH/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/600351.SH/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/600351.SH/2025-12-31/600351_2025_annual.pdf
+- stock_report/data/raw/filings/600351.SH/2025-12-31/600351_2025_annual.txt
+- stock_report/data/raw/filings/600351.SH/2025-12-31/metadata.json
+- config/input.json for market capitalization and PE TTM.
+
+3. Supplemental filing reads
+- Annual report pages 1, 17-18: 2025 profit distribution proposal and main-business revenue/margin tables.
+- Annual report pages 42, 46-47: peer margin comparison, channel coverage and sales-expense structure.
+- Annual report pages 89-98: consolidated balance sheet, income statement and cash-flow statement.
+- Annual report pages 136, 157, 175-176: cash restrictions, investments, borrowing and lease liabilities.
+- Annual report page 236: post-balance-sheet dividend arrangements.
+
+4. Model classification
+- Confirmed statement_model=ordinary_operating.
+- Confirmed owner_earnback_applicability=applicable.
+- Reason: drug R&D, manufacturing and sales are the operating substance; the company does not have customer deposits, insurance reserves, regulated presale cash, concession rights, or another balance-sheet structure requiring a special model.
+
+5. Calculations
+- gross_margin = 1,176,274,759.12 / 2,240,063,505.22 = 0.5251077732.
+- net_margin = 320,013,385.64 / 2,240,063,505.22 = 0.1428590685.
+- operating_free_cash_flow = 573,765,714.03 - 48,851,349.26 = 524,914,364.77.
+- discounted cash = 820,512,512.67 * 0.90 = 738,461,261.403.
+- deducted borrowing = 35,020,854.17.
+- deducted lease liabilities = 1,132,411.32.
+- discounted detachable net cash = 738,461,261.403 - 35,020,854.17 - 1,132,411.32 = 702,307,995.913.
+- 2023-2025 recurring parent-profit values = 180,147,228.32; 215,457,408.25; 231,571,401.19.
+- median recurring parent profit = 215,457,408.25.
+- discounted sustainable cash profit = 215,457,408.25 * 0.90 = 193,911,667.425.
+- operating business price = 4,491,000,000 - 702,307,995.913 = 3,788,692,004.087.
+- owner earnback years = 3,788,692,004.087 / 193,911,667.425 = 19.5382364269.
+- market cap / cash profit = 4,491,000,000 / 193,911,667.425 = 23.1600298200.
+- discounted net cash / market cap = 702,307,995.913 / 4,491,000,000 = 0.1563812059.
+- forecast 2025-attributable dividend = 138,400,009.20 + 103,800,006.90 = 242,200,016.10.
+- forecast dividend yield = 242,200,016.10 / 4,491,000,000 = 0.0539300860.
+
+6. Conservative treatments
+- Applied 10% discount to all monetary funds because individual deposit maturities were not disclosed.
+- Excluded bank-acceptance receivables, equity investments and investment property from detachable cash.
+- Deducted borrowing and lease liabilities in full.
+- Used three-year median recurring parent profit instead of reported 2025 parent profit.
+- Applied a further 10% sustainability discount because 2025 revenue fell 16.60% and major pediatric/cardiovascular categories declined.
+- Did not capitalize 2025 disposal gains, financial-asset gains, or unusually high single-year free cash flow.
+
+7. Known limitations
+- No detailed maturity split for monetary funds.
+- 2023 capital expenditure was not extracted; cash conversion uses 2023-2025 operating cash flow and 2024-2025 capital expenditure.
+- Market data was accepted from the supplied Tencent snapshot and not independently refreshed.
+- The 2025 final dividend remained a board proposal in the annual report and may change with registered share count.
+
+8. Protocol writes and validation
+- Populated the initialized JSON using protocol set and append commands; the result was not hand-written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation result: status=ok, errors=[].

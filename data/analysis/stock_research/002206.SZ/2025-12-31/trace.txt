@@ -1,0 +1,82 @@
+stock-research trace
+company=002206.SZ 海利得
+period=2025-12-31
+generated_date=2026-07-29 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md and reused the existing annual fact pack.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields using repeated protocol `set` commands; result.json was not constructed from scratch.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Final validator response: {"status":"ok","errors":[]}
+
+[reused local inputs]
+- config/input.json
+- stock_report/data/analysis/annual_review/002206.SZ/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/002206.SZ/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/002206.SZ/2025-12-31/extraction_trace.txt
+
+[supplemental primary filing]
+- Downloaded the 2025 annual report PDF from:
+  https://pdf.dfcfw.com/pdf/H2_AN202604171821300671_1.pdf
+- Local research copy:
+  work/002206-2025-annual.pdf
+- Extracted text for verification:
+  work/002206-2025-annual.txt
+- The PDF is the full Zhejiang Hailide New Material Co., Ltd. 2025 annual report disclosed on 2026-04-18.
+
+[key verified facts]
+- Revenue: 5,834,267,084.64 CNY.
+- Cost of sales: 4,705,195,365.27 CNY.
+- Gross profit: 1,129,071,719.37 CNY.
+- Parent net profit: 514,357,443.46 CNY.
+- Deducted parent net profit: 552,356,322.32 CNY.
+- Operating cash flow: 729,640,076.92 CNY.
+- Capital expenditure proxy: 216,514,651.26 CNY, defined as cash paid to acquire/build fixed, intangible and other long-term assets.
+- 2025 operating FCF: 513,125,425.66 CNY.
+- Total assets: 7,739,545,124.97 CNY.
+- Total liabilities: 3,718,683,020.49 CNY.
+- Parent equity: 4,007,746,200.00 CNY.
+- Cash and cash equivalents: 727,494,832.41 CNY.
+- Monetary funds excluded from cash equivalents: 954,773,198.37 CNY.
+- Restricted monetary funds disclosed in restricted-assets table: 487,992,727.31 CNY.
+- Trading financial assets: 648,819,507.49 CNY, all described as wealth-management products.
+- Interest-bearing debt used: 2,652,226,702.26 CNY.
+- 2025 cash dividend: 231,011,989.60 CNY, CNY 2.00 per 10 participating shares.
+
+[analysis model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: revenue comes from manufacturing and direct sales of industrial yarn, tire cord fabric and plastic materials. Inventory, receivables, production fixed assets and bank borrowings have ordinary manufacturing economic substance. No bank, brokerage, insurance, property development, construction-project, concession or investment-holding balance-sheet model was identified.
+
+[calculations]
+gross_margin=(5,834,267,084.64-4,705,195,365.27)/5,834,267,084.64=0.1935241742
+net_margin=514,357,443.46/5,834,267,084.64=0.0881614496
+operating_fcf_2025=729,640,076.92-216,514,651.26=513,125,425.66
+three_year_fcf_average=(619,513,300+468,651,200+513,125,425.66)/3=533,763,308.55
+discounted_cash_profit=533,763,308.55*0.80=427,010,646.84
+discounted_cash=727,494,832.41*0.80=581,995,865.93
+discounted_trading_assets=648,819,507.49*0.75=486,614,630.62
+discounted_detachable_net_cash=581,995,865.93+486,614,630.62-2,652,226,702.26=-1,583,616,205.71
+operating_business_price=6,147,000,000-(-1,583,616,205.71)=7,730,616,205.71
+owner_earnback_years=7,730,616,205.71/427,010,646.84=18.1040
+market_cap_to_cash_profit=6,147,000,000/427,010,646.84=14.3954
+forecast_dividend_yield=231,011,989.60/6,147,000,000=0.0375812575
+
+[judgment and limitations]
+- Cash discounts are analyst assumptions, not reported accounting values.
+- Non-cash-equivalent monetary funds receive a zero detachable value because they consist mainly of pledged/investment time deposits and guarantees; this avoids double counting cash that is not freely available.
+- Cash equivalents receive an 80% factor for operating and transfer buffers.
+- Wealth-management products receive a 75% factor because their aggregate nature is verified but individual maturities and redemption conditions are not modeled.
+- Sustainable cash profit uses a three-year FCF average and an additional 20% haircut because working capital fluctuates, capacity is under construction, and maintenance versus growth capex is not disclosed.
+- Market data timestamp is 2026-07-28 while statements are at 2025-12-31.
+- The owner earnback result is a static scenario and not a forecast, target price, ranking label, or trading recommendation.
+
+[outputs]
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

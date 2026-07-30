@@ -1,0 +1,79 @@
+stock-research trace
+company=海看股份
+code=301262.SZ
+period=2025-12-31
+generated_for=2026-07-29
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated all result fields using protocol set/append commands; result.json was not directly authored.
+
+[sources reused]
+- config/input.json: company identity, report period, market cap CNY 7,702,000,000, quote timestamp 20260728161451, Tencent qt.gtimg.cn, PE TTM 19.86.
+- stock_report/data/analysis/annual_review/301262.SZ/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/301262.SZ/2025-12-31/annual_facts.md
+- stock_report/data/raw/filings/301262.SZ/2025-12-31/metadata.json
+- stock_report/data/raw/filings/301262.SZ/2025-12-31/海看股份2025年年度报告.txt
+- stock_report/data/raw/filings/301262.SZ/2025-12-31/海看股份2025年年度报告.pdf
+
+[filing checks]
+- Business model and operator revenue sharing: annual report text lines 370-415.
+- 2025 effective IPTV basic users (16.76m): lines 474 and 630-675.
+- Segment revenue/margins: lines 723-742.
+- Top-five customer concentration (95.70%): lines 811-813.
+- Dividend events and 2025 annual proposal: lines 2754-2847.
+- Post-balance-sheet dividend payment: lines 10248-10266.
+- 2025 cash dividends paid (CNY 187.65m): cash-flow statement lines 5685-5740.
+- Statement and note line references were reused from the annual fact pack, including balance-sheet lines 5230-5326 and cash/financial-asset note lines 7945-7971.
+
+[analysis model]
+Confirmed ordinary_operating / applicable.
+Reason: IPTV content integration and operations is an ordinary service business. No customer deposits, insurance reserves, real-estate development inventory, concession debt, or other special-model balance-sheet items were found. Fundraising cash and operating liquidity were nevertheless treated as non-detachable where appropriate.
+
+[formulas]
+gross_margin = 519,756,236.54 / 938,563,354.82 = 0.5537785317
+net_margin = 415,006,746.50 / 938,563,354.82 = 0.4421723311
+operating_free_cash_flow = 428,120,083.99 - 34,497,276.73 = 393,622,807.26
+
+discounted_structured_deposits = 1,600,453,095.90 * 0.85 = 1,360,385,131.515
+discounted_detachable_net_cash =
+  1,744,607,550.48 bank deposits
+  + 1,360,385,131.515 discounted structured deposits
+  - 216,840,000.00 dividend payable
+  - 408,073,700.00 unused IPO proceeds
+  - 300,000,000.00 operating liquidity reserve
+  = 2,180,078,981.995
+
+three_year_average_deducted_parent_profit =
+  (364,645,242.35 + 369,707,685.72 + 369,946,641.92) / 3
+  = 368,099,856.6633333
+maintenance_capex = (34,497,276.73 + 18,771,197.00) / 2 = 26,634,236.865
+discounted_sustainable_cash_profit =
+  368,099,856.6633333 * 0.95 - 26,634,236.865
+  = 323,060,626.9651667
+
+operating_business_price = 7,702,000,000 - 2,180,078,981.995 = 5,521,921,018.005
+owner_earnback_years = 5,521,921,018.005 / 323,060,626.9651667 = 17.0925224466
+market_cap_to_cash_profit = 7,702,000,000 / 323,060,626.9651667 = 23.8407263440
+forecast_dividend_yield = 20,850,000 / 7,702,000,000 = 0.0027070891
+
+[judgment assumptions]
+- Structured deposits counted at 85% because individual maturity/protection terms were not available.
+- CNY 408,073,700 of unused offering proceeds excluded in full due to designated use.
+- CNY 300,000,000 retained as operating liquidity reserve; this is an analyst assumption.
+- Sustainable profit starts from three-year average deducted parent profit, applies the annual fact pack's 95% cash-conversion assessment, and subtracts estimated maintenance capex.
+- Maintenance capex uses the 2024-2025 average because 2023 capex was unavailable.
+- Forecast dividend uses only the announced 2025 annual final proposal (CNY 20.85m); no unannounced interim dividend is assumed.
+
+[known limitations]
+- Individual structured-deposit maturity and principal-protection terms were not obtained.
+- 2023 capex was unavailable in the 2025 annual report three-year summary.
+- Quote snapshot is supplied by the task input and was not independently refreshed.
+
+[validation]
+Command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Initial populated-result validation: status=ok, errors=[]

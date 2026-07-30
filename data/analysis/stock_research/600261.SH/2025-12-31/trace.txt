@@ -1,0 +1,48 @@
+stock-research trace
+company=阳光照明
+code=600261.SH
+period=2025-12-31
+generated_at=2026-07-29T18:15:54+08:00
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+write=all result.json mutations executed with protocol set
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validate_result={"status":"ok","errors":[]}
+
+[sources]
+primary_filing=stock_report/data/raw/filings/600261.SH/2025-12-31/600261_2025_annual.pdf
+filing_url=https://www.yankon.com/Upload/file/202605/20260507144426_8303.pdf
+annual_facts=stock_report/data/analysis/annual_review/600261.SH/2025-12-31/facts.json
+annual_facts_md=stock_report/data/analysis/annual_review/600261.SH/2025-12-31/annual_facts.md
+extraction_trace=stock_report/data/analysis/annual_review/600261.SH/2025-12-31/extraction_trace.txt
+market_snapshot=config/input.json; Tencent qt.gtimg.cn; 20260728161448
+business_cross_check=company official website and investor Q&A
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=LED lighting manufacturing and sales; no special financial statement structure
+
+[core_calculations]
+gross_margin=887206175.32/2668366159.67=0.3324904163189215
+net_margin=188557805.50/2668366159.67=0.07066414210683858
+operating_free_cash_flow=230064884.66-26620765.01=203444119.65
+necessary_operating_cash=2962162299.02/6=493693716.50333333
+discounted_net_cash=(2306006381.30-39580337.27)-493693716.50333333+22671300+225380600.20*0.50+111589425.34*0.30-124264603.38-75622083.39=1741684068.4586666
+three_year_adjusted_profit_average=(64229617.66+147418638.36+183740666.99)/3=131796307.67
+discounted_sustainable_cash_profit=131796307.67*0.80=105437046.136
+operating_business_price=3965000000-1741684068.4586666=2223315931.541333
+owner_earnback_years=2223315931.541333/105437046.136=21.08666747618808
+market_cap_to_cash_profit=3965000000/105437046.136=37.60537823570729
+forecast_dividend_yield=173556885.58/3965000000=0.04377222839344263
+
+[judgment_boundaries]
+fact=financial statements, dividend proposal, business segments and market snapshot
+inference=ordinary operating model applicability and business interpretation
+estimate=two months operating cash reserve, financial asset haircuts, 20% sustainable-profit haircut
+limitations=2023 capex not backfilled; non-current financial asset look-through incomplete; current market share unavailable

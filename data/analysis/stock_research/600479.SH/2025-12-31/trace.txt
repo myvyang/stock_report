@@ -1,0 +1,85 @@
+stock-research trace
+
+task:
+- company: 600479.SH 千金药业
+- period: 2025-12-31 annual
+- required outputs: outputs/result.json, outputs/report.md, outputs/trace.txt
+
+protocol:
+- read skill: /workspace/.agents/skills/stock-research/SKILL.md
+- read result contract: /workspace/.agents/skills/stock-research/references/result-contract.md
+- read report contract: /workspace/.agents/skills/stock-research/references/report-contract.md
+- initialized result:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- final validation:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+  status: ok
+
+primary reused sources:
+- config/input.json
+- stock_report/data/analysis/annual_review/600479.SH/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/600479.SH/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/600479.SH/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/600479.SH/2025-12-31/metadata.json
+- stock_report/data/raw/filings/600479.SH/2025-12-31/12241825.PDF
+
+annual report text checks:
+- pdftotext -layout stock_report/data/raw/filings/600479.SH/2025-12-31/12241825.PDF - | rg -n "分红|利润分配|现金红利|每股派发|销售费用|管理费用|研发费用|财务费用|医药工业|医药商业|市场份额|核心产品|妇科千金"
+- inspected annual report text around business and industry discussion, profit distribution, and expense notes.
+
+key extracted facts:
+- revenue: 3,628,843,106.61
+- cost_of_sales: 1,858,832,653.58
+- gross_profit: 1,770,010,453.03
+- parent_net_profit: 286,293,094.19
+- deducted_parent_net_profit: 279,393,713.73
+- operating_cash_flow: 480,244,967.37
+- capital_expenditure: 124,167,277.19
+- operating_free_cash_flow: 356,077,690.18
+- total_assets: 4,963,677,298.53
+- total_liabilities: 1,613,516,005.69
+- total_equity: 3,350,161,292.84
+- parent_equity: 3,028,298,496.58
+- cash_and_cash_equivalents: 736,043,191.35
+- restricted_cash: 44,105,186.96
+- debt_investment_wealth_management: 1,528,070,750.00
+- short_term_borrowing_bill_discount: 59,705,282.57
+- 2025 dividend plan: 187,039,806.08
+- market_cap: 4,710,000,000.00
+- pe_ttm: 15.29
+
+analysis model:
+- statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- reason: annual report business and balance sheet show drug manufacturing, drug distribution and hygiene products; no special financial, real estate, construction, utility concession or investment holding balance-sheet model.
+
+owner earnback calculation:
+- gross_margin = 1,770,010,453.03 / 3,628,843,106.61 = 0.4877616367
+- net_margin = 286,293,094.19 / 3,628,843,106.61 = 0.0788937647
+- discounted_detachable_net_cash:
+  cash and equivalents 736,043,191.35 - necessary operating cash 300,000,000.00
+  + debt investment 1,528,070,750.00 * 90%
+  + trading stocks 1,935,202.94 * 50%
+  - short-term borrowing 59,705,282.57
+  = 1,752,569,185.25
+- discounted_net_cash_to_market_cap = 1,752,569,185.25 / 4,710,000,000.00 = 0.3720953684
+- finance-related income removed from cash profit:
+  investment income 44,191,162.06
+  + fair value gain 2,407,585.49
+  + interest income 23,304,730.30
+  = 69,903,477.85 pretax
+  pretax amount * 75% = 52,427,608.39 after tax estimate
+- discounted_sustainable_cash_profit:
+  operating_free_cash_flow 356,077,690.18
+  - after-tax finance-related income 52,427,608.39
+  - working-capital quality discount 20,000,000.00
+  = 283,650,081.79
+- operating_business_price = 4,710,000,000.00 - 1,752,569,185.25 = 2,957,430,814.75
+- owner_earnback_years = 2,957,430,814.75 / 283,650,081.79 = 10.4263351382
+- market_cap_to_cash_profit = 4,710,000,000.00 / 283,650,081.79 = 16.6049661267
+- forecast_dividend_yield = 187,039,806.08 / 4,710,000,000.00 = 0.0397112115
+
+limitations:
+- 2023 capital expenditure was not available in the reused fact pack.
+- necessary operating cash of 300,000,000, 90% haircut for deposits/CDs, and 20,000,000 working-capital quality discount are analytical estimates.
+- early withdrawal terms for time deposits and transferable certificates of deposit were not disclosed item by item.

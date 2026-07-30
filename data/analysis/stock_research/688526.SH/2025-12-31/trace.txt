@@ -1,0 +1,73 @@
+任务：688526.SH 科前生物，2025-12-31 年报，普通经营公司控股回本研究。
+
+已读取协议：
+- /workspace/.agents/skills/stock-research/SKILL.md
+- /workspace/.agents/skills/stock-research/references/result-contract.md
+- /workspace/.agents/skills/stock-research/references/report-contract.md
+
+初始化：
+- 运行 `PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json`
+- 初始结果包含公司身份、市值 5,799,000,000 元、PE TTM 14.88、行情来源 Tencent qt.gtimg.cn、行情时间 20260728161456。
+
+复用数据：
+- 年报事实包：stock_report/data/analysis/annual_review/688526.SH/2025-12-31/facts.json
+- 年报人读事实：stock_report/data/analysis/annual_review/688526.SH/2025-12-31/annual_facts.md
+- 抽取 trace：stock_report/data/analysis/annual_review/688526.SH/2025-12-31/extraction_trace.txt
+- 原始披露元数据：stock_report/data/raw/filings/688526.SH/2025-12-31/metadata.json
+- 年报文本：stock_report/data/raw/filings/688526.SH/2025-12-31/688526_2025_annual_report.txt
+
+官方/可复核来源：
+- 上交所公告路径：https://www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-08/688526_20260408_CRBL.pdf
+- 本地保留 PDF：/root/aicode/stock_report/data/raw/filings/688526.SH/2025-12-31/688526_2025_annual_report.pdf
+- 新浪镜像 PDF：http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESH_STOCK/2026/2026-4/2026-04-08/12066432.PDF
+- PDF sha256：33767533a24a39781add9c9eea60b9060ec61a63cda2936cf6b5e67ed2c256ad
+
+关键字段：
+- 总资产 4,789,205,283.26 元
+- 总负债 550,026,958.07 元
+- 总权益 4,239,178,325.19 元
+- 归母权益 4,238,780,870.21 元
+- 营业收入 949,742,023.06 元
+- 营业成本 313,671,966.29 元
+- 毛利 636,070,056.77 元
+- 归母净利润 418,723,155.80 元
+- 扣非归母净利润 351,633,712.49 元
+- 经营现金流 468,541,833.22 元
+- 购建长期资产现金支出 123,878,027.06 元
+- 经营自由现金流 344,663,806.16 元
+
+模型判断：
+- 公司主业为兽用生物制品研发、生产、销售及动物防疫技术服务，主要产品为非强制免疫猪用疫苗和禽用疫苗。
+- 未发现客户存款、保险准备金、预售监管资金、项目垫资、收费权或底层股权平台等特殊报表模型特征。
+- analysis_model.statement_model = ordinary_operating。
+- owner_earnback_applicability = applicable。
+
+折后净现金假设：
+- 货币资金 176,801,385.46 元，折扣 50%，折后 88,400,692.73 元。理由：无受限资金，但保留经营缓冲。
+- 交易性金融资产 1,542,274,717.04 元，折扣 80%，折后 1,233,819,773.63 元。理由：银行理财、券商理财、股票投资未披露逐笔限制。
+- 一年内到期大额存单及利息 664,392,235.17 元，折扣 95%，折后 631,172,623.41 元。
+- 短期大额存单及国债逆回购 81,756,101.32 元，折扣 95%，折后 77,668,296.25 元。
+- 一年以上到期大额存单及利息 845,078,951.90 元，折扣 85%，折后 718,317,109.12 元。
+- 扣除一年内到期非流动负债及租赁负债 6,680,270.37 元。
+- 折后可剥离净现金合计 2,742,698,224.77 元。
+
+现金利润假设：
+- 归母净利润 418,723,155.80 元。
+- 扣除非经常性损益 67,089,443.31 元后，扣非归母净利润 351,633,712.49 元。
+- 经营自由现金流 344,663,806.16 元，与扣非利润接近。
+- 考虑毛利率下降风险和资本开支周期，折后可持续现金利润取 330,000,000 元。
+
+分红：
+- 2025 年利润分配预案为每 10 股派 6.4 元，以 466,128,056 股计算现金分红 298,321,955.84 元。
+- 回购计入现金分红金额 1,075,591.32 元，现金分红和回购合计 299,397,547.16 元，占归母净利润 71.50%。
+- 按本次市值计算预测现金分红率 5.1444%。
+
+输出：
+- outputs/result.json 已补全结构化字段。
+- outputs/report.md 已写入人读报告。
+- outputs/trace.txt 已记录数据来源、假设和校验路径。
+
+校验：
+- 第一次 validate 失败，原因是 evidence 条目缺少协议实现要求的 claim 字段。
+- 已将 evidence 转为 claim + source 格式，并移除事实包内旧行情线索，保留本次输入的 2026-07-28 行情。
+- 最终运行 `PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json`，返回 status=ok，errors=[]。

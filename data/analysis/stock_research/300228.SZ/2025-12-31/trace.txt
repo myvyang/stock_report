@@ -1,0 +1,29 @@
+任务：300228.SZ 富瑞特装，2025-12-31 年报研究
+生成时间：2026-07-29 Asia/Shanghai
+
+1. 完整读取 stock-research/SKILL.md、result-contract.md、report-contract.md，并补读 data-reuse.md。
+2. 读取 config/input.json；确认市值 4,158,000,000 元，快照 20260728161439，来源 Tencent qt.gtimg.cn，PE TTM 16.78。
+3. 复用 annual_review/facts.json、annual_facts.md、extraction_trace.txt 和 normalized annual-facts.json。
+4. 定向核对原始年报文本：业务与经营模式、行业位置、风险、客户集中、2025 年分红预案、合并净利润和筹资现金流。
+5. 基于业务事实确认 statement_model=ordinary_operating，owner_earnback_applicability=applicable。
+6. 使用协议 CLI init 初始化 outputs/result.json；使用协议 CLI set 写入各字段。
+7. 主要计算：
+   gross_margin = 775,509,968.04 / 3,149,595,100.52 = 24.622683%
+   net_margin = 241,099,479.65 / 3,149,595,100.52 = 7.655094%
+   operating_free_cash_flow = 603,004,362.64 - 112,021,323.65 = 490,983,038.99
+   necessary_operating_cash = 3,149,595,100.52 × 10% = 314,959,510.05（研究估算）
+   discounted_net_cash = 874,151,625.61 - 314,959,510.05 + 2,034,104.99×50% + 63,864,858.56×30% - 96,990,552.86 = 482,378,072.76
+   discounted_cash_profit = 212,535,208.69（三年扣非归母中位数）×85% = 180,654,927.39
+   operating_business_price = 4,158,000,000 - 482,378,072.76 = 3,675,621,927.24
+   owner_earnback_years = 3,675,621,927.24 / 180,654,927.39 = 20.34609
+   market_cap_to_cash_profit = 4,158,000,000 / 180,654,927.39 = 23.01626
+   forecast_dividend_yield = 71,691,065.88 / 4,158,000,000 = 1.724172%
+8. 受限保证金折扣率为 0；权益投资按 30%；衍生金融资产按 50%；银行借款全额扣除。必要经营现金、投资折扣和利润持续率均在 result.json 与 report.md 明示为研究假设。
+9. 协议 CLI validate 初次正式校验结果：status=ok，errors=[]。
+
+主要来源：
+- stock_report/data/raw/filings/300228.SZ/2025-12-31/300228_2025_annual_report.txt
+- stock_report/data/analysis/annual_review/300228.SZ/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/300228.SZ/2025-12-31/annual_facts.md
+- stock_report/data/raw/filings/300228.SZ/2025-12-31/metadata.json
+- config/input.json

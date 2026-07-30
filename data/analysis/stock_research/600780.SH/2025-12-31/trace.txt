@@ -1,0 +1,64 @@
+stock-research task trace for 600780.SH / 通宝能源 / 2025-12-31 annual
+
+Protocol and contracts:
+- Read /workspace/.agents/skills/stock-research/SKILL.md.
+- Read /workspace/.agents/skills/stock-research/references/result-contract.md.
+- Read /workspace/.agents/skills/stock-research/references/report-contract.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields through protocol CLI set commands using a Python subprocess wrapper. The wrapper did not write result.json directly.
+- Validated result with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+Data reused:
+- Input file: config/input.json.
+- Annual fact pack: stock_report/data/analysis/annual_review/600780.SH/2025-12-31/facts.json.
+- Annual fact summary: stock_report/data/analysis/annual_review/600780.SH/2025-12-31/annual_facts.md.
+- Annual extraction trace: stock_report/data/analysis/annual_review/600780.SH/2025-12-31/extraction_trace.txt.
+- Raw annual report mirror: stock_report/data/raw/filings/600780.SH/2025-12-31/sina_2025_annual.txt.
+- Raw filing metadata: stock_report/data/raw/filings/600780.SH/2025-12-31/metadata.json.
+
+Key source lookups:
+- Business model and revenue model: sina_2025_annual.txt lines 654-657.
+- Operating review and drivers: sina_2025_annual.txt lines 724-726 and 840-841.
+- Segment revenue/cost/margins: sina_2025_annual.txt lines 770-850.
+- Industry position: sina_2025_annual.txt lines 1695-1704.
+- Risk factors: sina_2025_annual.txt lines 1736-1748.
+- Balance sheet: sina_2025_annual.txt lines 3150-3360.
+- Income statement net profit and parent net profit: sina_2025_annual.txt lines 3650-3685.
+- Cash flow and capex: sina_2025_annual.txt lines 3835-3860.
+- Dividend proposal and three-year cash dividend disclosure: sina_2025_annual.txt lines 2409-2461.
+- Monetary funds, restricted assets, borrowings and lease liabilities were primarily reused from facts.json, which cites annual report lines 5063-5078, 6905-6906, 7227-7338.
+
+Analysis model:
+- Confirmed ordinary_operating.
+- Reason: company reports electric power business, mainly thermal power generation and power distribution, with small wind power exposure. Assets and liabilities are power plants, grid assets, receivables, inventory, project construction, borrowings and operating payables, not customer deposits, insurance reserves, real estate presale funds, construction project advances, concession rights, or a pure investment holding balance sheet.
+- Ordinary owner earnback applicability: applicable, with discounts for power-sector capital expenditure and regulated/market electricity price risk.
+
+Core calculations:
+- Gross margin = 1,132,698,492.29 / 11,264,300,694.30 = 0.10055648575354278.
+- Net margin = 648,166,214.24 / 11,264,300,694.30 = 0.05754162924361451.
+- 2025 operating FCF = 1,354,770,338.53 - 916,748,083.40 = 438,022,255.13.
+- Three-year operating FCF values reused from fact pack: 2023 526,089,929.97; 2024 685,310,340.73; 2025 438,022,255.13. Median = 526,089,929.97.
+- Discounted sustainable cash profit = 526,089,929.97 * 90% = 473,480,936.973.
+- Detachable cash:
+  bank deposits 1,642,125,629.91 less 1,000,000,000 operating cash = 642,125,629.91.
+  other monetary funds 2,320,006.86 * 50% = 1,160,003.43.
+  deposits in finance company 1,170,448,217.43 * 50% = 585,224,108.72.
+  trading financial assets 5,048,312.75 * 80% = 4,038,650.20.
+  deduct interest-bearing borrowings and project loans 636,832,349.41.
+  discounted detachable net cash = 595,716,042.845.
+- Operating business price = 6,776,000,000.000001 - 595,716,042.845 = 6,180,283,957.155001.
+- Owner earnback years = 6,180,283,957.155001 / 473,480,936.973 = 13.052867548725468.
+- Market cap to cash profit = 6,776,000,000.000001 / 473,480,936.973 = 14.311030225038179.
+- Forecast dividend yield = 206,370,454.14 / 6,776,000,000.000001 = 0.030456088273317587.
+
+Outputs:
+- outputs/result.json: complete and protocol-validated.
+- outputs/report.md: human-readable operating story and owner earnback report.
+- outputs/trace.txt: this trace.
+
+Limitations recorded:
+- Company website PDF download timed out in the existing annual review workflow; core financial numbers use Sina announcement full-text mirror and local text, with company PDF URL recorded in metadata.
+- Maintenance capex and growth capex cannot be precisely split from annual report disclosures.
+- Minimum operating cash balance and immediate withdrawal terms for finance company deposits cannot be fully verified from the annual report.

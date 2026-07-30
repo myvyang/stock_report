@@ -1,0 +1,61 @@
+stock-research task trace for 600398.SH 海澜之家, period 2025-12-31 annual
+
+1. Skill and protocol
+- Read /workspace/.agents/skills/stock-research/SKILL.md.
+- Read result contract: /workspace/.agents/skills/stock-research/references/result-contract.md.
+- Read report contract: /workspace/.agents/skills/stock-research/references/report-contract.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reused source material
+- Input: config/input.json.
+- Annual facts: stock_report/data/analysis/annual_review/600398.SH/2025-12-31/facts.json.
+- Human annual facts summary: stock_report/data/analysis/annual_review/600398.SH/2025-12-31/annual_facts.md.
+- Filing metadata: stock_report/data/raw/filings/600398.SH/2025-12-31/metadata.json.
+- Annual report text: stock_report/data/raw/filings/600398.SH/2025-12-31/2025-annual-report.txt.
+- User evaluation notes checked: stock_report/data/notes/user_stock_evaluations.md. No direct note for 600398.SH.
+
+3. Additional annual report checks
+- Dividend terms searched with rg for 利润分配/现金分红/每10股/派发. Confirmed 2025 plan: 每10股派息 4.10 元, cash dividend 1,969,135,821.36 元, payout ratio 90.91%.
+- Business and segment disclosures searched around 门店/品牌/营业收入. Confirmed 2025 year-end stores 7,330; brand revenue split: 海澜之家系列 14,903,386,367.69 元, 海澜团购定制系列 2,711,288,443.40 元, 其他品牌 3,447,007,988.94 元.
+- Channel disclosures checked: online 4,434,667,537.53 元, offline 16,627,015,262.50 元.
+- Inventory disclosures checked: ending inventory 10,818,897,407.02 元; apparel-chain inventory turnover days 344; non-returnable inventory impairment allowance 940,752,416.83 元.
+- Cash-flow explanation checked: operating cash flow increase mainly due to lower cash paid for goods and services.
+
+4. Analysis model decision
+- Input hint was ordinary_operating/applicable.
+- Rechecked against annual report business and balance sheet facts.
+- Final model kept as ordinary_operating/applicable because revenue comes from apparel retail, group purchase customization, brand agency and outlet retail; assets/liabilities are cash/deposits, inventories, receivables, store use-right assets, supplier payables, notes payable, lease liabilities and deposits. No banking, insurance, real estate development, construction-project, concession or investment-holding model identified.
+
+5. Key formulas and judgments
+- Gross margin = 9,704,390,197.82 / 21,625,651,303.09 = 0.4487444129.
+- Net margin = 2,165,990,940.78 / 21,625,651,303.09 = 0.1001584142.
+- Operating free cash flow = 4,482,481,474.60 - 429,928,193.40 = 4,052,553,281.20.
+- Forecast dividend yield = 1,969,135,821.36 / 28,913,000,000.00 = 0.0681055519.
+- Discounted detachable net cash = 11,668,640,645.5325 元:
+  non-restricted cash 6,788,914,862.10 at 95%;
+  restricted guarantee deposits 19,145,220.33 at 0%;
+  deposits due within one year 233,198,055.55 at 95%;
+  unpledged deposits over one year 3,908,600,534.71 at 90%;
+  pledged deposits 1,500,000,000.00 at 50%;
+  equity/non-current financial assets 664,341,739.14 at 50%;
+  investment property 662,870,038.26 at 60%.
+- Discounted sustainable cash profit selected as 2,000,000,000.00 元. This is lower than 2025 operating FCF and lower than the 2023-2025 average deducted parent net profit, reflecting inventory release in 2025 cash flow, main-brand revenue decline, margin pressure in growing segments and inventory turnover risk.
+- Operating business price = 28,913,000,000.00 - 11,668,640,645.5325 = 17,244,359,354.4675 元.
+- Owner earnback years = 17,244,359,354.4675 / 2,000,000,000.00 = 8.6221796772.
+- Market cap to cash profit = 28,913,000,000.00 / 2,000,000,000.00 = 14.4565.
+
+6. Result protocol writes
+- Used protocol CLI set commands through a Python subprocess wrapper with PYTHONPATH=src. The wrapper only called stock_analysis.stock_research.protocol set; it did not hand-write result.json from scratch.
+- Completed outputs/result.json fields: analysis_model, metrics, financials, asset_analysis, owner_earnback, dividend, business, risks, evidence, data_quality.
+
+7. Validation
+- Ran:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result:
+  {"status":"ok","errors":[]}
+
+8. Data limitations recorded
+- Annual report does not disclose every time deposit's bank, rate and maturity date; discounting uses disclosed term and pledge status.
+- 2023 capital expenditure was not separately extracted in the annual facts package; cash-profit normalization relies mainly on 2023-2025 deducted profit, 2025/2024 capex and 2025 cash-flow quality.
+- 2025 dividend is a profit-distribution plan and final implementation depends on later approval and registration-date share count.

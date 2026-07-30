@@ -1,0 +1,65 @@
+2026-07-29T18:21:24+08:00
+
+任务：歌力思 603808.SH，报告期 2025-12-31，annual。
+
+协议与合同：
+- 完整读取 .agents/skills/stock-research/SKILL.md。
+- 完整读取 references/result-contract.md、references/report-contract.md。
+- 读取 references/data-reuse.md，优先复用年度事实包，缺口再回查原始年报文本。
+
+初始化：
+- 在 /workspace 执行：
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- 未从空文件手写复杂 JSON；所有结构化字段均通过 protocol set 写入初始化后的骨架。
+
+复用材料：
+- stock_report/data/analysis/annual_review/603808.SH/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/603808.SH/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/603808.SH/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/603808.SH/2025-12-31/metadata.json
+
+原始材料核验：
+- 上海证券交易所《深圳歌力思服饰股份有限公司2025年年度报告》。
+- 本地 PDF：stock_report/data/raw/filings/603808.SH/2025-12-31/603808_2025_annual_report.pdf
+- 本地文本：stock_report/data/raw/filings/603808.SH/2025-12-31/603808_2025_annual_report.txt
+- 官方 URL：https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-25/603808_20260425_BZBF.pdf
+- 回查重点：第2、10-12、34-40、43-44、66-67、102-111、180、194、222-224、257、259页。
+
+财报模型复核：
+- 公司收入基本来自服装设计、生产与销售，资产核心为现金、库存、应收、门店使用权、品牌和联营投资。
+- 不存在客户存款、保险准备金、预售监管资金或收费权等特殊模型核心要素。
+- 采用 ordinary_operating；owner_earnback_applicability=applicable。
+
+核心财务事实：
+- 总资产 4,185,863,896.81；总负债 1,349,750,873.72；归母权益 2,604,949,241.45。
+- 营收 2,856,601,368.91；毛利 1,911,121,822.86；归母净利润 164,882,193.77；扣非归母净利润 108,661,597.79。
+- 经营现金流 576,400,778.71；资本开支 55,711,982.27；经营自由现金流 520,688,796.44。
+- 市值 2,706,000,000，日期 20260728161451，来源 Tencent qt.gtimg.cn；PE TTM 16.41。
+
+控股回本假设：
+- 现金及现金等价物 977,609,644.44，按100%。
+- 基金 63,419,830.89，按90%。
+- 股票 176,319.07，按50%。
+- 一年内到期非流动金融资产 113,069,765.11，因底层条款不足按70%。
+- 必要经营现金按年度经营现金流出 2,648,491,177.31 的两个月估算：441,415,196.22。
+- 短期借款 29,012,932.69 全额扣除。
+- 折后可剥离净现金 = 643,496,358.44。
+- 经营业务购买价 = 2,706,000,000 - 643,496,358.44 = 2,062,503,641.56。
+- 折后可持续现金利润采用2025年扣非归母净利润 108,661,597.79；未用单年高经营现金流外推。
+- 回本年 = 2,062,503,641.56 / 108,661,597.79 = 18.98098025。
+- 市值/现金利润 = 2,706,000,000 / 108,661,597.79 = 24.90300212。
+
+分红：
+- 采用2025年度董事会预案 66,199,448.41，每10股1.82元，占归母净利润40.15%。
+- 预测分红率 = 66,199,448.41 / 2,706,000,000 = 0.0244639499。
+- 预案仍以最终实施为准。
+
+已知限制：
+- 一年内到期非流动金融资产底层条款不完整。
+- 必要经营现金为分析估计，不是公司披露值。
+- 2024年大额亏损，单年扣非利润的跨周期稳定性未被证明。
+- 市值和PE来自输入行情快照，未以交易所收盘数据二次验证。
+
+验证：
+- 执行 PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- 首次完成验证结果：status=ok，errors=[]。

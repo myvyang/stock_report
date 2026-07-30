@@ -1,0 +1,87 @@
+stock-research trace
+
+input:
+- config/input.json
+- query: 000423.SZ
+- company: 东阿阿胶
+- period: 2025-12-31
+- report_type: annual
+- market_cap: 33270999999.999996
+- market_cap_date: 20260728161421
+- market_cap_source: Tencent qt.gtimg.cn
+- pe_ttm: 18.81
+
+skill/protocol:
+- Read /workspace/.agents/skills/stock-research/SKILL.md
+- Read /workspace/.agents/skills/stock-research/references/result-contract.md
+- Read /workspace/.agents/skills/stock-research/references/report-contract.md
+- Read /workspace/.agents/skills/stock-research/references/data-reuse.md
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Updated outputs/result.json with protocol set commands, using initialized skeleton rather than hand-writing full JSON from scratch.
+- Validated outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+sources reused:
+- stock_report/data/normalized/facts/000423.SZ/2025-12-31/annual-facts.json
+- stock_report/data/analysis/annual_review/000423.SZ/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/000423.SZ/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/000423.SZ/2025-12-31/report.md
+- stock_report/data/raw/filings/000423.SZ/2025-12-31/metadata.json
+- stock_report/data/raw/filings/000423.SZ/2025-12-31/annual-report.pdf
+
+official filing:
+- title: 东阿阿胶股份有限公司2025年年度报告全文
+- url: https://static.cninfo.com.cn/finalpage/2026-03-20/1225019488.PDF
+- local file: stock_report/data/raw/filings/000423.SZ/2025-12-31/annual-report.pdf
+- sha256: d1ce791faa85e60d7f0d27ebafe20303ab32fc5d1075e9a303f179a3e9acd1a0
+
+model decision:
+- analysis_model.statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- reason: 2025 annual facts show revenue from 阿胶、阿胶系列及其他中成药、健康消费品研发生产销售; no financial, real estate developer, construction, concession, or investment holding balance-sheet model found.
+
+key financial facts:
+- revenue: 6700474184.47
+- cost_of_sales: 1777652843.06
+- gross_profit: 4922821341.41
+- gross_margin: 0.7346974566098398
+- parent_net_profit: 1738741090.72
+- net_margin: 0.2594952301659427
+- deducted_nonrecurring_parent_net_profit_2025: 1638084776.94
+- operating_cash_flow: 2289207775.27
+- capital_expenditure: 82671902.76
+- operating_free_cash_flow: 2206535872.51
+- total_assets: 13381200012.41
+- total_liabilities: 3017963382.49
+- total_equity: 10363236629.92
+- parent_equity: 10336303915.94
+
+owner earnback calculation:
+- cash_and_cash_equivalents: 3405648680.51
+- operating_cash_required: 1227943689.97
+- excess_cash: 2177704990.54
+- time_deposits_within_one_year: 1807252547.40
+- trading_financial_assets: 3815103071.18
+- trading_financial_assets_discount: 0.90
+- financing_debt_to_deduct: 59420329.11
+- discounted_detachable_net_cash = 2177704990.54 + 1807252547.40 + 3815103071.18 * 0.90 - 59420329.11 = 7359129972.892
+- operating_business_price = 33270999999.999996 - 7359129972.892 = 25911870027.107994
+- discounted_sustainable_cash_profit: 1638084776.94
+- owner_earnback_years = 25911870027.107994 / 1638084776.94 = 15.818393768063872
+- market_cap_to_cash_profit = 33270999999.999996 / 1638084776.94 = 20.310914592681456
+
+dividend:
+- annual report profit distribution checked from local PDF text.
+- base shares: 643976824
+- cash dividend per 10 shares: 14.31
+- forecast_cash_dividend: 921530835.14
+- buyback_cash: 79992687.96
+- forecast_dividend_yield = 921530835.14 / 33270999999.999996 = 0.02769771979020769
+
+data quality:
+- status: complete
+- limitations:
+  1. Trading financial assets are not disclosed instrument by instrument for maturity, underlying asset, or redemption limits.
+  2. Required operating cash is estimated as 25% of 2025 operating cash outflow, not directly disclosed by the company.
+  3. Cash profit uses 2025 deducted non-recurring parent net profit and must be updated if future category demand, channel inventory, or expense rate changes.

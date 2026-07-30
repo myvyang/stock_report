@@ -1,15 +1,19 @@
 南方传媒 601900.SH 2025 股票研究 trace
-生成时间：2026-07-27 +08:00
+生成时间：2026-07-28T18:55:23+08:00
+时区：Asia/Shanghai
 
 使用的协议与契约：
 - 已读取 /workspace/.agents/skills/stock-research/SKILL.md
 - 已读取 /workspace/.agents/skills/stock-research/references/result-contract.md
 - 已读取 /workspace/.agents/skills/stock-research/references/report-contract.md
-- 补充读取 /workspace/.agents/skills/stock-research/references/data-reuse.md
+- 补充读取 /workspace/.agents/skills/stock-research/references/data-reuse.md，用于确认年度事实包和历史研究结果的复用边界。
 
 协议 CLI：
 - 已运行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- 已通过 protocol set 分组写入 metrics、financials、asset_analysis、owner_earnback、dividend、business、risks、evidence、data_quality。
+- 已通过 protocol set 写入 analysis.sources_used、valuation、metrics、financials、asset_analysis、owner_earnback、dividend、business、risks、evidence、data_quality。
+- 已通过 protocol append 补充本次市值和 PE 推算证据。
+- 首次 validate 提示 asset_analysis.assets/liabilities 每行缺少 explanation 字段；原因是历史结果使用 interpretation 字段。
+- 已通过 protocol set 为资产负债分类补齐 explanation，内容沿用对应 interpretation。
 - 已运行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
 - 验证结果：status ok，errors 为空。
 
@@ -17,47 +21,44 @@
 - config/input.json
 - stock_report/data/analysis/annual_review/601900.SH/2025-12-31/facts.json
 - stock_report/data/analysis/annual_review/601900.SH/2025-12-31/annual_facts.md
-- stock_report/data/analysis/annual_review/601900.SH/2025-12-31/extraction_trace.txt
 - stock_report/data/raw/filings/601900.SH/2025-12-31/metadata.json
-- stock_report/data/raw/filings/601900.SH/2025-12-31/601900_2025_annual_report.txt
 - stock_report/data/analysis/stock_research/601900.SH/2025-12-31/result.json
 - stock_report/data/analysis/stock_research/601900.SH/2025-12-31/report.md
 - stock_report/data/analysis/stock_research/601900.SH/2025-12-31/trace.txt
-- stock_report/data/notes/user_stock_evaluations.md
 
 复用判断：
-- 年度事实包已经覆盖业务、三张表、资产负债拆分、现金流和主要缺口，作为本次核心财报来源。
-- 历史 stock_research 输出存在旧 schema 和 investment_case_type 字段，未直接复制为本次 result.json。
-- 当前工作区未发现独立 owner_earnback 专题目录；折后可剥离净现金、折后现金利润和回本年数复用历史 stock_research result.json 中保存的 owner_earnback 口径，并在 data_quality 中标明二级证据限制。
-- 用户股票评价表无 601900.SH / 南方传媒 对应记录，未纳入判断。
+- 年度事实包已经覆盖业务、三张表、资产负债拆分、现金流、分红和主要缺口，作为本次核心财报来源。
+- 历史 stock_research/result.json 已是 stock-research-result-v1，保存了控股回本、折后净现金、折后现金利润、行业背景和风险判断，作为本次二级研究来源复用。
+- 当前工作区未发现独立 owner_earnback 专题目录；折后可剥离净现金、折后现金利润和回本年数复用历史 stock_research 保存口径，并在 data_quality 中标明限制。
+- 输出 report.md 复用历史研究报告正文；其核心数字与本次 result.json 一致。
 
-关键年报定位：
-- 合并资产负债表：文本行 2910-3065，总资产、总负债、权益、资金类资产、经营资产、投资资产、主要负债。
-- 合并利润表：文本行 3110-3245，收入、成本、费用、减值、投资收益、公允价值、所得税、净利润、归母净利润。
-- 合并现金流量表：文本行 3320-3505，经营现金流、资本开支、投资现金流、融资现金流、分配股利利润和现金等价物余额。
-- 现金流量表补充资料：文本行 9236-9275，净利润调节至经营现金流。
-- 主营业务分行业、分产品和成本构成：文本行 616-790。
-- 利润分配预案和三年分红：文本行 1812-1868。
+核心年报数字：
+- 总资产 17,764,422,758.81 元，总负债 8,173,738,261.60 元，归母权益 8,833,627,512.10 元。
+- 营业收入 8,635,268,656.97 元，营业成本 5,507,773,594.03 元，毛利 3,127,495,062.94 元。
+- 归母净利润 1,042,972,131.36 元，扣非归母净利润 967,996,059.47 元。
+- 经营现金流 1,715,533,303.52 元，资本开支 730,297,688.12 元，经营自由现金流 985,235,615.40 元。
+- 预测现金分红 493,903,252.64 元，依据为 2025 年报董事会利润分配预案，尚需股东会审议通过。
 
 核心计算：
 - 毛利率 = 3,127,495,062.94 / 8,635,268,656.97 = 36.2177%。
 - 净利率 = 1,042,972,131.36 / 8,635,268,656.97 = 12.0781%。
-- 经营自由现金流 = 1,715,533,303.52 - 730,297,688.12 = 985,235,615.40 元。
+- PE TTM = 10,072,000,000.00 / 1,042,972,131.36 = 9.657 倍，结果中四舍五入为 9.66。
 - 预测分红率 = 493,903,252.64 / 10,072,000,000.00 = 4.9037%。
 - 经营业务购买价 = 10,072,000,000.00 - 2,154,192,418.369 = 7,917,807,581.631 元。
 - 控股回本年数 = 7,917,807,581.631 / 765,000,000.00 = 10.3501 年。
 - 市值/折后现金利润 = 10,072,000,000.00 / 765,000,000.00 = 13.1660 年。
 
-外部来源复用：
-- 国家新闻出版署《2024年新闻出版统计公报》，用于行业总量和出版发行压力背景。
-- 新京报转述开卷《2025年图书零售市场趋势洞察报告》，用于图书零售渠道压力背景。
-- 广东省教育厅《2025年广东省初中教辅材料评议推荐目录的通知》，用于教材教辅政策约束。
-- 21世纪经济报道《广州国际文化中心封顶》，用于文化地产项目投资额、建设进度和预计竣工背景。
+行情与估值输入处理：
+- 本次输入 market_cap.amount 为 10,072,000,000 元，source 为 stock_report owner_earnback snapshot，date 为空，pe_ttm 为空。
+- 年度事实包 evidence 保留 market_cap 来源线索：config/input.json rough_screen_row，行情时间 20260723161446，腾讯 qt.gtimg.cn。
+- result.json 中 market_cap_date 写为 2026-07-23；PE TTM 因输入为空，按输入市值除 2025 年归母净利润推算。
+- 市值和 PE 不是年报披露值，已在 data_quality.limitations 和 evidence 中说明。
 
 未解决缺口：
+- 交易性金融资产中债务工具、权益工具和其他项目未披露逐笔底层资产、期限和退出条款。
+- 必要经营现金为历史专题估算值，不是公司披露专项口径。
 - 广州国际文化中心稳定出租率、租金水平和运营净现金流公开资料不可确认。
-- 交易性金融资产中债务工具、权益工具和其他项目逐笔底层资产、期限和退出条款公开资料不可确认。
-- 必要经营现金为专题估算值，不是公司披露专项口径。
+- 2025 年经营现金流受所得税退税和免税影响，不能直接作为常态可分配利润。
 
 输出文件：
 - outputs/result.json

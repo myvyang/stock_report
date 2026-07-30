@@ -1,0 +1,59 @@
+stock-research trace
+company: 迈拓股份 (301006.SZ)
+period: 2025-12-31
+generated_at: 2026-07-29 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All result fields were populated with protocol set/append commands; the complex result object was not handwritten from scratch.
+
+2. Reused materials
+- stock_report/data/analysis/annual_review/301006.SZ/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/301006.SZ/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/301006.SZ/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/301006.SZ/2025-12-31/2025_annual_report.txt
+- stock_report/data/raw/filings/301006.SZ/2025-12-31/2025_annual_report.pdf
+- config/input.json market-cap snapshot
+
+3. Model decision
+- Confirmed statement_model=ordinary_operating.
+- Confirmed owner_earnback_applicability=applicable.
+- Reason: revenue is product/project sales; assets are cash, receivables, inventory, and productive fixed assets; no customer funds, project liquidation structure, concession right, or material interest-bearing debt makes the balance sheet a special business model.
+
+4. Core formulas
+- gross_margin = 206,492,334.89 / 397,566,961.87 = 0.5193885417
+- net_margin = 92,265,886.59 / 397,566,961.87 = 0.2320763333
+- operating_free_cash_flow = 109,791,433.67 - 13,977,279.38 = 95,814,154.29
+- unrestricted_non_raising_cash = 619,390,355.18 - 7,411,336.87 - 213,518,395.90 = 398,460,622.41
+- discounted_detachable_net_cash = 398,460,622.41 * 0.80 = 318,768,497.93
+- discounted_sustainable_cash_profit = 95,814,154.29 - 15,814,154.29 - 10,000,000 = 70,000,000
+- operating_business_price = 1,648,000,000 - 318,768,497.93 = 1,329,231,502.07
+- owner_earnback_years = 1,329,231,502.07 / 70,000,000 = 18.9890214581
+- market_cap_to_cash_profit = 1,648,000,000 / 70,000,000 = 23.5428571429
+- forecast_dividend_yield = 27,520,260 / 1,648,000,000 = 0.0166991869
+
+5. Judgmental adjustments
+- Excluded restricted guarantee deposits in full.
+- Excluded all disclosed unused proceeds in the fundraising account because they have designated use.
+- Applied a 20% haircut to remaining cash for continuing working-capital needs given large receivables and inventory.
+- Normalized 2025 free cash flow downward because 2023-2025 operating cash flow was volatile and 2025 benefited from changes in operating payables.
+- Applied an additional CNY 10 million prudence adjustment for receivable risk and uncertainty over normalized post-expansion capital expenditure.
+
+6. Evidence checks added from annual-report text
+- 2025 dividend proposal: CNY 2 per 10 shares on 137,601,300 shares, total CNY 27,520,260; pending shareholder approval at annual-report publication.
+- 2024 dividend: same cash amount, implemented in 2025.
+- 2025 direct-sales share: 90.74%.
+- Top-five customer share: 21.19%; largest customer: 10.98%.
+- Company-disclosed position: operations in more than 30 provincial-level regions, over 1,000 enterprise customers, over 10 million ultrasonic meters online.
+
+7. Known limitations
+- 2023 capital expenditure was not available in the 2025 annual report and was not backfilled from an earlier filing.
+- Unused fundraising cash was not split by individual bank account.
+- Industry-position statements are company disclosures, not independently verified market-share statistics.
+
+8. Validation
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

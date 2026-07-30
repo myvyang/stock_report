@@ -1,0 +1,98 @@
+stock-research trace
+
+task:
+- company: 600826.SH 兰生股份
+- period: 2025-12-31
+- report_type: annual
+- created_at input: 2026-07-28T22:11:36+08:00
+
+protocol:
+1. Read stock-research SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields using protocol set/append commands from a Python driver that loaded the initialized skeleton and annual fact pack.
+5. Validated outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   validation result: {"status":"ok","errors":[]}
+
+sources reused:
+- config/input.json
+- stock_report/data/analysis/annual_review/600826.SH/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/600826.SH/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/600826.SH/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/600826.SH/2025-12-31/metadata.json
+- stock_report/data/raw/filings/600826.SH/2025-12-31/600826_2025_annual_report.pdf
+- stock_report/data/notes/user_stock_evaluations.md
+
+source checks:
+- Local PDF metadata: title "东浩兰生会展集团股份有限公司2025年年度报告", 217 pages.
+- Annual fact pack identified source PDF URL:
+  http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESH_STOCK/2026/2026-4/2026-04-24/12159675.PDF
+- User stock evaluations file was checked; no 600826.SH specific user note was found.
+- Dividend text was supplemented from local PDF text search because facts.json did not carry a dedicated dividend section.
+
+analysis model:
+- Confirmed ordinary_operating.
+- Reason: business is exhibition organization, venue operation, exhibition support services, and sports events. No bank deposits/loans model, brokerage client funds, insurance reserves, real estate pre-sale funds, construction project contract asset model, utility concession, or investment holding platform model dominates the financial statements.
+- Ordinary owner earnback is applicable, but financial assets are large and require separate discounting and profit de-duplication.
+
+core financial facts:
+- Total assets: 5,994,168,297.01
+- Total liabilities: 1,314,011,242.98
+- Total equity: 4,680,157,054.03
+- Parent equity: 4,546,556,399.34
+- Minority interest: 133,600,654.69
+- Revenue: 1,625,962,662.93
+- Cost of sales: 1,030,334,626.01
+- Gross profit: 595,628,036.92
+- Operating profit: 458,028,029.81
+- Parent net profit: 325,739,791.83
+- Operating cash flow: 362,875,325.70
+- Capital expenditure: 7,625,624.34
+- Operating free cash flow: 355,249,701.36
+
+computed metrics:
+- Gross margin = 595,628,036.92 / 1,625,962,662.93 = 0.3663233176
+- Net margin = 325,739,791.83 / 1,625,962,662.93 = 0.2003365755
+- Minority interest ratio = 133,600,654.69 / 4,680,157,054.03 = 0.0285461905
+- Market cap: 5,750,000,000.00
+- PE TTM: 17.06
+- Market data source: Tencent qt.gtimg.cn, 2026-07-28 16:14:42 input snapshot.
+
+discounted detachable net cash:
+- Unrestricted cash = 2,125,213,333.32 - 2,879,038.68 = 2,122,334,294.64; discount 0.90; discounted 1,910,100,865.176
+- Trading financial assets = 516,248,727.92; discount 0.60; discounted 309,749,236.752
+- Other equity instruments = 1,714,002,035.46; discount 0.55; discounted 942,701,119.503
+- Other non-current financial assets = 37,369,724.76; discount 0.20; discounted 7,473,944.952
+- Bank borrowing and current portion/interest deduction = -194,100,772.22
+- Trading financial liability contingent consideration deduction = -3,825,000.00
+- Lease liabilities were reviewed but not mechanically deducted from detachable net cash because they are operating-site lease obligations paired with right-of-use assets.
+- Discounted detachable net cash = 2,972,099,394.163
+- Discounted net cash / market cap = 0.5168868512
+
+sustainable cash profit:
+- Start with 2025 parent net profit: 325,739,791.83
+- Deduct non-recurring items: -72,964,094.31
+- Deduct estimated after-tax income from detachable financial assets:
+  (51,344,148.08 other equity instrument dividend income + 7,676,295.42 trading financial asset holding income) * 75% = 44,265,332.625
+- Discounted sustainable distributable cash profit = 208,510,364.895
+- Operating free cash flow was higher than the adjusted profit, so no additional maintenance capex deduction was made.
+
+owner earnback:
+- Operating business price = 5,750,000,000.00 - 2,972,099,394.163 = 2,777,900,605.837
+- Owner earnback years = 2,777,900,605.837 / 208,510,364.895 = 13.3226020070
+- Market cap to cash profit = 5,750,000,000.00 / 208,510,364.895 = 27.5765667711
+
+dividend:
+- 2025 total cash dividend: 217,255,070.40
+- Payout ratio: 66.70% of 2025 parent net profit.
+- Forecast dividend yield = 217,255,070.40 / 5,750,000,000.00 = 0.0377834905
+- Basis: 2025 annual report disclosed total dividend per 10 shares of 3.00 yuan including interim dividend, and a 2025-2027 shareholder return plan with cash dividend ratio not below 50%.
+
+data quality:
+- status: complete
+- limitations:
+  1. 2023 capital expenditure was not backfilled from the 2023 annual report; cash conversion mainly uses 2024-2025 capex.
+  2. Other equity instrument item-level table was not fully structured due to PDF line wrapping; total and asset nature are sufficient for this discounted-cash analysis.
+  3. The profit deduction for financial-asset dividends/holding income uses a 25% tax assumption; actual tax treatment and sustainability may differ.

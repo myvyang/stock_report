@@ -1,11 +1,11 @@
-运行时间：2026-07-27 Asia/Shanghai
+运行时间：2026-07-28T18:12:50+08:00 Asia/Shanghai
 公司：601019.SH 山东出版
 报告期：2025-12-31 annual
 
 执行协议：
 - 已运行 `PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json` 初始化结果骨架。
-- 已按 result-contract.md 填充新版 `stock-research-result-v1` 字段。
-- 已运行协议 validate 校验，最终状态见命令输出。
+- 复用既有 `stock_report/data/analysis/stock_research/601019.SH/2025-12-31/result.json` 的研究结果，并按新版协议要求补齐 `asset_analysis.*[].explanation` 字段。
+- 已运行 `PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json`，校验结果：{"status":"ok","errors":[]}。
 
 读取的本地文件：
 - config/input.json
@@ -15,6 +15,7 @@
 - .agents/skills/stock-research/references/data-reuse.md
 - stock_report/data/analysis/annual_review/601019.SH/2025-12-31/facts.json
 - stock_report/data/analysis/annual_review/601019.SH/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/601019.SH/2025-12-31/extraction_trace.txt
 - stock_report/data/normalized/facts/601019.SH/2025-12-31/annual-facts.json
 - stock_report/data/raw/filings/601019.SH/2025-12-31/metadata.json
 - stock_report/data/raw/filings/601019.SH/2025-12-31/601019_2025_annual.pdf
@@ -23,15 +24,16 @@
 - stock_report/data/analysis/stock_research/601019.SH/2025-12-31/trace.txt
 - stock_report/data/notes/user_stock_evaluations.md
 
-复用边界：
-- 年度核心财务数字、业务分部、资产负债拆分和现金流转换主要复用 annual_review facts.json 和 annual_facts.md。
-- 控股回本数字复用既有 stock_research 结果中记录的 owner_earnback 结果：折后可剥离净现金 82.17 亿元、折后可持续可分配现金利润 10.20 亿元、经营业务购买价 69.76 亿元、回本 6.84 年。
-- 旧 result.json 中的榜单分类字段未写入新版输出，最终只保留可排序数字、解释和数据质量。
+联网复核的公开来源：
+- 国家统计局 2025 年文化产业数据：https://www.stats.gov.cn/sj/zxfb/202601/t20260130_1962411.html
+- 山东省教育厅 2025 年山东省教育事业发展统计公报：https://edu.shandong.gov.cn/art/2026/6/11/art_107048_10347168.html?xxgkhide=1
+- 财政部、税务总局公告2023年第60号：https://guangdong.chinatax.gov.cn/gdsw/zjfg/2023-09/27/content_7d5eb2ad19f3484c8085f976032c169a.shtml
 
-本次补查：
-- 使用 pdftotext 从年报 PDF 核对利润分配：2025 年度累计现金分红 605,201,000 元，占归母净利润 51.55%；中期已派 125,214,000 元，年度拟派 479,987,000 元。
-- 联网复核行业和政策来源：国家统计局 2025 年文化产业数据、新华社图书零售趋势、山东省教育厅 2025 年教育事业统计公报、财政部税务总局公告2023年第60号、中国货币网评级报告。
-- 检索 user_stock_evaluations.md，未发现 601019.SH / 山东出版对应人工备注。
+复用边界：
+- 年度核心财务数字、业务分部、资产负债拆分和现金流转换主要复用 annual_review facts.json 与 annual_facts.md。
+- 控股回本数字复用既有 stock_research 结果中记录的 owner_earnback：折后可剥离净现金 82.17 亿元、折后可持续可分配现金利润 10.20 亿元、经营业务购买价 69.76 亿元、回本 6.84 年。
+- 旧结果没有发现 legacy ranking label；本次输出只保留可排序数字、解释和数据质量状态。
+- user_stock_evaluations.md 未发现 601019.SH / 山东出版对应人工备注。
 
 关键公式：
 - 毛利率 = 4,080,369,535.39 / 11,179,831,553.21 = 36.50%。
@@ -45,6 +47,7 @@
 仍无法公开确认：
 - 定期存款逐笔期限、提前支取代价和控股后资金调度约束。
 - 2028 年后出版物税收优惠是否延续。
+- 本次输入市值字段未带日期；目标输出沿用既有 owner_earnback 研究中的 2026-07-24 市值快照日期。
 
 输出文件：
 - outputs/result.json

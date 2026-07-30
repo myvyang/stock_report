@@ -1,0 +1,79 @@
+task=stock_research
+company=300773.SZ 拉卡拉
+period=2025-12-31
+generated_for_input=2026-07-29T21:09:46+08:00
+
+[protocol]
+skill=.agents/skills/stock-research/SKILL.md
+result_contract=.agents/skills/stock-research/references/result-contract.md
+report_contract=.agents/skills/stock-research/references/report-contract.md
+data_reuse=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+mutation=all result fields populated with protocol set commands; result.json was not authored as a monolithic hand-written object
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validate_result=status ok; errors=[]
+
+[reused_local_sources]
+stock_report/data/analysis/annual_review/300773.SZ/2025-12-31/facts.json
+stock_report/data/analysis/annual_review/300773.SZ/2025-12-31/annual_facts.md
+stock_report/data/analysis/annual_review/300773.SZ/2025-12-31/extraction_trace.txt
+stock_report/data/normalized/facts/300773.SZ/2025-12-31/annual-facts.json
+stock_report/data/raw/filings/300773.SZ/2025-12-31/metadata.json
+stock_report/data/raw/filings/300773.SZ/2025-12-31/300773_2025_annual_report.pdf
+
+[external_disclosures_checked]
+company_annual_report_page=https://www.lakala.com/article/1471.html
+szse_2025_dividend_plan=https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-17/921a50cd-dae9-4789-a400-25e391143c2b.PDF
+company_profile=https://www.lakala.com/about/introduce.html
+2024_annual_report=https://www.lakala.com/storage/topic/20250425/9222b207c0cb00bd49b596a19dd6869b.PDF
+market_snapshot=config/input.json; Tencent qt.gtimg.cn; market_cap=16016000000; pe_ttm=9.62; asof=20260728161451
+
+[model_decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=收入与利润来自支付手续费及科技/SaaS服务，不是银行式金融资产负债经营；但支付清算资金必须专项处理。
+special_handling=other_monetary_funds 6162730819.59 and other_current_liabilities 6117530831.86 were paired and excluded from detachable cash.
+
+[formula_inputs]
+revenue=5546874569.62
+gross_profit=1404860442.53
+parent_net_profit=1170636476.04
+operating_cash_flow=606877298.61
+capital_expenditure=43938216.60
+operating_free_cash_flow=562939082.01
+deducted_parent_net_profit_2025=300877984.14
+deducted_parent_net_profit_2024=552919755.16
+deducted_parent_net_profit_2023=568992294.29
+
+[cash_haircuts]
+cash_and_bank=1011280992.67; factor=1.00; discounted=1011280992.67
+other_monetary_funds=6162730819.59; factor=0.00; discounted=0; reason=payment settlement/regulatory constraint
+wealth_management=19390350.01; factor=0.90; discounted=17451315.009
+equity_instruments=1083824640.00; factor=0.70; discounted=758677248.00; reason=market/tax/post-period disposal uncertainty
+interest_bearing_debt=398179593.88; factor=-1.00; discounted=-398179593.88
+discounted_detachable_net_cash=1389229961.799
+
+[profit_adjustment]
+weighted_base=300877984.14*0.50+552919755.16*0.30+568992294.29*0.20=430113377.476
+distribution_factor=0.85
+discounted_sustainable_cash_profit=365596370.8546
+
+[derived]
+gross_margin=1404860442.53/5546874569.62=0.2532706346424997
+net_margin=1170636476.04/5546874569.62=0.21104433881586704
+operating_business_price=16016000000-1389229961.799=14626770038.201
+owner_earnback_years=14626770038.201/365596370.8546=40.0079738319
+market_cap_to_cash_profit=16016000000/365596370.8546=43.8078746859
+forecast_cash_dividend=468282465.20
+forecast_dividend_yield=468282465.20/16016000000=0.02923841565934066
+
+[fact_inference_judgment_separation]
+fact=statement figures, dividend announcements, and market snapshot values
+inference=other monetary funds and other current liabilities are treated as paired payment-settlement balances based on business nature and near-matching amounts
+judgment=haircuts of 0%, 90%, 70%, and sustainable-profit factor of 85%; all are scenario assumptions disclosed in result and report
+
+[limitations]
+annual report is image-based; core pages were OCR extracted
+full note for other current liabilities and cash-flow reconciliation not completely extracted
+2026Q1 BlueFocus disposal proceeds and taxes not verified
+dividend forecast is a mechanical continuation of 2025 total cash dividend, not management guidance

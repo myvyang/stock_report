@@ -1,0 +1,62 @@
+stock-research trace
+company: 海陆重工 002255.SZ
+period: 2025-12-31 annual
+generated_at: 2026-07-29 Asia/Shanghai
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated fields only through protocol set commands.
+4. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: status=ok, errors=[]
+
+[reused inputs]
+- config/input.json
+- stock_report/data/analysis/annual_review/002255.SZ/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/002255.SZ/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/002255.SZ/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/002255.SZ/2025-12-31/metadata.json
+- stock_report/data/raw/filings/002255.SZ/2025-12-31/002255_2025_annual_report.txt
+
+[model decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Industrial manufacturing contributed 82.23% of revenue. Receivables, inventory, contract liabilities and payables are identifiable order-related operating items; lease obligations are separately identifiable. No bank, insurance, property development, investment-holding or other special statement structure was found.
+
+[core calculations]
+gross_margin = 697681456.66 / 2322227263.96 = 0.3004363386
+net_margin = 416857430.13 / 2322227263.96 = 0.1795075945
+operating_free_cash_flow = 429447796.91 - 24993366.11 = 404454430.80
+
+discounted cash:
+cash_equivalents = 1942276185.43 * 0.85 = 1650936457.6155
+wealth_management = 31664151.00 * 0.80 = 25331320.80
+short_term_CD = 40799527.40 * 0.90 = 36719574.66
+restricted_cash = 54792754.75 * 0.00 = 0
+lease_obligations = -(1462126.33 + 32914992.90) = -34377119.23
+discounted_detachable_net_cash = 1678608533.8455
+
+sustainable_cash_profit:
+2025 deducted parent profit = 379212290.78
+2023-2025 deducted parent profit average = 357485735.7467
+selected sustainable cash profit = 350000000.00
+rationale = conservative haircut for working-capital release in 2025 and missing 2023 capex.
+
+operating_business_price = 6730000000.00 - 1678608533.8455 = 5051391466.1545
+owner_earnback_years = 5051391466.1545 / 350000000.00 = 14.4325470462
+market_cap_to_cash_profit = 6730000000.00 / 350000000.00 = 19.2285714286
+forecast_dividend_yield = 36668571.40 / 6730000000.00 = 0.0054485247
+
+[source checks]
+- Annual report income statement supplied total net profit 418989903.64 and parent net profit 416857430.13.
+- Annual report cash flow statement supplied operating cash flow, capex, financing cash flow and 2025 paid dividends.
+- Annual report profit distribution section supplied implemented interim dividend 40335428.54 and proposed annual dividend 36668571.40; proposal explicitly remained subject to shareholder approval.
+- Market cap 6730000000.00 and PE TTM 15.07 were taken from input snapshot, source Tencent qt.gtimg.cn, timestamp 20260728161427.
+
+[limitations]
+- 2023 capex was not extracted.
+- Consolidated cash upstreaming restrictions were not penetrated beyond disclosed restricted cash.
+- Long-term equity investments and other equity instruments were not penetrated by exit path and were excluded from detachable cash.
+- Forecast dividend is based on an unapproved board proposal.

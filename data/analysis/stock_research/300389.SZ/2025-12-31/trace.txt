@@ -1,0 +1,56 @@
+艾比森 300389.SZ 2025 年度股票研究 trace
+
+1. 按用户要求启用 stock-research skill，读取：
+   - /workspace/.agents/skills/stock-research/SKILL.md
+   - /workspace/.agents/skills/stock-research/references/result-contract.md
+   - /workspace/.agents/skills/stock-research/references/report-contract.md
+
+2. 使用协议 CLI 初始化结构化结果：
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. 复用本地年度事实包：
+   - stock_report/data/analysis/annual_review/300389.SZ/2025-12-31/facts.json
+   - stock_report/data/analysis/annual_review/300389.SZ/2025-12-31/annual_facts.md
+   - stock_report/data/analysis/annual_review/300389.SZ/2025-12-31/extraction_trace.txt
+
+4. 补充读取本地年报文本中的分红段落：
+   - stock_report/data/raw/filings/300389.SZ/2025-12-31/300389.SZ_2025_annual_report.txt
+   - 分红相关行：3231-3312
+   - 现金流分配股利相关行：5800-5845
+
+5. 报表模型复核：
+   - 年报业务为 LED 大屏显示产品及专业视听解决方案。
+   - 资产负债主要为现金、理财/存单、应收、存货、固定资产、应付票据/账款、合同负债。
+   - 未发现银行、券商、保险、地产开发、工程施工、收费权或投资控股平台等特殊模型特征。
+   - 最终 analysis_model.statement_model = ordinary_operating，owner_earnback_applicability = applicable。
+
+6. 核心计算：
+   - 毛利率 = 1,294,376,136.98 / 4,158,185,946.10 = 31.13%
+   - 净利率 = 251,871,977.33 / 4,158,185,946.10 = 6.06%
+   - 经营自由现金流 = 819,860,755.50 - 51,431,868.32 = 768,428,887.18
+   - 折后可剥离净现金 = 1,286,528,108.85
+   - 经营业务购买价 = 4,337,000,000.00 - 1,286,528,108.85 = 3,050,471,891.15
+   - 折后可持续现金利润 = 229,889,760.00 * 0.75 = 172,417,320.00
+   - 控股回本年 = 3,050,471,891.15 / 172,417,320.00 = 17.69
+   - 市值/折后现金利润 = 4,337,000,000.00 / 172,417,320.00 = 25.15
+   - 2025 年度预测现金分红 = 0，预测分红率 = 0
+
+7. 使用协议 CLI 写入 outputs/result.json 的主要字段：
+   - analysis.sources_used
+   - analysis_model
+   - metrics
+   - financials.balance_sheet
+   - financials.income_statement
+   - financials.cash_flow
+   - asset_analysis.assets
+   - asset_analysis.liabilities
+   - owner_earnback
+   - dividend
+   - business
+   - risks
+   - evidence
+   - data_quality
+
+8. 校验：
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   返回 {"status": "ok", "errors": []}

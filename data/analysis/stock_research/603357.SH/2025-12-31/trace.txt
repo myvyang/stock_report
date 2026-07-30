@@ -1,0 +1,47 @@
+stock-research trace for 603357.SH 2025-12-31
+
+1. Read required skill and contracts:
+   - /workspace/.agents/skills/stock-research/SKILL.md
+   - /workspace/.agents/skills/stock-research/references/result-contract.md
+   - /workspace/.agents/skills/stock-research/references/report-contract.md
+   - /workspace/.agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reused existing source materials:
+   - stock_report/data/raw/filings/603357.SH/2025-12-31/metadata.json
+   - stock_report/data/raw/filings/603357.SH/2025-12-31/603357_2025_annual_report.txt
+   - stock_report/data/analysis/annual_review/603357.SH/2025-12-31/facts.json
+   - stock_report/data/analysis/annual_review/603357.SH/2025-12-31/annual_facts.md
+   - stock_report/data/normalized/facts/603357.SH/2025-12-31/annual-facts.json
+
+4. Key annual report text checks:
+   - Lines 38-46: 2025 profit distribution plan, total cash dividend 112,115,581.80 yuan and payout ratio 30.66%.
+   - Lines 240-260: 2025 revenue, parent net profit, deducted non-recurring parent net profit and operating cash flow.
+   - Lines 424-492: business scope, qualifications and project-based service model.
+   - Lines 586-594: 2025 revenue, new contracts and backlog decline.
+   - Lines 2468-2578: dividend policy, current period distribution and three-year cash dividend data.
+
+5. Analysis model decision:
+   - Confirmed ordinary_operating.
+   - Reason: business is engineering consulting/design/project management/testing/EPC, not financial, insurance, real estate development, utility concession or investment holding.
+   - Caveat: project-based consulting and EPC create large receivables and contract assets, so ordinary owner earnback is applicable only with conservative cash and cash-profit discounts.
+
+6. Main calculations:
+   - gross_margin = 971,289,202.93 / 2,523,294,083.80 = 0.3849290533
+   - net_margin = 365,718,075.50 / 2,523,294,083.80 = 0.1449367626
+   - forecast_dividend_yield = 112,115,581.80 / 3,257,000,000.00 = 0.0344229603
+   - unrestricted_cash = 1,357,284,733.54 - 6,082,869.40 = 1,351,201,864.14
+   - discounted_cash = unrestricted_cash * 0.70 = 945,841,304.90
+   - interest_bearing_debt = 100,064,472.22 + 502,268,808.52 + 13,055,176.25 = 615,388,456.99
+   - nonfree_other_payables = 303,029,586.73 + 90,015,969.11 = 393,045,555.84
+   - discounted_net_cash = 945,841,304.90 - 615,388,456.99 - 393,045,555.84 = -62,592,707.93
+   - discounted_cash_profit = 351,287,228.63 * 0.56 - 23,038,589.31 = 173,682,258.72
+   - operating_business_price = 3,257,000,000.00 - (-62,592,707.93) = 3,319,592,707.93
+   - owner_earnback_years = 3,319,592,707.93 / 173,682,258.72 = 19.1130212858
+   - market_cap_to_cash_profit = 3,257,000,000.00 / 173,682,258.72 = 18.7526349781
+
+7. Validation:
+   - PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Result: {"status": "ok", "errors": []}

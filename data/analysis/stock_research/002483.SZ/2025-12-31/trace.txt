@@ -1,0 +1,56 @@
+stock-research task trace
+
+Input:
+- config/input.json
+- Company: 002483.SZ 润邦股份
+- Period: 2025-12-31 annual
+- Market cap: 4,494,000,000 yuan, date 20260728161406, source Tencent qt.gtimg.cn, PE TTM 12.53
+
+Protocol:
+- Read stock-research SKILL.md.
+- Read references/result-contract.md.
+- Read references/report-contract.md.
+- Read references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated outputs/result.json with protocol set/append commands.
+- Validated with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: {"status":"ok","errors":[]}
+
+Sources reused:
+- stock_report/data/analysis/annual_review/002483.SZ/2025-12-31/facts.json
+- stock_report/data/normalized/facts/002483.SZ/2025-12-31/annual-facts.json
+- stock_report/data/analysis/annual_review/002483.SZ/2025-12-31/annual_facts.md
+- stock_report/data/raw/filings/002483.SZ/2025-12-31/metadata.json
+- stock_report/data/raw/filings/002483.SZ/2025-12-31/2025-annual-report.txt
+
+Key annual-report evidence checked:
+- Major financial data: 2025 revenue 6,847,196,570.43; parent net profit 360,501,547.54; deducted parent net profit 337,083,865.27; operating cash flow 1,343,028,672.27.
+- Business mix: general equipment manufacturing revenue 6,040,182,644.94, environmental revenue 676,767,174.11; material handling equipment revenue 4,725,218,996.01; offshore engineering and supporting equipment revenue 979,525,254.98; overseas revenue share 70.25%.
+- Cash and financial assets: cash and cash equivalents 4,033,857,730.35; restricted monetary funds 270,356,362.28; restricted time deposits 3,044,515.60; wealth management products 415,850,000.00.
+- Contract liabilities: 2,764,828,504.44, mainly equipment sales advances; increase explained by higher unfulfilled-order advances.
+- Dividend plan: 886,468,413 shares, 1.50 yuan per 10 shares, cash dividend 132,970,261.95.
+
+Model decision:
+- statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- Reason: annual report shows equipment manufacturing and environmental services, not a financial institution, real estate developer, construction-project contractor, concession utility, or investment holding platform. Ordinary owner-earnback applies, with conservative cash discounts because contract liabilities and guarantee deposits constrain detachable cash.
+
+Owner-earnback assumptions:
+- Cash and cash equivalents: 4,033,857,730.35 * 50% = 2,016,928,865.18
+- Wealth management products: 415,850,000.00 * 70% = 291,095,000.00
+- Restricted monetary funds and restricted time deposit: 273,400,877.88 * 0% = 0
+- Interest-bearing financing liabilities: -1,326,147,738.36
+- Discounted detachable net cash: 981,876,126.82
+- Operating business price: 4,494,000,000.00 - 981,876,126.82 = 3,512,123,873.18
+- Sustainable distributable cash profit: 300,000,000.00, based on 2025 deducted parent net profit of 337,083,865.27 with a conservative discount for project cash flow timing, working capital and capital expenditure.
+- Owner earnback years: 3,512,123,873.18 / 300,000,000.00 = 11.71
+- Market cap to cash profit: 4,494,000,000.00 / 300,000,000.00 = 14.98
+
+Data quality:
+- status: complete
+- limitations:
+  1. Wealth-management product maturities, principal-protection terms and issuing banks were not fully split in extracted material; included at 70%.
+  2. Contract-liability cash cannot be matched order-by-order to future fulfillment costs; cash and equivalents included at 50%.
+  3. 2023 capital expenditure was not available in extracted facts; sustainable cash profit uses 2025 deducted parent net profit with a conservative discount, not a full three-year FCF average.

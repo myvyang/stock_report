@@ -1,0 +1,67 @@
+stock-research trace
+company: 001332.SZ 锡装股份
+period: 2025-12-31 annual
+generated_at: 2026-07-29T18:04:10+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because an annual fact pack and raw filing were available.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields with protocol set/append commands; the JSON was not hand-written from scratch.
+
+2. Reused local evidence
+- stock_report/data/analysis/annual_review/001332.SZ/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/001332.SZ/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/001332.SZ/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/001332.SZ/2025-12-31/metadata.json
+- stock_report/data/raw/filings/001332.SZ/2025-12-31/001332.SZ-2025-annual-report.txt
+- Primary filing URL recorded in metadata:
+  https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?stockid=001332&id=12203458
+
+3. Key filing locations checked
+- Main financial data: annual report text lines 239-259.
+- Business model and market position: lines 450-580.
+- Revenue mix, overseas margin and orders: lines 740-765.
+- Balance sheet: lines 4830-4965.
+- Income statement: lines 4960-5060.
+- Cash flow statement: lines 5060-5115.
+- Cash, restrictions and trading financial assets: lines 7987-8022 and 10779.
+- Dividend proposal and history: lines 2450-2575 and 11176-11185.
+
+4. Model decision
+- Confirmed statement_model=ordinary_operating.
+- Reason: the company designs and manufactures pressure vessels and sells them directly. Large inventory and contract liabilities reflect order production and customer advances, not a financial, real-estate, construction-financing, concession or investment-holding balance sheet.
+- Special treatment: preserve necessary operating cash and discount remaining cash because project delivery makes working capital and cash flows volatile.
+
+5. Owner earnback calculations
+- Market cap: 4,617,000,000, from config/input.json, quote timestamp 20260728161448, Tencent qt.gtimg.cn.
+- Cash and cash equivalents: 1,450,271,495.01.
+- Necessary operating cash assumption: 300,000,000.
+- Recognized cash: (1,450,271,495.01 - 300,000,000) * 80% = 920,217,196.008.
+- Structured deposits/bank wealth products: 205,750,454.79 * 90% = 185,175,409.311.
+- Interest-bearing debt: 0.
+- Discounted detachable net cash: 1,105,392,605.319.
+- Operating business price: 4,617,000,000 - 1,105,392,605.319 = 3,511,607,394.681.
+- 2023-2025 operating FCF: 194,111,292.63; 186,086,645.99; 264,825,440.43.
+- Three-year average operating FCF: 215,007,793.68333334.
+- Discounted sustainable cash profit: 150,000,000 after removing returns associated with detachable financial assets and allowing for project, working-capital and capex-classification uncertainty.
+- Owner earnback years: 3,511,607,394.681 / 150,000,000 = 23.41071596454.
+- Market cap / cash profit: 4,617,000,000 / 150,000,000 = 30.78.
+
+6. Dividend
+- 2025 annual proposal: 55,245,000 cash, based on 110,490,000 shares and RMB 5 per 10 shares.
+- Forecast dividend yield: 55,245,000 / 4,617,000,000 = 0.011965562053281352.
+- Filing states the annual proposal still required shareholder approval at report publication.
+
+7. Limitations retained
+- Maintenance versus growth capex was not precisely disclosed.
+- Bank deposits were not broken down account-by-account into freely distributable, fundraising and operating funds.
+- Cash discounts and sustainable cash profit are explicit analytical assumptions, not reported facts or management guidance.
+
+8. Validation
+- Command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result:
+  {"status":"ok","errors":[]}

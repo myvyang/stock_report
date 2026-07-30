@@ -1,0 +1,105 @@
+task=stock_research
+company=002852.SZ 道道全
+period=2025-12-31
+generated_date=2026-07-29
+
+[protocol]
+skill=.agents/skills/stock-research/SKILL.md
+result_contract=.agents/skills/stock-research/references/result-contract.md
+report_contract=.agents/skills/stock-research/references/report-contract.md
+data_reuse=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+mutation=all structured result fields populated through protocol set commands; result.json was not hand-written from scratch
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reused_sources]
+annual_facts_json=stock_report/data/analysis/annual_review/002852.SZ/2025-12-31/facts.json
+annual_facts_md=stock_report/data/analysis/annual_review/002852.SZ/2025-12-31/annual_facts.md
+annual_extraction_trace=stock_report/data/analysis/annual_review/002852.SZ/2025-12-31/extraction_trace.txt
+raw_filing=stock_report/data/raw/filings/002852.SZ/2025-12-31/002852-2025-annual-report.pdf
+raw_metadata=stock_report/data/raw/filings/002852.SZ/2025-12-31/metadata.json
+historical_stock_research=none found for this company/period
+
+[model_check]
+input_hint=ordinary_operating/applicable
+confirmed_statement_model=ordinary_operating
+confirmed_owner_earnback_applicability=applicable
+reason=食用植物油加工销售的资产负债主要是存货、应收预付、厂房设备、经销预收、采购应付和银行融资；无客户资金、保险准备金、预售监管款、合同项目垫资或特许经营权等特殊财报结构
+special_treatment=受限保证金不计可剥离现金；衍生金融资产服务原料套保，不计可剥离本金；融资负债全额扣除
+
+[financials_from_annual_report]
+total_assets=4166495082.34
+total_liabilities=1865273623.13
+total_equity=2301221459.21
+parent_equity=2245570744.45
+minority_interest=55650714.76
+revenue=6194555686.05
+cost_of_sales=5678625909.96
+gross_profit=515929776.09
+operating_profit=272343288.99
+parent_net_profit=233565964.81
+deducted_parent_net_profit=187317668.24
+operating_cash_flow=993348622.88
+capital_expenditure=143015574.85
+operating_free_cash_flow=850333048.03
+financing_cash_flow=-617841271.46
+gross_margin=515929776.09/6194555686.05=0.083288
+net_margin=233565964.81/6194555686.05=0.037706
+
+[cash_and_debt]
+bank_deposits=428681494.20
+operating_cash_reserve_assumption=300000000.00
+detachable_bank_cash=128681494.20
+other_monetary_funds=127466250.59
+explicit_restricted_guarantees=122000000.00
+other_monetary_funds_included=0
+derivative_financial_assets=4899950.00
+derivative_financial_assets_included=0
+short_term_borrowings=995010011.72
+current_lease_liability=799683.84
+noncurrent_lease_liability=257737.66
+financing_debt=996067433.22
+discounted_detachable_net_cash=128681494.20-996067433.22=-867385939.02
+
+[cash_profit]
+starting_parent_net_profit=233565964.81
+nonrecurring_items=-46248296.57
+normalized_parent_profit=187317668.24
+working_capital_reinvestment_assumption=-70000000.00
+discounted_sustainable_cash_profit=117317668.24
+reason=2025 operating cash flow includes 473694234.59 increase in operating payables; annual free cash flow is not annualized. 2024-2025 capital expenditures are close to depreciation/amortization scale, so full capex is not subtracted again from profit; a separate working-capital reserve is used.
+
+[owner_earnback]
+market_cap=2573000000.00
+operating_business_price=2573000000.00-(-867385939.02)=3440385939.02
+owner_earnback_years=3440385939.02/117317668.24=29.3254
+market_cap_to_cash_profit=2573000000.00/117317668.24=21.9319
+discounted_net_cash_to_market_cap=-867385939.02/2573000000.00=-0.337111
+
+[dividend]
+2024_annual_cash_dividend=44027943.03
+2025_interim_cash_dividend=60538421.68
+2025_final_dividend_per_10_shares=1.20
+share_base=343968305
+2025_final_cash_dividend=41276196.60
+forecast_baseline_cash_dividend=101814618.28
+forecast_dividend_yield=101814618.28/2573000000.00=0.039570
+interpretation=uses disclosed 2025 interim plus final cash return as a reproducible baseline, not a company forecast or future commitment
+
+[external_supplement]
+purpose=annual fact pack lacked final dividend proposal
+primary_disclosure_search=CNINFO/SZSE query for 002852 2025 annual profit distribution
+supporting_announcement=道道全关于2025年度利润分配预案的公告，披露每10股派1.20元
+annual_report_web_copy=https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12003023&stockid=002852
+profit_distribution_web_copy=https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12003005&stockid=002852
+
+[limitations]
+1=年报未逐笔区分银行存款的经营必要部分；300000000元经营现金储备为研究估算
+2=年度事实包未取得2023年资本开支
+3=70000000元常态营运资金再投入为跨周期保守估计
+4=预测分红率以2025年已披露现金分红为基准，不是未来承诺
+
+[outputs]
+result=outputs/result.json
+report=outputs/report.md
+trace=outputs/trace.txt

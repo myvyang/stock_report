@@ -1,0 +1,59 @@
+stock research trace
+
+task:
+- company: 601919.SH 中远海控
+- period: 2025-12-31 annual
+- outputs: outputs/result.json, outputs/report.md, outputs/trace.txt
+
+protocol:
+- read /workspace/.agents/skills/stock-research/SKILL.md
+- read /workspace/.agents/skills/stock-research/references/result-contract.md
+- read /workspace/.agents/skills/stock-research/references/report-contract.md
+- initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- validated outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- validation status after population: ok
+
+sources reused:
+- config/input.json
+- stock_report/data/analysis/annual_review/601919.SH/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/601919.SH/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/601919.SH/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/601919.SH/2025-12-31/metadata.json
+- stock_report/data/raw/filings/601919.SH/2025-12-31/601919-2025-annual-report.txt
+
+key extracted or reused facts:
+- 2025 revenue 219,503,805,222.70 yuan.
+- 2025 gross profit 44,009,231,809.82 yuan.
+- 2025 parent net profit 30,868,147,821.38 yuan.
+- 2025 operating cash flow 45,545,770,431.23 yuan.
+- 2025 capex 25,015,551,614.56 yuan.
+- 2025 operating free cash flow 20,530,218,816.67 yuan.
+- 2025 total assets 483,758,023,838.79 yuan.
+- 2025 total liabilities 200,351,998,919.29 yuan.
+- 2025 parent equity 232,265,324,350.62 yuan.
+- 2025 cash dividend forecast 15,412,000,000 yuan from annual report profit distribution plan.
+- market cap 235,587,000,000 yuan and PE TTM 9.4 from config/input.json, Tencent qt.gtimg.cn.
+
+analysis model:
+- statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- reason: core business is container shipping, terminals and supply-chain service operations. Assets and liabilities are operating fleet, terminal assets, working capital, borrowings and leases, not customer deposits, insurance reserves, real-estate presale funds, concession-only assets or an investment holding balance sheet.
+
+owner earnback assumptions:
+- ordinary non-finance-company unrestricted cash: 73,087,610,839.90 yuan at 95%.
+- finance company deposits: 77,793,990,165.87 yuan at 70%.
+- restricted cash: 588,110,068.33 yuan at 0%.
+- trading financial assets plus debt investments: 419,714,754.52 yuan at 80%.
+- debt deduction: short-term borrowings, long-term borrowings, lease liabilities and shareholder loan totaling 76,559,908,654.37 yuan.
+- discounted detachable net cash: 47,664,886,563.26 yuan.
+- sustainable distributable cash profit: 18,000,000,000 yuan, below 2025 operating FCF to reflect cycle risk, minority interests and undisclosed maintenance capex split.
+- operating business price: 187,922,113,436.74 yuan.
+- owner earnback years: 10.440117413152223.
+- market cap to cash profit: 13.088166666666666.
+
+known limitations:
+- annual report does not split maintenance capex and growth capex.
+- annual report alone cannot fully verify extraction path for finance company deposits and offshore cash.
+- lease liability termination cost under a liquidation-style scenario was not independently estimated.

@@ -1,0 +1,80 @@
+Stock research trace for 601811.SH 新华文轩, period 2025-12-31.
+
+Protocol and contracts:
+- Read stock-research skill: /workspace/.agents/skills/stock-research/SKILL.md.
+- Read result contract: /workspace/.agents/skills/stock-research/references/result-contract.md.
+- Read report contract: /workspace/.agents/skills/stock-research/references/report-contract.md.
+- Also read data reuse reference because existing annual fact packs were available.
+
+Initialization:
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- outputs/result.json was initialized from config/input.json, then populated through protocol CLI set/append commands.
+
+Data reused:
+- Annual facts JSON: stock_report/data/analysis/annual_review/601811.SH/2025-12-31/facts.json.
+- Annual facts Markdown: stock_report/data/analysis/annual_review/601811.SH/2025-12-31/annual_facts.md.
+- Annual extraction trace: stock_report/data/analysis/annual_review/601811.SH/2025-12-31/extraction_trace.txt.
+- Filing text: stock_report/data/raw/filings/601811.SH/2025-12-31/601811_2025_annual_report_winshare.txt.
+- Primary filing URL from facts pack: https://www.winshare.com.cn/u/cms/wx_new/202604/21162117e3uf.pdf.
+
+Important source notes:
+- The annual fact pack states that the SSE static PDF returned an anti-bot HTML challenge in the previous extraction environment, so the company IR annual report PDF was used as the primary local filing.
+- The report does not fully split each bank deposit by bank, maturity, and early-withdrawal penalty.
+- Other equity instrument investment liquidity was not fully disclosed by security in the extracted text.
+
+Core extracted figures:
+- Revenue: 11,731,677,466.92 yuan.
+- Cost of sales: 7,555,178,468.97 yuan.
+- Gross profit: 4,176,498,997.95 yuan.
+- Operating profit: 1,669,913,553.73 yuan.
+- Net profit: 1,607,706,527.97 yuan.
+- Parent net profit: 1,568,450,497.66 yuan.
+- Total assets: 23,444,441,325.05 yuan.
+- Total liabilities: 7,793,582,360.02 yuan.
+- Total equity: 15,650,858,965.03 yuan.
+- Parent equity: 15,260,687,340.27 yuan.
+- Minority interest: 390,171,624.76 yuan.
+- Operating cash flow: 1,508,458,892.06 yuan.
+- Capital expenditure: 178,961,810.43 yuan.
+- Operating free cash flow: 1,329,497,081.63 yuan.
+
+Valuation handling:
+- Input market cap: 15,016,000,000 yuan.
+- Input did not provide market_cap.date or pe_ttm.
+- Used config/input.json created_at date, 2026-07-28, as the snapshot date.
+- Computed PE TTM as market cap / 2025 parent net profit = 9.5737799965.
+
+Owner earnback assumptions:
+- Cash and cash equivalents: 7,279,621,670.33 yuan at 100%.
+- Time deposits over three months inside monetary funds: 1,500,890,654.94 yuan at 95%.
+- Restricted monetary funds: 32,782,671.64 yuan at 0%.
+- Noncurrent time deposits and large certificates of deposit: 3,062,939,775.54 yuan at 90%.
+- Trading financial assets: 47,285.12 yuan at 80%.
+- Long-term equity investments: 871,587,783.09 yuan at 40%.
+- Other equity instrument investments: 2,110,106,593.81 yuan at 50%.
+- Other noncurrent financial assets: 466,762,331.54 yuan at 30%.
+- Investment property: 75,059,480.25 yuan at 50%.
+- Operating reserve retained in business: -2,000,000,000 yuan.
+- Financing liabilities deducted: -20,584,681.60 yuan.
+- Discounted detachable net cash: 11,022,813,586.733 yuan.
+- Operating business price: 3,993,186,413.267 yuan.
+
+Sustainable cash profit:
+- Started from 2025 operating FCF: 1,329,497,081.63 yuan.
+- Deducted interest income: 236,287,981.87 yuan.
+- Deducted investment income: 171,976,013.71 yuan.
+- Deducted fair value gain: 58,735,314.31 yuan.
+- Deducted asset disposal gain: 72,595,657.18 yuan.
+- Applied 10% pressure haircut because 2025 revenue declined and the annual report disclosed industry and demand pressure.
+- Discounted sustainable cash profit: 710,911,903.104 yuan.
+- Owner earnback years: 5.6169919168.
+- Market cap to discounted cash profit: 21.1221670849.
+
+Dividend handling:
+- 2025 final proposed dividend: 518,000,000 yuan, based on RMB 4.20 per 10 shares and 1,233,841,000 shares.
+- Forecast dividend yield uses only the final proposed dividend / input market cap = 0.0344965370.
+- 2025 interim dividend of RMB 0.19 per share was recorded as history, not added to forecast.
+
+Validation:
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok.

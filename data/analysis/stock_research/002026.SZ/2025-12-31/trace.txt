@@ -1,0 +1,84 @@
+stock-research trace
+company: 002026.SZ 山东威达
+period: 2025-12-31 annual
+generated_for_input: 2026-07-29T15:13:40+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Read references/data-reuse.md because an annual fact pack and normalized facts were present.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields with repeated protocol `set` commands; result.json was not composed by hand.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   validation result: {"status":"ok","errors":[]}
+
+[reused_sources]
+- stock_report/data/analysis/annual_review/002026.SZ/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/002026.SZ/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/002026.SZ/2025-12-31/extraction_trace.txt
+- stock_report/data/normalized/facts/002026.SZ/2025-12-31/annual-facts.json
+- stock_report/data/raw/filings/002026.SZ/2025-12-31/metadata.json
+- stock_report/data/raw/filings/002026.SZ/2025-12-31/002026_2025_annual_report.txt
+- primary filing URL: https://static.cninfo.com.cn/finalpage/2026-04-21/1225125599.PDF
+- market snapshot from config/input.json: Tencent qt.gtimg.cn, 20260728161430
+
+[model_check]
+statement_model: ordinary_operating
+owner_earnback_applicability: applicable
+reason: Mechanical manufacturing operations; cash, wealth-management products, transferable CDs and financing liabilities can be distinguished from operating assets. No customer deposits, regulated presale cash, insurance reserves, concession rights, or similar special-model balance-sheet items were identified.
+
+[financial_formulas]
+gross_margin = 460132184.97 / 1922013719.35 = 0.23940109289418118
+net_margin = 252161118.98 / 1922013719.35 = 0.13119631584382113
+2025 operating_free_cash_flow = 292499345.53 - 94421874.69 = 198077470.84
+2024 operating_free_cash_flow = 267352666.06 - 94101986.20 = 173250679.86
+
+[owner_earnback_cash]
+cash_and_cash_equivalents:
+  book 706588684.55 * 100% = 706588684.55
+wealth_management_products:
+  book 1021266234.67 * 85% = 868076299.4695
+transferable_CDs:
+  gross = 108315643.82 + 32805000.00 + 75568027.72
+  pledged excluded = 10838222.30
+  eligible book = 205850449.24
+  eligible book * 95% = 195557926.778
+restricted_cash_and_pledged_CD:
+  29024357.77 + 10838222.30 = 39862580.07
+  haircut 0%; no separate addition
+financing_liabilities:
+  101019176.66 + 3299502.54 + 250024.52 = 104568703.72
+  deducted at 100%
+discounted_detachable_net_cash:
+  706588684.55 + 868076299.4695 + 195557926.778 - 104568703.72
+  = 1665654207.0775
+
+[owner_earnback_profit]
+two_year_FCF_mean:
+  (198077470.84 + 173250679.86) / 2 = 185664075.35
+stability_haircut:
+  185664075.35 * 90% = 167097667.815
+reason: 2025 revenue declined, customer concentration is high, working-capital internals fluctuated, and only two years of capex-complete FCF were available.
+nonrecurring_check:
+  2025 financial-asset fair-value and disposal gain 36055961.73 was not added to operating cash profit.
+
+[owner_earnback_output]
+market_cap = 4220000000.00
+operating_business_price = 4220000000.00 - 1665654207.0775 = 2554345792.9225
+discounted_net_cash_to_market_cap = 1665654207.0775 / 4220000000.00 = 0.3947047884069904
+owner_earnback_years = 2554345792.9225 / 167097667.815 = 15.286543650330959
+market_cap_to_cash_profit = 4220000000.00 / 167097667.815 = 25.254691194566025
+
+[dividend]
+2025 interim dividend already paid = 22026596.95
+2025 annual cumulative dividend disclosed by annual report = 30837235.73
+forecast_dividend_yield = 30837235.73 / 4220000000.00 = 0.007307401831753555
+2025 buyback and cancellation = 59987055.00; disclosed separately, not assumed recurring in forecast yield.
+
+[limitations]
+- 2023 capital expenditure was not completely extracted; sustainable cash profit uses 2024-2025 FCF only.
+- The filing did not disclose each wealth-management product's underlying asset, maturity, and redemption restriction. The 85% factor is a research haircut.
+- Industry leadership is mainly management disclosure; no independently verifiable market share was available in the reused sources.
+- Market cap and PE TTM were supplied by the task input and were not independently re-fetched.

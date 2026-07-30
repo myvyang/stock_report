@@ -1,0 +1,69 @@
+双象股份（002395.SZ）2025 年股票研究 trace
+
+1. 按用户要求读取：
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. 使用协议 CLI 初始化结构化结果：
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. 复用已存在的年报与事实包：
+   - stock_report/data/raw/filings/002395.SZ/2025-12-31/12085820.PDF
+   - stock_report/data/raw/filings/002395.SZ/2025-12-31/12085820.txt
+   - stock_report/data/analysis/annual_review/002395.SZ/2025-12-31/facts.json
+   - stock_report/data/analysis/annual_review/002395.SZ/2025-12-31/annual_facts.md
+   - stock_report/data/analysis/annual_review/002395.SZ/2025-12-31/extraction_trace.txt
+
+4. 回查年报文本，补齐或复核：
+   - 业务板块、上下游、采购/生产/销售模式
+   - 分行业收入、成本、毛利率
+   - PMMA、MS、超纤及板材产能利用率
+   - 营业利润、净利润及费用
+   - 2024 年已实施分红与 2025 年度分红预案
+
+5. 财报模型复核：
+   公司为高分子材料制造企业，资产主要为现金、应收、存货、固定资产和在建工程；负债主要为普通借款、供应商结算、合同负债及递延收益。未发现银行、券商、保险、地产开发、工程施工、收费权或投资控股等特殊报表经济实质。
+   结论：statement_model=ordinary_operating；owner_earnback_applicability=applicable。
+
+6. 核心财务计算（人民币元）：
+   gross_profit = 2,575,224,509.68 - 2,193,927,084.86 = 381,297,424.82
+   gross_margin = 381,297,424.82 / 2,575,224,509.68 = 0.1480656988
+   net_margin = 202,068,009.91 / 2,575,224,509.68 = 0.0784661685
+   operating_free_cash_flow = 211,153,401.94 - 10,968,717.60 = 200,184,684.34
+
+7. 折后可剥离净现金：
+   unrestricted_cash_discounted = 435,746,643.60 * 0.85 = 370,384,647.06
+   restricted_cash_discounted = 10,215,126.55 * 0 = 0
+   less short_term_borrowing = 65,198,436.02
+   less required_operating_cash = 80,000,000.00
+   less friction_reserve = 5,000,000.00
+   discounted_detachable_net_cash = 220,186,211.04
+
+   required_operating_cash 和 friction_reserve 均为分析估计，并非公司披露。
+
+8. 持续现金利润：
+   2025 扣非归母净利润 = 180,475,970.07
+   2025 经营自由现金流 = 200,184,684.34
+   持续现金利润基准 = 150,000,000.00
+   折扣 = 0.75
+   discounted_sustainable_cash_profit = 112,500,000.00
+
+   采用折扣的理由：2024 年归母利润含大额拆迁补偿；2025 年经营现金流改善部分来自收付款节奏；新增产能利用率仍待提升。基准与折扣均为分析判断。
+
+9. 控股回本计算：
+   market_cap = 3,138,000,000.00
+   operating_business_price = 3,138,000,000.00 - 220,186,211.04 = 2,917,813,788.96
+   owner_earnback_years = 2,917,813,788.96 / 112,500,000.00 = 25.9361225685
+   market_cap_to_cash_profit = 3,138,000,000.00 / 112,500,000.00 = 27.8933333333
+   discounted_net_cash_to_market_cap = 220,186,211.04 / 3,138,000,000.00 = 0.0701676899
+
+10. 分红预测：
+    采用 2025 年度董事会预案现金分红 53,641,800.00。
+    forecast_dividend_yield = 53,641,800.00 / 3,138,000,000.00 = 0.0170942639
+    该金额是已披露预案，不代表未来年度承诺。
+
+11. 通过协议 CLI 逐字段写入 result.json，没有从空文件手写复杂 JSON。
+
+12. 最终校验命令：
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

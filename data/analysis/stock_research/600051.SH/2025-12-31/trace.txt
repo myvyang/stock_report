@@ -1,0 +1,61 @@
+stock research trace
+
+target:
+- 600051.SH 宁波联合
+- period: 2025-12-31 annual
+- generated for task date: 2026-07-29 Asia/Shanghai
+
+protocol:
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md and references/report-contract.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields through protocol set commands; did not construct result.json from scratch.
+- Final validation:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok, no errors.
+
+reused sources:
+- stock_report/data/analysis/annual_review/600051.SH/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/600051.SH/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/600051.SH/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/600051.SH/2025-12-31/annual_report_2025.txt
+- stock_report/data/raw/filings/600051.SH/2025-12-31/宁波联合2025年度报告.PDF
+- stock_report/data/raw/filings/600051.SH/2025-12-31/metadata.json
+- config/input.json market-cap snapshot
+
+key filing locations checked:
+- Business description and segment discussion: annual_report_2025.txt around lines 350-520.
+- Segment revenue, cost and margins: around lines 580-680.
+- Real-estate reserves, projects and sales: around lines 925-1050.
+- Dividend policy and 2025 proposal: around lines 1989-2078.
+- Consolidated balance sheet: around lines 3070-3235.
+- Consolidated income statement: around lines 3330-3415.
+- Consolidated cash flow statement: around lines 3490-3610.
+- Monetary funds and restricted assets: annual fact extraction trace locations around lines 4888-4928 and 6508-6528.
+
+analysis-model decision:
+- Input hint said ordinary_operating/applicable based on stock master-data tags.
+- Overridden to real_estate_developer/requires_special_model after filing review.
+- Reason: real estate is a substantive business and balance-sheet model. Inventory was CNY 1,106,958,707.87 and investment property CNY 1,007,089,910.44, together about 47% of total assets. The filing also attributes 2025 operating cash-flow improvement mainly to sales of previously completed property.
+- Ordinary discounted net cash, sustainable cash profit, operating business price and payback fields were therefore left null as required by the contract.
+
+calculations:
+- gross profit = 1,267,561,246.52 - 1,123,285,088.25 = 144,276,158.27
+- gross margin = 144,276,158.27 / 1,267,561,246.52 = 0.1138219783
+- parent net margin = 84,387,429.20 / 1,267,561,246.52 = 0.0665746257
+- operating free cash flow = 443,035,201.32 - 26,955,817.55 = 416,079,383.77
+- minority interest ratio = 296,969,381.00 / 3,710,845,644.71 = 0.0800220059
+- forecast dividend yield = 18,652,800.00 / 1,763,000,000.00 = 0.0105801475
+
+quality limitations:
+- No project-by-project market or liquidation valuation of property inventory and investment property.
+- No account-by-account bank cash ownership/free-use schedule.
+- No specific holdings for trading financial assets.
+- No split between maintenance and growth capital expenditure.
+- 2025 dividend amount is a proposal and remains subject to implementation.
+
+outputs:
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt
