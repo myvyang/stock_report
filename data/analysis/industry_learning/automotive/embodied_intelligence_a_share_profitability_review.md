@@ -72,3 +72,7 @@
 - 中大力德人形机器人一体化关节: https://www.zd-motor.com/products_detail/499.html
 - 鸣志电器空心杯电机与灵巧手: https://www.moons.com.cn/article/cn-techschool-stepmotor-00106
 - 五洲新春丝杠布局资料: https://pdf.dfcfw.com/pdf/H3_AP202503041644047989_1.PDF
+
+## 相关清单
+
+- 专注度与技术优势初判：`embodied_intelligence_a_share_focus_tech_review.md`
