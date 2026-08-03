@@ -154,3 +154,4 @@ McKinsey 的重点不是证明某个零件贵，而是提出一个供应链判�
 ## 相关清单
 
 - A股供应链候选图谱：`embodied_intelligence_a_share_candidates.md`
+- 产品树拆解：`embodied_intelligence_product_breakdown.md`
