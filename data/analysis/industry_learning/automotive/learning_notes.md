@@ -2,6 +2,7 @@
 
 - Created: 2026-08-03 Asia/Shanghai
 - Mode: industry-learning-dialogue
+- Knowledge index: `data/knowledge/industries/automotive/index.md`
 
 ## 学习目标
 
