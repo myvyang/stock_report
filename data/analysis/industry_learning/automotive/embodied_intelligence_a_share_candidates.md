@@ -110,3 +110,7 @@
 - 东华测试六维力传感器报道: https://www.jingjiang.gov.cn/xwzx/zjdt/art/2025/art_1d70626be09743919fc106c6aa671403.html
 - 兆威机电官网: https://www.szzhaowei.net/
 - 丰立智能谐波减速器: https://www.fore.cn/Products_detail/373.html
+
+## 相关清单
+
+- 赚钱能力与竞争力初判：`embodied_intelligence_a_share_profitability_review.md`
