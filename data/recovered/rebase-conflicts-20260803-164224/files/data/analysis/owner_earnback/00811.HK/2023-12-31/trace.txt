@@ -1,0 +1,71 @@
+港股控股回本分析 trace
+
+运行目录: /Users/haha/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-22T10-35-19+08-00-00811-hk-xinhua-winshare
+公司: 00811.HK XINHUA WINSHARE
+报告期: 2023-12-31
+时区: Asia/Shanghai
+
+输入读取:
+- /Users/haha/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-22T10-35-19+08-00-00811-hk-xinhua-winshare/config/input.json
+- /Users/haha/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-22T10-35-19+08-00-00811-hk-xinhua-winshare/config/output-schema.json
+- 粗筛行只有历史信号日市值，资金资产/融资负债/现金调整 PE 均为空。
+
+事实包复用检查:
+- annual_facts_json 不存在，需新建。
+- annual_facts_md 不存在，需新建。
+- raw_filing_dir 初始无原始年报。
+
+原始年报获取:
+- 下载公司官网 2023 年报 PDF: https://www.winshare.com.cn/u/cms/wx_new/202404/25163525phru.pdf
+- HKEXnews 搜索结果对应披露 URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2024/0425/2024042500436.pdf
+- 本地 PDF: /Users/haha/aicode/stock_report/data/raw/filings/00811.HK/2023-12-31/xinhua_winshare_2023_annual_report.pdf
+- 本地抽取文本: /Users/haha/aicode/stock_report/data/raw/filings/00811.HK/2023-12-31/xinhua_winshare_2023_annual_report.txt
+- pdfinfo/pdftotext 不存在；使用本次 work/python_deps 内临时安装的 pypdf 抽取文本。
+
+关键来源定位:
+- 财务摘要: 2023 Annual Report p.9，列报单位 RMB0'000。
+- 业务分部: MDA p.23-30；分部报表 Note XVI p.326。
+- 合并资产负债表: p.138-140。
+- 合并利润表: p.144-145。
+- 合并现金流量表: p.146-148。
+- 现金及银行结余: Note VI.1 p.207。
+- 其他流动资产定存: Note VI.9 p.222。
+- 其他权益工具投资: Note VI.12 p.229-230。
+- 其他非流动金融资产: Note VI.13 p.230-231。
+- 其他非流动资产定存: Note VI.22 p.246。
+- 短期借款: Note VI.23 p.247。
+- 租赁负债: Note VI.31 p.254-255。
+- 现金流补充资料和受限资产: Note VI.55-56 p.279-280。
+
+补抽字段:
+- 现金及现金等价物、受限货币资金、定期存款期限、上市股权、非上市金融资产、短期借款、租赁负债、三年利润/经营现金流、2023 年资本开支、营运资金变化。
+
+计算口径:
+- metrics 金额全部写为人民币元绝对金额。
+- 市值采用 input rough_screen_row.market_cap = 10516496182.02 CNY，基础为 2024-05-27 信号日，不是实时市值。
+- 现金及现金等价物 RMB 9078342824.79 折扣 0.75。
+- 一年内定存 RMB 451473138.89 折扣 0.85。
+- 长期定存 RMB 756272309.80 折扣 0.65。
+- 上市权益工具 RMB 1767951589.74 折扣 0.55。
+- 非上市金融资产 RMB 449082949.02 折扣 0.10。
+- 必要经营现金保留 RMB 1800000000.00，按约两个月经营现金流出估算。
+- 税费/汇兑/分红及处置摩擦准备 RMB 400000000.00。
+- 短期借款 RMB 10000000.00 100% 扣除。
+- 租赁负债作为经营必需租赁，不从净现金机械扣除。
+
+输出:
+- result.json: /Users/haha/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-22T10-35-19+08-00-00811-hk-xinhua-winshare/outputs/result.json
+- report.md: /Users/haha/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-22T10-35-19+08-00-00811-hk-xinhua-winshare/outputs/report.md
+- trace.txt: /Users/haha/aicode/stock_analysis/data/outputs/hk_owner_earnback_agent_runs/2026-07-22T10-35-19+08-00-00811-hk-xinhua-winshare/outputs/trace.txt
+- annual_facts_json: /Users/haha/aicode/stock_report/data/analysis/annual_review/00811.HK/2023-12-31/facts.json
+- annual_facts_md: /Users/haha/aicode/stock_report/data/analysis/annual_review/00811.HK/2023-12-31/annual_facts.md
+- annual_extraction_trace: /Users/haha/aicode/stock_report/data/analysis/annual_review/00811.HK/2023-12-31/extraction_trace.txt
+- normalized_facts_json: /Users/haha/aicode/stock_report/data/normalized/facts/00811.HK/2023-12-31/annual-facts.json
+- owner_earnback_result_json: /Users/haha/aicode/stock_report/data/analysis/owner_earnback/00811.HK/2023-12-31/result.json
+- owner_earnback_report_md: /Users/haha/aicode/stock_report/data/analysis/owner_earnback/00811.HK/2023-12-31/report.md
+- owner_earnback_trace: /Users/haha/aicode/stock_report/data/analysis/owner_earnback/00811.HK/2023-12-31/trace.txt
+
+仍缺失字段:
+- 未拆清全部现金权属和分红限制。
+- 资本开支未拆维持/增长。
+- 金融投资逐项税费和减持节奏未测算。
