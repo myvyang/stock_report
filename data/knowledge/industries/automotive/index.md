@@ -5,40 +5,46 @@
 
 ## 行业范围
 
-本知识库先讨论三件事：
+本知识库先讨论四件事：
 
 1. 汽车整车成本如何拆分，供应链收入如何避免重复计算。
-2. 具身机器人产品树如何从整机拆到执行器、减速器、传感器、控制系统等核心部件。
-3. A股里哪些公司和具身智能供应链有关，哪些只是位置相关，哪些可能有真实技术或制造优势。
+2. 电动车整车路线和关键技术史如何影响成本、体验和竞争格局。
+3. 具身机器人产品树如何从整机拆到执行器、减速器、传感器、控制系统等核心部件。
+4. A股里哪些公司和具身智能供应链有关，哪些只是位置相关，哪些可能有真实技术或制造优势。
 
 暂不把自动驾驶、整车品牌竞争、机器人整机公司估值单独展开；这些可以在后续形成独立专题。
 
 ## 推荐阅读顺序
 
-1. [具身机器人产品树拆解](../../../analysis/industry_learning/automotive/embodied_intelligence_product_breakdown.md)  
+1. [具身机器人产品树拆解](../../../analysis/industry_learning/automotive/embodied_intelligence_product_breakdown.md)
    先理解每个模块解决什么问题、难在哪里，再看它由哪些子项组成。用于建立“整机 -> 执行系统 -> 关节执行器 -> 电机/减速器/驱动器/传感器”的基础概念。
 
-2. [汽车供应链学习地图](../../../analysis/industry_learning/automotive/supply_chain_map.md)  
+2. [汽车供应链学习地图](../../../analysis/industry_learning/automotive/supply_chain_map.md)
    复习汽车整车 100 元收入如何拆成外购零部件、制造转换成本、期间费用和利润，并理解供应链收入不能简单逐层相加。
 
-3. [具身智能与汽车供应链重合学习笔记](../../../analysis/industry_learning/automotive/embodied_intelligence_overlap.md)  
+3. [电动车技术发展史学习笔记](../../../analysis/industry_learning/automotive/electric_vehicle_technology_history.md)
+   复习 Tesla 圆柱电芯路线、比亚迪 LFP / 刀片电池路线、整车毛利率收敛原因，以及技术从原理验证到工程化和规模降本的迁移。
+
+4. [具身智能与汽车供应链重合学习笔记](../../../analysis/industry_learning/automotive/embodied_intelligence_overlap.md)
    看汽车电动化、智能驾驶、工厂自动化和具身智能为什么会合流，以及哪些能力可以共用、哪些不能共用。
 
-4. [具身智能供应链学习地图](../../../analysis/industry_learning/automotive/embodied_intelligence_supply_chain.md)  
+5. [具身智能供应链学习地图](../../../analysis/industry_learning/automotive/embodied_intelligence_supply_chain.md)
    用 McKinsey 风格框架理解哪些环节是成本大头、性能瓶颈、供应商稀缺和难标准化环节。
 
-5. [具身智能 A股供应链候选图谱](../../../analysis/industry_learning/automotive/embodied_intelligence_a_share_candidates.md)  
+6. [具身智能 A股供应链候选图谱](../../../analysis/industry_learning/automotive/embodied_intelligence_a_share_candidates.md)
    把产品树节点映射到 A股候选公司，但只作为初筛线索，不作为投资结论。
 
-6. [具身智能 A股候选赚钱能力初判](../../../analysis/industry_learning/automotive/embodied_intelligence_a_share_profitability_review.md)  
+7. [具身智能 A股候选赚钱能力初判](../../../analysis/industry_learning/automotive/embodied_intelligence_a_share_profitability_review.md)
    区分公司主业是否赚钱、机器人业务是否兑现、估值是否已经反映远期故事。
 
-7. [具身智能 A股候选专注度与技术优势初判](../../../analysis/industry_learning/automotive/embodied_intelligence_a_share_focus_tech_review.md)  
+8. [具身智能 A股候选专注度与技术优势初判](../../../analysis/industry_learning/automotive/embodied_intelligence_a_share_focus_tech_review.md)
    区分“技术专注型公司”和“制造平台型公司”，避免把“供应链位置对了”误认为“技术领先”。
 
 ## 核心理解
 
 汽车供应链和具身智能供应链有大量重合，但不是简单平移。汽车供应链能提供电池、电机、电控、热管理、传感器、线束连接器、结构件、制造质量体系和成本控制能力；具身智能额外需要关节执行器、灵巧手、全身控制、接触感知和操作数据。
+
+电动车技术史的关键理解：技术价值不能只看谁最早发明，还要分清谁证明原理、谁看懂商业机会、谁完成工程化、谁完成规模化降本。Tesla 的圆柱电芯路线体现“借用消费电子供应链并做汽车级系统集成”；比亚迪 LFP / 刀片电池路线体现“当市场约束转向成本、安全和规模后，结构工程能放大参数不极致路线的优势”。
 
 具身机器人硬件里，关节执行器是当前最值得优先理解的节点。它由电机、减速/传动机构、驱动器、传感器、轴承、壳体、制动和散热组成，不是一个单独电机。减速/传动、力/触觉传感、行星滚柱丝杠、机器人控制平台等环节更容易成为规模化瓶颈。
 
@@ -60,6 +66,7 @@
 
 ## 后续缺口
 
+- 继续补能源路线史：纯电、插混、增程为什么在不同时期轮流占优。
 - 把产品树节点和 A股候选公司做成稳定映射表，标注证据来源和置信度。
 - 对绿的谐波、雷赛智能、三花智控、拓普集团做正式股票研究报告。
 - 按 McKinsey 框架逐项评估：执行器、减速器、丝杠、力/触觉传感、控制平台，谁更可能长期留住利润。
