@@ -27,3 +27,4 @@ data/knowledge/industries/
 | 行业 | 入口 | 状态 |
 |---|---|---|
 | 汽车 / 具身智能关联 | [automotive/index.md](automotive/index.md) | 已建立初版索引，覆盖汽车供应链、具身机器人产品树、A股候选图谱 |
+| 玻璃 | [glass/index.md](glass/index.md) | 已建立汽车玻璃初版学习笔记，覆盖浮法玻璃、汽车玻璃格局、福耀 100 元收入拆解 |
