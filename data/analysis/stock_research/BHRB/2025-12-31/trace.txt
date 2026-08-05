@@ -1,0 +1,89 @@
+stock-research trace
+company=BHRB / Burke & Herbert Financial Services Corp.
+period=2025-12-31 annual
+generated_for_input=2026-08-05T03:42:52+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields using repeated protocol set commands; no complex JSON was authored from a blank file.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[local reuse audit]
+- Checked stock_report/data/analysis/annual_review/BHRB/2025-12-31: no fact files present.
+- Checked stock_report/data/raw/filings/BHRB/2025-12-31: no filing files present.
+- Checked configured /root/aicode sync-source locations: no reusable BHRB annual-review or filing files present.
+- Therefore fetched/inspected official public disclosures rather than inventing missing facts.
+
+[primary sources]
+1. SEC Form 10-K, fiscal year ended 2025-12-31, filed 2026-02-27:
+   https://www.sec.gov/Archives/edgar/data/1964333/000196433326000016/bhrb-20251231.htm
+   Used for company identity, business model, 2025 financial statements, deposits, borrowings, dividends, ratios, asset quality, capital and branch/employee data.
+2. Burke & Herbert 2026 Q2 results, released 2026-07-23:
+   https://investor.burkeandherbertbank.com/news-releases/news-release-details/burke-herbert-financial-services-corp-announces-second-quarter-2
+   Used for latest declared quarterly dividend ($0.55/share), 2026-06-30 shares outstanding (20,165,171), and post-LINK capital context.
+3. Federal Reserve H.10 Data Download Program, China spot exchange rate series RXI_N.A.CH:
+   https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+   2025-12-31 rate used: CNY 7.1875 per USD.
+4. config/input.json / Yahoo Finance yfinance:
+   market cap CNY 9,967,463,456.358032 as of 2026-08-03; PE TTM 12.717013.
+
+[model decision]
+- Input hint ordinary_operating/applicable was rejected based on filing facts.
+- Confirmed statement_model=financial_bank.
+- Set owner_earnback_applicability=requires_special_model.
+- Reason: deposits are operating funding; cash, securities and loans are regulated operating assets. They cannot be treated as detachable net cash, and bank cash flow is not comparable to industrial free cash flow.
+- All ordinary owner-earnback sortable fields remain null as required by the result contract.
+
+[key USD facts from 2025 Form 10-K]
+- total assets: $7,920.626m
+- total liabilities: $7,065.977m
+- total shareholders' equity: $854.649m
+- common shareholders' equity: $844.236m
+- cash and cash equivalents: $289.127m
+- investment securities at fair value: $1,615.954m
+- net loans: $5,319.853m
+- company-owned life insurance: $213.200m
+- premises and equipment: $136.809m
+- deposits: $6,403.941m
+- short-term borrowings: $450.000m
+- long-term debt: $87.490m
+- accrued interest and other liabilities: $124.546m
+- net interest income: $295.912m
+- non-interest income: $46.110m
+- non-interest expense: $195.561m
+- provision for credit losses: $1.523m
+- net income applicable to common: $116.406m
+- preferred dividends: $0.900m; inferred total net income $117.306m
+- diluted EPS: $7.72; dividends/share: $2.20; payout: 28.50%
+- NIM: 4.14%; ROE: 14.76%; efficiency ratio: 57.18%
+- CET1: 13.45%; total risk-based capital: 16.17%; leverage: 10.92%
+- NPL/loans: 1.38%; NPA/assets: 0.97%; allowance/NPL: 91.36%; net charge-offs/average loans: 0.05%
+- uninsured deposits: approximately $2.1bn
+
+[currency conversion]
+- Contract requires CNY absolute yuan.
+- Converted 2025 USD financial statement amounts at 7.1875 CNY/USD.
+- Example: total assets = 7,920,626,000 * 7.1875 = CNY 56,929,499,375.
+- This uses a period-end rate for all structured values, including income statement values, for deterministic comparability; it is not an accounting translation using average rates.
+
+[dividend forecast]
+- Mechanical annual DPS = $0.55 * 4 = $2.20.
+- Forecast cash dividend = 20,165,171 shares * $2.20 * 7.1875 = CNY 318,861,766.438.
+- Forecast yield = 318,861,766.438 / 9,967,463,456.358032 = 0.031990261899 (3.20%).
+- Not a board commitment; share count may change.
+
+[important comparability limitation]
+- Market cap date is 2026-08-03, after completion of the LINKBANCORP merger in May 2026.
+- Core annual financial facts are from 2025-12-31, before that merger.
+- Shares outstanding increased from 15,028,524 at 2025 year-end to 20,165,171 at 2026 Q2 end.
+- No ordinary payback or market-cap-to-2025-bank-profit conclusion was produced from mismatched scopes.
+
+[output check]
+- outputs/result.json: initialized and validated by protocol CLI.
+- outputs/report.md: bank-specific operating narrative with factual qualifications and official links.
+- outputs/trace.txt: source, formula, model override and validation record.

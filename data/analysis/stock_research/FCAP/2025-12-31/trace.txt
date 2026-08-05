@@ -1,0 +1,59 @@
+FCAP stock research trace
+generated_at=2026-08-04T20:08:14+08:00
+period=2025-12-31
+
+[protocol]
+1. Read stock-research/SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated initialized paths using protocol set commands; no complex result object was authored from scratch.
+4. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: status=ok, errors=[]
+
+[source discovery and reuse]
+- No pre-existing annual facts, normalized facts, or stock-research output for FCAP/2025-12-31 was present in the workspace.
+- Downloaded official SEC filing to stock_report/data/raw/filings/FCAP/2025-12-31/fcap-20251231x10k.htm.
+- Primary filing URL: https://www.sec.gov/Archives/edgar/data/1070296/000110465926037802/fcap-20251231x10k.htm
+- Earnings cross-check: https://www.sec.gov/Archives/edgar/data/1070296/000110465926006268/fcap-20260123xex99d1.htm
+- FX: 2025-12-31 CFETS/PBOC central parity, USD/CNY=7.0288.
+- Market data copied from config/input.json: CNY 1,428,586,720.2884674, 2026-08-03, Yahoo Finance yfinance, PE TTM 11.463768.
+
+[model decision]
+- Input hint ordinary_operating/applicable was rejected after filing review.
+- Confirmed model: financial_bank.
+- Owner earnback applicability: not_applicable.
+- Reason: deposits are core operating funding; loans, cash, and securities are regulated banking operating assets. Detachable net cash and ordinary free-cash-flow payback would misstate the economics.
+
+[currency conversion]
+Formula: CNY amount = USD thousands * 1,000 * 7.0288.
+- total assets: 1,271,995 * 1,000 * 7.0288 = CNY 8,940,598,456.00
+- total liabilities: 1,134,086 * 1,000 * 7.0288 = CNY 7,971,263,676.80
+- total equity: 137,909 * 1,000 * 7.0288 = CNY 969,334,779.20
+- parent equity: 137,797 * 1,000 * 7.0288 = CNY 968,547,553.60
+- parent net income: 16,367 * 1,000 * 7.0288 = CNY 115,040,369.60
+
+[derived metrics]
+- 2025 parent net income growth = 16.367 / 11.940 - 1 = 37.0771%.
+- price/book using input market cap and 2025 parent equity = 1,428,586,720.2884674 / 968,547,553.60 = 1.47498x.
+- forecast dividend USD = 1.20 * 3,341,871 shares = USD 4,010,245.20.
+- forecast dividend CNY = 4,010,245.20 * 7.0288 = CNY 28,187,211.46.
+- forecast dividend yield = 28,187,211.46 / 1,428,586,720.2884674 = 1.97309%.
+- uninsured deposit ratio = 263.8 / 1,122.99 = 23.49%.
+- deposits/total liabilities = 1,122.990 / 1,134.086 = 99.02%.
+- ordinary owner earnback fields intentionally null per special-model contract.
+
+[filing facts used]
+- Net interest income USD 42.150m; 2024 USD 35.790m.
+- Parent net income USD 16.367m; 2024 USD 11.940m.
+- NIM 3.61%; ROA 1.34%; ROE 13.18%; payout ratio 24.54%.
+- Nonperforming assets/total assets 0.34%; ACL/gross loans 1.52%; bank CBLR 11.01%.
+- Net loans USD 654.100m; AFS securities USD 417.190m; cash and equivalents USD 137.288m; deposits USD 1,122.990m.
+- Commercial real estate loans USD 207.1m (31.2% of loans); fixed-rate loans USD 308.8m (46.6%).
+- Uninsured deposits approximately USD 263.8m.
+- Parent-company unconsolidated liquid assets USD 2.3m.
+
+[quality notes]
+- Bank revenue/gross margin/operating cash flow/capex/free cash flow are null because they are not economically comparable with ordinary operating companies under the result contract.
+- Dividend forecast is a conservative historical annual run-rate, not a board commitment.
+- Core financial facts are from audited SEC filing; result status set to complete.

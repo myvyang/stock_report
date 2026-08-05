@@ -1,0 +1,56 @@
+Stock research trace — TBBK — period 2025-12-31
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Read protocol and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md (107 lines, complete)
+   - .agents/skills/stock-research/references/report-contract.md (69 lines, complete)
+   - .agents/skills/stock-research/references/data-reuse.md (24 lines, complete)
+
+2. Reuse check
+   - Searched stock_report for TBBK raw filings, annual review facts, normalized facts, and prior stock research.
+   - No reusable TBBK artifacts were present, so research returned to the primary filing.
+
+3. Protocol initialization
+   Command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Primary sources acquired and inspected
+   - SEC Form 10-K: accession 0001295401-26-000002, filed 2026-02-25, period 2025-12-31.
+     URL: https://www.sec.gov/Archives/edgar/data/1295401/000129540126000002/tbbk-20251231x10k.htm
+     Local copy: stock_report/data/raw/filings/TBBK/2025-12-31/tbbk-20251231x10k.htm
+   - The Bancorp FY2025 results release dated 2026-01-29.
+     URL: https://investors.thebancorp.com/press-releases/news-details/2026/The-Bancorp-Reports-4Q-2025-EPS-of-1-28-ROA-of-2-53-and-ROE-of-30-4-Driven-by-NIM-of-4-30-Continued-Fintech-Fee-Growth-and-150-Million-in-Share-Repurchases-in-the-Quarter/default.aspx
+   - Federal Reserve H.10 release dated 2025-12-29; 2025-12-26 USD/CNY = 7.0063.
+     URL: https://www.federalreserve.gov/releases/h10/20251229/
+   - Market cap and PE: config/input.json, Yahoo Finance yfinance snapshot dated 2026-08-03.
+
+5. Model override
+   - Input hint: ordinary_operating / applicable.
+   - Filing-confirmed model: financial_bank / not_applicable.
+   - Reason: The Bancorp is a financial holding company whose earnings are generated mainly by its FDIC-insured bank. Customer deposits fund loans and securities; these are operating assets and liabilities rather than detachable net cash.
+   - Ordinary owner earnback fields retained as null per result contract.
+
+6. Extraction and calculations
+   - Financial statements extracted from Form 10-K pp.72-76.
+   - Bank KPIs and operating drivers extracted from MD&A pp.43-63.
+   - USD financial amounts translated to CNY at 7.0063 CNY/USD.
+   - Nonaccrual ratio approximation: USD 27.934m / (USD 7,116.676m loans before allowance + USD 139.389m fair-value commercial loans) = 0.385%.
+   - Allowance/nonaccrual coverage approximation: USD 66.200m / USD 27.934m = 2.37x.
+   - Forecast cash dividend: USD 0 / supplied market cap = 0%, based on explicit 2026 no-cash-dividend plan.
+   - Buybacks analyzed separately and not classified as cash dividends.
+
+7. Result population
+   - Used protocol `set` for scalar/object fields.
+   - Used protocol `append` for sources, asset/liability rows, dividend history, risks, and evidence.
+   - Did not hand-write result.json from scratch.
+
+8. Validation
+   Command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+9. Known limitations
+   - CNY translations use a single near-year-end spot rate rather than average rates for income statement items.
+   - Bank operating cash flow and capex are disclosed but are not used as an ordinary-company free-cash-flow earnback measure.
+   - Market cap and PE are accepted from the supplied input snapshot and were not reconstructed from price and shares.

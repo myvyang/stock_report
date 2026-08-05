@@ -1,0 +1,76 @@
+stock-research trace
+company=中国神华
+code=601088.SH
+period=2025-12-31
+generated_at=2026-07-31T23:51:39+08:00
+
+[skill]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+
+[reuse_check]
+config/input.json exists
+no local raw filing, annual facts, normalized facts, or prior stock-research outputs existed for 601088.SH/2025-12-31
+decision=research from public annual-report disclosures
+
+[sources]
+1. China Shenhua Energy Company Limited 2025 Annual Report, official company PDF
+   https://www.shenhuachina.com/zgshww/dqbg/202603/86d1e5e489da4f94a1a5c885877860c9/files/a7e442c35d52455bb9fd58a97c422c1e.pdf
+   published=2026-03-30/31
+   used_for=business, operating data, financial statements, assets and liabilities, dividend
+2. Sina mirror of China Shenhua 2025 Annual Report disclosure text
+   https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12048559&stockid=601088
+   accessed=2026-07-31
+   role=text-searchable mirror for locating official disclosure facts; not a substitute for filing
+3. config/input.json
+   market_cap=965831000000 CNY
+   market_cap_date=20260731114334
+   market_cap_source=Tencent qt.gtimg.cn
+   pe_ttm=18.73
+
+[reported_financials_CNY]
+revenue=294916000000
+cost_of_sales=191465000000
+gross_profit=103451000000
+operating_profit=75532000000
+net_profit=62783000000
+parent_net_profit=52849000000
+total_assets=627761000000
+total_liabilities=146310000000
+total_equity=481451000000
+parent_equity=409107000000
+minority_interest=72344000000
+operating_cash_flow=75059000000
+capital_expenditure=48398000000 (cash paid to acquire/build fixed, intangible and other long-term assets)
+operating_free_cash_flow=26661000000
+
+[formulas]
+gross_margin=(294916000000-191465000000)/294916000000=0.3507812394
+net_margin=52849000000/294916000000=0.1792001790
+forecast_dividend_yield=41811000000/965831000000=0.0432901822
+unrestricted_cash=96772000000-17637000000=79135000000
+discounted_unrestricted_cash=79135000000*0.50=39567500000
+financing_debt=(409+9364+28268+971)*1000000=39012000000
+discounted_detachable_net_cash=39567500000-39012000000=555500000
+estimated_maintenance_capex=48398000000*0.50=24199000000
+pre_cycle_cash_profit=75059000000-24199000000=50860000000
+discounted_sustainable_cash_profit=50860000000*0.90=45774000000
+operating_business_price=965831000000-555500000=965275500000
+owner_earnback_years=965275500000/45774000000=21.0878555512
+market_cap_to_cash_profit=965831000000/45774000000=21.0999912614
+
+[judgments]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+cash_discount=50% of unrestricted cash because ongoing operations, active projects, and related-party finance-company deposits constrain detachability
+maintenance_capex=50% of reported capex; subjective estimate because filing does not split maintenance and growth capex
+cycle_discount=10%; subjective prudence for coal price, electricity price, and volume variability
+nonrecurring_note=2025 reported profit benefited from reversal of about CNY4.12bn special expenditure; cash-profit estimate starts from OCF and separately applies a cycle haircut
+
+[protocol]
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+population=protocol set/append commands only (populate_result.py helper)
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok

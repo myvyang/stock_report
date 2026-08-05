@@ -1,0 +1,55 @@
+stock-research trace
+company=601808.SH 中海油服
+period=2025-12-31
+generated_for_task=2026-07-31 Asia/Shanghai
+
+[inputs]
+read=config/input.json
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+read=stock_report/data/notes/user_stock_evaluations.md
+note=no matching local annual facts, normalized facts, raw filing metadata, or prior stock research result existed
+
+[official filing]
+source=https://www.hkexnews.hk/listedco/listconews/sehk/2026/0414/2026041400342.pdf
+title=China Oilfield Services Limited Annual Report 2025
+published=2026-04-14
+local_copy=stock_report/data/raw/filings/601808.SH/2025-12-31/annual-report-2025.pdf
+pages_used=17-26 management discussion; 82-87 consolidated financial statements; notes 15, 17, 23, 24, 26, 28, 32, 35-39, 45-46
+
+[model decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=oilfield services earn fees from drilling, well technology, marine support, and geophysical services; operating assets are rigs, vessels, and equipment. This is capital-intensive ordinary operations, not a bank, developer, concession, or holding platform.
+
+[key calculations]
+revenue=50210835000
+operating_expenses=44512989000
+gross_profit_proxy=50210835000-44512989000=5697846000
+gross_margin_proxy=5697846000/50210835000=0.1134784155650867
+parent_net_profit=3841741000
+net_margin=3841741000/50210835000=0.07651219104402467
+operating_cash_flow=11256246000
+capital_expenditure=5593664000
+operating_free_cash_flow=11256246000-5593664000=5662582000
+discounted_sustainable_cash_profit=5662582000*0.80=4530065600
+funds_and_low_risk_financial_assets=7462991000+105067000+10074000+5501704000=13079836000
+interest_and_lease_debt=4125695000+5832292000+5172118000+1764103000=16894208000
+discounted_detachable_net_cash=0 because funds do not cover interest and lease debt
+operating_business_price=59788000000-0=59788000000
+owner_earnback_years=59788000000/4530065600=13.198042871608747
+forecast_cash_dividend=0.2825*4771592000=1347974740
+forecast_dividend_yield=1347974740/59788000000=0.022545907874489863
+
+[judgment notes]
+cash_profit_discount=20% haircut to 2025 operating FCF for oil-service cyclicality, customer concentration, and 2026 preliminary capex budget of RMB8.44bn versus RMB5.594bn in 2025
+gross_margin_limitation=annual report does not present manufacturing-style cost of sales or gross profit; result uses net revenue less total operating expenses excluding other income as an operating gross-profit proxy
+market_data_limitation=market cap and PE reused from task input; not independently reconstructed from share classes and prices
+
+[protocol]
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+population=protocol set commands used for all populated fields
+validation=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok

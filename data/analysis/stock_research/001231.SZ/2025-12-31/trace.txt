@@ -1,0 +1,84 @@
+task=stock_research
+company=001231.SZ 农心科技
+period=2025-12-31
+generated_for=2026-08-01 Asia/Shanghai
+
+[protocol]
+init: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+set: all completed fields written through protocol set commands
+validate: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validate_result: ok
+
+[skill_and_contracts]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+
+[local_reuse_check]
+config/input.json: present
+annual facts package: absent at task start
+normalized facts: absent at task start
+prior stock research: absent at task start
+user evaluation for 001231/农心科技: no matching entry
+decision: retrieve official annual report because all core filing facts were missing
+
+[primary_sources]
+annual_report_url=https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-27/27b6c0d9-1ec2-4ac9-9e04-5456fd3bd8f6.PDF
+annual_report_local=stock_report/data/raw/filings/001231.SZ/2025-12-31/annual-report-2025.pdf
+annual_report_text=stock_report/data/raw/filings/001231.SZ/2025-12-31/annual-report-2025.txt
+annual_report_pages=195
+market_snapshot=config/input.json; Tencent qt.gtimg.cn; 20260731114345
+followup_project_announcement=https://static.cninfo.com.cn/finalpage/2026-06-27/1225392102.PDF
+
+[model_review]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Revenue comes from pesticide formulation and technical-material product sales. Cash, receivables, inventory, fixed assets, construction in progress, trade payables and customer advances have ordinary manufacturing economics; no special financial-statement model was identified.
+
+[reported_core_facts_cny]
+revenue=769856772.95
+cost_of_sales=552463011.62
+gross_profit=217393761.33
+parent_net_profit=66633350.64
+deducted_parent_net_profit=61097682.74
+operating_cash_flow=100536440.31
+capital_expenditure=71686517.54
+operating_free_cash_flow=28849922.77
+total_assets=1590085087.02
+total_liabilities=583462985.26
+total_equity=1006622101.76
+parent_equity=1001934816.57
+
+[owner_earnback_calculation]
+unrestricted_cash=280867768.83-45351614.87=235516153.96
+structured_deposit_discounted=80244586.30*0.95=76232356.985
+asset_management_discounted=65449305.00*0.70=45814513.5
+wealth_management_discounted=40066178.61*0.80=32052942.888
+other_debt_investment_discounted=62342867.57*0.85=52991437.4345
+other_equity_investment_discounted=42592504.00*0.40=17037001.6
+operating_cash_reserve=-100000000.00
+interest_bearing_and_lease_debt=-147250995.59
+discounted_detachable_net_cash=212393410.7775
+operating_business_price=1850000000.00-212393410.7775=1637606589.2225
+discounted_sustainable_cash_profit=61097682.74*0.90=54987914.466
+owner_earnback_years=1637606589.2225/54987914.466=29.7812092916
+market_cap_to_cash_profit=1850000000/54987914.466=33.6437564139
+
+[formula_checks]
+gross_margin=217393761.33/769856772.95=0.2823820858
+net_margin=66633350.64/769856772.95=0.0865529186
+forecast_dividend_yield=14967036.75/1850000000=0.0080902901
+discounted_net_cash_to_market_cap=212393410.7775/1850000000=0.1148072491
+
+[judgment_boundaries]
+fact=reported filing and input snapshot values
+inference=company is a domestic small/mid-sized pesticide company rather than a scale leader; based on revenue and overseas share
+assumption=haircuts by asset class, CNY100m operating reserve, and 10% sustainable-profit haircut
+limitation=annual report does not split maintenance and growth capex; actual 2025 FCF is used as a stress check
+limitation=2025 dividend amount was a proposal in the annual report and may be adjusted for participating shares
+
+[outputs]
+outputs/result.json
+outputs/report.md
+outputs/trace.txt

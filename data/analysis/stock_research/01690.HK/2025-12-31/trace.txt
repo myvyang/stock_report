@@ -1,0 +1,66 @@
+Stock research trace: 01690.HK / period 2025-12-31
+Generated for input created_at: 2026-08-04T15:24:07+08:00
+
+1. Instructions and protocol
+- Read /workspace/.agents/skills/stock-research/SKILL.md in full.
+- Read result-contract.md, report-contract.md, and data-reuse.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Requested annual fact paths, normalized facts, raw filing metadata, and prior stock-research outputs did not exist.
+- Only stock_report/data/notes/user_stock_evaluations.md existed; it supplied no company facts used here.
+- Therefore fetched the official 2025 annual report from HKEX rather than relying on third-party financial data.
+
+3. Primary filing
+- Filing: LAP KEI ENGINEERING (HOLDINGS) LIMITED Annual Report 2025.
+- HKEX URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0415/2026041501584.pdf
+- Published: 2026-04-15; financial statements approved 2026-03-26.
+- Local PDF: stock_report/data/raw/filings/01690.HK/2025-12-31/annual-report-2025.pdf
+- Local extracted text: stock_report/data/raw/filings/01690.HK/2025-12-31/annual-report-2025.txt
+- PDF text extraction performed with pypdf in temporary venv /tmp/stock-research-pdf because pdftotext was unavailable. The temporary environment did not alter research outputs.
+
+4. Model reconciliation
+- Input hint said financial_brokerage, but its own tags said construction contractor.
+- Annual report pages 4 and 76 identify the operations as Hong Kong building services engineering and maintenance.
+- Notes 6, 16, 17 and 19 show fixed-price project revenue, contract assets, trade receivables and project-related payables.
+- Final model: construction_project / requires_special_model.
+- Consequently all ordinary detachable-net-cash and owner-earnback numeric fields remain null per result contract.
+
+5. Core extracted HKD facts (HK$'000 in filing)
+- Income statement, annual report p.71: revenue 280,760; cost 244,317; gross profit 36,443; profit before tax 17,175; net/parent profit 15,685.
+- Balance sheet, pp.72-73: assets 271,326; liabilities 121,462; equity 149,864; no NCI disclosed.
+- Cash flow, p.75: operating cash flow 27,047; PPE purchases 4,248; calculated operating FCF 22,799; financing cash flow -15,964.
+- Notes 6, pp.91-95: engineering revenue 267,842; maintenance revenue 12,918; remaining performance obligations 142,162; customer concentration facts.
+- Notes 16-20, pp.103-107: trade and other receivables 84,120; contract assets 100,767; pledged deposits 5,478; bank balances 68,686; trade and other payables 118,326; contract liabilities 1,539.
+- Dividend: proposed HK$0.02/share, aggregate HK$28,905,000; cash dividend paid during 2025 HK$14,505,000.
+
+6. Currency conversion
+- Result contract requires CNY absolute yuan.
+- HKMA daily exchange-rate API record for 2025-12-31: cny=1.1144 HKD per CNY.
+- Conversion used: 1 HKD = 1 / 1.1144 = 0.8973438621679827 CNY.
+- All statement and dividend amounts in result.json use this single period-end rate for consistency.
+- Limitation: income and cash-flow items were not translated at a 2025 annual average rate; this is disclosed in data_quality.limitations.
+
+7. Calculations
+- Gross margin = 36,443 / 280,760 = 0.1298012537.
+- Net margin = 15,685 / 280,760 = 0.0558662203.
+- Operating FCF = 27,047 - 4,248 = HK$22,799 thousand.
+- Forecast dividend CNY = HK$28,905,000 * 0.8973438622 = CNY25,937,724.34.
+- Forecast dividend yield = CNY25,937,724.34 / CNY152,926,928.7967682 = 0.1696086133.
+- Proposed dividend / 2025 profit = 28,905 / 15,685 = 1.8428x; not treated as sustainable.
+
+8. Market data
+- Market cap CNY152,926,928.7967682; PE TTM 11.33.
+- As of 2026/08/03 09:46:46; source supplied in input: Tencent qt.gtimg.cn.
+- No independent market-price recalculation performed; limitation disclosed.
+
+9. Protocol population and validation
+- outputs/result.json was populated by populate_result.sh, which calls the protocol CLI set command for each field/section; it was not written as a replacement JSON object from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Expected/final validation payload: {"status":"ok","errors":[]}.
+
+10. Output scope
+- Required outputs created: outputs/result.json, outputs/report.md, outputs/trace.txt.
+- No buy/sell advice, target price, ranking label, or unsupported ordinary owner-earnback number was produced.

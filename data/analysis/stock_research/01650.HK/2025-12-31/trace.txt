@@ -1,0 +1,64 @@
+stock-research trace
+company: HYGIEIA GROUP LIMITED (01650.HK)
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- No annual facts, normalized facts, prior research output or filing metadata existed under the input-declared 01650.HK/2025-12-31 paths.
+- Therefore retrieved the official 2025 annual report from HKEX and saved it as:
+  stock_report/data/raw/filings/01650.HK/2025-12-31/2025-annual-report.pdf
+- Official filing URL:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042802889.pdf
+
+3. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Filing evidence: virtually all revenue is cleaning services in Singapore and Thailand; balance sheet contains trade receivables, deposits, cleaning equipment, ordinary borrowings and leases, with no brokerage client money or proprietary financial-asset model.
+- Override: ordinary_operating / applicable.
+
+4. Primary filing facts (reported currency SGD, S$'000)
+- Revenue 80,666; cost of sales 67,082; gross profit 13,584; operating profit 3,400.
+- Net profit 2,595; parent net profit 2,666.
+- Total assets 37,884; liabilities 11,345; equity 26,539; parent equity 26,492; NCI 47.
+- Operating cash flow 3,922; PPE purchases 654; lease principal paid 1,415; financing cash flow (7,104); dividends paid 4,000.
+- Cash 9,550; fixed deposits 4,399; pledged deposits 306; trade and other receivables/prepayments 20,081.
+- Borrowings 706; lease liabilities 1,226; trade and other payables 8,690; tax payable 723.
+- Proposed 2025 final dividend S$0.001/share on 2,000m shares = S$2.0m, subject to shareholder approval.
+- Employment credit grants 2,140; employee benefit expense 58,404.
+- Sources within annual report: pp.5-8, 71-77, notes 6, 9, 12, 15-24, 30-31.
+
+5. Currency translation
+- Protocol requires CNY absolute yuan.
+- Used 2025-12-31 official central parity 1 SGD = 5.4586 CNY for all statements for consistent translation.
+- Official announcement reproduced by Xinhua:
+  https://www.news.cn/fortune/20251231/447f7a38619042819be2410bb026481d/c.html
+- Limitation: income statement and cash flow were not translated at an annual-average rate.
+
+6. Calculations
+- gross_margin = 13,584 / 80,666 = 0.1683980859.
+- net_margin = parent net profit 2,666 / revenue 80,666 = 0.0330498599.
+- protocol operating FCF = OCF 3,922 - PPE capex 654 = S$3.268m.
+- economic cash remainder before haircut = 3,922 - 654 - lease principal 1,415 = S$1.853m.
+- discounted sustainable cash profit = S$1.853m * 90% * 5.4586 = CNY9,103,307.22.
+- discounted detachable net cash = (cash 9,550 * 70% + fixed deposits 4,399 * 90% - borrowings 706 - lease liabilities 1,226) * 5.4586 * 1,000 = CNY47,555,869.06.
+- Pledged deposits receive zero credit. Trade receivables receive zero detachable-cash credit.
+- operating business price = market cap CNY240,884,001.255 - discounted net cash = CNY193,328,132.195.
+- owner earnback = operating business price / discounted cash profit = 21.2371 years.
+- market cap / discounted cash profit = 26.4612 years.
+- forecast dividend = S$2.0m * 5.4586 = CNY10,917,200; yield = 4.5321%.
+
+7. Data provenance and judgment boundaries
+- Market cap, date, source and PE TTM were copied from config/input.json and were not independently reconstructed.
+- Filing facts are primary-source facts; currency conversion and arithmetic are calculations.
+- Cash haircuts, inclusion of lease principal, 10% sustainable-profit haircut and owner-earnback interpretation are analyst judgments, not company guidance.
+- No buy/sell recommendation or target price was produced.
+
+8. Validation
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status before report completion: ok, errors: [].

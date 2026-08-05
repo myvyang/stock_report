@@ -1,0 +1,72 @@
+task=stock-research
+query=GLRE
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-04T14:54:19+08:00
+
+[protocol]
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+populate=protocol set commands executed by populate_result.py
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[model_review]
+input_hint=ordinary_operating/applicable
+confirmed_model=financial_insurance/requires_special_model
+reason=GLRE is a regulated property and casualty reinsurer. Insurance reserves, restricted cash, investments and regulatory capital are operating elements; ordinary detachable-net-cash earnback is not economically valid.
+
+[primary_sources]
+1=https://www.sec.gov/Archives/edgar/data/1385613/000138561326000010/glre-20251231.htm
+  title=Greenlight Capital Re Ltd. 2025 Form 10-K
+  accession=0001385613-26-000010
+  filed=2026-03-09
+  used_for=business model, balance sheet, reserves, restricted cash, regulation, risk disclosures
+2=https://www.sec.gov/Archives/edgar/data/1385613/000138561326000009/pressreleaseearnings2025q4.htm
+  title=Greenlight Re 2025 full-year earnings release, SEC Exhibit 99.1
+  filed=2026-03-09
+  used_for=premiums, underwriting income, combined ratio, investment income, net income, book value per share
+3=https://data.sec.gov/api/xbrl/companyfacts/CIK0001385613.json
+  title=SEC Company Facts XBRL API
+  used_for=audited XBRL cross-checks, cash flow, repurchases
+4=config/input.json
+  title=task input market snapshot
+  used_for=market cap, market-cap date, PE TTM and Yahoo Finance yfinance attribution
+
+[key_usd_facts]
+total_assets=2169783000
+total_liabilities=1461806000
+shareholders_equity=707977000
+investments=633075000
+cash=111756000
+restricted_cash=531976000
+reinsurance_receivables=664381000
+loss_reserves=967960000
+ibnr=734884000
+unearned_premium_reserves=361704000
+net_premiums_earned=661144000
+underwriting_income=35651000
+combined_ratio=0.946
+total_investment_income=60168000
+net_income=74832000
+operating_cash_flow=210212000
+share_repurchases=9825000
+
+[currency_conversion]
+balance_sheet_usd_cny=7.0288
+income_cashflow_usd_cny=7.1426
+method=period-end rate for stocks; annual average rate for flows; ratios calculated from USD originals
+
+[important_nulls]
+gross_margin=null because insurance loss/acquisition costs are not ordinary cost of sales
+net_margin=null because net premiums earned is not a fully comparable ordinary-company revenue denominator
+capex_and_operating_fcf=null because ordinary OCF-minus-capex interpretation is not meaningful for insurer distributable cash
+ordinary_owner_earnback_fields=null because model applicability is requires_special_model
+
+[data_reuse]
+annual_facts_package=not present at start of task
+raw_filing_html=command-line SEC archive retrieval returned HTTP 403; official SEC web rendering and Company Facts API were used instead
+
+[outputs]
+outputs/result.json
+outputs/report.md
+outputs/trace.txt

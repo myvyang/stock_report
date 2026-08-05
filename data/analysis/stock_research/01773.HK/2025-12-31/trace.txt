@@ -1,0 +1,54 @@
+stock-research trace
+company: Tianli International Holdings Limited (01773.HK)
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse check
+- Checked the annual-review, raw-filing, normalized-facts, and prior stock-research paths in config/input.json.
+- No prior filing package, annual facts, or research result for 01773.HK/FY2025 existed in the workspace.
+
+3. Primary sources used
+- HKEX 2025 Annual Report, published 2025-12-30:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2025/1230/2025123000328.pdf
+  Key locations: pp.4, 7, 12, 19, 22, 32, 91-98, 131, 150, 152, 154, 157, 168-179.
+- HKEX 2026 Interim Report, published 2026-05-15:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0515/2026051502037.pdf
+  Key locations: pp.9-16, 26-34.
+- Market snapshot: config/input.json; Tencent qt.gtimg.cn; 2026/08/03 09:47:29.
+
+4. Identity and model resolution
+- Input hint said financial_brokerage/requires_special_model.
+- Annual report revenue consists of education services, product sales, logistical services, and management/franchise fees; company operates a school network.
+- No brokerage customer funds, proprietary securities portfolio, or repo financing structure was found.
+- Overrode hint with ordinary_operating/applicable.
+- Corrected analysis period from input 2025-12-31 to statutory FY end 2025-08-31; used 2026-02-28 interim only as a subsequent update.
+
+5. Core calculations (CNY absolute yuan)
+- Total liabilities = total assets 9,968,027,000 - total equity 2,963,027,000 = 7,005,000,000.
+- Gross margin = 1,213,533,000 / 3,588,901,000 = 0.3381324705.
+- Net margin = parent net profit 664,258,000 / revenue 3,588,901,000 = 0.1850867572.
+- Capex = PPE purchases 198,461,000 + intangible purchases 5,114,000 + land-use-right purchases 200,023,000 = 403,598,000.
+- Operating FCF = operating cash flow 852,592,000 - capex 403,598,000 = 448,994,000.
+- Discounted sustainable cash profit = 448,994,000 x 90% = 404,094,600.
+- Detachable net cash = 0 because cash is below interest-bearing debt, net current liabilities are material, and related-party balances are constrained.
+- Operating business price = market cap 2,254,932,341.748476 - detachable net cash 0 = 2,254,932,341.748476.
+- Owner earnback years = 2,254,932,341.748476 / 404,094,600 = 5.5802089688.
+- FY2026 forecast cash dividend = FY2025 final dividend amount 81,750,000 only; H1 FY2026 declared zero interim dividend.
+- Forecast dividend yield = 81,750,000 / 2,254,932,341.748476 = 0.0362539137.
+- FY2025 historical dividend = 121,893,000 interim + 81,750,000 final = 203,643,000.
+
+6. Judgmental treatments
+- All FY2025 PPE, intangible, and land purchases were treated as capex because maintenance/growth split is not disclosed.
+- Related-party receivables received 0% detachable-cash credit.
+- Cash, time deposits, and restricted deposits received 0% detachable-cash credit due to net debt and net current liabilities.
+- Added a 10% sustainability haircut after capex for regulation, liquidity, related-party, and capex volatility.
+- Dividend forecast does not extrapolate FY2025 total payout because H1 FY2026 paid no interim dividend.
+
+7. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status ok, errors [].

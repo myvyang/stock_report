@@ -1,0 +1,74 @@
+stock-research trace
+generated_at=2026-08-04T15:57:48+08:00
+query=06051.HK
+period=2025-12-31
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the task required deciding whether existing facts could be reused.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields with protocol set commands; the result was not constructed as a handwritten JSON document.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse_and_sources]
+- Expected annual facts, normalized facts, metadata and raw filings listed in config/input.json were absent from the workspace.
+- Downloaded the official 2025 annual report from HKEX:
+  https://www1.hkexnews.hk/listedco/listconews/gem/2026/0402/2026040201674.pdf
+- Local research copy:
+  stock_report/data/raw/filings/06051.HK/2025-12-31/annual_report_2025.pdf
+- Extracted a local text copy solely to locate and verify disclosures:
+  stock_report/data/raw/filings/06051.HK/2025-12-31/annual_report_2025.txt
+- Market-cap and PE data were reused from config/input.json (Tencent qt.gtimg.cn snapshot dated 2026-08-03 09:36:07).
+
+[identity_and_model_check]
+- Input hint said financial_brokerage. Rejected after checking the annual report.
+- Annual-report business: subscription solutions and merchant solutions (SaaS, third-party payment, logistics, distribution and consumer protection), not brokerage.
+- Selected statement_model=platform_financial_mixed.
+- owner_earnback_applicability=applicable only after fully excluding RMB2,815,150,000 balances with central bank restricted to settlement obligations and recognizing RMB2,919,021,000 settlement obligations as business-linked funds.
+
+[key_reported_facts_rmb]
+revenue=1487061000
+cost_of_sales=502672000
+gross_profit=984389000
+operating_profit=171582000
+net_profit=163007000
+parent_net_profit=163113000
+total_assets=5720830000
+total_liabilities=4455550000
+total_equity=1265280000
+parent_equity=1267054000
+operating_cash_flow=245210000
+capital_expenditure=3590000
+cash_and_cash_equivalents=1080475000
+balances_with_central_bank=2815150000
+settlement_obligations=2919021000
+interest_bearing_borrowings=352105000
+lease_liabilities=57500000
+cash_dividend_2025=0
+
+[formula_checks]
+gross_margin=984389000/1487061000=0.6619694820858055
+net_margin=163113000/1487061000=0.10968817015576361
+discounted_net_cash=(1080475000*0.80)+(297419000*0.70)+(102805000*0.50)-352105000-57500000=714370800
+discounted_net_cash_to_market_cap=714370800/1901090949.9049187=0.37576887104519047
+discounted_sustainable_cash_profit=130000000
+operating_business_price=1901090949.9049187-714370800=1186720149.9049187
+owner_earnback_years=1186720149.9049187/130000000=9.128616537730144
+market_cap_to_cash_profit=1901090949.9049187/130000000=14.623776537730144
+forecast_dividend_yield=0/1901090949.9049187=0
+
+[cash_profit_judgment]
+- Starting point: parent net profit RMB163,113,000.
+- Deducted FVTPL fair-value gain RMB14,552,000 as non-core/non-repeatable.
+- Deducted bank/central-bank interest and investment income RMB34,039,000 because related financial assets were removed from operating-business price.
+- Rounded to RMB130,000,000 after considering low capex and cash conversion, while retaining a buffer for the fact that 2025 was the first profitable year.
+- Did not use reported free cash flow RMB241,620,000 as sustainable profit because cash flow included RMB105,564,000 factoring-receivable runoff and large, offsetting settlement-balance movements.
+
+[limitations]
+- No independent exchange close-price verification for the Tencent market snapshot.
+- Sustainable cash profit is a judgment based on one profitable year, not a company forecast.
+- No verifiable market share was disclosed.
+- Report makes no buy/sell recommendation or target price.

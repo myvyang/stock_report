@@ -1,0 +1,74 @@
+stock-research trace
+generated_at=2026-08-03T12:23:01+08:00
+query=01235.HK
+task_period=2025-12-31
+actual_financial_period=2025-03-31
+
+[protocol]
+1. Read stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields only through protocol set commands.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   validation_status=ok
+
+[reuse-check]
+Checked configured annual facts, normalized facts, historical stock research and raw filing paths.
+No reusable files for 01235.HK/2025-12-31 existed at task start.
+
+[primary-source]
+source=Hong Kong Exchanges and Clearing Limited disclosure
+document=Travel Expert (Asia) Enterprises Limited Annual Report 2025
+publication_date=2025-07-24
+financial_year_end=2025-03-31
+url=https://www.hkexnews.hk/listedco/listconews/sehk/2025/0724/2025072400457.pdf
+local_pdf=stock_report/data/raw/filings/01235.HK/2025-12-31/annual_report_2025.pdf
+local_text=stock_report/data/raw/filings/01235.HK/2025-12-31/annual_report_2025.txt
+
+[model-review]
+input_hint=financial_brokerage/requires_special_model
+confirmed_model=ordinary_operating/applicable
+reason=Annual report identifies travel product agency and package-tour operation. No brokerage client money, proprietary securities funding or repo liabilities appear in the statements. Customer contract liabilities are advance travel receipts and are treated as operating obligations.
+
+[financial-source-pages]
+business_and_financial_review=annual report pages 6-9
+income_statement=pages 41-42
+balance_sheet=page 43
+cash_flow=page 45
+revenue_and_segments=pages 59-63
+dividend=page 66
+operating_assets_and_liabilities=pages 70-76
+
+[currency]
+annual_report_currency=HKD
+result_contract_currency=CNY
+conversion_assumption=1 HKD = 0.924 CNY
+method=Uniform approximate conversion for all statement and derived amounts. Not separate closing/average historical rates.
+
+[key-formulas]
+gross_margin=85.997/255.244=0.3369207503
+net_margin=3.374/255.244=0.0132187240
+reported_operating_free_cash_flow_HKD_m=20.166-2.561=17.605
+normalized_cash_profit_HKD_m=3.374+8.972-2.561-7.586=2.199
+normalized_cash_profit_CNY=2,031,876
+discounted_detachable_cash_HKD_m=(90.654-50.694-10.723)*0.70=20.466 approximately
+discounted_detachable_cash_CNY=18,910,584
+operating_business_price_CNY=83,337,261.43419743-18,910,584=64,426,677.43419743
+owner_earnback_years=64,426,677.43419743/2,031,876=31.70797698
+market_cap_to_cash_profit=83,337,261.43419743/2,031,876=41.01493469
+forecast_dividend_CNY=HKD4.079m*0.924=3,768,996
+forecast_dividend_yield=3,768,996/83,337,261.43419743=0.04522582018
+
+[judgment-boundaries]
+Fact: Contract liabilities rose HKD18.661m and operating cash flow was HKD20.166m.
+Inference: Reported operating cash flow is not a sustainable distributable-profit proxy because advance customer receipts funded most of the increase.
+Judgment: Deduct all contract and lease liabilities from cash, exclude pledged deposits, then apply a 30% safety haircut to residual cash.
+Judgment: Normalize cash profit by adding depreciation/amortization and deducting operating capex plus lease principal.
+
+[limitations]
+The task period does not match the company's March year-end; Annual Report 2025 is used and actual financial period is disclosed throughout.
+Market valuation date is about 16 months after the financial period end.
+FX conversion is approximate.
+Owner earnback amounts depend materially on cash haircut and normalized lease/capex assumptions.

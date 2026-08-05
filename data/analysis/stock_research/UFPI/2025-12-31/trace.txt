@@ -1,0 +1,80 @@
+UFPI stock-research trace
+generated_at=2026-08-04T23:01:00+08:00
+workspace=/workspace
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Read references/data-reuse.md because local data reuse was evaluated.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked stock_report/data/analysis/annual_review/UFPI/2025-12-31, normalized facts, and raw filing paths.
+- No local annual facts, normalized facts, filing metadata, or raw filing were present.
+- Therefore returned to primary public filings as required by the skill.
+
+3. Primary sources retrieved
+- SEC Form 10-K HTML:
+  https://www.sec.gov/Archives/edgar/data/912767/000110465926019567/ufpi-20251227x10k.htm
+  Filed 2026-02-25; fiscal year actually ended 2025-12-27; accession 0001104659-26-019567.
+- SEC Companyfacts JSON:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0000912767.json
+- UFP investor relations dividend history:
+  https://www.ufpinvestor.com/stock-information
+- UFP 2026 quarterly dividend release and Q1 results used to confirm $0.36 quarterly run rate.
+- Market cap, valuation date, source, and PE were taken unchanged from config/input.json.
+
+4. USD facts extracted from the 2025 10-K / SEC Companyfacts
+- Revenue 6,320,343,000
+- Cost of revenue 5,260,193,000
+- Gross profit 1,060,150,000
+- Operating income 363,901,000
+- Consolidated net income 294,792,000
+- Parent net earnings 295,992,000
+- Total assets 4,022,893,000
+- Total liabilities 934,186,000
+- Total equity including NCI 3,084,244,000
+- Parent equity 3,062,359,000
+- Cash and equivalents 914,199,000
+- Current marketable securities 34,374,000
+- Accounts receivable 475,959,000
+- Inventory 722,020,000
+- PP&E net 992,580,000
+- Goodwill plus finite-lived intangibles 477,537,000
+- Current plus noncurrent long-term debt 229,758,000
+- Operating cash flow 545,737,000
+- Capital expenditures 269,377,000
+- Operating free cash flow 276,360,000
+- Financing cash flow -530,143,000
+- Cash dividends paid 82,350,000
+- Common-stock repurchases 433,028,000
+
+5. Conversion and analytical formulas
+- Research conversion assumption: CNY 6.90 per USD. Input market cap was already CNY and was not reconverted.
+- Gross margin = 1,060,150 / 6,320,343 = 16.7738%.
+- Parent net margin = 295,992 / 6,320,343 = 4.6832%.
+- Operating FCF = 545,737 - 269,377 = USD 276,360 thousand.
+- Discounted detachable net cash:
+  cash * 70% + securities * 80% - debt * 100%
+  = (914.199 * 70% + 34.374 * 80% - 229.758) million USD
+  = CNY 3,019,995,450.
+- Sustainable cash profit = USD 315 million = CNY 2,173,500,000.
+  This starts from 2025 FCF of USD 276.36 million and adds USD 38.64 million for working-capital/capital-expenditure normalization. It remains close to 2025 parent earnings and far below 2023-2024 FCF peaks.
+- Operating business price = CNY 33,059,094,040.08545 - CNY 3,019,995,450 = CNY 30,039,098,590.08545.
+- Owner earnback = operating business price / sustainable cash profit = 13.82015 years.
+- Market cap / sustainable cash profit = 15.20961.
+- Forecast dividend = $0.36 * 4 * 56,594,928 shares * 6.90 = CNY 562,327,204.608.
+- Forecast dividend yield = forecast dividend / market cap = 1.700977%.
+
+6. Protocol writes and validation
+- All complex result fields were populated using repeated protocol `set` commands; the initialized JSON was not manually composed from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report/trace finalization: {"status":"ok","errors":[]}.
+
+7. Known limitations
+- Input period 2025-12-31 differs from the company's actual 2025 fiscal year-end 2025-12-27.
+- The input gives only a CNY market cap and no underlying USD market cap or conversion rate. A transparent 6.90 research conversion was used for filing amounts; small FX-basis mismatch remains.
+- Sustainable cash profit is an analytical normalization, not company guidance. The unadjusted 2025 FCF is retained as a lower anchor in the report.

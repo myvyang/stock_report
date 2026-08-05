@@ -1,0 +1,72 @@
+stock-research task trace
+company: 骆驼股份 (601311.SH)
+period: 2025-12-31 annual
+generated_for_input_at: 2026-07-31T16:25:10+08:00
+
+[1] Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read .agents/skills/stock-research/references/result-contract.md completely.
+- Read .agents/skills/stock-research/references/report-contract.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+[2] Reuse audit
+- Checked input-declared annual facts, normalized facts, raw filing and prior stock-research paths.
+- No annual facts package, normalized facts, raw filing metadata/PDF, or prior research result existed in this workspace.
+- Therefore retrieved the publicly available full 2025 annual-report PDF and extracted its complete text for research.
+
+[3] Principal sources
+- 骆驼集团股份有限公司2025年年度报告, disclosed 2026-04-22, 234 pages.
+  Public PDF retrieved from https://pdf.dfcfw.com/pdf/H2_AN202604211821383757_1.pdf
+  The report identifies SSE as its statutory disclosure venue and carries a standard unqualified audit opinion by 中审众环.
+- 骆驼股份2025年年度权益分派实施公告, disclosed 2026-06-29.
+  Confirmed total dividend CNY 422,332,602.48, CNY 0.36 per share, implementation based on 1,173,146,118 shares.
+- config/input.json market snapshot: market cap CNY 9,444,000,000; PE TTM 12.42; Tencent qt.gtimg.cn; timestamp 20260731114339.
+
+[4] Annual-report cross-check locations
+- Annual report pp. 2, 8: audit opinion, dividend proposal, revenue, parent net profit, deducting-nonrecurring parent profit, OCF, assets and parent equity.
+- Annual report pp. 11-25: business model, capacity, volume, segment revenue/cost/margin, operating discussion.
+- Annual report pp. 29, 89-98: restricted assets and audited balance sheet, income statement and cash-flow statement.
+- Annual report pp. 148, 161-167: cash, wealth-management products, inventories, long-term equity and financial investments.
+- Annual report pp. 188-192: revenue/cost split, government-related other income, investment income and fair-value changes.
+- Annual report pp. 196-197: cash-flow reconciliation and depreciation/amortization.
+
+[5] Analysis model
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: the company manufactures/sells low-voltage automotive batteries and recycles used batteries; its assets are operating working capital, factories/equipment and separable financial assets. It does not have customer deposits, insurance reserves, regulated presale cash, project advances, concession rights or another special-model balance-sheet structure.
+
+[6] Core calculations
+- Gross profit = 16,303,224,497.01 - 13,849,668,574.82 = 2,453,555,922.19.
+- Gross margin = 2,453,555,922.19 / 16,303,224,497.01 = 0.15049513196852443.
+- Net margin = 837,835,277.28 / 16,303,224,497.01 = 0.051390771036346726.
+- Operating free cash flow = 828,815,454.51 - 285,301,670.97 = 543,513,783.54.
+- Discounted detachable net cash:
+  cash equivalents 1,041,567,269.72 * 100%
+  + trading financial assets 1,127,502,130.32 * 90%
+  + wealth management in other current assets 400,318,815.21 * 90%
+  - short borrowing 520,181,694.44
+  - current non-current liabilities 55,460,590.07
+  - long borrowing 1,311,284,760.80
+  - lease liabilities 12,505,909.98
+  = 517,173,165.407.
+- Strategic/long-term equity and financial investments were excluded from detachable cash.
+- Sustainable cash profit = CNY 520,000,000, anchored to deducting-nonrecurring parent profit CNY 561,211,086.56 and operating FCF CNY 543,513,783.54, then conservatively rounded down.
+- Operating business price = 9,444,000,000 - 517,173,165.407 = 8,926,826,834.593.
+- Owner earnback years = 8,926,826,834.593 / 520,000,000 = 17.166974681909615.
+- Market cap / cash profit = 9,444,000,000 / 520,000,000 = 18.161538461538463.
+- Forecast/implemented dividend yield = 422,332,602.48 / 9,444,000,000 = 0.044719674129606105.
+
+[7] Protocol construction
+- Populated result.json through repeated protocol `set` and `append` operations; the complex result object was not handwritten from scratch.
+- Set data_quality.status=complete only after all ordinary-company minimum fields, asset/liability explanation rows, earnback haircuts, profit-quality rows, dividend basis, business story and evidence were populated.
+
+[8] Validation
+- Ran:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[].
+
+[9] Known limitations
+- The workspace lacked the input-declared prebuilt fact pack and raw official filing archive.
+- Core numbers were nevertheless taken from and cross-checked within the audited annual report.
+- Sustainable cash profit is an analyst estimate based on one annual period, not management guidance.
+- No separate bottom-up valuation was performed for Rimac, associates, funds or other long-term investments.

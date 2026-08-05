@@ -1,0 +1,64 @@
+stock-research trace — REGN — period 2025-12-31
+generated_at: 2026-08-05 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse audit
+- Checked config/input.json.
+- No REGN raw filing, annual facts, normalized facts, or prior stock-research result existed under the paths supplied in the input.
+- Result: official-source retrieval was necessary.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: initialized stock-research-result-v1 skeleton.
+
+4. Primary sources used
+- SEC Form 10-K filed 2026-02-04:
+  https://www.sec.gov/Archives/edgar/data/872589/000087258926000008/regn-20251231.htm
+  Used for company identity, business model, product/collaboration revenue, three statements, securities composition, R&D, risks, dividends and repurchases.
+- Regeneron FY2025 results dated 2026-01-30:
+  https://investor.regeneron.com/news-releases/news-release-details/regeneron-reports-fourth-quarter-and-full-year-2025-financial
+  Used to cross-check FY2025 totals and obtain 2026 R&D, gross-margin and capex guidance plus January 2026 dividend declaration.
+- IRS yearly average exchange rates:
+  https://www.irs.gov/individuals/international-taxpayers/yearly-average-currency-exchange-rates
+  Used 2025 China yuan rate of 7.129 CNY per USD.
+- Market snapshot was reused from config/input.json: market cap CNY 529,829,812,677.5156; 2026-08-03; Yahoo Finance yfinance; PE TTM 18.867641.
+
+5. Currency and formulas
+- All USD financial statement amounts multiplied by 1,000,000 and 7.129.
+- Gross profit research definition = revenue - cost of goods sold - cost of collaboration and contract manufacturing.
+- Operating FCF = operating cash flow - capital expenditure.
+- Discounted detachable net cash = cash*100% + current securities*95% + noncurrent securities*90% - long-term debt and finance leases*100%.
+- Sustainable cash profit = 2025 FCF - stock-based compensation economic cost - working-capital/capex normalization buffer.
+- Operating business price = market cap - discounted detachable net cash.
+- Owner earnback years = operating business price / sustainable cash profit.
+- Market-cap-to-cash-profit = market cap / sustainable cash profit.
+
+6. Key source figures (USD millions)
+- Revenue 14,342.9; COGS 1,140.8; collaboration/contract manufacturing cost 959.9; operating income 3,577.9; net income 4,504.9.
+- OCF 4,978.9; capex 898.4; FCF 4,080.5; stock compensation 993.7.
+- Assets 40,558.7; liabilities 9,301.8; equity 31,256.9.
+- Cash 3,118.1; current securities 5,487.1; noncurrent securities 10,260.6; debt 1,985.9; finance leases 720.0.
+- 2025 EYLEA HD/EYLEA U.S. sales 4,384.7; Sanofi collaboration revenue 5,884.0; total R&D 5,850.2.
+
+7. Judgment log
+- analysis_model confirmed ordinary_operating/applicable because financial assets are separable treasury investments, not business-model liabilities such as deposits or insurance reserves.
+- R&D was not added back; it is necessary to sustain the franchise.
+- Securities were discounted for duration, market, tax and deployment uncertainty.
+- Stock compensation was deducted from FCF because it is a real dilution cost to current owners.
+- A further normalization buffer was deducted for favorable working-capital movements and higher 2026 capex guidance.
+- Forecast dividend annualizes the already-declared USD 0.94 quarterly dividend; no growth assumption.
+
+8. Protocol population and validation
+- Populated initialized fields only through protocol CLI `set` commands; result JSON was not constructed manually from scratch.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- First completed validation result: status ok, errors [].
+
+9. Known limitations
+- Balance-sheet items use the annual-average FX rate rather than 2025-12-31 spot rate.
+- Gross margin is a research definition and is not directly comparable with pure product-sales peers because collaboration revenue contains profit share.
+- Sustainable cash profit is an analytical estimate, not company guidance.

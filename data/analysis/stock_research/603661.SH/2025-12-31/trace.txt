@@ -1,0 +1,58 @@
+task: stock research 603661.SH / 恒林股份
+period: 2025-12-31 annual
+generated_at: 2026-08-01 Asia/Shanghai
+
+1. Read instructions
+- Read /workspace/AGENTS.md.
+- Read stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the local annual facts layer was absent.
+
+2. Reuse audit
+- config/input.json exists.
+- No raw filing metadata, annual facts package, normalized annual facts, or prior stock-research result existed for 603661.SH/2025-12-31 in the workspace or referenced sync tree.
+- Therefore public disclosure retrieval was required.
+
+3. Sources inspected
+- 恒林股份2025年年度报告, disclosed 2026-04-30, SSE PDF URL:
+  https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-30/603661_20260430_S9YB.pdf
+- Search/open extraction used the full-text announcement mirror:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12279697&stockid=603661
+- 恒林股份2026年4月投资者关系活动记录表:
+  https://dataclouds.cninfo.com.cn/shgonggao/investor/2026/20260430/3c38196fda7544ed8d1d576b8626bf02.PDF
+- Market snapshot supplied by config/input.json: Tencent qt.gtimg.cn, 2026-07-31 11:43:44, market cap CNY 3,908,000,000, PE TTM 22.86.
+
+4. Model decision
+- Confirmed statement_model=ordinary_operating.
+- Reason: furniture manufacturing and retail/export business with ordinary inventory, receivables, production assets, trade liabilities and borrowings; no bank, insurance, real-estate-development, construction-project, concession or investment-holding economics.
+- Confirmed owner_earnback_applicability=applicable.
+
+5. Key extracted facts (CNY)
+- Revenue 11,677,150,044.58; cost of sales 9,511,239,481.95; gross profit 2,165,910,562.63.
+- Operating profit 302,362,602.55; net profit 190,911,218.75; parent net profit 163,843,057.29.
+- Total assets 10,801,192,910.51; total liabilities 7,080,850,246.63; total equity 3,720,342,663.88; parent equity 3,637,906,977.94.
+- Operating cash flow 942,043,245.04; capex 163,728,508.60; operating FCF 778,314,736.44.
+- Cash and cash equivalents 1,058,513,713.12; restricted monetary funds 206,040,670.98.
+- Short-term borrowing 1,132,869,808.63; long-term borrowing 773,325,652.48; lease liabilities 926,696,441.17; current non-current liabilities 477,854,850.15.
+- Accounts receivable 2,078,493,294.48; inventory 2,742,009,850.45; accounts payable 2,671,822,637.31.
+- Credit impairment 57,974,881.39 and asset impairment 142,461,784.48.
+
+6. Calculations and judgments
+- gross_margin=(revenue-cost)/revenue=0.1854828065.
+- net_margin=parent_net_profit/revenue=0.0140310826.
+- Explicit short+long borrowings exceed available cash, before current maturities and leases. Discounted detachable net cash set to 0; no cash deducted from market cap.
+- Sustainable cash profit set to CNY 300,000,000. This partially normalizes 2025 impairment charges but does not extrapolate CNY 778.3m FCF because accounts payable rose materially and inventory also increased.
+- operating_business_price=3,908,000,000-0=3,908,000,000.
+- owner_earnback_years=3,908,000,000/300,000,000=13.0266666667.
+- Forecast dividend uses implemented 2025 interim cash dividend CNY 76,486,867.05 as a flat base case; yield=0.0195718698.
+
+7. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields only through protocol `set` commands; did not hand-write the result object.
+- Protocol validation performed after population.
+
+8. Limitations
+- Market cap and PE are the task-provided Tencent snapshot and were not independently reconstructed from exchange close and share count.
+- Sustainable cash profit is an analytical normalization based on one annual period, not company guidance.
+- Current maturities were not split between bank debt and lease liabilities; this does not change the zero detachable-net-cash conclusion because explicit short and long borrowings alone exceed available cash.

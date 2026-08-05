@@ -1,0 +1,75 @@
+stock-research trace
+company=301345.SZ 涛涛车业
+period=2025-12-31
+generated_for=2026-08-01
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Read references/data-reuse.md because the skill directs reuse of existing filing/facts layers.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields only through protocol set/append commands (recorded in outputs/populate.sh).
+6. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse audit]
+- config/input.json existed.
+- No annual facts package, normalized facts file, raw filing metadata, or prior stock-research result was present under the paths supplied in the input.
+- Therefore the study returned to the public 2025 annual report and dividend announcement.
+
+[primary/reviewed sources]
+- 涛涛车业2025年年度报告（公告编号2026-026，披露日2026-03-31）
+  reviewed web text: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12042142&stockid=301345
+  relevant sections: main financial indicators; revenue composition; balance sheet; income statement; cash-flow statement; restricted assets; revenue recognition; dividend section; acquisition note.
+- 涛涛车业2025年年度权益分派实施公告
+  reviewed web text: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12142061&stockid=301345
+- Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026-07-31 11:43:03, market cap CNY 27,013,000,000, PE TTM 29.8.
+
+[model determination]
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- reason: all 2025 revenue is manufacturing revenue from electric mobility and powersports products. No banking, brokerage, insurance, property development, construction-project, concession, or investment-holding balance-sheet economics were found.
+
+[key extracted facts, CNY]
+revenue=3,941,430,356.32
+cost_of_sales=2,306,625,741.86
+gross_profit=1,634,804,614.46
+parent_net_profit=816,322,513.73
+operating_cash_flow=753,822,365.68
+capital_expenditure=212,110,160.67
+operating_free_cash_flow=541,712,205.01
+total_assets=5,906,237,240.80
+total_liabilities=2,285,658,668.69
+parent_equity=3,620,509,222.73
+cash=1,375,457,803.37
+restricted_cash=151,327,835.09
+inventory=1,705,803,779.63
+accounts_receivable=939,197,582.10
+short_term_borrowing=857,880,862.20
+current_noncurrent_liabilities=77,508,360.35
+lease_liabilities=98,576,486.15
+
+[calculations]
+gross_margin=(3,941,430,356.32-2,306,625,741.86)/3,941,430,356.32=0.41477445
+net_margin=816,322,513.73/3,941,430,356.32=0.20711327
+operating_free_cash_flow=753,822,365.68-212,110,160.67=541,712,205.01
+discounted_unrestricted_cash=(1,375,457,803.37-151,327,835.09)*0.8=979,303,974.62
+discounted_net_cash=979,303,974.62-857,880,862.20-77,508,360.35-98,576,486.15=-54,661,734.08
+operating_business_price=27,013,000,000-(-54,661,734.08)=27,067,661,734.08
+owner_earnback_years=27,067,661,734.08/541,712,205.01=49.96687
+market_cap_to_cash_profit=27,013,000,000/541,712,205.01=49.86596
+forecast_dividend_yield=327,147,213/27,013,000,000=0.01211073
+
+[judgment notes]
+- Restricted cash was excluded before applying an 80% haircut to remaining cash.
+- Short-term borrowing, current noncurrent liabilities, and lease liabilities were deducted at 100%.
+- Inventory, receivables, operating fixed assets, goodwill, and contract liabilities were not treated as detachable cash.
+- Sustainable cash profit uses reported 2025 operating cash flow less reported capital expenditure. No second mechanical haircut was applied because this figure is already about CNY 275m below parent net profit; its single-year nature is explicitly disclosed as a limitation.
+- Dividend forecast uses the 2025 cumulative cash dividend as a flat run-rate, not a growth forecast.
+
+[quality]
+status=complete
+limitations=market quote supplied by input; no disclosed auditable industry market share; sustainable cash profit based on one high-growth year.
+validation_status=ok
+

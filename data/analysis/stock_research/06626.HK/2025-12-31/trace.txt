@@ -1,0 +1,75 @@
+stock-research trace
+company: 06626.HK / YUEXIU SERVICES
+period: 2025-12-31 annual
+generated context date: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill directs reuse of existing facts.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- No annual facts package, normalized facts, previous stock-research result, or raw filing existed for 06626.HK/2025-12-31.
+- Located official HKEX 2025 annual-results announcement and 2025 annual report.
+- Downloaded the official annual report to stock_report/data/raw/filings/06626.HK/2025-12-31/annual-report-2025.pdf for local extraction.
+
+3. Model verification
+- Input hint said financial_brokerage/requires_special_model.
+- Official annual report says the group provides non-commercial property management and value-added services and commercial property management and operational services.
+- No brokerage customer funds, proprietary securities portfolio, repo financing, or margin-finance structure was found.
+- Overrode hint with ordinary_operating/applicable.
+
+4. Core reported facts (RMB unless stated)
+- Revenue 3,901,890,000; cost of sales 3,325,170,000; gross profit 576,720,000.
+- Net profit 277,889,000; parent net profit 273,690,000.
+- Total assets 6,902,972,000; total liabilities 3,322,353,000; total equity 3,580,619,000; parent equity 3,515,914,000.
+- Operating cash flow 508,724,000.
+- Cash capex: PPE 16,952,000 + intangible assets 1,880,000 = 18,832,000.
+- Operating free cash flow = 508,724,000 - 18,832,000 = 489,892,000.
+- Cash and equivalents 3,521,782,000; time deposits 1,384,516,000; restricted deposits 39,654,000.
+- No bank borrowings; lease liabilities 91,048,000.
+- Trade receivables 849,282,000; contract assets 109,642,000.
+- Trade and bills payable 1,079,177,000; other payables/accruals 1,393,913,000; contract liabilities 647,756,000.
+- Shares at 2025 year end 1,502,212,177.
+- Full-year 2025 dividend approximately RMB0.110/share; payout ratio 60%.
+
+5. Derived metrics
+- Gross margin = 576,720,000 / 3,901,890,000 = 0.1478049632.
+- Parent net margin = 273,690,000 / 3,901,890,000 = 0.0701429328.
+- Forecast dividend = 1,502,212,177 * RMB0.110 = 165,243,339.47.
+- Forecast dividend yield = 165,243,339.47 / 2,500,702,847.0289707 = 0.0660779666.
+
+6. Owner earnback assumptions
+- Cash and equivalents: 75% included = 2,641,336,500.
+- Time deposits: 85% included = 1,176,838,600.
+- Restricted deposits: excluded.
+- FVOCI unlisted shares: 50% included = 16,301,000.
+- Lease liabilities: fully deducted = 91,048,000.
+- Additional continuing-operation liquidity reserve: 1,200,000,000, approximately four months of cost of sales.
+- Discounted detachable net cash = 2,543,428,100.
+- Operating business price = input market cap 2,500,702,847.0289707 - 2,543,428,100 = -42,725,252.9710293.
+
+7. Sustainable cash-profit bridge
+- Start parent net profit: 273,690,000.
+- Remove estimated after-tax bank interest: 94,100,000 * 75% = -70,575,000.
+- Add depreciation and amortisation: +96,899,000.
+- Deduct cash capex: -18,832,000.
+- Deduct lease principal: -(73,713,000 - 3,501,000) = -70,212,000.
+- Pre-haircut cash profit: 210,970,000.
+- Apply approximately 10% operating-volatility haircut and round: 190,000,000.
+- Owner earnback years = -42,725,252.9710293 / 190,000,000 = -0.2248697525.
+- Market cap / cash profit = 2,500,702,847.0289707 / 190,000,000 = 13.1615939317.
+- Negative owner earnback is a formula output, not a liquidation claim. Interpretation explicitly states sensitivity to detachable-cash assumptions.
+
+8. Output construction and validation
+- Populated initialized JSON through repeated protocol CLI `set` commands; did not write result.json from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[].
+
+9. Sources
+- HKEX annual results announcement: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032600474.pdf
+- HKEX annual report: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042902260.pdf
+- Market snapshot: config/input.json / Tencent qt.gtimg.cn.

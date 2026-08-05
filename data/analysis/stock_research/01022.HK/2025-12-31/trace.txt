@@ -1,0 +1,66 @@
+stock-research trace
+task: 01022.HK / FY2025 annual
+generated_at_input: 2026-08-03T12:54:22+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+- No raw filing, annual facts, normalized facts, or prior stock-research result existed for 01022.HK/FY2025.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Official-source retrieval
+- HKEX issuer title-search page for stock code 01022.
+- Primary filing: Feiyu Technology International Company Ltd., Annual Report 2025, published 2026-04-27:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042700762.pdf
+- Cross-reference filing: Annual Results Announcement for year ended 2025, published 2026-03-27:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0327/2026032701126.pdf
+- Market valuation source retained from config/input.json: Tencent qt.gtimg.cn, timestamp 2026/07/31 16:08:46.
+
+4. Model override
+- Input hint stated financial_brokerage.
+- Annual report states the group principally develops and operates web/mobile games; the statements show ordinary operating assets and liabilities, not brokerage client money or securities financing.
+- Overrode model to ordinary_operating; owner earnback applicability set to applicable.
+
+5. Key extracted audited facts (RMB)
+- Revenue 810,239,000; cost of sales 66,265,000; gross profit 743,974,000.
+- Parent net profit 105,304,000; total net profit 103,342,000.
+- Total assets 820,578,000; liabilities 214,978,000; equity 605,600,000; parent equity 594,809,000; NCI 10,791,000.
+- Operating cash flow 139,786,000; PP&E purchases 4,605,000; operating FCF 135,181,000.
+- Cash 221,195,000; time deposits 90,000,000; bank loans 83,500,000; lease liabilities 2,684,000.
+- HTML5 game revenue 623,126,000, 76.9% of total revenue; growth mainly attributed to Yi Bu Liang Bu.
+- No final dividend declared for FY2025.
+
+6. Analytical calculations
+- Gross margin = 743,974,000 / 810,239,000 = 0.9182154895.
+- Net margin = 105,304,000 / 810,239,000 = 0.1299665901.
+- Discounted detachable net cash:
+  cash 221,195,000 @100%
+  + time deposits 90,000,000 @95%
+  + FVOCI debt 21,565,000 @70%
+  + FVTPL assets 24,008,000 @50%
+  + FVOCI equity 37,384,000 @30%
+  - bank loans and leases 86,184,000 @100%
+  - operating safety reserve 80,000,000
+  = 178,825,700.
+- Investment property 196,489,000 excluded from detachable cash because of valuation/liquidity uncertainty and partial pledging.
+- Sustainable cash profit starts from operating FCF 135,181,000 and applies a 65,181,000 concentration/cycle haircut, resulting in 70,000,000.
+- Operating business price = 602,020,737.1366024 - 178,825,700 = 423,195,037.1366024.
+- Owner earnback years = 423,195,037.1366024 / 70,000,000 = 6.0456433877.
+- Market cap/cash profit = 602,020,737.1366024 / 70,000,000 = 8.6002962448.
+- Forecast dividend = 0; forecast yield = 0.
+
+7. Protocol construction and validation
+- All result fields were populated using protocol set/append commands; the JSON was not authored from a blank object.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Expected/observed validation status: ok, errors: [].
+
+8. Data-quality notes
+- Market-cap conversion and share-count basis were not independently revalidated.
+- Sustainable cash profit and cash haircuts are explicit scenarios, not audited facts.
+- No investment-property liquidation value is credited.

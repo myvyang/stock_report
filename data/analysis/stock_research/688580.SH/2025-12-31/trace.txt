@@ -1,0 +1,16 @@
+2026-08-01 02:50:37+08:00 | protocol init | config/input.json -> outputs/result.json
+2026-08-01 | local reuse check | 未发现 stock_report/data/raw/filings、annual_review、normalized facts 或既有 stock_research 结果；仅存在用户评价笔记，故转向公开披露。
+2026-08-01 | primary filing discovery | 确认上交所2026-04-28董事会决议公告，公告说明2025年年度报告已审议并披露，且载明年度分红预案。
+2026-08-01 | annual report extraction | 使用新浪财经公告全文镜像（公告ID 12217958）读取南京伟思医疗科技股份有限公司2025年年度报告；核心数字回溯至报告中的经审计合并报表与附注。
+2026-08-01 | statement model | 业务为康复及能量源医疗器械研发、生产、销售；不存在金融、地产、工程垫资、收费权或投资控股等特殊报表结构，确认 ordinary_operating / applicable。
+2026-08-01 | financial extraction | 总资产1,909,048,216.54；总负债216,002,090.92；归母权益1,693,046,125.62；收入462,725,664.61；营业成本156,456,654.82；归母净利润138,072,645.50；经营现金流176,744,309.66；资本开支118,117,619.25。
+2026-08-01 | formula | 毛利=收入-营业成本=306,269,009.79；毛利率=66.1880%；净利率=归母净利/收入=29.8390%；经营自由现金流=经营现金流-资本开支=58,626,690.41。
+2026-08-01 | cash haircut | 货币资金1,022,971,611.93，年报明确无受限；按90%计入920,674,450.737，再扣全部负债216,002,090.92，折后可剥离净现金704,672,359.817。
+2026-08-01 | sustainable profit | 以扣非归母净利润121,384,115.98为起点，剔除理财、公允价值等非经常性收益；对经销、产品迭代、毛利及单年增长不确定性再折价10%，折后可持续现金利润109,245,704.382。
+2026-08-01 | earnback formula | 经营业务购买价=4,520,000,000-704,672,359.817=3,815,327,640.183；回本年=3,815,327,640.183/109,245,704.382=34.9243；市值/现金利润=41.3746。
+2026-08-01 | dividend | 采用董事会2025年度分配预案103,560,041.01；预测分红率=103,560,041.01/4,520,000,000=2.2912%。
+2026-08-01 | protocol population | 所有结构化字段均通过 stock_analysis.stock_research.protocol set 写入，而非从空白手写复杂JSON。
+Sources:
+- Annual report mirror: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12217958&stockid=688580
+- SSE board resolution: https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-28/688580_20260428_OQCC.pdf
+- Market snapshot: config/input.json / Tencent qt.gtimg.cn

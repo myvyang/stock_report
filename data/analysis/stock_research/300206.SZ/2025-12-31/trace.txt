@@ -1,0 +1,71 @@
+stock-research trace
+company: 理邦仪器 (300206.SZ)
+period: 2025-12-31 annual
+generated_for_input: 2026-07-31T18:45:02+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because local facts reuse was evaluated.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated initialized fields with protocol `set` commands; the result was not hand-written from scratch.
+6. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Expected/observed result before report handoff: status=ok, errors=[]
+
+[local-reuse-check]
+- Requested annual filing directory, annual facts JSON/MD, normalized facts, and prior stock-research directory were absent in /workspace.
+- Only stock_report/data/notes/user_stock_evaluations.md existed; it did not provide company facts used here.
+- Therefore core facts were reconstructed from public annual-report disclosures.
+
+[primary-and-market-sources]
+- Shenzhen Stock Exchange static disclosure PDF, 2025 annual report summary, published 2026-03-31:
+  https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-03-31/78a70404-8853-4b5d-86dd-b4be1d3cc1c5.PDF
+- Full 2025 annual-report text mirror used to inspect audited tables and notes:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12038104&stockid=300206
+  The report itself identifies the filing as 理邦仪器2025年年度报告 and the audit as XYZH/2026SZAA3B0119, standard unqualified opinion.
+- Input valuation snapshot: Tencent qt.gtimg.cn, market cap CNY 6,794,000,000, PE TTM 19.66, timestamp 20260731114321.
+
+[audited-facts-used]
+- total assets 2,643,753,826.57
+- total liabilities 449,817,712.47
+- total equity 2,193,936,114.10
+- parent equity 2,192,708,472.86
+- minority interest 1,227,641.24
+- revenue 1,998,852,476.71
+- cost of sales 832,539,866.75
+- gross profit 1,166,312,609.96
+- operating profit 313,954,071.95
+- net profit 307,980,814.24
+- parent net profit 305,637,857.53
+- operating cash flow 352,882,179.84
+- capital expenditure 84,695,699.93 (cash paid to acquire fixed, intangible and other long-term assets)
+- operating free cash flow 268,186,479.91
+- financing cash flow -132,563,360.97
+- dividend/profit/interest cash paid 120,425,312.62
+
+[derived-formulas]
+- gross margin = 1,166,312,609.96 / 1,998,852,476.71 = 0.5834917130
+- net margin = 305,637,857.53 / 1,998,852,476.71 = 0.1529066678
+- discounted detachable net cash = 1,287,644,814.35 monetary cash - 300,000,000 operating buffer - 30,523,644.81 lease-related obligations = 957,121,169.54
+- operating business price = 6,794,000,000 - 957,121,169.54 = 5,836,878,830.46
+- 2025 FCF = 352,882,179.84 - 84,695,699.93 = 268,186,479.91
+- discounted sustainable cash profit = 268,186,479.91 - 18,186,479.91 prudence adjustment = 250,000,000
+- owner earnback years = 5,836,878,830.46 / 250,000,000 = 23.34751532184
+- market cap / cash profit = 6,794,000,000 / 250,000,000 = 27.176
+- forecast dividend = 579,663,346 shares * CNY 0.311 = CNY 180,275,300.606 (stored rounded CNY 180,275,300.61)
+- forecast dividend yield = 180,275,300.61 / 6,794,000,000 = 0.02653448699
+
+[judgment-boundaries]
+- FACT: ordinary medical-device manufacturing/sales statements with no bank borrowings, customer funds, insurance reserves, property pre-sale funds, concession assets, or project-financing structure.
+- INFERENCE: ordinary_operating model is applicable.
+- ASSUMPTION: CNY 300m must remain as operating liquidity. This is deliberately disclosed, not treated as a reported restriction.
+- ASSUMPTION: sustainable distributable cash profit is CNY 250m, below 2025 FCF, because net profit grew 88.54% while revenue grew 8.97%, with expense compression and overseas/FX uncertainty.
+- COMPANY CLAIM: detailed positions in ECG export, fetal monitoring, blood gas and ultrasound. No independent market-share dataset was available, so report wording is qualified.
+
+[quality]
+- result status: complete
+- no incomplete reasons
+- limitations recorded in outputs/result.json and outputs/report.md
+- no buy/sell recommendation, target price, ranking label, or unsupported certainty included

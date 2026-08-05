@@ -1,0 +1,74 @@
+stock-research trace
+company=002714.SZ 牧原股份
+period=2025-12-31
+generated_for=2026-07-31T17:30:18+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields with protocol set commands; JSON was not authored from an empty object.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   validation_status=ok
+
+[reuse audit]
+Requested annual facts, normalized facts, raw filing metadata and prior stock-research outputs were absent under the supplied workspace paths. No local facts could be reused, so official disclosures were retrieved.
+
+[primary sources]
+- 牧原食品股份有限公司2025年年度报告全文, 巨潮资讯, disclosed 2026-03-28:
+  https://static.cninfo.com.cn/finalpage/2026-03-28/1225042507.PDF
+- 牧原食品股份有限公司截至2025年12月31日止年度财务报表, 港交所披露:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0329/2026032900095_c.pdf
+- 关于2025年度利润分配方案及2026年中期分红规划的公告, disclosed 2026-03-28:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0329/2026032900141_c.pdf
+- 2025年度A股权益分派实施公告, disclosed 2026-05-20:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0520/2026052001320_c.pdf
+- Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026-07-31 11:43:24.
+
+[key extracted facts, CNY yuan]
+total_assets=171741086702.08
+total_liabilities=92999107770.76
+total_equity=78741978931.32
+parent_equity=77689245439.49
+minority_interest=1052733491.83
+revenue=144144965371.68
+cost_of_sales=118461055325.37
+gross_profit=25683910046.31
+operating_profit=16894216594.00
+net_profit=15811817543.45
+parent_net_profit=15486891254.04
+operating_cash_flow=30056186914.47
+capital_expenditure=9528929651.93
+financing_cash_flow=-22877950696.52
+cash=13862397618.88
+inventory=37177438419.40
+fixed_assets=100634104612.66
+2025_attributable_dividend=7437649300.00
+
+[derived formulas]
+gross_margin=(144144965371.68-118461055325.37)/144144965371.68=0.17818111080108587
+net_margin=15486891254.04/144144965371.68=0.10743969596237243
+operating_free_cash_flow=30056186914.47-9528929651.93=20527257262.54
+major_financing_debt=41155376669.30+7485550933.75+303371917.84+7733417073.16+11695079085.28+2179276683.90+676542042.38=71228614405.61
+discounted_cash=13862397618.88*0.70=9703678333.216
+discounted_detachable_net_cash=9703678333.216-71228614405.61=-61524936072.394
+base_cash_profit=min(15486891254.04,20527257262.54)=15486891254.04
+discounted_sustainable_cash_profit=15486891254.04*0.70=10840823877.828
+operating_business_price=225378000000.00003-(-61524936072.394)=286902936072.39404
+owner_earnback_years=286902936072.39404/10840823877.828=26.465049087198725
+market_cap_to_cash_profit=225378000000.00003/10840823877.828=20.78974831986251
+forecast_dividend_yield=7437649300/225378000000.00003=0.033000777804399715
+
+[judgment boundaries]
+- statement_model=ordinary_operating because assets, liabilities, revenue and cash flow reflect an operating livestock and slaughter business; it is not a financial, property-development, construction, concession or holding-company model.
+- Inventory, biological assets, fixed assets, construction in progress and right-of-use assets were excluded from detachable cash because they are necessary operating assets.
+- Exact restricted cash at 2025 year-end was not separately extracted. A 70% cash inclusion rate is an analytical haircut, not a filing fact.
+- Sustainable cash profit uses the lower of parent net profit and operating FCF, then applies a 30% cycle haircut due to pig-price cyclicality and the sharp Q4 profit slowdown. This is an analytical assumption, not company guidance.
+- Dividend forecast uses the 2025 attributable dividend as a base case. The 2026 interim plan states conditions and a ceiling but no committed amount.
+
+[quality]
+status=complete
+incomplete_reasons=[]
+limitations=restricted-cash detail; cycle-normalization judgment; non-binding dividend forecast; supplied market-cap basis not independently recomputed.

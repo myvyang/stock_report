@@ -1,0 +1,55 @@
+Stock research trace — 00085.HK — period 2025-12-31
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the selected skill directly routes reuse decisions there.
+- Initialized outputs/result.json using:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reused source layers
+- Annual fact pack: stock_report/data/analysis/annual_review/00085.HK/2025-12-31/facts.json
+- Human-readable annual facts and extraction trace in the same directory.
+- Official filing text and PDF under stock_report/data/raw/filings/00085.HK/2025-12-31/.
+- Primary filing URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042900597.pdf
+
+3. Model review
+- Input hint said financial_brokerage / requires_special_model.
+- Annual Report Note 5 identifies one segment: integrated circuit products and services.
+- Business review identifies smart cards, secure-element chips, security MCU chips and application systems.
+- No brokerage client cash, proprietary trading book, repo funding, underwriting or asset-management operations were found.
+- Overrode hint with ordinary_operating / applicable.
+
+4. Currency normalization
+- Annual report currency/unit: HKD, HK$'000.
+- Result contract requires absolute CNY yuan.
+- Used CNY 0.90486 per HKD, sourced to the PBOC/CFETS 2025-12-26 central parity announcement, the nearest official working-day observation retrieved before period end.
+- Formula: annual-report amount × 1,000 × 0.90486.
+- Limitation: a single near-period-end rate was used for all statements; income/cash-flow items were not translated using annual average rates.
+
+5. Owner earnback judgments
+- Reported funds assets: CNY 2,131,897,212.72.
+- Included 70%: CNY 1,492,328,048.904.
+- Less borrowings: CNY 250,509,586.14.
+- Less lease liabilities: CNY 25,352,367.48.
+- Discounted detachable net cash: CNY 1,216,466,095.284.
+- Market cap: CNY 1,589,128,962.2795584.
+- Operating business price: CNY 372,662,866.9955585.
+- Sustainable cash profit estimate: CNY 90,000,000.
+- Basis: start from parent profit CNY 212,964,230.16; remove/haircut government grants, cash interest and inventory provision reversal totaling about CNY 128.97m; round with a small cash-conversion/cycle buffer. This avoids double-counting interest on detached cash and avoids annualizing 2025 working-capital release.
+- Owner earnback: 4.140698522 years.
+- Market cap / sustainable cash profit: 17.656988470.
+
+6. Dividend
+- Board recommendation: HKD 73.075m, HK3.6 cents per share.
+- Converted forecast dividend: CNY 66,122,644.50.
+- Forecast yield against input market cap: 4.160936341%.
+
+7. Protocol writes and validation
+- Populated result sections using protocol `set` commands; did not construct result.json directly.
+- First batch attempt stopped before any write because a shell variable containing an environment assignment was not executable; reran with exported PYTHONPATH.
+- Protocol validation returned: {"status":"ok","errors":[]}.
+
+8. Output scope
+- Created outputs/result.json, outputs/report.md and outputs/trace.txt only.
+- Did not sync to /root/aicode targets because the user requested the outputs/ files and did not authorize broader synchronization.

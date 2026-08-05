@@ -1,0 +1,78 @@
+stock-research trace: PAX / Patria Investments Limited
+period: 2025-12-31 annual
+generated_for_input: config/input.json
+
+[1] Protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the skill routes reuse decisions through that reference.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated scalar/object fields with protocol `set` and evidence rows with protocol `append`; no complex result JSON was handwritten from scratch.
+
+[2] Reuse audit
+- Checked stock_report/data/analysis/annual_review/PAX/2025-12-31, raw filing and normalized facts paths.
+- No reusable PAX annual facts package or raw filing files were present in this workspace at task start.
+- Therefore returned to primary filings and company IR materials.
+
+[3] Primary sources
+- SEC 2025 Form 20-F, filed 2026-04-30, accession 0002070979-26-000201:
+  https://www.sec.gov/Archives/edgar/data/1825570/000207097926000201/pax-20251231.htm
+- SEC extracted inline-XBRL instance used for exact financial facts:
+  https://www.sec.gov/Archives/edgar/data/1825570/000207097926000201/pax-20251231_htm.xml
+- Patria FY2025 earnings release, 2026-02-03:
+  https://ir.patria.com/news-releases/news-release-details/patria-reports-fourth-quarter-full-year-2025-earnings-results
+- Patria 4Q/FY2025 presentation:
+  https://ir.patria.com/static-files/a4fe8bbf-4e2f-4816-abab-d0c345086f0f
+- 2025 national economic and social development statistical communiqué: annual average USD/CNY 7.1429.
+- PBOC/CFETS year-end exchange-rate publication series: balance-sheet conversion uses USD/CNY 7.0288 at 2025 year-end.
+- Market cap, date, PE and price-source description were taken unchanged from config/input.json.
+
+[4] Model decision
+- Input hint: ordinary_operating / applicable.
+- Overridden result: platform_financial_mixed / requires_special_model.
+- Evidence: Patria manages third-party capital; 2025 year-end FEAUM was USD40.810bn. Its economics are driven by management fees, performance economics, FRE and DE. Consolidated statements include client funds, energy trading contracts with matched liabilities, derivatives, acquisition consideration, put obligations, and material acquired management rights/goodwill.
+- Consequence required by result-contract: metrics.discounted_net_cash, discounted_net_cash_to_market_cap, discounted_cash_profit, operating_business_price, owner_earnback_years and market_cap_to_cash_profit remain null. Corresponding owner_earnback ordinary-model figures remain null.
+- Gross profit/cost of sales/gross margin remain null because an asset manager has no manufacturing/retailing cost-of-sales measure with comparable economic meaning.
+
+[5] Currency conversion
+- Statement of financial position USD amounts × 7.0288.
+- Income statement and cash-flow USD amounts × 7.1429.
+- This creates a display translation, not a second set of audited CNY statements; CNY statements are not expected to cross-foot across average and closing rates.
+
+[6] Core audited USD facts and CNY conversion
+- Assets 1,495.109m -> CNY 10,508,822,139.20.
+- Liabilities 861.690m -> CNY 6,056,646,672.00.
+- Equity 633.419m -> CNY 4,452,175,467.20.
+- Parent equity 611.750m -> CNY 4,299,868,400.00.
+- NCI 21.669m -> CNY 152,307,067.20; NCI/equity = 3.420958%.
+- Revenue 381.730m -> CNY 2,726,659,217.00.
+- Operating profit proxy = pretax profit 92.265m - finance income 17.415m + finance costs 39.748m = USD114.598m -> CNY 818,562,054.20.
+- Net profit 90.545m -> CNY 646,753,880.50.
+- Parent net profit 85.651m -> CNY 611,796,527.90.
+- Net margin = 85.651 / 381.730 = 22.4375868%.
+- Operating cash flow 282.610m -> CNY 2,018,654,969.00.
+- Protocol capex = PP&E purchases 10.558m + intangible purchases 4.378m = USD14.936m -> CNY 106,686,354.40.
+- Mechanical operating FCF = 282.610m - 14.936m = USD267.674m -> CNY 1,911,968,614.60.
+- Financing cash flow -268.203m -> CNY -1,915,747,208.70.
+- Parent dividends paid 95.142m -> CNY 679,589,791.80.
+
+[7] Special-model operating facts
+- Year-end FEAUM USD40.810bn, increase USD7.909bn from 2024.
+- FY2025 FRE USD202.5m; FRE margin 58.9%.
+- FY2025 DE USD200.9m -> CNY1,435,008,610 using average rate. This is discussed as a special-model reference only and is not inserted into ordinary owner earnback fields.
+- FY2025 IFRS parent net income USD85.651m.
+
+[8] Dividend calculation
+- 2025 recognized distributions to parent owners: USD97.961m × 7.1429 = CNY699,725,626.90.
+- 2026 forecast basis: fixed quarterly dividend USD0.16 × 4 × midpoint shares 159m × 7.0288 = CNY715,250,688.00.
+- Forecast yield = 715,250,688 / 11,783,906,762.450317 = 6.0697246%.
+- This is an estimate. Board declaration remains required and the fixed policy is subject to annual review.
+
+[9] Data-quality judgment
+- status complete under the special-model minimum: identity, period, valuation inputs, model decision, audited balance sheet/equity/net income, asset and liability explanations, dividend forecast, business story and primary evidence are present.
+- Limitations are explicitly recorded in result.json: mixed FX conversion bases, non-comparable gross margin, input market-data reliance, and forecast share/dividend uncertainty.
+
+[10] Validation
+- Protocol validate was run after population and returned status ok.
+- A final validation and cross-file consistency check is run after report/trace creation.

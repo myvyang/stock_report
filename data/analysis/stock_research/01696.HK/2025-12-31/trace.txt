@@ -1,0 +1,61 @@
+[2026-08-05 Asia/Shanghai] Stock research trace — 01696.HK / FY2025
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- Checked configured raw filing, annual review, normalized facts and prior research paths.
+- No reusable filing metadata, facts.json, annual_facts.md, normalized fact pack or prior result was present in /workspace.
+- Returned to public annual-report sources as required by the data-reuse rule.
+
+3. Primary/public sources consulted
+- Sisram Medical 2025 annual results announcement / annual report, released 2026-03-23 / 2026-04-22; IFRS consolidated statements and notes.
+  HKEX title search: https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=162607
+  Company IR: https://sisram-medical.com/investor_relations/financial-reports/
+- Sisram Medical FY2025 earnings release:
+  https://sisram-medical.com/wp-content/uploads/2026/03/EN_FY2025-Earnings-Release.pdf
+- Federal Reserve G.5A annual USD/CNY via FRED AEXCHUS (2025 average 7.1875):
+  https://fred.stlouisfed.org/series/AEXCHUS
+- Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026/08/03 09:20:05.
+
+4. Model verification
+- Input hint said financial_brokerage/requires_special_model.
+- Filing says the group researches, develops, designs, manufactures, sells and markets medical-aesthetics and dental equipment, home-use devices, injectables and cosmeceuticals.
+- No brokerage customer funds, proprietary securities book or repo-financing structure was present.
+- Overrode hint with ordinary_operating/applicable.
+
+5. Reported USD figures extracted (US$'000)
+- Revenue 365,347; cost of sales 150,203; gross profit 215,144.
+- Operating profit proxy 31,585 = gross profit + other income/gains - selling - administrative - R&D - other expenses.
+- Net profit 25,005; parent net profit 19,016; NCI profit 5,989.
+- Total assets 657,256; total liabilities 153,575; total equity 503,681; parent equity 479,852; NCI 23,829.
+- Cash and bank balances 70,973; inventory 93,289; net trade receivables 128,505.
+- Borrowings 10,788; lease liabilities 40,965; contract liabilities 15,494.
+- Operating cash flow 9,398; capital expenditure 2,600; operating free cash flow 6,798; financing cash flow (10,923); dividends paid including tax 10,400.
+
+6. Currency translation
+- All USD statement amounts multiplied by 7.1875 and by 1,000 to output absolute CNY yuan.
+- This deliberately favors one consistent conversion basis; using the annual average for balance-sheet items is disclosed as a limitation.
+- Forecast dividend: HKD0.095 × 468,343,092 shares × approximate CNY/HKD 0.918 = CNY40,844,201.
+
+7. Owner-earnback judgments
+- Detachable net cash = CNY0. Cash is required against working-capital expansion, CNY77.5m borrowings and CNY294.4m lease liabilities; 2025 FCF was weak.
+- Sustainable cash profit = CNY75m, judgmentally placed between reported 2025 FCF of CNY48.9m and parent net profit of CNY136.7m.
+- Operating business price = market cap CNY1,019,378,078.
+- Owner earnback years = 1,019,378,078 / 75,000,000 = 13.5917 years.
+- Forecast dividend yield = CNY40,844,201 / CNY1,019,378,078 = 4.0067% before withholding tax.
+
+8. Protocol operations
+- Initialized with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated through protocol set commands in outputs/populate.sh; complex result JSON was not authored from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before final file review: status=ok, errors=[].
+
+9. Data-quality calls
+- status=complete because company identity, model, market data, three statements, asset/liability explanations, dividend scenario, business story, owner-earnback inputs and evidence are populated.
+- Explicit limitations retained for absent local fact pack, currency translation, market snapshot consistency, dividend tax and judgmental cash-profit normalization.

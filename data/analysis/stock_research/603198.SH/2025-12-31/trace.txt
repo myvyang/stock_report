@@ -1,0 +1,49 @@
+stock-research trace | 603198.SH | period 2025-12-31
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- references/result-contract.md
+- references/report-contract.md
+- references/data-reuse.md
+
+2. Protocol initialization
+- PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+- Expected annual facts/raw filing directories were absent locally; only stock_report/data/notes/user_stock_evaluations.md existed.
+- No prior 603198.SH annual facts or stock-research result was reused.
+
+4. Primary materials examined
+- 安徽迎驾贡酒股份有限公司2025年年度报告, disclosed 2026-04-23, 212 pages; audit opinion standard unqualified.
+- SSE-hosted 2025 related-party/non-operating fund occupation special report, disclosed 2026-04-23.
+- 2025 annual shareholder meeting materials / dividend implementation disclosure for approval of CNY 1.50 per share.
+- Market cap and PE TTM were taken unchanged from config/input.json: Tencent qt.gtimg.cn, timestamp 20260731114349.
+
+5. Key extracted facts (CNY)
+- Assets 13,821,055,998.03; liabilities 3,157,355,901.38; equity 10,663,700,096.65; parent equity 10,635,273,211.10.
+- Revenue 6,018,726,913.75; cost 1,652,643,068.70; gross profit 4,366,083,845.05; parent net profit 1,985,645,392.08.
+- OCF 1,234,403,273.26; capex 745,007,080.88; FCF 489,396,192.38.
+- Cash 162,438,976.75; restricted acceptance guarantee 48,128,100.00; short-term wealth products 3,836,862,851.00.
+- Inventory 5,226,520,123.20, including raw liquor 4,564,990,020.40.
+- Long-term loan 461,647,089.36; current maturity 138,039.47; lease liability 684,086.85.
+
+6. Model and calculations
+- Confirmed ordinary_operating / applicable.
+- Unrestricted cash = 162,438,976.75 - 48,128,100.00 = 114,310,876.75.
+- Discounted investments = 3,836,862,851.00 x 90% = 3,453,176,565.90.
+- Financing deductions = 461,647,089.36 + 138,039.47 + 684,086.85 = 462,469,215.68.
+- Discounted detachable net cash = 3,105,018,226.97.
+- Adjusted cash profit = (1,985,645,392.08 - 73,875,619.12) x 80% = 1,529,415,818.368.
+- Operating business price = 31,040,000,000 - 3,105,018,226.97 = 27,934,981,773.03.
+- Owner earnback = 27,934,981,773.03 / 1,529,415,818.368 = 18.2651 years.
+- Market cap / cash profit = 20.2953; forecast dividend yield = 1,200,000,000 / 31,040,000,000 = 3.8660%.
+
+7. Protocol population and validation
+- All complex result sections were populated with repeated protocol `set` commands, not by hand-writing result.json.
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok; errors: [].
+
+8. Judgment boundaries
+- 90% haircut on wealth products is analyst judgment due incomplete product-level liquidity detail.
+- 20% haircut on ex-nonrecurring parent profit is analyst judgment reflecting weak 2025 cash conversion and inability to split maintenance/growth capex.
+- These assumptions are explicit in result.json and report.md and should be updated when better product-level or normalized cash-flow evidence becomes available.

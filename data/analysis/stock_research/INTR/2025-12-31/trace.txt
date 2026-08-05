@@ -1,0 +1,59 @@
+2026-08-05 stock research trace — INTR — period 2025-12-31
+
+1. Read required instructions:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check:
+   - No annual facts package, normalized facts, historical research result, or local filing metadata existed for INTR/2025-12-31.
+   - Returned to the primary annual filing as required by the data-reuse rules.
+
+3. Protocol initialization:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Primary sources retrieved and used:
+   - SEC Form 20-F, accession 0002070979-26-000185, filed 2026-04-29:
+     https://www.sec.gov/Archives/edgar/data/1864163/000207097926000185/intr-20251231.htm
+   - Local preserved copy:
+     stock_report/data/raw/filings/INTR/2025-12-31/intr-20251231.htm
+   - ECB Euro Foreign Exchange Reference Rates, 2025-12-31:
+     https://www.ecb.europa.eu/stats/exchange/eurofxref/shared/pdf/2025/12/20251231.pdf
+   - Market valuation from config/input.json: Yahoo Finance yfinance, dated 2026-08-03.
+
+5. Model determination:
+   - Overrode input hint ordinary_operating/applicable.
+   - Confirmed financial_bank/not_applicable because Banco Inter takes customer deposits, makes loans, holds securities, and is subject to bank capital regulation.
+   - Ordinary detachable-net-cash and cash-profit payback fields remain null.
+
+6. Currency conversion:
+   - ECB 2025-12-31: EUR/BRL 6.4364; EUR/CNY 8.2262.
+   - Cross rate used: 1 BRL = 8.2262 / 6.4364 = 1.2780747001429371 CNY.
+   - Dividend conversion: EUR/USD 1.1750; therefore 1 USD = 8.2262 / 1.1750 = 7.0010212766 CNY.
+   - All structured financial amounts are absolute CNY yuan.
+
+7. Key audited facts extracted (R$ thousand unless stated):
+   - Total assets 98,611,518; total liabilities 88,218,556; total equity 10,392,962; parent equity 10,169,589.
+   - Revenue 8,400,938; net income 1,397,321; parent net income 1,312,390.
+   - Customer loans net 45,251,104; securities 29,010,323; customer deposits 54,883,084; bank deposits 14,585,704; securities issued 14,127,144.
+   - Company-defined metrics: NIM 7.8%; efficiency ratio 46.4%; ROAE 14.4%; NPL >90 days 4.7%; coverage 141%; capital adequacy 14.4% versus 10.5% minimum.
+   - Post-period dividend based on FY2025 profit: USD 0.11 per common share, paid 2026-03-05.
+
+8. Dividend estimate:
+   - Common shares disclosed: 325,767,698 Class A + 115,720,675 Class B = 441,488,373.
+   - 441,488,373 × USD 0.11 × CNY 7.0010212766/USD = CNY 339,995,644.
+   - Forecast/known FY2025 distribution yield = 339,995,644 / 16,683,315,912.689941 = 2.03793806%.
+
+9. Result construction:
+   - Used protocol `set` and `append` commands for all result.json changes; did not hand-write the result object.
+
+10. Validation:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Result: {"status":"ok","errors":[]}
+
+11. Known limitations:
+    - Bank cash flow and capex do not provide ordinary-company free-cash-flow economics and remain null under the special-model contract.
+    - Income statement CNY values use the period-end FX rate rather than an annual average rate.
+    - Market cap and PE were accepted from task input and were not independently confirmed against an exchange-native quotation.
+    - Company-defined non-IFRS bank metrics may not be directly comparable with peers.

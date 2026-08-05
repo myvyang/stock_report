@@ -1,0 +1,54 @@
+stock-research trace
+task: AU / AngloGold Ashanti plc / FY ended 2025-12-31
+generated_at_input: 2026-08-04T21:53:46+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Read references/data-reuse.md because no annual facts were present.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated scalar fields with protocol set and arrays with protocol append.
+6. Validated with protocol validate; final expected status: ok.
+
+[source discovery]
+- No AU raw filing, annual-review facts, normalized facts, or prior stock-research output existed under the input paths.
+- Primary filing located: SEC accession 0001973832-26-000066, filed 2026-03-26.
+- Primary company sources located: 2025 Annual Report suite, investment case, official dividend history.
+- FX source: Federal Reserve H.10 historical USD/CNY series.
+- Market snapshot reused unchanged from config/input.json.
+
+[financial extraction]
+Source: 2025 Form 20-F, Item 18, figures in USD millions.
+Income statement: revenue 9,893; cost of sales 5,022; gross profit 4,871; derived operating profit 4,130 before finance/tax/equity-accounted contribution; net profit 3,174; parent profit 2,636.
+Balance sheet: assets 15,078; liabilities 5,162; equity 9,916; parent equity 8,091; NCI 1,825; cash 2,905; borrowings 2,044; leases 214; restricted cash 67.
+Cash flow: CFO 4,784; capex 1,449; CFO-capex 3,335; financing cash flow -2,104; dividends/distributions paid 1,871.
+Company APM: free cash flow 2,908; gold production 3.09Moz; AISC $1,709/oz; dividends declared about $1.8bn.
+
+[conversion]
+USD/CNY = 6.9931 at 2025-12-31 from Federal Reserve H.10.
+All filing amounts converted at this single rate to comply with the CNY absolute-yuan result contract.
+
+[owner earnback]
+Detachable cash:
+  cash 2,905 - borrowings 2,044 - operating reserve 500 = residual 361 USDm.
+  residual haircut 50% => 180.5 USDm = CNY 1,262,254,550.
+Sustainable parent cash profit:
+  company FCF 2,908 USDm x 65% cycle retention x (2,636 / 3,174 parent attribution)
+  = 1,569.806931 USDm = CNY 10,977,816,851.39.
+Operating business price:
+  CNY 270,701,327,907.67 - CNY 1,262,254,550 = CNY 269,439,073,357.67.
+Owner earnback years = 24.54396.
+Market cap / cash profit = 24.65894.
+
+[dividend]
+Mechanical forecast uses policy target of 50% of 2025 company FCF:
+  2,908 x 50% = 1,454 USDm = CNY 10,167,967,400.
+Forecast yield on input market cap = 3.75616%.
+Actual 2025 declared dividends were about $1.8bn / $3.565 per share; extra distributions are not assumed in forecast.
+
+[judgment flags]
+- FACT: financial statement values, production, reserves, reported FCF, dividend policy/history.
+- INFERENCE: ordinary-operating model applicability based on business and balance-sheet substance.
+- JUDGMENT: USD 500m operating reserve, 50% residual cash haircut, 65% cash-profit cycle retention.
+- LIMITATION: market cap and PE were supplied externally and were not recomputed; PE TTM period differs from FY2025 profit.

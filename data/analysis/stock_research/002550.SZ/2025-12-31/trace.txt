@@ -1,0 +1,93 @@
+stock-research trace
+company=002550.SZ 千红制药
+period=2025-12-31 annual
+generated_at=2026-08-01T00:11:55+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated initialized fields through protocol set commands (see /workspace/set_result.sh during construction; temporary script removed after completion).
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[reuse audit]
+No pre-existing raw filing, annual facts, normalized facts, or historical stock-research result was present for 002550.SZ/2025-12-31. Research therefore returned to the original annual filing.
+
+[primary source]
+Title: 常州千红生化制药股份有限公司2025年年度报告全文
+Disclosure date: 2026-04-24
+Official disclosure URL: https://static.cninfo.com.cn/finalpage/2026-04-24/1225160148.PDF
+Local PDF: stock_report/data/raw/filings/002550.SZ/2025-12-31/annual-report.pdf
+Extracted text: stock_report/data/raw/filings/002550.SZ/2025-12-31/annual-report.txt
+PDF sha256: 2fbd8b0faa6a122c80caaa177b8f8e7a4a105d7eef4a59ac7099ecd83d895675
+
+[market source]
+market_cap=8703000000.00
+pe_ttm=26.95
+snapshot=20260731114327
+source=Tencent qt.gtimg.cn (provided in config/input.json; not independently refetched)
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: revenue and assets arise from medicine R&D, manufacturing, and sales. Financial assets are treasury management rather than the operating model. No bank/insurance/property/construction/concession structure was found.
+
+[financial facts, CNY]
+revenue=1571276512.22
+cost_of_sales=654347578.18
+gross_profit=916928934.04 (= revenue - cost_of_sales)
+gross_margin=0.5835566985880188
+operating_profit=455631141.11
+net_profit=373254947.94
+parent_net_profit=398795539.59
+net_margin=0.2538035390260853 (= parent_net_profit / revenue)
+deducted_nonrecurring_parent_profit=283349240.75
+operating_cash_flow=361361453.12
+capital_expenditure=141604595.59
+operating_free_cash_flow=219756857.53 (= OCF - capex)
+total_assets=3086860376.49 (used audited consolidated balance sheet; annual highlights page differs by 1312600.00)
+total_liabilities=320641499.80
+total_equity=2766218876.69
+parent_equity=2767899632.16
+minority_interest=-1680755.47
+
+[cash discount, CNY]
+unrestricted_cash=(491049981.31-2811945.66)*1.00=488238035.65
+bank_wealth_products=346789208.94*0.90=312110288.046
+foreign_exchange_swaps=247227247.23*0.00=0 (excluded: risk-management contract and unclear net detachable value)
+current_large_CDs=76202295.66*0.95=72392180.877
+long_term_large_CDs=129573252.30*0.90=116615927.07
+yield_certificates=20123287.66*0.80=16098630.128
+lease_liability=-3072052.36
+overdue_trust_receivable=158164632.78*0.00=0 (fully impaired)
+discounted_detachable_net_cash=1002383009.411
+discounted_net_cash_to_market_cap=0.11517672175238423
+
+[profit normalization, CNY]
+reported_parent_profit=398795539.59
+less_nonrecurring=115446298.84
+base_deducted_nonrecurring_profit=283349240.75
+prudence_factor=0.85
+discounted_sustainable_cash_profit=240846854.6375
+Cross-check: operating_free_cash_flow=219756857.53. The selected cash profit is slightly higher because current capex includes expansion and R&D-related investment; this is a judgment and remains a limitation.
+
+[earnback formulas]
+operating_business_price=8703000000.00-1002383009.411=7700616990.589
+owner_earnback_years=7700616990.589/240846854.6375=31.973085146489638
+market_cap_to_cash_profit=8703000000.00/240846854.6375=36.13499546464469
+
+[dividend]
+2025 proposal: 1261800000 shares * CNY 0.15/share = 189270000.00
+forecast_dividend_yield=189270000.00/8703000000.00=0.021747673216132368
+2024 dividend implemented in 2025=149976000.00
+
+[quality and caveats]
+status=complete
+- Core annual numbers come from the official filing and all required ordinary-company fields are populated.
+- Market snapshot was supplied by input and not independently refetched.
+- Industry ranking statements are company disclosures without independently verified share data.
+- Discounts and sustainable cash profit are explicit analytical judgments.
+- Annual report highlights and consolidated balance sheet disagree on total assets by CNY 1,312,600; the consolidated statement value is used.

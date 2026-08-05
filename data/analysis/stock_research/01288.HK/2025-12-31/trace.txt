@@ -1,0 +1,67 @@
+stock-research trace
+company: 01288.HK / Agricultural Bank of China Limited
+period: 2025-12-31 annual
+run_date: 2026-08-03 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Initialized result using protocol CLI
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse checks
+- Referenced annual-review and raw-filing paths under /workspace/stock_report were absent.
+- Referenced sync paths under /root/aicode were also not found by file search.
+- No prior fact package or prior stock-research result was reused.
+
+4. Primary-source retrieval
+- Downloaded official English 2025 Annual Report from Agricultural Bank of China:
+  https://www.abchina.com/en/investor-relations/performance-reports/annual-reports/202603/P020260423652699711023.pdf
+- Local research copy: outputs/source/abc-2025-annual-report.pdf
+- Extracted text copy: outputs/source/abc-2025-annual-report.txt
+- Company dividend history page consulted:
+  https://www.abchina.com/en/investor-relations/share-and-dividend-distribution/previous-dividend-distribution/pddis/
+- Market data source was not fetched anew; config/input.json supplied Tencent qt.gtimg.cn snapshot dated 2026/07/31 16:08:45.
+
+5. Model determination
+- Confirmed financial_bank from annual report business description and balance sheet.
+- Customer deposits, loans, debt investments and interbank balances are operating assets/liabilities.
+- owner_earnback_applicability retained as not_applicable.
+- All ordinary owner-earnback fields retained null as required.
+
+6. Key extraction points (annual-report printed pages)
+- pp. 8-10: five-year financial data, NIM, ROE, NPL, allowance coverage, capital adequacy.
+- p. 29: average yields/costs and net interest margin.
+- pp. 35-41: asset and liability composition.
+- pp. 81-83: NPL composition and allowance movements.
+- pp. 101-102: ordinary dividends and 30% payout history.
+- pp. 180-186: audited consolidated statements.
+
+7. Unit conversion
+- Annual report unit: RMB million.
+- JSON unit: RMB absolute yuan.
+- Every reported financial amount multiplied by 1,000,000.
+
+8. Forecast dividend calculation
+- Scenario cash dividend: RMB87,321,000,000, equal to 2025 ordinary cash dividend.
+- Basis: 2023, 2024 and 2025 ordinary payout ratio each 30.0%; no management forecast assumed.
+- Input market cap: RMB1,899,880,456,180.6118.
+- Yield = 87,321,000,000 / 1,899,880,456,180.6118 = 0.045961313757363 (about 4.60%).
+
+9. Non-comparable fields
+- Gross profit/gross margin: null; bank interest expense is funding cost, not ordinary cost of sales.
+- Operating cash flow/free cash flow/capital expenditure: null for valuation use; bank cash flow is dominated by deposits, loans and interbank movements.
+- Discounted detachable net cash, discounted cash profit, operating business price and payback ratios: null because ordinary owner-earnback is not applicable.
+
+10. Protocol population and validation
+- All result fields were populated through protocol CLI set operations, not by hand-writing result.json.
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: []
+
+11. Data-quality decision
+- status: complete
+- Reason: company identity, period, valuation snapshot, bank model, audited balance sheet/profit figures, asset/liability explanations, special-model interpretation, dividend forecast, business story, risks and evidence are all present.
+- Limitations are recorded in outputs/result.json and report.md.

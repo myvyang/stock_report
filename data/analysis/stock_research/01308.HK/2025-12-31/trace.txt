@@ -1,0 +1,69 @@
+stock-research trace
+company=01308.HK / SITC International Holdings Company Limited / 海丰国际控股有限公司
+period=2025-12-31
+generated_context=2026-08-03 Asia/Shanghai
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated fields using protocol `set` and `append`; complex result object was not handwritten from scratch.
+3. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+4. Validation result: status=ok, errors=[]
+
+[source discovery and reuse]
+- Checked configured annual-review, normalized-facts, and prior stock-research paths. No reusable facts or prior research existed.
+- Downloaded official 2025 annual report to stock_report/data/raw/filings/01308.HK/2025-12-31/annual-report-2025.pdf.
+- Official annual report URL: https://www.sitc.com/en/upfile/202603/2026032474208417.pdf
+- Annual report publication page/date: SITC investor relations, 2026-03-24.
+
+[model verification]
+- Input hint said financial_brokerage/requires_special_model.
+- Annual report p.69 states the group provides integrated shipping logistics including container transportation, freight forwarding, shipping agency, depot, warehousing and land leasing.
+- Balance sheet contains vessels/equipment, right-of-use assets, ordinary receivables, cash/deposits, trade payables, bank borrowings and lease liabilities; it does not show a brokerage customer-funds/self-trading/repo-financing business model.
+- Override: statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+- Judgment: ordinary owner earnback is usable only with shipping-cycle and capital-expenditure haircuts.
+
+[primary financial extraction, original USD]
+- Annual report pp.60-61: revenue=3,411,647,000; cost_of_sales=2,101,181,000; gross_profit=1,310,466,000; segment_results used as operating_profit=1,228,988,000; net_profit=1,230,402,000; parent_net_profit=1,222,887,000.
+- Annual report pp.62-63: total_assets=3,477,570,000; total_liabilities=976,364,000 (assets minus equity); total_equity=2,501,206,000; parent_equity=2,478,538,000; NCI=22,668,000.
+- Annual report pp.66-68: operating_cash_flow=1,401,037,000; financing_cash_flow=-1,170,768,000; dividends_paid=937,716,000; buybacks=914,000.
+- Annual report p.13: paid capital expenditure=133,100,000, mainly vessels=60,000,000 and containers=46,000,000. This company-disclosed aggregate, which includes vessel advances, is used rather than only the PPE-purchase line.
+- Operating free cash flow=1,401,037,000-133,100,000=1,267,937,000 USD.
+
+[operating facts]
+- Annual report pp.13-15: 76 trade lanes; 80 major Asian ports; 119 vessels; 184,961 TEU; 99 owned and 20 chartered; volume=3,847,539 TEU, +7.8%; average freight rate=USD753.3/TEU, +4.5%.
+- Annual report pp.11 and 13: management says 2025 benefited from the Red Sea crisis and port congestion and faced increasing Asian competition.
+- Annual report pp.123-124: trade-receivable terms generally 15 days and up to three months for selected customers; customers diversified.
+
+[currency conversion]
+- Income statement and cash flow: 2025 average USD/CNY=7.1429 from National Bureau of Statistics 2025 national statistical communiqué.
+  Source: https://www.stats.gov.cn/english/PressRelease/202602/t20260228_1962661.html
+- Balance sheet: SAFE 2025-12-31 conversion rate CNY 1=USD 0.14227179603915319; therefore USD 1=CNY 7.0288.
+- Dividend translation: SAFE HKD 1=USD 0.12850273161848394 divided by CNY 1=USD 0.14227179603915319; therefore HKD 1=CNY 0.90322.
+  Source: https://www.safe.gov.cn/safe/2025/1231/26980.html and attached official spreadsheet.
+- Rounded RMB amounts in result.json are absolute yuan as required by the contract.
+
+[owner earnback]
+- Cash equivalents CNY 1,712,103,219.20 x 90%.
+- Unpledged >3 month deposits CNY 3,778,992,147.20 x 90%.
+- FVTPL financial assets CNY 1,176,522,716.80 x 60%.
+- Less bank borrowings CNY 133,118,443.20 x 100%.
+- Less lease liabilities CNY 2,145,941,841.60 x 100%.
+- Less dividend payables CNY 1,706,810,532.80 x 100%.
+- Discounted detachable net cash=CNY 1,662,028,642.24.
+- 2025 operating FCF=CNY 9,056,747,197; judgmental shipping-cycle haircut=20%; discounted sustainable cash profit=CNY 7,245,397,757.84.
+- Market cap=CNY 92,096,087,618.83199 from input Tencent snapshot dated 2026-07-31 16:08:42.
+- Operating business price=CNY 90,434,058,976.59.
+- Owner earnback years=12.4816; market cap/cash profit=12.7110.
+
+[dividend]
+- 2025 ordinary interim dividend=HKD1.30/share; proposed final=HKD1.00/share; special=HKD0.70/share.
+- Forecast excludes the special dividend and uses HKD2.30 x 2,699,988,016 shares x CNY0.90322/HKD=CNY5,608,971,304.37.
+- Forecast dividend yield=6.090347% of input market cap.
+- Forecast is a mechanical analytical assumption, not company guidance.
+
+[quality]
+- status=complete
+- Key figures, model override, asset/liability explanations, owner-earnback breakdown, dividend forecast, business story and primary evidence are present.
+- Limitations recorded in result.json: FX translation, subjective cycle haircut, and non-guidance dividend forecast.

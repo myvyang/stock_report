@@ -1,0 +1,67 @@
+stock-research trace
+company: 01837.HK / 五谷磨房食品国际控股有限公司
+period: 2025-12-31 annual
+generated context date: 2026-08-04 Asia/Shanghai
+
+[1] Protocol initialization
+Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+Result: initialized stock-research-result-v1 from input.
+
+[2] Required contracts read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md (required by skill reuse workflow)
+
+[3] Local reuse check
+Checked annual facts, normalized facts and raw filing paths supplied in config/input.json.
+Result: no local annual facts or filing files existed; public primary disclosures were required.
+
+[4] Primary sources obtained
+- HKEX Annual Report 2025, published 2026-04-24:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042401512.pdf
+- HKEX clarification of 2025 final dividend, published 2026-03-31:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0331/2026033102865.pdf
+- HKEX cash dividend announcement, HKD0.069/share, approval date 2026-05-22, payment date 2026-06-12:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0331/2026033100149.pdf
+- HKEX title search confirming 2026-05-22 AGM poll-results disclosure for stock 01837.
+- Market snapshot supplied by input: Tencent qt.gtimg.cn, 2026/08/03 09:48:03.
+
+[5] Model verification
+Input hint said financial_brokerage. Rejected.
+Evidence: annual report states all 2025 revenue was sale of natural health food products; channels are supermarket counters, offline shelves and e-commerce. Balance sheet contains ordinary cash, inventory, receivables, PPE and operating payables; it has no brokerage client money, proprietary securities book or repo financing.
+Final model: ordinary_operating.
+Owner earnback applicability: applicable.
+
+[6] Core extracted facts (RMB absolute yuan)
+Revenue 2,525,591,000; cost of sales 883,050,000; gross profit 1,642,541,000.
+Operating profit proxy 326,178,000 = profit before tax 325,816,000 + finance cost 362,000.
+Net profit and parent net profit 265,685,000.
+Total assets 2,077,532,000; total liabilities 382,501,000; total/parent equity 1,695,031,000; minority interest 0.
+Operating cash flow 235,990,000; capex 34,189,000; operating FCF 201,801,000.
+Financing cash flow -102,843,000; dividends plus award-scheme share purchases 101,864,000.
+Cash and bank balances plus time deposits 1,226,962,000.
+
+[7] Formula checks
+Gross margin = 1,642,541,000 / 2,525,591,000 = 0.6503503785.
+Net margin = 265,685,000 / 2,525,591,000 = 0.1051979507.
+2024 FCF = 271,452,000 - 24,634,000 = 246,818,000.
+Two-year average FCF = (201,801,000 + 246,818,000) / 2 = 224,309,500.
+Discounted sustainable cash profit = 224,309,500 * 0.90 = 201,879,450.
+Discounted detachable net cash = 1,011,252,000*0.70 + 215,710,000*0.70 + 1,648,000*0.50 - 11,976,000 - 132,900,000 = 714,821,400.
+The final dividend is deducted because the market-cap snapshot is after the disclosed 2026-06-12 payment date, avoiding a year-end-cash/ex-dividend-market-cap mismatch.
+Operating business price = 2,918,369,896.2050676 - 714,821,400 = 2,203,548,496.2050676.
+Owner earnback years = 2,203,548,496.2050676 / 201,879,450 = 10.9151700925.
+Market cap / cash profit = 2,918,369,896.2050676 / 201,879,450 = 14.4559956274.
+Forecast dividend yield = 132,900,000 / 2,918,369,896.2050676 = 0.0455391185.
+
+[8] Judgment boundaries
+- 70% cash/time-deposit recognition and 50% trading-asset recognition are analyst haircuts, not reported facts.
+- The 10% haircut to two-year average FCF is an analyst sustainability allowance.
+- Company claims industry leadership; no independent market-share evidence was found, so report does not treat rank as verified.
+- No 2026 interim balance sheet was available in the requested annual-period package; later market cap is matched only by deducting the disclosed final dividend.
+
+[9] Protocol population and validation
+All result fields were populated through protocol CLI set commands after initialization; no complex result JSON was authored from scratch.
+Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Validation result: status ok, errors [].

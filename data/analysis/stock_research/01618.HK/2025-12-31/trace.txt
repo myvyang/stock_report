@@ -1,0 +1,60 @@
+stock-research trace
+task: 01618.HK / 2025-12-31 annual
+generated_at: 2026-08-05T04:56:56+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because it governs the fallback when annual facts are absent.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields through repeated protocol `set` commands; did not hand-write the JSON skeleton.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: status=ok, errors=[]
+
+[reuse check]
+- config/input.json existed.
+- The referenced annual facts, normalized facts, raw filing metadata and extraction trace under stock_report/ did not exist in this workspace.
+- No historical stock-research result was available for reuse.
+- Therefore public disclosures were consulted to fill the missing annual facts.
+
+[model decision]
+- Input hint said financial_brokerage, but its own tags said construction contractor.
+- 2025 annual report shows engineering contracting revenue RMB407,981.532m, 88.43% of segment revenue.
+- Engineering revenue is recognized over time using input-method completion; receivables and contract assets are audit key matters.
+- Overrode model to construction_project / requires_special_model.
+- All ordinary owner-earnback sorting fields remain null as required by the result contract.
+
+[primary disclosure evidence]
+- China MCC 2025 annual report, disclosed 2026-03-30/31. Public searchable text used for consolidated statements, notes and business data:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12048698&stockid=601618
+  The page reproduces the company annual report; core figures were cross-checked against the HKEX company announcement below where overlapping.
+- HKEX company announcement: 2025 annual results / profit distribution scheme, 2026-03-30:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0330/2026033004254_c.pdf
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, market cap RMB26,701,501,168.11812, PE TTM 21.21, dated 2026/08/03 09:47:49.
+
+[key unit conversions]
+Annual report tables use RMB thousand; result.json requires absolute RMB yuan. Each reported amount was multiplied by 1,000.
+- Revenue: 455,380,420 thousand -> 455,380,420,000 yuan.
+- Cost of sales: 409,445,805 thousand -> 409,445,805,000 yuan.
+- Gross profit: revenue - cost = 45,934,615,000 yuan.
+- Gross margin: 45,934,615 / 455,380,420 = 0.1008719441.
+- Parent net profit: 1,321,768 thousand -> 1,321,768,000 yuan.
+- Net margin: 1,321,768 / 455,380,420 = 0.0029025588.
+- Operating cash flow: 15,322,753 thousand -> 15,322,753,000 yuan.
+- Capital expenditure proxy: cash paid to acquire fixed, intangible and other long-term assets, 6,277,713 thousand -> 6,277,713,000 yuan.
+- Simplified operating FCF: 15,322,753 - 6,277,713 = 9,045,040 thousand -> 9,045,040,000 yuan.
+
+[special items]
+- Continuing-operation net profit: RMB7,711.931m.
+- Discontinued-operation net loss: RMB5,189.903m.
+- Investment income: RMB18,189.173m.
+- Net cash received from disposal of subsidiaries: RMB28,514.826m.
+- Credit impairment loss: RMB8,214.433m; asset impairment loss: RMB19,439.098m.
+- 2025 proposed dividend: zero because parent-company retained earnings were negative RMB2,785.151m; proposal remains subject to shareholder approval.
+
+[limitations]
+- Market cap and PE were accepted from the task input and not independently recalculated across A and H shares.
+- The public annual-report mirror was used because the workspace lacked the filing package. HKEX was used as an official cross-check and primary source for dividend facts.
+- Simplified FCF is not distributable cash and is especially non-representative in a disposal year.

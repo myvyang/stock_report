@@ -1,0 +1,24 @@
+2026-08-05T02:17:29+08:00 START stock-research CZFS period=2025-12-31 report_type=annual
+INPUT config/input.json; market_cap=2515758751.130768 CNY; date=2026-08-03; source=Yahoo Finance yfinance
+SKILL read .agents/skills/stock-research/SKILL.md
+CONTRACT read result-contract.md and report-contract.md; also read data-reuse.md as directed by skill
+INIT PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+REUSE_CHECK no raw filing, annual review, normalized facts, or prior stock-research files found for CZFS/2025-12-31 in workspace
+SOURCE SEC Form 10-K accession 0001140361-26-009103, filed 2026-03-12, period 2025-12-31
+SOURCE_URL https://www.sec.gov/Archives/edgar/data/739421/000114036126009103/ef20060669_10k.htm
+MODEL_OVERRIDE input hint ordinary_operating/applicable rejected; filing identifies bank holding company and SIC 6022; selected financial_bank/not_applicable
+EXTRACTION audited balance sheet: assets USD 3,064.564m; liabilities USD 2,726.513m; equity USD 338.051m; deposits USD 2,376.979m; net loans USD 2,327.816m
+EXTRACTION audited income statement: net interest income USD 98.001m; noninterest income USD 14.344m; provision USD 2.375m; net income USD 36.572m
+EXTRACTION bank KPIs: tax-equivalent NIM 3.50%; ACL USD 22.806m; NPL USD 26.831m; ACL/NPL 85.7%; CBLR 9.54%; non-owner-occupied CRE/risk capital 287.0%
+SOURCE Citizens Financial Services official dividend release dated 2026-06-02; quarterly dividend USD 0.51
+SOURCE_URL https://www.firstcitizensbank.com/about-us/news-events/press-releases/detail.html?cId=118308&title=citizens-financial-services-inc-declares-quarterly-cash-dividend
+FX 2025-12-31 USD/CNY central parity=7.0288; applied to all filing and dividend USD amounts
+FX_SOURCE 中国外汇交易中心/中国人民银行授权公布的2025-12-31人民币汇率中间价
+CALC forecast_dividend=0.51*4*4807219*7.0288=68929521.050688 CNY; yield=0.0273990982
+CALC price_to_book=2515758751.130768/(338051000*7.0288)=1.05878
+CALC tangible_equity=(338.051-85.758-2.221)m USD; price_to_tangible_book=1.43127
+PROTOCOL result fields populated with protocol set commands; complex result object was not handwritten from scratch
+VALIDATE PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+VALIDATION_RESULT status=ok; errors=[]
+SEMANTIC_CHECK assets=liabilities+equity after USD-to-CNY conversion; special-bank ordinary owner-earnback fields all null; report and result use the same FX, market cap, dividend forecast, model and core financial facts
+COMPLETE outputs/result.json outputs/report.md outputs/trace.txt

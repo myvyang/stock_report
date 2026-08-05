@@ -1,0 +1,68 @@
+stock-research trace
+company: 00995.HK / 安徽皖通高速公路股份有限公司
+period: 2025-12-31 annual
+generated_for_input: 2026-08-03T16:22:38+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Read references/data-reuse.md because it is directly linked by the selected skill and governs reuse.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked configured raw filing, annual review, normalized facts and prior stock research paths.
+- No reusable files existed for 00995.HK/2025-12-31 in the workspace.
+- Retrieved the official 2025 annual report from Shanghai Stock Exchange disclosure:
+  https://star.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-03-28/600012_20260328_EBPM.pdf
+- Market-cap data was reused from config/input.json as instructed.
+
+3. Model verification
+- Input hint said financial_brokerage.
+- Annual report pp.15, 157-158 establishes that the company invests in, builds and operates toll roads and holds toll-road concession rights amortized over concession terms.
+- Overrode model to utility_concession / requires_special_model.
+- Ordinary detachable-cash and owner-earnback sorting values remain null under the result contract.
+
+4. Core extraction and calculations
+- Balance sheet, annual report pp.135-136:
+  total assets 30,408,343,193.82
+  total liabilities 16,203,272,090.54
+  total equity 14,205,071,103.28
+  parent equity 12,802,330,387.77
+  minority interest 1,402,740,715.51
+  cash and cash equivalents 3,483,129,459.95
+  intangible assets 19,604,235,629.18
+- Income statement, pp.137-138:
+  revenue 6,721,574,180.34
+  cost of sales 3,730,302,006.68
+  gross profit = revenue - cost = 2,991,272,173.66
+  gross margin = gross profit / revenue = 0.4450642418
+  operating profit 2,605,092,017.07
+  net profit 1,859,360,406.99
+  parent net profit 1,877,443,900.82
+  net margin = parent net profit / revenue = 0.2793069997
+- Cash flow statement, pp.139-140:
+  operating cash flow 3,539,492,972.51
+  purchases of fixed/intangible/other long-term assets 2,201,936,196.80
+  simple operating free cash flow = 1,337,556,775.71
+  financing cash flow 831,927,063.23
+- Capital management, p.242:
+  total borrowings 14,624,960,420.89
+  net debt 11,141,830,960.94
+  capital gearing ratio 43.96%
+- Dividend proposal, p.72:
+  CNY 0.66/share; total 1,127,670,646.74; payout ratio 60.06%
+  forecast yield = 1,127,670,646.74 / 23,018,660,084.93006 = 0.0489894508
+
+5. Key limitations
+- No complete route-by-route concession-expiry schedule was assembled from reusable data.
+- Maintenance capital expenditure was not separated from expansion/new-project expenditure.
+- Therefore no special-model DCF or payback years were asserted.
+- Market capitalization and PE were accepted from the supplied Tencent snapshot and not independently reconstructed across A/H listings.
+
+6. Result construction and validation
+- Populated result.json using protocol CLI set and append commands; did not hand-write the initialized complex result object.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed-result validation status: ok; errors: [].

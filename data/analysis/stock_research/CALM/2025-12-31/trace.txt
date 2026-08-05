@@ -1,0 +1,94 @@
+CALM stock research trace
+generated_at_input: 2026-08-04T13:05:42+08:00
+requested_period: 2025-12-31
+selected_filing_period: FY2025 ended 2025-05-31
+
+[protocol]
+1. Read stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Read references/data-reuse.md because the skill directs reuse decisions there.
+4. Ran protocol init:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields only through protocol set/append commands.
+6. Ran protocol validate; result: {"status":"ok","errors":[]}.
+
+[reuse-check]
+Expected annual fact package, normalized facts and raw filing metadata were absent under the paths in config/input.json.
+The only existing stock_report file was data/notes/user_stock_evaluations.md; it contained no reusable CALM fact package.
+Therefore the research returned to the official SEC filing.
+
+[primary-sources]
+SEC submissions JSON:
+https://data.sec.gov/submissions/CIK0000016160.json
+Identified accession 0001562762-25-000170, filed 2025-07-22, report date 2025-05-31.
+
+SEC FY2025 Form 10-K:
+https://www.sec.gov/Archives/edgar/data/16160/000156276225000170/calm2025053110K.htm
+Local downloaded copy:
+stock_report/data/raw/filings/CALM/2025-12-31/calm-2025-10k.html
+
+Federal Reserve Bank of St. Louis DEXCHUS:
+https://fred.stlouisfed.org/series/DEXCHUS
+2025-05-30 observation: 7.1991 Chinese yuan per U.S. dollar.
+
+Market data reused verbatim from config/input.json:
+market cap CNY 27,790,837,690.37036 as of 2026-08-03; PE TTM 13.239819; provider Yahoo Finance yfinance.
+
+[model-decision]
+statement_model: ordinary_operating
+owner_earnback_applicability: applicable
+Reason: Cal-Maine has one operating/reporting segment centered on production, packaging, marketing and distribution of eggs and foods. Cash and investment securities are corporate liquidity, not customer deposits, policyholder reserves, regulated project cash or matched financial liabilities. The ordinary operating-company framework is economically appropriate.
+
+[currency]
+All filing values were reported in USD and converted to CNY at 7.1991.
+This uses a single balance-sheet-date proxy for consistent presentation, not transaction-date FX.
+
+[financial-statements]
+USD source values from FY2025 10-K, then multiplied by 7.1991:
+total assets 3,084,619,000; total liabilities 518,604,000; total equity 2,566,015,000; parent equity 2,560,624,000; minority interest 5,391,000.
+revenue 4,261,885,000; cost of sales 2,411,000,000; gross profit 1,850,885,000; operating profit 1,536,539,000; net income 1,218,232,000; parent net income 1,220,048,000.
+operating cash flow 1,224,734,000; capital expenditure 161,255,000; operating free cash flow 1,063,479,000; financing cash flow -386,724,000; dividend plus buyback cash out 384,243,000.
+
+gross margin = 1,850,885 / 4,261,885 = 0.4342878796588833.
+net margin = 1,220,048 / 4,261,885 = 0.28626957320528357.
+
+[owner-earnback-cash]
+All following source amounts are USD thousands unless noted.
+cash 499,392 at 100% = 499,392.
+available-for-sale securities 892,708 at 95% = 848,072.6.
+less declared FY2025 Q4 dividend payable 114,163.
+less post-year-end Echo Lake Foods cash acquisition 258,000.
+less estimated required operating cash reserve 150,000.
+discounted detachable net cash = 825,301.6 thousand USD.
+Converted value = CNY 5,941,428,748.56.
+Ratio to market cap = 0.2137909196820911.
+
+[owner-earnback-profit]
+Operating FCF in USD thousands:
+FY2023: 863,010 - 136,569 = 726,441.
+FY2024: 451,398 - 147,116 = 304,282.
+FY2025: 1,224,734 - 161,255 = 1,063,479.
+Three-year average = 698,067.3333333334.
+Apply 20% cycle/reinvestment haircut = 558,453.8666666667.
+Converted discounted sustainable cash profit = CNY 4,020,365,231.52.
+
+operating business price = 27,790,837,690.37036 - 5,941,428,748.56 = CNY 21,849,408,941.81036.
+owner earnback years = 21,849,408,941.81036 / 4,020,365,231.52 = 5.434682593140833.
+market cap to cash profit = 27,790,837,690.37036 / 4,020,365,231.52 = 6.912515677055374.
+
+[dividend]
+Company policy: quarterly dividend equals one-third of GAAP net income attributable to Cal-Maine for profitable quarters, subject to cumulative-profit and credit-facility restrictions.
+No reliable consensus estimate was provided.
+Mechanical forecast uses input TTM PE:
+forecast dividend = market cap / PE TTM / 3
+= 27,790,837,690.37036 / 13.239819 / 3
+= CNY 699,678,187.7045892.
+forecast yield = 0.025176577816761192.
+This is not company guidance.
+
+[important-limitations]
+1. Requested period 2025-12-31 does not match the issuer's fiscal year-end; FY2025 ended 2025-05-31 was used.
+2. Market valuation date 2026-08-03 is later than the selected FY2025 filing, producing a deliberate timing mismatch inherited from the input.
+3. FY2025 benefited materially from HPAI-driven supply constraints and lower feed costs. Latest-year earnings/FCF were not extrapolated directly.
+4. The 20% sustainable-profit haircut and USD 150 million operating cash reserve are analyst estimates, disclosed rather than presented as facts.
+5. Subsequent FY2026 annual results were not mixed into the FY2025 requested annual period.

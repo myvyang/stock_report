@@ -1,0 +1,66 @@
+HNNA stock-research trace
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read and applied:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check:
+   - No HNNA raw filing, annual facts package, normalized facts, or prior stock-research result existed locally.
+   - Returned to primary sources instead of using third-party financial statement summaries.
+
+4. Primary sources used:
+   - SEC Form 10-K for fiscal year ended 2025-09-30, filed 2025-12-03:
+     https://www.sec.gov/Archives/edgar/data/1145255/000143774925036795/hnna20250930_10k.htm
+   - SEC Form 8-K on full redemption of $40.25m 4.875% notes on 2026-06-30:
+     https://www.sec.gov/Archives/edgar/data/1145255/000143774926018751/hnna20260527_8k.htm
+   - Company investor-relations dividend page:
+     https://www.hennessyadvisors.com/for-investors
+   - Federal Reserve H.10 monthly USD/CNY series; 2025-09 average = 7.1235 CNY/USD:
+     https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.M.CH&rel=H10
+   - Market cap, date and PE TTM came from config/input.json (Yahoo Finance yfinance).
+
+5. Period handling:
+   - Task period retained as 2025-12-31 per input protocol.
+   - Actual annual financial statements are FY2025 ended 2025-09-30; this mismatch is disclosed in result limitations and report.
+
+6. Model decision:
+   - statement_model = ordinary_operating
+   - owner_earnback_applicability = applicable
+   - Reason: customer fund assets are not consolidated; HNNA itself is a fee-earning asset manager. Management contracts are operating intangible assets, not detachable cash.
+
+7. Conversion and analytical conventions:
+   - All USD financial statement amounts converted at 7.1235 CNY/USD.
+   - Analytical gross profit = total revenue - sub-advisory fees because statutory statements do not present cost of sales/gross profit.
+   - Operating free cash flow = operating cash flow - purchases of property and equipment.
+   - Management-contract acquisition payments excluded from maintenance capex because they are growth acquisitions, not recurring property/equipment maintenance.
+
+8. Owner earnback calculations (CNY):
+   - Discounted cash = 515,962,228.50 * 90% = 464,366,005.65
+   - Less notes payable = 283,565,164.50
+   - Discounted detachable net cash = 180,800,841.15
+   - Operating business price = 524,188,268.1884537 - 180,800,841.15 = 343,387,427.0384537
+   - FY2025 operating FCF = 98,247,312.00 - 3,134,340.00 = 95,112,972.00
+   - Less stock compensation = 8,036,830.00
+   - Less after-tax interest income = 14,416,665.564
+   - Add after-tax interest expense = 11,943,791.198
+   - Adjusted cash profit before haircut = 84,603,267.63436125
+   - 85% sustainability haircut = 71,912,777.48920706
+   - Owner earnback years = 343,387,427.0384537 / 71,912,777.48920706 = 4.7750544344
+   - Market cap / cash profit = 524,188,268.1884537 / 71,912,777.48920706 = 7.2892229516
+
+9. Dividend forecast:
+   - $0.60 annualized dividend per share * 7,889,941 FY2025 ending shares * 7.1235 = CNY 33,722,396.8281
+   - Forecast yield = 33,722,396.8281 / 524,188,268.1884537 = 6.4332605%
+   - Board discretion and non-guaranteed status disclosed.
+
+10. Protocol completion:
+   - Populated result fields using protocol CLI set commands after initialization.
+   - Final validation command:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Final validation status: ok; errors: []

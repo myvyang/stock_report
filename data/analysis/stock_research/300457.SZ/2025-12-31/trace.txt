@@ -1,0 +1,62 @@
+stock-research trace
+company: 300457.SZ 赢合科技
+period: 2025-12-31 annual
+generated_at_input: 2026-07-31T19:00:08+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized successfully from config/input.json.
+
+3. Local reuse audit
+- Expected annual facts, normalized facts, raw filing metadata and prior stock-research outputs were absent under /workspace/stock_report for 300457.SZ/2025-12-31.
+- Existing user evaluation note was not used as a source for financial facts.
+- Decision: retrieve primary annual disclosure rather than infer missing fields.
+
+4. Sources retrieved/used
+- Annual report summary, CNINFO, published 2026-03-28: https://static.cninfo.com.cn/finalpage/2026-03-28/1225043967.PDF
+- Annual report full text, public filing mirror ID 12030602; PDF saved to stock_report/data/raw/filings/300457.SZ/2025-12-31/annual-report-2025.pdf. Filing title and figures cross-checked against CNINFO summary and Shenzhen Stock Exchange materials.
+- Profit distribution proposal, Shenzhen Stock Exchange, published 2026-03-28: https://disc.static.szse.cn/disc/disk03/finalpage/2026-03-28/75822b48-90bd-4e41-a5dc-ad34514022a2.PDF
+- Market cap CNY 13,284,000,000 and PE TTM 22.71 from config/input.json, source Tencent qt.gtimg.cn, timestamp 20260731114339.
+
+5. Statement model review
+- Confirmed ordinary_operating/applicable.
+- Basis: two operating segments manufacture/sell lithium-battery automation equipment and e-cigarette products. Balance sheet is dominated by receivables, inventory, plant, supplier payables and customer advances. No bank/broker/insurance/developer/concession/holding-platform economics identified.
+- Special caution within ordinary model: project-style equipment acceptance, large working capital and minority ownership of the profitable e-cigarette unit.
+
+6. Extracted core facts (CNY)
+- Revenue 9,445,215,868.27; cost 7,143,044,164.17; gross profit 2,302,171,704.10; gross margin 24.3739448%.
+- Operating profit 850,349,535.82; net profit 783,441,283.13; parent net profit 538,164,526.06; parent net margin 5.6977472%.
+- Total assets 19,479,558,809.50; liabilities 12,386,808,531.22; equity 7,092,750,278.28; parent equity 6,810,315,336.49; minority interest 282,434,941.79.
+- Operating cash flow 795,033,778.34; capex 176,412,302.36; operating free cash flow 618,621,475.98.
+- Cash and cash equivalents 1,799,760,697.08. Restricted cash 595,296,876.46 is excluded from this amount.
+- Bank borrowings and lease-related closing liability from cash-flow note: 308,613,724.02.
+- Receivable notes + accounts receivable + receivables financing 8,205,846,991.99; inventory 3,956,544,087.81; contract assets 974,792,243.80.
+- Payable notes + accounts payable 8,016,733,580.10; contract liabilities 3,333,432,915.83.
+- Segment revenue/profit: lithium equipment 7,113,374,140.24 / 436,782,121.97; e-cigarettes 2,331,841,728.03 / 614,551,360.57; unallocated operating loss 200,983,946.72.
+- 2025 proposed cash dividend 54,287,377.38; forecast yield versus input market cap 0.4086674%.
+
+7. Owner earnback judgment and formulas
+- Cash haircut: include 50% of cash and equivalents to retain working capital for CNY 12.868bn equipment backlog and expanding inventory/receivables. Do not include receivables, notes or investments. Deduct all CNY 308,613,724.02 borrowings/lease liabilities.
+- Discounted detachable net cash = 1,799,760,697.08 * 50% - 308,613,724.02 = 591,266,624.52.
+- Sustainable cash profit starts from parent net profit, not consolidated profit or consolidated FCF. Applied CNY 78,164,526.06 (14.5%) prudential reduction for grants, recurring credit/inventory loss exposure, margin decline and working-capital timing. Result = 460,000,000.
+- Operating business price = 13,284,000,000 - 591,266,624.52 = 12,692,733,375.48.
+- Owner earnback years = 12,692,733,375.48 / 460,000,000 = 27.5928986.
+- Market cap / cash profit = 13,284,000,000 / 460,000,000 = 28.8782609.
+- Discounted net cash / market cap = 4.4509683%.
+
+8. Protocol writes and validation
+- outputs/result.json was populated using repeated protocol `set` commands; no complex JSON file was hand-written.
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial populated validation status: ok, errors: [].
+
+9. Known limitations
+- Local annual fact pack was absent; facts were extracted directly from the annual report.
+- Market cap and PE were accepted from task input and not independently reconstructed.
+- Cash haircut and sustainable cash profit are explicit analyst assumptions, not management guidance.
+- No independently verifiable market share was found; industry positioning is limited to products, customer description, backlog and overseas revenue.

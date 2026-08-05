@@ -1,0 +1,53 @@
+stock-research trace
+generated_at: 2026-08-04T15:00:04+08:00
+company: TOPSPORTS / 06110.HK
+input_period: 2025-12-31
+financial_period_used: year ended 2025-02-28 (FY2024/25)
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No annual facts, normalized facts, raw filing metadata, or prior stock-research result existed for 06110.HK/2025-12-31 in the workspace.
+- Returned to primary filings because core fields were absent.
+
+3. Protocol
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated initialized paths with repeated protocol `set` commands; no complex result object was handwritten from scratch.
+- Final validation command and result are recorded below after validation.
+- Validation: `PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json` -> `status: ok`, `errors: []`.
+
+4. Model override
+- Input hint: financial_brokerage / requires_special_model.
+- Filing fact: annual report note 1 says the group principally sells sportswear products and leases commercial spaces for concessionaire sales; balance sheet is dominated by inventory, store right-of-use assets, cash, borrowings and lease liabilities.
+- Decision: ordinary_operating / applicable. The brokerage hint is a stock-master classification error.
+
+5. Primary evidence
+- Audited annual report FY2024/25 (HKEX, published 2025-06-17):
+  https://www.hkexnews.hk/listedco/listconews/sehk/2025/0617/2025061700335.pdf
+  Key pages: 9 (stores), 15 (revenue mix), 17 (margin drivers), 55 (profit or loss), 57-58 (balance sheet), 60 (cash flow), 102-106 (inventory, cash, payables, borrowings).
+- Company dividend history (accessed 2026-08-04):
+  https://www.topsports.com.cn/en/dividend-history
+- Market capitalization and PE TTM: config/input.json, Tencent qt.gtimg.cn snapshot dated 2026-08-03 09:48:17.
+
+6. Calculations (RMB yuan)
+- gross_margin = 10,383,400,000 / 27,012,900,000 = 0.3843867189
+- net_margin = 1,286,000,000 / 27,012,900,000 = 0.0476068841
+- operating_free_cash_flow = 3,755,300,000 - 372,800,000 = 3,382,500,000
+- detachable_net_cash = 2,587,400,000 + 996,700,000 - 2,130,000,000 = 1,454,100,000
+- sustainable_cash_profit = 1,200,000,000 (analytical assumption; 86,000,000 below parent profit because revenue, margin and store trends weakened; current FCF rejected as recurring base due to working-capital release)
+- operating_business_price = 6,428,565,974.493623 - 1,454,100,000 = 4,974,465,974.493623
+- owner_earnback_years = 4,974,465,974.493623 / 1,200,000,000 = 4.1453883121
+- market_cap_to_cash_profit = 6,428,565,974.493623 / 1,200,000,000 = 5.3571383121
+- forecast_cash_dividend = 0.28 * 6,201,222,024 = 1,736,342,166.72
+- forecast_dividend_yield = 1,736,342,166.72 / 6,428,565,974.493623 = 0.2700978995
+
+7. Judgment boundaries
+- Facts: reported financials, store count, revenue mix, supplier concentration, dividends and input market snapshot.
+- Inference: ordinary operating classification and working-capital explanation for cash conversion.
+- Subjective analytical assumption: RMB1.2bn discounted sustainable cash profit. It is not management guidance.
+- No buy/sell recommendation or target price is provided.

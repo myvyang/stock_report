@@ -1,0 +1,51 @@
+stock-research trace
+task: 01637.HK / archive period 2025-12-31 / annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- Checked configured raw filing, annual review, normalized facts, and prior stock research directories.
+- No usable FY2025 fact pack, metadata, or prior research result was present.
+
+3. Primary evidence acquired and used
+- HKEX 2024-25 Annual Report, published 2025-07-22:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2025/0722/2025072200650.pdf
+- HKEX Annual Results Announcement for year ended 2025-03-31, published 2025-06-25:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2025/0625/2025062501292.pdf
+- PBOC RMB central parity announcement for 2025-04-01, HKD/CNY 0.92257:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/5648456/index.html
+- Market-cap and PE inputs inherited from config/input.json, source Tencent qt.gtimg.cn, timestamp 2026-08-03 09:20:05.
+
+4. Identity and model resolution
+- Official filing identifies SH Group as a Hong Kong E&M engineering contractor, not a brokerage.
+- Overrode input hint financial_brokerage with construction_project.
+- Set owner_earnback_applicability=requires_special_model because contract assets, receivables, payables, cash, and performance guarantees form project working capital.
+- Kept all ordinary owner-earnback sorting fields null as required by result-contract.md.
+
+5. Period and currency handling
+- Archive period remains 2025-12-31 per task protocol.
+- Financial statements used are audited FY2025, year ended 2025-03-31; company does not have a 2025-12-31 fiscal year end.
+- HKD financial statement amounts multiplied by 0.92257 and stored as absolute CNY yuan.
+- Ratios calculated in source currency: gross margin=32,970/608,490=0.054183306; net margin=5,388/608,490=0.008854706.
+- Operating FCF uses statement cash purchase of property/equipment: 88,522-11=88,511 HKD thousand. MD&A rounded capital expenditures to HKD0.3m; limitation disclosed.
+
+6. Dividend forecast
+- FY2024 and FY2025 declared/paid dividends: zero.
+- FY2025 proposed final dividend: zero.
+- Forecast dividend set to zero absent a stated payout policy or contrary announcement.
+
+7. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated scalar/object/list fields via protocol set and append commands; did not construct result JSON from scratch.
+- Validation command and outcome recorded after final validation below.
+
+8. Final validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Outcome: status=ok; errors=[]
+- Confirmed required ordinary owner-earnback metrics remain null under requires_special_model.

@@ -1,0 +1,69 @@
+stock-research trace
+company=002133.SZ 广宇集团
+period=2025-12-31 annual
+generated_at=2026-08-01T02:35:14+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md as requested.
+3. Read references/data-reuse.md because the skill routes reuse decisions through that reference.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result.json only through protocol set/append commands.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   validation_status=ok
+
+[local reuse]
+Checked configured stock_report paths. No raw filing, annual facts, normalized facts, or prior stock research result existed in the workspace. Only config/input.json and stock_report/data/notes/user_stock_evaluations.md were present. Public filing research was therefore required.
+
+[sources]
+Primary filing summary:
+https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-29/92058d54-07f2-4d15-9e52-63cbbceb6c8d.PDF
+Title: 广宇集团股份有限公司2025年年度报告摘要
+Published: 2026-04-29
+
+Full annual report announcement mirror used to inspect financial statements and notes:
+https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12257878&stockid=002133
+Underlying PDF mirror:
+http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESZ_STOCK/2026/2026-4/2026-04-29/12257878.PDF
+Title: 广宇集团股份有限公司2025年年度报告
+Announcement no.: (2026)009
+Published: 2026-04-29
+Audit opinion: standard unmodified opinion; auditor 立信会计师事务所（特殊普通合伙）.
+
+Market snapshot reused from config/input.json:
+source=Tencent qt.gtimg.cn
+market_cap=1943000000.0
+market_cap_date=20260731114324
+pe_ttm=26.89
+
+[model decision]
+Input hint ordinary_operating/applicable was overridden.
+Selected statement_model=real_estate_developer.
+Selected owner_earnback_applicability=requires_special_model.
+Evidence: real estate represented 64.95% of 2025 revenue; inventory was RMB 3.119bn or 44.90% of assets; contract liabilities were RMB 0.228bn; interest-bearing borrowings plus lease liabilities were about RMB 1.425bn; restricted assets had RMB 1.463bn carrying value. Cash, inventory, project liabilities and delivery obligations cannot be separated into ordinary detachable net cash.
+
+[key calculations]
+gross_profit = 4075744988.98 - 3588386440.15 = 487358548.83
+gross_margin = 487358548.83 / 4075744988.98 = 0.1195765527
+net_margin = 38265367.82 / 4075744988.98 = 0.0093885509
+operating_free_cash_flow = 564607607.14 - 33798899.07 = 530808708.07
+Note: this mechanical FCF is not treated as distributable sustainable cash profit because real-estate working capital timing dominates operating cash flow.
+forecast_dividend_yield = 38204053.75 / 1943000000.0 = 0.0196624054
+Forecast dividend is a scenario baseline equal to 2025 actual interim dividend, not management guidance.
+
+[ordinary earnback fields]
+discounted_detachable_net_cash=null
+discounted_sustainable_cash_profit=null
+operating_business_price=null
+owner_earnback_years=null
+market_profit_payback_years=null
+Reason: protocol requires null ordinary sorting metrics for a special financial statement model. A reliable project-level liquidation model would require remaining saleable value, future construction cost, taxes, selling costs, regulated cash and project-specific debt, which are not fully disclosed.
+
+[output status]
+outputs/result.json: protocol initialized, populated, validated ok
+outputs/report.md: created
+outputs/trace.txt: created
+data_quality.status=complete
+Limitations are recorded in result.json and report.md.

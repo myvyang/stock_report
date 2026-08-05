@@ -1,0 +1,62 @@
+stock-research trace
+company: C-MER Medical Holdings Limited (03309.HK)
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked configured annual facts, normalized facts, prior research, and raw filing paths.
+- No reusable annual facts, normalized facts, or prior research were present at task start.
+
+3. Primary sources consulted
+- HKEX annual results announcement, published 2026-03-27:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0327/2026032700690.pdf
+- HKEX Annual Report 2025, published 2026-04-17:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0417/2026041701408_c.pdf
+- PBOC/CFETS RMB central parity announcement, 2025-12-26: HKD/CNY 0.90486.
+- SAFE/PBOC central parity near market date, 2026-07-28: HKD/CNY 0.86627.
+- config/input.json market data: HKD market cap 967,278,310.0396395; PE TTM 11.2; 2026-08-03 09:20:05; Tencent qt.gtimg.cn.
+
+4. Model decision
+- Input hint financial_brokerage rejected.
+- Filing states business is ophthalmic, dental and other medical services plus vision-aid products.
+- No brokerage customer funds, proprietary trading balance sheet, or repo funding was found.
+- Final model: ordinary_operating; owner earnback applicability: applicable.
+
+5. Currency conversion
+- Financial statement amounts converted from HKD to CNY at 0.90486.
+- Market cap converted at 0.86627, the nearest official central parity retrieved before 2026-08-03.
+- Ratios were computed consistently from like-currency numerator and denominator; currency-date mismatch is disclosed as a limitation.
+
+6. Key source figures in HKD
+- Revenue 1,946,712,000; cost of revenue 1,343,042,000; gross profit 603,670,000.
+- Operating profit 167,471,000; net profit 111,174,000; parent profit 100,366,000.
+- Total assets 2,732,626,000; liabilities 796,007,000; equity 1,936,619,000; parent equity 1,774,950,000.
+- Cash 347,871,000; short-term deposits 107,093,000; bank borrowings 44,354,000; lease liabilities 374,989,000.
+- Operating cash flow 283,300,000; cash purchase of property/plant/equipment 77,500,000; financing cash outflow 221,300,000.
+- 2025 proposed final plus special dividend: HKD 0.03/share, about 36.2% of parent profit.
+
+7. Owner earnback judgments
+- Discounted detachable cash = cash x 70% + short-term deposits x 90% - borrowings x 100%.
+- Lease liabilities were treated as operating obligations matched to the clinic/hospital network, not netted mechanically against cash.
+- Operating cash flow less cash equipment purchases was not used directly as cash profit because lease payments are classified in financing cash flow.
+- Sustainable distributable cash profit normalized to HKD 90,000,000 (CNY 81,437,400), below 2025 parent profit and well below OCF less cash equipment purchases.
+- Operating business price = CNY 837,924,181.64 - CNY 267,421,781.48 = CNY 570,502,400.16.
+- Owner earnback = 570,502,400.16 / 81,437,400 = 7.01 years.
+- Market cap / cash profit = 10.29.
+
+8. Protocol writes and validation
+- All result fields and array rows were populated through protocol set/append commands; result.json was not directly authored.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report creation: {"status":"ok","errors":[]}.
+
+9. Known limitations
+- Full annual cash flow statement was not available in the compact results announcement extraction; management-disclosed cash-flow totals were used.
+- Cash capex uses disclosed cash purchases of PP&E, not the broader HKD 355.8m additions measure that includes right-of-use assets and other additions.
+- Sustainable cash profit is an analyst normalization, sensitive to lease payments, maintenance capex, and ramp-up losses.

@@ -1,0 +1,105 @@
+stock-research trace
+company: 300888.SZ 稳健医疗
+period: 2025-12-31 annual
+generated context date: 2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields through protocol `set`; did not construct the JSON skeleton by hand.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[local reuse check]
+- Checked annual review, normalized facts, prior stock research and raw filing paths specified by config/input.json.
+- No 300888.SZ annual facts, normalized facts, prior research, or raw filing existed locally at task start.
+- Therefore obtained the filing linked by the company's investor-relations periodic-report page.
+
+[primary filing]
+- Company investor relations periodic reports: https://winnermedical.cn/investor/report.html
+- Listed item: 2026-04-22 稳健医疗:2025年年度报告
+- Linked PDF resolved to: https://pdf.dfcfw.com/pdf/H2_AN202604211821394945_1.pdf
+- Saved local copy: stock_report/data/raw/filings/300888.SZ/2025-12-31/annual-report-2025.pdf
+- Extracted 313 pages to annual-report-2025.txt using pypdf installed into /tmp/stock_pdf because system pdftotext was unavailable.
+
+[filing locations used]
+- Consolidated balance sheet: PDF pages 119-122.
+- Consolidated income statement: PDF pages 126-128.
+- Consolidated cash-flow statement: PDF pages 131-132.
+- Business model and industry: PDF pages 22 onward.
+- Revenue composition and segment gross margins: PDF pages 38-39.
+- Dividend proposal: PDF pages 1 and 84; post-balance-sheet-events note.
+- Cash and restricted cash: notes page 176.
+- Trading financial assets: note page 177.
+- Inventory: notes pages 194-195.
+- One-year large CDs: note page 195.
+- Other non-current assets / long-term CDs: note page 221.
+- Borrowings and operating liabilities: notes pages 223 onward.
+- Goodwill and impairment: notes pages 215-218.
+
+[core extraction]
+total_assets=18404858027.22
+total_liabilities=6112276598.33
+total_equity=12292581428.89
+parent_equity=11516711030.45
+minority_interest=775870398.44
+revenue=10949489967.01
+cost_of_sales=5733463029.53
+gross_profit=5216026937.48
+operating_profit=1067678099.51
+net_profit=814117727.77
+parent_net_profit=767967461.87
+operating_cash_flow=1665676894.93
+capital_expenditure=647910000.49
+operating_free_cash_flow=1017766894.44
+gross_margin=0.47637168061667734
+net_margin=0.07013728166187
+
+[analysis model]
+- Confirmed ordinary_operating/applicable.
+- Reason: revenue comes from manufacturing and selling medical consumables and cotton consumer goods; statement assets and liabilities are inventory, receivables, plant/equipment, leases, normal trade liabilities, borrowings and the company's own treasury products. No customer deposits, insurance reserves, project regulatory cash or similar special-model balance-sheet structure was found.
+
+[discounted detachable net cash]
+cash_and_cash_equivalents 1560722108.58 * 100% = 1560722108.58
+bank_wealth_management 1818988678.23 * 90% = 1637089810.407
+trust_plans 1006390017.33 * 60% = 603834010.398
+large_CDs 1987862701.27 * 95% = 1888469566.2065
+short_and_long_borrowings_plus_current_and_noncurrent_lease_liabilities 2488403888.28 * -100% = -2488403888.28
+discounted_detachable_net_cash = 3201711607.3115005
+Note: cash equivalents exclude RMB 33,267,211.34 restricted monetary funds. Trust haircut is the largest judgment because underlying assets are insufficiently disclosed.
+
+[sustainable cash profit]
+reported_parent_net_profit base = 767967461.87
+add back non-cash Ping An Medical goodwill impairment = 179042411.72
+subtract investment income net of fair-value loss = 28752049.96
+intermediate adjusted profit = 918257823.63
+subtract operating/acquisition uncertainty buffer = 118257823.63
+discounted_sustainable_cash_profit = 800000000
+Cross-check: lower than 2025 operating free cash flow 1017766894.44 and lower than company-stated profit excluding goodwill impairment of about RMB 950m.
+
+[owner earnback formulas]
+market_cap=17880000000
+operating_business_price=17880000000-3201711607.3115005=14678288392.6885
+owner_earnback_years=14678288392.6885/800000000=18.347860490860626
+market_cap_to_cash_profit=17880000000/800000000=22.35
+discounted_net_cash_to_market_cap=3201711607.3115005/17880000000=0.17906664470422262
+
+[dividend]
+- 2025 interim implemented cash dividend: 262048413.60.
+- 2025 annual proposed cash dividend: 174698942.40, pending shareholder approval at annual-report date.
+- Baseline forecast: 436747356.00, equal to the two amounts above.
+- forecast_dividend_yield=436747356/17880000000=0.024426585906040268.
+- This is a baseline assumption, not 2026 company guidance.
+
+[market snapshot]
+- Source exactly as supplied in config/input.json: Tencent qt.gtimg.cn.
+- timestamp=20260731114248
+- market_cap=17880000000
+- pe_ttm=23.19
+
+[data quality]
+- status=complete under result-contract minimum requirements.
+- Limitations retained in result.json: no 2026 full-year dividend commitment; trust underlying assets not sufficiently disclosed; maintenance versus growth capex not split.
+- Report contains no recommendation, target price, ranking label or unsupported certainty.

@@ -1,0 +1,66 @@
+2026-08-05 stock-research trace — TLK / FY2025
+
+1. Read skill and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+   - No existing TLK raw filing, annual facts, normalized facts, or prior stock-research result was present under stock_report.
+   - Research therefore returned to primary disclosures.
+
+3. Protocol initialization
+   - Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - result.json was initialized from config/input.json; the complex JSON was not authored from scratch.
+
+4. Primary sources inspected
+   - SEC FY2025 Form 20-F, accession 0001104659-26-062051, filed 2026-05-15.
+   - Telkom official audited FY2025 consolidated financial statements and official financial highlights.
+   - FY2025 AGM minutes filed on SEC Form 6-K, filed 2026-06-10.
+   - CFETS-authorized 2025-12-31 CNY central parity as reproduced by Xinhua.
+   - Market capitalization and PE were accepted from the task input (Yahoo Finance yfinance, 2026-08-03).
+
+5. Accounting model decision
+   - Confirmed ordinary_operating.
+   - Telkom is a capital-intensive telecommunications network operator, not a bank/insurer/property developer or investment holding platform.
+   - Network assets and maintenance capex are operating necessities.
+   - Cash is tested against interest-bearing and lease liabilities before being treated as detachable.
+   - Material minority interests require attribution discipline.
+
+6. Reporting-basis decision
+   - Core financial statements use the FY2025 SEC 20-F IFRS figures consistently.
+   - Local Indonesian figures differ because of dropcore accounting-policy treatment.
+   - Local figures are used only for declared dividends, historical parent-profit median, and a labeled cross-check.
+   - Telkom reports expenses by nature and does not publish conventional product gross profit in the IFRS statement. Structured gross_profit uses IFRS operating profit as a disclosed proxy; this limitation is explicit.
+
+7. Currency conversion
+   - 20-F convenience rate: USD 1 = IDR 16,676.
+   - CFETS 2025-12-31 central parity: USD 100 = CNY 702.88.
+   - Derived rate: CNY 1 = IDR 2,372.5244707489187.
+   - All structured monetary amounts are absolute CNY yuan.
+
+8. Key calculations
+   - Revenue: IDR 146.742tn / 2,372.52447 = CNY 61.851bn.
+   - Parent net profit: IDR 17.486tn / 2,372.52447 = CNY 7.370bn.
+   - Operating cash flow: IDR 63.842tn = CNY 26.909bn.
+   - Capex: IDR 24.577tn = CNY 10.359bn.
+   - Operating FCF: IDR 39.265tn = CNY 16.550bn.
+   - Funding assets: cash CNY 14.427bn + other current financial assets CNY 0.599bn.
+   - Interest-bearing debt CNY 21.401bn + lease liabilities CNY 10.323bn; net detachable cash floored at zero.
+   - Sustainable cash-profit baseline: local-GAAP parent-profit median for 2023–2025, IDR 23.649tn.
+   - Prudence adjustment: 85%, producing IDR 20.102tn / CNY 8.473bn.
+   - Operating business price: CNY 97.639bn.
+   - Owner earnback: 97.639 / 8.473 = 11.524 years.
+   - FY2025 approved dividend: IDR 21.999902tn = CNY 9.273bn; yield = 9.497% against input market cap.
+
+9. Protocol mutation and validation
+   - result.json fields were populated using protocol `set` and `append` commands.
+   - Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Validation result before final file audit: status=ok, errors=[].
+
+10. Known limitations
+   - Input market cap was not independently reconstructed from ADS count, price, and FX.
+   - A single closing FX rate is used for both balance-sheet and income/cash-flow translation for deterministic comparability.
+   - Sustainable cash profit includes a judgmental 15% haircut and is not an audited metric.
+   - Ongoing investigations can require future restatement or a larger prudence adjustment.

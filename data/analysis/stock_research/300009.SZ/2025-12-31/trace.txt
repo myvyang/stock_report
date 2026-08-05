@@ -1,0 +1,144 @@
+task
+  company: 安科生物
+  code: 300009.SZ
+  period: 2025-12-31
+  report_type: annual
+  task_created_at: 2026-07-31T16:34:14+08:00
+
+protocol
+  skill: .agents/skills/stock-research/SKILL.md
+  result_contract: .agents/skills/stock-research/references/result-contract.md
+  report_contract: .agents/skills/stock-research/references/report-contract.md
+  data_reuse: .agents/skills/stock-research/references/data-reuse.md
+  init_command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+  result_edits: protocol set/append commands only
+  validation_command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+reuse_check
+  annual_facts_json: missing
+  annual_facts_md: missing
+  normalized_facts_json: missing
+  raw_filing_metadata: missing
+  prior_stock_research_result: missing
+  conclusion: no reusable local filing or annual fact package; fetched official annual report
+
+sources
+  1:
+    title: 安徽安科生物工程（集团）股份有限公司2025年年度报告
+    publication_date: 2026-03-31
+    company_investor_page: https://www.ankebio.com/investor_105.html
+    pdf: https://www.ankebio.com/upload/2026-04/177745622566658800.pdf
+    role: core financial statements, notes, business model, segment data, dividend proposal, risks
+  2:
+    path: config/input.json
+    role: company identity, period, market capitalization, PE TTM, snapshot timestamp and source
+    market_cap: 13800000000
+    market_cap_date: 20260731114327
+    market_cap_source: Tencent qt.gtimg.cn
+    pe_ttm: 19.89
+
+source_processing
+  annual_report_downloaded_to_temporary_directory: true
+  pdf_size_bytes: 4952973
+  pdf_pages: 197
+  extraction_method: pypdf text extraction in temporary virtual environment
+  local_long_term_source_files_modified: false
+
+model_check
+  input_hint: ordinary_operating / applicable
+  confirmed_statement_model: ordinary_operating
+  confirmed_owner_earnback_applicability: applicable
+  evidence: company earns from R&D, manufacture and sale of biological drugs, Chinese medicines, chemical drugs and peptide drugs; no customer deposits, insurance reserves, project escrow funds or concession-linked debt structure
+  special_handling: strategic equity investments and industry funds excluded from detachable cash
+
+financial_statement_checks
+  total_assets: 5547653408.80
+  total_liabilities: 811296771.84
+  total_equity: 4736356636.96
+  balance_check_assets_minus_liabilities_minus_equity: 0.00
+  parent_equity: 4558015051.29
+  minority_interest: 178341585.67
+  equity_check_parent_plus_minority_minus_total: 0.00
+  revenue: 2646519767.58
+  cost_of_sales: 643158185.54
+  gross_profit: 2003361582.04
+  gross_profit_check: revenue - cost_of_sales
+  parent_net_profit: 735192705.68
+  operating_cash_flow: 863220471.02
+  capital_expenditure: 126891933.56
+  operating_free_cash_flow: 736328537.46
+  fcf_check: operating_cash_flow - capital_expenditure
+
+business_evidence
+  biological_products_revenue: 1979905736.96
+  biological_products_revenue_share: 0.7481
+  gene_engineering_drugs_revenue: 1937177956.36
+  gene_engineering_drugs_revenue_share: 0.7320
+  gene_engineering_drugs_gross_margin: 0.8253
+  gene_engineering_drugs_gross_margin_yoy_change: -0.0265
+  overall_gross_margin_calculation: 2003361582.04 / 2646519767.58 = 0.7569796404
+  net_margin_calculation: 735192705.68 / 2646519767.58 = 0.2777960379
+
+detachable_cash
+  unrestricted_cash_and_equivalents:
+    book_amount: 238201226.97
+    discount_rate: 0.50
+    discounted_amount: 119100613.485
+    note: cash equivalents exclude restricted cash; 50% operating/R&D reserve retained
+  bank_and_broker_wealth_management:
+    book_amount: 1191953897.57
+    discount_rate: 0.90
+    discounted_amount: 1072758507.813
+    note: annual report classifies products as low-to-medium risk, but redemption detail is incomplete
+  large_certificates_of_deposit:
+    book_amount: 245117305.57
+    discount_rate: 0.95
+    discounted_amount: 232861440.2915
+    note: high credit quality but subject to term/early-liquidation constraints
+  lease_financing_liabilities:
+    book_amount: -32956572.12
+    discount_rate: 1.00
+    discounted_amount: -32956572.12
+  discounted_detachable_net_cash: 1391763989.4695
+  excluded_assets:
+    strategic_and_industry_investments: 693104174.43
+    reason: value and liquidity depend on markets, R&D commercialization and partner relationships
+
+sustainable_cash_profit
+  starting_operating_cash_flow: 863220471.02
+  less_capital_expenditure: -126891933.56
+  reported_operating_free_cash_flow: 736328537.46
+  less_working_capital_release_and_prudence: -76428537.46
+  discounted_sustainable_cash_profit: 660000000.00
+  rationale: receivables and inventory fell while accounts payable increased; do not extrapolate all 2025 working-capital release
+  cross_check: discounted cash profit is slightly below 2025 recurring parent net profit of 668054957.26
+
+owner_earnback
+  market_cap: 13800000000.00
+  discounted_detachable_net_cash: 1391763989.4695
+  operating_business_price: 12408236010.5305
+  discounted_sustainable_cash_profit: 660000000.00
+  owner_earnback_years: 18.8003575917
+  market_cap_to_cash_profit: 20.9090909091
+  discounted_net_cash_to_market_cap: 0.1008524630
+  formulas:
+    operating_business_price: market_cap - discounted_detachable_net_cash
+    owner_earnback_years: operating_business_price / discounted_sustainable_cash_profit
+    market_cap_to_cash_profit: market_cap / discounted_sustainable_cash_profit
+
+dividend
+  forecast_basis: 2025 annual dividend proposal, RMB 2.50 per 10 shares on 1670700708-share base
+  forecast_cash_dividend: 417675177.00
+  forecast_dividend_yield: 0.0302663172
+  status_at_annual_report: subject to shareholder meeting approval
+
+limitations
+  - no company-disclosed revenue split among growth hormone, interferon and trastuzumab
+  - annual report's first-tier industry-position statements were not independently verified with market-share data
+  - wealth-management redemption terms were not disclosed item by item
+  - market capitalization and PE were reused from task input and not independently refreshed
+  - detachable-cash discounts and sustainable-profit adjustment are research judgments, not reported GAAP measures
+
+validation
+  protocol_status: ok
+  protocol_errors: []

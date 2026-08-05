@@ -1,0 +1,33 @@
+2026-08-04 stock-research trace: OPY / 2025-12-31 annual
+
+1. Read required skill and contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - references/result-contract.md
+   - references/report-contract.md
+   - references/data-reuse.md
+
+2. Checked configured annual-review, normalized-facts, and raw-filing paths. No reusable OPY annual fact package was present in the workspace.
+
+3. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Retrieved and reviewed primary sources:
+   - SEC 2025 Form 10-K, accession 0001628280-26-012313, filed 2026-02-26.
+   - Oppenheimer 2025 Annual Report and FY2025 investor materials.
+   - SEC-filed Oppenheimer Q1 2026 earnings release for the latest declared regular dividend and disclosed cash-sweep litigation accrual.
+   - Federal Reserve H.10 weekly release dated 2026-01-05 for 2025-12-31 USD/CNY = 6.9931.
+   - Market cap and PE were accepted from config/input.json (Yahoo Finance yfinance).
+
+5. Model decision:
+   Input hint ordinary_operating/applicable was overridden. The 10-K identifies a full-service broker-dealer and investment bank. Customer receivables, trading securities, clearing balances, repos and customer/broker payables are operating financial assets and liabilities; regulatory capital constrains distributions. Classified as financial_brokerage / requires_special_model. All ordinary owner-earnback ranking fields retained as null.
+
+6. Currency normalization:
+   All USD statement amounts were multiplied by 6.9931 and stored as absolute CNY yuan. Flow items also use the period-end rate for deterministic protocol consistency; this is disclosed as a limitation.
+
+7. Dividend forecast:
+   Annualized the declared $0.20 quarterly regular dividend to $0.80 per share, multiplied by 10,487,240 period-end shares and converted at 6.9931. Forecast CNY 58,670,654.44 / input market cap CNY 7,705,552,810.136353 = 0.0076140747. The $1.00 special dividend was excluded from recurrence.
+
+8. Result fields were populated with protocol CLI set commands, not by constructing result.json manually.
+
+9. Key interpretive limitation:
+   Reported 2025 OCF less capex is shown, but brokerage working positions make it non-comparable to ordinary-company distributable FCF. No ordinary discounted cash profit or earnback years were calculated.

@@ -1,0 +1,59 @@
+stock-research trace
+company: 06866.HK / 佐力科创股份有限公司（报告期内名称：佐力科创小额贷款股份有限公司）
+period: 2025-12-31
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because SKILL.md directly defines it as the reuse boundary.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Searched stock_report/data for 06866.HK/2025-12-31.
+- No raw filing metadata, annual facts, normalized facts, or prior stock-research output existed.
+- Therefore returned to primary disclosure rather than inventing or reusing missing facts.
+
+3. Primary filing
+- HKEX title search for stock code 06866 identified Annual Report 2025, released 2026-04-28.
+- Primary URL:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042802760.pdf
+- A local copy was retained at:
+  stock_report/data/raw/filings/06866.HK/2025-12-31/annual-report-2025.pdf
+- Core pages reviewed: 7-21 (business, loans, asset quality, financial overview and ratios), 70 (dividend), 98-108 (audit report and primary statements), 128-149 (notes, borrowings, dividends, risk management).
+
+4. Model verification
+- Input hint classified the company as financial_brokerage.
+- Filing evidence contradicts brokerage classification: substantially all interest income comes from customer loans; 95.6% of assets are net customer loans; principal funding liability is interest-bearing borrowing.
+- Overrode hint with statement_model=unknown_special because protocol v1 has no dedicated microfinance/lender enum.
+- owner_earnback_applicability=requires_special_model.
+- Ordinary detachable-net-cash and cash-profit ranking fields remain null as required.
+
+5. Key extracted facts (RMB)
+- Interest income: 172,334,000; net interest income: 142,913,000.
+- Impairment loss: 12,449,000; parent net profit: 60,442,000.
+- Total assets: 2,557,786,000; total liabilities: 516,502,000.
+- Parent equity: 2,031,326,000; NCI: 9,958,000.
+- Net customer loans: 2,444,125,000; gross loans: 2,639,054,000.
+- Loan impairment allowance: 194,929,000; impaired loans: 101,497,000.
+- Impaired loan ratio: 3.8%; overdue ratio: 3.9%; allowance coverage: 192%.
+- Interest-bearing borrowings: 439,676,000; cash: 23,495,000.
+- Weighted average ROE: 3.0%; disclosed gearing ratio: 20.5%.
+- 2025 final dividend recommendation: nil.
+
+6. Market data
+- Used task input without alteration: market cap RMB299,470,431.56027794; PE TTM 5.2.
+- Snapshot date/time: 2026/08/03 09:20:05; source: Tencent qt.gtimg.cn.
+- Limitation recorded: market quote was not independently reconstructed from exchange price and share count.
+
+7. Protocol population
+- Populated outputs/result.json only through protocol set/append commands after init.
+- Financial-company non-comparable metrics (gross margin, net margin, ordinary owner earnback metrics) retained as null.
+- Forecast dividend set to zero strictly on the announced FY2025 final-dividend decision.
+- Data quality marked complete because all special-model minimum fields, business narrative, dividend basis, asset/liability explanations and evidence are present.
+
+8. Validation
+- Protocol validation run after structured fields were populated: status ok, errors [].
+- Final protocol validation after report/trace creation and the non-comparable free-cash-flow field was reset to null: status ok, errors [].
+- Confirmed all three required outputs exist and are non-empty.

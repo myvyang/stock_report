@@ -1,0 +1,61 @@
+[2026-08-01 Asia/Shanghai] task=stock_research code=002928.SZ period=2025-12-31
+
+1. Instructions and protocol
+- Read /workspace/AGENTS.md.
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as explicitly requested.
+- Read references/data-reuse.md because local-data reuse boundaries were relevant.
+
+2. Local reuse check
+- Checked stock_report/data/analysis/annual_review/002928.SZ/2025-12-31 and stock_report/data/raw/filings/002928.SZ/2025-12-31.
+- No annual facts package, normalized facts, raw filing, prior stock-research result, or extraction trace existed in the workspace.
+- Therefore public disclosures were retrieved; no prior owner-earnback conclusion was reused.
+
+3. Sources
+- Company 2025 annual report public text mirror, disclosed 2026-04-27:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12201699&stockid=002928
+- Shenzhen Stock Exchange 2025 annual report summary:
+  https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-27/d0f0f7d2-c63b-4361-824d-dbbda57af42e.PDF
+- CNINFO 2025 profit distribution proposal:
+  https://static.cninfo.com.cn/finalpage/2026-04-27/1225178647.PDF
+- Market-cap and PE snapshot: config/input.json; Tencent qt.gtimg.cn; 20260731114339.
+
+4. Model review
+- Confirmed statement_model=ordinary_operating because the company earns substantially all revenue from aviation transport and reports standard operating-company statements.
+- Confirmed owner_earnback_applicability=applicable with special handling.
+- Special handling: aircraft/right-of-use assets and lease liabilities are operating structure; restricted cash is not detachable; operating cash flow must be tested against capex and lease/debt service.
+
+5. Extracted audited 2025 facts (CNY yuan)
+- Revenue 7,456,121,307.37.
+- Cost of sales 7,291,995,536.40; gross profit 164,125,770.97.
+- Operating profit 720,617,186.43; net/parent net profit 625,910,360.24.
+- Total assets 23,809,795,334.24; total liabilities 19,943,559,081.89; parent/total equity 3,866,236,252.35; no minority interest.
+- Operating cash flow 2,521,266,161.95.
+- Capex 2,372,433,074.65; calculated operating free cash flow 148,833,087.30.
+- Financing cash flow -1,049,120,888.09.
+- Cash 1,816,161,223.68; restricted cash 825,768,170.83; cash equivalents 990,393,052.85.
+- Long-term lease liability 7,993,761,257.73; lease liabilities including current portion 9,466,377,516.48.
+- Other income 1,697,620,670.13, mainly route subsidies related to ordinary operations.
+- 2025 cash dividend 0; buyback 139,001,185.25.
+
+6. Calculations
+- Gross margin = 164,125,770.97 / 7,456,121,307.37 = 0.022012218444966817.
+- Net margin = 625,910,360.24 / 7,456,121,307.37 = 0.08394583918871051.
+- Operating FCF = 2,521,266,161.95 - 2,372,433,074.65 = 148,833,087.30.
+- Discounted detachable net cash = 0 because cash is partly restricted and the remainder is required against operating liquidity, short borrowings, current maturities, lease payments, and long-term debt.
+- Discounted sustainable cash profit = 400,000,000.00. This is an analyst estimate: audited parent net profit 625,910,360.24 less a 225,910,360.24 haircut for subsidy/fuel/FX/utilization cyclicality and capital intensity. The annual report does not precisely separate maintenance from expansion capex.
+- Operating business price = 8,398,000,000 - 0 = 8,398,000,000.
+- Owner earnback years = 8,398,000,000 / 400,000,000 = 20.995.
+- Market cap / cash profit = 20.995.
+- Forecast cash dividend = 0; forecast yield = 0 because consolidated and parent distributable profits remained negative and the board proposed no 2025 cash dividend.
+
+7. Protocol commands
+- Initialized skeleton with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields with repeated protocol set commands; result.json was not authored from a blank complex object.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+8. Data-quality judgment
+- status=complete because identity, period, valuation snapshot, model review, three statements, asset/liability explanations, owner-earnback components, dividend forecast, business story, and evidence are present.
+- Limitations retained in result.json: no local raw filing/facts package; detailed financial statement text read from a public mirror and cross-checked against official SZSE/CNINFO documents; maintenance capex is not precisely disclosed; market snapshot not independently reconstructed.

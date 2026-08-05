@@ -1,0 +1,71 @@
+stock-research trace
+company: AEM / Agnico Eagle Mines Limited
+period: 2025-12-31 annual
+generated_at: 2026-08-04T23:47:05+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- config/input.json exists.
+- No local raw filing, annual facts, normalized facts, or historical AEM stock-research result was present under the paths supplied in input.
+- Therefore primary-source retrieval was required.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized with schema stock-research-result-v1.
+
+4. Primary sources used
+- SEC Form 40-F landing document: https://www.sec.gov/Archives/edgar/data/2809/000110465926032153/aem-20251231x40f.htm
+- Audited consolidated financial statements (Exhibit 99.2): https://www.sec.gov/Archives/edgar/data/2809/000110465926032153/aem-20251231xex99d2.htm
+- 2025 MD&A (Exhibit 99.3): https://www.sec.gov/Archives/edgar/data/2809/000110465926032153/aem-20251231xex99d3.htm
+- 2025 Annual Information Form (Exhibit 99.1): https://www.sec.gov/Archives/edgar/data/2809/000110465926032153/aem-20251231xex99d1.htm
+- PBOC/CFETS USD-CNY central parity, 2025-12-26: https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- Market cap and PE: config/input.json, source recorded there as Yahoo Finance yfinance.
+
+5. Model decision
+- statement_model = ordinary_operating.
+- owner_earnback_applicability = applicable.
+- Reason: revenue/cash flow arise from owned mining operations; balance sheet consists principally of mine PP&E, inventory, cash, investments and identifiable financing/reclamation obligations. Mining is capital intensive and cyclical, but not a special financial-statement model like banking, insurance, real estate development, construction concessions or investment holding.
+
+6. Currency conversion
+- All USD filing amounts converted to CNY absolute yuan at USD/CNY 7.0358.
+- This is a consistent comparison convention, not a reconstruction using annual-average income-statement FX.
+
+7. Key formulas
+- Cost of sales = production costs + amortization = USD 4,985.981m.
+- Gross profit = revenue - production costs - amortization = USD 6,921.870m.
+- Gross margin = 6,921.870 / 11,907.851 = 58.1286%.
+- Net margin = 4,461.461 / 11,907.851 = 37.4666%.
+- Operating FCF = CFO USD 6,817.113m - PP&E/mine development additions USD 2,418.200m = USD 4,398.913m.
+- FCF before non-cash working-capital changes = company disclosed USD 3,594.616m = CNY 25.3553bn.
+
+8. Owner earnback assumptions
+- Cash: 70% recognition.
+- Equity/other investments: 50% recognition.
+- Long-term debt, lease liabilities and reclamation provision: 100% deduction.
+- Discounted detachable net cash = CNY 6.8661bn.
+- Sustainable cash profit starts from FCF before working-capital changes, then applies 30% cyclicality/capital-needs haircut.
+- Discounted sustainable cash profit = CNY 17.7037bn.
+- Operating business price = market cap CNY 496.3804bn - discounted net cash CNY 6.8661bn = CNY 489.5143bn.
+- Owner earnback years = 489.5143 / 17.7037 = 27.6504.
+- Market cap / cash profit = 496.3804 / 17.7037 = 28.0382.
+
+9. Dividend forecast
+- Quarterly dividend declared 2026-02-12: USD 0.45/share.
+- Annualized at four equal quarters using 501,029,605 shares outstanding on 2026-01-30.
+- Forecast cash dividend = CNY 6.3453bn; forecast yield = 1.2783% of input market cap.
+- This is mechanical annualization, not management annual guidance.
+
+10. Protocol writes and validation
+- result.json was populated field-by-field using protocol set/append commands; it was not hand-written as a complex JSON object.
+- Initial completed validation: status ok, errors [].
+- Final validation rerun after consistency corrections; see command output in task execution.
+
+11. Known limitations
+- Input market value date is later than the financial-report period.
+- Market cap and PE are third-party input data and were not replaced.
+- Sustainable cash profit is a scenario based on one high-gold-price year and a stated haircut, not a forecast with certainty.

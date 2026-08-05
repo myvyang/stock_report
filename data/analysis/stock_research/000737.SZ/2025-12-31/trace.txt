@@ -1,0 +1,44 @@
+task: stock research 000737.SZ 北方铜业, period 2025-12-31
+generated_at: 2026-08-01 Asia/Shanghai
+
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Checked configured annual-review and raw-filing paths. No reusable 2025 facts package or filing metadata existed in the workspace.
+4. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Located the official 2025 annual report through public disclosure search and downloaded the CNINFO PDF:
+   https://static.cninfo.com.cn/finalpage/2026-04-25/1225182337.PDF
+   Local copy: stock_report/data/raw/filings/000737.SZ/2025-12-31/annual-report-2025.pdf
+6. Extracted PDF text in an isolated temporary Python virtual environment using pypdf; project dependencies were not modified.
+7. Reconciled core figures to the annual report:
+   revenue 27,916,109,130.32
+   cost of sales 25,046,423,104.72
+   parent net profit 790,615,580.91
+   operating cash flow 1,888,050,453.53
+   capex cash out 770,249,615.95
+   total assets 18,342,822,634.44
+   total liabilities 11,553,641,615.94
+   parent equity 6,789,181,018.50
+8. Confirmed ordinary_operating model from disclosed mining, beneficiation, smelting and fabrication operations. Identified special analytical handling for resource-profit versus externally sourced smelting-profit economics.
+9. Owner earnback assumptions:
+   unrestricted cash 847,752,876.68 at 100%
+   restricted cash 49,534,491.27 at 0%
+   borrowings 8,897,941,797.27 deducted at 100%
+   lease liabilities and long-term payable 95,854,769.96 deducted at 100%
+   discounted detachable net cash = -8,145,043,690.55
+   sustainable distributable cash profit = 650,000,000.00, an analyst scenario below 2025 profit and FCF because 2023-2024 cash conversion was weak/negative and maintenance capex was not separately disclosed
+   operating business price = 33,516,043,690.55
+   owner earnback years = 51.5631441393
+10. Dividend forecast uses the disclosed 2025 proposed distribution of 266,660,300.90; forecast yield = 1.0510437149% against task-input market cap.
+11. Populated result sections only through protocol CLI set commands; did not hand-write result.json from scratch.
+12. Protocol validation executed after population:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    status: ok; errors: []
+
+Key source pages (annual-report printed page numbering):
+- pp. 6-15: financial highlights, business model, capacities, product volumes and revenue/margins
+- pp. 40-41 and 161: dividend proposal
+- pp. 73-84: consolidated balance sheet, income statement and cash-flow statement
+- pp. 117, 133-137, 146: cash restrictions, borrowings, leases, payables, cash-equivalent reconciliation
+
+Data-quality limitations are recorded in outputs/result.json and outputs/report.md. Facts and analyst assumptions are explicitly separated.

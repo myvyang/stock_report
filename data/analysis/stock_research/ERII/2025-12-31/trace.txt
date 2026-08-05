@@ -1,0 +1,87 @@
+stock-research trace
+company=Energy Recovery, Inc.
+ticker=ERII
+period=2025-12-31
+report_type=annual
+generated_for_task=2026-08-05
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the selected skill requires reuse-first research.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields with repeated protocol `set` commands; did not hand-write the initialized JSON structure.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse_check]
+Expected annual facts, normalized facts, raw filing, and prior stock-research artifacts were absent under the paths supplied in config/input.json.
+Only stock_report/data/notes/user_stock_evaluations.md existed, with no reusable ERII annual package found.
+Therefore the research returned to the primary SEC filing and SEC XBRL facts.
+
+[primary_sources]
+- Energy Recovery 2025 Form 10-K, SEC accession 0001421517-26-000022, filed 2026-02-25:
+  https://www.sec.gov/Archives/edgar/data/1421517/000142151726000022/erii-20251231.htm
+- SEC companyfacts API, CIK 0001421517:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0001421517.json
+- Energy Recovery investor-relations annual reports index:
+  https://ir.energyrecovery.com/sec-filings/annual-reports
+- Federal Reserve H.10 China spot exchange-rate series, 2025-12-31 observation used as 7.1875 CNY/USD.
+- Market capitalization, date, PE TTM and market-data source were supplied by config/input.json (Yahoo Finance yfinance).
+
+[model_decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=The company sells manufactured pressure-energy-recovery products and services. Its balance sheet contains cash, investment-grade marketable debt securities, receivables, inventory, PP&E, leases, and ordinary operating liabilities. No customer funds, insurance reserves, regulated project cash, concession rights, or financial intermediation balances were identified.
+
+[currency]
+All filing values were reported in USD and converted to CNY at 7.1875 CNY/USD for the result protocol.
+Market capitalization from input was already treated as CNY because the protocol initializer copied it into the CNY result.
+
+[core_usd_facts]
+revenue=134,987,000
+cost_of_revenue=47,056,000
+gross_profit=87,931,000
+operating_income=23,889,000
+net_income=22,962,000
+operating_cash_flow=18,770,000
+capital_expenditure=1,330,000
+operating_free_cash_flow=17,440,000
+total_assets=231,514,000
+total_liabilities=25,322,000
+stockholders_equity=206,192,000
+cash_and_cash_equivalents=48,076,000
+short_term_investments=27,173,000
+long_term_investments=8,034,000
+accounts_receivable=76,639,000
+inventory=24,260,000
+share_repurchase_cash_out=35,623,000
+stock_based_compensation=7,719,000
+
+[owner_earnback]
+cash_discount:
+- cash_and_equivalents: 70%; retains 30% operating/restructuring buffer
+- short_term_investments: 95%; small liquidity/market discount
+- long_term_investments: 90%; larger duration/liquidity discount
+- interest_bearing_debt: zero at year end
+discounted_detachable_net_cash_cny=479,392,953.125
+
+profit_base_cny=125,350,000 (2025 operating cash flow less capex)
+safety_adjustment_cny=-12,146,875
+discounted_sustainable_cash_profit_cny=113,203,125
+market_cap_cny=3,008,706,963.704132
+operating_business_price_cny=2,529,314,010.579132
+owner_earnback_years=22.3431465393
+market_cap_to_cash_profit=26.5779497139
+
+[dividend]
+forecast_cash_dividend=0
+forecast_dividend_yield=0
+basis=The 2025 Form 10-K says the company has never declared or paid a common-stock dividend and does not intend to do so for the foreseeable future. Buybacks were analyzed separately and not treated as dividends.
+
+[quality]
+status=complete
+Key timing limitation: market capitalization is dated 2026-08-03 while operating and balance-sheet facts end 2025-12-31.
+Key judgment limitation: sustainable cash profit contains an analyst safety discount, not management guidance.
+Key subsequent-event limitation: the exact final cost of winding down the CO2 refrigeration business was not determinable from the 2025 annual statements.

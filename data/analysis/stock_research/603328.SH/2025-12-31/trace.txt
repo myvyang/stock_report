@@ -1,0 +1,53 @@
+stock-research trace
+company: 依顿电子 (603328.SH)
+period: 2025-12-31 annual
+generated_at: 2026-07-31T22:00:53+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked the configured raw filing, annual review, normalized facts, and prior stock research paths.
+- No local filing metadata, annual facts package, or prior research outputs existed for 603328.SH/2025-12-31.
+- Therefore researched the disclosed 2025 annual report rather than fabricating or carrying forward missing facts.
+
+3. Sources used
+- Primary disclosure identity: 广东依顿电子科技股份有限公司2025年年度报告, disclosed 2026-03-31 on the Shanghai Stock Exchange.
+- Accessible full-text mirror used for extraction and cross-checking:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12037248&stockid=603328
+- Official SSE regular-report index used to confirm the exchange disclosure channel:
+  https://www.sse.com.cn/disclosure/listedinfo/regular/
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, timestamp 20260731114335.
+
+4. Extracted report facts
+- Revenue 4,025,314,283.14; cost of sales 3,132,686,398.52; operating profit 518,688,876.18; parent net profit 465,673,527.14.
+- Total assets 6,308,980,529.12; total liabilities 1,994,096,107.54; parent and total equity 4,314,884,421.58; no minority interest.
+- Operating cash flow 839,309,687.35; capex 500,167,571.60; financing cash flow -131,063,937.86.
+- Cash equivalents 435,427,556.50; one-year debt investments 801,064,625.49; debt investments 1,073,139,359.22; short borrowings 169,359,481.12.
+- PCB main-business revenue 3,587,040,347.30 and main-business gross margin 13.39%; export revenue 2,303,116,756.88 and export gross margin 18.21%.
+- 2025 profit distribution proposal: CNY 1.68 per 10 shares, tax inclusive.
+
+5. Model decisions
+- Confirmed ordinary_operating/applicable because the company manufactures and directly sells PCB products; no special financial-statement model applies.
+- Discounted detachable net cash:
+  435,427,556.50 * 50% + (801,064,625.49 + 1,073,139,359.22) * 90% - 169,359,481.12
+  = 1,735,137,883.369.
+- Sustainable cash profit:
+  465,673,527.14 - 18,758,883.85 + 232,091,875.99 - 295,745,731.32
+  = 383,260,787.96.
+- The 232,091,875.99 add-back comprises fixed-asset depreciation, right-of-use amortization, intangible amortization, and long-term deferred expense amortization.
+- Used 2024 capex as a proxy for maintenance capex because 2025 capex includes material Thailand expansion spending. This is an explicit judgment and key sensitivity.
+- Operating business price = 9,555,000,000 - 1,735,137,883.369 = 7,819,862,116.631.
+- Owner earnback = 7,819,862,116.631 / 383,260,787.96 = 20.4035 years.
+- Market cap / cash profit = 24.9308 times.
+
+6. Output construction and validation
+- Populated outputs/result.json through repeated protocol CLI `set` operations; the complex result was not hand-written from scratch.
+- Wrote outputs/report.md as the human-readable operating story.
+- Wrote outputs/trace.txt with sources, decisions, formulas, and limitations.
+- Final protocol validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

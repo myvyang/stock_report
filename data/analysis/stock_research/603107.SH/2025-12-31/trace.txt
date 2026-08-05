@@ -1,0 +1,60 @@
+stock-research trace
+company=603107.SH 上海汽配
+period=2025-12-31
+generated_at=2026-08-01T02:56:42+08:00
+
+[protocol]
+read .agents/skills/stock-research/SKILL.md
+read references/result-contract.md
+read references/report-contract.md
+read references/data-reuse.md
+initialized outputs/result.json with:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+all result fields populated through protocol set commands; JSON was not authored from scratch.
+
+[reuse check]
+No annual facts package, normalized facts, raw filing, or prior stock research result existed in the workspace for 603107.SH/2025-12-31.
+
+[source discovery]
+Queried Shanghai Stock Exchange company bulletin endpoint for productId=603107, 2026-01-01 through 2026-08-01.
+Located official filing: 上海汽车空调配件股份有限公司2025年年度报告, disclosure date 2026-04-21, SSE URL /disclosure/listedinfo/announcement/c/new/2026-04-21/603107_20260421_IDAR.pdf.
+SSE direct PDF download presented anti-bot challenge in the execution environment; figures were checked against the indexed full annual-report text and the official-report abstract mirror on CNINFO. Core figures refer back to the SSE filing.
+Dividend implementation cross-checked against the 2025 annual equity distribution implementation announcement.
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Revenue and assets arise from manufacturing and selling automotive thermal-management and engine-system components. No special financial, property, construction, concession, or holding-company statement structure was found.
+
+[calculations]
+revenue=2239615678.46
+cost_of_sales=1812069941.75
+gross_profit=427545736.71
+gross_margin=427545736.71/2239615678.46=0.1909013858
+parent_net_profit=156282547.13
+net_margin=156282547.13/2239615678.46=0.0697809667
+operating_cash_flow=184635379.14
+capital_expenditure=130582636.04
+operating_free_cash_flow=54052743.10
+
+discounted_cash=731426714.92*0.50=365713357.46
+discounted_trading_financial_assets=10000000*0.90=9000000
+less_short_term_borrowing=10000000
+less_current_and_noncurrent_lease_liabilities=11725433.28+25038538.04=36763971.32
+discounted_detachable_net_cash=327949386.14
+
+discounted_sustainable_cash_profit=100000000
+basis=between 2025 operating FCF 54052743.10 and recurring parent profit 181454100; conservative haircut reflects maintenance capex, working-capital volatility, overseas ramp, and customer concentration.
+operating_business_price=4304000000-327949386.14=3976050613.86
+owner_earnback_years=3976050613.86/100000000=39.7605061386
+market_cap_to_cash_profit=4304000000/100000000=43.04
+forecast_dividend_yield=101200500/4304000000=0.0235131273
+
+[quality]
+status=complete
+limitations=market snapshot supplied by input; detachable cash and sustainable cash profit are research estimates; no independent market-share data obtained.
+
+[validation]
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

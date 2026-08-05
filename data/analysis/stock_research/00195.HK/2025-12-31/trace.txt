@@ -1,0 +1,54 @@
+Task: stock research for 00195.HK, requested period 2025-12-31
+Generated: 2026-08-04 Asia/Shanghai
+
+Protocol:
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the skill routes reuse decisions to it.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields through protocol CLI set commands; did not construct result.json directly.
+6. Validated with protocol CLI; result: {"status":"ok","errors":[]}.
+
+Reused local evidence:
+- stock_report/data/analysis/annual_review/00195.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/00195.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/00195.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/00195.HK/2025-12-31/metadata.json
+- annual_report_2023.txt, with spot checks of profit or loss, financial position, cash flow and note 42
+- hkex_delay_2025_08_29.txt
+- hkex_auditor_2026_05_05.txt
+
+Model decision:
+- Input hint said financial_brokerage.
+- Audited 2023 report shows a single continuing tin-mining segment through a 50% Renison interest, with no brokerage customer funds, proprietary securities book or repo funding structure.
+- Overrode hint to ordinary_operating / applicable.
+- Kept data_quality.status=partial because audited 2024 and 2025 statements are unavailable and the stock has been suspended since 2024-09-02.
+
+Currency conversion:
+- Annual-report amounts are HKD thousands.
+- Converted to CNY absolute yuan at HKD/CNY 0.90622, the China Foreign Exchange Trade System central parity rate for 2023-12-29.
+- Formula: reported HKD'000 * 1,000 * 0.90622.
+
+Owner earnback scenario:
+- Cash: CNY 182,379,493.66; include 50% = CNY 91,189,746.83.
+- Impaired financial investment: include zero.
+- Lease liabilities: subtract CNY 43,116,135.16.
+- Discounted detachable net cash = CNY 48,073,611.67.
+- 2023 operating FCF = CFO CNY 216,485,989.58 - cash capex CNY 176,896,862.66 = CNY 39,589,126.92.
+- Apply 20% cycle/capex-definition/data-staleness haircut: cash profit CNY 31,671,301.536.
+- Operating business price = CNY 329,047,545.71437836 - CNY 48,073,611.67 = CNY 280,973,934.04437834.
+- Owner earnback years = 8.871562595083189.
+- Market cap / cash profit = 10.389454482644421.
+- These are indicative only and are explicitly excluded from formal ranking due to partial data quality.
+
+Dividend:
+- Annual Report 2023 note 42 states no ordinary shareholder dividend for 2023 or 2022.
+- Forecast cash dividend set to zero as a conservative scenario, not management guidance.
+
+Remaining gaps:
+- No audited 2025 annual report.
+- No audited 2024 annual report.
+- Market cap and PE after prolonged suspension may not represent executable or verifiable valuation.
+- No reliable split of maintenance versus growth/development/exploration capex.
+- No cash split by legal entity, jurisdiction, restriction, or upstreamability.

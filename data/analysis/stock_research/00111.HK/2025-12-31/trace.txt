@@ -1,0 +1,52 @@
+stock-research trace
+company: 00111.HK / Cinda International Holdings Limited
+period: 2025-12-31
+generated_for_input: config/input.json
+
+1. Read and applied:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check:
+   - No annual facts package, normalized facts, prior research result, or raw filing existed for 00111.HK/2025-12-31.
+   - Initialized outputs/result.json with the protocol CLI from config/input.json.
+
+3. Primary filings consulted:
+   - 2025 Annual Report, HKEX release 2026-04-20:
+     https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0420/2026042000346.pdf
+     Relevant pages: 8-10 (business/segments), 29 (dividend), 40-42 (audit and key audit matters), 46-51 (primary statements), 87-90 (dividend and investments), 93-106 (associates/JVs and receivables), 129-134 (financial risks).
+   - Profit Alert, HKEX release 2026-07-15:
+     https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0715/2026071500608.pdf
+
+4. Market data:
+   - Market cap CNY 330,974,617.72441864; PE TTM 4.78; timestamp 2026/07/31 16:08:47.
+   - Source supplied in input: Tencent qt.gtimg.cn.
+
+5. Model decision:
+   - Confirmed financial_brokerage / requires_special_model from audited business and balance-sheet facts.
+   - Debt investments, margin loans, settlement receivables, bank loans and repo borrowings are operating financial assets/liabilities.
+   - All ordinary owner earnback fields retained as null per result contract.
+
+6. Currency conversion:
+   - Reporting currency in filing: HKD.
+   - Closing balance-sheet and dividend conversion: 0.90486 CNY/HKD, PBOC central parity announcement dated 2025-12-26 (nearest cited official year-end reference used).
+   - Income statement and cash-flow conversion: 0.923 CNY/HKD approximate 2025 annual-average cross-rate.
+   - Original HKD figures remain the analytical source of ratios; CNY values are protocol display conversions.
+
+7. Derived checks:
+   - Total assets HKD 2,583.924m = non-current assets 457.171m + current assets 2,126.753m.
+   - Total liabilities HKD 1,523.530m = current liabilities 1,497.271m + non-current lease liabilities 26.259m.
+   - Average-equity ROE = 80.430 / ((935.796 + 1,060.394) / 2) = 8.06%.
+   - Assets/equity = 2,583.924 / 1,060.394 = 2.44x.
+   - Net margin = 80.430 / 203.446 = 39.53%; gross margin not meaningful for brokerage model.
+   - Dividend = 641,205,600 shares x HKD 0.05 = HKD 32.060m.
+   - Forecast/history dividend yield = CNY 29.010m / CNY 330.975m = 8.765%.
+
+8. Protocol operations:
+   - init: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - populate: protocol set commands used for all completed sections.
+   - final validation: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - final validation result: {"status":"ok","errors":[]}
+   - arithmetic cross-checks: balance-sheet residual -1.19e-7 CNY (floating-point rounding); dividend-yield residual 0; all 11 ordinary owner-earnback fields null.

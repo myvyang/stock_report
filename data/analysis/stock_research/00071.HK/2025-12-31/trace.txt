@@ -1,0 +1,66 @@
+stock-research trace
+company: 00071.HK MIRAMAR HOTEL
+period: 2025-12-31 annual
+generated_at: 2026-08-03T12:22:55+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely as requested.
+- Read references/data-reuse.md because the skill routes research through existing annual facts where available.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked stock_report annual_review, normalized facts and raw filing paths for 00071.HK/2025-12-31.
+- No reusable annual facts package existed, so returned to primary filings.
+
+3. Primary sources acquired and reviewed
+- HKEX Annual Report 2025, released 2026-04-23:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042300784.pdf
+  Saved as stock_report/data/raw/filings/00071.HK/2025-12-31/annual-report-2025.pdf.
+- HKEX 2025 Final Results Announcement, released 2026-03-19:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0319/2026031901636.pdf
+- Company 2025 results press release used only as cross-check.
+- PBOC/CFETS 2025-12-31 exchange rate, republished by China Economic Net:
+  1 HKD = 0.90322 CNY.
+- Tencent market snapshot came from config/input.json and was not independently recalculated.
+
+4. Model verification
+- Input hint said financial_brokerage, but filing states property rental, hotels and serviced apartments, food and beverage, and travel operations.
+- No brokerage customer funds, repo liabilities or capital-market operating balance sheet was found.
+- Overrode model to ordinary_operating/applicable.
+- Kept investment properties as core operating assets, not detachable cash.
+
+5. Key HKD filing facts (HK$'000 unless stated)
+- Revenue 2,581,394; cost of sales derived from disclosed cost lines 1,710,575; gross profit 870,819.
+- Operating result before finance cost and fair-value movement 821,297.
+- Net profit 700,069; parent net profit 677,463; underlying parent profit 695,635.
+- Total assets 22,687,752; liabilities 1,253,447; total equity 21,434,305; parent equity 21,235,593; NCI 198,712.
+- Investment properties 15,073,880; cash and bank balances 6,377,512; no loans.
+- Reported operating cash flow 253,973; shareholder dividends 366,209 are classified in operating activities.
+- Capex 80,106 = investment properties 12,039 + other PPE 68,067.
+- Reported operating FCF 173,867; pre-shareholder-dividend operating cash flow 620,182; corresponding pre-dividend FCF 540,076.
+- 2025 dividend 0.53 HKD/share, total 366,209.
+
+6. Conversion and formulas
+- All result.json monetary values use CNY absolute yuan and 0.90322 CNY/HKD.
+- Gross margin = 870,819 / 2,581,394 = 0.3373444736.
+- Net margin = 677,463 / 2,581,394 = 0.2624407588.
+- Discounted detachable net cash = (cash 6,377,512 * 80% - all liabilities 1,253,447) * 1,000 * 0.90322 = CNY 3,476,098,711.57.
+- Sustainable cash profit estimate = HKD 400,000,000 * 0.90322 = CNY 361,288,000.
+- Operating business price = market cap CNY 5,926,494,891.88 - discounted net cash = CNY 2,450,396,180.31.
+- Owner earnback = 2,450,396,180.31 / 361,288,000 = 6.7824 years.
+- Market cap / cash profit = 16.4038 years.
+- Forecast dividend = HKD 366,209,000 * 0.90322 = CNY 330,767,292.98; yield = 5.5812%.
+
+7. Judgment boundaries
+- The HKD 400m sustainable cash profit is an analyst normalization, not company guidance.
+- It removes a conservative estimate of cash-related earnings after assuming cash is detachable, includes annual capex, and adds a cycle buffer.
+- No liquidation value was assigned to HKD 15.074bn investment properties; therefore owner earnback is an operating-cash framework, not a NAV liquidation analysis.
+- Cash detachability depends on board capital allocation and is not guaranteed.
+
+8. Protocol writes and validation
+- Populated outputs/result.json only after CLI initialization, using repeated protocol `set` operations for scalar and branch fields.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed-result validation status: ok; errors: [].

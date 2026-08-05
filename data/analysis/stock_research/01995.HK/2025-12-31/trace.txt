@@ -1,0 +1,53 @@
+stock-research trace
+company: 01995.HK / 永升服务集团有限公司
+period: 2025-12-31 annual
+generated_at: 2026-08-04T11:58:22+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Source retrieval and identity check
+- Local annual facts and raw filing were absent at task start.
+- Located HKEX Annual Report 2025, released 2026-04-20:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0420/2026042000986.pdf
+- Saved official PDF to stock_report/data/raw/filings/01995.HK/2025-12-31/annual_report_2025.pdf.
+- Official report identifies issuer as Ever Sunshine Services Group Limited and describes property management/value-added/city services. Therefore input hint financial_brokerage was rejected and replaced with ordinary_operating/applicable.
+
+3. Core facts extracted from official annual report (RMB)
+- Revenue 6,866,231,000; cost of services 5,564,654,000; gross profit 1,301,577,000.
+- Net profit 550,050,000; parent net profit 437,449,000.
+- Total assets 9,625,691,000; liabilities 4,003,898,000; equity 5,621,793,000; parent equity 5,178,998,000; NCI 442,795,000.
+- Operating cash flow 508,570,000.
+- Capex = PPE 30,811,000 + intangible assets 26,004,000 + investment properties 3,453,000 = 60,268,000.
+- Operating free cash flow = 508,570,000 - 60,268,000 = 448,302,000.
+- Cash 2,765,420,000; FVTPL assets 292,079,000; borrowings 36,491,000; lease liabilities 10,477,000.
+- Trade and bills receivables 2,726,351,000; ECL charge 108,100,000.
+- Full-year declared dividend HKD0.1978/share; forecast is normalized to RMB300,000,000 using approximately 68.5% payout on 2025 parent profit rather than asserting an FX conversion.
+
+4. Ratios and owner earnback calculations
+- Gross margin = 1,301,577,000 / 6,866,231,000 = 0.1895591728.
+- Net margin = 437,449,000 / 6,866,231,000 = 0.0637073078.
+- Parent share of FCF = 448,302,000 * 437,449,000 / 550,050,000 = 356,529,882.0070903.
+- Discounted cash profit = 356,529,882.0070903 * 85% = 303,050,399.70602673.
+- Discounted detachable net cash = cash * 50% + FVTPL * 30% - borrowings - lease liabilities
+  = 2,765,420,000 * 50% + 292,079,000 * 30% - 36,491,000 - 10,477,000
+  = 1,423,365,700.
+- Operating business price = 2,652,683,445.8208084 - 1,423,365,700 = 1,229,317,745.8208084.
+- Owner earnback years = 1,229,317,745.8208084 / 303,050,399.70602673 = 4.0564795394.
+- Market cap / cash profit = 2,652,683,445.8208084 / 303,050,399.70602673 = 8.7532748625.
+- Forecast dividend yield = 300,000,000 / 2,652,683,445.8208084 = 0.1130930268.
+
+5. Judgment/fact separation
+- 50% cash recognition, 30% FVTPL recognition and 15% cash-profit haircut are analyst assumptions.
+- Receivable growth, ECL, cash flow, capex, declared dividend and statements are filing facts.
+- Market cap and PE are input facts from Tencent qt.gtimg.cn, not annual-report facts.
+- Currency limitation: protocol treats input market cap amount as CNY; HK quote feeds often carry HKD. No independent FX conversion was imposed because the supplied task input is authoritative for the valuation fields.
+
+6. Output construction and validation
+- outputs/result.json was populated only through protocol set commands after protocol init.
+- outputs/report.md and outputs/trace.txt were written as human-readable artifacts.
+- Final protocol validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

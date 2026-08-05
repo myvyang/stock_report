@@ -1,0 +1,59 @@
+stock-research trace
+company: 深圳机场 (000089.SZ)
+period: 2025-12-31 annual
+generated_for_input: 2026-08-01T00:58:27+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely as requested.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked stock_report/data/analysis/annual_review/000089.SZ/2025-12-31, normalized facts, and prior stock research paths.
+- No pre-existing annual facts package or prior research result was available for this company/period.
+- Therefore returned to the original filing layer.
+
+3. Primary sources
+- Shenzhen Airport 2025 Annual Report, CNINFO official filing, disclosed 2026-04-24:
+  https://static.cninfo.com.cn/finalpage/2026-04-24/1225169129.PDF
+- Local archival copy:
+  stock_report/data/raw/filings/000089.SZ/2025-12-31/annual-report-2025.pdf
+- Shenzhen Airport 2025 profit distribution proposal, disclosed 2026-04-24; proposal: RMB 0.16/share, RMB 328,123,121.44 total, 62.48% payout. Annual shareholder meeting passed it on 2026-05-20.
+- Market snapshot was supplied by config/input.json: Tencent qt.gtimg.cn, timestamp 20260731114321, market cap RMB 13,781,000,000, PE TTM 22.21.
+
+4. Annual report locations used
+- Annual report p.6: revenue, parent net profit, adjusted parent net profit, operating cash flow, total assets, parent equity.
+- Annual report pp.9-10: business model, airport network, throughput and national rankings.
+- Annual report p.17: revenue split and cost composition.
+- Annual report pp.18-20: customer/supplier concentration, cash-flow discussion and asset composition.
+- Annual report pp.76-78: consolidated balance sheet.
+- Annual report pp.80-82: consolidated income statement.
+- Annual report pp.84-85: consolidated cash flow statement.
+- Annual report pp.162-168: borrowings, lease liabilities, revenue/cost and investment income notes.
+
+5. Key calculations
+- Gross profit = 5,128,350,945.52 - 4,037,350,573.97 = 1,091,000,371.55.
+- Gross margin = 1,091,000,371.55 / 5,128,350,945.52 = 21.2737%.
+- Net margin = 525,205,361.13 / 5,128,350,945.52 = 10.2411%.
+- Operating free cash flow proxy = 1,836,036,908.23 - 481,538,184.30 = 1,354,498,723.93.
+- Forecast dividend yield = 328,123,121.44 / 13,781,000,000 = 2.3809%.
+- Minority interest ratio = 18,123,316.97 / 11,647,270,701.95 = 0.1557%.
+- The free-cash-flow proxy does not distinguish maintenance from growth capex and is not treated as distributable cash profit.
+
+6. Model decision
+- Confirmed statement_model = utility_concession and owner_earnback_applicability = requires_special_model.
+- Reason: airport cash flow depends on inseparable operating infrastructure and use-right arrangements. At 2025 year-end, fixed assets were RMB 10.314bn, right-of-use assets RMB 6.392bn, long-term borrowings RMB 3.411bn and lease liabilities RMB 6.641bn. Cash and financial assets support operations, expansion, lease payments and debt service, so they are not treated as detachable cash.
+- Per result-contract.md, all ordinary owner earnback ranking fields remain null.
+
+7. Output construction and validation
+- outputs/result.json was populated through repeated protocol CLI set calls; no complex JSON object was handwritten from scratch.
+- First validation command returned {"status":"ok","errors":[]}.
+- outputs/report.md was written from the validated facts and model decision.
+- Final validation is run after all outputs are present.
+
+8. Limitations
+- No facility-by-facility remaining lease/use period or discounted project cash-flow model was constructed.
+- Maintenance and expansion capex were not separately disclosed in a form sufficient for a sustainable distributable-cash estimate.
+- Market valuation fields are an input market snapshot and are not audited annual-report data.

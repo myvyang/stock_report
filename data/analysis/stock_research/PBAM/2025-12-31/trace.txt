@@ -1,0 +1,63 @@
+stock-research trace
+task_created_at=2026-08-04T19:51:31+08:00
+company=Private Bancorp of America, Inc. (PBAM)
+period=2025-12-31
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- Checked the annual-review, normalized-facts and raw-filing paths specified in config/input.json.
+- No PBAM annual fact pack, normalized facts or raw filing metadata existed in /workspace.
+- Research therefore returned to primary public disclosures.
+
+3. Company and filing identification
+- SEC company-ticker data identified PBAM as CIK 0001705284 and Private Bancorp of America, Inc.
+- SEC submissions showed the company registered its common stock in July 2026.
+- Primary annual source: Form 10-12B/A, filed 2026-07-17, accession 0001193125-26-307732, containing audited statements for 2025, 2024 and 2023.
+- Current identity/listing cross-check: Form 8-K filed 2026-07-29, accession 0001193125-26-323834.
+
+4. Model override
+- Input hint: ordinary_operating/applicable.
+- Filing fact: the holding company's operating subsidiary is CalPrivate Bank; deposits, loans, securities, liquidity and regulatory capital are the operating model.
+- Final model: financial_bank/requires_special_model.
+- All ordinary owner-earnback metrics left null as required by result-contract.md.
+
+5. Core source facts (USD, filing units expanded from thousands)
+- Total assets: 2,535,057,000
+- Total liabilities: 2,271,093,000
+- Total equity and parent equity: 263,964,000
+- Net income attributable to common/parent: 40,666,000
+- Net interest income: 118,230,000
+- Net interest margin: 4.76%
+- ROA: 1.61%; ROE: 16.45%; efficiency ratio: 49.04%
+- Net loans: 2,096,824,000; allowance: 29,323,000
+- Deposits: 2,223,881,000; uninsured deposits: 1,062,732,000
+- Nonaccrual loans: 42,227,000; OREO: 8,568,000; NPA/assets: 2.00%
+- Bank capital at 2025-12-31: total 13.90%; CET1 12.64%; Tier 1 leverage 10.85%
+- Cash dividends: none; common-share repurchases in 2025: 5,023,000
+
+6. Currency conversion
+- Federal Reserve H.10 spot rate on 2025-12-31: CNY 7.1875 per USD.
+- All filing monetary amounts in result.json multiplied by 7.1875.
+- Market cap was already supplied in CNY and was not converted again.
+
+7. Dividend forecast
+- Forecast cash dividend: CNY 0.
+- Forecast dividend yield: 0.
+- Basis: no current common dividend and explicit filing disclosure that the company currently does not pay common dividends; no unannounced payout assumed.
+
+8. Protocol actions
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields using protocol set commands; result.json was not composed from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed-result validation status: ok, errors: [].
+
+9. Data-quality judgment
+- status=complete because identity, reporting period, supplied valuation snapshot, audited balance sheet/net income, bank-specific operating metrics, dividend baseline, asset/liability explanations and primary evidence are present.
+- Limitations retained in result.json: registration statement rather than periodic 10-K; supplied market snapshot not replaced; bank cash flow not treated as distributable cash; zero dividend forecast is not a board commitment.

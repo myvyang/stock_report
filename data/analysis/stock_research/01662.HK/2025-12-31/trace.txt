@@ -1,0 +1,64 @@
+stock-research trace
+company: 01662.HK / YEE HOP HLDGS
+requested_archive_period: 2025-12-31
+report_type: annual
+generated_at: 2026-08-04T23:17:29+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because it is directly referenced by the selected skill.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local data reuse check
+- Checked the paths declared in config/input.json.
+- No raw filing, annual facts, normalized facts, or historical stock-research outputs existed locally for 01662.HK/2025-12-31.
+- Only stock_report/data/notes/user_stock_evaluations.md existed; it was not needed and was not modified.
+
+3. Company and model verification
+- Input hint classified the company as financial_brokerage.
+- HKEX annual report states the group mainly provides foundation, other civil, and tunneling works, with PRC premises revitalisation and a very small health/environment segment.
+- Overrode the hint with statement_model=construction_project and owner_earnback_applicability=requires_special_model.
+- Reason: cash, contract assets, receivables, payables, and borrowings form the project funding/settlement cycle; PRC subleased properties have matching lease liabilities.
+
+4. Primary sources
+- HKEX 2024/25 Annual Report, released 2025-07-24, year ended 2025-03-31:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2025/0724/2025072401281.pdf
+- HKEX 2025/26 Interim Results Announcement, released 2025-11-28, six months ended 2025-09-30:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2025/1128/2025112801565.pdf
+- 2025-03-31 RMB central parity authorised by China Foreign Exchange Trade System, reproduced by Xinhua:
+  https://www.news.cn/20250331/936fa9fcea9f480782390983d6107051/c.html
+- Valuation snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026-08-03 09:46:59.
+
+5. Period handling
+- The requested archive period is 2025-12-31, but Yee Hop's statutory year end is 31 March.
+- Annual core statements use the latest audited annual report available by the archive date: year ended 2025-03-31.
+- The September 2025 interim filing is used only for information known by 2025-12-31, notably the declared special dividend, updated order backlog, and subsequent balance-sheet observations.
+- The provided market-cap date is after the archive period. It is retained because the protocol/input requires it, with an explicit cross-period limitation.
+
+6. Currency and calculations
+- Reporting currency in filings: HKD. Result-contract currency: CNY absolute yuan.
+- Conversion rate: 1 HKD = 0.92283 CNY at 2025-03-31.
+- Gross margin = 137.044 / 1,108.472 = 12.3633%.
+- Parent net margin = 39.846 / 1,108.472 = 3.5947%.
+- Operating profit field = profit before tax 37.817 + finance costs 17.173 = HKD54.990m.
+- Capital expenditure = investment-property capex 1.598 + equipment purchases 12.579 = HKD14.177m.
+- Operating free cash flow = operating cash flow 82.509 - capex 14.177 = HKD68.332m.
+- Dividend and buyback cash out = dividend paid 48.000 + trustee share purchases 9.484 = HKD57.484m.
+- Forecast cash dividend = HKD0.15 x 515,000,000 shares = HKD77.250m = CNY71.289m.
+- Forecast dividend yield = CNY71.289m / CNY279.124m = 25.5401%.
+- The dividend is explicitly labelled special/non-recurring.
+
+7. Owner earnback handling
+- Because owner_earnback_applicability is not applicable under the ordinary formula, all ordinary ranking values remain null:
+  discounted_net_cash, discounted_net_cash_to_market_cap, discounted_cash_profit,
+  operating_business_price, owner_earnback_years, market_cap_to_cash_profit.
+- No synthetic ordinary owner-earnback number was produced.
+
+8. Output generation and validation
+- outputs/result.json was populated only through protocol set/append commands after protocol init.
+- outputs/report.md and outputs/trace.txt were created as human-readable artifacts.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before final file review: status=ok, errors=[]

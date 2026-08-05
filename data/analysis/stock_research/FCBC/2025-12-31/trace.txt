@@ -1,0 +1,30 @@
+FCBC stock research trace
+generated_at_input=2026-08-05T01:38:52+08:00
+period=2025-12-31
+
+1. Read stock-research/SKILL.md and required result-contract.md/report-contract.md; also read data-reuse.md because the workflow requires reuse checks.
+2. Checked configured annual-review, normalized-facts and raw-filing paths. No reusable FCBC files existed in the workspace.
+3. Initialized outputs/result.json with the protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Located and reviewed the official SEC 2025 Form 10-K filed 2026-03-06:
+   https://www.sec.gov/Archives/edgar/data/859070/000143774926007180/fcbc20251231c_10k.htm
+5. Overrode input analysis_model_hint after filing verification:
+   statement_model=financial_bank
+   owner_earnback_applicability=requires_special_model
+   Reason: deposits, loans, securities and liquidity assets are the regulated operating balance sheet, not detachable cash/debt.
+6. Extracted audited 2025 values (USD thousands): total assets 3,259,643; total liabilities 2,759,096; equity 500,547; net income 48,794; net interest income 124,613; cash equivalents 512,240; AFS securities 132,688; loans net 2,283,994; deposits 2,685,329.
+7. Extracted bank-specific indicators: FTE NIM 4.42%; ROA 1.52%; ROE 9.64%; NPL/loans 0.61%; ACL/loans 1.33%; company CET1 16.10%; total capital 17.35%; average loan/deposit 88.81%.
+8. Reviewed subsequent-event disclosure: Hometown acquisition closed 2026-01-23, adding approximately USD 415m assets, USD 172m loans, USD 376m deposits and 1,029,314 issued FCBC shares. Flagged mismatch between post-acquisition market-cap date and pre-acquisition year-end statements.
+9. Reviewed official 2026 Q1 Form 10-Q / earnings release for current regular dividend and share count:
+   https://www.sec.gov/Archives/edgar/data/859070/000143774926015833/fcbc20260331_10q.htm
+   Regular quarterly dividend remained USD 0.31; 18,866,729 shares outstanding at 2026-05-07.
+10. Used 2025-12-31 USD/CNY central parity 7.0288, published by CFETS and reported by Xinhua:
+    https://www1.xinhuanet.com/20251231/fe9f6466f6884589b5287e6ee946baed/c.html
+11. Dividend forecast: USD 0.31 x 4 x 18,866,729 x 7.0288 = CNY 164,436,976.35; divided by supplied market cap CNY 6,075,361,217.99707 = 2.7066205686%. Excluded special dividends.
+12. Populated result fields using protocol CLI set commands; ordinary owner-earnback fields remain null as required for the bank model.
+13. Wrote outputs/report.md with business, earnings, balance-sheet economics, asset quality, capital, dividend and valuation-timing discussion.
+14. Validation command:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Result: status=ok, errors=[]
+
+Data-quality conclusion: complete under the special financial-bank contract. Limitations are disclosed in result.json and report.md.

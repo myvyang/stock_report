@@ -1,0 +1,62 @@
+stock-research trace
+company=603500.SH 祥和实业
+period=2025-12-31
+generated_for=2026-08-01
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated the initialized result through protocol set commands; no complex result JSON was handwritten from scratch.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Initial completed validation status: ok, errors=[]
+
+[reuse audit]
+- config/input.json existed.
+- No raw filing, annual facts, normalized facts, or historical stock-research files existed under the input paths at research time.
+- Therefore public filing retrieval was required.
+
+[primary filing]
+- Document: 浙江天台祥和实业股份有限公司2025年年度报告
+- Filing date: 2026-04-24
+- Official disclosure venue stated in report: 上海证券交易所
+- Readable full-text mirror used for extraction:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12158263&stockid=603500
+- Core sections checked: main financial data, product revenue/cost, consolidated balance sheet, consolidated income statement, consolidated cash flow statement, cash-flow supplement, cash composition, dividend proposal, risks.
+
+[market input]
+- market_cap=2822000000.00 CNY
+- timestamp=20260731114335
+- source=Tencent qt.gtimg.cn
+- pe_ttm=20.4
+
+[formula audit]
+- gross_profit=834707570.77-566466536.76=268241034.01
+- gross_margin=268241034.01/834707570.77=0.3213592920
+- net_margin=134432391.04/834707570.77=0.1610532787
+- operating_free_cash_flow=127388527.91-121141027.47=6247500.44
+- discounted_cash=323502281.84*0.90=291152053.656
+- discounted_other_noncurrent_financial_assets=50000000*0.50=25000000
+- interest_bearing_debt=198128287.31+56900000+30398.63=255058685.94
+- discounted_detachable_net_cash=291152053.656+25000000-255058685.94=61093367.716
+- discounted_sustainable_cash_profit=133268327.49*0.80=106614661.992
+- operating_business_price=2822000000-61093367.716=2760906632.284
+- owner_earnback_years=2760906632.284/106614661.992=25.89612517
+- market_cap_to_cash_profit=2822000000/106614661.992=26.46915487
+- forecast_cash_dividend=0.22*332790246=73213854.12
+- forecast_dividend_yield=73213854.12/2822000000=0.02594395965
+
+[judgment audit]
+- statement_model=ordinary_operating: manufacturing assets and operating liabilities, no special financial-statement structure.
+- Cash equivalent haircut=10% operational buffer; restricted guarantee deposits excluded.
+- Other noncurrent financial asset haircut=50% because it is not cash and underlying liquidity was not fully established.
+- Sustainable profit haircut=20% due to rapid one-year profit growth, customer concentration, receivable occupation, and high expansion capex.
+- The 20% haircut is analyst judgment, not a filing fact.
+
+[known limitations]
+- Exchange-hosted PDF was not saved locally; readable filing mirror was used for numeric extraction.
+- Maintenance versus growth capex was not separately disclosed.
+- Underlying composition and realization terms of the CNY 50 million other noncurrent financial asset were not fully analyzed.
+- Proposed dividend amount uses year-end shares and can change with the record-date share count.

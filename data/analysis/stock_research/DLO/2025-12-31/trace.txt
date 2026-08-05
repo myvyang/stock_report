@@ -1,0 +1,116 @@
+stock-research trace
+company=DLocal Limited
+code=DLO
+period=2025-12-31
+generated_at=2026-08-05T03:53:15+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read result-contract.md and report-contract.md completely as requested.
+3. Read data-reuse.md; checked configured annual-review, normalized-facts, raw-filing and prior stock-research paths.
+4. No existing DLO annual facts package or prior research result was present.
+5. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+6. Populated fields only through protocol set/append commands.
+7. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   status=ok; errors=[]
+
+[primary_sources]
+SEC 20-F filing:
+https://www.sec.gov/Archives/edgar/data/1846832/000207097926000113/dlo-20251231.htm
+accession=0002070979-26-000113
+filed=2026-03-18
+auditor=Price Waterhouse & Co. S.R.L.
+reporting_standard=IFRS
+original_currency=USD
+
+PBOC FX announcement:
+https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+rate_used=7.0358 CNY per USD
+rate_date=2025-12-26
+
+Market data copied from config/input.json:
+market_cap_cny=29944778606.784668
+market_cap_date=2026-08-03
+pe_ttm=23.5625
+source=Yahoo Finance yfinance
+
+[model_review]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=DLocal has one operating segment, payment processing, and earns transaction fees. It is not a deposit-taking bank or investment holding company. However, merchant cash and merchant settlement working capital are integral to payment operations and require explicit exclusion from detachable cash.
+
+[audited_usd_thousands]
+revenue=1093587
+cost_of_services=690831
+gross_profit=402756
+operating_profit=219915
+profit_for_year=196902
+profit_attributable_to_owners=196801
+total_assets=1540964
+total_liabilities=971535
+total_equity=569429
+parent_equity=569261
+non_controlling_interest=168
+operating_cash_flow=415457
+ppe_capex=2282
+intangible_additions=34503
+total_capex=36785
+ifrs_operating_free_cash_flow=378672
+financing_cash_flow=-121073
+dividends_paid=149982
+
+[key_operating_facts]
+tpv_2025_usd_billion=40.8
+tpv_yoy=59.6%
+nrr_2025=145%
+tpv_from_merchants_on_platform_over_two_years=98.8%
+adjusted_ebitda_usd_thousands=278078
+adjusted_free_cash_flow_usd_thousands=190690
+share_based_payment_usd_thousands=24136
+declared_2026_dividend_usd=57211274
+
+[cash_ownership]
+total_cash_usd_thousands=719897
+corporate_cash_usd_thousands=424498
+merchant_cash_usd_thousands=295399
+merchant_cash_treatment=excluded in full; belongs to merchants or their customers
+fvpl_financial_assets_usd_thousands=99089
+financial_liabilities_usd_thousands=86898
+lease_liabilities_usd_thousands=3385
+net_derivative_liability_usd_thousands=1427
+
+[formulas]
+gross_margin=402756/1093587=0.3682889427
+net_margin=196801/1093587=0.1799591619
+
+discounted_detachable_net_cash_usd_million=
+  424.498*80% + 99.089*60% - 86.898 - 3.385 - 1.427
+  =307.3418
+discounted_detachable_net_cash_cny=307.3418m*7.0358=2162395436.44
+
+discounted_sustainable_cash_profit_usd_million=
+  (190.690 adjusted FCF - 24.136 share-based compensation)*90%
+  =149.8986
+discounted_sustainable_cash_profit_cny=149.8986m*7.0358=1054656569.88
+
+operating_business_price=
+  29944778606.784668-2162395436.44=27782383170.34
+owner_earnback_years=
+  27782383170.34/1054656569.88=26.3425876857
+market_cap_to_cash_profit=
+  29944778606.784668/1054656569.88=28.3929190430
+discounted_net_cash_to_market_cap=0.0722127709
+forecast_dividend_yield=
+  (57211274*7.0358)/29944778606.784668=0.0134423128
+
+[judgment_separation]
+Facts: audited statements, cash ownership split, adjusted FCF reconciliation, dividend declaration, TPV and NRR are sourced from the 20-F.
+Inference: ordinary-operating classification is based on the disclosed fee model and single payment-processing segment.
+Judgment: 80% corporate-cash recovery, 60% FVPL-asset recovery, full debt deduction, SBC deduction, and 10% sustainability haircut are analyst assumptions. They are disclosed in result.json and report.md.
+
+[limitations]
+All USD statement amounts use one period-end-adjacent PBOC rate for consistent CNY presentation; income statement translation at an annual average rate would differ slightly.
+Market cap was supplied by the task and was not independently reconstructed from price times diluted shares.
+The sustainable cash-profit estimate is not management guidance and may change materially with settlement working capital, customer mix, FX controls, processor credit losses and growth.

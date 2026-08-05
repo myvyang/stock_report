@@ -1,0 +1,73 @@
+Stock research trace — CENT — request period 2025-12-31
+Generated for task created_at: 2026-08-05T03:42:46+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the task required checking reusable artifacts.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked the input-declared raw filing, annual-review, normalized-facts and prior stock-research paths.
+- None existed in /workspace for CENT/2025-12-31, so no annual fact package could be reused.
+
+3. Primary sources acquired and used
+- SEC FY2025 Form 10-K, accession 0000887733-25-000041:
+  https://www.sec.gov/Archives/edgar/data/887733/000088773325000041/cent-20250927.htm
+- Central investor-relations annual-report index used as an identity/source cross-check:
+  https://ir.central.com/company-information/annual-reports
+- Federal Reserve H.10 weekly exchange rates, release 2025-09-29; 2025-09-26 China yuan per USD = 7.1328:
+  https://www.federalreserve.gov/releases/h10/20250929/
+- Market cap, date and PE TTM were taken exactly from config/input.json (Yahoo Finance yfinance snapshot).
+
+4. Period handling
+- Request path/period: 2025-12-31.
+- Actual annual audited fiscal period: 52 weeks ended 2025-09-27.
+- The subsequent quarter ended 2025-12-27 was identified but deliberately excluded because report_type is annual.
+
+5. Analysis-model decision
+- Confirmed ordinary_operating / applicable.
+- Reason: Pet and Garden are branded-product manufacturing, purchasing and distribution businesses. Inventory, receivables, PP&E, leases and brands are ordinary operating assets; the balance sheet is not a bank, insurer, broker, developer, construction contractor, concession or investment-holding model.
+
+6. Currency normalization
+- All 10-K USD amounts converted to CNY absolute yuan at 7.1328 CNY/USD.
+- The same spot rate was used for balance-sheet, income-statement and cash-flow amounts for deterministic comparability inside this result.
+- This is a presentation conversion, not a claim that 7.1328 was the annual average rate.
+
+7. Key extracted USD facts (millions unless noted)
+- Assets 3,625.643; liabilities 2,040.710 (assets less equity); equity 1,584.933; parent equity 1,583.268; NCI 1.665.
+- Revenue 3,129.064; COGS 2,131.728; gross profit 997.336; operating income 250.042; net income 163.963; parent net income 162.843.
+- OCF 332.506; PP&E additions 41.418; operating FCF 291.088; financing cash flow -156.643; common-stock repurchases 155.066.
+- Cash 882.488; restricted cash 15.945; debt 1,191.703; operating lease liabilities 248.604.
+- Stock compensation 21.060.
+
+8. Owner-earnback calculations
+- Discounted detachable net cash = cash × 90% + restricted cash × 0% - debt × 100%.
+- USD result = 882.488 × 0.90 - 1,191.703 = -397.4638 million.
+- CNY result = -397.4638m × 7.1328 = -2,835,029,792.64 yuan.
+- FY2025 operating FCF = (332.506 - 41.418)m × 7.1328 = 2,076,272,486.40 yuan.
+- Pre-haircut owner cash profit = operating FCF - stock compensation owner cost = 1,926,055,718.40 yuan.
+- Discounted sustainable cash profit = pre-haircut amount × 85% = 1,637,147,360.64 yuan.
+- Operating business price = market cap - discounted detachable net cash = 21,011,928,407.238632 yuan.
+- Owner earnback years = operating business price / discounted sustainable cash profit = 12.8344759381.
+- Market cap / cash profit = 11.102787111.
+- Forecast cash dividend = 0; forecast dividend yield = 0, based on explicit 10-K policy.
+
+9. Judgment boundaries
+- Cash 10% reserve reflects operating and seasonal working-capital needs.
+- Restricted cash was assigned zero detachable value.
+- Debt was deducted at 100% carrying amount.
+- Sustainable cash profit deducts stock compensation as an owner cost and applies a 15% uncertainty haircut for weather, commodity, volume and working-capital variability.
+- These are analyst assumptions, separately labeled from filing facts.
+
+10. Protocol population and validation
+- Populated outputs/result.json only through repeated protocol `set` commands after CLI initialization; no complex JSON object was hand-written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+
+11. Output set
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

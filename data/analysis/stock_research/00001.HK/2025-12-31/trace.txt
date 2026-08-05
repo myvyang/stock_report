@@ -1,0 +1,56 @@
+Stock research trace: 00001.HK / 2025-12-31 annual
+Generated at: 2026-08-03 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill directs reuse of existing annual facts.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the configured raw filing, annual review, normalized facts and prior stock research paths.
+- No filing metadata, annual facts or prior research existed in the workspace for 00001.HK / 2025-12-31.
+- Downloaded the official 2025 annual report to stock_report/data/raw/filings/00001.HK/2025-12-31/ckh_2025_annual_report.pdf.
+- Extracted the PDF locally for locating financial statements and notes; the downloaded official PDF is retained as source evidence.
+
+3. Company identity and model audit
+- The input hint classified the company as financial_brokerage.
+- Official annual report and company overview identify CK Hutchison as a diversified holding group operating ports, retail, infrastructure, telecommunications, and finance/investments/other businesses.
+- Overrode the hint with statement_model=investment_holding and owner_earnback_applicability=requires_special_model.
+- Ordinary owner-earnback metrics remain null because consolidated cash/debt spans operating subsidiaries, substantial value is equity-accounted, and upstream cash availability depends on ownership, regulation and governance.
+
+4. Core sources
+- CK Hutchison Holdings 2025 Annual Report / Annual Results, dated 2026-03-19:
+  https://www.ckh.com.hk/upload/attachments/en/pr/e_CKHH_AR_2025_full_20260319.pdf
+- CK Hutchison official business overview:
+  https://www.ckh.com.hk/en/global/home.php/
+- 2025-12-31 HKD/CNY central parity, 1 HKD = CNY 0.90322:
+  https://www.ce.cn/xwzx/gnsz/gdxw/202512/t20251231_2676993.shtml
+- VodafoneThree proposed disposal, dated 2026-05-05:
+  https://www.ckh.com.hk/en/media/press_each.php?id=3472
+- Panama Ports Company statement, dated 2026-03-06:
+  https://www.ckh.com.hk/upload/attachments/en/pr/PPC_statement_20260306_e.pdf
+- Valuation snapshot supplied by input: Tencent qt.gtimg.cn, 2026-07-31 16:08:47.
+
+5. Key extraction and transformations
+- Original annual-report currency: HKD million.
+- Protocol currency: CNY yuan. Conversion used: HKD million * 1,000,000 * 0.90322.
+- Statutory revenue HKD 280,036m; parent profit HKD 11,841m; net margin=11,841/280,036=4.2284%.
+- Total assets HKD 1,155,673m; liabilities HKD 467,281m; equity HKD 688,392m; parent equity HKD 562,772m; NCI HKD 125,620m.
+- Operating cash flow HKD 62,567m.
+- Capital expenditure HKD 20,835m = fixed assets 18,743m + telecom licences 0 + brands/other rights 2,092m.
+- Operating free cash flow HKD 41,732m = 62,567m - 20,835m.
+- No gross profit or gross margin calculated: the income statement separately presents inventory cost, staff, customer acquisition, depreciation and other costs, so inventory cost alone is not a valid total cost of revenue.
+- Forecast dividend: HKD 2.312/share * 3,830,044,500 shares * 0.90322 = CNY 7,998,069,898.09.
+- Forecast dividend yield: CNY 7,998,069,898.09 / CNY 242,511,069,447.51 = 3.2980%.
+
+6. Result construction
+- Used repeated protocol CLI set and append commands to populate the initialized result; no complex result JSON was handwritten from scratch.
+- Set data_quality.status=complete because all minimum fields for a special-model company are supported and ordinary owner-earnback nulls are intentional.
+- Limitations record the missing comparable gross margin, translation-rate convention, valuation/report date mismatch and special-model exclusion.
+
+7. Validation
+- Protocol validation run after structured population:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[].

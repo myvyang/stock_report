@@ -1,0 +1,49 @@
+stock-research trace
+company: 300401.SZ 花园生物
+period: 2025-12-31 annual
+generated_for_input: 2026-08-01T03:21:01+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because no existing annual facts or prior stock-research result was available.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked configured raw filing, annual review, normalized facts, and prior stock research paths.
+- No company-specific files existed in the workspace; only stock_report/data/notes/user_stock_evaluations.md was present.
+- Therefore fetched the 2025 annual-report PDF from the public announcement mirror and saved it at stock_report/data/raw/filings/300401.SZ/2025-12-31/annual-report-2025.pdf.
+- Since pdftotext/PDF Python libraries were unavailable, extracted the Sina public disclosure full text to annual-report-2025-sina.txt and cross-checked headline figures against the annual-report search result and annual-report summary.
+
+3. Primary facts used
+- Revenue 1,237,398,520.91; cost of sales 549,062,452.11; parent net profit 304,864,608.69.
+- Total assets 5,781,790,377.44; total liabilities 2,292,704,079.84; parent equity 3,489,096,425.46.
+- Operating cash flow 474,738,253.78; capex 361,956,910.67; operating FCF 112,781,343.11.
+- Cash 1,032,433,660.11, including restricted bank-acceptance deposits 108,110,000.00.
+- Structural deposits 301,222,813.70.
+- Interest-bearing debt: short-term loans 431,400,641.67; current long-term loans 60,030,833.32; long-term loans 233,259,177.79; convertible bonds 1,024,750,511.73.
+- Deducted non-recurring parent profit 290,179,777.09; capitalized R&D 45,303,826.39.
+- Proposed 2025 cash dividend 61,436,406.24.
+
+4. Judgment trail
+- Confirmed ordinary_operating model: revenue comes from manufacturing and selling vitamin and pharmaceutical products; balance-sheet operating assets are inventory, receivables, plants, equipment, projects, and R&D rather than special-model customer funds or concession assets.
+- Available cash = 1,032,433,660.11 - 108,110,000.00 + 301,222,813.70 = 1,225,546,473.81.
+- Interest-bearing debt = 1,749,441,164.51.
+- Discounted detachable net cash = -523,894,690.70. Cash and structural deposits received 100% weight; all interest-bearing debt was deducted at 100%.
+- Base normalized profit = deducted non-recurring parent profit 290,179,777.09 - capitalized R&D 45,303,826.39 = 244,875,950.70.
+- Applied 80% sustainability weight due to vitamin price cyclicality, pharmaceutical tender risk, receivable/inventory volatility, and uncertain maintenance/growth capex split.
+- Discounted sustainable cash profit = 195,900,760.56.
+- Operating business price = 6,903,000,000.00 - (-523,894,690.70) = 7,426,894,690.70.
+- Owner earnback = 37.9115 years; market cap/cash profit = 35.2372; forecast dividend yield = 0.889996%.
+
+5. Result construction and validation
+- Populated outputs/result.json exclusively through protocol `set` commands after initialization; did not hand-write the complex JSON from scratch.
+- Protocol validation after population returned: {"status":"ok","errors":[]}.
+- Generated outputs/report.md from the same facts and formulas.
+
+6. Source limitations
+- Core annual-report content is company disclosure, but the locally stored PDF came from an announcement mirror because the exact official static PDF URL was not discoverable in search.
+- Company industry-position claims were not independently verified with a paid industry dataset.
+- Market cap and PE were reused from the supplied Tencent snapshot without re-querying the historical timestamp.
+- The 80% cash-profit discount is an explicit analytical judgment, not management guidance.

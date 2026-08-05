@@ -1,0 +1,64 @@
+stock-research trace
+task: CNO / annual / 2025-12-31
+generated_at: 2026-08-04T13:05:50+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Local reuse check
+- Checked configured annual review, normalized facts, raw filing, and prior stock research paths.
+- No CNO local filing or annual facts package existed; only config/input.json was present.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result skeleton created successfully.
+
+4. Primary sources retrieved and reviewed
+- SEC Form 10-K, filed 2026-02-24:
+  https://www.sec.gov/Archives/edgar/data/1224608/000122460826000017/cno-20251231.htm
+- CNO full-year 2025 earnings release, dated 2026-02-05:
+  https://ir.cnoinc.com/news/news-details/2026/CNO-Financial-Group-Reports-Fourth-Quarter-and-Full-Year-2025-Results/default.aspx
+- CNO dividend increase release, dated 2026-05-06:
+  https://ir.cnoinc.com/news/news-details/2026/CNO-Financial-Group-Announces-Increase-of-Quarterly-Dividend-to-0-18/default.aspx
+- Market cap and PE were reused from config/input.json (Yahoo Finance yfinance snapshot, 2026-08-03).
+
+5. Model classification
+- Input hint ordinary_operating/applicable was rejected.
+- Confirmed financial_insurance/requires_special_model because investment assets back policyholder accounts and insurance reserves.
+- Ordinary detachable-net-cash and cash-profit earnback fields were kept null as required.
+
+6. Currency normalization
+- Original filing currency: USD.
+- Structured result currency: CNY absolute yuan, as required by the contract.
+- Applied research conversion assumption: USD 1 = CNY 7.1884 to all filing and dividend amounts.
+- Market cap was already supplied in CNY and was not reconverted.
+
+7. Key extracted facts (USD millions unless noted)
+- Total assets 38,790.6; total liabilities 36,152.4; shareholders' equity 2,638.2.
+- Investments 29,998.5; unrestricted cash 956.1; reinsurance receivables 3,677.5; DAC 2,397.3.
+- Policyholder account balances 18,912.6; future policy benefits 11,898.0.
+- Revenue 4,487.4; GAAP net income 229.3; operating cash flow 675.7.
+- Cash dividends paid 66.2; share repurchases paid 331.4.
+- Management net operating income 439.2; insurance product margin 1,067.6.
+- Estimated consolidated US insurance subsidiary RBC ratio 380%.
+- Holding-company unrestricted cash and investments 351.4.
+- 2026 quarterly dividend run rate: USD 0.18 per share.
+
+8. Dividend forecast
+- Annualized dividend per share: USD 0.72.
+- Shares: 94,484,339 at 2025-12-31.
+- Forecast cash dividend: USD 68,034,724.08 = CNY 489,056,313.60.
+- Forecast dividend yield versus input market cap: 0.014092...
+
+9. Protocol population and validation
+- Populated initialized result exclusively through protocol set/append commands.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok; errors [].
+
+10. Known limitations
+- No local annual facts package was available.
+- Market cap and PE were not independently reconstructed; they are input snapshots.
+- A single stated FX assumption was used for comparability rather than separate average and closing rates.
+- No ordinary-company free cash flow or owner earnback figure was fabricated for the insurance model.

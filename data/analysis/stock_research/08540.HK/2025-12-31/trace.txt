@@ -1,0 +1,63 @@
+stock-research trace
+company: 08540.HK / VICTORY SEC
+period: 2025-12-31 annual
+generated_at: 2026-08-05 Asia/Shanghai
+
+[1] Instructions and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the skill defines the reuse boundary.
+
+[2] Reuse audit
+- Checked stock_report/data/raw/filings/08540.HK/2025-12-31.
+- Checked stock_report/data/analysis/annual_review/08540.HK/2025-12-31.
+- Checked stock_report/data/normalized/facts/08540.HK/2025-12-31.
+- No filing, annual fact package, normalized facts, or prior stock-research result existed in the workspace.
+- Therefore fetched and reviewed official HKEX disclosures instead of relying on third-party financial summaries.
+
+[3] Primary sources reviewed
+- HKEX Annual Results Announcement for the year ended 31 December 2025, published 2026-03-19:
+  https://www1.hkexnews.hk/listedco/listconews/gem/2026/0319/2026031901482.pdf
+  Used for company identity, licensed activities, segments, revenue, profit, balance sheet, receivables/ECL, borrowings and dividends.
+- HKEX Cash Dividend Announcement, published 2026-03-19:
+  https://www1.hkexnews.hk/listedco/listconews/gem/2026/0319/2026031901506.pdf
+  Used to confirm final dividend HKD0.03/share and payment timetable.
+- PBOC/CFETS central parity announcement dated 2025-12-26:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+  Used conversion rate: HKD1 = CNY0.90486.
+- Tencent qt.gtimg.cn market snapshot embedded in config/input.json:
+  Market cap CNY814,927,782.2458744; PE TTM 15.69; timestamp 2026/08/03 09:39:54.
+
+[4] Model decision
+- Confirmed statement_model=financial_brokerage based on licensed brokerage, futures, margin financing, asset management, corporate finance and virtual-asset services.
+- Confirmed owner_earnback_applicability=requires_special_model.
+- Reason: client/clearing receivables and payables, financing receivables, cash and borrowings are operating and regulatory capital structure, not detachable net cash.
+- All ordinary owner-earnback amounts and ratios remain null by contract.
+
+[5] Key calculations
+- Total assets: HKD515,434,309 x 0.90486 = CNY466,395,888.84.
+- Total liabilities: HKD276,758,201 x 0.90486 = CNY250,427,425.76.
+- Parent equity: HKD239,232,238 x 0.90486 = CNY216,471,682.88.
+- Revenue: HKD209,442,994 x 0.90486 = CNY189,516,587.55.
+- Parent net profit: HKD60,363,502 x 0.90486 = CNY54,620,518.42.
+- Net margin: HKD60,363,502 / HKD209,442,994 = 28.82097%.
+- Approximate average-parent-equity ROE: 60,363,502 / average(172,548,658, 239,232,238) = 29.3183%.
+- FY2025 dividend run-rate, net of share-award holdings: (3,179,100 + 6,376,440 - 216,450 - 259,740) HKD = HKD9,079,350; translated CNY8,215,540.64.
+- Forecast dividend yield: CNY8,215,540.64 / CNY814,927,782.2458744 = 1.00813%.
+- Dividend payout reference: HKD9,079,350 / HKD60,363,502 = 15.0411%.
+- Price/book reference: CNY814,927,782.2458744 / CNY216,471,682.88 = approximately 3.76x.
+
+[6] Data-quality choices
+- Gross margin left null: brokerage statements have no manufacturing/retail-style cost of sales and gross profit that are economically comparable.
+- Operating cash flow, capex and operating free cash flow left null: the annual-results announcement does not present the full cash-flow statement, and broker cash flow is distorted by client settlement and financing balances.
+- Status marked complete under the special-model minimum threshold: identity, market data, balance sheet, parent profit, dividend forecast, explained assets/liabilities, business story, evidence and special-model interpretation are present.
+- Currency limitation disclosed: one near-year-end rate is used for all HKD statement amounts; profit-and-loss items were not translated at an annual average rate.
+- PE inconsistency disclosed: input PE TTM is retained but is not reconciled to a static market-cap/FY2025-profit calculation.
+
+[7] Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields with repeated protocol `set` commands; no complex JSON result was handwritten from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before final consistency check: status=ok, errors=[].

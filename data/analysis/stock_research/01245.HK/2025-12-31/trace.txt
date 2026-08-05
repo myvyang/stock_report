@@ -1,0 +1,74 @@
+stock-research trace
+task company: NIRAKU GC HOLDINGS, INC. / 01245.HK
+task period: 2025-12-31
+report basis: audited annual report for year ended 2025-03-31; latest completed fiscal year available before task period
+generated timezone: Asia/Shanghai
+
+1. Read instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- /workspace/AGENTS.md
+
+2. Local reuse check
+- Expected raw filing and annual-review paths did not exist in the workspace.
+- No prior result, facts.json, annual_facts.md, or extraction trace was available for 01245.HK.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Skeleton inherited financial_brokerage from analysis_model_hint.
+
+4. Model verification
+- Official annual report pp.2, 33 and 57 confirms the group operates pachinko/pachislot halls, amusement arcades, hotels and restaurants.
+- No brokerage customer funds, proprietary securities portfolio, repo financing or other brokerage statement features were found.
+- Overrode hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Special treatment: lease principal is classified in financing cash flow under IFRS but deducted as an economically operating cash requirement.
+
+5. Primary financial source
+- Official company annual report: https://www.ngch.co.jp/info/EN01245-2025AR.pdf
+- Filing title: Annual Report 2024/2025
+- Audit period: year ended 2025-03-31
+- Key pages: 51 comprehensive income; 53-54 financial position; 56 cash flows; 69 revenue; 98-102 deposits, cash, payables and borrowings; 105 dividends; 106 cash-flow reconciliation.
+
+6. FX conversion
+- Source: China Foreign Exchange Trade System central parity published by Xinhua on 2025-03-31.
+- URL: https://www.news.cn/20250331/936fa9fcea9f480782390983d6107051/c.html
+- Rate: JPY 100 = CNY 4.8355; JPY 1 = CNY 0.048355.
+- All financial statement amounts in result.json converted from JPY million to absolute CNY yuan using amount_jpy_million * 1,000,000 * 0.048355.
+
+7. Derived metrics
+- Revenue: JPY 28,316m -> CNY 1,369,220,180.
+- Inferred gross contribution: revenue JPY 28,316m - hall operating expenses JPY 21,488m = JPY 6,828m -> CNY 330,167,940.
+- Gross margin: 6,828 / 28,316 = 0.2411357536. This is inferred, not a company-presented gross-profit subtotal.
+- Parent net profit: JPY 607m -> CNY 29,351,485.
+- Net margin: 607 / 28,316 = 0.0214366436.
+- Operating free cash flow protocol field: OCF JPY 6,163m - PPE JPY 2,132m - intangible JPY 3m = JPY 4,028m -> CNY 194,773,940.
+
+8. Owner earnback
+- Cash and bank balances: JPY 11,408m -> CNY 551,633,840.
+- Bank/syndicated borrowings: JPY 9,840m -> CNY 475,813,200.
+- Discounted detachable cash: max(70% * cash - 100% * borrowings, 0) = CNY 0.
+- Pre-haircut cash profit: OCF JPY 6,163m - PPE/intangible capex JPY 2,135m - lease principal JPY 2,938m = JPY 1,090m -> CNY 52,706,950.
+- Sustainable cash-profit haircut: 30% due to machine replacement, payout, traffic and lease-renewal variability.
+- Discounted sustainable cash profit: JPY 763m -> CNY 36,894,865.
+- Operating business price: CNY 189,300,412.98627853 - CNY 0 = CNY 189,300,412.98627853.
+- Owner earnback years: 189,300,412.98627853 / 36,894,865 = 5.1308064953.
+- Investment-property purchase JPY 827m treated as expansionary and excluded from maintenance capex; this judgment is disclosed as a limitation.
+
+9. Dividend forecast scenario
+- FY2025 interim dividend JPY 0.09/share + final dividend JPY 0.12/share = JPY 0.21/share.
+- Shares: 1,195,850,460.
+- Approximate total: JPY 251m -> CNY 12,137,105.
+- Forecast yield on input market cap: 0.0641155759.
+- This is an unchanged-FY2025-dividend scenario, not management guidance.
+
+10. Market data
+- Market cap: CNY 189,300,412.98627853.
+- Market cap timestamp: 2026/07/31 16:08:47.
+- PE TTM: 2.11.
+- Source: Tencent qt.gtimg.cn, supplied in config/input.json; not independently revalidated.
+
+11. Protocol population and validation
+- outputs/result.json was populated using repeated protocol set/append commands, not handwritten from scratch.
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok; errors: [].

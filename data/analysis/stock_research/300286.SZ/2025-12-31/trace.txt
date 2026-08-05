@@ -1,0 +1,70 @@
+stock-research trace
+company: 安科瑞 300286.SZ
+period: 2025-12-31 annual
+generated for task date: 2026-07-31 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because the skill requires reuse assessment.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked configured raw filing, annual review, normalized facts, prior stock research and outputs paths.
+- No 2025 filing metadata, facts package, normalized facts, or prior research files were present locally.
+- Therefore supplemented with public disclosure research.
+
+3. Sources
+- Primary disclosure target: 安科瑞2025年年度报告, disclosed 2026-03-28 on 巨潮资讯网.
+  Official disclosure cross-check: https://static.cninfo.com.cn/finalpage/2026-03-28/1225042278.PDF
+  Full-text mirror used for extraction: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12033024&stockid=300286
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, 20260731114327, market cap CNY 5,053,000,000, PE TTM 24.86.
+
+4. Key extracted facts (CNY yuan)
+- Revenue 1,094,239,051.69; cost 585,951,342.02; gross profit 508,287,709.67.
+- Operating profit 218,098,533.14; net profit 205,029,920.14; parent net profit 205,171,514.93; deducted parent profit 179,258,887.23.
+- OCF 222,839,848.36; capex 70,760,641.14; operating FCF 152,079,207.22.
+- Total assets 2,704,026,151.51; liabilities 459,619,573.07; equity 2,244,406,578.44; parent equity 2,243,419,726.05.
+- Cash 644,911,130.05; cash equivalents 640,510,740.34; trading financial assets 1,024,385,832.45.
+- Trading financial assets consist of bank structured deposits 572,539,560.27 and wealth-management products 451,846,272.18.
+- Net private-placement proceeds 785,011,300, committed to R&D headquarters, enterprise microgrid technical upgrade, and working capital.
+- 2025 interim dividend implemented 24,717,375.50; 2025 annual proposal 87,774,629.25.
+
+5. Analysis model
+- Classified ordinary_operating / applicable.
+- Reason: manufacturing plus software/system solution sales; no bank, insurance, real-estate development or concession balance-sheet economics; no interest-bearing borrowings.
+- Special handling: committed placement proceeds are not detachable; structured deposits and wealth-management products are discounted.
+
+6. Calculations
+- gross_margin = 508,287,709.67 / 1,094,239,051.69 = 0.4645.
+- net_margin = 205,171,514.93 / 1,094,239,051.69 = 0.1875.
+- discounted detachable cash:
+  640,510,740.34 cash equivalents
+  + 1,024,385,832.45 * 0.95 = 973,166,540.83 discounted structured deposits/WMP
+  - 785,011,300.00 committed net placement proceeds
+  - 250,000,000.00 operating cash buffer (approximately three months of operating cash outflow)
+  = 578,665,981.17.
+- discounted sustainable cash profit:
+  205,171,514.93 parent profit
+  - 25,912,627.70 nonrecurring profit
+  - 8,958,887.23 prudence adjustment
+  = 170,300,000.00.
+- operating business price = 5,053,000,000.00 - 578,665,981.17 = 4,474,334,018.83.
+- owner earnback years = 4,474,334,018.83 / 170,300,000.00 = 26.27325.
+- market cap / cash profit = 5,053,000,000.00 / 170,300,000.00 = 29.67117.
+- forecast dividend = 24,717,375.50 + 87,774,629.25 = 112,492,004.75.
+- forecast dividend yield = 112,492,004.75 / 5,053,000,000.00 = 0.02226242.
+
+7. Judgment boundaries
+- Cash discount, placement deduction and operating buffer are explicit research assumptions, not reported accounting figures.
+- Placement deduction uses net proceeds rather than a verified year-end project-account balance.
+- Sustainable cash profit is anchored to deducted parent profit and triangulated against OCF and reported-period FCF; it is not management guidance.
+- No independent market-share evidence was found; industry position remains qualitative.
+- No buy/sell recommendation or target price was produced.
+
+8. Protocol operations and validation
+- Populated result fields using repeated protocol CLI set commands, not by hand-writing the initialized JSON from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result after population: status ok, errors [].

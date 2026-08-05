@@ -1,0 +1,64 @@
+[2026-07-31 Asia/Shanghai] stock-research trace — 688425.SH / 2025 annual
+
+1. Read required instructions:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized outputs/result.json with the protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse audit:
+   - No existing annual facts, normalized facts, raw filing, or prior stock-research result was present for 688425.SH/2025-12-31.
+   - Located the official SSE disclosure record via SSE company bulletin API.
+   - Official annual report title: 中国铁建重工集团股份有限公司2025年年度报告.
+   - SSE disclosure date: 2026-03-21.
+   - SSE announcement path: /disclosure/listedinfo/announcement/c/new/2026-03-21/688425_20260321_0Z3X.pdf
+   - Downloaded the identical filing from the CNInfo static mirror: https://static.cninfo.com.cn/finalpage/2026-03-21/1225021863.PDF
+   - Saved PDF and extracted searchable text under stock_report/data/raw/filings/688425.SH/2025-12-31/.
+
+4. Model decision:
+   - Confirmed ordinary_operating/applicable.
+   - Reason: revenue is generated primarily by manufacturing, direct sale, rental, and service of equipment. The company is not primarily a construction contractor, developer, financial institution, concession operator, or investment holding platform.
+   - Special caution: large receivables and work-in-process are operating assets; they are not detachable cash.
+
+5. Core audited facts (CNY):
+   - Revenue 10,045,298,702.64
+   - Cost of sales 7,124,191,202.80
+   - Gross profit 2,921,107,499.84
+   - Operating profit 1,666,692,623.06
+   - Net profit 1,483,129,629.84
+   - Parent net profit 1,483,028,394.33
+   - Total assets 27,297,043,654.29
+   - Total liabilities 8,685,670,806.57
+   - Total equity 18,611,372,847.72
+   - Parent equity 18,590,019,341.64
+   - Operating cash flow 1,100,910,637.77
+   - Capital expenditure 82,921,952.89
+   - Operating free cash flow 1,017,988,684.88
+   Sources: annual report pages 95-105.
+
+6. Owner earnback assumptions and formulas:
+   - External bank deposits 1,086,992,458.00 × 80% = 869,593,966.40.
+   - Deposits at CRCC Finance Company 1,286,548,929.98 × 50% = 643,274,464.99.
+   - Financing liabilities deducted at 100% = 1,292,330,123.16, including short borrowing, current and non-current long borrowing, current and non-current lease liabilities, and current/non-current long-term payables.
+   - Discounted detachable net cash = 220,538,308.23.
+   - Sustainable cash profit = (OCF 1,100,910,637.77 - capex 82,921,952.89) × 90% = 916,189,816.392.
+   - Operating business price = market cap 22,827,000,000 - discounted net cash 220,538,308.23 = 22,606,461,691.77.
+   - Owner earnback years = 22,606,461,691.77 / 916,189,816.392 = 24.6744302188.
+   - Market cap / cash profit = 22,827,000,000 / 916,189,816.392 = 24.9151426829.
+   - Forecast dividend yield = 448,013,748 / 22,827,000,000 = 1.9626483901%.
+
+7. Protocol mutation:
+   - Populated initialized result using repeated protocol CLI `set` commands from update_result.sh.
+   - Did not create result.json by hand from an empty complex object.
+
+8. Validation:
+   - First complete validation command returned status=ok and errors=[].
+   - Final validation and file consistency checks performed after report/trace creation.
+
+9. Limitations recorded:
+   - Company-provided industry rankings were not independently reconciled to market-share data.
+   - Sustainable cash profit is a conservative normalization based on one annual cash-flow period, not a forecast.
+   - 2025 dividend was still a board proposal at annual-report publication date.

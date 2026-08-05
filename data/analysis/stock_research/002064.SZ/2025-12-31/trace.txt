@@ -1,0 +1,51 @@
+stock-research trace
+company: 华峰化学（002064.SZ）
+period: 2025-12-31 annual
+generated_context_date: 2026-07-31 Asia/Shanghai
+
+1. Protocol
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields using repeated protocol set commands; the complex result object was not handwritten from scratch.
+- Final validation:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+  status: ok, errors: []
+
+2. Reuse audit
+- Expected annual facts and normalized facts paths from config/input.json were absent.
+- Expected raw filing directory and historical stock-research outputs were absent.
+- Only stock_report/data/notes/user_stock_evaluations.md existed and contained no reusable company facts for this task.
+- Therefore returned to public annual-report and company-announcement sources.
+
+3. Primary/near-primary sources consulted
+- 华峰化学：2025年年度报告（公开披露全文镜像，公告 id 12028752）
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12028752&stockid=002064
+  Used for business, audited statements, segment revenue/margins, production capacity, restricted assets, cash flow and risks.
+- 华峰化学：关于2025年度利润分配预案及2026年中期分红授权的公告
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12028728&stockid=002064
+- 华峰化学：2025年年度分红派息实施公告
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12369294&stockid=002064
+- Market-cap snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026-07-31 11:42:57.
+
+4. Key extraction
+- Revenue 24,198,215,078.91; cost of sales 21,006,708,959.00; gross profit 3,191,506,119.91.
+- Parent net profit 1,857,552,915.09; deducted non-recurring parent profit 1,777,697,964.02.
+- Operating cash flow 3,740,472,955.38; capex 1,717,285,144.62; operating FCF 2,023,187,810.76.
+- Total assets 36,883,696,290.36; liabilities 9,544,533,210.35; equity 27,339,163,080.01; parent equity 27,338,594,783.86.
+- Cash and cash equivalents 6,029,941,010.90 after excluding restricted cash.
+
+5. Judgments and formulas
+- Model confirmed ordinary_operating/applicable because the company manufactures and sells physical chemical products; no customer-money, reserve or concession accounting dominates the balance sheet.
+- Discounted detachable net cash = 80% cash equivalents + 90% trading financial assets + 90% one-year non-current assets + 85% debt investments - 100% financing liabilities = 6,065,125,100.04.
+- Sustainable cash profit set at 1,750,000,000, slightly below 2025 deducted non-recurring profit and below 2025 operating FCF, to reflect chemical cyclicality, capacity ramp and working-capital/capex variability.
+- Operating business price = 54,588,000,000 - 6,065,125,100.04 = 48,522,874,899.96.
+- Owner earnback years = 48,522,874,899.96 / 1,750,000,000 = 27.7273571.
+- Market cap / cash profit = 31.1931429.
+- Forecast dividend = 2025 attributable interim plus annual cash dividends = 744,381,584.55; forecast yield = 1.3636359%.
+
+6. Limitations
+- No local original filing/fact pack was supplied; public filing text was used.
+- Sustainable cash profit is a conservative single-year normalization, not a full-cycle statistical average.
+- Bottom-level purpose of every financial asset was not fully expanded; haircuts reflect this uncertainty.

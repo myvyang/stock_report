@@ -1,0 +1,80 @@
+stock-research trace
+company=603182.SH 嘉华股份
+period=2025-12-31
+generated_for_task=2026-08-01 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Also read references/data-reuse.md because the skill routes reuse decisions there.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated scalar/object fields with protocol set and list records with protocol append.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[reuse-check]
+Existing stock_report directory contained no raw filing, annual facts, normalized facts, or prior stock-research result for 603182.SH/2025-12-31. Only the general user evaluation note existed. Therefore the task returned to the original filing.
+
+[primary-source]
+SSE bulletin API identified the filing:
+title=嘉华股份2025年年度报告
+disclosure_date=2026-04-28
+url=https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-28/603182_20260428_U3QX.pdf
+The PDF was downloaded and text-extracted locally for review (194 pages). The big5 SSE mirror was used because the standard SSE file endpoint returned gzip-compressed web content rather than the PDF in this environment.
+
+[model-review]
+Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+Reason: operations are soybean processing plus captive/external heat and power sales; balance sheet is dominated by inventory, receivables, fixed assets, land-use/intangible assets, trade payables, deferred income, and small bank loans. No special financial, property-development, construction-project, concession, or investment-holding economics were identified.
+
+[financial-extraction]
+All amounts are CNY yuan.
+revenue=1385717238.86
+cost_of_sales=1203937420.85
+gross_profit=181779818.01 (revenue-cost_of_sales)
+operating_profit=125574295.60
+net_profit=94700620.84
+parent_net_profit=94700620.84
+total_assets=1374841963.83
+total_liabilities=269556564.66
+total_equity=1105285399.17
+parent_equity=1105285399.17
+minority_interest=0
+operating_cash_flow=79363344.19
+capital_expenditure=54745635.33 (cash paid to acquire fixed/intangible/other long-term assets)
+operating_free_cash_flow=24617708.86 (OCF-capex)
+financing_cash_flow=-81617510.12
+dividend_and_buyback_cash_out=65820000 (cash dividends paid during 2025; no buyback cash-out identified)
+
+[formula-checks]
+gross_margin=(1385717238.86-1203937420.85)/1385717238.86=0.1311810324013479
+net_margin=94700620.84/1385717238.86=0.06834050857150929
+
+[owner-earnback]
+market_cap=1915000000 from config/input.json snapshot 20260731114320
+cash=93989777.99; 50% detachable assumption => 46994888.995
+short_term_borrowing=3000000; deducted at 100%
+long_term_borrowing=6423000; deducted at 100%
+discounted_detachable_net_cash=37571888.995
+Long-term performance deposits, deductible VAT/tax assets, receivables, and inventory were assigned zero detachable value because they are operating-bound.
+
+parent_net_profit_start=94700620.84
+cycle_and_price_discount=-9470062.08
+cash_conversion_and_maintenance_reserve=-10230558.76
+discounted_sustainable_cash_profit=75000000
+The two deductions are analyst judgments, not company guidance. They reflect 2025 revenue/profit decline, raw-material/product-price cyclicality, and weak current-year working-capital conversion.
+
+operating_business_price=1915000000-37571888.995=1877428111.005
+owner_earnback_years=1877428111.005/75000000=25.0323748134
+market_cap_to_cash_profit=1915000000/75000000=25.5333333333
+discounted_net_cash_to_market_cap=37571888.995/1915000000=0.0196197854
+
+[dividend]
+2025 attributable-period dividend basis: interim CNY0.30/share already implemented plus annual CNY0.20/share proposal disclosed in the annual report, total 82275000. The annual proposal was still subject to shareholder approval at filing date.
+forecast_cash_dividend=82275000 as a flat next-period scenario, not company guidance.
+forecast_dividend_yield=82275000/1915000000=0.0429634465
+
+[quality]
+status=complete because identity, valuation snapshot, model, three statements, asset/liability explanations, owner-earnback details, dividend scenario, business story, risks, and primary-source evidence are present.
+Limitations retained in result.json: market quote not independently cross-checked; owner-earnback discounts and dividend forecast are scenarios; industry position lacks independently standardized market-share data.

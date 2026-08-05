@@ -1,0 +1,83 @@
+CMCL stock research trace
+generated_at=2026-08-04T16:41:36+08:00
+period=2025-12-31
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated result fields only through protocol set commands.
+4. Validated with protocol validate; status=ok, errors=[].
+
+[reuse audit]
+- No existing CMCL raw filing, annual facts, normalized facts, or stock-research output existed in the workspace.
+- Downloaded the audited 2025 Form 20-F to:
+  stock_report/data/raw/filings/CMCL/2025-12-31/cmcl-20251231x20f.htm
+
+[primary sources]
+- SEC audited 2025 Form 20-F, filed 2026-04-23:
+  https://www.sec.gov/Archives/edgar/data/766011/000110465926047739/cmcl-20251231x20f.htm
+- Company-hosted annual report PDF:
+  https://wp-caledoniamining-2020.s3.eu-west-2.amazonaws.com/media/2026/04/20-F-2025.pdf
+- Company dividend history:
+  https://www.caledoniamining.com/investors/dividends/
+- SEC Q1 2026 results exhibit:
+  https://www.sec.gov/Archives/edgar/data/766011/000168316826003620/caledonia_ex9901.htm
+- SEC Blanket Q1 2026 production update:
+  https://www.sec.gov/Archives/edgar/data/766011/000168316826003061/caledonia_ex9901.htm
+- 2025-12-31 USD/CNY central parity 7.0288, CFETS data relayed by China Economic Net:
+  https://finance.ce.cn/fe/gdxw/202512/t20251231_2676978.shtml
+- Market cap and PE TTM: config/input.json, source stated as Yahoo Finance yfinance.
+
+[audited USD facts, $000 unless stated]
+revenue=267663
+cost_of_sales=130539 (royalty 13521 + production costs 101321 + depreciation 15697)
+gross_profit=137124
+operating_profit=109622
+net_profit=67511
+parent_net_profit=55219
+operating_cash_flow=76233
+ppe_capex=32450
+exploration_capex=3633
+total_capex=36083
+operating_free_cash_flow=40150
+financing_cash_flow=-19151
+dividend_cash_out=19916
+total_assets=411895
+total_liabilities=128349
+total_equity=283546
+parent_equity=258997
+minority_interest=24549
+cash=35738
+short_term_deposits=5000
+interest_bearing_debt_and_overdraft=31419
+shares_outstanding=19304784
+
+[currency conversion]
+- All USD statement amounts converted at 1 USD = CNY 7.0288.
+- Input market cap was already supplied in CNY and was not converted.
+
+[model decision]
+- statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+- Reason: revenue comes from mined gold, supported by ordinary mine PPE, inventory, receivables and exploration assets. There are no customer deposits, insurance reserves, regulated presale cash, or similar special-model balances.
+- Special cautions: mine sustaining capex, commodity cyclicality, Blanket non-controlling interests, and Bilboes development funding.
+
+[owner earnback calculation]
+- Cash + short deposits: USD 40.738m; apply 80% = USD 32.5904m.
+- Less loans, notes and overdrafts at 100%: USD 31.419m.
+- Discounted detachable net cash: USD 1.1714m = CNY 8,233,536.32.
+- OCF USD 76.233m - capex USD 36.083m = FCF USD 40.150m.
+- Less actual Blanket NCI dividends USD 9.072m = USD 31.078m.
+- Apply 80% commodity/operating-cycle factor = USD 24.8624m = CNY 174,752,837.12.
+- Operating business price = CNY 2,396,663,998.36 - CNY 8,233,536.32 = CNY 2,388,430,462.04.
+- Owner earnback years = 13.6675; market cap/cash profit = 13.7146.
+- Post-period USD 150m convertible notes were not backdated into 2025 net cash; disclosed as a limitation and risk because proceeds are earmarked principally for Bilboes development.
+
+[dividend forecast]
+- Quarterly DPS maintained at USD 0.14 and confirmed for Q1 and Q2 2026.
+- Annualized DPS USD 0.56 * 19,304,784 shares * 7.0288 = CNY 75,986,100.84.
+- Forecast dividend yield = 3.1705% against input market cap.
+
+[quality]
+- result data_quality.status=complete.
+- Limitations are recorded in result.json: FX translation convention, unverified market-data input, judgmental sustainability discounts, and post-period financing.

@@ -1,0 +1,89 @@
+stock-research trace
+company=CODA / Coda Octopus Group, Inc.
+input_period=2025-12-31
+actual_fiscal_year_end=2025-10-31
+generated_for_timezone=Asia/Shanghai
+
+[skill_and_contract]
+read .agents/skills/stock-research/SKILL.md
+read .agents/skills/stock-research/references/result-contract.md
+read .agents/skills/stock-research/references/report-contract.md
+read .agents/skills/stock-research/references/data-reuse.md
+
+[reuse_check]
+No annual facts, normalized facts, historical stock-research result, or raw filing existed in the supplied workspace for CODA/2025-12-31.
+Research therefore returned to the primary filing.
+
+[primary_sources]
+SEC 10-K original accession 0001493152-26-004135, filed 2026-01-29, FY ended 2025-10-31.
+SEC 10-K/A accession 0001493152-26-008174, filed 2026-02-26.
+URL=https://www.sec.gov/Archives/edgar/data/1334325/000149315226008174/form10-ka.htm
+Amendment scope=add signed independent auditor report only; no other disclosure changes.
+Local raw copy=stock_report/data/raw/filings/CODA/2025-12-31/form10-ka.htm
+FX source=Federal Reserve H.10, 2025-10-31, 1 USD=7.1169 CNY.
+Market source=config/input.json; Yahoo Finance yfinance; date=2026-08-03.
+
+[model_check]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Revenue is generated from marine technology products/software/rental/support, acoustic sensor products, and defense engineering services. Balance sheet lacks customer financial funds, insurance reserves, regulated development cash, concession rights, or other special-model structures.
+
+[reported_usd_facts]
+total_assets=64493562
+total_liabilities=6378148
+total_equity=58115414
+cash_and_equivalents=28682615
+accounts_receivable_net=3732806
+inventory=13636512
+unbilled_receivables=2988779
+revenue=26563126
+cost_of_revenue=8900758
+gross_profit=17662368
+operating_profit=4536028
+net_income=4129930
+operating_cash_flow=7211168
+property_and_equipment_purchases=1170718
+other_intangible_purchases=25351
+capital_expenditure_total=1196069
+operating_free_cash_flow=6015099
+financing_cash_flow=0
+cash_dividends=0
+
+[currency]
+All statement amounts in result.json were multiplied by 7.1169 CNY/USD.
+Market cap was already supplied in CNY and was not converted again.
+
+[formula_check]
+gross_margin=17662368/26563126=0.6649205368
+net_margin=4129930/26563126=0.1554760535
+discounted_detachable_net_cash_usd=28682615*0.90-6378148=19436205.50
+discounted_detachable_net_cash_cny=19436205.50*7.1169=138325530.92295
+adjusted_profit_before_haircut_usd=4129930+861292+530218-1170718-25351-224786=4100585
+discounted_sustainable_cash_profit_usd=4100585*0.90=3690526.50
+discounted_sustainable_cash_profit_cny=3690526.50*7.1169=26265108.04785
+operating_business_price=771882466.8853455-138325530.92295=633556935.9623954
+owner_earnback_years=633556935.9623954/26265108.04785=24.1216192527
+market_cap_to_cash_profit=771882466.8853455/26265108.04785=29.3881321744
+forecast_cash_dividend=0
+forecast_dividend_yield=0/771882466.8853455=0
+
+[judgment_notes]
+Cash haircut=90%; rationale is operating buffer, cross-border accessibility, and FX uncertainty.
+All liabilities deducted at 100% so deferred revenue, trade obligations, leases, and deferred tax are not left behind in the operating shell.
+Sustainable cash profit starts from GAAP net income, adds D&A, deducts tangible and intangible capex, deducts stock compensation as an owner cost, then applies a 10% sustainability haircut.
+FY2025 OCF/FCF were not used directly because working-capital movements increased cash conversion and may not recur.
+Dividend forecast is zero because no FY2025 dividend cash outflow or disclosed approved next-year dividend was found.
+
+[limitations]
+Market date is about nine months after the annual balance-sheet date.
+Market cap and PE TTM were supplied by the input and not independently reconstructed from an official exchange source.
+Single-date FX is a presentation convention and not historical-average translation.
+No verifiable industry market share was disclosed.
+
+[protocol]
+Initialized with:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+Populated with protocol set commands only; result.json was not hand-written from scratch.
+Validation command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Validation result at draft completion: status=ok, errors=[]

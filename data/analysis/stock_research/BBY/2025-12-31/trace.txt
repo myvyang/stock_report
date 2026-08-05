@@ -1,0 +1,96 @@
+stock-research trace
+generated_at=2026-08-05 Asia/Shanghai
+query=BBY
+input=config/input.json
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because no annual fact package was present.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields only through repeated protocol `set` commands; the complex result was not hand-written from scratch.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: {"status":"ok","errors":[]}
+
+[source discovery]
+- Expected annual-review and normalized fact paths under stock_report/data/.../BBY/2025-12-31 were absent.
+- Downloaded and inspected the official SEC FY2026 10-K:
+  https://www.sec.gov/Archives/edgar/data/764478/000076447826000009/bby-20260131.htm
+  accession=0000764478-26-000009
+  filed=2026-03-18
+  fiscal_year_end=2026-01-31
+- Used SEC Companyfacts only as an extraction cross-check:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0000764478.json
+- Used Best Buy's FY2026 Q4 release for FY2027 guidance and the declared $0.96 quarterly dividend:
+  https://investors.bestbuy.com/News--Events/news/news-details/2026/Best-Buy-Reports-Fourth-Quarter-Results/default.aspx
+- Used Federal Reserve H.10 release dated 2025-12-29 for 2025-12-26 USD/CNY=7.0063:
+  https://www.federalreserve.gov/releases/h10/20251229/
+- Used the input market snapshot without alteration: market cap CNY 122,683,851,011.77734; date 2026-08-03; source Yahoo Finance yfinance; PE TTM 15.974074.
+
+[period decision]
+The requested analysis period is 2025-12-31. Best Buy's fiscal year ends on the Saturday nearest the end of January. The annual filing covering that analysis period is FY2026, ended 2026-01-31. This period mapping is disclosed as a limitation rather than silently treating the fiscal year as calendar 2025.
+
+[statement model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: Best Buy is an omnichannel technology-products retailer with inventories, stores, leases, supplier payables and ordinary corporate debt. It does not have customer deposits, insurance reserves, regulated project cash or other balance-sheet items that make the balance sheet itself a special financial model.
+
+[source financials, USD millions]
+FY2026 revenue=41691
+cost_of_sales=32318
+gross_profit=9373
+operating_profit=1389
+net_earnings_attributable_to_parent=1069
+operating_cash_flow=1962
+capital_expenditure=704
+operating_free_cash_flow=1258
+financing_cash_flow=-1083
+dividends_paid=801
+share_repurchase=273
+total_assets=14670
+total_liabilities=11706 (derived as assets 14670 - equity 2964; agrees with balance-sheet components)
+total_equity=parent_equity=2964
+cash_and_cash_equivalents=1738
+restricted_cash_excluded=285
+interest_bearing_debt=1176
+inventory=5230
+receivables=1043
+accounts_payable=4745
+operating_lease_liabilities=2957
+
+[conversion]
+All filing amounts were converted to absolute CNY yuan using USD/CNY=7.0063.
+Ratios were computed from unrounded values.
+gross_margin=9373/41691=0.22482070470845025
+net_margin=1069/41691=0.02564102564102564
+
+[owner earnback judgments]
+Gross net cash: USD 1738m cash - USD 1176m debt = USD 562m.
+Restricted cash was excluded before this calculation.
+Only 50% of gross net cash was treated as detachable because seasonal retail inventory and working capital require liquidity.
+discounted_detachable_net_cash=USD 281m=CNY 1,968,770,300.
+Operating leases were not subtracted again because they correspond to operating right-of-use assets and are part of the going business.
+
+Historical FCF:
+FY2024=1470-795=USD 675m
+FY2025=2098-706=USD 1392m
+FY2026=1962-704=USD 1258m
+Three-year average=USD 1108.333333m.
+10% sustainability haircut applied for demand, inventory/payables volatility and ongoing capex.
+discounted_sustainable_cash_profit=USD 997.5m=CNY 6,988,784,250.
+operating_business_price=CNY 122,683,851,011.77734 - CNY 1,968,770,300 = CNY 120,715,080,711.77734.
+owner_earnback_years=17.272686692506976.
+market_cap_to_cash_profit=17.554390953158606.
+
+[dividend forecast]
+Quarterly dividend=$0.96/share.
+Shares used=209.1m, equal to FY2026 year-end shares outstanding.
+Forecast annual cash dividend=0.96*4*209.1m*7.0063=CNY 5,625,666,547.2.
+Forecast dividend yield=0.045854988254810734.
+This is an estimate, not a company commitment for four future payments.
+
+[quality]
+status=complete
+Known limitations are recorded in outputs/result.json, including fiscal/calendar period mapping, FX-date mismatch, lack of standalone profit disclosure for Ads/Marketplace/membership, and the judgmental nature of owner-earnback haircuts.

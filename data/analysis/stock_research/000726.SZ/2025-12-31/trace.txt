@@ -2,9 +2,10 @@ stock-research trace for 000726.SZ / 鲁泰A / 2025-12-31 annual
 
 1. Skill and contracts
 - Used the stock-research skill as requested.
-- Read /workspace/.agents/skills/stock-research/SKILL.md.
-- Read /workspace/.agents/skills/stock-research/references/result-contract.md.
-- Read /workspace/.agents/skills/stock-research/references/report-contract.md.
+- Read /workspace/.agents/skills/stock-research/SKILL.md completely.
+- Read /workspace/.agents/skills/stock-research/references/result-contract.md completely.
+- Read /workspace/.agents/skills/stock-research/references/report-contract.md completely.
+- Read /workspace/.agents/skills/stock-research/references/data-reuse.md because the task had reusable annual facts and prior research.
 
 2. Inputs and reusable data
 - Read config/input.json.
@@ -15,26 +16,34 @@ stock-research trace for 000726.SZ / 鲁泰A / 2025-12-31 annual
   stock_report/data/raw/filings/000726.SZ/2025-12-31/metadata.json
 - Primary filing source:
   https://static.cninfo.com.cn/finalpage/2026-04-17/1225112669.PDF
-- Reused prior stock research only where it was supported by the annual fact pack:
+- Reused prior stock research only where supported by the annual fact pack:
   stock_report/data/analysis/stock_research/000726.SZ/2025-12-31/result.json
   stock_report/data/analysis/stock_research/000726.SZ/2025-12-31/report.md
 
 3. Protocol CLI
 - Initialized outputs/result.json with:
   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- Updated outputs/result.json from the initialized skeleton by structured JSON merge, preserving this run's initialized company, analysis period, generated_at, and valuation provenance.
-- Validated with:
+- Populated initialized fields with repeated protocol set commands; did not hand-write the complex JSON from scratch.
+- Final validation command:
   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-- Final validation status: ok.
+- First validation found seven reused asset-analysis rows using the legacy
+  `interpretation` key. Migrated each row to the contract-required
+  `explanation` key with protocol set commands.
+- Final protocol validation status: ok, with no errors.
 
-4. Market data
-- Used config/input.json market_cap payload.
-- Market cap: 4,709,000,000 yuan.
-- Market cap date: 2026-07-24.
-- PE TTM: 8.74.
-- Source text: AH Note published stock payload, based on prior screening snapshot; normalized to CNY, as-of 2026-07-24 for this batch input.
+4. Analysis model
+- Confirmed ordinary_operating from the 2025 annual report business and balance-sheet facts.
+- The company manufactures fabric and garments using inventory, receivables, factories and equipment.
+- It does not exhibit the special statement structure of a bank, broker, insurer, property developer, construction contractor, concession utility or investment holding platform.
+- Ordinary owner earnback methodology is applicable.
 
-5. Financial facts reused
+5. Market data
+- Market cap: 4,872,000,000 yuan.
+- Market timestamp: 2026-07-31 11:42:54 (input raw value 20260731114254).
+- PE TTM: 9.04.
+- Source: Tencent qt.gtimg.cn, provided by config/input.json.
+
+6. Financial facts reused
 - Revenue: 5,904,308,724.88 yuan.
 - Cost of sales: 4,546,124,192.37 yuan.
 - Gross profit: 1,358,184,532.51 yuan.
@@ -47,11 +56,11 @@ stock-research trace for 000726.SZ / 鲁泰A / 2025-12-31 annual
 - Total liabilities: 3,976,667,307.79 yuan.
 - Parent equity: 9,811,054,187.05 yuan.
 
-6. Key calculations
+7. Key calculations
 - Gross margin = 1,358,184,532.51 / 5,904,308,724.88 = 0.2300327770.
 - Net margin = 593,586,067.81 / 5,904,308,724.88 = 0.1005343886.
-- Forecast cash dividend = 122,628,841.05 yuan from 2025 profit distribution plan.
-- Forecast dividend yield = 122,628,841.05 / 4,709,000,000 = 0.0260413763.
+- Forecast cash dividend = 122,628,841.05 yuan from the 2025 profit distribution plan.
+- Forecast dividend yield = 122,628,841.05 / 4,872,000,000 = 0.0251701234.
 - Financing liabilities deducted from net cash:
   652,836,872.89 + 315,426,401.72 + 1,539,049,797.44 + 247,912,723.61 = 2,755,225,795.66 yuan.
 - Necessary operating cash retained:
@@ -67,12 +76,12 @@ stock-research trace for 000726.SZ / 鲁泰A / 2025-12-31 annual
   - financing liabilities 2,755,225,795.66
   = 95,956,745.09 yuan.
 - Discounted sustainable cash profit selected: 350,000,000 yuan.
-- Operating business price = 4,709,000,000 - 95,956,745.09 = 4,613,043,254.91 yuan.
-- Owner earnback years = 4,613,043,254.91 / 350,000,000 = 13.1801235855.
-- Market cap to cash profit = 4,709,000,000 / 350,000,000 = 13.4542857143.
+- Operating business price = 4,872,000,000 - 95,956,745.09 = 4,776,043,254.91 yuan.
+- Owner earnback years = 4,776,043,254.91 / 350,000,000 = 13.6458378712.
+- Market cap to cash profit = 4,872,000,000 / 350,000,000 = 13.92.
 
-7. Main limitations
+8. Main limitations
 - Trading financial assets are not disclosed by individual product at period end.
-- Cash is not disclosed by entity, geography, or operating necessity.
+- Cash is not disclosed by entity, geography or operating necessity.
 - Maintenance capex is not separately disclosed.
-- Market cap and PE are from the provided 2026-07-24 batch payload, not company filings.
+- Market cap and PE are from the provided Tencent market snapshot, not company filings.

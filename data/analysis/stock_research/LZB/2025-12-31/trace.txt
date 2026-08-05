@@ -1,0 +1,73 @@
+Stock research trace — LZB
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Read required protocol material
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+   - config/input.json found.
+   - No LZB raw filing, annual facts package, normalized facts, or prior stock-research result existed under the supplied workspace paths or sync paths.
+   - Therefore researched the primary filing rather than fabricating missing annual facts.
+
+3. Protocol initialization
+   Command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Primary sources
+   - SEC FY2025 Form 10-K, filed 2025-06-17, fiscal year ended 2025-04-26:
+     https://www.sec.gov/Archives/edgar/data/57131/000005713125000029/lzb-20250426.htm
+   - La-Z-Boy investor relations annual reports:
+     https://ir.la-z-boy.com/annual-reports
+   - La-Z-Boy investor relations corporate profile:
+     https://ir.la-z-boy.com/company-profile
+   - Valuation snapshot: config/input.json, source Yahoo Finance yfinance, dated 2026-08-03.
+
+5. Period and currency handling
+   - Input research period: 2025-12-31.
+   - Actual audited annual period: FY2025 ended 2025-04-26.
+   - All filing amounts were reported in USD.
+   - Uniform research translation assumption: USD 1 = CNY 7.20.
+   - Input market cap was treated as already expressed in CNY, consistent with the result protocol.
+
+6. Key extracted USD facts (millions except margins)
+   - Revenue 2,109.207; cost of sales 1,182.789; gross profit 926.418.
+   - Operating income 135.837; net income 100.952; parent net income 99.556.
+   - Assets 1,922.162; liabilities 890.186; equity 1,031.976; parent equity 1,020.623.
+   - Cash 328.449; no restricted cash.
+   - Operating cash flow 187.271; capital expenditure 74.280; FCF 112.991.
+   - Dividends 34.955; repurchases 77.930.
+   - FY2024 FCF 104.576; FY2023 FCF 136.355.
+
+7. Model determination
+   - statement_model = ordinary_operating.
+   - owner_earnback_applicability = applicable.
+   - Basis: revenue arises from furniture manufacturing, wholesale and retail; inventory, receivables, PP&E, store leases, customer deposits and payables are ordinary operating balances rather than special financial-model assets/liabilities.
+
+8. Formula trace
+   - Gross margin = 926.418 / 2,109.207 = 0.4392257374.
+   - Net margin = 99.556 / 2,109.207 = 0.0472006778.
+   - Retained operating cash = 5% × CNY revenue 15,186,290,400 = CNY 759,314,520.
+   - Discounted residual cash = (2,364,832,800 - 759,314,520) × 70% = CNY 1,123,862,796.
+   - Cash-enhancement investments = USD 2.607m × 7.20 × 80% = CNY 15,016,320.
+   - Discounted detachable net cash = CNY 1,138,879,116.
+   - Three-year average FCF = (112.991 + 104.576 + 136.355) / 3 × 7.20 = CNY 849,412,800.
+   - Discounted sustainable cash profit = CNY 849,412,800 × 85% = CNY 722,000,880.
+   - Operating business price = 10,632,428,881.458618 - 1,138,879,116 = CNY 9,493,549,765.458618.
+   - Owner earnback years = 9,493,549,765.458618 / 722,000,880 = 13.1489448676.
+   - Market cap / cash profit = 10,632,428,881.458618 / 722,000,880 = 14.7263378425.
+   - Forecast dividend = FY2025 actual dividend USD 34.955m × 7.20 = CNY 251,676,000.
+   - Forecast dividend yield = 251,676,000 / 10,632,428,881.458618 = 0.0236706027.
+
+9. Judgment boundaries
+   - Cash retention at 5% of revenue, 70% residual-cash discount, and 85% FCF sustainability factor are analyst assumptions, not company guidance.
+   - Retirement/compensation-plan investments were excluded from detachable cash.
+   - Operating lease liabilities were treated as operating constraints matched to store and facility ROU assets, not subtracted again as ordinary debt in the detachable-cash formula.
+   - Forecast dividend holds FY2025 cash dividends flat; it does not assume growth.
+
+10. Validation
+    - result.json initialized and populated with protocol CLI commands.
+    - Final protocol validation command:
+      PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

@@ -1,0 +1,68 @@
+stock-research trace — BKE
+generated context: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields using protocol `set` commands; result.json was not authored from a blank JSON object.
+
+2. Reuse check
+- Checked the configured raw filing, annual review, and normalized fact paths.
+- No filing metadata, facts.json, annual_facts.md, or normalized facts were present for BKE/2025-12-31.
+- Returned to primary public disclosures as required by the reuse boundary.
+
+3. Company and period identity
+- Primary filing: The Buckle, Inc. Form 10-K, accession 0000885245-26-000012, filed 2026-04-01.
+- Filing URL: https://www.sec.gov/Archives/edgar/data/885245/000088524526000012/bke-20260131.htm
+- Fiscal 2025 is the 52 weeks ended 2026-01-31. Input period remains 2025-12-31 to preserve the task protocol; the mismatch is disclosed in data_quality and report.md.
+- Confirmed ordinary_operating model: apparel retailer, one reportable segment, store/e-commerce sales, no bank/broker/insurance/property-development/concession economics.
+
+4. Currency convention
+- Result contract requires absolute CNY yuan.
+- Source: Federal Reserve H.10 historical Chinese yuan rate, 2026-01-30 = 6.9510 CNY per USD.
+- URL: https://www.federalreserve.gov/releases/h10/Hist/dat00_ch.htm
+- All USD financial-statement figures multiplied by 6.9510. Percentages and per-share narrative remain dimensionless/USD where explicitly labeled.
+
+5. Extracted primary facts (USD thousands unless noted)
+- Balance sheet: assets 991,279; liabilities 566,636; equity 424,643; cash 249,461; short-term investments 24,698; inventory 139,504; receivables 10,980; PP&E net 162,446; operating lease ROU assets 339,687; long-term investments 32,393.
+- Liabilities: accounts payable 47,749; accrued employee compensation 54,960; accrued store operating expenses 20,072; gift certificates 17,237; lease liabilities current 85,877 and non-current 297,937; income taxes payable 10,810; deferred compensation 31,994.
+- Income statement: sales 1,297,835; cost of sales 661,977; gross profit 635,858; operating income 261,444; net income 209,744.
+- Cash flow: CFO 251,140; purchases of PP&E 45,361; operating FCF 205,779; financing cash flow/dividends paid -225,090.
+- Business facts: 440 stores in 42 states; private label 47% of sales; brand merchandise 53%; online sales USD 217.1m; comparable sales +5.6%; transactions +4.2%; average unit retail +3.6%; units per transaction -1.2%.
+- Forward capex guidance: USD 60m–65m for fiscal 2026.
+
+6. Calculations
+- gross margin = 635.858 / 1,297.835 = 0.4899374728.
+- net margin = 209.744 / 1,297.835 = 0.1616106824.
+- operating FCF = (251.140 - 45.361) × 6.9510m = CNY 1,430,369,829.
+- discounted detachable cash:
+  cash: 249.461 × 80% × 6.9510m = CNY 1,387,202,728.8
+  short investments: 24.698 × 90% × 6.9510m = CNY 154,508,218.2
+  long investments: 32.393 × 80% × 6.9510m = CNY 180,130,994.4
+  total = CNY 1,721,841,941.4.
+- Lease liabilities remain inside the operating business and are not netted against cash; no interest-bearing borrowing was reported.
+- sustainable cash profit:
+  reported CFO CNY 1,745,674,140
+  less forward capex midpoint USD 62.5m × 6.9510 = CNY 434,437,500
+  less retail-cycle/inventory buffer CNY 60,056,520
+  result = CNY 1,251,180,120, rounded in sortable/result fields to CNY 1,251,180,000.
+- operating business price = CNY 15,216,381,441.2417 - CNY 1,721,841,941.4 = CNY 13,494,539,499.8417.
+- owner earnback = 13,494,539,499.8417 / 1,251,180,000 = 10.78545 years.
+- market cap/cash profit = 15,216,381,441.2417 / 1,251,180,000 = 12.16162.
+- discounted net cash/market cap = 0.1131571.
+- dividend forecast: 51,156,626 shares × USD 1.40 regular annual dividend × 6.9510 = CNY 497,825,590.26; yield = 3.27164%. Special dividend excluded.
+
+7. Judgment boundaries
+- Facts: filings, input market snapshot, and Federal Reserve FX rate.
+- Inference: ordinary operating model and treatment of lease assets/liabilities as operating structure.
+- Analyst estimates: cash discounts, forward capex midpoint, cycle buffer, sustainable cash profit, and regular-only dividend forecast.
+- No buy/sell recommendation, target price, or ranking label was produced.
+
+8. Validation
+- Initial post-population command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial validation result: status ok, errors [].
+- Final validation and cross-file checks are performed after report.md and trace.txt creation.

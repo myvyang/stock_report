@@ -1,0 +1,49 @@
+stock-research trace
+company=600854.SH 春兰股份
+period=2025-12-31
+generated_at=2026-08-01T03:26:09+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields only through protocol set/append commands.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[local reuse audit]
+- No raw filing, annual facts package, normalized facts, or prior stock-research result existed locally for 600854.SH/2025-12-31.
+- Existing stock_report/data/notes/user_stock_evaluations.md was not used because it did not provide a company fact package for this task.
+
+[sources retrieved]
+- Primary annual report: 江苏春兰制冷设备股份有限公司2025年年度报告, disclosed 2026-04-16.
+  SSE URL: https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-16/600854_20260416_U004.pdf
+  CNInfo mirror used for PDF text extraction: https://static.cninfo.com.cn/finalpage/2026-04-16/1225109155.PDF
+- Dividend proposal / board disclosure: 2026-04-16, every 10 shares cash CNY 1.2, total CNY 62,335,024.56.
+- Annual shareholder meeting resolution: 2026-05-20 meeting, published 2026-05-21; no proposal rejected.
+- Market snapshot reused exactly from config/input.json: market cap CNY 2,228,000,000; PE TTM 17.67; timestamp 20260731114322; Tencent qt.gtimg.cn.
+
+[model decision]
+- Input hint ordinary_operating/applicable was overridden after filing review.
+- Final model: investment_holding / requires_special_model.
+- Reason: 2025 investment income CNY 132,092,506.01 exceeded parent net profit CNY 127,630,651.23. Dividends from two 10%-owned energy companies were CNY 122,237,868.17. Cash CNY 1,213,111,472.08 and the energy stakes CNY 571,294,794.90 are earnings-producing assets, so deducting them as detachable assets while retaining their interest/dividend income would double count.
+- Consequence: ordinary discounted cash, cash profit, operating business price, earnback years, and market-cap/cash-profit sorting metrics remain null.
+
+[calculations]
+- consolidated gross profit = 94,858,629.00 - 74,299,000.23 = 20,559,628.77
+- consolidated gross margin = 20,559,628.77 / 94,858,629.00 = 0.2167323559
+- parent net margin = 127,630,651.23 / 94,858,629.00 = 1.3454648350
+- operating free cash flow = 17,869,436.68 - 2,623,685.78 = 15,245,750.90
+- forecast dividend yield = 62,335,024.56 / 2,228,000,000 = 0.0279771205
+- indicative price/book reference = 2,228,000,000 / 2,466,117,975.33 = about 0.9034; disclosed only in narrative, not represented as ordinary earnback.
+- energy-stake cash dividend / reported carrying value = 122,237,868.17 / 571,294,794.90 = about 0.2140; used only as descriptive historical yield, not a forecast.
+
+[quality and limitations]
+- Annual report has a standard unqualified audit opinion.
+- Core special-model fields, asset/liability rows, dividend forecast, business story, risks, and evidence are complete.
+- Market quote is an input-provided snapshot and was not reconstructed.
+- The two energy stakes are Level 3 fair values based on investee period-end net assets, not observable transaction prices.
+- Full standalone 2025 financial statements for the two investees were not obtained; future dividend durability therefore cannot be independently stress-tested.
+- No buy/sell recommendation or target price was produced.

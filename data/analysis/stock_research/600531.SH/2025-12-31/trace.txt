@@ -1,0 +1,90 @@
+stock-research trace
+company=600531.SH 豫光金铅
+period=2025-12-31
+generated_at=2026-08-01 Asia/Shanghai
+
+[protocol]
+1. Read stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Read references/data-reuse.md because the skill and workspace instructions require reuse checks.
+4. Ran protocol init with config/input.json -> outputs/result.json.
+5. Populated fields with protocol set commands; no complex result JSON was hand-written from scratch.
+6. Ran protocol validate; status=ok, errors=[].
+
+[reuse audit]
+Expected annual fact, normalized fact and raw filing paths under stock_report were absent.
+No historical stock_research result for 600531.SH/2025-12-31 was available.
+Result therefore rebuilt from the corrected 2025 annual-report text and dividend disclosures.
+
+[primary and supporting sources]
+1. 河南豫光金铅股份有限公司2025年年度报告（更正后）, disclosed 2026-04-29.
+   Accessible text mirror used for extraction: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12244271&stockid=600531
+   The correction concerned the customer/supplier disclosure; consolidated statements were used as published.
+2. 河南豫光金铅股份有限公司2025年年度报告摘要, disclosed 2026-04-17.
+   PDF mirror: https://pdf.dfcfw.com/pdf/H2_AN202604171821299003_1.pdf
+3. 2024 annual report and annual dividend disclosures for dividend history.
+   https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=10992865&stockid=600531
+4. 2023 annual report and 2023 distribution disclosure for dividend history.
+   https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=9965598&stockid=600531
+5. Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026-07-31 11:43:31, market cap CNY 14,148,000,000, PE TTM 15.61.
+
+[model review]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: revenue is generated from purchasing mineral/recycled feedstock, smelting, recovering multiple metals and selling products. Deposits, inventory and derivatives are working-capital and hedging items, not a financial-institution balance-sheet model. Ordinary owner earnback is usable only after treating restricted cash, inventory, margin deposits and financing debt conservatively.
+
+[core extraction]
+revenue=49,553,593,201.18
+cost_of_sales=47,011,739,389.97
+gross_profit=2,541,853,811.21
+operating_profit=1,107,992,851.04
+net_profit=859,848,240.60
+parent_net_profit=860,092,192.16
+operating_cash_flow=510,154,447.40
+capital_expenditure=405,384,655.04
+operating_free_cash_flow=104,769,792.36
+total_assets=23,629,587,085.80
+total_liabilities=17,087,473,877.43
+total_equity=6,542,113,208.37
+parent_equity=6,541,755,012.51
+minority_interest=358,195.86
+
+[derived metrics]
+gross_margin=(49,553,593,201.18-47,011,739,389.97)/49,553,593,201.18=0.051295045
+net_margin=860,092,192.16/49,553,593,201.18=0.017356808
+operating_free_cash_flow=510,154,447.40-405,384,655.04=104,769,792.36
+forecast_dividend_yield=259,991,480.07/14,148,000,000=0.018376554
+
+[owner earnback cash bridge]
+cash_and_cash_equivalents=1,677,976,944.76
+  Source: cash flow statement. This excludes restricted cash from total monetary funds of 2,003,792,696.57.
+long_term_equity_and_associate_investments=75,086,810.53+22,300,058.43=97,386,868.96
+discounted_investments=97,386,868.96*50%=48,693,434.48
+financing_debt=6,686,060,228.51 short-term borrowings
+              +1,956,131,661.53 current portion of non-current liabilities
+              +3,531,621,357.79 long-term borrowings
+              +6,749,227.50 lease liabilities
+              +41,540,895.65 long-term payables
+              =12,222,103,370.98
+discounted_detachable_net_cash=1,677,976,944.76+48,693,434.48-12,222,103,370.98=-10,495,432,991.74
+operating_business_price=14,148,000,000-(-10,495,432,991.74)=24,643,432,991.74
+discounted_sustainable_cash_profit=2025 operating free cash flow=104,769,792.36
+owner_earnback_years=24,643,432,991.74/104,769,792.36=235.215060
+market_cap_to_cash_profit=14,148,000,000/104,769,792.36=135.038924
+
+[judgment boundaries]
+- Inventory of 13,066,392,797.75 is operating inventory and receives no detachable-cash credit.
+- Other receivables of 1,592,722,614.06 mainly comprise futures-exchange margin after metals prices and margin ratios rose; treated as operating working capital, not detachable cash.
+- Derivative liability of 993,438,688.25 is discussed with hedged inventory/sales and is not added again to financing debt, avoiding double counting operating hedge exposure.
+- Sustainable cash profit uses one-year OCF less all capex. This is deliberately conservative because maintenance and growth capex cannot be reliably separated from disclosed data.
+- The 235.2-year figure is a static diagnostic, not a forecast, recommendation or target price.
+
+[dividend]
+2025: 259,991,480.07, CNY 2.15 per 10 shares, payout ratio 30.23%.
+2024: implemented amount 245,308,128.75, CNY 0.225 per share, payout ratio about 30.39%.
+2023: 174,438,821.44, CNY 1.60 per 10 shares, payout ratio 30.01%.
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

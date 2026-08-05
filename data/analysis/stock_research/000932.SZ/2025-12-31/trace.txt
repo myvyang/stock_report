@@ -1,0 +1,97 @@
+task: stock research for 000932.SZ / 华菱钢铁
+period: 2025-12-31 annual
+generated_at: 2026-08-01 Asia/Shanghai
+
+1. Required instructions and contracts read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+- /workspace/AGENTS.md content supplied in task context
+
+2. Local reuse check
+- Searched stock_report for 000932.SZ annual-review, normalized-facts, raw filing, and prior stock-research artifacts.
+- No company-specific local filing, fact pack, or prior result existed at start.
+- Existing user evaluation file was not used because it did not provide a company-specific fact package for this period.
+
+3. Protocol initialization
+command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+result: initialized schema stock-research-result-v1 from task input.
+
+4. Official filing discovery and acquisition
+- Queried CNINFO announcement endpoint for secCode 000932, annual-report category, date range 2026-03-01 to 2026-05-01.
+- Located announcementId 1225061884, title 2025年年度报告, disclosure date 2026-03-31.
+- Official URL: https://static.cninfo.com.cn/finalpage/2026-03-31/1225061884.PDF
+- Downloaded to stock_report/data/raw/filings/000932.SZ/2025-12-31/2025-annual-report.pdf
+- PDF: 204 pages.
+- Environment lacked pdfinfo/pdftotext; created temporary venv /tmp/stock-pdf-venv, installed pypdf, and extracted text to stock_report/data/raw/filings/000932.SZ/2025-12-31/2025-annual-report.txt for line-level checks.
+- Cross-check announcement: https://static.cninfo.com.cn/finalpage/2026-04-14/1225098734.PDF confirms the annual report was disclosed on 2026-03-31.
+
+5. Key audited facts extracted from 2025 annual report
+- Revenue: 121,137,836,576.22
+- Cost of sales: 109,370,276,385.35
+- Gross profit calculated: 11,767,560,190.87
+- Operating profit: 5,206,159,322.63
+- Net profit: 3,870,294,431.45
+- Parent net profit: 2,610,615,029.92
+- Total assets: 148,540,136,349.77
+- Total liabilities: 79,411,409,395.66
+- Total equity: 69,128,726,954.11
+- Parent equity: 55,698,911,357.37
+- Minority interest: 13,429,815,596.74
+- Operating cash flow: 6,573,964,816.44
+- Cash paid to acquire long-term assets / capex: 6,136,250,193.57
+- Operating free cash flow calculated: 437,714,622.87
+- Financing cash flow: -3,490,949,158.80
+- Fixed-asset depreciation plus amortization: 4,069,837,011.88
+- Cash and cash equivalents: 5,930,218,565.09
+- Restricted monetary funds: 4,341,632,457.67
+- Total large certificates of deposit: 29,323,125,856.28
+  - within one year: 12,399,351,221.82
+  - maturing within one year: 7,662,880,553.88
+  - over one year: 9,260,894,080.58
+- Pledged large certificates of deposit: 6,365,083,928.60
+  - current maturity pledged: 2,608,257,216.27
+  - non-current pledged: 3,756,826,712.33
+- Bank borrowings: 16,135,748,607.90
+  - short-term: 4,402,093,684.94
+  - current portion of long-term: 4,977,121,752.88
+  - long-term: 6,756,533,170.08
+- Finance-company matched liabilities: 7,096,307,278.13
+  - deposits: 4,185,562,487.18
+  - repo liabilities: 2,761,000,000.00
+  - central-bank borrowing: 149,744,790.95
+- Proposed 2025 cash dividend: 1,096,417,465.60, RMB 1.60 per 10 shares, pending shareholder approval.
+
+6. Analysis-model decision
+- statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- Reason: steel manufacturing assets and working capital are the core business, so the ordinary operating model is appropriate.
+- Special handling: consolidated finance company creates financial operating assets and liabilities. Deposits, repo funding, central-bank borrowing, loans, and CDs cannot be treated as ordinary detachable cash without matching.
+
+7. Formula and assumption trace
+- gross_margin = 11,767,560,190.87 / 121,137,836,576.22 = 0.0971418774
+- net_margin = 2,610,615,029.92 / 121,137,836,576.22 = 0.0215515943
+- unpledged_CDs = 29,323,125,856.28 - 6,365,083,928.60 = 22,958,041,927.68
+- discounted_unpledged_CDs = 22,958,041,927.68 * 70% = 16,070,629,349.38
+- discounted_detachable_net_cash = 5,930,218,565.09 + 16,070,629,349.38 - 16,135,748,607.90 - 7,096,307,278.13 = -1,231,207,971.56
+- base_cash_profit = 6,573,964,816.44 - 4,069,837,011.88 = 2,504,127,804.56
+- discounted_sustainable_cash_profit = 2,504,127,804.56 * 80% = 2,003,302,244.45
+- operating_business_price = 27,068,000,000.00 - (-1,231,207,971.56) = 28,299,207,971.56
+- owner_earnback_years = 28,299,207,971.56 / 2,003,302,244.45 = 14.1262810
+- market_cap_to_cash_profit = 27,068,000,000.00 / 2,003,302,244.45 = 13.5116891
+- forecast_dividend_yield = 1,096,417,465.60 / 27,068,000,000.00 = 0.0405052995
+
+8. Interpretation safeguards
+- Full 2025 capex would produce only 437,714,622.87 operating FCF; this is disclosed as a major downside sensitivity.
+- Depreciation/amortization as maintenance capex is an inference, not a reported maintenance figure.
+- 70% haircut on unpledged CDs and 20% cash-profit cyclicality haircut are analyst assumptions, explicitly retained in result.json.
+- Market cap and PE are from the task input Tencent quote snapshot and were not independently reconstructed from exchange tick data.
+- No buy/sell recommendation, target price, or ranking label was produced.
+
+9. Result population and validation
+- outputs/result.json was initialized and populated only through protocol CLI init/set/append commands in populate_result.sh.
+- validation command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- validation status after population: ok, errors=[]

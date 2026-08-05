@@ -1,0 +1,79 @@
+task=MNSB annual stock research
+period=2025-12-31
+generated_context_date=2026-08-05 Asia/Shanghai
+
+[protocol]
+1. Read stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the skill and task prefer reuse.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result.json only through protocol set/append commands.
+6. Validated result.json with protocol validate; final expected status: ok.
+
+[reuse audit]
+- No existing annual facts package, normalized facts, raw filing, or prior research result for MNSB was present under the input paths.
+- Downloaded the official 2025 Form 10-K HTML to stock_report/data/raw/filings/MNSB/2025-12-31/main20251231_10k.htm for reproducible extraction.
+
+[company and model]
+- SEC CIK: 0001693577.
+- Official filing identifies MainStreet Bancshares as a financial holding company owning MainStreet Bank.
+- Overrode input analysis_model_hint ordinary_operating/applicable with financial_bank/requires_special_model.
+- Reason: deposits, loans, securities, liquidity cash, and subordinated debt are the operating balance sheet of a bank; ordinary detachable-net-cash and operating-free-cash-flow formulas are economically invalid.
+- Kept all ordinary owner-earnback sorting fields null, as required by result contract.
+
+[primary sources]
+- 2025 Form 10-K, filed 2026-03-13, SEC accession 0001437749-26-008073:
+  https://www.sec.gov/Archives/edgar/data/1693577/000143774926008073/main20251231_10k.htm
+- 2026 Q1 Form 10-Q:
+  https://www.sec.gov/Archives/edgar/data/1693577/000143774926015780/main20260331_10q.htm
+- 2025 results release furnished on Form 8-K:
+  https://www.sec.gov/Archives/edgar/data/1693577/000143774926002007/ex_911320.htm
+- 2026-01 common dividend Form 8-K:
+  https://www.sec.gov/Archives/edgar/data/1693577/000143774926002146/main20260126_8k.htm
+- 2026-04 common dividend Form 8-K:
+  https://www.sec.gov/Archives/edgar/data/1693577/000143774926012891/main20260327c_8k.htm
+- Federal Reserve H.10 USD/CNY daily series preview, 2025-12-31 observation 7.1875 CNY/USD:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Valuation snapshot was supplied in config/input.json: Yahoo Finance yfinance, market cap CNY 1,107,536,523.5677643 on 2026-08-03, PE TTM 11.359606.
+
+[key audited USD facts]
+- Total assets: 2,212,669,000.
+- Total liabilities: 1,994,078,000.
+- Total stockholders' equity: 218,591,000, including preferred stock 27,263,000.
+- Net loans: 1,841,833,000; allowance for credit losses on loans: 19,308,000.
+- Deposits: 1,899,184,000; noninterest-bearing deposits 378,694,000; time deposits 779,844,000.
+- Cash and cash equivalents: 162,756,000; federal funds sold 136,301,000.
+- AFS, HTM, and restricted securities: 57,954,000 + 13,798,000 + 7,005,000.
+- Subordinated debt: 69,936,000.
+- Net interest income: 69,545,000; noninterest income: 4,027,000; noninterest expense: 54,551,000.
+- Net income: 15,613,000; preferred dividends: 2,156,000; income available to common shareholders: 13,457,000.
+- Common dividends paid: 3,050,000; common share repurchases: 4,336,000.
+- NIM 3.46%; ROA 0.73%; ROE 7.33%; efficiency ratio 74.15%.
+- Bank CET1 ratio 15.05%; total risk-based capital ratio 16.08%; tier 1 leverage ratio 13.28%.
+
+[credit-quality interpretation]
+- Nonperforming assets: USD 33.2m at 2025-12-31 versus USD 21.7m at 2024-12-31.
+- Nonaccrual loans: USD 31.5m at 2025-12-31.
+- Approximate nonaccrual/gross-loan ratio: 1.69%; allowance/gross-loan ratio: 1.04%; NPA/assets: 1.50%.
+- 10-K subsequent-event disclosure states another USD 28.7m of loans moved to nonaccrual after year-end. Management says these are well collateralized, no losses are expected, and no additional allowance was required. Treated this as a management estimate, not a realized recovery fact.
+- Owner-occupied CRE is about 24.0% and investment CRE about 30.4% of loans. Regulatory CRE concentration is 354.6% of consolidated risk-based capital; construction/land development is 97.6%.
+
+[currency conversion]
+- Contract requires CNY absolute yuan.
+- Applied 7.1875 CNY/USD uniformly to audited USD statement amounts and dividend estimates.
+- This translation is for protocol comparability only; it is not the company's functional currency or an actual cash conversion.
+
+[dividend forecast]
+- Historical declared dividend per share was USD 0.40 in each of 2023, 2024, and 2025.
+- Q1 and Q2 2026 dividends declared at USD 0.10 per common share each.
+- Forecast assumption: USD 0.40 annual run rate x 7,117,438 shares outstanding at 2026-04-30 = USD 2,847,000 approximately; CNY 20,462,634.25.
+- Forecast yield: CNY 20,462,634.25 / CNY 1,107,536,523.5677643 = 1.8475809885%.
+- Forecast is not board guidance; subsequent declarations remain discretionary.
+
+[known limitations]
+- No 2026 Q2 MNSB 10-Q was found as of the task date; subsequent credit quality is only updated through Q1 public materials.
+- Market cap and PE were accepted from the supplied yfinance snapshot and not independently reconstructed from exchange tick data.
+- Gross margin, net margin, operating cash flow, capex, and ordinary free cash flow are null because they lack comparable economic meaning for this bank model.
+- Total-equity price/book approximation includes preferred equity and is explicitly not treated as common tangible book valuation.
+

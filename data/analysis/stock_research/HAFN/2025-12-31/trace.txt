@@ -1,0 +1,75 @@
+stock-research trace
+generated_at=2026-08-04T21:09:19+08:00
+query=HAFN
+period=2025-12-31
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json using:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields using repeated protocol `set` commands; no complex JSON object was handwritten as the initial result.
+5. Validated using:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   validation_status=ok; errors=[]
+
+[reuse_check]
+No pre-existing HAFN raw filing, annual facts package, normalized facts, or prior stock-research outputs were present under the paths supplied in config/input.json.
+Action: retrieved the official 2025 Form 20-F from SEC EDGAR and saved it to stock_report/data/raw/filings/HAFN/2025-12-31/form20f.html.
+
+[primary_sources]
+SEC Form 20-F, filed 2026-04-17, accession 0001140361-26-015278:
+https://www.sec.gov/Archives/edgar/data/1815779/000114036126015278/ef20060668.htm
+Hafnia official 2025 Annual Report announcement, 2026-04-17:
+https://investor.hafnia.com/ir-news/news-details/2026/HAFNIA-LIMITED-Annual-Report-2025-2026-QJC4DAvXeB/default.aspx
+China NBS 2025 statistical communiqué, annual average USD/CNY=7.1429:
+https://www.stats.gov.cn/english/PressRelease/202602/t20260228_1962661.html
+CFETS central parity via Xinhua, 2025-12-31 USD/CNY=7.0288:
+https://english.news.cn/20251231/d55adf458b384452b9c936aff80e901f/c.html
+Market cap and PE TTM: Yahoo Finance yfinance values supplied by config/input.json.
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Hafnia is a tanker operating platform. Vessels, working capital, and debt are ordinary operating structures rather than a special financial-statement model. Vessels remain indispensable operating assets and were not treated as detachable cash.
+
+[currency]
+Income statement and cash flow: USD amounts multiplied by 7.1429 (2025 annual average).
+Balance sheet: USD amounts multiplied by 7.0288 (2025-12-31 central parity).
+All result.json monetary values are absolute CNY yuan.
+
+[key_extraction_usd]
+Revenue total=2,281.909m (Hafnia/TC vessels 1,421.831m + external pool vessels 860.078m)
+Cost-of-sales proxy=1,326.035m (voyage expenses 465.957m + 329.566m + external pool distributions 530.512m)
+TCE/gross-profit proxy=955.874m
+Operating profit=369.586m
+Net/parent profit=339.682m; no minority interest reported
+Total assets=3,811.896m; liabilities=1,482.309m; equity=2,329.587m
+Operating cash flow=602.889m
+Purchase of PP&E=146.199m
+Operating free cash flow=456.690m
+Borrowings=1,122.976m
+Cash at bank and on hand=103.609m
+Cash retained in commercial pools=88.966m
+Restricted cash=10.000m
+Other investments=297.581m
+FY2025 attributable dividend declared=184.0m
+
+[owner_earnback_assumptions]
+Detachable value: bank cash 100%; commercial-pool cash 0%; restricted cash 0%; other investments (mainly TORM) 50%; borrowings deducted 100%.
+Discounted detachable net cash USD=-870.5765m; CNY=-6,119,108,103.2.
+Cash-profit base: 2025 OCF less all PP&E purchases = USD456.690m.
+Cyclical haircut=25%; discounted sustainable cash profit USD342.5175m; CNY2,446,568,250.75.
+Operating business price=CNY32,053,820,359.78.
+Owner earnback years=13.1015.
+Market cap/cash profit=10.6004.
+
+[dividend_forecast]
+Assumption: 80% of discounted sustainable cash profit, matching the company's stated payout tier when net LTV is above 20% and at or below 30%.
+Forecast cash dividend=CNY1,957,254,600.60.
+Forecast dividend yield=7.5469%.
+This is an analytical scenario, not company guidance.
+
+[quality]
+status=complete
+Known limitations are recorded in outputs/result.json: FX translation basis; yfinance market data not exchange-tick verified; forecast and normalization assumptions; TCE proxy used for gross profit.

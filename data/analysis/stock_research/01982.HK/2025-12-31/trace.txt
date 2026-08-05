@@ -1,0 +1,83 @@
+stock-research trace
+company: NAMESON HOLDINGS LIMITED / 南旋控股有限公司
+code: 01982.HK
+task_period: 2025-12-31
+actual_annual_period_used: year ended 2025-03-31
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All result fields were populated through protocol `set`; the result object was not authored from scratch.
+
+2. Local data reuse check
+- Checked stock_report/data/analysis/annual_review/01982.HK/2025-12-31 and raw filing paths.
+- No pre-existing annual facts, normalized facts, raw filing metadata, or historical stock-research result was available.
+- Downloaded official HKEX annual report:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2025/0731/2025073100620.pdf
+- Stored source as stock_report/data/raw/filings/01982.HK/2025-12-31/annual-report-2025.pdf.
+- Extracted text locally with pypdf in a temporary virtual environment to annual-report-2025.txt; 136 PDF pages.
+
+3. Period decision
+- Company year-end is 31 March. The task label 2025-12-31 is not a statutory annual reporting date.
+- Used the latest complete annual report publicly available by the task period: FY2025, year ended 2025-03-31, published 2025-07-31.
+- Did not backfill FY2026 annual report, which was published after the task period.
+
+4. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Annual report, Note 5: one operating segment, manufacturing of knitwear products.
+- Principal activities: manufacturing of knitwear products.
+- Balance sheet contains manufacturing PPE, ROU assets, inventory, operating receivables, cash, bank loans, leases, and operating payables; it does not contain brokerage client money, repo funding, or proprietary trading inventories.
+- Conclusion: override hint with ordinary_operating / applicable.
+
+5. Core source facts (HK$000 unless stated)
+- Revenue 4,352,130; cost of sales 3,570,315; gross profit 781,815; operating profit 449,910; net profit 355,414; parent net profit 342,327.
+  Source: Annual Report 2025, consolidated income statement p.63 and MDA p.9.
+- Total assets 4,778,595; total liabilities 2,140,890; total equity 2,637,705; parent equity 2,371,555; NCI 266,150.
+  Source: consolidated balance sheet pp.65-66.
+- OCF 222,940; cash purchase of PPE 255,539; financing cash flow -272,114; dividends paid 303,159.
+  Source: consolidated cash flow statement p.68.
+- Cash 430,818; bank borrowings 872,788; lease liabilities 222,311.
+  Source: Notes 22-24, pp.110-112.
+- Inventory 1,207,897; trade and bills receivable 153,114; prepayments/deposits/other receivables/assets 535,253; PPE 1,873,536; ROU assets 358,786; unlisted insurance FVTPL 197,358.
+  Source: balance sheet and Notes 18-21.
+- Customer A 2,036,569; top five customers 68.9% of revenue.
+  Source: Note 5(c), p.93.
+- FY2025 dividends: 9.8 HK cents interim + 1.5 HK cents second interim = 11.3 HK cents/share; total HK$257.571m.
+  Source: Note 14, p.101.
+
+6. Currency conversion
+- Contract requires absolute CNY yuan.
+- Applied 1 HKD = 0.90486 CNY, the PBOC/CFETS midpoint published 2025-12-26, to annual-report HKD amounts.
+- Example: revenue = 4,352,130,000 * 0.90486 = CNY 3,938,068,351.80.
+- Market cap was retained exactly from input at CNY 1,549,159,424.071312 because protocol initialization labels it CNY. Input does not prove whether Tencent-derived HK market cap was already converted; recorded as a limitation.
+
+7. Formula checks
+- gross_margin = 781,815 / 4,352,130 = 0.17964.
+- net_margin = 342,327 / 4,352,130 = 0.07866.
+- operating_free_cash_flow = (222,940 - 255,539) * 1000 * 0.90486 = CNY -29,497,531.14.
+- discounted cash components, CNY:
+  cash 389,829,975.48 * 50% = 194,914,987.74
+  unlisted insurance FVTPL 178,581,359.88 * 50% = 89,290,679.94
+  bank debt -789,750,949.68 * 100%
+  lease liabilities -201,160,331.46 * 100%
+  total discounted detachable net cash = CNY -706,705,613.46.
+- normalized sustainable cash profit = HK$240m * 0.90486 = CNY 217,166,400.00.
+  Start with parent profit, remove volatile/non-core other gains, then apply a normalization haircut for working-capital absorption and recurring reinvestment. This is analyst judgment, not management guidance.
+- operating_business_price = 1,549,159,424.071312 - (-706,705,613.46) = CNY 2,255,865,037.53.
+- owner_earnback_years = 2,255,865,037.53 / 217,166,400 = 10.39.
+- market_cap_to_cash_profit = 1,549,159,424.071312 / 217,166,400 = 7.13.
+- forecast dividend = HK$257.571m * 0.90486 = CNY 233,065,695.06.
+- forecast dividend yield = 233,065,695.06 / 1,549,159,424.071312 = 0.15045.
+
+8. Validation
+- Command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[]
+
+9. Data-quality conclusion
+- status=complete under the result contract: identity, period mapping, valuation input, model, three statements, asset/liability explanations, owner-earnback components, dividend estimate, business story, risks, and evidence are present.
+- Explicit limitations are retained for period mapping, market-cap currency provenance, and analyst normalization of cash profit.

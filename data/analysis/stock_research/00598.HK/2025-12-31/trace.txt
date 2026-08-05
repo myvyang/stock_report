@@ -1,0 +1,63 @@
+stock-research trace
+company=00598.HK SINOTRANS LIMITED
+period=2025-12-31 annual
+generated_for_input=2026-08-03T15:37:14+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the selected skill routes reuse decisions through it.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated initialized paths with protocol set commands; no complex JSON was authored as an uninitialized standalone result.
+6. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: {"status":"ok","errors":[]}
+
+[source retrieval]
+- No annual facts package, normalized facts, prior stock-research output, or raw filing existed locally.
+- Retrieved the official English 2025 Annual Report from HKEX:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0413/2026041300428.pdf
+- Local raw filing: stock_report/data/raw/filings/00598.HK/2025-12-31/annual-report-2025.pdf
+- Text extraction used pypdf in a temporary virtual environment because pdftotext was unavailable.
+- An earlier HKEX link dated 2026-03-30 resolved to the ESG report, not the annual financial report; it was replaced by the correct 494-page annual report before research.
+
+[model review]
+- input hint: financial_brokerage / requires_special_model.
+- filing facts: core segments are logistics, forwarding and related business, and e-commerce business; no brokerage clients, proprietary securities trading, or customer-fund balance-sheet model.
+- override: ordinary_operating / applicable.
+- reason: receivables, prepayments, logistics fixed assets, contract liabilities and purchased transport capacity are an ordinary logistics operating structure. Equity-method investments require an explicit cash-conversion adjustment but do not turn the consolidated company into a financial brokerage.
+
+[core filing facts]
+- Revenue: RMB96,808,663,837.20.
+- Cost of sales/operating costs: RMB91,304,872,884.98.
+- Gross profit calculated: RMB5,503,790,952.22.
+- Parent net profit: RMB4,021,797,495.79.
+- Parent net profit excluding non-recurring items: RMB1,678.33 million (rounded disclosure).
+- Operating cash flow: RMB3,085,506,143.28.
+- Purchase/construction of fixed assets, intangible assets and other long-term assets: RMB1,652,518,918.57.
+- Operating free cash flow calculated: RMB1,432,987,224.71.
+- Total assets: RMB78,347,869,453.49.
+- Total liabilities: RMB34,303,420,852.14.
+- Total equity: RMB44,044,448,601.35.
+- Parent equity: RMB41,289,563,850.47.
+- Non-controlling interests: RMB2,754,884,750.88.
+- Cash and bank balances: RMB17,009,624,398.71, including RMB5,838,359,951.91 deposited with finance companies.
+- Borrowings and bonds used for owner-earnback debt deduction: short-term RMB1,345,531,402.61 + long-term RMB2,523,539,379.01 + bonds RMB3,999,104,347.06 = RMB7,868,175,128.68.
+
+[formula calculations]
+- gross_margin = 5,503,790,952.22 / 96,808,663,837.20 = 0.056852256131492.
+- net_margin = 4,021,797,495.79 / 96,808,663,837.20 = 0.041543776521421.
+- non-finance-company cash = 17,009,624,398.71 - 5,838,359,951.91 = 11,171,264,446.80.
+- discounted cash = 11,171,264,446.80 * 70% + 5,838,359,951.91 * 50% - 7,868,175,128.68 = RMB2,870,889,960.035.
+- discounted sustainable cash profit = RMB1,400,000,000, a judgment set slightly below 2025 operating FCF and cross-checked against adjusted parent profit.
+- operating business price = 29,129,852,784.770126 - 2,870,889,960.035 = RMB26,258,962,824.735126.
+- owner earnback = 26,258,962,824.735126 / 1,400,000,000 = 18.75640201766795 years.
+- market cap / cash profit = 29,129,852,784.770126 / 1,400,000,000 = 20.807037703407232.
+- forecast dividend yield = 2,152,971,681.08 / 29,129,852,784.770126 = 0.07390945972118444.
+
+[fact/inference/judgment separation]
+- Facts: filing statement values, segment results, disclosed dividend and network/industry ranking; input market snapshot.
+- Calculations: margins, FCF, discounted cash sum, operating business price and payback ratios.
+- Judgments: cash haircuts of 70%/50%, exclusion of matched lease liabilities from financing debt deduction, and RMB1.4bn sustainable cash profit.
+- Limitations are recorded in outputs/result.json data_quality.limitations and the report Data Boundary section.

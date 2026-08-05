@@ -1,0 +1,75 @@
+stock-research trace
+company=603885.SH 吉祥航空
+period=2025-12-31
+generated_at=2026-08-01T02:40:19+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Read references/data-reuse.md because no local annual fact package was present.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields only through stock_analysis.stock_research.protocol set.
+6. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[local_reuse]
+- config/input.json: company identity, report period, market cap, PE TTM, market-cap timestamp and source.
+- No annual facts, normalized facts, raw filing metadata, or historical stock-research result existed for 603885.SH/2025-12-31 at task start.
+
+[sources]
+- Shanghai Juneyao Air Co., Ltd. 2025 Annual Report, disclosed 2026-04-23.
+  Regulatory disclosure mirror used for full text:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12147828&stockid=603885
+  PDF preserved at stock_report/data/raw/filings/603885.SH/2025-12-31/603885_2025_annual.pdf
+- 2025 annual profit distribution proposal, announcement 临2026-026:
+  https://dataclouds.cninfo.com.cn/shgonggao/hsomarket/2026/20260422/7deddca02ad345599d7dbb6f1057e75e.PDF
+- Final 2025 dividend implementation/adjustment announcement, disclosed 2026-06-05:
+  https://dataclouds.cninfo.com.cn/shgonggao/hsomarket/2026/20260604/cba4fe7107794f9bb0a2b49423806b3f.PDF
+- Eastmoney RPT_DMSK_FN_BALANCE and RPT_DMSK_FN_CASHFLOW endpoints used only to cross-check statement values extracted from the annual report.
+- Tencent qt.gtimg.cn market snapshot supplied in config/input.json.
+
+[model_review]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Revenue and profit arise from passenger/cargo transport rather than a financial balance-sheet or concession model. Aviation leasing is nevertheless economically operating-critical, so lease liabilities and lease cash payments receive special handling.
+
+[key_facts_cny]
+revenue=22499438223.61
+cost_of_sales=19698781173.40
+gross_profit=2800657050.21
+parent_net_profit=1039638382.35
+parent_net_profit_ex_nonrecurring=896543831.11
+operating_cash_flow=7269559364.10
+cash_paid_to_construct_long_lived_assets=625618171.24
+lease_cash_payments=5742913603.07
+total_assets=52251121203.06
+total_liabilities=40119318761.14
+parent_equity=12144397248.79
+monetary_funds=3143850559.45
+other_equity_instruments=7530725106.12
+interest_bearing_debt=35624402587.16
+contracted_aircraft_engine_capex_commitment=28943192600.00
+
+[calculations]
+gross_margin=(22499438223.61-19698781173.40)/22499438223.61=0.1244767546
+net_margin=1039638382.35/22499438223.61=0.0462073040
+accounting_operating_fcf=7269559364.10-625618171.24=6643941192.86
+lease_adjusted_cash_check=7269559364.10-5742913603.07-625618171.24=901027589.79
+discounted_cash_profit=896543831.11*0.80=717235064.888
+discounted_net_cash=3143850559.45*0.80+7530725106.12*0.50+90000000*0.50-35624402587.16=-29298959586.54
+operating_business_price=23620000000-(-29298959586.54)=52918959586.54
+owner_earnback_years=52918959586.54/717235064.888=73.7819
+market_cap_to_cash_profit=23620000000/717235064.888=32.9320
+forecast_dividend_yield=424120054.80/23620000000=0.0179568186
+
+[judgment_boundaries]
+- 80% cash discount, 50% listed strategic-equity discount, and 80% sustainable-profit factor are analyst assumptions, not reported facts.
+- Lease cash payments are deducted because they are necessary to retain operating aircraft even though accounting classifies them as financing cash flow.
+- 2025 dividend was implemented at CNY0.20 per participating share; the final CNY424,120,054.80 amount reflects the record-date share base after excluding repurchased shares.
+- No buy/sell recommendation or target price is produced.
+
+[validation]
+status=ok
+data_quality.status=complete
+data_quality.incomplete_reasons=[]

@@ -1,0 +1,52 @@
+Stock research trace — FIRST PACIFIC (00142.HK)
+Generated for period 2025-12-31
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse audit
+   - config/input.json found.
+   - No existing annual facts, normalized facts, raw filing metadata, prior result, report, or trace existed in the supplied stock_report paths.
+   - Input market snapshot reused: market cap CNY 20,533,528,667.98222; PE TTM 4.64; timestamp 2026/07/31 16:08:44; source Tencent qt.gtimg.cn.
+
+3. Source acquisition
+   - Downloaded official First Pacific Annual Report 2025 from:
+     https://www.firstpacific.com/media/normal/17172_2026042802399.pdf
+   - Saved as stock_report/data/raw/filings/00142.HK/2025-12-31/annual-report-2025.pdf
+   - Consulted official company annual report/announcement pages and HKEX title search to confirm publication and filing identity.
+   - Currency translation uses 2025-12-31 CFETS/PBOC central parity: USD 1 = CNY 7.0288.
+
+4. Model verification
+   - Input hint: financial_brokerage.
+   - Filing fact: Note 1 and Corporate Profile identify First Pacific as an investment holding company with consumer food, telecommunications, infrastructure, power, mining and energy interests.
+   - Override applied: statement_model = investment_holding; owner_earnback_applicability = requires_special_model.
+   - Rationale: consolidated cash/debt belong substantially to operating subsidiaries and coexist with large NCI; associates are equity-accounted; holding-company cash extraction depends on upstream dividends and governance.
+
+5. Core filing facts (USD millions unless noted)
+   - Revenue 10,232.5; cost of sales 6,502.6; gross profit 3,729.9.
+   - Net profit 1,780.9; parent net profit 661.0; recurring profit 740.0.
+   - Total assets 30,647.6; liabilities 17,524.0; total equity 13,123.6; parent equity 4,388.8; NCI 8,734.8.
+   - Operating cash flow 1,748.3; capex 1,407.1; derived operating FCF 341.2.
+   - Head Office dividend and fee income 310.9; Head Office operating cash flow 225.7; Head Office net debt 1,315.8.
+   - 2025 distributions 153.9; 27.0 HK cents/share including special distribution.
+   - Sources: Annual Report pp. 2-5, 10, 80-83, 89, 101, 103, 105-107.
+
+6. Protocol operations
+   - Initialized outputs/result.json with:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Populated sections using repeated protocol `set` commands; complex JSON was not authored from scratch.
+   - Ordinary owner-earnback ranking fields retained as null under the special model.
+   - Validation executed after population and returned status=ok with no errors.
+
+7. Key judgments and limitations
+   - Gross and net margins describe the consolidated group, not standalone HoldCo economics.
+   - Forecast dividend assumes the 2025 total distribution remains flat; it includes a special distribution and is not management guidance.
+   - Annual-report adjusted NAV uses the 2023 MPIC delisting tender price and investment cost for FPM Power; it is not a fully current realizable market NAV.
+   - Financial statement values converted at one period-end FX rate for schema consistency; income statement translation at an annual average rate would differ.
+
+8. Outputs
+   - outputs/result.json
+   - outputs/report.md
+   - outputs/trace.txt

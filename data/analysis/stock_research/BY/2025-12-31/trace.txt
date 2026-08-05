@@ -1,0 +1,52 @@
+2026-08-05 stock-research trace — BY / Byline Bancorp, Inc.
+
+1. Read required instructions:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check:
+   - No local annual facts, normalized facts, raw filing package, or prior stock-research output existed for BY/2025-12-31.
+   - Public primary-source collection was therefore required.
+
+4. Core sources used:
+   - SEC 10-K, accession 0001193125-26-083194, filed 2026-02-27, period 2025-12-31.
+     https://www.sec.gov/Archives/edgar/data/1702750/000119312526083194/by-20251231.htm
+   - Byline Bancorp Q4 and Full Year 2025 Earnings Release, dated 2026-01-22.
+     https://s25.q4cdn.com/402942813/files/doc_financials/2025/q4/BY-4Q25-Earnings-Release-Final.pdf
+   - SEC Q1 2026 Form 10-Q, including 2026-04-21 dividend declaration.
+     https://www.sec.gov/Archives/edgar/data/1702750/000119312526201603/by-20260331.htm
+   - PBOC/CFETS 2025-12-26 central parity: USD 1 = CNY 7.0358.
+     https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+   - Market snapshot reused from config/input.json: CNY 12,033,179,831.229126, 2026-08-03, Yahoo Finance yfinance, PE TTM 12.75.
+
+5. Model decision:
+   - Overrode input hint ordinary_operating/applicable.
+   - Confirmed financial_bank/requires_special_model because deposits, loans, securities, liquidity, borrowings, and regulatory capital form the operating model.
+   - Kept every ordinary owner-earnback field null as required by contract.
+
+6. Currency translation:
+   - All protocol monetary fields are absolute CNY yuan.
+   - USD balance-sheet and flow figures multiplied by 7.0358.
+   - This is a year-end-near proxy rate. No average-rate translation was used for income statement flows; disclosed as a limitation.
+
+7. Dividend forecast:
+   - 2026 annualized DPS assumption = USD 0.12 x 4 = USD 0.48, based on declarations in January and April 2026.
+   - Shares used = 45,545,928 at 2025-12-31.
+   - Forecast cash dividend = 45,545,928 x 0.48 x 7.0358 = CNY 153,816,979.31.
+   - Forecast yield = 153,816,979.31 / 12,033,179,831.229126 = 0.0127827375.
+   - Remaining 2026 quarters are not yet declared; forecast is conditional.
+
+8. JSON population:
+   - Used protocol CLI `set` commands for analysis sources, model, financial statements, assets/liabilities, owner-earnback interpretation, dividend, business, risks, evidence, and data quality.
+   - Did not hand-write the full JSON object.
+
+9. Validation:
+   - Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Result: status=ok, errors=[]
+   - Ran Python JSON parser check successfully.
+   - Confirmed financial_bank / requires_special_model, all ordinary owner-earnback fields null, dividend yield consistent in metrics and dividend, and data_quality.status=complete.

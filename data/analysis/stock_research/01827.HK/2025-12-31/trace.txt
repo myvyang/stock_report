@@ -1,0 +1,73 @@
+stock-research trace
+generated_at: 2026-08-04 Asia/Shanghai
+company: MIRICOR Enterprises Holdings Limited (01827.HK)
+requested_period_path: 2025-12-31
+actual_core_fiscal_period: year ended 2025-03-31 (FY2025)
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No annual facts, normalized facts, filing metadata, or prior stock-research outputs existed under the paths specified by config/input.json.
+- Research therefore returned to original company/HKEX disclosures.
+
+3. Core filing
+- MIRICOR Annual Report 2024/25, published 2025-07-24.
+- Company source: https://miricor.com/download/14134/?tmstv=1754987182
+- Investor index: https://miricor.com/investors/
+- Local temporary extraction: /tmp/miricor_research/ar2025.pdf and ar2025.txt (not an output dependency).
+- Key pages: business pp.9-20; profit and loss p.104; balance sheet pp.105-106; cash flow pp.108-109; segment/revenue pp.147-150; cash note pp.166-167; contract liabilities note p.168 onward.
+
+4. Model verification
+- Annual report Note 4 says the group has one reportable segment: non-surgical medical aesthetic and wellness beauty services, plus skincare sales.
+- This disproves config analysis_model_hint=financial_brokerage.
+- Final model: ordinary_operating; owner earnback applicability: applicable.
+
+5. Currency conversion
+- Reporting currency: HKD.
+- Output contract currency: CNY absolute yuan.
+- Applied 2025-03-31 CFETS/PBOC central parity: HKD 1 = CNY 0.9228.
+- Official historical index: https://m.safe.gov.cn/safe/2020/1218/17833.html
+- Cross-check announcement: https://www.news.cn/20250331/936fa9fcea9f480782390983d6107051/c.html
+
+6. Valuation input reused
+- Market cap CNY 258,090,001.3446808, PE TTM 26.71, timestamp 2026-08-03 09:20:05.
+- Source supplied in input: Tencent qt.gtimg.cn.
+
+7. Dividend forecast evidence
+- HKEX title search for 01827: https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=215360
+- FY2026 annual results and final dividend announcements released 2026-06-26.
+- Proposed final dividend: HKD 0.10/share; assumed 400,000,000 issued shares, total HKD 40,000,000.
+- Converted forecast cash dividend: CNY 36,912,000; yield = 36,912,000 / 258,090,001.3446808 = 14.3019876%.
+
+8. Owner earnback calculations
+- Discounted detachable net cash, HKD million:
+  182.320 unrestricted cash/deposits
+  + 65.847 pledged deposits x 25%
+  - 5.850 bank borrowings
+  - 183.730 contract liabilities/deferred revenue x 30% fulfillment reserve
+  = 137.81275; converted CNY 127,173,605.70.
+- Sustainable cash profit, HKD million:
+  114.020 operating cash flow
+  - 1.953 PPE purchases/deposit
+  - 42.788 lease principal
+  - 6.108 interest income
+  - 10.289 tax timing normalization
+  = 52.882; x 70% sustainability factor = 37.0174; converted CNY 34,159,656.72.
+- Operating business price = 258,090,001.3446808 - 127,173,605.70 = CNY 130,916,395.6446808.
+- Owner earnback years = 130,916,395.6446808 / 34,159,656.72 = 3.8324856926.
+- Market cap / cash profit = 7.5554038338.
+
+9. Protocol usage
+- Initialized with: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All structured fields were populated using protocol set commands.
+- Validation performed with protocol validate; status ok, errors [].
+
+10. Important limitations
+- Directory period differs from actual fiscal year-end.
+- Gross profit is protocol-defined as revenue less inventory/consumables only because expenses are presented by nature; it is not full store gross profit.
+- 30% fulfillment reserve, 25% pledged-deposit inclusion, and 70% cash-profit sustainability factor are analytical assumptions.
+- FY2026 dividend is used only as the market-date forecast basis; core operating statements remain FY2025.

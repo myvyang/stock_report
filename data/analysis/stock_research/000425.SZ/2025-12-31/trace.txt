@@ -1,0 +1,55 @@
+stock-research trace
+task: 000425.SZ 徐工机械, annual period 2025-12-31
+generated_at: 2026-07-31T18:13:18+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Initialized protocol result
+- command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+- Searched configured annual facts, normalized facts, raw filing metadata, and prior stock research paths.
+- No local filing/facts/prior research files existed; official filing retrieval was required.
+
+4. Primary sources
+- Xu Gong Group Construction Machinery Co., Ltd. 2025 Annual Report, CNINFO, published 2026-04-29
+  https://static.cninfo.com.cn/finalpage/2026-04-29/1225240627.PDF
+- config/input.json market snapshot: Tencent qt.gtimg.cn, 2026-07-31 11:43:18
+- XCMG official site used only as a cross-check for headline 2025 revenue, parent profit, and disclosed industry position:
+  https://www.xcmg.com/aboutus/news-detail-1128918.htm
+
+5. Filing extraction
+- Downloaded the CNINFO PDF and extracted all 261 pages locally for targeted review.
+- Reviewed annual report pages 2, 7-9, 18-25, 41, 56, 103-116, 161-193, and 203-204.
+
+6. Model decision
+- statement_model: ordinary_operating
+- applicability: applicable
+- reason: all revenue is classified as construction machinery and physical product sales dominate. Finance-company and sales-financing balances are present but do not change the consolidated manufacturing economics. Financial/customer balances and restricted cash are conservatively excluded from detachable cash.
+
+7. Core calculations (CNY)
+- gross_profit = 100,822,903,512.12 - 78,028,893,823.29 = 22,794,009,688.83
+- gross_margin = 22,794,009,688.83 / 100,822,903,512.12 = 0.2260796793
+- net_margin = 6,572,221,644.27 / 100,822,903,512.12 = 0.0651858002
+- operating_free_cash_flow = 14,142,346,479.28 - 4,136,793,157.03 = 10,005,553,322.25
+- financing_debt = short borrowings + current long-term borrowings + current bonds + non-bank current borrowings + long-term borrowings + bonds + lease liabilities = 42,671,414,396.50
+- detachable_net_cash = 17,282,529,704.80 - 42,671,414,396.50 = -25,388,884,691.70
+- sustainable_cash_profit = 6,550,268,856.67 * 0.85 = 5,567,728,528.17
+- operating_business_price = 105,518,000,000.00 - (-25,388,884,691.70) = 130,906,884,691.70
+- owner_earnback_years = 130,906,884,691.70 / 5,567,728,528.17 = 23.5117218861
+- market_cap_to_cash_profit = 105,518,000,000.00 / 5,567,728,528.17 = 18.9517142343
+- forecast_dividend_yield = 2,350,000,000 / 105,518,000,000 = 0.0222710817
+
+8. Judgment flags
+- The 15% sustainable-profit haircut is analyst judgment, not company guidance.
+- Receivables and inventory are operating assets and receive zero detachable-cash credit.
+- 2025 cash-flow strength is not directly extrapolated because operating payables increased by CNY 6.827bn.
+- Dividend forecast uses the board proposal; shareholder approval and final record-date share count remain pending.
+
+9. Result construction and validation
+- Populated outputs/result.json with repeated protocol CLI set operations; did not hand-write the initialized JSON schema.
+- validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- validation status: ok; errors: []

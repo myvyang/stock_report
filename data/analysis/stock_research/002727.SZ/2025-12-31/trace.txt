@@ -1,0 +1,72 @@
+stock-research trace
+company=002727.SZ 一心堂
+period=2025-12-31
+task_created_at=2026-07-31T20:47:44+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No existing annual facts, normalized facts, or stock-research output existed for 002727.SZ/2025-12-31.
+- Downloaded the official annual report from CNINFO:
+  https://static.cninfo.com.cn/finalpage/2026-04-29/1225226967.pdf
+- Saved raw filing as stock_report/data/raw/filings/002727.SZ/2025-12-31/annual_report.pdf.
+- Extracted local text to annual_report.txt for deterministic line searching; PDF has 244 pages.
+
+3. Protocol initialization
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+status=success
+
+4. Model determination
+- Confirmed ordinary_operating/applicable from audited business facts.
+- Rationale: revenue is earned from medicine/health-product retail and pharmaceutical wholesale. Inventory, receivables, store right-of-use assets, supplier credit and lease liabilities are ordinary operating capital; no bank deposits, client funds, insurance reserves, regulated presale funds or concession rights dominate the statements.
+
+5. Core audited facts used
+- Revenue=17,336,241,788.74
+- Cost of sales=11,680,376,715.31
+- Gross profit=5,655,865,073.43
+- Parent net profit=263,432,452.20
+- Deducted parent net profit=241,541,261.17
+- Operating cash flow=1,633,400,632.92
+- Capital expenditure=278,285,888.22
+- Operating free cash flow=1,355,114,744.70
+- Total assets=15,607,753,398.70
+- Total liabilities=8,150,443,840.15
+- Parent equity=7,303,470,419.42
+- Sources: annual report pages 9, 19-20, 90-98, 199-201.
+
+6. Owner earnback calculation
+- Cash and cash equivalents=1,520,061,823.50 at 100%.
+- Trading financial assets=759,841,950.04 at 90%=683,857,755.036.
+- Term deposits/restricted guarantee/frozen cash=782,379,703.06 at 0%.
+- Short-term borrowing=519,457,352.62 deducted at 100%.
+- Discounted detachable net cash=1,684,462,225.916.
+- Sustainable distributable cash profit=240,000,000, anchored to audited deducted parent net profit and rounded down for durability.
+- Operating business price=6,758,000,000-1,684,462,225.916=5,073,537,774.084.
+- Owner earnback years=5,073,537,774.084/240,000,000=21.13974072535.
+- Market cap/cash profit=6,758,000,000/240,000,000=28.15833333333.
+- Warning: reported OCF less capex is not used as sustainable profit because lease principal cash payments are mainly classified in financing cash flow.
+
+7. Dividend basis
+- 2025 interim cash dividend=114,825,645.00, implemented in September 2025.
+- 2025 annual cash dividend approximately=114,825,645.00, implemented May 29, 2026.
+- Forecast/base cash dividend=229,651,290.00.
+- Static yield=229,651,290/6,758,000,000=0.03398213820657.
+- Repurchased shares were planned for later sale and therefore were not treated as permanent cancellation or forecast dividends.
+
+8. Protocol population
+- Used protocol `set` for scalar/object fields and protocol `append` for asset, liability, haircut, profit adjustment, dividend history, risk and evidence rows.
+- Complex result JSON was not authored from scratch.
+
+9. Validation
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]
+
+10. Known limitations
+- Market cap and PE TTM were accepted from the input Tencent snapshot rather than independently reconstructed.
+- Sustainable cash profit is an analyst haircut, not company guidance.
+- Detachable cash may be lower if minimum operating cash or financial-product restrictions are larger than disclosed.

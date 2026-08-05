@@ -1,0 +1,104 @@
+stock-research trace
+company=603231.SH 索宝蛋白
+period=2025-12-31
+generated_at=2026-07-31 Asia/Shanghai
+
+[1] Instructions and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read .agents/skills/stock-research/references/result-contract.md completely.
+- Read .agents/skills/stock-research/references/report-contract.md completely.
+- Followed AGENTS.md: core financial facts prioritized annual report/exchange disclosures; facts, inference and judgment separated; no buy/sell recommendation or target price.
+
+[2] Local reuse audit
+- Checked config/input.json.
+- Checked requested annual-review, raw-filing and normalized-facts paths.
+- No stock_report annual facts, normalized facts, local filing metadata or prior research outputs were present in the workspace for 603231.SH/2025-12-31.
+- Therefore no historical conclusion was reused.
+
+[3] Primary and cross-check sources
+- Company 2025 annual report, disclosed 2026-04-24. Searchable full text used:
+  https://stock.stockstar.com/notice/SN2026042400007289.shtml
+  This is a searchable reproduction of the company annual report; the report identifies the original disclosure as Shanghai Stock Exchange.
+- Company 2025 annual report summary, disclosed 2026-04-24:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12165444&stockid=603231
+- Company 2026 Q1 report, used only to cross-check 2025-12-31 balance-sheet opening figures:
+  https://file.finance.sina.com.cn/211.154.219.97%3A9494/MRGG/CNSESH_STOCK/2026/2026-4/2026-04-30/12274786.PDF
+- Market-cap snapshot supplied in config/input.json:
+  Tencent qt.gtimg.cn, timestamp 20260731114321, market cap CNY 2,811,000,000, PE TTM 15.88.
+- Attempted direct retrieval from static.sse.com.cn URL identified by search. Server returned an anti-bot HTML challenge rather than the PDF. No values were extracted from that response.
+
+[4] Analysis-model review
+- Business facts: purchases non-GMO soybeans; manufactures soy protein, soybean oil and dietary fiber; sells products directly and through distributors.
+- Main assets: inventory, receivables, production fixed assets, cash and wealth-management financial assets.
+- Main liabilities: supplier payables and small short-term borrowing.
+- No deposits, customer funds, insurance reserves, regulated presale cash, project advances, concession rights or underlying holding-company stakes dominate the statements.
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+[5] Extracted financial facts (CNY)
+- total_assets=2,269,214,409.20
+- total_liabilities=262,506,252.57
+- total_equity=2,006,708,156.63
+- parent_equity=2,006,708,156.63
+- minority_interest=0
+- revenue=1,748,098,617.55
+- cost_of_sales=1,456,464,077.36
+- gross_profit=291,634,540.19
+- operating_profit=227,041,819.49
+- net_profit=parent_net_profit=189,716,351.28
+- operating_cash_flow=311,105,975.23
+- financing_cash_flow=-59,025,882.56
+- dividend_and_buyback_cash_out=57,493,061.53 (cash-flow statement line includes immaterial interest)
+
+[6] Derived financial calculations
+- gross_profit = revenue - cost_of_sales
+  = 1,748,098,617.55 - 1,456,464,077.36
+  = 291,634,540.19
+- gross_margin = gross_profit / revenue
+  = 0.1668295697
+- net_margin = parent_net_profit / revenue
+  = 0.1085272589
+- capital_expenditure inferred by cash-flow statement reconciliation:
+  investment cash outflow total 3,113,500,067.40
+  less other investing cash payments (wealth-management related) 2,923,509,444.44
+  less investment payments 0
+  = 189,990,622.96
+- operating_free_cash_flow
+  = 311,105,975.23 - 189,990,622.96
+  = 121,115,352.27
+
+[7] Discounted detachable net cash
+- cash: 238,753,582.97 * 50% = 119,376,791.49
+  Judgment: retain half for purchasing, payroll, tax and seasonal working capital.
+- trading financial assets: 655,987,876.26 * 90% = 590,389,088.63
+  Judgment: wealth-management assets receive 10% haircut for maturity, valuation and liquidity.
+- financing debt: -(23,774,000.00 + 486,079.26) = -24,260,079.26
+- declared 2025 final dividend: -57,437,731.50
+  Judgment: treated as a post-balance-sheet committed distribution constraint on year-end funds.
+- long-term equity investment 10,067,954.84 assigned 0% detachable value because small and loss-making on equity-method result.
+- discounted_detachable_net_cash
+  = 119,376,791.49 + 590,389,088.63 - 24,260,079.26 - 57,437,731.50
+  = 628,068,069.36.
+
+[8] Sustainable distributable cash-profit judgment
+- Starting 2025 parent net profit: 189,716,351.28.
+- Deduct non-recurring profit: 8,296,374.74, giving recurring parent profit 181,419,976.54.
+- Further cycle/cash-distribution haircut: 31,419,976.54.
+- Final discounted sustainable cash profit: 150,000,000.00.
+- Rationale: raw-material cost decline contributed to 2025 margin expansion; OCF benefited from working-capital release; capex was CNY 189.99m and includes growth investment. CNY 150m sits below recurring earnings but above the single-year FCF affected by expansion capex.
+
+[9] Owner-earnback and dividend formulas
+- operating_business_price = market_cap - discounted_net_cash
+- owner_earnback_years = operating_business_price / discounted_cash_profit
+- market_cap_to_cash_profit = market_cap / discounted_cash_profit
+- forecast_cash_dividend=70,839,868.85, based on 2025 cumulative distribution plan.
+- forecast_dividend_yield=70,839,868.85 / 2,811,000,000 = 0.0252009494.
+
+[10] Final validation and arithmetic audit
+- outputs/result.json was initialized using:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Fields and array records were populated only through protocol CLI set/append commands, not by manually authoring a complex JSON object.
+- Initial protocol validation returned status=ok, errors=[].
+- Arithmetic audit corrected the initial discounted-net-cash transcription to 628,068,069.36 and updated operating-business price to 2,182,931,930.64, earnback to 14.5528795 years and net-cash/market-cap to 0.2234322552.
+- Profit-adjustment arithmetic was reconciled: 189,716,351.28 - 8,296,374.74 - 31,419,976.54 = 150,000,000.00.
+- Final protocol validation returned status=ok, errors=[].
+- Report/result checks confirmed matching market cap, gross margin, net margin, dividend yield, discounted net cash, cash profit, operating-business price and earnback years.

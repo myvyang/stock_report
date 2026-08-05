@@ -1,0 +1,69 @@
+task=stock_research
+query=06066.HK
+company=中信建投证券股份有限公司
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-04T11:16:44+08:00
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+write_method=protocol set commands; result JSON was not hand-written from scratch
+
+[reuse_check]
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+prior_stock_research=missing
+decision=download and inspect official 2025 annual filing
+
+[primary_source]
+title=CSC Financial Co., Ltd. Annual Report 2025
+publisher=Hong Kong Exchanges and Clearing Limited
+publication_date=2026-04-24
+url=https://www.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042400732.pdf
+local_file=stock_report/data/raw/filings/06066.HK/2025-12-31/annual-report-2025.pdf
+audit_opinion=standard unqualified
+
+[source_locations]
+pp24-27=key financial data, ROE, balance sheet totals, net capital and risk-control indicators
+pp34-44=business segments, operating facts and industry position
+pp62-74=profitability, income composition, asset and liability analysis, credit impairment
+pp94-95=2024 dividend history and 2025 interim/final dividend plan
+p189=consolidated cash flow statement
+p234=EPS and profit attributable to ordinary equity holders
+
+[market_snapshot]
+source=Tencent qt.gtimg.cn via config/input.json
+market_cap=78542207299.2146
+market_cap_date=2026/08/03 09:47:49
+pe_ttm=8.74
+limitation=no second market-data source cross-check
+
+[model_decision]
+statement_model=financial_brokerage
+owner_earnback_applicability=requires_special_model
+reason=client funds, proprietary financial assets, margin financing, repos and debt funding are operating balance-sheet items of a regulated broker
+ordinary_owner_earnback_fields=all null by contract
+special_focus=segment mix; ROE; net capital; risk coverage; capital leverage; liquidity; stable funding; dividends
+
+[calculations]
+net_margin=9439000000/34985000000=0.26977275975418037
+forecast_cash_dividend=1279854641.51+1357421589.47=2637276230.98
+forecast_dividend_yield=2637276230.98/78542207299.2146=0.03357865328600852
+minority_interest=119150000000-119102000000=48000000
+minority_interest_ratio=48000000/119150000000=0.00040285354678976166
+
+[judgement_boundaries]
+fact=2025 revenue, profits, balance-sheet items, risk metrics and dividend plan are taken from the official annual report
+inference=profit improvement reflects both fee recovery and market-sensitive investment income
+judgement=operating cash flow is not distributable cash profit because repo and trading balance-sheet movements dominate it
+forecast=2025 full-year dividend includes a final dividend that was pending shareholder approval at annual-report publication
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

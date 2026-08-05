@@ -1,0 +1,57 @@
+FRME stock research trace
+generated_at=2026-08-04T23:12:49+08:00
+period=2025-12-31
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- Requested raw filing, annual review, normalized facts, and prior stock-research paths did not exist in /workspace/stock_report.
+- No reusable FRME fact pack was available, so official public sources were consulted.
+
+3. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields using protocol `set` operations; the initialized skeleton was retained.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+4. Model decision
+- Input hint ordinary_operating/applicable was overridden.
+- Confirmed statement_model=financial_bank and owner_earnback_applicability=not_applicable.
+- Reason: deposits, loans, securities, borrowings, liquidity, and regulatory capital are the operating system of a bank. Ordinary detachable-net-cash and cash-profit formulas are not economically valid.
+- All ordinary owner-earnback sorting fields remain null.
+
+5. Primary sources
+- SEC Form 10-K, fiscal year ended 2025-12-31, filed 2026-02-25:
+  https://www.sec.gov/Archives/edgar/data/712534/000071253426000022/frme-20251231.htm
+- First Merchants Q4 2025 earnings release, 2026-01-26:
+  https://ir.firstmerchants.com/news-releases/news-release-details/first-merchants-corporation-announces-fourth-quarter-2025
+- First Merchants official dividend history:
+  https://ir.firstmerchants.com/stock-data/stock-splits-dividends
+- First Merchants Q2 2026 earnings release, 2026-07-22:
+  https://ir.firstmerchants.com/news-releases/news-release-details/first-merchants-corporation-announces-second-quarter-2026
+- Federal Reserve H.10 USD/CNY, 2025-12-31 value 7.1875:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Market cap and PE: task input, Yahoo Finance yfinance, dated 2026-08-03.
+
+6. Conversion and derived calculations
+- All USD financial-statement amounts multiplied by 7.1875 to produce absolute CNY yuan.
+- Parent/common equity = total equity USD 2,466.667m less preferred carrying amount USD 25.125m = USD 2,441.542m.
+- Parent/common net income = USD 224.1m.
+- Interpretive current market cap / 2025 common net income = 11.2425x; not placed in ordinary owner-earnback fields.
+- Interpretive current market cap / 2025 year-end common equity = 1.0319x.
+- Dividend scenario = USD 0.37 quarterly x 4 x 62.574m Q2 2026 average diluted shares x 7.1875 = CNY 665,630,925.
+- Forecast dividend yield = CNY 665,630,925 / CNY 18,108,571,280.266846 = 0.0367577825.
+
+7. Data-quality decisions
+- Bank revenue, gross margin, net margin, operating cash flow, capex, and operating free cash flow are null because ordinary-company definitions lack comparable economic meaning here.
+- status=complete under the special-model minimum threshold.
+- Limitations record FX-date mismatch, post-period acquisition, cash-flow non-comparability, and dividend share-count approximation.
+
+8. Final protocol result
+- status=ok
+- errors=[]

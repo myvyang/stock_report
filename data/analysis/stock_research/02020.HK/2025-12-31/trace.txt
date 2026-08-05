@@ -1,0 +1,66 @@
+stock-research trace
+company: ANTA SPORTS / 02020.HK
+period: 2025-12-31 annual
+run date: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the skill requires reuse checks.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked the paths in config/input.json for raw filing metadata, annual facts, normalized facts, and prior stock research.
+- No filing, fact pack, normalized facts, or prior research files existed in this workspace.
+- Returned to primary public filings rather than inventing missing data.
+
+3. Primary sources used
+- HKEX Annual Report 2025, published 2026-04-09:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0409/2026040900840.pdf
+- HKEX 2025 Annual Results Announcement, published 2026-03-25:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0325/2026032500245.pdf
+- Company 2025 annual results press release, published 2026-03-25:
+  https://ir.anta.com/en/news_detail.php?id=160710
+- Market cap and PE: Tencent qt.gtimg.cn snapshot supplied in config/input.json, 2026-08-03 09:48:10.
+
+4. Extraction and model review
+- Downloaded the official HKEX annual-report PDF to a temporary directory.
+- Local pdftotext was unavailable; installed pypdf into /tmp only and extracted 224 pages for read-only analysis.
+- Confirmed audited financial statements on annual-report pages 133-138; segment data on pages 139-141; liquidity/capex/dividend information on pages 46-49; cash details in Note 19; inventory and receivables in Notes 17-18.
+- Overrode input model hint financial_brokerage/requires_special_model.
+- Evidence: principal activities are R&D, design, manufacturing, marketing and sale of footwear, apparel and accessories; revenue is sale of goods. Final model: ordinary_operating/applicable.
+
+5. Core reported facts (RMB)
+- Revenue 80,219m; cost of sales 30,485m; gross profit 49,734m.
+- Operating profit 19,091m; net profit 15,662m; parent net profit 13,588m.
+- Total assets 124,295m; liabilities 51,890m; equity 72,405m; parent equity 65,782m; NCI 6,623m.
+- Operating cash flow 20,996m; capex 2,716m; operating FCF 18,280m.
+- Cash and equivalents 12,181m; fixed deposits over three months 42,128m; pledged deposits 712m; borrowings 23,302m.
+- Dividends paid to parent shareholders 6,585m; share repurchases 1,952m; combined cash outflow 8,537m.
+- 2025 ordinary dividend disclosed at RMB6,199m / HKD2.45 per share.
+
+6. Analytical calculations
+- Gross margin = 49,734 / 80,219 = 0.6199778107430908.
+- Parent net margin = 13,588 / 80,219 = 0.16938630499008964.
+- Unpledged cash and fixed deposits = 12,181 + 42,128 = 54,309m.
+- Discounted detachable net cash = 54,309m * 90% - 23,302m = 25,576.1m.
+- Pledged deposits receive 0%; Amer Sports and other investments receive 0% in the cash deduction.
+- Sustainable cash profit = parent net profit 13,588m - associate profit share 1,203m = 12,385m.
+- Operating business price = 185,740.17325672922m - 25,576.1m = 160,164.07325672922m.
+- Owner earnback = 160,164.07325672922 / 12,385 = 12.932101191500138 years.
+- Market cap / cash profit = 185,740.17325672922 / 12,385 = 14.997187990046768.
+- Dividend yield = 6,199 / 185,740.17325672922 = 0.03337457853790074.
+
+7. Protocol population and validation
+- Populated initialized JSON using repeated protocol `set` commands; did not hand-write result.json from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].
+
+8. Known limitations
+- No local historical fact pack was available.
+- Market cap and PE were accepted from the task input and not independently reconstructed.
+- Market-share statement is company-reported from an industry source not independently obtained.
+- Sustainable cash profit and cash discounts are analyst assumptions, not company guidance.
+- Proposed final dividend was subject to shareholder approval at the annual-report date.

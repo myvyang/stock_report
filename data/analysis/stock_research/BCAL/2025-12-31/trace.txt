@@ -1,0 +1,62 @@
+Stock research trace — BCAL — period 2025-12-31
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill's reuse rules applied.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked the input-declared raw filing, annual review, and normalized fact paths.
+- No BCAL annual facts package, normalized facts, metadata, or prior research output existed locally.
+- Therefore retrieved the primary filing instead of fabricating missing facts.
+
+3. Primary source retrieval and identity
+- Downloaded SEC Form 10-K HTML to stock_report/data/raw/filings/BCAL/2025-12-31/bcal-20251231.htm.
+- SEC accession: 0001795815-26-000005; filed 2026-03-13; report period 2025-12-31.
+- Confirmed issuer: California BanCorp, Nasdaq BCAL; bank holding company for California Bank of Commerce, N.A.
+- This evidence overrode input analysis_model_hint from ordinary_operating/applicable to financial_bank/not_applicable.
+
+4. Extracted USD facts (Form 10-K, USD thousands unless stated)
+- Total assets 4,033,386; total liabilities 3,456,800; shareholders' equity 576,586.
+- Cash and equivalents 399,913; debt securities 287,826; net loans held for investment 2,999,539.
+- Deposits 3,370,581; borrowings 33,832.
+- Net interest income 169,092; noninterest income 11,085; noninterest expense 101,043; net income 63,058.
+- Net interest margin 4.55%; ROA 1.57%; ROE 11.56%; tangible ROE 15.25%; efficiency ratio 56.1%.
+- Nonperforming loans/assets 16,086; NPA/assets 0.40%; allowance/loans 1.13%; allowance/NPL 213.5%.
+- Bank CET1 13.26%; total capital 14.24%; leverage ratio 11.57%.
+- CRE concentration 469.3% of total risk-based capital; construction and land development 28.0%.
+- Uninsured deposits 1.66 billion, 49% of deposits; reciprocal deposits 743.6 million, 22.1%.
+- 2025 shareholder dividends paid 3,253; buybacks 3,366; subsidiary-to-parent dividends 60,000.
+
+5. Currency transformations
+- Contract requires CNY absolute yuan.
+- Balance-sheet items: USD thousands × 1,000 × 7.1875 (Federal Reserve H.10 spot, 2025-12-31).
+- Income statement and 2025 paid dividends: USD thousands × 1,000 × 7.129 (IRS 2025 average CNY/USD).
+- Forecast dividend: 32,326,866 shares × USD 0.40 annualized × about 6.776 CNY/USD = CNY 87,618,737.61.
+- Forecast yield: CNY 87,618,737.61 / input market cap CNY 4,615,264,144.20 = 1.8984555%.
+- Indicative P/B: input market cap / converted equity = 1.1137x.
+- Indicative P/tangible book: input market cap / converted tangible common equity = 1.4360x.
+
+6. Dividend forecast evidence
+- 2025 Form 10-K: first quarterly USD 0.10 dividend declared in December 2025.
+- Form 10-K subsequent event: USD 0.10 declared 2026-03-12.
+- Company release dated 2026-05-28: another USD 0.10 quarterly dividend declared.
+- Annualized USD 0.40 is an estimate, not management guidance; subject to board and regulatory constraints.
+
+7. Null and comparability decisions
+- gross_margin and net_margin left null: bank interest spread accounting is not comparable with ordinary-company revenue/gross profit margins.
+- Revenue, gross profit, operating cash flow, capex, and operating free cash flow left null where ordinary-company meanings are not economically comparable.
+- discounted_net_cash, discounted_cash_profit, operating_business_price, owner_earnback_years, and market_cap_to_cash_profit left null because owner_earnback_applicability is not_applicable.
+- Bank-specific metrics are preserved in owner_earnback.interpretation, risks, evidence, and report.md because schema v1 has no dedicated bank metrics object.
+
+8. Market data
+- Reused task input: market cap CNY 4,615,264,144.199707 as of 2026-08-03; PE TTM 11.576086; source Yahoo Finance yfinance.
+- Did not independently recompute market cap or TTM PE.
+
+9. Validation
+- Populated outputs/result.json using protocol set and append commands only after protocol initialization.
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].

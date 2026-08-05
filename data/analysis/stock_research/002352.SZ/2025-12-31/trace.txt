@@ -1,0 +1,135 @@
+stock-research trace
+company: 顺丰控股（002352.SZ）
+period: 2025-12-31 annual
+generated for input created_at: 2026-07-31T16:50:00+08:00
+
+[skill and contracts]
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read .agents/skills/stock-research/references/result-contract.md in full.
+- Read .agents/skills/stock-research/references/report-contract.md in full.
+- Read .agents/skills/stock-research/references/data-reuse.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields through protocol `set` commands; complex JSON was not authored as a replacement document from scratch.
+
+[reuse check]
+- Requested annual facts, normalized facts, prior stock research result/report/trace, and local raw filing were absent under /workspace.
+- /root/aicode sync targets also had no matching 002352.SZ/2025-12-31 files.
+- Therefore returned to primary filing material.
+
+[primary source acquisition]
+- Official/IR-distributed annual report landing page:
+  https://asia.tools.euroland.com/tools/Pressreleases/GetPressRelease/?ID=7930738&companycode=cn-002352&lang=zh-CN&v=a_share
+- PDF attachment:
+  https://ea-cdn.eurolandir.com/press-releases-attachments/4009575/c1f4e122-e2dc-43b6-ba86-660140d9fb51.PDF
+- Saved as:
+  stock_report/data/raw/filings/002352.SZ/2025-12-31/annual-report-2025.pdf
+- Text extracted mechanically with pypdf in isolated temporary venv to:
+  stock_report/data/raw/filings/002352.SZ/2025-12-31/annual-report-2025.txt
+- PDF length: 283 pages.
+
+[key filing locations and extracted facts]
+- Annual report pp. 3, 105-107: 2025 mid-year plus proposed final cash dividends RMB 4,457,966,000; approximately 40% of parent net profit; final dividend subject to shareholder approval at filing date.
+- Annual report pp. 58-60: total revenue and revenue by segment/product/geography.
+- Annual report pp. 66-68: segment net profit and consolidated cash-flow discussion.
+- Annual report pp. 69-75: asset/liability movements, liquidity pool, financing debt, restricted assets, capital expenditure and capital commitments.
+- Annual report pp. 153-156: consolidated balance sheet.
+- Annual report pp. 159-160: consolidated income statement.
+- Annual report pp. 161-162: consolidated cash-flow statement.
+- Annual report pp. 251-254: KLN minority interest and segment details.
+- Annual report pp. 83-86: market competition, regulation, labor/fuel, international operation and FX risks.
+
+[statement model]
+- Confirmed ordinary_operating.
+- Reason: revenue and profit arise from freight/logistics service operations; cash, receivables, fixed assets and leases support ordinary operations.
+- Not treated as a utility concession or financial business. Small loan/deposit lines are immaterial to the consolidated economic model.
+- Owner earnback applicability: applicable.
+- Special handling:
+  1. Sorting centers, aircraft, vehicles, warehouses/leases, land/software and sustaining capex are operating necessities, not detachable assets.
+  2. Financing debt deducted in full from liquid funds.
+  3. Lease liabilities treated as continuing operating obligations; corresponding right-of-use assets not counted as detachable.
+  4. Consolidated FCF adjusted for minority ownership, one-off REIT disposal gain, and cash-flow variability.
+
+[core statement values; all result.json amounts in absolute CNY]
+- total_assets = 216,469,037,000
+- total_liabilities = 106,144,286,000
+- total_equity = 110,324,751,000
+- parent_equity = 99,309,488,000
+- minority_interest = 11,015,263,000
+- revenue = 308,226,647,000
+- cost_of_sales = 267,178,276,000
+- gross_profit = 41,048,371,000
+- operating_profit = 14,763,467,000
+- net_profit = 11,684,811,000
+- parent_net_profit = 11,117,216,000
+- operating_cash_flow = 27,555,275,000
+- non-equity capital_expenditure = 9,620,270,000
+- operating_free_cash_flow = 17,935,005,000
+- financing_cash_flow = -22,935,460,000
+- dividend_and_buyback_cash_out = 6,147,843,000
+  Derivation: parent cash dividends paid RMB 4,504,223,000 plus share repurchases RMB 1,643,620,000. Interest and minority dividends excluded from this field.
+
+[formulas]
+- gross_margin = 41,048,371,000 / 308,226,647,000
+  = 0.13317593206015052
+- net_margin = 11,117,216,000 / 308,226,647,000
+  = 0.03606831566383033
+
+[discounted detachable net cash]
+- Cash and cash equivalents: 19,959,631,000 * 100% = 19,959,631,000
+- Fixed-income certificates: 5,618,400,000 * 95% = 5,337,480,000
+- Structured deposits: 16,080,264,000 * 95% = 15,276,250,800
+- Financing debt: -33,808,398,000 * 100% = -33,808,398,000
+- discounted_detachable_net_cash = 6,764,963,800
+- discounted_net_cash_to_market_cap
+  = 6,764,963,800 / 182,917,000,000
+  = 0.036983789368948757
+- Restricted monetary funds were not included in cash and cash equivalents.
+- Equity investments, investment property and goodwill were given no detachable value because of governance, valuation and liquidity constraints.
+
+[discounted sustainable cash profit]
+- Starting 2025 operating FCF:
+  27,555,275,000 - 9,620,270,000 = 17,935,005,000
+- Downward adjustment:
+  1,435,005,000 for combined minority-interest attribution, RMB 590m after-tax one-off REIT disposal gain, and cash-flow variability.
+- discounted_sustainable_cash_profit = 16,500,000,000
+- This is an analyst haircut, not company guidance and not an exact accounting allocation.
+
+[earnback]
+- market_cap = 182,917,000,000 (input snapshot)
+- operating_business_price
+  = 182,917,000,000 - 6,764,963,800
+  = 176,152,036,200
+- owner_earnback_years
+  = 176,152,036,200 / 16,500,000,000
+  = 10.675880981818182
+- market_profit_payback_years
+  = 182,917,000,000 / 16,500,000,000
+  = 11.085878787878787
+
+[dividend]
+- forecast_cash_dividend = 4,457,966,000
+- forecast_dividend_yield
+  = 4,457,966,000 / 182,917,000,000
+  = 0.02437152369653996
+- Basis is 2025 mid-year dividend already paid plus proposed final dividend.
+- Share repurchases for employee incentives were not treated as cash dividends.
+
+[market source]
+- market cap RMB 182,917,000,000, PE TTM 16.03
+- timestamp 20260731114303
+- source supplied by config/input.json: Tencent qt.gtimg.cn
+- Market snapshot was not independently overwritten.
+
+[quality and limitations]
+- data_quality.status = complete under result-contract minimum requirements.
+- Core statements and business/model claims trace to the annual report.
+- The 16.5bn sustainable cash-profit figure involves judgment because public consolidated statements do not exactly allocate FCF between parent/minority owners or maintenance/growth capex.
+- Final 2025 dividend remained subject to shareholder approval when the annual report was issued.
+- Industry ranking is company-reported third-party research and was not independently reconstructed.
+
+[validation]
+- Command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final expected validator payload:
+  {"status":"ok","errors":[]}

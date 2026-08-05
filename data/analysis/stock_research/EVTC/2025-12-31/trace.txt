@@ -1,0 +1,117 @@
+stock-research trace
+company=EVERTEC, Inc. (NYSE: EVTC)
+period=2025-12-31
+generated_at=2026-08-05T02:46:14+08:00
+
+[protocol]
+initialized_with=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+updated_with=protocol set / append commands only
+validated_with=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[reuse_check]
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+prior_stock_research=missing
+action=returned to original SEC filing because no reusable annual fact package existed
+
+[primary_sources]
+1. EVERTEC 2025 Form 10-K, filed 2026-03-02, accession 0001559865-26-000012
+   https://www.sec.gov/Archives/edgar/data/1559865/000155986526000012/evtc-20251231.htm
+   used_for=business, segments, customer concentration, financial statements, assets/liabilities, debt security, dividends, subsequent events, risks
+2. IRS Yearly average currency exchange rates
+   https://www.irs.gov/individuals/international-taxpayers/yearly-average-currency-exchange-rates
+   used_for=2025 USD/CNY conversion rate 7.129
+3. config/input.json supplied market snapshot
+   used_for=market cap CNY 12,657,380,857.374023 at 2026-08-03; PE TTM 14.634616; source label Yahoo Finance yfinance
+
+[analysis_model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=EVTC earns service and transaction fees from payment processing, merchant acquiring and technology services. It does not fund a loan book with customer deposits. Settlement assets USD26.098m and settlement liabilities USD26.202m are nearly matched payment-flow items and are presented net in financing cash flows; they do not turn the whole balance sheet into a financial-institution model.
+
+[currency]
+reporting_currency=USD
+result_currency=CNY
+conversion=all filing amounts multiplied by 7.129 CNY/USD
+note=IRS rate is an annual average. It is suitable for income/cash-flow comparability; using it for the balance sheet is a protocol consistency choice, not a claim that it was the 2025-12-31 spot rate.
+
+[2025 financial extraction, USD thousands]
+revenue=931818
+cost_of_revenues_ex_DA=469128
+gross_profit_calculated=462690
+operating_profit=186440
+net_income=144560
+parent_net_income=141590
+operating_cash_flow=227007
+software_additions=68165
+property_equipment_acquired=23336
+capital_expenditure=91501
+operating_free_cash_flow=135506
+financing_cash_flow=28448
+dividends_paid=12781
+share_repurchase=69293
+dividend_and_buyback=82074
+total_assets=2243296
+total_liabilities=1529304
+total_equity=624837
+parent_equity=621606
+noncontrolling_interest=3231
+cash=305993
+restricted_cash=25838
+accounts_receivable=164381
+settlement_assets=26098
+AFS_debt_securities=3202
+equity_securities=5849
+equity_method_investments=30120
+property_equipment_net=64354
+goodwill=891992
+other_intangibles=553082
+short_term_borrowing=10000
+current_long_term_debt=23867
+long_term_debt=1053030
+operating_lease_liabilities=39183
+settlement_liabilities=26202
+redeemable_noncontrolling_interests=89155
+
+[derived margins]
+gross_margin=(931818-469128)/931818=0.4965454627
+net_margin=141590/931818=0.1519502736
+
+[cash profit]
+definition=three-year average of OCF less software additions and equipment capex, less three-year average share-based compensation
+2025_FCF_USD_thousands=227007-68165-23336=135506
+2024_FCF_USD_thousands=260059-63044-25379=171636
+2023_FCF_USD_thousands=211194-63524-21428=126242
+three_year_average_FCF_CNY=1,028,709,630
+SBC_USD_thousands_2025_2024_2023=29582,30275,25732
+three_year_average_SBC_CNY=202,232,778
+discounted_sustainable_cash_profit_CNY=826,476,851.67
+rationale=three-year averaging reduces working-capital noise; all software investment is treated as capex; SBC is deducted as an owner dilution cost. Acquisition cash outlays are excluded as growth capital, creating a stated limitation.
+
+[discounted detachable net cash]
+cash=2,181,424,097*80%=1,745,139,278
+AFS_debt_securities=22,827,586*70%=15,979,310
+equity_securities_and_equity_method_investments=256,422,473*50%=128,211,237
+interest_bearing_debt=7,748,488,713*100%=-7,748,488,713
+redeemable_NCI=635,585,995*100%=-635,585,995
+discounted_detachable_net_cash_CNY=-6,494,744,989.30
+excluded=restricted cash, settlement assets, receivables and operating assets because they are constrained or required by the business
+
+[owner earnback]
+market_cap_CNY=12,657,380,857.374023
+operating_business_price=market_cap-discounted_net_cash=19,152,125,846.67
+owner_earnback_years=19,152,125,846.67/826,476,851.67=23.1732
+market_cap_to_cash_profit=12,657,380,857.374023/826,476,851.67=15.3149
+discounted_net_cash_to_market_cap=-0.513119
+
+[dividend]
+forecast_basis=hold 2025 annual dividend at USD0.20/share and cash dividend USD12.781m constant
+forecast_cash_dividend_CNY=91,115,749
+forecast_yield=91,115,749/12,657,380,857.374023=0.00719863
+cross_check=2026-02-19 board declared another USD0.05 quarterly dividend, subject to future board approval
+
+[quality]
+status=complete
+limitations=balance sheet translated at average rather than closing FX; input market cap original currency conversion unavailable; maintenance versus growth software capex cannot be separated; owner cash-profit treatment of acquisitions is judgmental and disclosed

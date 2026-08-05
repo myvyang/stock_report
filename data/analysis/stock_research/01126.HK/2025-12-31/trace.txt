@@ -1,0 +1,111 @@
+Stock research trace — DREAM INT'L (01126.HK)
+Generated for period 2025-12-31
+
+1. Protocol and contracts
+- Read: .agents/skills/stock-research/SKILL.md
+- Read: .agents/skills/stock-research/references/result-contract.md
+- Read: .agents/skills/stock-research/references/report-contract.md
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- Checked annual review, normalized facts, raw filing, and prior stock-research paths for 01126.HK/2025-12-31.
+- No local annual facts, normalized facts, prior research result, or metadata existed.
+- Therefore fetched the official annual report rather than reusing missing artifacts.
+
+3. Primary sources
+- HKEX Annual Report 2025, published 2026-04-08:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0408/2026040802047.pdf
+  Local copy: stock_report/data/raw/filings/01126.HK/2025-12-31/annual-report-2025.pdf
+- HKEX title search confirmed annual results announcement dated 2026-03-27 and annual report dated 2026-04-08.
+- Valuation input: config/input.json; Tencent qt.gtimg.cn snapshot at 2026/07/31 16:08:45.
+- FX: China Foreign Exchange Trade System central parity on 2025-12-31, 100 HKD = CNY 90.322:
+  https://www1.xinhuanet.com/20251231/fe9f6466f6884589b5287e6ee946baed/c.html
+
+4. PDF extraction
+- Downloaded official PDF from HKEX.
+- System had no pdftotext. Created temporary virtual environment /tmp/dream-pdf-env and installed pypdf.
+- Extracted all 142 PDF pages to /tmp/dream2025.txt with explicit PDF page markers.
+- Core annual-report pages used:
+  pp. 6-9: management discussion, segment trends, factory count/utilisation, liquidity.
+  pp. 13-14: dividends, customer concentration, distributable reserves.
+  pp. 63-68: consolidated income statement, balance sheet, changes in equity, cash flow.
+  pp. 85-98: revenue, segments and geographic information.
+  pp. 110-116: inventory, receivables, cash restrictions, cash-flow reconciliation, payables and loans.
+
+5. Analysis-model override
+- Input hint stated financial_brokerage/requires_special_model.
+- Annual report states principal activities are design, development, manufacture and sale of plush stuffed toys, plastic figures and tarpaulin.
+- No brokerage customer funds, proprietary securities portfolio, repo funding or margin-finance balance sheet was found.
+- Overrode model to ordinary_operating/applicable. This is a factual correction, not a discretionary classification.
+
+6. Currency conversion
+- Protocol requires absolute CNY yuan.
+- Applied CNY 0.90322 per HKD uniformly to balance-sheet and flow amounts.
+- Limitation: flow amounts were converted at year-end rate, not annual average rate, to maintain one auditable conversion factor.
+
+7. Financial statement extraction and calculations
+- Revenue: HKD 5,974.359m -> CNY 5,396.161m.
+- Cost of sales: HKD 4,768.502m -> CNY 4,307.006m.
+- Gross profit: HKD 1,205.857m -> CNY 1,089.154m.
+- Operating profit: HKD 875.034m -> CNY 790.348m.
+- Parent/net profit: HKD 692.904m -> CNY 625.845m. No minority interest shown.
+- Gross margin = 1,205.857 / 5,974.359 = 20.1839%.
+- Net margin = 692.904 / 5,974.359 = 11.5980%.
+- Total assets: HKD 5,545.141m -> CNY 5,008.482m.
+- Total liabilities: HKD 1,342.210m -> CNY 1,212.311m.
+- Equity/parent equity: HKD 4,202.931m -> CNY 3,796.171m.
+- Operating cash flow: HKD 859.617m -> CNY 776.423m.
+- Capital expenditure definition: PPE payment 202.500 + PPE prepayment 1.131 + intangible purchase 4.279 = HKD 207.910m -> CNY 187.788m.
+- Operating FCF = 859.617 - 207.910 = HKD 651.707m -> CNY 588.635m.
+
+8. Owner earnback — detachable cash
+- Cash and time deposits: HKD 1,798.011m.
+- Mainland bank deposits restricted for remittance: HKD 334.015m; included at 70%.
+- Non-mainland cash/time deposits: HKD 1,463.996m; included at 100%.
+- Operating cash reserve: 10% of revenue = HKD 597.436m, deducted.
+- Bank loans + lease liabilities: 40.952 + 80.497 = HKD 121.449m, deducted.
+- Current tax payable: HKD 204.091m, deducted.
+- Discounted detachable cash = 1,463.996 + 334.015*70% - 597.436 - 121.449 - 204.091
+  = HKD 635.1695m = CNY 573.6978m.
+- Investment property, receivables, inventory and production PPE assigned no detachable value.
+
+9. Owner earnback — sustainable cash profit
+- Cash generated from operations: HKD 1,017.230m.
+- 2025 working-capital net cash contribution:
+  -82.456 inventory -228.444 receivables -2.514 long-term receivables +348.596 payables = +35.182m HKD.
+- Normalized post-tax, post-capex cash:
+  1,017.230 - 35.182 - (20.941 + 136.672 tax paid) - 207.910 capex
+  = HKD 616.525m = CNY 556.858m.
+- Applied 10% sustainability haircut for margin decline, customer concentration, and expansion execution.
+- Discounted sustainable cash profit = CNY 501.172m.
+
+10. Valuation formulas
+- Market cap = CNY 4,052,856,115.115881.
+- Operating business price = market cap - discounted detachable net cash
+  = 4,052,856,115.115881 - 573,697,795.79
+  = CNY 3,479,158,319.325881.
+- Owner earnback years = 3,479,158,319.325881 / 501,171,939.45 = 6.9420 years.
+- Market cap / cash profit = 4,052,856,115.115881 / 501,171,939.45 = 8.0868x.
+- Discounted net cash / market cap = 14.1554%.
+
+11. Dividend forecast
+- 2025 interim dividend HKD 0.25/share; proposed final HKD 0.35/share.
+- Total cash dividend disclosed: HKD 169.216m + 236.903m = HKD 406.119m.
+- Converted forecast baseline = CNY 366.815m.
+- Forecast yield = 366.815m / CNY 4,052.856m = 9.0508%.
+- Baseline assumes the same HKD 0.60/share; it is not a commitment or guaranteed distribution.
+
+12. Data-quality decisions
+- Marked complete because identity, period, valuation, model, three statements, asset/liability explanations, owner earnback, dividend baseline, business narrative and evidence are present.
+- Limitations retained in result.json:
+  a) year-end FX used for all items;
+  b) only two-year comparative data, not a full cycle;
+  c) seven-month gap between report date and market-cap date;
+  d) market cap and PE TTM supplied by third-party snapshot and not independently reconstructed.
+
+13. Protocol writes and validation
+- All structured result fields were populated with protocol `set`; the complex JSON skeleton was not handwritten.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before final handoff: status ok, errors [].

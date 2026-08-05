@@ -1,0 +1,102 @@
+task=stock-research
+company=欧普康视
+code=300595.SZ
+period=2025-12-31
+report_type=annual
+run_date=2026-07-31 Asia/Shanghai
+
+[protocol]
+skill=.agents/skills/stock-research/SKILL.md
+result_contract=.agents/skills/stock-research/references/result-contract.md
+report_contract=.agents/skills/stock-research/references/report-contract.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+mutation=all structured result fields populated with protocol set/append commands
+validation=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_result={"status":"ok","errors":[]}
+
+[reuse_check]
+requested_raw_filing_dir=stock_report/data/raw/filings/300595.SZ/2025-12-31
+requested_annual_review_dir=stock_report/data/analysis/annual_review/300595.SZ/2025-12-31
+requested_normalized_facts=stock_report/data/normalized/facts/300595.SZ/2025-12-31/annual-facts.json
+status=not_found
+action=used Shenzhen Stock Exchange official 2025 annual report directly
+
+[primary_sources]
+annual_report_title=欧普康视科技股份有限公司2025年年度报告
+annual_report_disclosure_date=2026-03-28
+annual_report_url=https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-03-28/598c1ba3-5448-4138-a292-b14c45f09d9c.pdf
+annual_report_audit=容诚审字[2026]230Z0810号，标准无保留意见
+market_snapshot=config/input.json; Tencent qt.gtimg.cn; 2026-07-31 11:43:06
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=business consists of medical-device products and optometry services; cash/wealth-management assets are not customer funds, insurance reserves, regulated presale cash, or another special-model operating liability
+
+[financial_extraction_CNY]
+revenue=1861147153.21
+cost_of_sales=512642860.87
+gross_profit=1348504292.34
+operating_profit=649750399.83
+net_profit=543947578.83
+parent_net_profit=479524593.37
+total_assets=6261176033.27
+total_liabilities=852122874.26
+total_equity=5409053159.01
+parent_equity=4911934616.94
+minority_interest=497118542.07
+operating_cash_flow=730078196.25
+capital_expenditure=120707951.67
+operating_free_cash_flow=609370244.58
+formula_operating_free_cash_flow=730078196.25-120707951.67
+
+[derived_metrics]
+gross_margin=1348504292.34/1861147153.21=0.7245554388400601
+net_margin=479524593.37/1861147153.21=0.25765001576739566
+minority_interest_ratio=497118542.07/5409053159.01=0.09190490968681585
+
+[cash_haircuts_CNY]
+cash_and_cash_equivalents=843535275.51*0.70=590474692.857
+current_wealth_management=(1217558813.23+1132051401.43)*0.85=1997168682.461
+long_term_wealth_management=50591917.81*0.70=35414342.467
+less_short_borrowing_and_trading_financial_liability=-(19014819.27+34906372.14)=-53921191.41
+discounted_detachable_net_cash=2569136526.375
+excluded_from_detachable_cash=long-term equity investments, other equity instruments, goodwill, receivables, inventory, fixed/use-right assets, development expenditure, operating real estate
+note=restricted cash of 4315549.10 is excluded naturally because cash starting point uses cash and cash equivalents, not total monetary funds
+
+[sustainable_cash_profit_CNY]
+quarterly_deducted_parent_profit=147281543.93+68928873.48+175553233.68+17214577.99=408978229.08
+sustainability_haircut=10%
+discounted_sustainable_cash_profit=408978229.08*0.90=368080406.172
+reason=remove nonrecurring items, particularly wealth-management return already treated with detachable assets; add safety discount because revenue grew only 2.62%, parent profit fell 16.20%, and impairment risk exists
+
+[owner_earnback]
+market_cap=10224000000
+operating_business_price=10224000000-2569136526.375=7654863473.625
+owner_earnback_years=7654863473.625/368080406.172=20.796715460175744
+market_cap_to_cash_profit=10224000000/368080406.172=27.776539659713464
+discounted_net_cash_to_market_cap=2569136526.375/10224000000=0.2512848715155516
+
+[dividend]
+forecast_cash_dividend=118178164.24
+forecast_basis=2025 final dividend proposal, CNY 1.32 per 10 shares
+forecast_dividend_yield=118178164.24/10224000000=0.011558897128325508
+2025_interim_paid=50136186.59
+2025_full_year_including_final_proposal=168314350.83
+approval_status_at_annual_report=final proposal subject to shareholder approval
+
+[business_checks]
+hard_contact_lens_industry_revenue=981502668.25
+hard_contact_lens_industry_gross_margin=0.8288
+hard_contact_lens_sales_volume_change=-0.0596
+terminal_business_revenue=1079804345.11
+terminal_business_revenue_share=0.5802
+goodwill=884023492.50
+asset_impairment_loss=63281509.37
+
+[limitations]
+1=The requested local filing/fact packages were absent.
+2=Market cap and PE are taken from the supplied Tencent snapshot and were not rechecked against an exchange closing record.
+3=Cash haircuts and sustainable cash profit are analytical estimates, not company guidance.
+4=Deducted parent profit was reconstructed by summing the four quarterly figures disclosed in the annual report.
+5=Forecast dividend yield uses the final 2025 proposal only; the already-paid interim dividend is not double-counted.

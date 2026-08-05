@@ -1,0 +1,61 @@
+stock-research trace
+generated_at=2026-08-05T03:41:17+08:00
+query=SAIC
+input_period_label=2025-12-31
+report_type=annual
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated fields only through protocol set/append commands.
+3. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[period_mapping]
+SAIC fiscal year ends near the end of January. The annual filing covering the input's 2025 operating year is FY2026, ended 2026-01-30 and filed 2026-03-16. It was available before the task generation date 2026-08-05. Therefore FY2026 is used, while analysis.period remains the input protocol label 2025-12-31.
+
+[reuse_check]
+No annual facts package, normalized facts, raw filing, or prior stock-research result existed under the paths supplied in config/input.json. Research returned to official filing and company IR sources.
+
+[primary_sources]
+- SAIC FY2026 Form 10-K: https://investors.saic.com/node/15776/html
+  Used for identity, business model, customer mix, contract types, backlog, three statements, debt, acquisition, dividends, receivable-sale facility, risks.
+- SAIC FY2026 results release: https://investors.saic.com/news-releases/news-release-details/saic-announces-fourth-quarter-and-full-fiscal-year-2026-results
+  Used as cross-check of annual results and guidance context.
+- PBOC/CFETS 2026-01-30 midpoint announcement (reposted by Guangdong tax authority): https://gtm-cn-uqm3dbhc20k.guangdong.chinatax.gov.cn/gdsw/lvxx/2026-02/02/content_8346c961abd340b992321e002c9fc405.shtml
+  USD/CNY=6.9678.
+- Market data: supplied input, Yahoo Finance yfinance; market cap CNY 33,415,312,438.265625 dated 2026-08-03; PE TTM 13.160674.
+
+[source_units]
+SAIC filing figures are USD millions. Conversion formula for every filing amount: USD millions * 1,000,000 * 6.9678 = CNY yuan.
+
+[core_calculations]
+gross_profit_usd_m=7262-6390=872
+gross_margin=872/7262=0.12007711374277058
+net_margin=358/7262=0.049297714128339304
+operating_free_cash_flow_usd_m=609-32=577
+total_liabilities_usd_m=5354-1500=3854
+discounted_detachable_net_cash_usd_m=182-2487=-2305
+discounted_detachable_net_cash_cny=-2305*1000000*6.9678=-16060779000
+
+Three-year FCF USD millions: FY2026 577; FY2025 458; FY2024 369. Mean=468.
+Three-year stock compensation USD millions: 64; 53; 68. Mean=61.667.
+Conservative sustainable cash profit rounded to USD 406m.
+discounted_sustainable_cash_profit_cny=406*1000000*6.9678=2828926800
+operating_business_price=33415312438.265625-(-16060779000)=49476091438.265625
+owner_earnback_years=49476091438.265625/2828926800=17.489350179815762
+market_cap_to_cash_profit=33415312438.265625/2828926800=11.812010278337928
+
+Dividend forecast: 44m period-end shares * USD 1.48 annual dividend * 6.9678 = CNY 453,743,136.
+forecast_dividend_yield=453743136/33415312438.265625=0.013578898501646059
+
+[judgment_notes]
+- analysis_model=ordinary_operating/applicable because assets and liabilities represent a labor-led project service operator, not a special financial-statement model.
+- Cash counted at 100%; all interest-bearing debt deducted at 100%.
+- Receivables, contract assets, goodwill, intangibles, PP&E, and securities matched to deferred-compensation obligations are not detachable cash.
+- Sustainable cash profit uses a three-year average and deducts stock compensation to reduce dependence on FY2026 working-capital and tax timing.
+- Backlog is not capitalized because most is unfunded and government contracts can be modified or cancelled.
+
+[validation]
+status=ok
+errors=[]

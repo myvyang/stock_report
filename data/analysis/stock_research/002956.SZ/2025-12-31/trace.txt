@@ -1,0 +1,94 @@
+stock-research trace
+company=西麦食品
+code=002956.SZ
+period=2025-12-31
+generated_at=2026-08-01T00:22:08+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md as requested.
+3. Read references/data-reuse.md because it is directly referenced by the selected skill and governs source reuse.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated scalar and list fields only through protocol set/append commands.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: status=ok, errors=[]
+
+[reuse audit]
+- Input-declared annual facts, normalized facts, raw filing, and prior stock-research paths were checked.
+- Those files/directories were absent in the current /workspace checkout; only stock_report/data/notes/user_stock_evaluations.md existed.
+- Therefore no historical conclusion was silently reused. Core facts were rebuilt from the publicly disclosed 2025 annual report.
+
+[primary sources]
+- 桂林西麦食品股份有限公司2025年年度报告, disclosure date 2026-04-15. Public full-text copy located from the disclosure record; audited by 立信会计师事务所（特殊普通合伙）, report 信会师报字[2026]第ZA11128号, standard unqualified opinion.
+  Public record: https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12089872&stockid=002956
+- 桂林西麦食品股份有限公司2025年年度报告摘要, 巨潮资讯网, 公告编号2026-005.
+  PDF: https://static.cninfo.com.cn/finalpage/2026-04-15/1225103314.PDF
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, market_cap=5,616,000,000, timestamp=20260731114257, pe_ttm=25.7.
+
+[model classification]
+- Fact: company develops, manufactures, and sells oat and health-grain foods; 96.93% of 2025 revenue came from food manufacturing.
+- Fact: balance sheet consists mainly of cash/investments, inventory, receivables, plants/equipment, ordinary trade liabilities, and modest bank debt.
+- No customer deposits, insurance reserves, regulated presale cash, project contract assets, concession rights, or holding-company look-through structure was identified.
+- Conclusion: statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+
+[core reported facts, CNY]
+total_assets=2,279,597,631.37
+total_liabilities=647,713,257.10
+total_equity=1,631,884,374.27
+parent_equity=1,609,652,138.33
+minority_interest=22,232,235.94
+revenue=2,239,551,091.99
+cost_of_sales=1,300,016,811.04
+operating_profit=201,527,069.89
+net_profit=172,739,830.58
+parent_net_profit=171,713,736.58
+deducted_parent_net_profit=162,177,038.96
+operating_cash_flow=265,068,890.41
+capital_expenditure=122,422,340.30
+financing_cash_flow=-114,461,284.54
+cash_dividend_paid_in_2025=93,227,899.14 (cash-flow note: ordinary dividends)
+2025_dividend_proposal=120,196,122.88
+
+[formula checks]
+gross_profit = 2,239,551,091.99 - 1,300,016,811.04 = 939,534,280.95
+gross_margin = 939,534,280.95 / 2,239,551,091.99 = 0.4195190207
+net_margin = 171,713,736.58 / 2,239,551,091.99 = 0.0766732839
+operating_free_cash_flow = 265,068,890.41 - 122,422,340.30 = 142,646,550.11
+forecast_dividend_yield = 120,196,122.88 / 5,616,000,000 = 0.0214024435
+
+[detachable cash assumptions]
+- Unrestricted monetary cash: 202,987,487.93 less restricted cash 27,363,450.35 = 175,624,037.58; 90% value = 158,061,633.82.
+- Trading debt instruments: 461,600,807.01; 90% value = 415,440,726.31.
+- Current-maturity debt investments: 76,259,520.58; 90% value = 68,633,568.52.
+- Long-term debt investments: 223,567,287.65; 85% value = 190,032,194.50.
+- Equity instruments: 20,801,520.98; 50% value = 10,400,760.49.
+- Interest-bearing borrowings fully deducted: short-term borrowing 94,052,595.83 plus total long-term principal/interest including current maturity 15,573,190.00 = 109,625,785.83.
+- Minimum operating cash reserve deducted: 150,000,000. This is an analyst assumption for inventory, receivables, procurement, payroll, tax, and platform/channel settlement needs.
+- discounted_detachable_net_cash = 582,943,097.82.
+- Lease obligations are disclosed separately. They were not additionally deducted in this net-cash bridge because the sustainable cash-profit estimate is after ordinary operating lease effects; treating both would risk double counting. This choice is immaterial to the broad conclusion.
+
+[sustainable cash profit]
+- Fact anchors: 2025 parent net profit 171.71m; deducted parent net profit 162.18m; 2025 full-capex free cash flow 142.65m.
+- Three-year operating cash flow average: (119.88m + 169.99m + 265.07m) / 3 = approximately 184.98m.
+- 2025 fixed-asset depreciation disclosed in cash-flow reconciliation: 51.32m.
+- Company does not disclose maintenance capex separately. Recent capex includes expansion and completion of 贺州、宿迁、张北 capacity.
+- Judgment: discounted_sustainable_cash_profit=140,000,000, slightly below current free cash flow and materially below current OCF, leaving room for maintenance capex and working-capital normalization.
+
+[owner earnback]
+operating_business_price = 5,616,000,000 - 582,943,097.8155 = 5,033,056,902.1845
+owner_earnback_years = 5,033,056,902.1845 / 140,000,000 = 35.9504064442
+market_cap_to_cash_profit = 5,616,000,000 / 140,000,000 = 40.1142857143
+discounted_net_cash_to_market_cap = 582,943,097.8155 / 5,616,000,000 = 0.1038004092
+
+[fact/inference/judgment separation]
+- Facts: audited financial statement numbers, product/channel breakdown, asset restrictions, dividend proposal, and stated market snapshot.
+- Inferences: brand/channel spending is the main gross-to-profit conversion constraint; new fixed assets represent production capacity that must earn future utilization.
+- Judgments: discount rates, 150m operating reserve, 140m sustainable cash profit, and the resulting earnback interpretation.
+
+[limitations]
+- Input-declared long-term fact packages were missing locally.
+- Market cap and PE were accepted from the input snapshot and not independently reconstructed for the post-capitalization share count.
+- Industry-first claims originate from company disclosure citing third-party datasets; no same-basis original dataset was available for independent verification.
+- Maintenance capex is not separately reported, so sustainable cash profit remains assumption-sensitive.

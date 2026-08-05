@@ -1,0 +1,103 @@
+Stock research trace: BWLP / BW LPG Limited
+Period: 2025-12-31 annual
+Generated for input created_at: 2026-08-05T00:31:53+08:00
+
+1. Instructions and contracts read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+- /workspace/AGENTS.md instructions supplied in task context
+
+2. Reuse audit
+- Checked stock_report/data/analysis/annual_review/BWLP/2025-12-31
+- Checked stock_report/data/raw/filings/BWLP/2025-12-31
+- Checked stock_report/data/normalized/facts/BWLP/2025-12-31
+- No reusable local BWLP 2025 filing/fact package was present.
+
+3. Protocol initialization
+Command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+Result: initialized stock-research-result-v1 skeleton.
+
+4. Primary and official sources consulted
+- SEC Form 20-F, filed 2026-03-31:
+  https://www.sec.gov/Archives/edgar/data/1649313/000110465926037215/bwlp-20251231x20f.htm
+- BW LPG 2025 Integrated Annual Report:
+  https://www.bwlpg.com/wp-content/uploads/2026/01/2025-integrated-annual-report.pdf
+- BW LPG Q4/FY2025 results, dated 2026-03-03:
+  https://www.bwlpg.com/bw-lpg-limited-financial-results-for-q4-2025/
+- BW LPG dividend policy and history:
+  https://www.bwlpg.com/investor/dividends/
+- ECB reference rates for 2025-12-31:
+  https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=OJ:C_202600044
+- Market cap and PE: config/input.json, source Yahoo Finance yfinance.
+
+5. Core extracted figures (USD thousands unless noted)
+- Revenue: 3,582,139
+- Economic gross profit used: Shipping TCE 709,000 + Product Services gross profit 15,900 = 724,900
+- Operating profit: 348,048
+- Net profit: 289,711
+- Parent net profit: 242,313
+- Total assets: 3,149,893
+- Total liabilities: 1,224,340
+- Total equity: 1,925,553
+- Parent equity: 1,830,002
+- Non-controlling interests: 95,551
+- Cash and cash equivalents: 242,009
+- Borrowings: 853,103
+- Lease liabilities: 137,139
+- Operating cash flow: 567,403
+- Additions to PPE / reported capex: 182,295
+- Operating FCF on unadjusted statement basis: 385,108
+- Company-reported adjusted free cash flow: USD 510 million
+- FY2025 total dividends declared: approximately USD 223 million
+
+6. Currency conversion
+- ECB 2025-12-31: EUR/CNY 8.2262; EUR/USD 1.1750.
+- Cross rate used: USD/CNY = 8.2262 / 1.1750 = 7.0010212766.
+- All monetary fields in outputs/result.json are CNY absolute yuan.
+- Input market cap was already supplied as CNY 23,111,478,557.529785.
+
+7. Analysis model decision
+- statement_model = ordinary_operating
+- owner_earnback_applicability = applicable
+- Reason: ship owning, chartering and LPG trading are ordinary operating activities; no bank deposits, insurance reserves, regulated presale funds or other special-model balance sheet structure.
+- Special caution: shipping is capital-intensive and cyclical. Cash, debt, leases and vessels are operationally linked.
+
+8. Owner earnback calculation
+- Detachable net cash = 0.
+- Reason: cash USD 242.009m is below borrowings plus lease liabilities USD 990.242m and is needed for trading, margin and fleet liquidity.
+- Operating business price = market cap - discounted detachable net cash
+  = CNY 23,111,478,557.53.
+- Sustainable cash profit starting point = adjusted FCF USD 510m.
+- Parent attribution factor = 242.313 / 289.711 = 83.6396%.
+- Cycle/maintenance uncertainty factor = 75% (25% haircut).
+- Discounted sustainable cash profit
+  = USD 510m * 83.6396% * 75%
+  = USD 319.921m
+  = CNY 2,239,775,894.73.
+- Owner earnback years
+  = CNY 23,111,478,557.53 / CNY 2,239,775,894.73
+  = 10.3186567 years.
+
+9. Dividend forecast basis
+- Baseline forecast uses FY2025 declared dividends of approximately USD 223m.
+- CNY forecast cash dividend = 223m * 7.0010212766 = CNY 1,561,227,744.68.
+- Forecast yield = CNY 1,561,227,744.68 / CNY 23,111,478,557.53 = 6.7552%.
+- This is a baseline scenario, not company guidance; actual quarterly payout is discretionary and leverage/Shipping NPAT-linked.
+
+10. Protocol population
+- outputs/result.json was not hand-authored from an empty object.
+- It was initialized by protocol CLI and populated with repeated protocol `set` operations for the required paths.
+
+11. Validation
+Command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Result before report finalization: {"status":"ok","errors":[]}
+
+12. Known limitations
+- Financial statement amounts use the 2025-12-31 FX rate while market cap is dated 2026-08-03.
+- Gross profit is an economic measure because IFRS statements do not present one consolidated gross-profit line.
+- Sustainable cash profit relies on a judgmental 25% cycle/maintenance haircut.
+- Dividend forecast uses FY2025 declared dividends as a baseline and is not a commitment.

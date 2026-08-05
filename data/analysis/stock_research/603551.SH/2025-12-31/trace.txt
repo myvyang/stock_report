@@ -2,14 +2,16 @@
 
 公司：603551.SH 奥普科技
 报告期：2025-12-31
-生成时间：2026-07-27 +08:00
+生成时间：2026-07-31 13:21:41 +08:00
 
 执行协议：
 - 已读取 /workspace/.agents/skills/stock-research/SKILL.md
 - 已读取 /workspace/.agents/skills/stock-research/references/result-contract.md
 - 已读取 /workspace/.agents/skills/stock-research/references/report-contract.md
 - 已运行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- 已运行多次 protocol set，迁移并更新 analysis_model、financials、asset_analysis、owner_earnback、dividend、business、risks、evidence 和 data_quality
 - 已运行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- 最终验证结果：status=ok，errors=[]
 
 读取和复用文件：
 - config/input.json
@@ -24,6 +26,9 @@
 核心复用：
 - 年度事实包已覆盖业务分部、资产负债表、利润表、现金流量表、货币资金附注、主要经营资产、融资负债、经营负债、三年利润现金化数据。
 - 既有 stock_research 结果已覆盖 owner_earnback 数字、风险核查、行业外部来源和验证路径；本次将其迁移到 stock-research-result-v1 协议结构。
+- 本次用协议 CLI 初始化 outputs/result.json，再通过协议 set 命令迁移已有事实和研究字段；未从头手写复杂 JSON。
+- 复核主营业务与资产负债结构后，将 analysis_model 明确为 ordinary_operating，普通控股回本口径 applicable；旧结果中该字段为 null，本次已修正。
+- 协议首次验证提示 asset_analysis 行缺少 explanation；已将既有 business_substance 映射为协议要求的 explanation 后重新验证。
 
 本次补充核查：
 - 在年报文本中核查利润分配：资产负债表日后拟分配现金股利 210,948,457.50 元；本报告期利润分配表披露现金分红 326,068,552.50 元、回购计入现金分红 26,786,473.00 元。
@@ -35,16 +40,16 @@
 
 关键口径：
 - 金额单位：人民币绝对元，报告展示转为亿元。
-- 市值：3,501,000,000 元，来自 config/input.json，市值日期 2026-07-24。
+- 市值：3,585,000,000 元，来自 config/input.json，行情时间 2026-07-31 11:43:23。
 - 折后可剥离净现金：866,453,723.667 元，复用既有 stock_research owner_earnback 口径。
 - 折后可持续可分配现金利润：243,000,000 元，复用既有 stock_research owner_earnback 口径。
-- 经营业务购买价：2,634,546,276.333 元。
-- 控股回本年：10.8417542236 年。
-- 市值/现金利润：14.4074074074 倍。
+- 经营业务购买价：2,718,546,276.333 元。
+- 控股回本年：11.1874332359 年。
+- 市值/现金利润：14.7530864198 倍。
 - 预测现金分红：210,948,457.50 元，采用资产负债表日后拟分配现金股利的保守口径。
 
 数据缺口：
-- 市值和 PE 沿用输入文件快照，未更新为实时行情。
+- 市值和 PE 采用输入文件的 2026-07-31 行情快照，未更新为实时行情。
 - 当前工作区未发现单独 owner_earnback 目录文件，因此 owner_earnback 数字来自既有 stock_research 输出，而不是重新计算专题文件。
 - 应收前五名房地产客户匿名披露，无法公开确认逐户名称、项目分布和信用状态。
 - 长期股权投资、其他权益工具投资和投资性房地产未做资产级处置估值，不纳入可剥离现金主口径。

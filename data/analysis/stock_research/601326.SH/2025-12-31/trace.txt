@@ -1,0 +1,115 @@
+stock-research trace
+company=秦港股份
+code=601326.SH
+period=2025-12-31
+generated_for=2026-07-31
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Read references/data-reuse.md because the skill and AGENTS.md require reuse-first behavior.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated initialized fields with repeated protocol `set` calls.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Initial completed validation result: {"status":"ok","errors":[]}
+
+[reuse audit]
+Expected annual facts:
+stock_report/data/analysis/annual_review/601326.SH/2025-12-31/facts.json
+Expected annual facts markdown:
+stock_report/data/analysis/annual_review/601326.SH/2025-12-31/annual_facts.md
+Expected normalized facts:
+stock_report/data/normalized/facts/601326.SH/2025-12-31/annual-facts.json
+Expected historical research:
+stock_report/data/analysis/stock_research/601326.SH/2025-12-31/
+Result: none existed. Only stock_report/data/notes/user_stock_evaluations.md was present. Reuse path exhausted; official filing retrieval was required.
+
+[official sources]
+Primary filing:
+Qinhuangdao Port Co., Ltd. Annual Report 2025
+HKEX disclosure date: 2026-04-24
+URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042401004.pdf
+Local copy: stock_report/data/raw/filings/601326.SH/2025-12-31/annual_report_2025_en.pdf
+Local extracted text: stock_report/data/raw/filings/601326.SH/2025-12-31/annual_report_2025_en.txt
+Extraction tool: pypdf in temporary virtual environment /tmp/qhd-pdf-venv
+Audit opinion: standard unqualified opinion, Deloitte Touche Tohmatsu Certified Public Accountants LLP.
+Accounting basis: annual report states no differences between PRC accounting standards and overseas accounting standards for reported net profit/net assets.
+
+Dividend approval cross-check:
+秦皇岛港股份有限公司2025年年度股东会决议公告
+SSE disclosure date: 2026-06-27
+URL: https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-06-27/601326_20260627_TUT9.pdf
+
+Market snapshot:
+config/input.json
+source=Tencent qt.gtimg.cn
+timestamp=20260731114346
+market_cap=19444000000
+pe_ttm=12.05
+
+[key filing locations]
+Annual report p.7: revenue, parent net profit, OCF, assets, parent equity, multi-year indicators.
+Annual report p.8: five-year income/balance/cash-flow summary.
+Annual report pp.12-15: throughput, business description, business model, customers.
+Annual report pp.18-21: operating results, revenue/cost by cargo category, customer/supplier concentration.
+Annual report pp.24-27: balance-sheet changes, external equity investments.
+Annual report pp.54-57: dividend policy and three-year cumulative dividends.
+Annual report pp.95-96: consolidated balance sheet.
+Annual report p.99: consolidated income statement.
+Annual report p.101: consolidated cash-flow statement.
+Annual report notes 16-18, 24-25: term deposits, restrictions and borrowings.
+Annual report note 36: revenue/cost breakdown.
+Annual report note 51: cash equivalents and non-cash-equivalent deposits.
+Annual report capital management note: net-debt components.
+Annual report related-party commitments note: capital and investment commitments.
+
+[model classification]
+Input hint=ordinary_operating/applicable.
+Confirmed=ordinary_operating/applicable.
+Reason: revenue is generated from integrated port handling/storage/transport/logistics services. Funding assets, borrowings and operating assets are separately identifiable. No evidence found that consolidated economics must be valued as a single concession with a finite remaining toll period. Port capital intensity is handled through capex deduction and an additional sustainability haircut.
+
+[core calculations; CNY]
+revenue=6985609647.91
+cost_of_sales=4074724881.47
+gross_profit=2910884766.44
+gross_margin=2910884766.44/6985609647.91=0.4166973124973992
+parent_net_profit=1606251547.62
+net_margin=1606251547.62/6985609647.91=0.2299372035625507
+
+operating_cash_flow=2298384754.34
+capital_expenditure=895062954.23
+operating_free_cash_flow=2298384754.34-895062954.23=1403321800.11
+minority_profit_proxy=51671026.07
+pre_haircut_parent_cash_profit=1403321800.11-51671026.07=1351650774.04
+cash_profit_sustainability_factor=0.90
+discounted_sustainable_cash_profit=1351650774.04*0.90=1216485696.636
+
+cash_equivalents=1462704175.48 at 100%
+term_deposits_current=1384900878.75
+term_deposits_over_one_year=2751557410.99
+term_deposits_total=4136458289.74 at 90%
+interest_bearing_debt=300195983.33+388491578.81+3449486000=4138173562.14
+discounted_detachable_net_cash=1462704175.48+4136458289.74*0.90-4138173562.14=1047343074.106
+discounted_net_cash_to_market_cap=1047343074.106/19444000000=0.053864589287492305
+
+operating_business_price=19444000000-1047343074.106=18396656925.894
+owner_earnback_years=18396656925.894/1216485696.636=15.122789340447703
+market_cap_to_cash_profit=19444000000/1216485696.636=15.983747325405735
+
+forecast_cash_dividend=642552380
+forecast_dividend_yield=642552380/19444000000=0.033046306315572926
+
+[judgment boundaries]
+Fact: filing numbers, business descriptions, throughput, declared/approved dividends, commitments.
+Inference: ordinary-operating classification after review, profit concentration interpretation, cash detachability.
+Judgment: 90% discount on term deposits, 90% sustainability factor on adjusted FCF, minority profit used as proxy for minority cash share.
+No target price, trading recommendation or certainty claim was produced.
+
+[known limitations]
+1. No pre-existing annual facts package was available; the official English annual report was extracted directly.
+2. Market cap and PE were accepted from the supplied Tencent snapshot and not independently reconstructed.
+3. One-year capex may not equal normalized maintenance capex.
+4. Minority profit is only a proxy for the minority share of consolidated cash flow.
+5. Equity-method earnings and cash dividends may differ in timing; no additional investment income was added to owner cash profit.

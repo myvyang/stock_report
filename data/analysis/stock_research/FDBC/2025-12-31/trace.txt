@@ -1,0 +1,61 @@
+Stock research trace — FDBC — period 2025-12-31
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Read instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Local data audit
+   - Read config/input.json.
+   - Checked stock_report paths. No raw filing, annual facts package, normalized facts, or prior stock-research result existed for FDBC/2025-12-31.
+   - Therefore retrieved and inspected official public disclosures rather than reusing unavailable local facts.
+
+3. Primary sources inspected
+   - SEC Form 10-K for fiscal year ended 2025-12-31, filed 2026-03-13:
+     https://www.sec.gov/Archives/edgar/data/1098151/000143774926008215/fdbc20260301_10k.htm
+   - Fidelity D&D Bancorp investor relations overview, quarterly results, annual reports and dividend materials:
+     https://ir.bankatfidelity.com/
+   - Q2 2026 dividend release, dated 2026-04-22:
+     https://www.globenewswire.com/news-release/2026/04/22/3279422/0/en/fidelity-d-d-bancorp-inc-second-quarter-2026-dividend.html
+   - PBOC/CFETS 2025-12-31 USD/CNY central parity: 7.0288 CNY per USD.
+   - Market cap, market-cap date, PE TTM and quote source were taken without modification from config/input.json.
+
+4. Model determination
+   - 10-K Item 1 identifies Fidelity D & D Bancorp as a bank holding company whose wholly owned principal subsidiary is The Fidelity Deposit and Discount Bank.
+   - Overrode input hint ordinary_operating/applicable with financial_bank/requires_special_model.
+   - Kept all ordinary owner-earnback amounts and ratios null because deposits, loans, securities and liquidity are operating balance-sheet items.
+   - Used bank-specific framework: net interest margin, asset quality, regulatory capital, ROA/ROE, tangible equity and dividend coverage.
+
+5. Key audited facts extracted (USD thousands unless stated)
+   - Assets 2,748,058; liabilities 2,509,198; shareholders' equity 238,860.
+   - Net loans 1,890,983; AFS securities 296,607; HTM securities 227,339; cash and equivalents 148,060.
+   - Deposits 2,467,353; uninsured deposits estimated at 39%; uninsured and uncollateralized deposits 27%.
+   - Net interest income 72,671; non-interest income 20,559; net income 28,198.
+   - NIM 2.95%; ROA 1.05%; ROE 12.88%; efficiency ratio 60.30%.
+   - NPA/assets 0.08%; ACL/loans 1.06%; net charge-offs/average loans 0.03%.
+   - Total risk-based capital 14.8%; CET1 13.7%; Tier 1 risk capital 13.7%; leverage 9.3%.
+   - 2025 dividend per share USD 1.63; payout ratio 33.70%.
+
+6. Currency and forecast calculations
+   - All result.json statement amounts = reported USD amount × 7.0288.
+   - Dividend forecast = USD 0.43 quarterly dividend × 4 × 5,805,183 shares × 7.0288 = CNY 70,181,968.865.
+   - Forecast dividend yield = CNY 70,181,968.865 / CNY 2,061,703,204.224884 = 0.0340407721.
+   - Forecast is a mechanical annualization, not board guidance.
+
+7. Protocol actions
+   - Initialized outputs/result.json with:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Populated scalar fields using protocol set.
+   - Populated asset_analysis, dividend.history, risks and evidence using protocol append.
+   - Did not hand-write result.json from scratch.
+
+8. Data-quality decisions
+   - Status complete under the special-model minimum threshold.
+   - Revenue, gross profit/margin, operating cash flow, capex, free cash flow and all ordinary owner-earnback fields remain null because they lack comparable economic meaning for a bank.
+   - Yahoo Finance market cap and PE are input data and were not independently reconstructed.
+   - Financial statements use 2025-12-31 FX while market cap is dated 2026-08-03; this limits cross-date valuation precision.
+
+9. Validation
+   - Protocol validation completed successfully after population.

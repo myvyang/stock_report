@@ -1,0 +1,55 @@
+stock-research trace
+generated_at: 2026-08-04T21:26:08+08:00
+company: NVR, Inc. (NYSE: NVR)
+period: 2025-12-31 annual
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- config/input.json present.
+- No raw filing, annual facts, normalized facts, or prior stock-research result existed under stock_report for NVR/2025-12-31.
+- Returned to primary filing source.
+
+3. Result initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized successfully; subsequent JSON changes performed through protocol set/append commands.
+
+4. Primary sources
+- SEC NVR 2025 Form 10-K, accession 0000906163-26-000018, filed 2026-02-11:
+  https://www.sec.gov/Archives/edgar/data/906163/000090616326000018/nvr-20251231.htm
+- PBOC USD/CNY central parity, 2025-12-26, USD 1 = CNY 7.0358:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- Market cap and PE: config/input.json, Yahoo Finance yfinance attribution.
+
+5. Model decision
+- Input hint ordinary_operating/applicable was overridden.
+- Confirmed model: real_estate_developer / requires_special_model.
+- Reason: homebuilding inventory, LPA deposits, customer deposits, delivery obligations, and project cash are integral to operations. NVR's presold/LPA structure is capital-light but does not make project cash freely detachable.
+- Required ordinary owner earnback ranking fields remain null.
+
+6. Currency and calculations
+- All filing USD amounts translated at CNY 7.0358 per USD for protocol display.
+- Consolidated revenue = USD 10,323.959m = CNY 72,637,310,732.2.
+- Cost of sales = USD 7,953.401m = CNY 55,958,538,755.8.
+- Protocol gross profit = revenue - cost of sales = CNY 16,678,771,976.4.
+- Protocol gross margin = 0.22961714590303972.
+- Company-reported homebuilding gross margin (more operationally comparable) = 21.2%.
+- Net income = USD 1,339.816m = CNY 9,426,677,412.8.
+- Net margin = 0.1297773460743112.
+- Operating FCF = CFO USD 1,121.320m - PP&E purchases USD 24.508m = USD 1,096.812m = CNY 7,716,949,869.6.
+- Forecast cash dividend = 0; forecast dividend yield = 0.
+
+7. Quality controls
+- Facts, inference, and judgment separated in report wording.
+- No buy/sell recommendation, target price, unsupported certainty, or ranking label used.
+- Market valuation date mismatch disclosed: 2026-08-03 market cap/PE versus 2025-12-31 filing.
+- FX basis and market-data decomposition limitation disclosed.
+
+8. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}
+- Confirmed special-model ordinary earnback fields are null and data_quality.status is complete.

@@ -1,0 +1,72 @@
+stock-research trace
+task: HON annual 2025-12-31
+generated_at: 2026-08-05 Asia/Shanghai
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+   - config/input.json existed.
+   - No staged raw filing, annual facts package, normalized facts, or prior stock-research output existed for HON/2025-12-31.
+   - Result: fetched primary filing and supplemental official disclosures.
+
+3. Protocol initialization
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   result: initialized stock-research-result-v1 template.
+
+4. Primary sources acquired/reviewed
+   - SEC 2025 Form 10-K filed 2026-02-17:
+     https://www.sec.gov/Archives/edgar/data/773840/000077384026000013/hon-20251231.htm
+     local copy: stock_report/data/raw/filings/HON/2025-12-31/hon-20251231.htm
+   - SEC Companyfacts API CIK 0000773840:
+     https://data.sec.gov/api/xbrl/companyfacts/CIK0000773840.json
+     local copy: stock_report/data/raw/filings/HON/2025-12-31/companyfacts.json
+   - Honeywell official Aerospace separation completion release, 2026-06-29.
+   - Honeywell Technologies official Q2 2026 results/guidance, 2026-07-23.
+   - Honeywell Technologies official dividend release, 2026-07-24.
+   - Federal Reserve/FRED AEXCHUS annual USD/CNY series.
+   - Market cap and PE TTM from task input (Yahoo Finance yfinance snapshot).
+
+5. Core USD facts extracted from 2025 Form 10-K (USD millions)
+   income statement: revenue 37,442; cost of sales 23,613; gross profit 13,829; operating profit 8,127; net income 4,772; parent net income 4,729.
+   balance sheet: assets 73,681; liabilities 58,651 (assets less total equity); equity 15,030; parent equity 13,904; NCI 1,126.
+   cash flow: CFO 6,408; capex 986; operating FCF 5,422; financing cash flow -1,953; dividends 2,976; buybacks 3,804.
+   segments: Aerospace sales/profit 17,510/4,284; Industrial Automation 9,401/1,743; Building Automation 7,367/1,953; Energy & Sustainability 3,134/692.
+
+6. Currency normalization
+   - Applied 2025 annual average USD/CNY 7.1875 from Federal Reserve/FRED to all 2025 filing amounts for deterministic CNY display.
+   - Limitation recorded: balance-sheet values were not converted at a separate 2025-12-31 spot rate.
+
+7. Model review and decisive boundary finding
+   - Underlying statement model: ordinary_operating.
+   - Honeywell Aerospace completed spin-off on 2026-06-29 and trades as HONA.
+   - Market-cap date 2026-08-03 is post-spin; 2025 annual statements include Aerospace.
+   - Aerospace generated 4,284 / (4,284+1,743+1,953+692) = 49.4% of the four operating segments' 2025 profit.
+   - Therefore current HON market cap and 2025 consolidated cash profit are not perimeter-compatible.
+   - owner_earnback_applicability set to requires_special_model for this snapshot; all ordinary owner-earnback ranking fields left null.
+
+8. Dividend estimate
+   - Official post-spin quarterly dividend: USD 0.70/share.
+   - Annualized USD 2.80/share x approximately 320 million guided weighted-average shares = USD 896 million.
+   - Converted forecast cash dividend = CNY 6,440,000,000.
+   - Forecast yield = 6,440,000,000 / 519,813,754,118.9297 = approximately 1.2389%.
+
+9. Data-quality decision
+   status: partial
+   reasons:
+   - Post-spin market capitalization is incompatible with the pre-spin annual reporting perimeter.
+   - Post-spin HON net debt and a full-year standalone cash-flow bridge after disposals/acquisition are not yet available in a sufficiently comparable annual package.
+   - Partial status intentionally prevents formal sorting; it is not an investment label.
+
+10. Protocol population and validation
+   - Used protocol `set` and `append` commands to populate outputs/result.json.
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: {"status":"ok","errors":[]}
+
+11. Required outputs
+   - outputs/result.json
+   - outputs/report.md
+   - outputs/trace.txt

@@ -1,0 +1,73 @@
+stock-research trace
+company=Manhattan Bridge Capital, Inc. (NASDAQ: LOAN)
+period=2025-12-31
+generated_for_input=2026-08-04T20:35:35+08:00
+
+[skill/protocol]
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated structured fields with protocol set/append commands; result.json was not hand-written from scratch.
+
+[reuse audit]
+- Expected local raw filing, annual facts, normalized facts, and annual review paths from config/input.json were absent under /workspace/stock_report.
+- No prior stock-research output was present for reuse.
+- Research therefore used the primary SEC filing and company release directly.
+
+[primary sources]
+1. SEC Form 10-K, fiscal year ended 2025-12-31, filed 2026-03-27:
+   https://www.sec.gov/Archives/edgar/data/1080340/000149315226013241/form10-k.htm
+2. Company 2025 results release, 2026-03-27:
+   https://manhattanbridgecapital.com/press-article.php?press=324%2Fmanhattan-bridge-capital-inc-reports-2025-results
+3. Federal Reserve H.10 historical RMB/USD rates:
+   https://www.federalreserve.gov/releases/h10/Hist/dat00_ch.htm
+4. Market snapshot supplied in config/input.json: Yahoo Finance yfinance, market cap date 2026-08-03.
+
+[model decision]
+- Input hint: ordinary_operating / applicable.
+- Overridden to unknown_special / requires_special_model.
+- Reason: company is a mortgage REIT/non-bank real-estate finance company. Loans receivable were USD 60,218,841, 96.6% of USD 62,350,731 total assets. All 2025 revenue was loan interest/origination fees and USD 17,601,132 credit-line borrowings funded the portfolio. Loans and matching financing are the business itself, not detachable cash/debt.
+- Consequence: discounted net cash, discounted cash profit, operating business price, owner earnback years, and market-cap/cash-profit fields remain null per result contract.
+
+[currency conversion]
+- Contract requires CNY absolute yuan.
+- Balance-sheet items: 2025-12-31 H.10 spot rate, USD 1 = CNY 6.9931.
+- 2025 income, cash-flow and dividend items: H.10 2025 annual average, USD 1 = CNY 7.1875.
+- Ratios were calculated on native USD figures unless they compare against the supplied CNY market cap.
+
+[key source facts, USD]
+- Total assets 62,350,731; liabilities 19,251,187; equity 43,099,544.
+- Loans receivable net 60,218,841; interest/fees receivable 1,642,825; cash 204,889; restricted cash 23,350.
+- Lines of credit 17,601,132; dividends payable 1,314,732.
+- Revenue 8,666,307: loan interest 7,175,043 and origination fees 1,491,264.
+- Interest and deferred financing cost 1,755,353; G&A 1,813,510; operating income 5,094,187; net income 5,110,977.
+- Operating cash flow 4,929,066; fixed-asset purchases 418; financing cash flow -10,215,683; cash dividends paid 5,261,780; treasury-share purchases 28,558.
+- Year-end portfolio: 88 loans, principal earning interest 60,674,000, weighted rate 11.12%, weighted term 5.52 months, 93.18% of loans by count in NY metro including NJ/CT.
+- Three entities under common control owed 6,245,000 or 10.3% of portfolio.
+- CECL allowance was zero; company reports zero realized principal loss since business inception. Auditor identified allowance estimate as a critical audit matter.
+- Subsequent paydowns/payoffs of year-end loans were approximately 10,931,000, including 6,353,000 originally due by 2025-12-31.
+
+[derived calculations]
+- Net margin = 5,110,977 / 8,666,307 = 0.5897525901.
+- Loans / assets = 60,218,841 / 62,350,731 = 96.58%.
+- Credit lines / equity = 17,601,132 / 43,099,544 = 40.84%.
+- 2025 ROE = 5,110,977 / average(43,099,544, 43,265,127) = 11.84%.
+- Cash dividends / net income = 5,261,780 / 5,110,977 = 102.95%.
+- Forecast dividend scenario = USD 0.11 * 4 * 11,432,451 shares = USD 5,030,278.44; translated at 7.1875 = CNY 36,155,126.29.
+- Forecast dividend yield = CNY 36,155,126.29 / CNY 320,841,089.69221115 = 11.26885784%.
+- Forecast is a constant-quarter scenario based on the 2026-02 declared dividend, not management guidance.
+
+[limitations]
+- Local filing/facts packages referenced by input were unavailable.
+- Market cap and PE were accepted from input; the market-cap currency conversion mechanics and TTM earnings bridge were not available in the input.
+- No independent property-level appraisal, delinquency roll-forward, or full loan aging schedule was disclosed; zero CECL is management's estimate, not a guarantee of recoverability.
+- Gross margin is null because it is not economically comparable for this lending model.
+
+[validation]
+- Final protocol validation command and result are recorded after report/result completion.
+
+{
+  "status": "ok",
+  "errors": []
+}

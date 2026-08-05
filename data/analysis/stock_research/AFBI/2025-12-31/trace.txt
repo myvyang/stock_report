@@ -1,0 +1,50 @@
+AFBI stock-research trace
+generated_at: 2026-08-05T05:59:59+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Initialized structured result using protocol CLI
+- PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Local reuse check
+- No pre-existing AFBI 2025 annual facts, normalized facts, raw filing, or stock-research result was present under the configured stock_report paths.
+
+4. Official filing retrieval
+- SEC Form 10-K accession 0001193125-26-117734 downloaded to stock_report/data/raw/filings/AFBI/2025-12-31/afbi-20251231.htm
+- SEC Companyfacts CIK 0001823406 downloaded to stock_report/data/raw/filings/AFBI/2025-12-31/companyfacts.json
+- Filing URL: https://www.sec.gov/Archives/edgar/data/1823406/000119312526117734/afbi-20251231.htm
+- Companyfacts URL: https://data.sec.gov/api/xbrl/companyfacts/CIK0001823406.json
+
+5. Model decision
+- Input hint ordinary_operating/applicable rejected.
+- Filing establishes that the company operates through wholly owned Affinity Bank, takes customer deposits, originates loans, holds securities, and uses FHLB funding.
+- Final model: financial_bank; ordinary owner earnback: not_applicable.
+- Ordinary discounted net cash, cash profit, operating-business price, earnback years, and market-cap/cash-profit fields kept null.
+
+6. Core source facts (USD)
+- Total assets 881,697,000; liabilities 754,678,000; equity 127,019,000.
+- Net income attributable to parent 8,332,000; no minority interest.
+- Net interest income 31,137,000; noninterest income 1,924,000; noninterest expense 21,699,000.
+- Gross loans 742,682,000; ACL 8,994,000; net loans 733,688,000.
+- Deposits 695,005,000; FHLB advances and other borrowings 54,000,000.
+- NIM 3.59%; NPL ratio 0.48%; ACL/loans 1.21%; ACL/NPL 251.9%.
+- CET1 12.04%; total risk-based capital 13.24%; Tier 1 leverage 10.82%.
+- 2025 cash dividend 8,801,000 (special dividend USD 1.50/share); repurchases 5,942,000.
+
+7. Currency normalization
+- Federal Reserve G.5A annual 2025 rate: CNY 7.1875 per USD.
+- All filing monetary values in result.json converted at 7.1875 to satisfy the CNY/yuan protocol.
+- Market cap CNY 945,950,531.6166229 and PE 16.78832 retained from input.
+
+8. Post-period event
+- SEC-filed merger agreement announced 2026-03-30: Fidelity proposed all-cash acquisition at USD 23/share, approximately USD 142.8m transaction value, subject to approvals and closing.
+
+9. Structured result population
+- All fields written with protocol CLI set operations; the result was not hand-authored as a complex JSON document.
+
+10. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Output: {"status":"ok","errors":[]}

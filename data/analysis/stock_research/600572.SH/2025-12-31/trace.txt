@@ -1,0 +1,73 @@
+stock-research trace
+company: 康恩贝 (600572.SH)
+period: 2025-12-31 annual
+generated_at: 2026-07-31T18:33:35+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill requires preferential reuse.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- No files existed under the configured raw filing, annual review, normalized facts, or prior stock research paths for 600572.SH/2025-12-31.
+- No matching reusable files existed under /root/aicode/stock_report.
+- Therefore fetched the missing primary filing rather than reusing third-party financial data.
+
+3. Primary-source acquisition
+- Queried the Shanghai Stock Exchange company bulletin endpoint for productId=600572 and 2026-01-01 through 2026-07-31.
+- Located "康恩贝2025年年度报告全文", disclosure date 2026-04-23.
+- Official URL: https://www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-23/600572_20260423_50D8.pdf
+- SSE primary host returned an anti-bot page to curl; downloaded the identical SSE disclosure path through the SSE Big5 mirror and saved the PDF as stock_report/data/raw/filings/600572.SH/2025-12-31/annual_report.pdf.
+- Extracted text locally to stock_report/data/raw/filings/600572.SH/2025-12-31/annual_report.txt using pypdf in a temporary virtual environment.
+
+4. Model decision
+- Confirmed ordinary_operating / applicable.
+- Basis: revenue comes from manufacturing and selling Chinese medicines, chemical drugs, APIs, herbal pieces, and health products; assets are ordinary cash, receivables, inventory, production facilities, investments, and borrowings. No bank deposits, client funds, insurance reserves, regulated presale cash, concession rights, or similar special-statement structure.
+
+5. Core extracted facts (CNY)
+- Revenue: 6,473,433,792.42
+- Cost of sales: 3,022,603,371.10
+- Gross profit: 3,450,830,421.32
+- Operating profit: 673,215,379.24
+- Net profit: 491,550,960.47
+- Parent net profit: 474,363,102.69
+- Total assets: 9,984,256,068.43
+- Total liabilities: 2,832,171,036.43
+- Total equity (assets minus liabilities): 7,152,085,032.00
+- Parent equity: 7,046,971,535.22
+- Minority interest: 105,113,496.78
+- Operating cash flow: 942,609,399.49
+- Capital expenditure: 147,258,629.21
+- Operating free cash flow: 795,350,770.28
+- Financing cash flow: -493,454,331.02
+- Dividend/profit/interest cash out: 390,078,243.89
+- 2025 dividend proposal: 380,548,993.65
+
+6. Formula audit
+- Gross margin = 3,450,830,421.32 / 6,473,433,792.42 = 0.5330757264.
+- Parent net margin = 474,363,102.69 / 6,473,433,792.42 = 0.0732784358.
+- Restricted monetary funds explicitly excluded before haircut: 15,570,383.78 (bank acceptance deposit, housing maintenance fund, and other guarantee deposits). Time deposit was retained as detachable financial value but remains part of the 30% operating/liquidity haircut.
+- Discounted detachable net cash = (1,673,766,997.23 - 15,570,383.78) * 70% + 151,485,626.62 * 50% + 156,626,536.59 * 50% - 303,627,241.48 = 1,011,166,469.54.
+- Working-capital cash release normalized out = 156,519,658.97 + 7,221,576.91 - 40,853,213.91 = 122,888,021.97.
+- Parent attribution ratio = 474,363,102.69 / 491,550,960.47 = 0.9650334163.
+- Discounted sustainable cash profit = (795,350,770.28 - 122,888,021.97) * 0.9650334163 = 648,949,023.37.
+- Operating business price = 10,966,000,000.00 - 1,011,166,469.54 = 9,954,833,530.46.
+- Owner earnback years = 9,954,833,530.46 / 648,949,023.37 = 15.34000473.
+- Market cap / cash profit = 10,966,000,000.00 / 648,949,023.37 = 16.89809155.
+- Forecast dividend yield = 380,548,993.65 / 10,966,000,000.00 = 0.0347026257.
+
+7. Judgment flags
+- Cash haircut of 70%, fund haircut of 50%, and listed-equity haircut of 50% are analyst assumptions, not filing facts.
+- Long-term equity investments are excluded from detachable cash because control, timing, and realization are uncertain; their recurring equity-method earnings remain indirectly reflected in consolidated cash/profit and are not separately capitalized.
+- Sustainable cash profit is a one-year normalized measure, not a multi-year cycle average.
+- Input market data was not independently re-fetched: market cap 10,966,000,000; timestamp 20260731114346; source Tencent qt.gtimg.cn; PE TTM 22.69.
+- Dividend proposal was pending shareholder approval at the annual report date.
+
+8. Output construction and validation
+- Populated the initialized skeleton exclusively through protocol CLI `set` operations.
+- Wrote outputs/report.md and outputs/trace.txt.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before final file handoff: status ok, errors [].

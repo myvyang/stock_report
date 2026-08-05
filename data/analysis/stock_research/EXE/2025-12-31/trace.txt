@@ -1,0 +1,66 @@
+stock-research trace — EXE — period 2025-12-31
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because no existing EXE fact package was present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Searched configured raw filing, annual review, normalized fact, and prior stock research paths.
+- No EXE 2025 files existed; research returned to primary public filings.
+
+3. Primary evidence
+- SEC 2025 Form 10-K, accession 0000895126-26-000011, filed 2026-02-18.
+  URL: https://www.sec.gov/Archives/edgar/data/895126/000089512626000011/exe-20251231.htm
+- SEC Companyfacts API, CIK 0000895126, used to cross-check statement values.
+- FY2025 results and 2026 outlook, Exhibit 99.1 filed 2026-02-17.
+  URL: https://www.sec.gov/Archives/edgar/data/895126/000089512626000008/exe-ex_991x20251231x8kxpr.htm
+- USD/CNY central parity on 2025-12-31: 7.0288.
+- Market cap and PE were reused exactly from config/input.json.
+
+4. Model decision
+- statement_model: ordinary_operating.
+- owner_earnback_applicability: applicable.
+- Reason: the balance sheet is an ordinary upstream producer structure, not a bank, insurer, developer, concession or holding platform. Oil and gas properties are operating assets. Continuing development capex is economically required because shale production declines.
+
+5. Currency conversion
+- All USD statement amounts multiplied by 7.0288.
+- A single closing rate was used for balance sheet, income statement, and cash flow amounts to preserve internal formula comparability.
+- Limitation: translated P&L and cash flow values are analytical CNY displays, not accounting translations using annual-average FX.
+
+6. Key source values (USD millions)
+- Assets 28,287; liabilities 9,709; equity attributable to parent 18,578.
+- Cash 616; long-term debt 5,009; no current long-term debt maturity.
+- Revenue and other 12,124; operating expenses 9,653; operating income 2,471; net income 1,819.
+- CFO 4,575; capex 2,736; operating FCF 1,839.
+- Dividends paid 765; buybacks 100.
+- Production approximately 7.18 Bcfe/d, 92% natural gas.
+
+7. Analytical gross profit
+- Company does not report GAAP gross profit.
+- Defined analytical cost of sales = production 635 + gathering/processing/transportation 2,376 + severance/ad valorem taxes 193 + marketing expense 3,160 = USD 6,364 million.
+- Analytical gross profit = 12,124 - 6,364 = USD 5,760 million.
+- Gross margin = 5,760 / 12,124 = 0.4750907291.
+
+8. Owner earnback
+- Detachable net cash = cash 616 - long-term debt 5,009 = USD -4,393 million = CNY -30,877,518,400.
+- Derivative net asset was assigned zero detachable value because it changes with commodity prices and settlements.
+- 2025 operating FCF = CFO 4,575 - capex 2,736 = USD 1,839 million.
+- Sustainable cash profit applies a 25% commodity-cycle and maintenance-capex haircut: 1,839 * 75% = USD 1,379.25 million = CNY 9,694,472,400.
+- Operating business price = market cap - discounted net cash = CNY 177,770,013,626.4121.
+- Owner earnback years = operating business price / discounted cash profit = 18.3372551173.
+- Market cap / discounted cash profit = 15.1521907707.
+
+9. Dividend forecast
+- Annualized base dividend = USD 0.575 * 4 * 240,398,260 shares = USD 552,915,998.
+- Converted forecast dividend = CNY 3,886,335,966.7424.
+- Forecast dividend yield = 0.0264570083.
+- Variable dividends and future repurchases excluded.
+
+10. Validation
+- Populated initialized JSON using protocol set commands.
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final status: ok; errors: [].

@@ -1,0 +1,85 @@
+stock-research trace: UG / United-Guardian, Inc.
+period: 2025-12-31 annual
+generated context date: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the reuse decision was required.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse decision
+- Checked the annual-review, normalized-facts, and raw-filing paths supplied in config/input.json.
+- No existing UG annual facts package, normalized facts, or raw filing was present.
+- Therefore retrieved the official 2025 10-K and SEC Companyfacts instead of reusing a prior analysis.
+
+3. Primary sources
+- SEC filing index: https://www.sec.gov/Archives/edgar/data/101295/000117184326001973/0001171843-26-001973-index.html
+- SEC 2025 Form 10-K: https://www.sec.gov/Archives/edgar/data/101295/000117184326001973/ug20251231_10k.htm
+- Filing date: 2026-03-27; accession: 0001171843-26-001973; period: 2025-12-31.
+- SEC Companyfacts: https://data.sec.gov/api/xbrl/companyfacts/CIK0000101295.json
+- FX: China Foreign Exchange Trade System rate relayed by Xinhua, 2025-12-31, USD/CNY 7.0288:
+  https://english.news.cn/20251231/d55adf458b384452b9c936aff80e901f/c.html
+- Market cap and PE were reused exactly from config/input.json: Yahoo Finance yfinance, market-cap date 2026-08-03.
+
+4. Local source cache
+- Saved official filing to stock_report/data/raw/filings/UG/2025-12-31/ug20251231_10k.htm.
+- SEC Companyfacts was downloaded to a temporary research path for XBRL cross-checking.
+
+5. Model classification
+- Confirmed ordinary_operating / applicable.
+- Reason: the company manufactures specialty ingredients and medical products; no customer deposits, insurance reserves, regulated project cash, contract assets, concessions, or financial balance-sheet model exists.
+- No interest-bearing debt was reported at 2025-12-31.
+
+6. USD facts extracted and cross-checked
+- Total assets 13,108,579; total liabilities 1,876,567; stockholders' equity 11,232,012.
+- Revenue 10,545,468; cost of sales 5,404,328; gross profit derived 5,141,140.
+- Operating income 2,243,348; net income 2,105,738.
+- Operating cash flow 1,966,819; capex 58,995; operating FCF derived 1,907,824.
+- Financing cash flow -2,766,720; dividends paid 2,766,720.
+- Cash 1,251,097; marketable securities 7,322,646; accounts receivable 1,586,889; inventory 1,507,763; PP&E net 907,182.
+- Marketable securities: U.S. Treasury bills 6,544,683 and equity/other mutual funds fair value 777,963.
+- Shares outstanding 4,594,319.
+- 2025 dividends declared per share: 0.35 + 0.25 = USD 0.60.
+- Subsequent event: USD 0.25 per share declared 2026-01-26 and paid 2026-02-17.
+
+7. Currency conversion
+- All financial-statement amounts in result.json were converted at 7.0288 CNY/USD.
+- Ratios were calculated from the unrounded source facts and are dimensionless.
+- Market cap was already supplied in CNY and was not reconverted.
+
+8. Derived formulas
+- Gross margin = 5,141,140 / 10,545,468 = 0.4875212745.
+- Net margin = 2,105,738 / 10,545,468 = 0.1996817970.
+- Operating FCF = 1,966,819 - 58,995 = USD 1,907,824 = CNY 13,409,713.33.
+- Discounted detachable net cash:
+  50% * cash 1,251,097 + 100% * Treasury bills 6,544,683 + 80% * mutual funds 777,963
+  = USD 7,792,601.90 = CNY 54,772,640.23.
+- No interest-bearing debt deduction was required.
+- Sustainable cash profit:
+  [FCF 1,907,824 - (investment income and securities gain 399,667 * (1 - 20.3% effective tax rate))] * 90%
+  = USD 1,430,360.4609 = CNY 10,053,717.61.
+- Operating business price = 218,567,387.30 - 54,772,640.23 = CNY 163,794,747.06.
+- Owner earnback = 163,794,747.06 / 10,053,717.61 = 16.291958 years.
+- Market cap / cash profit = 218,567,387.30 / 10,053,717.61 = 21.739957.
+- Forecast dividend scenario = 4,594,319 shares * USD 0.50 * 7.0288 = CNY 16,146,274.69.
+- Forecast yield = 16,146,274.69 / 218,567,387.30 = 0.0738732109.
+
+9. Key interpretive evidence
+- 2025 sales fell 13%; largest cosmetic distributor ASI sales fell 54% because of reported Asian demand weakness and overstocking.
+- Cosmetic ingredient net sales fell 45%; pharmaceutical net sales rose 15%; medical lubricants rose 4%.
+- Lubrajel and Renacidin together were approximately 93% of sales.
+- Four largest customers represented approximately 74.5% of 2025 gross sales (derived from the 10-K customer table).
+- Receivable days rose from 45 to 52.
+- 2025 cash dividends exceeded operating FCF, so current dividends were not fully covered by current-year FCF.
+
+10. Protocol operations and validation
+- result.json was not hand-written from scratch. It was created with protocol init and populated using protocol set/append operations.
+- First completed validation result: status=ok, errors=[].
+- Final validation is run after report and trace creation; its output is reported in the final handoff.
+
+11. Limitations
+- Financial statements and valuation have different dates; this is explicit in result.json and report.md.
+- PE TTM was retained from the supplied market-data input even though it does not exactly reconcile to market cap divided by FY2025 net income.
+- The dividend forecast is a scenario based on the historical semiannual cadence and one declared 2026 dividend, not a company commitment.

@@ -1,0 +1,59 @@
+task=002372.SZ 伟星新材 2025-12-31 annual
+generated_at=2026-07-31T15:41:18+08:00
+
+[protocol]
+1. Read stock-research/SKILL.md.
+2. Read references/result-contract.md and report-contract.md in full.
+3. Read references/data-reuse.md.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields only through protocol set commands in outputs/populate.sh.
+6. Validated result.json; validator returned {"status":"ok","errors":[]}.
+
+[reuse_and_sources]
+- No annual facts package, normalized facts, raw filing metadata, or prior stock-research result existed locally for 002372.SZ/2025-12-31.
+- Downloaded official annual report PDF from:
+  https://static.cninfo.com.cn/finalpage/2026-04-03/1225076292.PDF
+- Browser-indexed annual-report text was used for page/line verification.
+- Official interim dividend implementation announcement:
+  https://static.cninfo.com.cn/finalpage/2025-10-23/1224725146.PDF
+- Market-cap and PE snapshot reused exactly from config/input.json.
+
+[key_extraction]
+- Annual report pp.74-76: consolidated balance sheet.
+- Annual report pp.79-80: consolidated income statement.
+- Annual report pp.82-83: consolidated cash-flow statement.
+- Annual report pp.10-20: business model, products, channels, margins, production/sales.
+- Annual report pp.26-27: bank wealth-management products and restricted cash.
+- Annual report p.159: annual dividend proposal and post-balance-sheet acquisition.
+
+[calculations]
+gross_profit=5,381,991,829.02-3,176,274,733.77=2,205,717,095.25
+gross_margin=2,205,717,095.25/5,381,991,829.02=0.4098328584
+net_margin=740,777,487.24/5,381,991,829.02=0.1376400245
+operating_free_cash_flow=1,178,385,378.88-248,505,025.23=929,880,353.65
+
+unrestricted_cash=1,184,520,355.48-90,347,494.14=1,094,172,861.34
+discounted_cash=1,094,172,861.34*0.70=765,921,002.94
+discounted_financial_assets=1,190,143,712.57*0.90=1,071,129,341.31
+financing_like_debt=599,670.37+2,963,919.01+6,440,582.44+3,043,484.33=13,047,656.15
+post_balance_sheet_acquisition=110,739,201.00
+discounted_net_cash=765,921,002.94+1,071,129,341.31-13,047,656.15-110,739,201.00=1,713,263,487.10
+
+discounted_cash_profit=684,311,685.47*0.90=615,880,516.92
+operating_business_price=13,851,000,000.00-1,713,263,487.10=12,137,736,512.90
+owner_earnback_years=12,137,736,512.90/615,880,516.92=19.7079403868
+market_cap_to_cash_profit=13,851,000,000.00/615,880,516.92=22.4897518584
+
+forecast_cash_dividend=157,186,798.80+550,153,795.80=707,340,594.60
+forecast_dividend_yield=707,340,594.60/13,851,000,000.00=0.0510678359
+
+[judgment_boundary]
+- Facts: reported financial statements, product/channel shares, announced dividends, restricted funds, acquisition consideration.
+- Inferences: classification as ordinary_operating and explanation of profit source.
+- Subjective estimates: 70% cash inclusion, 90% wealth-management inclusion, 90% sustainability factor for adjusted profit.
+- Free cash flow was used only as a cross-check because 2025 cash conversion benefited from receivable/inventory reduction and higher contract liabilities.
+
+[data_quality]
+status=complete
+limitations=local facts package absent; market snapshot not independently rechecked; dividend and owner-earnback figures include explicit assumptions.

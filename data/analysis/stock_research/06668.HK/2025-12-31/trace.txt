@@ -1,0 +1,59 @@
+stock-research trace
+company=06668.HK E-Star Commercial Management Company Limited / 星盛商业管理股份有限公司
+period=2025-12-31
+generated_at=2026-08-04T13:22:07+08:00
+
+[protocol]
+2026-08-04 initialized outputs/result.json with:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+[input audit]
+Input analysis_model_hint stated financial_brokerage. This was rejected after checking the audited annual report.
+Annual report pp.12-16 and p.74 identify the group as a commercial-property operations and subleasing business with entrusted management, brand/management output, and sublease models.
+Final model: ordinary_operating; owner_earnback_applicability=applicable.
+Lease liabilities and right-of-use investment properties were treated as paired operating items, not ordinary debt versus detachable property.
+
+[sources]
+Primary filing: HKEX, 2025 Annual Report, released 2026-04-22:
+https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0422/2026042200454.pdf
+Market snapshot: config/input.json; Tencent qt.gtimg.cn; timestamp 2026/08/03 09:20:05.
+No annual facts package or raw-filing metadata existed in the workspace at research time; research returned to the HKEX filing.
+
+[core extraction; annual report RMB'000 converted to absolute RMB]
+Revenue=582,898,000; cost_of_services=304,630,000; gross_profit=278,268,000.
+Net_profit=138,237,000; parent_net_profit=142,631,000.
+Total_assets=2,286,790,000; total_liabilities=1,014,913,000; total_equity=1,271,877,000; parent_equity=1,267,464,000; NCI=4,413,000.
+Operating_cash_flow=173,774,000.
+Capex=517,000 PPE + 70,457,000 leasehold improvements = 70,974,000.
+Operating_free_cash_flow=102,800,000.
+Cash=512,599,000; short-term deposits=830,835,000; restricted/pledged balances=10,086,000.
+Investment_properties=797,073,000; lease_liabilities=681,330,000.
+Operating_profit=null because audited statements do not disclose a consistent operating-profit subtotal.
+
+[derived metrics]
+gross_margin=278,268,000 / 582,898,000 = 0.4773871243.
+net_margin=142,631,000 / 582,898,000 = 0.2446928965.
+discounted_detachable_net_cash:
+  512,599,000 * 0.90
+  + 830,835,000 * 0.90
+  - 311,842,000 non-lease operating current liabilities
+  - 53,141,000 contracted capital commitments
+  = 844,107,600.
+restricted/pledged balances received a zero detachable value.
+discounted_sustainable_cash_profit=(173,774,000 - 70,974,000) * 0.90 = 92,520,000.
+operating_business_price=1,143,355,911.9570255 - 844,107,600 = 299,248,311.9570255.
+owner_earnback_years=299,248,311.9570255 / 92,520,000 = 3.2344175525.
+market_cap_to_cash_profit=1,143,355,911.9570255 / 92,520,000 = 12.3579324682.
+forecast_dividend=142,631,000 * 0.87 = 124,088,970.
+forecast_dividend_yield=124,088,970 / 1,143,355,911.9570255 = 0.1085304836.
+
+[judgment notes]
+The 10% cash haircut covers ordinary working-capital needs, RMB/HKD transfer and FX uncertainty, and the fact that consolidated cash cannot be assumed immediately distributable.
+All non-lease operating current liabilities and contracted capex were deducted to avoid treating tenant receipts, deposits, tax and project obligations as shareholder cash.
+The 10% FCF haircut reflects 9.6% revenue contraction, lower project count/GFA, and ECL expense rising to RMB8.026m.
+Related-party commercial-property and tenant-management revenue was RMB148.654m, about 25.5% of total revenue.
+
+[validation]
+Final command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Final status expected: ok, errors=[].

@@ -1,0 +1,67 @@
+CAAP stock-research trace
+generated_at=2026-08-05T01:26:28+08:00
+period=2025-12-31
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- config/input.json exists.
+- No local raw filing, annual facts, normalized facts, or prior stock-research outputs existed for CAAP/2025-12-31.
+- Therefore official public filings were required.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized successfully from task input.
+
+4. Official sources inspected
+- CAAP FY2025 Form 20-F, filed with SEC 2026-03-17:
+  https://www.sec.gov/Archives/edgar/data/1717393/000110465926029442/caap-20251231x20f.htm
+- CAAP FY2025 results, Exhibit 99.1, filed with SEC 2026-03-17:
+  https://www.sec.gov/Archives/edgar/data/1717393/000110465926028980/tm268957d1_ex99-1.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/1717393/000110465926029442/0001104659-26-029442-index.htm
+- 2025-12-31 USD/CNY central parity (CFETS announcement, reproduced by China Economic Net):
+  https://www.ce.cn/xwzx/gnsz/gdxw/202512/t20251231_2676993.shtml
+- Direct curl downloads from SEC returned HTTP 403; values were read from accessible SEC indexed web content. No unofficial source replaced core filing figures.
+
+5. Model decision
+- Input hint ordinary_operating/applicable was overridden.
+- Confirmed model: utility_concession / requires_special_model.
+- Basis: 52 airport concessions; tariff and investment obligations governed by concession contracts; $3.138bn concession intangible assets; $203.165m acquisition of concession intangible assets presented within operating cash flows.
+- Consequence: all ordinary owner-earnback ranking fields remain null.
+
+6. Currency conversion
+- All result.json money values are absolute CNY yuan.
+- USD/CNY=7.0288, date=2025-12-31.
+- For consistent display, the same closing conversion rate was applied to balance sheet, income statement, and cash flow amounts. This is a research translation, not the company's functional-currency translation policy.
+
+7. Core extraction (USD thousands unless stated)
+- Revenue 1,962,134; cost of services 1,272,363; gross profit 689,771; operating income 488,284.
+- Net income 257,719; attributable to parent 247,724; NCI 9,995.
+- Total assets 4,448,677; liabilities 2,787,929; equity 1,660,748; parent equity 1,586,579; NCI 74,169.
+- Cash 592,759; concession intangible assets 3,137,980; borrowings 1,095,218.
+- Operating cash flow 465,217.
+- Capital expenditure definition for this result: concession intangible acquisition 203,165 + PPE 16,708 + other intangible acquisition 2,004 = 221,877.
+- Operating FCF: 465,217 - 221,877 = 243,340.
+- Financing cash flow -234,664.
+- Dividend cash out 49,456, explicitly dividends to non-controlling interests in subsidiaries.
+
+8. Dividend forecast
+- Forecast cash dividend to CAAP common shareholders: CNY 0.
+- Basis: no common-shareholder cash dividend identified or announced; 2025 cash flow dividend was paid to subsidiary NCI; parent depends on constrained upstream dividends.
+
+9. Market data
+- Used task input unchanged: market cap CNY 28,383,770,319.29956 as of 2026-08-03; PE TTM 14.810345; source Yahoo Finance yfinance.
+
+10. Protocol mutation
+- outputs/result.json was initialized by CLI.
+- Values were populated with repeated protocol `set` and `append` commands; the complex result was not authored from scratch.
+
+11. Known limitations
+- No per-airport forecast cash flows, full concession-expiry schedule, or complete committed-capex schedule were available in the local inputs; no concession DCF/payback figure was fabricated.
+- Input market snapshot was not independently reconciled to an official NYSE historical close file.
+- Applying closing FX to income/cash-flow values sacrifices average-rate precision for one consistent CNY research presentation.

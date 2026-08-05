@@ -1,0 +1,72 @@
+stock-research trace
+company: 01033.HK / SINOPEC SSC
+period: 2025-12-31
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Also read references/data-reuse.md because the task required deciding whether existing annual facts could be reused.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated initialized paths using protocol set/append commands; did not construct the result JSON manually.
+
+2. Reuse check
+- No files existed under stock_report/data/analysis/annual_review/01033.HK/2025-12-31 or the normalized facts path.
+- No prior stock-research output existed for this period.
+- Downloaded the official HKEX English annual report to:
+  stock_report/data/raw/filings/01033.HK/2025-12-31/annual-report-2025-en.pdf
+- Official source URL:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042700587.pdf
+- Local pdftotext was unavailable. Figures were read from the HKEX-indexed PDF text and checked by statement/page references below.
+
+3. Model determination
+- Input hint said financial_brokerage, but this conflicts with the company's audited principal activities.
+- Annual report PDF p.171: principal activities are oil/gas prospecting, exploration, drilling, exploitation and general contracting/design/construction.
+- Annual report PDF p.15: five sectors are geophysics, drilling, logging/mud logging, downhole operations and engineering construction.
+- PDF p.71: receivables CNY11,174,568k, receivables financing CNY4,029,356k, contract assets CNY17,065,962k.
+- PDF p.72: short-term borrowings CNY28,311,044k, accounts payable CNY23,016,953k, contract liabilities CNY7,617,701k.
+- Conclusion: statement_model=construction_project; owner_earnback_applicability=requires_special_model.
+
+4. Financial extraction (all source amounts RMB thousand, multiplied by 1,000 in result.json)
+- Balance sheet, PDF pp.71-72:
+  total assets 77,254,593; total liabilities 67,988,891; parent equity 9,254,404; minority interest 11,298; total equity 9,265,702.
+- Income statement, PDF p.75:
+  revenue 80,712,178; cost of sales 74,158,853; operating profit 1,228,560; net profit 660,048; parent net profit 658,841.
+- Calculations:
+  gross profit = 80,712,178 - 74,158,853 = 6,553,325.
+  gross margin = 6,553,325 / 80,712,178 = 0.08119.
+  net margin = 658,841 / 80,712,178 = 0.008163.
+- Cash flow, PDF p.170:
+  operating cash flow 6,645,946; purchases of PPE/intangibles/other non-current assets 2,763,820; financing cash flow -2,835,109; share repurchase cash out 41,560.
+  operating free cash flow = 6,645,946 - 2,763,820 = 3,882,126.
+- Management capital expenditure disclosure, PDF p.15: actual completed capex CNY3.45bn; used only as a limitation because it differs from cash-paid capex.
+
+5. Asset and operating evidence
+- PDF p.112 Note 5.2.5: top-five receivables plus contract assets CNY18,705,427k, 62.62% of relevant closing balance; provisions CNY673,335k.
+- PDF p.155 capital management: net debt CNY25,499,815k; shareholders' equity CNY9,265,702k; debt-to-capital 73.35% versus 69.82% in 2024.
+- PDF pp.129-130 Note 5.36: revenue and cost; six reported segments.
+- PDF p.156: external segment revenue supports business mix.
+- PDF p.186: largest customer revenue CNY46,260,427k, approximately 57% of revenue.
+
+6. Dividend treatment
+- PDF p.40: cash dividend per 10 shares = 0; cash dividend amount = 0; repurchases counted under distribution rules = CNY41,965k.
+- PDF p.129: consolidated retained earnings = CNY-21,925,671k.
+- Forecast cash dividend set to zero because no forward dividend commitment was identified and the latest declared annual dividend is zero. This is a conservative scenario, not company guidance.
+
+7. Market snapshot
+- Used input values without modification:
+  market cap CNY10,437,598,407.381176;
+  date 2026/07/31 16:08:45;
+  source Tencent qt.gtimg.cn;
+  PE TTM 15.76.
+- Limitation recorded: market snapshot was not independently reproduced.
+
+8. Owner earnback handling
+- Because applicability is requires_special_model, discounted net cash, discounted cash profit, operating business price, owner earnback years and market-cap-to-cash-profit were all kept null as required by result-contract.md.
+- Alternative lens stated: backlog/order quality, project settlement, receivable/contract-asset impairment, net debt, debt service, maintenance capex and dividends.
+
+9. Validation
+- Ran:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation output: {"status":"ok","errors":[]}

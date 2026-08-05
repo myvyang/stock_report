@@ -1,0 +1,64 @@
+stock-research trace
+company=00393.HK GLORIOUS SUN
+period=2025-12-31
+generated_for_input=config/input.json
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because no existing annual facts package was present.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields through protocol `set`; result.json was not authored from a blank object.
+
+[source acquisition]
+- No pre-existing files were found under the supplied annual_review, normalized facts, or raw filing paths.
+- Downloaded official HKEX annual report:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0422/2026042201187.pdf
+- Local source:
+  stock_report/data/raw/filings/00393.HK/2025-12-31/annual_report_2025.pdf
+- Extracted local text for research:
+  stock_report/data/raw/filings/00393.HK/2025-12-31/annual_report_2025.txt
+- Market cap and PE reused exactly from config/input.json / Tencent qt.gtimg.cn.
+- Conversion rate: HKD 1 = CNY 0.8983 at 2025-12-31, based on the CFETS/PBOC central parity publication (Xinhua reproduction located during source check).
+
+[model audit]
+- Input hint: financial_brokerage / requires_special_model.
+- Annual-report evidence: operating segments are financial investments, interior decoration and renovation, apparel export, and retail/franchise; financial investments are the group's own treasury assets. There are no brokerage customer funds, margin balances, or repo liabilities. Year-end bank borrowings are nil.
+- Override: statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+- Double-count control: investment assets are treated as detachable only after investment-segment income and bank interest are removed from sustainable core profit.
+
+[currency and formulas]
+- All HKD financial-statement amounts were multiplied by 0.8983 to produce absolute CNY amounts in result.json.
+- Reported gross margin = HKD 223.318m / HKD 976.676m = 22.8651%.
+- Reported parent net margin = HKD 75.176m / HKD 976.676m = 7.6971%.
+- Operating free cash flow = HKD 138.291m operating cash flow - HKD 2.310m cash PPE purchases = HKD 135.981m.
+- Forecast dividend = HKD 147.026m * 0.8983 = CNY 132.0734558m.
+- Forecast dividend yield = CNY 132.0734558m / CNY 1,729.203009m = 7.6378%.
+
+[owner earnback judgments]
+- Cash: 80% of HKD 1,204.208m.
+- Listed FVOCI bank shares: 70% of HKD 2,039.439m.
+- FVTPL assets: 50% of HKD 12.029m.
+- Unlisted FVOCI equity and Stage 3 debt: 0%.
+- Lease liabilities: deducted at 100%.
+- Discounted detachable net cash = HKD 2,380.0782m = CNY 2,138.02424706m.
+- Core pre-tax profit used for two-year midpoint:
+  2025: HKD 29.354m (operating segments excluding financial investments, plus unallocated income, less corporate expense and non-lease finance cost).
+  2024: HKD 54.639m on the same basis.
+- Two-year midpoint HKD 41.9965m; apply 16.3% tax, deduct two-year average cash PPE purchases HKD 2.3735m, then apply a 30% sustainability haircut.
+- Discounted sustainable cash profit = HKD 22.94429935m = CNY 20.610864106105m.
+- Operating business price = CNY 1,729.203009m - CNY 2,138.024247m = CNY -408.821238m.
+- Owner earnback years = -408.821238 / 20.610864 = -19.8352 years. Interpretation records that a negative result denotes asset coverage, not a literal negative recovery period.
+- Market cap / discounted cash profit = 83.8976 years.
+
+[data limitations]
+- Market-cap date and financial-statement date differ.
+- PE TTM was not independently recalculated.
+- Cash/investment haircuts and the 30% sustainable-profit haircut are analytical judgments, not audited facts.
+- Forecast dividend is a flat baseline based on the 2025 declared/proposed annual distribution, not management guidance.
+
+[validation]
+Command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Final status after all three outputs were written: ok, errors=[]

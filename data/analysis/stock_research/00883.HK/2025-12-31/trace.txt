@@ -1,0 +1,63 @@
+stock-research trace
+generated_at=2026-08-03T14:04:02+08:00
+company=00883.HK CNOOC
+period=2025-12-31
+
+[protocol]
+1. Initialized outputs/result.json using:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated scalar fields with protocol set and array fields with protocol append.
+3. Final validation command and result are recorded at the end of this file.
+
+[source acquisition]
+- Existing annual facts package and normalized facts were absent under the input-declared paths.
+- Downloaded the official audited annual report from:
+  https://www.cnoocltd.com/english/investorrelations/reports/annualreport/material/e00883-2025AnnualResults-en.pdf
+- Local source: stock_report/data/raw/filings/00883.HK/2025-12-31/annual-report-2025.pdf
+- Extracted text locally to annual-report-2025.txt for reproducible page/term lookup.
+- Official annual-results release:
+  https://www.cnoocltd.com/english/presscenter/pressreleases/2026/202603/t20260326_120621.html
+- Market snapshot came from config/input.json: Tencent qt.gtimg.cn, 2026/07/31 16:08:45.
+
+[model verification]
+- Input hint said financial_brokerage/requires_special_model.
+- Annual report pp.2 and 84 states the group principally explores, develops, produces and sells crude oil and natural gas.
+- Overrode hint with ordinary_operating/applicable.
+- Oil and gas depletion, recurring development capex and dismantlement provision are explicitly included in owner-earnback assumptions.
+
+[audited financial anchors: RMB million]
+- Annual report pp.78-79: revenue 398,220; operating profit 169,593; net profit 122,148; parent net profit 122,082.
+- Annual report pp.80-81: assets 1,098,559; liabilities 293,375; equity 805,184; parent equity 802,750; NCI 2,434.
+- Annual report p.83: CFO 209,042; cash capex 111,555; financing CF -85,983; dividends paid 60,432.
+- Derived operating FCF = 209,042 - 111,555 = 97,487.
+
+[derived gross margin]
+- IFRS presentation is by nature and does not disclose statutory gross profit.
+- Analytical cost of sales = operating expense 40,273 + taxes other than income tax 18,194 + DD&A 79,771 + special oil gain levy 2,044 + crude oil/product purchases 47,646 = 187,928.
+- Analytical gross profit = 398,220 - 187,928 = 210,292.
+- Analytical gross margin = 210,292 / 398,220 = 52.8077%.
+- This limitation is explicitly disclosed in result.json and report.md.
+
+[owner earnback]
+- Discounted positive assets (RMB million): cash 78,679*95%=74,745.05; term deposits 136,016*90%=122,414.4; other financial assets 25,998*70%=18,198.6; debt investment 9,305*60%=5,583; associates/JV 45,819*30%=13,745.7.
+- Full deductions: total interest-bearing debt including leases 69,800; dismantlement provision 116,039.
+- Discounted detachable net cash = 48,847.9 million.
+- Sustainable cash profit = CFO 209,042 - cash capex 111,555 - cycle/maintenance buffer 7,487 = 90,000 million.
+- Operating business price = market cap 974,000.264125 - discounted net cash 48,847.9 = 925,152.364125 million.
+- Owner earnback = 925,152.364125 / 90,000 = 10.2795 years.
+- Market cap/cash profit = 974,000.264125 / 90,000 = 10.8222x.
+
+[dividend]
+- 2025 parent net profit 122,082 million; declared payout ratio approximately 45%.
+- Baseline forecast = 122,082*45% = 54,936.9 million.
+- Forecast yield = 54,936.9 / 974,000.264125 = 5.6403%.
+- Company policy says expected annual payout ratio for 2025-2027 is no less than 45%, subject to approval and conditions; forecast is not guaranteed.
+
+[quality notes]
+- Core financials are audited and source-resolved.
+- Market cap is an input-provided third-party snapshot and was not independently reconstructed.
+- Owner-earnback values are disclosed assumptions, not reported GAAP/IFRS measures.
+
+[validation]
+Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Result: status=ok; errors=[]

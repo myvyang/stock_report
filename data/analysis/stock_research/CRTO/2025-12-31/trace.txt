@@ -1,0 +1,60 @@
+[2026-08-04] task input
+- Read config/input.json: CRTO, annual period 2025-12-31, market cap CNY 7,398,072,895.691162 dated 2026-08-03, PE TTM 10.244131.
+- Read AGENTS.md instructions supplied in task context.
+
+[2026-08-04] skill and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely as explicitly requested.
+- Read references/data-reuse.md because the skill routes source reuse decisions through that reference.
+
+[2026-08-04] local reuse audit
+- Checked configured raw filing, annual facts, normalized facts, and prior research paths.
+- No CRTO 2025 filing metadata, annual facts, normalized facts, or prior research files existed locally.
+- Decision: retrieve official filing because all key financial and business fields were absent.
+
+[2026-08-04] primary sources
+- SEC filing: Criteo S.A. Form 10-K for year ended 2025-12-31, filed 2026-02-26, accession 0001576427-26-000014.
+  URL: https://www.sec.gov/Archives/edgar/data/1576427/000157642726000014/crto-20251231.htm
+- Federal Reserve G.5A annual FX: 2025 USD/CNY average 7.1875 CNY per USD.
+  URL: https://www.federalreserve.gov/releases/g5a/current/
+- 2025-12-31 USD/CNY reference: 6.997165237 CNY per USD; used for balance sheet translation.
+  URL: https://www.xe.com/currencytables/?date=2025-12-31&from=CNY
+- Market data source retained from input: Yahoo Finance yfinance.
+
+[2026-08-04] model determination
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: advertising technology operating platform; no customer deposits, insurance reserves, regulated presale cash, concession rights, or project financing structure that would make balance-sheet funding the product itself.
+- Special analytical handling: gross/net advertising revenue presentation; recurring equity compensation treated as shareholder economic cost.
+
+[2026-08-04] audited USD facts (thousands)
+- Assets 2,201,207; liabilities 1,015,478; equity 1,185,729; parent equity 1,149,210; NCI 36,519.
+- Revenue 1,944,901; traffic acquisition cost 770,284; other cost of revenue 125,237; gross profit 1,049,380; operating income 202,765; net income 149,379; parent net income 144,602.
+- Operating cash flow 311,237; acquisition of intangible assets/property/equipment 102,739; operating FCF 208,498; financing cash flow -151,476; treasury stock repurchases 152,064.
+- Equity awards compensation add-back in cash flow: 57,848.
+- Cash 342,038; current securities 23,242; noncurrent securities 23,500; current financial liabilities 11,360.
+
+[2026-08-04] translations and formulas
+- Balance sheet CNY = USD thousands * 1,000 * 6.997165237.
+- Income/cash flow CNY = USD thousands * 1,000 * 7.1875.
+- Gross margin = 1,049,380 / 1,944,901 = 0.539557.
+- Parent net margin = 144,602 / 1,944,901 = 0.074349.
+- Operating FCF = (311,237 - 102,739) * 1,000 * 7.1875 = CNY 1,498,579,375.
+- Sustainable distributable cash profit = (311,237 - 102,739 - 57,848) * 1,000 * 7.1875 = CNY 1,082,796,875.
+- Discounted detachable net cash = [342,038*70% + (23,242+23,500)*90% - 11,360] * 1,000 * 6.997165237 = CNY 1,890,175,033.04.
+- Operating business price = 7,398,072,895.691162 - 1,890,175,033.04 = CNY 5,507,897,862.65.
+- Owner earnback years = 5,507,897,862.65 / 1,082,796,875 = 5.086732.
+- Market cap / cash profit = 7,398,072,895.691162 / 1,082,796,875 = 6.832374.
+- Discounted net cash / market cap = 0.255496.
+- Forecast dividend = zero because company states it has never paid and does not currently anticipate cash dividends. Buybacks analyzed separately.
+
+[2026-08-04] protocol operations
+- Initialized outputs/result.json using:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields using repeated protocol `set` operations; the result object was not hand-written from scratch.
+- First validation command returned status=ok with errors=[].
+
+[2026-08-04] limitations
+- No local annual fact pack existed; analysis was reconstructed from the SEC filing.
+- Market cap and PE were accepted from task input and not independently rebuilt from price and diluted share count.
+- FX translations introduce presentation differences and do not represent Criteo's functional-currency accounting.
+- Cash discounts and equity-compensation adjustment are explicit analytical judgments, not reported GAAP line items.

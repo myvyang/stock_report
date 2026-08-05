@@ -1,0 +1,74 @@
+Stock research trace — GASS — period 2025-12-31
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because no annual facts were present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked raw filing, annual review, normalized facts, prior stock-research and outputs paths.
+- No GASS source files or prior research artifacts existed, so official public sources were required.
+
+3. Primary sources
+- SEC Form 20-F filed 2026-04-28, accession 0001193125-26-183385:
+  https://www.sec.gov/Archives/edgar/data/1328919/000119312526183385/d66975d20f.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/1328919/000119312526183385/0001193125-26-183385-index.htm
+- Company FY2025 results release dated 2026-03-02:
+  https://www.stealthgas.com/investor-relations-mainmenu-99/449-stealthgas-inc-reports-fourth-quarter-and-twelve-months-2025-financial-and-operating-results.html
+- SAFE 2025-12-31 exchange-rate table and ECB cross-rate reference.
+- Market cap and PE: accepted directly from config/input.json (Yahoo Finance yfinance).
+
+4. Model decision
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: revenue comes from ordinary chartering/transport operations using owned vessels; there are no customer financial balances or regulated funds. Vessels are operating assets, not detachable cash.
+- Shipping-specific handling: depreciation used as a proxy for maintenance/replacement capital reserve because current-year acquisition cash flow was abnormally low.
+
+5. Currency
+- Filing currency: USD; protocol output currency: CNY absolute yuan.
+- Translation rate: USD 1 = CNY 7.00, approximately the 2025-12-31 official cross-rate.
+- Market cap was already supplied in CNY and was not retransformed.
+
+6. Key extracted USD facts
+- Assets 711,690,128; liabilities 21,363,518; equity 690,326,610.
+- Cash 99,077,831; claims receivable 61,697,544; assets held for sale 24,945,022.
+- Vessels, net 491,413,817; JV investments 23,467,353; bank debt zero.
+- Revenue 173,161,478; operating income 55,132,949; net income 60,648,616.
+- Operating cash flow 85,182,679; vessel acquisition/improvement cash outflow 412,428.
+- Depreciation 25,252,476; financing cash flow -87,309,052; repurchase 1,784,712.
+- Fleet utilization 96.7%; operational utilization 91.8%; TCE/day 15,022.
+
+7. Analytical definitions
+- Analytical cost of sales = voyage expense + related voyage expense + vessel operating expense + related vessel operating expense + drydock + related management fee = USD 84,492,204.
+- Analytical gross profit = USD 88,669,274; gross margin = 51.2061%.
+- Reported operating free cash flow = OCF - reported vessel acquisition/improvement cash outflow = USD 84,770,251.
+- Sustainable pre-haircut cash profit = OCF - depreciation proxy = USD 59,930,203.
+- Discounted sustainable cash profit = 80% of preceding amount = USD 47,944,162.4 = CNY 335,609,136.8.
+
+8. Detachable cash calculation
+- Cash: CNY 693,544,817 x 80% = 554,835,853.6.
+- Insurance claim: CNY 431,882,808 x 80% = 345,506,246.4.
+- Held-for-sale vessels: CNY 174,615,154 x 90% = 157,153,638.6.
+- Less all liabilities: CNY 149,544,626.
+- Discounted detachable net cash = CNY 907,951,112.6.
+- Operating business price = CNY 2,238,287,031.3782043 - 907,951,112.6 = 1,330,335,918.7782042.
+- Owner earnback = 3.963944 years; market-cap/cash-profit = 6.669327 years.
+
+9. Dividend forecast
+- Forecast cash dividend = 0; forecast yield = 0%.
+- Basis: no common dividend since Q1 2009 and no announced/stable dividend policy.
+
+10. Protocol operations and validation
+- Populated initialized result using repeated protocol `set` commands; result was not handwritten from an empty JSON object.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+
+11. Limitations retained in result/report
+- Valuation date differs from reporting date.
+- Shipping gross margin is an analytical, not reported, subtotal.
+- Insurance claim and vessel sale proceeds are not all collected at report date.
+- Single-year cash-profit base is not a full-cycle fleet model.

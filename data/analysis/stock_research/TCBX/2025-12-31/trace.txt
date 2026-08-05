@@ -1,0 +1,52 @@
+TCBX stock-research trace
+Generated for period: 2025-12-31
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No TCBX annual facts, normalized facts, raw filing package, or prior stock-research result existed under stock_report.
+- Used the SEC filing as the primary source.
+
+3. Protocol initialization
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Primary evidence reviewed
+- SEC 2025 Form 10-K, accession 0001193125-26-091656:
+  https://www.sec.gov/Archives/edgar/data/1781730/000119312526091656/tcbx-20251231.htm
+- SEC 2026-02-02 Form 8-K, Keystone completion:
+  https://www.sec.gov/Archives/edgar/data/1781730/000119312526033737/tcbx-20260201.htm
+- SEC Exhibit 99.1, merger completion release:
+  https://www.sec.gov/Archives/edgar/data/1781730/000119312526033737/tcbx-ex99_1.htm
+- 2025-12-31 RMB central parity: USD 1 = CNY 7.0288, published under PBOC authorization by CFETS.
+- Market cap, date, PE TTM: config/input.json (Yahoo Finance yfinance).
+
+5. Model decision
+- Input hint ordinary_operating/applicable was overridden.
+- Confirmed financial_bank/requires_special_model because deposits fund loans and securities; these balances are the operating model and are constrained by liquidity and regulatory capital.
+- All ordinary owner-earnback fields remain null.
+
+6. Currency method
+- All 2025 USD statement amounts were multiplied by 1,000 (filing unit) and 7.0288 CNY/USD.
+- Ratios remain in reported/original-currency terms.
+
+7. Key checks
+- Assets: USD 5,340.759m; liabilities: USD 4,809.732m; equity: USD 531.027m.
+- Balance equation holds: 5,340.759 = 4,809.732 + 531.027 (USD millions).
+- Net income: USD 66.291m; income available to common: USD 61.541m.
+- NIM: 4.06%; ACL/loans: 1.00%; NPA/assets: 0.56%.
+- Bank CET1: 12.23%; total capital: 13.14%; well-capitalized status confirmed.
+- Forecast common dividend: zero; forecast yield = 0 / CNY 4,922,391,651.085327 = 0.
+
+8. Data limitation
+- 2026-08-03 valuation reflects post-Keystone shares/business while FY2025 financial statements are substantially pre-merger.
+- Bank gross margin, net margin, operating cash flow, capex, and ordinary free cash flow are not economically comparable and remain null.
+
+9. Protocol population and validation
+- outputs/result.json was populated through protocol set commands in fill_result.sh after initialization.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok; errors: []

@@ -1,0 +1,74 @@
+stock-research trace
+company=688550.SH 瑞联新材
+period=2025-12-31
+generated_for=2026-07-31 task input
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated the initialized result with protocol `set` commands; no complex result JSON was created from scratch.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Initial populated validation status: ok, errors: []
+
+[reuse audit]
+- stock_report/data/raw/filings/688550.SH/2025-12-31: absent
+- stock_report/data/analysis/annual_review/688550.SH/2025-12-31: absent
+- stock_report/data/normalized/facts/688550.SH/2025-12-31: absent
+- stock_report/data/analysis/stock_research/688550.SH/2025-12-31: absent
+- /root/aicode/stock_report paths for 688550.SH: absent
+- Conclusion: no local filing, annual facts package, normalized facts, or prior research result was reusable.
+
+[sources]
+S1 瑞联新材2025年年度报告公告文本（报告披露日2026-04-24；报告内列明交易所披露网址为 sse.com.cn）
+   https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12172874&stockid=688550
+   Used for business, model classification, financial statements, product/geography data, cash flow, dividends, audit matters, and risks.
+S2 Tencent qt.gtimg.cn input snapshot, timestamp=20260731114344
+   Used only for market_cap=6492000000.0 and pe_ttm=21.12.
+
+[key extracted facts, CNY]
+revenue=1676255333.84
+cost_of_sales=923641442.54
+gross_profit=752613891.30
+operating_profit=357531710.83
+net_profit=parent_net_profit=309280422.25
+operating_cash_flow=344595762.31
+capital_expenditure=85362999.31
+operating_free_cash_flow=259232763.00
+total_assets=3649419062.17
+total_liabilities=360464694.07
+total_equity=parent_equity=3288954368.10
+cash=633805263.59
+restricted_cash=1558000.00
+trading_financial_assets=511635182.65 (mainly bank wealth-management products)
+interest_bearing_debt_at_2025_year_end=0
+inventory_book_value=519375589.91
+inventory_gross=604328138.34
+inventory_write_down_allowance=84952548.43
+forecast_cash_dividend=156459994.20 (proposal at annual-report date)
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Manufacturing/straight-sale operating structure; no bank deposits, insurance reserves, regulated presale cash, construction contract assets, concession rights, or comparable special-model balance-sheet structure.
+
+[calculations]
+gross_margin=(1676255333.84-923641442.54)/1676255333.84=0.44898523280215114
+net_margin=309280422.25/1676255333.84=0.18450674906518813
+operating_free_cash_flow=344595762.31-85362999.31=259232763.00
+discounted_cash=(633805263.59-1558000.00)*0.90+511635182.65*0.90=1029494201.616
+discounted_cash_profit=259232763.00*0.90=233309486.70
+operating_business_price=6492000000.00-1029494201.616=5462505798.384
+owner_earnback_years=5462505798.384/233309486.70=23.413131954672462
+market_cap_to_cash_profit=6492000000.00/233309486.70=27.825700925516628
+discounted_net_cash_to_market_cap=1029494201.616/6492000000.00=0.15857889735304992
+forecast_dividend_yield=156459994.20/6492000000.00=0.02410043040665434
+
+[judgment boundaries]
+- Facts are attributed to S1/S2.
+- Haircuts (90% cash and bank products; 90% of single-year FCF) are analyst judgments, not company guidance.
+- Inventory, receivables, production assets, and long-term investments are excluded from detachable cash.
+- Dividend amount was a proposal at annual-report publication and could change with approval/share count.
+- No buy/sell recommendation or target price produced.

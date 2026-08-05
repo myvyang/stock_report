@@ -1,0 +1,64 @@
+00376.HK Yunfeng Financial 2025 stock research trace
+
+Task input
+- Read config/input.json.
+- Requested period: 2025-12-31 annual report.
+- Market snapshot reused from input: CNY 5,622,456,267.293693 at 2026/07/31 16:08:41; PE TTM 10.02; source Tencent qt.gtimg.cn.
+
+Required instructions and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md in full.
+- Read references/report-contract.md in full.
+- Read references/data-reuse.md in full because an annual fact pack was available for reuse.
+
+Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields with repeated protocol `set` commands; the result was not handwritten from an empty JSON object.
+- First shell wrapper attempt failed before mutation because an environment assignment was stored as a command string.
+- Second batch populated fields through asset_analysis and then stopped at owner_earnback.interpretation because a JSON string lacked surrounding JSON quotes.
+- Corrected the string encoding, completed all remaining fields, and validated successfully.
+
+Reused local sources
+- stock_report/data/analysis/annual_review/00376.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/00376.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/00376.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/00376.HK/2025-12-31/metadata.json
+- stock_report/data/raw/filings/00376.HK/2025-12-31/2025-annual-report.txt
+- Primary filing URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042300993.pdf
+
+Additional verification from filing text
+- Financial highlights and owners' group embedded value equity: annual report pp.6-7.
+- Insurance embedded value, VNB and APE: pp.14-15.
+- Solvency ratio: p.27.
+- Embedded value movement: p.41.
+- Dividend decision: p.77 and Note 47(d).
+- Consolidated statements: pp.183-189.
+- Segment results: Note 16 p.331.
+- Investments and pledges: Note 23 pp.348-350.
+- Cash, fixed deposits and segregated client balances: Note 26 pp.357-360.
+
+Model determination
+- Overrode input hint financial_brokerage with financial_insurance.
+- Evidence: 2025 insurance segment profit HKD 1,578.889m; other financial services and corporate segment loss HKD 179.033m.
+- owner_earnback_applicability remains requires_special_model.
+- Ordinary detachable cash and cash-profit ranking fields remain null because investments match insurance/investment contract liabilities and regulatory capital.
+
+Currency conversion
+- Result contract requires absolute CNY yuan.
+- Converted HKD financial-statement values at 1 HKD = CNY 0.90322, the 2025-12-31 RMB central parity published by CFETS under PBOC authority.
+- Verification URL: https://www.news.cn/fortune/20251231/447f7a38619042819be2410bb026481d/c.html
+- Market cap was already supplied in CNY and was not reconverted.
+
+Important judgments
+- Gross profit and gross margin are null because the insurer's presentation has no comparable cost-of-sales/gross-profit construct.
+- OCF and capex are reported as facts, but their difference is not used as sustainable distributable cash profit.
+- Forecast listed-company dividend is zero: no dividend in 2025 or 2024 and no predetermined payout ratio.
+- YF Life's HKD 300m shareholder dividend is not treated as a listed-company shareholder dividend.
+- Market cap / owners' group embedded value equity of approximately 0.37x is reported only as an insurance-specific reference, not liquidation value or immediate distributable cash.
+- Data quality marked complete because all special-model minimum fields, dividend forecast, business narrative, asset/liability explanations and evidence are present; ordinary-model fields are intentionally null under the contract.
+
+Final checks
+- Re-run protocol validation after report and trace creation.
+- Confirm special-model ordinary owner-earnback fields are null.
+- Confirm outputs/result.json, outputs/report.md and outputs/trace.txt exist and are non-empty.

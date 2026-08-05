@@ -1,0 +1,71 @@
+stock-research trace
+generated_at: 2026-08-03T16:58:42+08:00
+company: ALI HEALTH (00241.HK)
+input_period: 2025-12-31
+financial_period_used: year ended 2025-03-31
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- Expected annual facts, normalized facts, prior research and filing metadata were absent.
+- Downloaded official HKEX FY2025 annual report to:
+  stock_report/data/raw/filings/00241.HK/2025-12-31/fy2025-annual-report.pdf
+- Official filing URL:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2025/0710/2025071000289.pdf
+
+3. Protocol initialization
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Model override
+- Input hint: financial_brokerage / requires_special_model.
+- Filing evidence: annual report pp.117 and 154-155 identifies pharmaceutical direct sales, pharmaceutical e-commerce platform, and healthcare/digital services.
+- Decision: ordinary_operating / applicable.
+- Reason: no brokerage customer funds, securities inventory financing, or repo liabilities; inventory, receivables, payables and contract liabilities are retail/platform operating items.
+
+5. Core audited facts (RMB)
+- Revenue: 30,598,292,000
+- Cost of sales: 23,166,201,000
+- Gross profit: 7,432,091,000
+- Parent net profit: 1,432,427,000
+- Operating cash flow: 1,395,033,000
+- Capex (property/equipment plus intangibles): 18,903,000
+- Operating free cash flow: 1,376,130,000
+- Total assets: 21,178,417,000
+- Total liabilities: 4,865,257,000
+- Parent equity: 16,312,179,000
+- Sources: FY2025 annual report pp.108-116.
+
+6. Owner earnback calculations
+- Cash and bank deposits: 2,218,296,000 x 90% = 1,996,466,400
+- Short-term time deposits: 5,617,926,000 x 90% = 5,056,133,400
+- Long-term time deposits: 4,152,413,000 x 90% = 3,737,171,700
+- Less lease liabilities: 35,515,000 x 100% = 35,515,000
+- Discounted detachable net cash = 10,754,256,500
+- Discounted sustainable cash profit = OCF 1,395,033,000 - capex 18,903,000 = 1,376,130,000
+- Operating business price = market cap 49,957,044,859.28237 - 10,754,256,500 = 39,202,788,359.28237
+- Owner earnback years = 39,202,788,359.28237 / 1,376,130,000 = 28.4877071
+- Market cap / cash profit = 49,957,044,859.28237 / 1,376,130,000 = 36.3025622
+- Discounted net cash / market cap = 10,754,256,500 / 49,957,044,859.28237 = 0.2152700691
+
+7. Dividend
+- FY2025 board recommendation: nil; FY2024 comparator: nil.
+- Forecast cash dividend: 0.
+- Forecast dividend yield: 0.
+- Source: annual report pp.24 and 166.
+
+8. Data limitations
+- Input requests annual period 2025-12-31, but company fiscal year ends March 31. Used latest audited annual filing available by the input date: FY2025 ended 2025-03-31.
+- Market snapshot date 2026-07-31 is about 16 months after the financial statement date.
+- Cash haircut and sustainable-profit choice are analyst assumptions, not company guidance.
+- Company industry-position language lacks independent market-share verification.
+
+9. Protocol operations
+- Initialized result with protocol CLI.
+- Populated fields using repeated protocol `set` commands; did not hand-write the complete JSON from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial populated validation status: ok, errors: []

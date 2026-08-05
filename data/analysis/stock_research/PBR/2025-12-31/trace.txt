@@ -1,0 +1,90 @@
+stock-research trace v1
+company=PBR / Petróleo Brasileiro S.A. - Petrobras ADS
+period=2025-12-31
+generated_for_task=2026-08-04 Asia/Shanghai
+
+[protocol]
+init: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+population: all result fields were populated through protocol set/append commands; result.json was not hand-written.
+validate: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validate_result={"status":"ok","errors":[]}
+
+[local reuse]
+Checked stock_report/data/analysis/annual_review/PBR/2025-12-31, normalized facts, raw filing metadata and prior stock-research paths.
+No pre-existing PBR filing/facts/research package was present. Downloaded the official 2025 20-F PDF and SEC iXBRL HTML to stock_report/data/raw/filings/PBR/2025-12-31 for reproducibility.
+
+[primary sources]
+1. Petrobras Annual Report and Form 20-F 2025, official PDF:
+   https://petrobras.com.br/documents/2677942/17808296/FORM%2B20F%2B2025%2BEN.pdf/3b6371b3-900d-ae05-294d-f9acd9d8b26e?download=true&t=1777312960000&version=1.0
+2. SEC iXBRL filing, accession 0001292814-26-002168:
+   https://www.sec.gov/Archives/edgar/data/1119639/000129281426002168/pbrform20f_2025.htm
+3. Petrobras Management Report 2025:
+   https://petrobras.com.br/documents/2677942/17808296/Management%2BReport%2B2025.pdf/c8e4fe18-0baa-3988-e5a0-ea18bc3a8041?download=true&t=1777312966000&version=1.0
+4. Official 2025 production/operating release (2026-02-10):
+   https://agencia.petrobras.com.br/w/produ%C3%A7%C3%A3o-de-petr%C3%B3leo-e-g%C3%A1s-da-petrobras-cresce-11-e-alcan%C3%A7a-3-milh%C3%B5es-de-barris-em-2025
+5. Official 2025 proved-reserves release:
+   https://agencia.petrobras.com.br/en/w/petrobras-aumenta-reservas-provadas-em-2025
+6. Official 2025 AGM shareholder remuneration announcement (2026-04-16):
+   https://agencia.petrobras.com.br/w/institucional/petrobras-informa-sobre-remunera%C3%A7%C3%A3o-aos-acionistas-16-04-2026
+7. PBOC/CFETS USD/CNY central parity announcement, 2025-12-26, USD 1 = CNY 7.0358:
+   https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+8. Valuation snapshot: config/input.json; Yahoo Finance yfinance, market cap CNY 843,639,706,257.4688 on 2026-08-03, PE TTM 6.1198735.
+
+[financial extraction]
+20-F presentation currency is USD million. Consolidated Statements of Financial Position, 2025:
+assets=222337; liabilities=146446; equity=75891; parent_equity=75565; NCI=326.
+cash=6471; financial investments included in adjusted cash=2729; adjusted_cash=9200.
+PP&E=168040; inventories=8210; current+non-current trade/other receivables=4627+851=5478; judicial deposits=14814.
+finance debt=2186+24255=26441; lease liabilities=10037+33315=43352; decommissioning=2950+25563=28513; employee benefits=3805+15367=19172; trade payables=7442.
+
+Consolidated Statements of Income, 2025:
+revenue=89195; cost_of_sales=46736; gross_profit=42459; operating_profit=26113; consolidated_net_income=19720; parent_net_income=19634.
+gross_margin=42459/89195=0.4757979707.
+net_margin=19634/89195=0.2201244464.
+
+Consolidated Statements of Cash Flows and FCF reconciliation, 2025:
+OCF=36047; acquisition of PP&E/intangibles=19521; equity acquisition=-2 (cash inflow in the presentation); company-policy FCF=16528; financing cash flow=-17406; cash dividends paid to Petrobras shareholders=8114; lease principal repayments=9409.
+
+[currency conversion]
+Protocol requires absolute CNY. All USD statement values were multiplied by 1,000,000 and by 7.0358.
+The same closing reference rate was used for balance sheet, income and cash-flow display consistency. This is an approximation: IAS 21 USD income/cash-flow presentation used Petrobras average-rate translation from BRL, while balance sheet used closing rates. No false precision about underlying BRL/CNY translation should be inferred.
+
+[analysis model]
+statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+Reason: exploration/production, refining, logistics and fuel sales are ordinary operating activities with identifiable operating assets and cash flow. Nevertheless this is capital-intensive and cyclical; leases, decommissioning and minimum liquidity must be treated explicitly.
+
+[owner earnback]
+Company Business Plan 2026-30 minimum cash balance=USD 6bn. Adjusted cash=USD 9.2bn.
+Potential excess cash=(9.2-6.0)*7.0358=CNY 22.51456bn.
+80% haircut value=CNY 18.011648bn.
+Finance debt=26.441*7.0358=CNY 186.0335878bn.
+Lease liabilities=43.352*7.0358=CNY 305.0160016bn.
+discounted_detachable_net_cash=18.011648-186.0335878-305.0160016=-CNY 473.0379414bn.
+
+Company-policy FCF=16.528*7.0358=CNY 116.2877024bn.
+Less lease principal=9.409*7.0358=CNY 66.1574422bn.
+Subtotal=CNY 50.1302602bn.
+10% cycle/execution/maintenance classification buffer => discounted sustainable cash profit=CNY 45.07907418bn.
+operating business price=market cap - discounted net cash=CNY 1,316.677647657bn.
+owner earnback years=1,316.677647657/45.07907418=29.2082.
+market cap/cash profit=843.639706257/45.07907418=18.7147.
+
+Interpretive note: Petrobras shareholder-policy FCF excludes lease repayments because they are classified as financing cash flows. Business Plan 2026-30 projects lease cash outlays of about USD 9-10bn annually, so they were treated as recurring economic cash costs for owner analysis. The 10% buffer is analyst judgment, explicitly separated from facts.
+
+[dividend]
+2025 approved shareholder remuneration=BRL 41.23575bn; 20-F equivalent disclosure=USD 7.507bn.
+For CNY protocol consistency, used USD 7.507bn * 7.0358 = CNY 52.8177906bn.
+Forecast/reference yield=52.8177906/843.639706257=0.062606.
+This is the latest complete-year approved reference, not a forecast guarantee. The policy can change and distribution depends on FCF, debt limits and financial sustainability.
+
+[operating evidence]
+2025 own oil/gas production=2.99mmboed, +about 11%; pre-salt share=82%.
+SEC proved reserves=12.1bn boe; additions=1.7bn boe; reserve replacement=175%; R/P=12.5 years.
+Brent average 2025=USD69.06/bbl versus USD80.76 in 2024.
+Management CAPEX=USD20.319bn, +22%, 84% to E&P.
+Business Plan 2026-30: USD109bn target portfolio, minimum cash USD6bn, gross debt ceiling USD75bn converging toward USD65bn; projected annual leases USD9-10bn.
+
+[quality]
+status=complete.
+Core identity, period, model, market snapshot, three statements, asset/liability explanations, owner-earnback bridge, dividend basis, business story, risks and primary-source evidence are present.
+Limitations are recorded in result.json: supplied market-cap construction was not independently rebuilt; CNY conversion is approximate; sustainable cash profit includes analytical adjustments.

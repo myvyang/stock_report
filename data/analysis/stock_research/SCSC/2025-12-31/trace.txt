@@ -1,0 +1,67 @@
+2026-08-05 stock-research trace for SCSC
+
+1. Read skill and required contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Inspected configured reuse paths. No raw filing, annual facts, normalized facts, or prior research result existed in the workspace for SCSC/2025-12-31.
+
+3. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Resolved reporting period:
+   - Input research snapshot: 2025-12-31.
+   - ScanSource fiscal year end: June 30.
+   - Annual base filing: FY2025 Form 10-K, period ended 2025-06-30, filed 2025-08-21, SEC accession 0000918965-25-000029.
+   - The 2025-12-31 10-Q was filed in February 2026 and was not available at the requested snapshot date, so it was not used for annual core figures.
+
+5. Primary sources retrieved/checked:
+   - SEC Form 10-K HTML and filing index.
+   - SEC Companyfacts API for CIK 0000918965, cross-checking XBRL values.
+   - PBOC 2025 Q2 Monetary Policy Report for 2025-06-30 USD/CNY central parity of 7.1586.
+   - Market cap and PE were retained from config/input.json as explicitly supplied.
+
+6. Model determination:
+   ordinary_operating / applicable. The company buys and distributes technology products and earns net supplier commissions. Receivables, inventory, and payables are operating working capital, not customer or regulated funds.
+
+7. Core USD facts from FY2025 10-K:
+   assets 1,785,606,000; liabilities 879,197,000; equity 906,409,000;
+   revenue 3,040,810,000; cost of sales 2,632,164,000; gross profit 408,646,000;
+   operating income 85,200,000; net income 71,548,000;
+   operating cash flow 112,349,000; capex 8,286,000; operating FCF 104,063,000;
+   financing cash flow -110,905,000; repurchases 106,524,000;
+   cash 126,157,000; interest-bearing debt 136,149,000.
+
+8. Currency conversion:
+   All filing amounts multiplied by 7.1586 CNY/USD. This is a presentation conversion; flow items were not translated at an annual-average rate. Market cap was already supplied in CNY.
+
+9. Owner earnback assumptions and formulas:
+   discounted detachable net cash = cash * 50% - interest-bearing debt
+   = CNY 451,553,750.1 - CNY 974,636,231.4 = CNY -523,082,481.3.
+
+   sustainable cash profit = net income + D&A - capex - share-based compensation
+   = CNY 512,183,512.8 + 216,153,927.0 - 59,316,159.6 - 79,188,433.2
+   = CNY 589,832,847.0.
+
+   operating business price = market cap - discounted detachable net cash
+   = CNY 8,288,510,890.55.
+
+   owner earnback years = operating business price / sustainable cash profit
+   = 14.0523 years.
+
+   market cap / cash profit = 13.1655x.
+
+10. Dividend forecast:
+    Forecast cash dividend 0 and yield 0. The 10-K states the company has never declared or paid a cash dividend and its credit facility restricts cash dividends. Repurchases are described separately.
+
+11. Populated result sections using protocol CLI set commands.
+
+12. Final protocol validation:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Result: {"status":"ok","errors":[]}
+
+13. Independent consistency checks passed:
+    - Balance sheet balances within floating-point tolerance.
+    - Operating business price equals market cap minus discounted detachable net cash.
+    - Owner earnback years equals operating business price divided by sustainable cash profit.

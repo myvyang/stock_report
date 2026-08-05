@@ -1,0 +1,90 @@
+stock-research trace
+company: OneSpan Inc. (NASDAQ: OSPN; CIK 0001044777)
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because no annual facts package or prior research result existed.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked config/input.json and the configured raw filing, annual review, normalized facts, and stock research paths.
+- No reusable OSPN 2025 filing, facts package, normalized facts, or prior stock research output existed at task start.
+
+3. Primary sources retrieved/read
+- SEC Form 10-K, accession 0001044777-26-000008, filed 2026-02-26:
+  https://www.sec.gov/Archives/edgar/data/1044777/000104477726000008/ospn-20251231.htm
+- SEC company facts API for CIK 0001044777:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0001044777.json
+- OneSpan FY2025 earnings release, dated 2026-02-26:
+  https://investors.onespan.com/news-releases/news-release-details/onespan-reports-fourth-quarter-and-full-year-2025-financial
+- Federal Reserve H.10 exchange-rate release containing 2025-12-31:
+  https://www.federalreserve.gov/releases/h10/20260105/
+- Market capitalization and PE were supplied in config/input.json from Yahoo Finance yfinance; no independent primary-market reconstruction was available in the input.
+
+4. Filing identity and model check
+- 10-K fiscal year ended 2025-12-31; consolidated statements audited by KPMG LLP.
+- Business consists of Cybersecurity and Digital Agreements software/services plus Digipass hardware.
+- Customer contract liabilities, receivables, cloud costs, R&D, inventory, and leases are ordinary operating items.
+- 10-K states no debt outstanding at 2025-12-31.
+- Classification confirmed: ordinary_operating; owner earnback applicability: applicable.
+
+5. Source USD facts used
+- Revenue: 243,180,000
+- Gross profit: 179,354,000
+- Operating income: 48,446,000
+- Net income attributable to parent: 72,904,000
+- Income tax benefit: 23,542,000; deferred tax benefit: 30,382,000
+- Operating cash flow: 59,454,000
+- Capital expenditure: 8,959,000
+- Share-based compensation: 11,196,000
+- Common dividends paid: 18,460,000
+- Share repurchases: 13,142,000
+- Total assets: 397,702,000
+- Total liabilities: 125,859,000
+- Parent stockholders' equity: 271,843,000
+- Cash and cash equivalents: 70,499,000
+- Accounts receivable: 55,999,000
+- Contract assets current: 18,269,000
+- Inventory: 10,466,000
+- Goodwill: 103,840,000
+- Intangible assets excluding goodwill: 9,741,000
+- Contract liabilities: 74,180,000
+- Operating lease liabilities: 8,401,000
+- Shares outstanding: 37,361,000
+- ARR: 186,900,000; NRR: 104%
+
+6. Currency conversion
+- Result contract requires CNY absolute yuan.
+- Income-statement and cash-flow facts converted at 2025 Federal Reserve annual average 7.1875 CNY/USD.
+- Balance-sheet facts converted at 2025-12-31 Federal Reserve daily rate 6.9931 CNY/USD.
+- This creates a translation difference if converted CNY statement subtotals are recombined; source USD statements remain internally consistent.
+- Input market cap 3,872,594,147.829895 treated as CNY because the protocol initializer places it in a CNY result. This assumption is disclosed as a limitation.
+
+7. Calculations
+- Gross margin = 179,354,000 / 243,180,000 = 0.7375359816.
+- Net margin = 72,904,000 / 243,180,000 = 0.2997943910.
+- Operating FCF = (59,454,000 - 8,959,000) * 7.1875 = CNY 362,932,812.50.
+- Conservative cash profit = (59,454,000 - 8,959,000 - 11,196,000) * 7.1875 = CNY 282,461,562.50.
+- Discounted detachable cash = 70,499,000 * 6.9931 * 50% = CNY 246,503,278.45.
+- 50% cash recognition reflects operating needs, acquisition activity, repurchases, and the Q1 2026 cash decline to USD 49.8m.
+- Operating business price = 3,872,594,147.829895 - 246,503,278.45 = CNY 3,626,090,869.38.
+- Owner earnback years = 3,626,090,869.38 / 282,461,562.50 = 12.8374665823.
+- Market cap / cash profit = 3,872,594,147.829895 / 282,461,562.50 = 13.7101632999.
+- Forecast annual dividend = 0.52 USD/share * 37,361,000 shares * 7.1875 = CNY 139,636,737.50.
+- Forecast dividend yield = 139,636,737.50 / 3,872,594,147.829895 = 0.0360576740.
+
+8. Judgment boundaries
+- Facts: filing figures, segment descriptions, ARR/NRR, dividend declaration, no-debt statement.
+- Inference: software mix improvement is the main economic driver of higher consolidated gross margin.
+- Judgment: 50% cash discount and subtraction of share-based compensation from owner cash profit. These are conservative analytical choices, not company guidance.
+- No target price, buy/sell advice, or leaderboard label produced.
+
+9. Protocol operations and validation
+- outputs/result.json was initialized by protocol CLI and populated with protocol set/append commands; it was not authored from a blank JSON object.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed-result validation status: ok; errors: [].

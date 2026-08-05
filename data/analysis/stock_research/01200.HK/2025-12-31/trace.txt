@@ -1,0 +1,79 @@
+stock-research trace
+company: 01200.HK Midland Holdings Limited
+period: 2025-12-31
+generated context date: 2026-08-03 Asia/Shanghai
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Expected annual-review, normalized-facts, and raw-filing directories contained no reusable facts or filing at task start.
+- Only stock_report/data/notes/user_stock_evaluations.md existed; it did not provide company facts used here.
+- Therefore fetched the official HKEX annual report.
+
+3. Primary source acquired
+- Midland Holdings Limited Annual Report 2025.
+- HKEX publication date: 2026-04-29.
+- URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042900740.pdf
+- Local PDF: stock_report/data/raw/filings/01200.HK/2025-12-31/annual-report-2025.pdf
+- Local extracted text: stock_report/data/raw/filings/01200.HK/2025-12-31/annual-report-2025.txt
+- PDF text extraction used pypdf in an isolated /tmp virtual environment because pdftotext was unavailable.
+
+4. Model override
+- Input hint: financial_brokerage / requires_special_model.
+- Annual report pp.69 and 96 and notes 6-7 show property agency is the operating business.
+- 2025 agency fee revenue HK$5,482.680m / total revenue HK$5,498.926m = 99.70%.
+- No broker client money, proprietary securities inventory, or repo financing appeared in the balance sheet.
+- Final model: ordinary_operating / applicable.
+
+5. Core source locations and extracted HKD values
+- Income statement, PDF p.91: revenue 5,498,926k; operating profit 497,429k; attributable profit 422,682k.
+- Balance sheet, PDF p.93: assets 4,698,867k; liabilities 3,295,185k; equity 1,403,682k; cash and bank 999,455k.
+- Cash flow, PDF p.95: OCF 540,076k; PPE purchases 8,915k; lease principal 256,046k; financing cash flow -256,203k.
+- Notes 6-7, PDF pp.118-121: commission split 2,078,292k; revenue less commission split 3,420,634k.
+- Note 23, PDF p.138: receivables/contract assets/other receivables 3,250,028k; trade and contract assets net 3,101,910k; allowance 146,877k.
+- Note 28, PDF p.145: trade/other payables 2,965,772k; commission-related payables 2,694,665k.
+- Dividend, PDF pp.69, 91, 130: HK$0.09/share, HK$64.521m aggregate, including HK$0.03 special dividend.
+- Contingent liabilities, PDF p.149: Competition Commission proceeding unresolved; no provision because amount not reliably estimable.
+
+6. Currency convention
+- Result-contract requires absolute CNY yuan.
+- Applied a uniform research conversion HKD 1 = CNY 0.918 to statement and dividend values.
+- This is a disclosed approximation, not a claim that one rate is the accounting translation method for all flow and stock items.
+
+7. Derived metrics
+- Gross-profit proxy = revenue - direct commission split = HK$3,420.634m.
+- Gross-margin proxy = 3,420.634 / 5,498.926 = 62.2055%.
+- Net margin = 422.682 / 5,498.926 = 7.6866%.
+- Lease-adjusted 2025 economic FCF = 540.076 - 8.915 - 256.046 = HK$275.115m.
+- Same 2024 reference = 644.595 - 8.392 - 295.917 = HK$340.286m.
+
+8. Owner earnback assumptions
+- Starting cash: HK$999.455m.
+- Less restricted cash: HK$2.236m.
+- Less declared dividend: HK$64.521m.
+- Less operating buffer: HK$300.000m (research judgment).
+- Residual cash: HK$632.698m = CNY580.817m.
+- 70% inclusion gives discounted detachable cash CNY406.572m.
+- Sustainable cash-profit anchor: HK$300.000m, between 2025 and 2024 lease-adjusted FCF.
+- 80% inclusion gives discounted sustainable cash profit CNY220.320m.
+- Operating business price = CNY1,393.841m - CNY406.572m = CNY987.269m.
+- Owner earnback = 987.269 / 220.320 = 4.4811 years.
+- Market cap / cash profit = 1,393.841 / 220.320 = 6.3264.
+- Dividend yield = (HK$64.521m * 0.918) / CNY1,393.841m = 4.2494%.
+
+9. Protocol population and validation
+- Populated initialized JSON via protocol CLI set commands in populate_result.sh; did not construct result.json from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].
+
+10. Limitations
+- Market cap and PE are accepted from the supplied Tencent snapshot and were not independently reconstructed.
+- Absolute industry market share is not disclosed or independently verified.
+- Currency conversion and owner-earnback haircuts are explicit research conventions.
+- The annual report is the primary evidence; later 2026 operations are not treated as audited 2025 facts.

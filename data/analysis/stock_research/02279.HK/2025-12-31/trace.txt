@@ -1,0 +1,54 @@
+stock-research trace
+company: 02279.HK / YONGHE MEDICAL
+period: 2025-12-31 annual
+generated: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill identifies it as the reuse boundary.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse decision
+- No annual facts, normalized facts, metadata, or prior stock-research outputs existed for 02279.HK/2025-12-31.
+- Downloaded the official HKEX 2025 annual report and final-dividend announcement into stock_report/data/raw/filings/02279.HK/2025-12-31/.
+- Primary annual-report URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0416/2026041600388.pdf
+- Dividend URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0331/2026033101155.pdf
+
+3. Model correction
+- Input hint said financial_brokerage.
+- Annual report shows revenue from hair transplant and medical hair-care services and a leased clinic network; no brokerage client funds, proprietary trading assets, or repo financing.
+- Overrode model to ordinary_operating / applicable.
+
+4. Core extracted facts (RMB)
+- Revenue 1,808,333,000; cost of sales/services 614,096,000; gross profit 1,194,237,000.
+- Operating profit 118,617,000; net profit 73,562,000; parent net profit 73,711,000.
+- Total assets 1,701,840,000; liabilities 914,466,000; equity 787,374,000; parent equity 788,055,000.
+- Operating cash flow 495,529,000; capex 18,897,000; financing cash flow -215,560,000.
+- Cash equivalents 698,993,000; term deposit 50,181,000; restricted cash 1,331,000; bank borrowings nil.
+- Lease liabilities 484,673,000; contract liabilities 259,738,000.
+- Lease principal paid 164,830,000; ROU depreciation 126,476,000; PPE depreciation 112,496,000; intangible amortization 4,704,000.
+- 2025 final dividend RMB0.076/share, approximately RMB40,000,000 total.
+
+5. Calculations
+- Gross margin = 1,194,237,000 / 1,808,333,000 = 0.6604076793.
+- Parent net margin = 73,711,000 / 1,808,333,000 = 0.0407618508.
+- Reported operating FCF = 495,529,000 - 18,897,000 = 476,632,000; not used directly as sustainable profit due to contract-liability growth and lease classification.
+- Adjusted cash profit = 73,711,000 + 126,476,000 + 112,496,000 + 4,704,000 - 18,897,000 - 164,830,000 = 133,660,000.
+- Discounted sustainable cash profit = 133,660,000 * 80% = 106,928,000.
+- Discounted detachable cash = 698,993,000 * 60% + 50,181,000 * 100% + 1,331,000 * 0% = 469,576,800.
+- Operating business price = 1,102,517,470.7442522 - 469,576,800 = 632,940,670.7442522.
+- Owner earnback = 632,940,670.7442522 / 106,928,000 = 5.9193164629 years.
+- Market cap / cash profit = 1,102,517,470.7442522 / 106,928,000 = 10.3108397309.
+- Dividend yield = 40,000,000 / 1,102,517,470.7442522 = 0.0362806042.
+
+6. Protocol writes and validation
+- All result fields were populated through repeated protocol `set` commands; the initialized JSON was not replaced with a hand-written object.
+- Initial completed result validation returned status=ok and no errors.
+- Final precision correction and validation performed after report creation.
+
+7. Limitations
+- HKEX annual report is the primary source; company-claimed industry leadership was not independently verified.
+- Market cap and PE are accepted from config/input.json and were not reconstructed from shares and FX.
+- Cash and sustainable-profit discounts are analyst assumptions, explicitly separated from reported facts.

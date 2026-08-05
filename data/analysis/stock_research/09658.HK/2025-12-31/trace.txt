@@ -1,0 +1,71 @@
+stock-research trace — 09658.HK — period 2025-12-31
+
+1. Read required skill and contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit:
+   - Checked paths specified in config/input.json.
+   - No raw filing metadata, annual facts package, normalized facts, or prior stock-research outputs existed in the workspace.
+   - Public primary-source research was therefore required.
+
+3. Protocol initialization:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Model verification:
+   - Input hint said financial_brokerage.
+   - SUPER HI audited 2025 results and Form 20-F identify the business as overseas Haidilao restaurant operations, delivery, and other restaurant/food business.
+   - Balance sheet contains restaurant PP&E, right-of-use assets, working capital, lease liabilities, and no bank borrowings.
+   - Overrode hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+5. Primary sources used:
+   - SUPER HI audited annual-results announcement dated 2026-03-31, company IR/HKEX exhibit.
+     Key evidence: revenue, expense-by-nature income statement, balance sheet, cash composition, no bank borrowing, operating KPIs, final dividend.
+   - SUPER HI Form 20-F filed 2026-04-13, SEC/company IR.
+     Key evidence: operating cash flow, investing/financing cash flow, PP&E cash purchases, business and risk context.
+   - PBOC end-December 2025 central parity materials.
+     Translation convention: all USD financial amounts multiplied by 7.03 CNY/USD. This is an analytical near-year-end translation for comparison to CNY market cap, not a statutory translation.
+   - Market snapshot was taken as provided in config/input.json: Tencent qt.gtimg.cn, 2026/08/03 09:36:47.
+
+6. Key original-currency facts (USD'000 unless stated):
+   - Revenue 840,755; raw materials and consumables 282,818; operating income 37,434.
+   - Net profit 36,338; parent net profit 36,429.
+   - Total assets 745,883; total liabilities 354,239; equity 391,644; parent equity 390,102.
+   - Bank balances and cash 271,990; pledged deposits 2,793; no bank borrowings.
+   - Operating cash flow 114,648; PP&E purchases 53,200; operating FCF 61,448; financing cash flow (51,035).
+   - 126 Haidilao restaurants, 14 countries, 32.0m guests, turnover 3.9/day, restaurant-level operating margin 8.7%.
+   - No 2025 dividend and no recommended final dividend.
+
+7. Gross-margin treatment:
+   - IFRS statement uses expense-by-nature presentation and does not report gross profit.
+   - result.json cost_of_sales uses raw materials and consumables only; gross_profit=revenue-raw materials, gross_margin=66.36%.
+   - This is explicitly flagged as a food-cost contribution proxy, not complete restaurant gross margin. Restaurant-level operating margin is used for operational interpretation.
+
+8. Owner earnback assumptions and formulas:
+   - Time deposits USD127.4m × 90%.
+   - Cash equivalents USD144.59m less USD80m operating reserve; excess × 50%.
+   - Pledged deposits × 0%.
+   - Discounted detachable cash = CNY1,033,093,650.
+   - Operating FCF = (USD114.648m - USD53.2m) × 7.03 = CNY431,979,440.
+   - Sustainable cash profit = operating FCF × 75% = CNY323,984,580.
+   - Operating business price = market cap - discounted detachable cash = CNY5,031,367,553.60.
+   - Owner earnback = operating business price / discounted cash profit = 15.53 years.
+   - Market cap / discounted cash profit = 18.72 years.
+   - Lease liabilities were not mechanically netted against cash because they match restaurant ROU assets and continuing lease operations.
+
+9. Dividend forecast:
+   - Baseline forecast dividend amount CNY0 and yield 0%, based on explicit 2025 non-payment/non-recommendation and retained-earnings rationale.
+   - This is a conservative continuation assumption, not a claim that future dividends are impossible.
+
+10. Protocol population and validation:
+    - result.json was initialized by protocol CLI and populated through repeated protocol set commands; it was not hand-written from scratch.
+    - Initial validation command:
+      PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    - Initial validation result: status=ok, errors=[]
+
+11. Output files:
+    - outputs/result.json
+    - outputs/report.md
+    - outputs/trace.txt

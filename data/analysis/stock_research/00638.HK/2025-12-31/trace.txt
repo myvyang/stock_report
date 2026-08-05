@@ -1,0 +1,66 @@
+stock-research trace
+company: FIBOCOM / Fibocom Wireless Inc. / 00638.HK
+period: 2025-12-31 annual
+generated_at: 2026-08-03T16:28:16+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated every structured field through protocol set/append commands in outputs/build_result.sh; the JSON was not hand-written from scratch.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: status=ok, errors=[]
+
+[reuse audit]
+- config/input.json existed.
+- No annual facts package, normalized facts, prior stock-research result, or raw filing metadata existed for 00638.HK/2025-12-31 at task start.
+- Downloaded the official annual report to stock_report/data/raw/filings/00638.HK/2025-12-31/annual-report-2025.pdf.
+- Core facts were therefore extracted from the official HKEX annual report rather than a third-party financial database.
+
+[model verification]
+- Input hint: financial_brokerage / requires_special_model.
+- Verified fact: 99.74% of revenue was wireless communication modules and applications; brokerage, customer deposits, insurance reserves and repurchase-financing lines were zero.
+- Override: ordinary_operating / applicable.
+- Reason: actual business is an IoT communication-module and solutions operating company with receivables, inventory, R&D and supply-chain funding.
+
+[official source]
+- Fibocom Wireless Inc. Annual Report 2025, HKEX release 2026-04-23:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042302300.pdf
+- Relevant annual report pages:
+  pp.21-28: business model, products, manufacturing and industry context
+  pp.37-43: product/geography/channel revenue, margins, customer/supplier concentration
+  pp.47-55: R&D, cash flow, liquidity, borrowings and leverage
+  p.106: dividend amount and distribution base
+  pp.172-173: H-share net proceeds, use and unutilised balance
+  pp.199-212: audited consolidated financial statements
+  pp.334-336: cash-flow reconciliation and restricted/non-equivalent cash composition
+- HKEX title search and AGM/dividend releases confirmed approval in May 2026:
+  https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=1000276933
+- Market snapshot source supplied by input: Tencent qt.gtimg.cn, 2026/07/31 16:08:44.
+
+[key calculations]
+- gross_profit = 6,987,612,096.68 - 5,842,540,055.04 = 1,145,072,041.64
+- gross_margin = 1,145,072,041.64 / 6,987,612,096.68 = 0.1638730909
+- net_margin = 347,040,640.51 / 6,987,612,096.68 = 0.0496651166
+- 2025 operating FCF = 353,307,653.06 - 217,922,946.27 = 135,384,706.79
+- 2024 operating FCF = 439,885,620.76 - 124,102,873.73 = 315,782,747.03
+- two-year FCF mean = 225,583,726.91; discounted sustainable cash profit rounded down to 220,000,000.
+- forecast dividend yield = 209,813,264.86 / 6,111,743,291.842937 = 0.0343295278
+- detachable net cash = 0: year-end liquid funds were offset conceptually by designated H-share proceeds, debt and operating liquidity needs; no unsupported cash deduction was taken.
+- operating business price = 6,111,743,291.842937 - 0 = 6,111,743,291.842937
+- owner earnback = 6,111,743,291.842937 / 220,000,000 = 27.78065133 years
+
+[judgment boundaries]
+- Fact: H-share unutilised proceeds were HKD2,395.30m at 2025-12-31 and had stated uses through 2029.
+- Judgment: discounted detachable net cash set to zero because no part was proven freely distributable after earmarks, debt and working-capital needs.
+- Fact: 2024 and 2025 operating FCF were RMB315.78m and RMB135.38m.
+- Judgment: sustainable cash profit set to RMB220m using their mean rounded down.
+- Scenario, not guidance: next dividend assumed equal to the approved FY2025 cash dividend.
+
+[limitations]
+- Market cap and PE TTM were accepted from the supplied Tencent snapshot and not independently reconstructed.
+- Only two years of comparable FCF were used for sustainable cash profit.
+- The H-share proceeds table is denominated in HKD; the zero detachable-cash conclusion uses a consolidated constraint test, not transaction-by-transaction FX conversion.
+- No independent 2025 industry-association market-share source was located; industry ranking was therefore not asserted as a current fact.

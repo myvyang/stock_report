@@ -1,0 +1,65 @@
+MWA stock research trace
+generated_at=2026-08-05T05:34:35+08:00
+input=config/input.json
+result=outputs/result.json
+report=outputs/report.md
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated each result section with protocol `set`; JSON was not constructed as an unvalidated file from scratch.
+3. Final validation command and result are recorded below after execution.
+
+[source selection]
+- No local raw filing, annual facts package, normalized facts, or prior MWA stock-research output existed under stock_report.
+- Primary filing: Mueller Water Products FY2025 Form 10-K, fiscal year ended 2025-09-30, SEC accession 0001350593-25-000066.
+  https://www.sec.gov/Archives/edgar/data/1350593/000135059325000066/mwa-20250930.htm
+- FX: Federal Reserve G.5A annual USD/CNY rate, 2025 = 7.1875 CNY per USD, available through FRED AEXCHUS.
+  https://fred.stlouisfed.org/series/AEXCHUS
+- Valuation snapshot: input.json, Yahoo Finance yfinance, market cap CNY 26,650,078,872.648926 at 2026-08-03, PE TTM 19.121212.
+
+[period mapping]
+- Requested period: 2025-12-31, annual.
+- Company fiscal year end: 2025-09-30.
+- Used FY2025 10-K because it was the latest completed annual filing available by requested period.
+
+[currency]
+- All filing USD amounts multiplied by 7.1875 and 1,000,000 to produce absolute CNY yuan.
+- The same annual-average FX was used for flow and balance-sheet values for protocol consistency; this is disclosed as a limitation.
+
+[model]
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Basis: manufacturer and seller of valves, hydrants, brass products, metering, leak detection, and pressure-control products. Working capital, production assets, and debt are ordinary manufacturing economics rather than a special financial-statement model.
+
+[key source facts, USD millions]
+- Revenue 1,429.7; cost of sales 913.0; gross profit 516.7; operating income 260.6; net income 191.7.
+- Total assets 1,838.9; liabilities 857.2; equity 981.7; cash 431.5; total debt 454.1.
+- Operating cash flow 219.3; capex 47.3; free cash flow 172.0; dividends 41.9; repurchases 15.0.
+- D&A 46.9; FY2026 capex guidance 60.0-65.0; midpoint 62.5.
+- Overseas cash: Israel 84.3, Canada 14.0, China 8.8; total 107.1.
+- Quarterly dividend declared 2025-10-23: USD 0.070/share.
+
+[formula audit]
+- gross_margin = 516.7 / 1,429.7 = 0.3614044905.
+- net_margin = 191.7 / 1,429.7 = 0.1340840736.
+- discounted net cash USD = 431.5 * 80% - 454.1 = -108.9 million.
+- discounted net cash CNY = -108.9m * 7.1875 = -782,718,750.
+- pre-haircut sustainable cash profit USD = 191.7 + 46.9 - 62.5 = 176.1 million.
+- discounted sustainable cash profit CNY = 176.1m * 90% * 7.1875 = 1,139,146,875.
+- operating business price CNY = 26,650,078,872.648926 - (-782,718,750) = 27,432,797,622.648926.
+- owner earnback years = 27,432,797,622.648926 / 1,139,146,875 = 24.0818793649.
+- market cap / cash profit = 26,650,078,872.648926 / 1,139,146,875 = 23.3947697681.
+- forecast dividend = 0.28 * 156,331,004 * 7.1875 = CNY 314,616,145.55.
+- forecast yield = 314,616,145.55 / 26,650,078,872.648926 = 0.01180544895.
+
+[judgment flags]
+- 80% cash recognition is an analyst haircut for overseas retention and operating liquidity, not a reported accounting measure.
+- Sustainable cash profit uses guided capex midpoint and a further 10% haircut; it is an analyst estimate, not company guidance.
+- No buy/sell recommendation or target price is produced.
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]
+json_parse=ok

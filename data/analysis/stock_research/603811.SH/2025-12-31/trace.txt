@@ -1,0 +1,87 @@
+stock-research trace
+company: 603811.SH 诚意药业
+period: 2025-12-31
+generated context date: 2026-07-31 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized structured output
+command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Local reuse check
+- config/input.json existed.
+- No annual facts, normalized facts, prior stock-research result, or raw filing was present for 603811.SH/2025-12-31.
+- Therefore returned to public annual-report disclosure.
+
+4. Source discovery and extraction
+- Located 2025 annual report disclosed 2026-04-24.
+- Primary disclosure identity: Zhejiang Chengyi Pharmaceutical Co., Ltd. 2025 Annual Report, SSE listed company code 603811.
+- Accessible full-text mirror used for extraction:
+  https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12157566&stockid=603811
+- Official SSE static PDF URL identified:
+  https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-24/603811_20260424_WK0G.pdf
+- Direct CLI download returned a 3.8KB access-block page, not a valid PDF. It was not used as evidence.
+- Audit report: Zhonghui CPAs, 中汇会审[2026]2072号, standard unmodified opinion.
+
+5. Key extracted facts (CNY yuan)
+- revenue 812,349,118.11
+- cost of sales 245,335,524.13
+- gross profit 567,013,593.98
+- parent net profit 195,116,716.86
+- recurring parent net profit 173,880,085.66
+- operating cash flow 280,389,678.78
+- capex 45,401,719.88
+- operating free cash flow 234,987,958.90
+- total assets 1,702,348,884.14
+- total liabilities 304,553,513.10
+- parent equity 1,390,465,065.30
+- cash and cash equivalents 217,113,850.99
+- interest-bearing debt 37,752,228.23
+- proposed cash dividend 98,191,296.00
+
+6. Model review
+- statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- Reason: pharmaceutical manufacturing and sales use ordinary operating assets and liabilities; no special financial, property-development, concession, or investment-holding balance-sheet model was identified.
+
+7. Owner earnback assumptions
+- discounted detachable net cash:
+  217,113,850.99 cash equivalents
+  less 37,752,228.23 interest-bearing debt
+  = 179,361,622.76
+- sustainable cash profit:
+  173,880,085.66 recurring parent net profit
+  x 90% subjective prudence factor
+  = 156,492,077.094
+- operating business price:
+  3,258,000,000.00 market cap
+  less 179,361,622.76 discounted net cash
+  = 3,078,638,377.24
+- owner earnback years:
+  3,078,638,377.24 / 156,492,077.094
+  = 19.6728066648
+- market cap to cash profit:
+  3,258,000,000.00 / 156,492,077.094
+  = 20.8189453453
+
+8. Result construction
+- outputs/result.json was initialized and populated through protocol CLI `set` operations.
+- Complex JSON was not written from scratch.
+
+9. Validation
+command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+result:
+{"status":"ok","errors":[]}
+
+10. Known limitations
+- No local annual fact pack was supplied.
+- The official SSE direct PDF download was access-blocked; extraction used the mirrored full text of the SSE-disclosed report.
+- Market cap and PE were taken from the provided Tencent snapshot.
+- The 10% sustainable-profit haircut is an explicit subjective estimate.
+- The 2025 dividend is a board proposal at annual-report date and was then subject to shareholder approval.

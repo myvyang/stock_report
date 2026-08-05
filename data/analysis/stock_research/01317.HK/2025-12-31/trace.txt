@@ -1,0 +1,58 @@
+stock-research trace
+company: China Maple Leaf Educational Systems Limited / 01317.HK
+task input period: 2025-12-31
+actual annual-report period used: 2025-08-31
+generated at: 2026-08-03T12:47:49+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No annual facts, normalized facts, prior stock-research outputs, or raw filing metadata existed under the paths in config/input.json.
+- Downloaded official HKEX annual report PDF:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2025/1219/2025121900583.pdf
+- Local evidence copy: stock_report/data/raw/filings/01317.HK/2025-12-31/annual-report-2025.pdf
+- Extracted text for research: stock_report/data/raw/filings/01317.HK/2025-12-31/annual-report-2025.txt
+
+3. Model correction
+- Input hint classified the company as financial_brokerage.
+- Official annual report states the group operates bilingual private schools and preschools in China and other Asia-Pacific countries.
+- Overrode model to ordinary_operating; owner earnback is applicable with full deduction of financing and related-party funding liabilities.
+
+4. Key annual-report evidence (RMB'000 in filing, converted to absolute RMB in result.json)
+- Annual report p.79: revenue 1,180,049; gross profit 583,848; profit attributable to owners 308,877.
+- Annual report pp.80-81: total assets 6,462,081; total equity 1,870,279; derived total liabilities 4,591,802.
+- Annual report pp.83-84: operating cash flow 335,320; financing cash flow -127,449; purchase of PPE 5,153.
+- MD&A p.21: disclosed capital expenditure 7,400; this amount is used in the free-cash-flow calculation.
+- Notes 25, 29 and 40: bank balances and cash 901,327; listed securities 12,106; borrowings 1,638,571; related-party amounts due 1,876,395; lease liabilities 23,017.
+- Note 41: bargain-purchase gain 190,841 from reconsolidation of Shanghai School.
+- MD&A pp.15 and 19: enrolment 8,385 versus 9,390; overseas revenue 62.2%.
+- Annual report pp.10 and 33: no dividends for FY2021-FY2025; no FY2025 recommendation.
+
+5. Owner-earnback calculations
+- discounted cash = 901,327,000 * 90% = 811,194,300
+- discounted listed securities = 12,106,000 * 50% = 6,053,000
+- financing liabilities = 1,638,571,000 + 1,876,395,000 + 23,017,000 = 3,537,983,000
+- discounted detachable net cash = 811,194,300 + 6,053,000 - 3,537,983,000 = -2,720,735,700
+- operating free cash flow = 335,320,000 - 7,400,000 = 327,920,000
+- discounted sustainable cash profit = 327,920,000 * 75% = 245,940,000
+- operating business price = 425,710,854.2180062 - (-2,720,735,700) = 3,146,446,554.218006
+- owner earnback years = 3,146,446,554.218006 / 245,940,000 = 12.7935535261
+- market cap / cash profit = 425,710,854.2180062 / 245,940,000 = 1.7309541116
+- forecast dividend = 0; forecast yield = 0
+
+6. Protocol actions
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields through repeated protocol set commands.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation result: status ok, errors [].
+
+7. Limitations
+- Market cap and PE TTM are taken from the Tencent snapshot supplied in config/input.json and were not independently cross-checked.
+- The disclosed capex of RMB7.4m differs from cash-flow PPE purchases of RMB5.153m; the higher company-designated capex figure is used.
+- Sustainable cash profit is a scenario estimate, not a reported IFRS measure.

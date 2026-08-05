@@ -1,88 +1,49 @@
 stock-research trace
+company=600551.SH 时代出版
+period=2025-12-31
+generated_at=2026-07-31T12:05:27+08:00
 
-Task:
-- Company: 600551.SH 时代出版
-- Period: 2025-12-31 annual
-- Required outputs: outputs/result.json, outputs/report.md, outputs/trace.txt
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Reused the existing 2025 annual research result only where supported by the same annual fact pack and filings.
+3. Populated and updated result fields with protocol set commands.
+4. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
 
-Protocol and contracts:
-- Read /workspace/.agents/skills/stock-research/SKILL.md
-- Read /workspace/.agents/skills/stock-research/references/result-contract.md
-- Read /workspace/.agents/skills/stock-research/references/report-contract.md
-- Initialized result skeleton with:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- Validated final result with:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-- Final validation status: ok
+[sources]
+- config/input.json: company identity; market cap CNY 4,753,000,000; quote time 20260731114336; Tencent qt.gtimg.cn; PE TTM 11.86.
+- stock_report/data/analysis/annual_review/600551.SH/2025-12-31/facts.json: three statements, segment data, asset/liability categories, three-year cash conversion and evidence locations.
+- stock_report/data/analysis/annual_review/600551.SH/2025-12-31/annual_facts.md: readable annual fact summary and disclosed gaps.
+- stock_report/data/raw/filings/600551.SH/2025-12-31/600551_2025_annual_report.pdf: primary annual filing.
+- stock_report/data/raw/filings/600551.SH/2025-12-31/600551_2025_annual_inquiry_reply.pdf: trade composition and operating-quality supplement.
+- stock_report/data/analysis/stock_research/600551.SH/2025-12-31/result.json and report.md: prior research reused after checking against the current annual fact pack; stale market data and derived valuation outputs were replaced.
 
-Primary reused data:
-- config/input.json
-- stock_report/data/analysis/annual_review/600551.SH/2025-12-31/facts.json
-- stock_report/data/analysis/annual_review/600551.SH/2025-12-31/annual_facts.md
-- stock_report/data/analysis/annual_review/600551.SH/2025-12-31/extraction_trace.txt
-- stock_report/data/raw/filings/600551.SH/2025-12-31/600551_2025_annual_report.txt
-- stock_report/data/raw/filings/600551.SH/2025-12-31/600551_2025_annual_inquiry_reply.txt
-- stock_report/data/notes/user_stock_evaluations.md was checked; no 600551.SH user note was present.
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Publishing, distribution and merchandise trade are operating businesses. Deposits, wealth-management products and investments are not customer funds, insurance reserves or concession-linked assets. Financing debt is small and the annual report says the main restricted-asset disclosure is not applicable. Ordinary owner earnback is therefore usable, subject to liquidity, ownership and execution haircuts.
 
-Core source facts:
-- 2025 annual report PDF source: https://pdf.dfcfw.com/pdf/H2_AN202604221821456051_1.pdf
-- 2025 annual inquiry reply PDF source: https://pdf.dfcfw.com/pdf/H2_AN202607131826931652_1.pdf
-- Market cap: 4,604,000,000 CNY from config/input.json / stock_report owner_earnback snapshot.
-- Market cap date: input date was blank; annual_review extraction_trace records quote_time=20260723161452, so result records 2026-07-23.
-- PE TTM: input was null; result uses market_cap / 2025 parent_net_profit = 11.235884938703377.
+[core calculations]
+gross_profit=6664247907.90-5848477720.30=815770187.60
+gross_margin=815770187.60/6664247907.90=0.12240994015738244
+net_margin=409758557.08/6664247907.90=0.061486091565450304
+operating_free_cash_flow=730457499.08-37494382.62=692963116.46
+discounted_detachable_net_cash=3908126049.922
+discounted_sustainable_cash_profit=213750000.00
+operating_business_price=4753000000.00-3908126049.922=844873950.078
+discounted_net_cash_to_market_cap=3908126049.922/4753000000.00=0.8222440677302756
+owner_earnback_years=844873950.078/213750000.00=3.952626666
+market_cap_to_cash_profit=4753000000.00/213750000.00=22.23625730994152
+forecast_dividend_yield=203416571.70/4753000000.00=0.04279793261098254
 
-Financial statement fields:
-- Total assets: 8,386,682,746.48
-- Total liabilities: 2,412,682,044.81
-- Total equity: 5,974,000,701.67
-- Parent equity: 5,924,498,018.47
-- Minority interest: 49,502,683.20
-- Revenue: 6,664,247,907.90
-- Cost of sales: 5,848,477,720.30
-- Gross profit: 815,770,187.60
-- Operating profit: 399,396,785.33
-- Parent net profit: 409,758,557.08
-- Deducted parent net profit: 320,556,659.88
-- Operating cash flow: 730,457,499.08
-- Capital expenditure: 37,494,382.62
-- Operating free cash flow: 692,963,116.46
+[judgment notes]
+- Retained CNY 600 million of necessary operating cash before applying a 90% haircut to remaining monetary funds.
+- Applied separate haircuts to traded financial assets, short- and long-dated deposits, fixed-income products and non-listed financial investments.
+- Started sustainable profit from deducted parent profit, removed interest income to avoid double counting cash assets, anchored pre-haircut profit at CNY 285 million, then applied a 75% quality factor for thin-margin trade, impairments and tax-refund effects.
+- Forecast dividend uses the disclosed 2025 distribution plan as a run-rate convention, not a promise for the 2026 fiscal year.
 
-Business interpretation:
-- News publishing revenue: 1,888,232,200.00, gross margin 35.81%.
-- Printing materials and cultural goods trading revenue: 4,276,588,100.00, gross margin 1.37%.
-- Inquiry reply states trading categories include textiles, wood pulp, plastic particles and printing paper products.
-- Interpretation: publishing is the higher-margin profit source; trading inflates revenue but has thin spread and working-capital/impairment risk.
-
-Owner earnback calculation:
-- Necessary operating cash retained: 600,000,000.00.
-- Monetary cash detachable amount: 3,372,827,532.29 - 600,000,000.00 = 2,772,827,532.29; haircut 90%; discounted 2,495,544,779.061.
-- Trading financial assets: 743,762,326.00; haircut 75%; discounted 557,821,744.50.
-- Current large-denomination deposits: 219,503,826.98; haircut 90%; discounted 197,553,444.282.
-- Short-term large-denomination deposits: 55,644,486.30; haircut 90%; discounted 50,080,037.67.
-- Principal-protected fixed-income securities wealth management: 91,554,863.01; haircut 80%; discounted 73,243,890.408.
-- Long-term large-denomination deposits and similar non-current assets: 783,257,531.41; haircut 70%; discounted 548,280,271.987.
-- Other non-current financial assets: 591,529,410.07; haircut 20%; discounted 118,305,882.014.
-- Short-term borrowings deducted: -32,704,000.00.
-- Tax/FX/dividend execution friction reserve deducted: -100,000,000.00.
-- Discounted detachable net cash: 3,908,126,049.922.
-- Operating business price: market cap 4,604,000,000.00 - discounted net cash 3,908,126,049.922 = 695,873,950.078.
-
-Profit denominator:
-- Starting point: 2025 deducted parent net profit 320,556,659.88.
-- Deduct interest income: 38,526,403.86.
-- Adjusted amount after interest removal: 282,030,256.02.
-- Rounded sustainable cash profit before quality discount: 285,000,000.00.
-- Quality haircut: 75%, reflecting low-margin trading, impairment/doubtful-debt risk, inventory markdown risk and 2025 tax refund uplift to operating cash flow.
-- Discounted sustainable cash profit: 213,750,000.00.
-- Owner earnback years: 695,873,950.078 / 213,750,000.00 = 3.2555506436397663.
-- Market cap to cash profit: 4,604,000,000.00 / 213,750,000.00 = 21.539181286549706.
-
-Dividend:
-- 2025 total cash dividend: 203,416,571.70.
-- Forecast dividend yield at 4,604,000,000.00 market cap: 4.418257421807124%.
-- 2024 dividend referenced in annual report: 271,222,095.60.
-- 2023-2025 cumulative cash dividend: 716,801,252.80.
-
-Data quality notes:
-- Final result status is complete because required fields, formulas, evidence, asset/liability rows, earnback rows and dividend basis are present.
-- Limitations retained in result: market cap date inferred from trace, PE inferred rather than provided, cash/deposit/financial-asset detachability depends on incomplete disclosures, and trading risk is handled by discount rather than fully itemized customer-level analysis.
+[limitations]
+- Monetary funds and long-dated deposits lack complete instrument-level maturity, ownership and early-withdrawal detail.
+- Non-current financial investments lack fully disclosed exit paths.
+- Trade customer concentration and item-level bad-debt/inventory impairment detail are not fully expanded.

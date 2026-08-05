@@ -1,0 +1,59 @@
+stock-research trace: 00116.HK / 2025-12-31 annual
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- Requested annual facts, normalized facts, filing metadata, and historical stock-research outputs were absent.
+- Downloaded the official 2025 annual report from HKEX to:
+  stock_report/data/raw/filings/00116.HK/2025-12-31/annual-report-2025.pdf
+- Extracted PDF text locally with pypdf in a temporary virtual environment; no project dependency files changed.
+
+3. Primary sources
+- Chow Sang Sang Holdings International Limited Annual Report 2025, HKEX release 2026-04-24:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042402286.pdf
+- PBOC/CFETS central parity announcement, 2025-12-26: HKD 1 = CNY 0.90486:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- Market cap CNY 6,720,672,238.015532 and PE TTM 4.55 at 2026/07/31 16:08:41 were reused from config/input.json, source Tencent qt.gtimg.cn.
+
+4. Model decision
+- Overrode input hint financial_brokerage -> ordinary_operating.
+- Evidence: continuing turnover HKD 22,446.181m; retail HKD 21,661.669m (~96.5%). Securities/futures broking ceased in May 2021 and is a discontinued operation with residual recovery activity.
+- Owner earnback applicability: applicable.
+- Jewellery inventory and bullion loans are operating working-capital assets/financing, not brokerage customer balances.
+
+5. Currency conversion
+- All HKD statement amounts multiplied by 0.90486 and by 1,000 because annual-report tables use HKD'000.
+- Limitation: closing/verified official rate used for all statements instead of an average income-statement rate, solely for protocol-wide CNY comparability.
+
+6. Key formulas
+- gross_margin = HKD 7,321.389m / HKD 22,446.181m = 0.3261752634.
+- net_margin = parent net profit HKD 1,717.461m / turnover HKD 22,446.181m = 0.0765146196.
+- 2025 operating FCF = operating cash flow HKD 613.353m - capex HKD 128.975m = HKD 484.378m.
+- 2024 operating FCF = HKD 1,776.106m - HKD 213.947m = HKD 1,562.159m.
+- two-year mean operating FCF = HKD 1,023.2685m = CNY 925.9147m.
+- discounted sustainable cash profit = two-year mean FCF * 75% = CNY 694.4361m.
+- discounted detachable net cash = cash 100% + HKEX shares 80% + investment property 50% + FVTPL assets 50% - bank borrowings 100% - bullion loans 100% = CNY -4,644.7450m.
+- operating business price = market cap - discounted detachable net cash = CNY 11,365.4172m.
+- owner earnback years = CNY 11,365.4172m / CNY 694.4361m = 16.3664.
+- market cap to cash profit = CNY 6,720.6722m / CNY 694.4361m = 9.6779.
+- forecast cash dividend = HKD 1.00/share * 671,712,000 shares * 0.90486 = CNY 607.8053m.
+- forecast dividend yield = CNY 607.8053m / CNY 6,720.6722m = 0.0904382.
+
+7. Judgment boundaries
+- Inventory received no detachable-asset value because it is required to sustain jewellery retail operations.
+- Bullion loans were deducted in full even though economically matched to bullion inventory; they remain repayment obligations assumed by a controller.
+- HKEX shares haircut 20% for strategic-holding/market/tax constraints; investment property haircut 50% for illiquidity and disposal friction.
+- Sustainable cash profit uses only two years and a 25% haircut. This is an explicit analytical assumption, not reported company guidance.
+- Dividend forecast is a flat-2025-DPS scenario, not a management forecast.
+
+8. Protocol writes and validation
+- Used protocol set commands to populate initialized fields; did not construct result.json manually from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation result: {"status":"ok","errors":[]}

@@ -1,0 +1,95 @@
+stock-research trace
+company=常州星宇车灯股份有限公司
+code=601799.SH
+period=2025-12-31
+generated_at=2026-07-31T16:00:46+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Read references/data-reuse.md because the skill requires reuse-first handling.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated scalar/object fields with protocol set and list rows with protocol append.
+6. Final validation command and result are recorded at the end of this trace.
+
+[reuse check]
+Checked the paths supplied in config/input.json:
+- stock_report/data/analysis/annual_review/601799.SH/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/601799.SH/2025-12-31/annual_facts.md
+- stock_report/data/normalized/facts/601799.SH/2025-12-31/annual-facts.json
+- stock_report/data/raw/filings/601799.SH/2025-12-31/
+No reusable 2025 annual fact package or filing was present in the workspace, so the research returned to the disclosed annual report.
+
+[sources]
+S1=常州星宇车灯股份有限公司2025年年度报告；公司代码601799；董事会批准报送日2026-03-19；公开披露日2026-03-20；天衡会计师事务所出具标准无保留意见。Full report text retrieved from the public announcement mirror at https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12004126&stockid=601799 ; report itself identifies 上海证券交易所 https://www.sse.com.cn/ as the designated exchange disclosure site.
+S2=config/input.json; Tencent qt.gtimg.cn market snapshot; market_cap=28170999999.999996; pe_ttm=17.0; timestamp=20260731114327.
+
+[model check]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Basis: 95.55% of revenue came from automotive lamps/controllers. Assets are ordinary manufacturing working capital, production assets, cash and investments; liabilities are mainly supplier bills/payables. No banking deposits/loans, insurance reserves, property project inventories, concession rights, or holding-company look-through structure was found.
+
+[core financial extraction from S1]
+revenue=15256665866.59
+cost_of_sales=12258946238.23
+gross_profit=2997719628.36
+operating_profit=1817517638.79
+net_profit=1624090601.09
+parent_net_profit=1624090601.09
+operating_cash_flow=2436690466.04
+capital_expenditure=930969399.12
+operating_free_cash_flow=1505721066.92
+total_assets=19345227511.87
+total_liabilities=7946977044.35
+total_equity=11398250467.52
+parent_equity=11398250467.52
+minority_interest=0
+
+[formula checks]
+gross_margin=(15256665866.59-12258946238.23)/15256665866.59=0.19648589374462178
+net_margin=1624090601.09/15256665866.59=0.1064512138688529
+operating_free_cash_flow=2436690466.04-930969399.12=1505721066.92
+
+[cash haircut]
+reported cash=2373348984.22
+restricted cash=29473900.00
+unrestricted cash=2343875084.22
+discounted unrestricted cash=2343875084.22*0.80=1875100067.376
+bank wealth products=1444626056.43
+discounted bank wealth products=1444626056.43*0.90=1300163450.787
+lease liabilities plus long-term payables=14303834.87+13082683.07+116835543.81=144222061.75
+discounted detachable net cash=1875100067.376+1300163450.787-144222061.75=3031041456.413
+
+[cash profit normalization]
+2025 operating free cash flow=1505721066.92
+inventory decrease cash contribution=43720433.16
+operating receivables cash use=-954853175.07
+operating payables cash contribution=1096877594.86
+net working-capital cash release=43720433.16-954853175.07+1096877594.86=185744852.95
+discounted sustainable cash profit=1505721066.92-185744852.95=1319976213.97
+
+[owner earnback]
+operating_business_price=28171000000-3031041456.413=25139958543.587
+owner_earnback_years=25139958543.587/1319976213.97=19.045766338451887
+market_cap_to_cash_profit=28171000000/1319976213.97=21.342051244447845
+discounted_net_cash_to_market_cap=3031041456.413/28171000000=0.10759438629842746
+
+[dividend]
+S1 states the proposed final dividend is CNY 18 per 10 shares. Using shares outstanding net of treasury shares at 2026-02-28, proposed final cash dividend=508874002.20.
+Including the implemented 2025 interim distribution, forecast 2025 total cash dividend=565735651.00, equal to 34.83% of parent net profit per S1.
+forecast_dividend_yield=565735651/28171000000=0.020082199815413013
+The final distribution remains subject to shareholder approval and the implementation announcement.
+
+[limitations]
+Market data are from S2, not audited financial statements, and are about seven months after period end.
+Named customer sales were not disclosed; only top-five aggregate sales of CNY 9.8740534 billion and 64.70% share were available.
+Sustainable cash profit is a one-year normalization. A complete multi-year maintenance-capex and working-capital cycle was not available locally.
+
+[validation]
+financials.cash_flow.dividend_and_buyback_cash_out was set to 587649276.80, comprising cash dividends paid of 426462366.00 and cash used for share repurchases of 161186910.80. Lease cash payments were excluded.
+Command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Result:
+status=ok
+errors=[]

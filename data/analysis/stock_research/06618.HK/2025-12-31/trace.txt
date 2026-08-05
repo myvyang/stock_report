@@ -1,0 +1,59 @@
+stock-research trace — 06618.HK — period 2025-12-31
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read mandatory instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+   - No files were present in the supplied raw filing directory.
+   - No annual facts package or prior stock-research result was present for this company/period.
+   - Therefore sourced the official 2025 annual report from HKEX:
+     https://www.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042401364.pdf
+   - Market data was reused exactly from config/input.json; it was not recomputed.
+
+3. Protocol operations
+   - Initialized: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Populated fields using repeated protocol set commands.
+   - Final validation: status=ok, errors=[]
+
+4. Model classification
+   - Input hint said financial_brokerage/requires_special_model.
+   - Annual report Note 1 says the group provides pharmaceutical and healthcare products, internet healthcare, health management, intelligent healthcare solutions and marketing services.
+   - No brokerage client funds, proprietary securities book or repo funding was found.
+   - Override: ordinary_operating/applicable.
+
+5. Financial statement extraction (annual report pages 95–100; RMB converted from thousands to absolute yuan)
+   - revenue 73,441,487,000
+   - cost_of_sales 55,242,325,000
+   - gross_profit 18,199,162,000
+   - operating_profit 4,710,395,000 (gross profit less fulfillment, S&M, R&D and G&A, plus other income/gains; before finance income/cost, impairment and associates/JVs)
+   - net_profit 5,367,109,000
+   - parent_net_profit 5,375,405,000
+   - total_assets 81,586,601,000
+   - total_liabilities 21,513,391,000
+   - total_equity 60,073,210,000
+   - parent_equity 60,071,824,000
+   - operating_cash_flow 10,173,949,000
+   - capex proxy 151,009,000 (purchases of intangible assets, PPE and payments for ROU assets)
+   - operating_free_cash_flow 10,022,940,000
+
+6. Formula checks
+   - gross_margin = 18,199,162,000 / 73,441,487,000 = 0.2478049225773438
+   - net_margin = 5,375,405,000 / 73,441,487,000 = 0.07319303052782687
+   - cash + term deposits = 31,784,669,000 + 14,686,730,000 = 46,471,399,000; 85% = 39,500,689,150
+   - bank wealth products = 21,354,678,000 + 501,373,000 + 1,177,730,000 = 23,033,781,000; 75% = 17,275,335,750
+   - lease liabilities = 429,375,000 + 206,642,000 = 636,017,000
+   - discounted detachable net cash = 39,500,689,150 + 17,275,335,750 - 636,017,000 = 56,140,007,900
+   - operating business price = 109,044,711,756.13643 - 56,140,007,900 = 52,904,703,856.13643
+   - sustainable cash profit = 5,000,000,000 (analyst assumption; see report)
+   - owner earnback = 52,904,703,856.13643 / 5,000,000,000 = 10.580940771227286 years
+   - market cap / cash profit = 21.808942351227287
+   - forecast dividend = 0 because no 2025 dividend and no disclosed payout policy; yield = 0
+
+7. Judgment boundaries
+   - Facts are sourced to the audited annual report or supplied market snapshot.
+   - Cash haircuts, sustainable cash profit and forecast dividend are analyst assumptions, explicitly labelled.
+   - No buy/sell advice, target price or ranking label is produced.

@@ -1,0 +1,66 @@
+stock-research trace — LAUR — period 2025-12-31
+generated_at: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill linked it for reuse boundaries.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked stock_report/data/analysis/annual_review/LAUR/2025-12-31, raw filing, normalized facts, and prior stock-research paths.
+- No LAUR filing package, annual facts package, normalized facts, or prior research result existed in the workspace.
+- Therefore returned to primary public disclosures.
+
+3. Primary sources retrieved and reviewed
+- SEC 2025 Form 10-K, accession 0001628280-26-009479:
+  https://www.sec.gov/Archives/edgar/data/912766/000162828026009479/laur-20251231.htm
+- SEC Companyfacts for CIK 0000912766, used to cross-check statement facts:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0000912766.json
+- Laureate FY2025 results release dated 2026-02-19:
+  https://investors.laureate.net/news/news-details/2026/Laureate-Education-Reports-Financial-Results-for-the-Fourth-Quarter-and-Full-Year-2025-and-Provides-2026-Outlook/default.aspx
+- Federal Reserve H.10 USD/CNY, 2025-12-31 = 7.1875 CNY per USD:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Market cap and PE TTM retained from config/input.json: Yahoo Finance yfinance, dated 2026-08-03.
+
+4. Model decision
+- Confirmed statement_model = ordinary_operating.
+- Confirmed owner_earnback_applicability = applicable.
+- Reason: tuition-based education operations; campuses, receivables, leases and brands are ordinary operating assets/obligations. No customer deposits, investment book, insurance reserves, project-development inventory or concession asset makes the balance sheet the financial product.
+
+5. Currency policy
+- Result contract requires absolute CNY yuan.
+- Converted all USD filing facts at 7.1875 CNY/USD, the Federal Reserve H.10 period-end spot rate.
+- Used one rate for balance sheet and flow amounts for protocol consistency. Limitation disclosed: income/cash-flow CNY values are display translations, not average-rate accounting translations.
+
+6. Core audited facts before translation (USD)
+- Total assets 2,206.350m; liabilities 1,017.590m; total equity 1,187.362m; parent equity 1,187.937m; NCI -0.575m.
+- Revenue 1,701.930m; direct costs 1,219.754m; analytical gross profit 482.176m; operating income 431.102m; net income 283.784m; parent net income 281.630m.
+- Operating cash flow 366.192m; capex 103.043m; operating FCF 263.149m; financing cash flow -222.465m; dividends/equivalents plus buybacks 215.623m.
+- 2023/2024/2025 operating FCF: 194.343m / 160.847m / 263.149m.
+- Cash 146.703m; restricted cash 5.372m; debt and finance leases 127.708m; operating lease liability 387.763m.
+
+7. Formula checks
+- Analytical gross margin = (revenue - direct costs) / revenue = 0.2833112995. The report states this is not a separately presented GAAP gross margin because direct costs include broader operating items.
+- Parent net margin = parent net income / revenue = 0.1654768410.
+- Cash haircut: 146.703m * 50% = 73.3515m USD.
+- Discounted detachable net cash = (73.3515m - 127.708m) * 7.1875 = -390,687,343.75 CNY.
+- Three-year average FCF = (194.343m + 160.847m + 263.149m) / 3 = 206.113m USD.
+- Discounted sustainable cash profit = 206.113m * 85% * 7.1875 = 1,259,221,609.375 CNY.
+- Operating business price = 35,610,400,392.23584 - (-390,687,343.75) = 36,001,087,735.98584 CNY.
+- Owner earnback years = 36,001,087,735.98584 / 1,259,221,609.375 = 28.5899538794.
+- Market cap / cash profit = 35,610,400,392.23584 / 1,259,221,609.375 = 28.2796928889.
+- Forecast ordinary cash dividend = 0 because the 10-K says ordinary dividends are not anticipated for the foreseeable future; buybacks excluded from dividend yield.
+
+8. Output construction and validation
+- Updated the protocol-initialized JSON only through repeated protocol CLI `set` commands; did not hand-write result.json from scratch.
+- Created outputs/report.md and outputs/trace.txt with apply_patch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed JSON validation status: ok, errors: [].
+
+9. Data quality limitations carried into result/report
+- Market cap and PE TTM are input-provided yfinance values, not official exchange market capitalization.
+- Period-end FX used for both stocks and flows.
+- Zero dividend forecast excludes uncertain special dividends and does not treat repurchases as dividends.

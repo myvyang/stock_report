@@ -1,0 +1,70 @@
+stock-research trace
+company: VTech Holdings Limited (00303.HK)
+input: config/input.json
+requested period: 2025-12-31
+generated_at: 2026-08-03T15:27:31+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because no reusable local fact package was found.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result sections through protocol `set` commands, not by hand-writing the initialized JSON.
+
+2. Local data reuse check
+- Checked stock_report/data/analysis/annual_review/00303.HK/2025-12-31 and stock_report/data/raw/filings/00303.HK/2025-12-31.
+- No usable annual facts, annual_facts.md, metadata, or raw filing was present.
+- Therefore official public disclosures were retrieved.
+
+3. Company/model verification
+- Input hint classified the company as financial_brokerage.
+- Official disclosure states that the principal activity is design, manufacture and distribution of consumer electronic products, with revenue from electronic learning products, telecommunication products and contract manufacturing services.
+- Overrode hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+4. Period handling
+- VTech's legal financial year ends 31 March, so 2025-12-31 is not an annual reporting date.
+- Core annual financial statements use FY2025 ended 2025-03-31, the latest completed audited annual period available by 2025-12-31.
+- FY2026 interim disclosure is used only to describe post-year-end operating trend.
+- FY2026 full-year dividend, available by the 2026-08-03 generation date, is used as the dividend continuation baseline against the 2026-07-31 input market cap.
+
+5. Primary sources
+- VTech FY2026 annual results announcement, including audited FY2025 comparative statements:
+  https://www.vtech.com/wp-content/uploads/2026/05/EW303_FY26May212026.pdf
+- VTech FY2025 annual results press release:
+  https://www.vtech.com/en/press_release/2025/vtech-announces-fy2025-annual-results/
+- VTech FY2025/26 interim results press release:
+  https://www.vtech.com/en/press_release/2025/vtech-announces-2025-2026-interim-results/
+- VTech official dividend history:
+  https://www.vtech.com/en/investors/stock-information-contact/
+- Market cap and PE TTM: Tencent qt.gtimg.cn, supplied in config/input.json.
+
+6. FY2025 source figures (USD million)
+- Revenue 2,177.2; cost of sales 1,490.4; gross profit 686.8; operating profit 188.7; attributable profit 156.8.
+- Total assets 1,319.2; total liabilities 674.8; total equity 644.4; deposits and cash 335.6; stocks 360.8; debtors/deposits/prepayments 331.2.
+- Net operating cash flow 225.3; purchase of tangible assets 29.5; operating free cash flow 195.8; financing cash flow -188.3; dividends paid 164.5.
+- No bank borrowing; lease liabilities total 142.1.
+
+7. Currency and formulas
+- Protocol requires CNY absolute yuan. Research conversion rate: USD/CNY 7.1782.
+- This is a uniform research translation rate, not a company-reported CNY presentation.
+- Gross margin = 686.8 / 2,177.2 = 31.5%.
+- Net margin = 156.8 / 2,177.2 = 7.2001%.
+- Free cash flow = 225.3 - 29.5 = USD195.8m = CNY1,405,491,560.
+- Working-capital net release = -12.8 stocks -49.9 debtors +67.5 creditors +3.7 provisions = USD8.5m.
+- Normalized FCF = USD187.3m = CNY1,344,476,860.
+- Discounted sustainable cash profit = normalized FCF * 85% = CNY1,142,805,331.
+- Discounted detachable net cash = cash * 70% - lease liabilities = CNY666,280,524.
+- Operating business price = input market cap - discounted net cash = CNY10,600,414,806.70.
+- Owner earnback years = operating business price / discounted cash profit = 9.275783.
+- Market cap / cash profit = 9.858805.
+- FY2026 continuation dividend = USD0.53 * approximately 253.4m shares * 7.1782 = CNY964,032,260; yield = 8.5565% of input market cap.
+
+8. Known limitations
+- The requested period, annual statement date, market valuation date and dividend baseline are different dates and are separated explicitly in result.json and report.md.
+- Input market cap was consumed as CNY per the protocol initialization. Tencent's underlying HK quotation may be in HKD; no independent currency correction was applied.
+- Owner earnback is a static conditional estimate, not a forecast or investment recommendation.
+
+9. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial final validation result: status=ok, errors=[]

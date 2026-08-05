@@ -1,0 +1,72 @@
+stock-research trace
+company: 巨人网络 (002558.SZ)
+period: 2025-12-31
+generated_at: 2026-07-31T22:08:24+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read result-contract.md and report-contract.md in full.
+3. Read data-reuse.md because the expected annual-facts paths were absent.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result.json only through protocol set commands.
+6. Validated with protocol validate; final status: ok, errors: [].
+
+[reuse audit]
+- Expected annual facts JSON/Markdown, normalized facts, and prior stock-research outputs did not exist in the workspace.
+- Located and downloaded the 2025 annual report filing mirror to:
+  stock_report/data/raw/filings/002558.SZ/2025-12-31/annual-report-2025.pdf
+- PDF identity: 巨人网络集团股份有限公司2025年年度报告, 2026-定001, disclosure date 2026-04-27, 192 pages.
+- Environment lacked pdftotext and Python PDF libraries. Extraction therefore used the text version of the same filing from Sina's announcement mirror; core dividend figures were cross-checked against the official CNINFO announcement.
+
+[primary and input sources]
+- 2025 annual report full text: https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12204147&stockid=002558
+- Annual-report PDF mirror: http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESZ_STOCK/2026/2026-4/2026-04-27/12204147.PDF
+- Official CNINFO 2025 profit-distribution proposal: https://static.cninfo.com.cn/finalpage/2026-04-27/1225190397.PDF
+- Market-cap and PE snapshot: config/input.json, Tencent qt.gtimg.cn, timestamp 20260731114251.
+
+[model determination]
+- statement_model: ordinary_operating.
+- applicability: applicable.
+- Basis: revenue is predominantly online-game virtual-item sales and operations. Deposits, regulated presale cash, insurance reserves, project advances, concessions, or other special-model balance-sheet structures are absent.
+- Special caution: RMB 9.323bn long-term equity investment and RMB 1.710bn game deferred revenue require separate treatment.
+
+[audited facts used, CNY]
+- Revenue: 5,047,387,122.20
+- Cost of sales: 452,584,044.11
+- Gross profit: 4,594,803,078.09
+- Parent net profit: 1,754,514,184.37
+- Deducted parent net profit: 2,127,472,552.49
+- Operating cash flow: 2,985,105,474.41
+- Capital expenditure: 110,742,298.83
+- Operating free cash flow: 2,874,363,175.58
+- Total assets: 18,962,948,062.93
+- Total liabilities: 3,540,364,871.05
+- Parent equity: 15,393,247,430.20
+- Cash: 6,260,427,064.26; restricted cash: 364,756.67
+- Long-term equity investments: 9,322,661,797.60
+- Contract liabilities: 1,709,601,232.68
+- ALPHA borrowing principal plus interest: 638,902,945.70
+- Lease liabilities: 11,555,656.85
+
+[calculations]
+- gross_margin = (5,047,387,122.20 - 452,584,044.11) / 5,047,387,122.20 = 0.9103330034
+- net_margin = 1,754,514,184.37 / 5,047,387,122.20 = 0.3476084045
+- operating_free_cash_flow = 2,985,105,474.41 - 110,742,298.83 = 2,874,363,175.58
+- discounted_net_cash = (6,260,427,064.26 - 364,756.67) * 0.85 - 638,902,945.70 - 11,555,656.85 = 4,670,594,358.90
+- discounted_cash_profit = 2,127,472,552.49 * 0.80 = 1,701,978,041.99
+- operating_business_price = 56,238,000,000.00 - 4,670,594,358.90 = 51,567,405,641.10
+- owner_earnback_years = 51,567,405,641.10 / 1,701,978,041.99 = 30.2985
+- market_cap_to_cash_profit = 56,238,000,000.00 / 1,701,978,041.99 = 33.0427
+- forecast_dividend_yield = 643,336,297.65 / 56,238,000,000.00 = 0.0114395302
+
+[judgment flags]
+- 85% cash inclusion is a subjective conservatism discount for operating, marketing, R&D, dividend, and governance needs.
+- 80% sustainable-profit inclusion is a subjective discount for hit-game concentration, product lifecycle, and the RMB 1.076bn increase in deferred game revenue.
+- Long-term equity investments and other investment assets were assigned zero detachable value, not because they have no economic value, but because current fair value, liquidity, control, and distribution path were not sufficiently verifiable for this task.
+- Forecast dividend uses the announced 2025 full-year aggregate as a reproducible baseline; it is not a claim that future dividends will be maintained.
+
+[quality]
+- result data_quality.status: complete
+- protocol validation: passed
+- known limitations are recorded in result.json and report.md.

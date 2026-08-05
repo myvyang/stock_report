@@ -1,0 +1,54 @@
+2026-08-05 stock-research trace — CMTV / 2025-12-31
+
+1. Read required skill and contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Inspected configured long-term paths. No existing CMTV 2025 annual facts package, normalized facts, or stock-research result was available for reuse.
+
+3. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Company/model identification:
+   - SEC CIK 0000718413, Community Bancorp. /VT, ticker CMTV.
+   - Wholly owned operating subsidiary is Community National Bank.
+   - Annual report describes deposit-taking and commercial, real-estate, municipal and consumer lending.
+   - Overrode input hint ordinary_operating/applicable with financial_bank/requires_special_model.
+   - Ordinary detachable-net-cash and cash-profit payback metrics deliberately remain null.
+
+5. Primary sources retrieved/reviewed:
+   - Audited 2025 Annual Report, SEC Exhibit 13:
+     https://www.sec.gov/Archives/edgar/data/718413/000207709626000059/ea028548101-ars_community.pdf
+     Local copy: stock_report/data/raw/filings/CMTV/2025-12-31/2025-annual-report.pdf
+   - FY2025 earnings release, SEC Exhibit 99.1:
+     https://www.sec.gov/Archives/edgar/data/718413/000165495426000622/cmtv_ex991.htm
+   - SEC Companyfacts XBRL API for CIK0000718413, used to cross-check statements.
+   - Banque de France daily parities for 2025-12-31:
+     EUR/CNY 8.2262 and EUR/USD 1.1750; derived USD/CNY = 7.0010212766.
+   - Market cap and PE retained from config/input.json (Yahoo Finance yfinance input).
+
+6. Key original-currency facts (USD):
+   - Assets 1,287,558,946; liabilities 1,173,871,968; equity 113,686,978.
+   - Cash equivalents 128,061,761; AFS securities 144,528,758; net loans 955,207,283.
+   - Deposits 1,070,668,001; repurchase agreements 41,498,171; borrowings 35,975,022; junior subordinated debentures 12,887,000.
+   - Net interest income 40,873,909; noninterest income 7,909,305; credit-loss expense 1,373,661; net income 16,967,981.
+   - ROA 1.41%; ROE 16.04%; NIM 3.68%; efficiency ratio 57.0%; total capital ratio 15.20%; CET1 ratio 13.95%.
+   - 2025 dividends declared per common share 0.98; 2026 announced quarterly rate 0.25.
+
+7. Dividend forecast:
+   - 2025 year-end common shares outstanding = 5,882,266 issued - 299,339 treasury = 5,582,927.
+   - Assumed four 2026 quarterly dividends at USD 0.25 = USD 1.00 per share.
+   - Forecast cash dividend = USD 5,582,927 = CNY 39,086,190.71.
+   - Forecast dividend yield = CNY 39,086,190.71 / CNY 1,529,064,226.51 = 2.5562%.
+   - An initial one-quarter forecast was detected during arithmetic audit and corrected before final validation.
+
+8. Result fields populated only through protocol CLI set/append commands; report.md and trace.txt created as human-readable files.
+
+9. Pending at this trace-writing stage: protocol validate and final file checks. Validation outcomes are appended below.
+
+10. Final validation:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Result: status=ok, errors=[]
+    Confirmed data_quality.status=complete; financial-bank ordinary owner-earnback fields remain null; forecast annual dividend arithmetic corrected and reconciled.

@@ -1,0 +1,125 @@
+stock-research trace
+company: 佳士科技 (300193.SZ)
+period: 2025-12-31 annual
+generated_for_input: 2026-07-31T16:09:35+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because SKILL.md routes reuse decisions there.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields with repeated protocol `set` commands; the result was not hand-written from a blank JSON object.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[reuse check]
+- Expected annual facts:
+  stock_report/data/analysis/annual_review/300193.SZ/2025-12-31/facts.json
+  stock_report/data/analysis/annual_review/300193.SZ/2025-12-31/annual_facts.md
+- Expected raw filing metadata:
+  stock_report/data/raw/filings/300193.SZ/2025-12-31/metadata.json
+- Expected historical stock research:
+  stock_report/data/analysis/stock_research/300193.SZ/2025-12-31/
+- None of those files/directories existed. Only stock_report/data/notes/user_stock_evaluations.md was present.
+- Therefore no annual fact package or historical owner-earnback conclusion was reused.
+
+[sources acquired/read]
+- Official CNINFO annual report full PDF:
+  https://static.cninfo.com.cn/finalpage/2026-04-11/1225095850.PDF
+  163 pages, downloaded to temporary working storage and text-extracted for research.
+- Official CNINFO annual report summary:
+  https://static.cninfo.com.cn/finalpage/2026-04-11/1225095849.PDF
+  Announcement no. 2026-002.
+- Valuation input:
+  config/input.json; Tencent qt.gtimg.cn; market cap CNY 3,553,000,000; timestamp 20260731114300; PE TTM 20.11.
+- Temporary PDF/text files remained outside workspace under /tmp/jasic-research and were not treated as long-term stock_report artifacts.
+
+[model determination]
+- Confirmed statement_model=ordinary_operating.
+- Evidence: 98.72% of revenue is inverter welders and accessories; balance sheet consists of conventional manufacturing cash, receivables, inventory, plant/construction assets and operating liabilities.
+- No customer deposits, insurance reserves, regulated presale cash, concession rights, or other special-model balance sheet structure.
+- owner_earnback_applicability=applicable.
+- Special treatment: CNY 969,476,830.32 foreign-exchange forward margin is restricted cash and was not treated as fully detachable.
+
+[core facts]
+- Revenue: 1,270,831,746.74
+- Cost of sales: 897,134,084.62
+- Gross profit: 373,697,662.12
+- Operating profit: 231,494,510.25
+- Net profit: 196,490,887.87
+- Parent net profit: 198,141,681.92
+- Deducted nonrecurring parent profit: 174,911,553.15
+- Total assets: 3,129,374,098.51
+- Total liabilities: 758,168,377.49
+- Total equity: 2,371,205,721.02
+- Parent equity: 2,364,655,430.01
+- Minority interest: 6,550,291.01
+- Operating cash flow: 173,885,971.43
+- Capital expenditure proxy (cash paid to acquire/build long-lived assets): 47,508,918.37
+- Operating free cash flow: 126,377,053.06
+- Cash and cash equivalents: 558,334,949.90
+- Restricted FX forward margin: 969,476,830.32
+- Proposed 2025 cash dividend: 142,874,941.50
+
+[calculated formulas]
+- gross_margin = (1,270,831,746.74 - 897,134,084.62) / 1,270,831,746.74
+  = 0.2940575438712698
+- net_margin = 198,141,681.92 / 1,270,831,746.74
+  = 0.155914960755649
+- operating_free_cash_flow = 173,885,971.43 - 47,508,918.37
+  = 126,377,053.06
+- forecast_dividend_yield = 142,874,941.50 / 3,553,000,000
+  = 0.04021248001688714
+
+[owner earnback judgments]
+The following are research judgments, not reported facts:
+- Unrestricted cash included at 100%.
+- FX forward margin included at 50% due to contractual restriction and currency/derivative exposure.
+- Trading financial assets included at 80%.
+- Other equity instruments included at 50%.
+- Other non-current financial assets included at 30%.
+- Interest-bearing and lease liabilities deducted at 100%.
+- CNY 200,000,000 retained as minimum operating cash reserve.
+
+discounted detachable net cash:
+  558,334,949.90
+  + 969,476,830.32 * 0.50
+  + 4,528,412.08 * 0.80
+  + 84,477,665.48 * 0.50
+  + 31,243,226.87 * 0.30
+  - 89,953,317.27
+  - 200,000,000
+  = 808,354,578.255
+
+discounted sustainable cash profit:
+- Starting point: parent net profit 198,141,681.92.
+- Deducted nonrecurring profit: 174,911,553.15.
+- 2025 operating FCF cross-check: 126,377,053.06.
+- Proposed cash dividend cross-check: 142,874,941.50.
+- Selected sustainable cash profit: 140,000,000.
+- Rationale: below deducted nonrecurring profit, close to current FCF and proposed distribution, without assuming all accounting profit is distributable or that one-year project capex repeats forever.
+
+operating business price:
+  3,553,000,000 - 808,354,578.255
+  = 2,744,645,421.745
+
+owner earnback years:
+  2,744,645,421.745 / 140,000,000
+  = 19.604610155321428
+
+market cap to cash profit:
+  3,553,000,000 / 140,000,000
+  = 25.37857142857143
+
+[known limitations]
+- No pre-existing local annual facts or raw filing metadata.
+- The 50% restricted-margin haircut, operating reserve and sustainable cash profit require judgment.
+- Industry position is based mainly on company disclosure; no independent market-share dataset was found.
+- The dividend figure is a board-approved proposal disclosed in the annual report, not a guarantee of future annual distributions.
+
+[outputs]
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

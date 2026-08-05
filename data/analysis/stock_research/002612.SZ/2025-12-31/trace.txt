@@ -1,0 +1,56 @@
+stock-research trace
+company: 朗姿股份 (002612.SZ)
+period: 2025-12-31 annual
+generated_at: 2026-07-31T19:40:34+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: initialized stock-research-result-v1 skeleton.
+
+3. Local reuse audit
+- Checked configured raw filing, annual review, normalized facts, and prior stock research paths.
+- No filing/facts/research files existed in the workspace; only stock_report/data/notes/user_stock_evaluations.md was present.
+- Therefore no prior facts or conclusions were reused.
+
+4. Public sources read
+- 朗姿股份有限公司2025年年度报告, announcement 2026-018; official disclosure identified as SZSE/CNINFO, full-text mirror used for extraction:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12199616&stockid=002612
+- 朗姿股份2025年年度报告摘要:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12199615&stockid=002612
+- 朗姿股份关于2025年度利润分配方案的公告:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12199613&stockid=002612
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, 20260731114342.
+
+5. Model determination
+- Confirmed ordinary_operating/applicable.
+- Rationale: revenue derives from apparel/infant product sales and medical-aesthetic services; inventory, stores, leases and medical institutions are operating assets. The company is not a bank, broker, insurer, property developer, construction contractor, concession utility or investment holding company.
+- Special owner adjustments: lease liabilities included as debt; disposal gain excluded from sustainable profit.
+
+6. Key extracted facts (CNY)
+- Revenue 6,002,717,304.75; cost of sales 2,422,338,161.97; gross profit 3,580,379,142.78.
+- Net profit 1,046,939,908.63; parent net profit 999,285,328.15; recurring parent profit 269,360,329.70.
+- OCF 445,196,403.92; capex 105,421,443.56; operating FCF 339,774,960.36.
+- Total assets 8,574,617,220.86; liabilities 4,539,475,708.06; equity 4,035,141,512.80; parent equity 3,401,379,278.74.
+- Disposal/reclassification of Ruoyuchen interest affected net profit by approximately 757,286,100, so reported parent profit was not treated as sustainable.
+- Proposed dividend 530,934,450.00.
+
+7. Owner earnback calculations
+- Usable cash: 795,189,857.68 x 100%.
+- Trading financial assets: 385,492,987.35 x 80% = 308,394,389.88.
+- Debt deducted: short-term borrowing + current non-current liabilities + long-term borrowing + bonds payable + lease liabilities = 2,557,096,368.00.
+- Discounted detachable net cash = -1,453,512,120.44.
+- Sustainable cash profit = (445,196,403.92 - 105,421,443.56) x 90% = 305,797,464.32.
+- Operating business price = 6,597,000,000 - (-1,453,512,120.44) = 8,050,512,120.44.
+- Owner earnback = 26.3263 years; market cap/cash profit = 21.5731x.
+- The 80% asset discount and 10% profit haircut are analyst judgments, not reported facts.
+
+8. Protocol population and validation
+- Populated outputs/result.json using repeated protocol set/append commands; did not construct the JSON from scratch.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial populated result: status ok, errors [].
+- Final validation is rerun after numeric reconciliation.

@@ -1,0 +1,76 @@
+stock-research trace
+company: 08371.HK / TASTE GOURMET GROUP LIMITED
+input period: 2025-12-31
+actual annual-report period used: year ended 2025-03-31
+generated_at: 2026-08-04T15:41:42+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No pre-existing raw filing, annual facts, normalized facts, or stock-research output was found for 08371.HK/2025-12-31.
+- Downloaded the official HKEX annual report to stock_report/data/raw/filings/08371.HK/2025-12-31/annual-report-2024-25.pdf.
+- Source URL: https://www1.hkexnews.hk/listedco/listconews/gem/2025/0702/2025070202106.pdf
+- Extracted text locally for verification. The PDF has 130 pages; audited financial statements are on annual-report pages 64-128.
+
+3. Period resolution
+- The company has a 31 March fiscal year end. There is no annual report with a 31 December 2025 year end.
+- Following the requested annual-report task and directory period, used the latest complete annual report published by 2025-12-31: FY2025 ended 2025-03-31, published 2025-07-02.
+- Market data is from 2026-08-03, about 16 months after the balance-sheet date. This mismatch is disclosed as a limitation and risk.
+
+4. Model override
+- Input hint: financial_brokerage / requires_special_model.
+- Verified fact: the group operates restaurants in Hong Kong and mainland China and recognizes revenue when catering services are rendered.
+- No brokerage customer money, proprietary trading book, repo financing, or securities operations were found.
+- Final model: ordinary_operating / applicable.
+- Lease liabilities are treated as operating infrastructure financing: not deducted as ordinary bank debt from cash, but lease principal and interest are deducted when deriving cash profit.
+
+5. Currency conversion
+- Reporting currency: HKD; protocol output currency: CNY absolute yuan.
+- Rate: 1 HKD = 0.92283 CNY, the RMB central parity published for 2025-03-31.
+- Source: CFETS-authorized central parity announcement, reproduced at https://finance.ce.cn/fe/gdxw/202503/31/t20250331_39335345.shtml
+- All annual-report amounts were multiplied by 1,000 (from HK$'000) and by 0.92283.
+- Input market capitalization was already denominated in CNY and was not converted.
+
+6. Key reported facts (HK$'000 unless stated)
+- Revenue 1,219,605; raw materials and consumables 334,043.
+- Net profit 93,163; parent profit 95,533.
+- Total assets 876,757; total liabilities 603,945; total equity 272,812; parent equity 274,814; NCI -2,002.
+- Cash and cash equivalents 190,888; no bank borrowings.
+- Operating cash flow 349,478.
+- PPE purchase 65,481; intangible purchase 2,281; ROU-asset payments 2,584.
+- Lease principal repayments 148,862; lease interest 19,260.
+- Lease liabilities 449,683; ROU assets 417,988.
+- FY2025 interim dividend 22,770 plus proposed final dividend 30,472; stated payout ratio 56%.
+- 66 restaurants at 2025-03-31: 60 Hong Kong and 6 mainland China.
+- Customers 5,230,386, up 26.4%; ASP HK$233.2 versus HK$247.5.
+
+7. Derived metrics
+- Food gross-profit proxy = revenue - raw materials and consumables = HK$885.562m.
+- Food gross margin proxy = 885.562 / 1,219.605 = 72.6106%.
+- Parent net margin = 95.533 / 1,219.605 = 7.8331%.
+- Lease-adjusted operating FCF = 349.478 - 65.481 - 2.281 - 2.584 - 148.862 - 19.260 = HK$111.010m = CNY102.443m.
+- Sustainable cash profit = lease-adjusted operating FCF * 80% = CNY81.955m.
+- Discounted detachable cash = cash CNY176.157m * 70% = CNY123.310m. Rental deposits receive zero detachable value.
+- Operating business price = market cap CNY625.430m - discounted cash CNY123.310m = CNY502.119m.
+- Owner earnback years = 502.119 / 81.955 = 6.1268.
+- Market cap / cash profit = 625.430 / 81.955 = 7.6314.
+- Forecast dividend = sustainable cash profit * 50% = CNY40.977m.
+- Forecast dividend yield = 40.977 / 625.430 = 6.5519%.
+
+8. Judgment notes
+- The 70% cash factor preserves a 30% buffer for payroll, minimum rents, new-store fit-out, working capital, and dividends.
+- The 80% cash-profit factor reflects lower ASP, new-store ramp-up, impairment at a loss-making restaurant, and the lack of same-store-sales disclosure.
+- Gross profit is a food-margin proxy because the issuer does not report a conventional gross-profit line; labor, occupancy, depreciation, and other restaurant expenses remain below this proxy.
+- Forecast dividend is an estimate anchored to the company's minimum 50% payout policy, not a declared dividend.
+
+9. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields with repeated protocol `set` operations; the JSON was not authored from a blank complex object.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok; errors: none.

@@ -1,0 +1,92 @@
+stock-research trace
+company: 贵州黔源电力股份有限公司 (002039.SZ)
+period: 2025-12-31 annual
+generated_for_input_time: 2026-07-31T20:36:23+08:00
+
+1. Instructions and protocol
+- Read /workspace/AGENTS.md.
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields only through protocol set/append commands; did not hand-write the result object.
+
+2. Reuse audit
+- Checked the input-declared raw filing, annual review, normalized facts, and prior stock-research locations.
+- No annual facts package, normalized facts, prior result, or filing metadata existed in the workspace.
+- Therefore followed the documented fallback and obtained the original annual report from an official source.
+
+3. Primary source obtained
+- Source: Shenzhen Stock Exchange, 贵州黔源电力股份有限公司2025年年度报告.
+- Disclosure date: 2026-04-03.
+- URL: https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-03/08b895dd-7fed-43d3-b09d-df7e6b89ba5b.PDF
+- Saved original PDF: stock_report/data/raw/filings/002039.SZ/2025-12-31/annual-report-2025.pdf
+- Extracted text for local verification: stock_report/data/raw/filings/002039.SZ/2025-12-31/annual-report-2025.txt
+- PDF contained 156 pages. pypdf was installed in temporary venv /tmp/qydl-pdf-venv because system PDF text utilities were absent. Original PDF was not modified.
+
+4. Model determination
+- Input hint: utility_concession / requires_special_model.
+- Confirmed with annual-report facts: 99.66% of revenue was power sales; fixed assets were 93.52% of total assets; operations are long-lived hydro and solar generation assets; project debt and minority interests are material.
+- Final model: utility_concession, requires_special_model.
+- Ordinary owner-earnback fields intentionally remain null under the result contract.
+- Special model required: plant-level equity cash flow using multi-year normalized hydrology, volume and tariff assumptions, maintenance capex, taxes, debt service, minority ownership, and remaining operating life.
+- Missing for a reliable special-model payback number: plant-level remaining operating lives and normalized maintenance capex; therefore no special payback number was fabricated.
+
+5. Core extracted facts (CNY absolute yuan)
+- Revenue: 3,285,422,989.95
+- Cost of sales: 1,438,784,130.80
+- Gross profit: 1,846,638,859.15
+- Operating profit: 1,346,156,420.54
+- Consolidated net profit: 1,115,249,420.00
+- Parent net profit: 600,128,761.60
+- Total assets: 15,161,647,449.72
+- Total liabilities: 7,406,226,713.05
+- Total equity: 7,755,420,736.67
+- Parent equity: 4,441,010,112.51
+- Minority interest: 3,314,410,624.16
+- Operating cash flow: 2,434,452,414.12
+- Purchase of fixed/intangible/other long-term assets: 370,267,420.75
+- Financing cash flow: -1,939,751,221.41
+- Cash: 304,754,890.22
+- Fixed assets: 14,178,860,234.61
+- Short-term borrowings: 1,360,477,960.79
+- Long-term borrowings: 3,720,994,674.50
+- Current portion of non-current liabilities: 926,971,426.01
+- Interest expense: 215,290,302.18
+
+6. Operating facts
+- Installed capacity: 3.9731 GW total; 3.2335 GW hydro and 0.7396 GW solar.
+- Generation: 12.120 TWh total; 11.452 TWh hydro and 0.668 TWh solar.
+- Inflow was 45% higher year over year.
+- Average on-grid tariff: CNY 0.3074/kWh total; CNY 0.3037 hydro and CNY 0.3711 solar.
+- Hydro revenue: 3,056,868,048.14; hydro gross margin 58.67%.
+- Solar revenue: 217,449,853.51; solar gross margin 20.80%.
+- 2026 management operating plan: 9.398 TWh generation and CNY 510 million parent net profit; annual report explicitly says this is not an earnings forecast.
+
+7. Calculations
+- Gross margin = (3,285,422,989.95 - 1,438,784,130.80) / 3,285,422,989.95 = 0.5620703528278724.
+- Parent net margin = 600,128,761.60 / 3,285,422,989.95 = 0.18266407809154986.
+- Minority interest ratio = 3,314,410,624.16 / 7,755,420,736.67 = 0.42736696521034034.
+- Simple operating free cash flow = 2,434,452,414.12 - 370,267,420.75 = 2,064,184,993.37.
+- Dividend baseline = 42,755,812.60 implemented 2025 interim dividend + 166,747,669.14 2025 annual proposal = 209,503,481.74.
+- Forecast dividend yield = 209,503,481.74 / 8,500,000,000 = 0.02464746844.
+- Dividend baseline is a mechanical continuation of the latest full attribution-year payout, not company guidance.
+
+8. Market data
+- Market cap: 8,500,000,000.
+- Market cap timestamp: 20260731114306.
+- PE TTM: 13.33.
+- Source: config/input.json / Tencent qt.gtimg.cn.
+- This market snapshot was supplied by the task and was not independently reconstructed from exchange ticks.
+
+9. Known limitations
+- 2025 was a high-inflow year; one-year earnings and cash flow are not normalized.
+- Consolidated cash flow includes substantial minority interests.
+- Reported capex mixes maintenance, expansion, and project completion spending.
+- Plant-level remaining operating lives and debt amortization schedules were not available in the annual report.
+- Forecast dividend is an analytical baseline, not a 2026 promise.
+- financials.cash_flow.dividend_and_buyback_cash_out remains null because the cash-flow statement combines dividends with interest and does not provide a complete standalone consolidated dividend cash-out figure; no imputed number was inserted.
+
+10. Validation
+- Protocol validation was run after structured population and returned status=ok with errors=[].
+- A final validation is run again after report and trace creation.

@@ -1,0 +1,55 @@
+stock-research trace
+company=300529.SZ 健帆生物
+period=2025-12-31 annual
+generated_at=2026-07-31T21:04:02+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated result fields with protocol set commands.
+4. Validation command and result recorded at end of this trace.
+
+[reuse check]
+- No files existed under stock_report/data/analysis/annual_review/300529.SZ/2025-12-31.
+- No raw filing or prior stock-research result existed for this period.
+- Therefore fetched and read public filing material; did not reuse an absent fact pack.
+
+[primary sources]
+- 健帆生物2025年年度报告, 公告编号2026-009, disclosed 2026-04-28.
+  Official filing text was read via the disclosed full-report page; key totals were cross-checked with the SZSE annual-report summary:
+  https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-28/ae1fe05b-8d19-4944-b7ac-3bfaa02a3cdb.PDF
+- 健帆生物关于2025年度利润分配预案的公告, 公告编号2026-015:
+  https://static.cninfo.com.cn/finalpage/2026-04-28/1225211575.PDF
+- Market cap and PE: config/input.json, Tencent qt.gtimg.cn snapshot at 20260731114342.
+
+[model decision]
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Reason: 99.73% of revenue is medical-device manufacturing. Cash, working capital, production assets and debt can be separated in the ordinary-company sense; no bank deposits, insurance reserves, regulated presale cash or similar special-model balance-sheet structure dominates.
+
+[formula checks]
+- gross_profit = 2,011,817,980.59 - 428,504,854.51 = 1,583,313,126.08
+- gross_margin = 1,583,313,126.08 / 2,011,817,980.59 = 0.7870061513
+- net_margin = 532,821,312.26 / 2,011,817,980.59 = 0.2648456855
+- operating_free_cash_flow = 721,216,443.19 - 172,590,825.89 = 548,625,617.30
+- discounted unrestricted cash = (2,515,856,402.50 - 27,614,529.99) * 0.90 = 2,239,417,685.259
+- discounted long-term deposits = 187,807,372.91 * 0.80 = 150,245,898.328
+- debt deducted = 39,392,654.06 + 138,349,225.12 + 1,045,030,644.04 + 4,094,308.75 + 8,602,192.42 = 1,235,469,024.39
+- discounted_net_cash = 2,239,417,685.259 + 150,245,898.328 - 1,235,469,024.39 = 1,154,194,559.197
+- sustainable cash profit = 548,625,617.30 - 48,625,617.30 judgment haircut = 500,000,000.00
+- operating_business_price = 14,726,000,000 - 1,154,194,559.197 = 13,571,805,440.803
+- owner_earnback_years = 13,571,805,440.803 / 500,000,000 = 27.1436108816
+- market_cap_to_cash_profit = 14,726,000,000 / 500,000,000 = 29.452
+- forecast_dividend_yield = 402,668,528.60 / 14,726,000,000 = 0.0273440533
+
+[judgment flags]
+- Cash discounts (90% and 80%) are research assumptions.
+- Other equity investment is assigned zero detachable value for conservatism.
+- Sustainable cash profit of CNY 500m is a research estimate, not company guidance.
+- Dividend is a proposal and final cash amount can change with the record-date share base.
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

@@ -1,0 +1,104 @@
+stock-research trace
+company=002817.SZ 黄山胶囊
+period=2025-12-31
+generated_at=2026-07-31T20:56:12+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because local fact/result reuse was evaluated.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields using repeated protocol set commands; the result was not written from scratch.
+
+[local reuse check]
+Checked the configured annual-review, normalized-facts, raw-filing and prior stock-research paths. No pre-existing 2025 fact pack, normalized facts, filing or prior research result was present. Only config/input.json existed.
+
+[source acquisition]
+Located the 2025 annual report disclosed 2026-03-21. Downloaded a PDF mirror of the company-authored filing from:
+http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESZ_STOCK/2026/2026-3/2026-03-21/12009651.PDF
+Saved as stock_report/data/raw/filings/002817.SZ/2025-12-31/annual-report-2025.pdf.
+The environment lacked pdftotext/pdfinfo, so a temporary /tmp virtual environment with pypdf was used for read-only text extraction. Extracted text was saved beside the PDF as annual-report-2025.txt. The PDF is 164 pages.
+
+[model classification]
+Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable. Business is manufacturing and sale of pharmaceutical empty capsules. No customer funds, insurance reserves, regulated project cash, development inventory, concession rights or investment-holding structure was identified. There were no short-term or long-term bank borrowings.
+
+[core statement extraction]
+Balance sheet, CNY:
+total_assets=1,107,891,830.42
+total_liabilities=146,370,023.29
+total_equity=961,521,807.13
+parent_equity=960,106,606.54
+minority_interest=1,415,200.59
+cash_and_bank=155,470,137.53
+large_CDs_and_time_deposits_in_other_noncurrent_assets=392,787,257.65
+accounts_receivable_net=126,870,816.74
+receivables_financing=35,353,849.99
+inventory_net=75,759,514.89
+fixed_assets=284,510,788.08
+construction_in_progress=4,183,274.04
+intangible_assets=17,134,748.95
+notes_and_accounts_payable=91,263,690.94
+lease_liabilities_current_and_noncurrent=43,704.38
+restricted_assets=none disclosed
+
+Income statement, CNY:
+revenue=460,424,830.18
+cost_of_sales=323,467,885.25
+gross_profit=136,956,944.93
+operating_profit=74,363,514.47
+net_profit=65,112,508.50
+parent_net_profit=64,985,897.94
+adjusted_parent_net_profit=62,905,363.26
+gross_margin=136,956,944.93/460,424,830.18=0.2974577737
+net_margin=64,985,897.94/460,424,830.18=0.1411433391
+
+Cash flow, CNY:
+operating_cash_flow=84,894,046.03
+cash_capex=3,868,612.01
+operating_free_cash_flow=81,025,434.02
+noncash_bill_endorsement_for_long_term_asset_purchases=11,350,105.65
+economic_capex_cross_check=15,218,717.66
+inventory_reduction_contribution_to_OCF=22,964,620.06
+financing_cash_flow=-29,967,942.19
+dividend_and_interest_cash_out=29,311,581.11
+
+[business extraction]
+2025 product revenue/cost, CNY:
+gelatin_capsules=319,044,888.55 / 235,998,905.91; gross_margin about 26.03%
+enteric_gelatin_capsules=85,961,001.03 / 46,787,580.58; gross_margin about 45.57%
+plant_capsules_and_other=55,418,940.60 / 40,681,398.76; gross_margin about 26.59%
+domestic_revenue=391,751,618.09
+foreign_revenue=68,673,212.09
+
+[owner earnback assumptions]
+cash_and_bank haircut=50%; discounted=77,735,068.765. Rationale: retain operating buffer for procurement, payroll, taxes and receivable cycle despite no legal restriction.
+large_CDs_and_time_deposits haircut=95%; discounted=373,147,894.7675. Rationale: no restriction disclosed, but recognize maturity and early-withdrawal friction.
+lease_liability deduction=43,704.38.
+discounted_detachable_net_cash=450,839,259.1525.
+
+sustainable profit base=2025 adjusted parent net profit 62,905,363.26.
+profit haircut=10% due to product price pressure, higher receivables and uncertainty that procurement/product-mix gains repeat.
+discounted_sustainable_cash_profit=56,614,826.934.
+
+market_cap=1,819,000,000 from input snapshot.
+operating_business_price=1,819,000,000-450,839,259.1525=1,368,160,740.8475.
+owner_earnback_years=1,368,160,740.8475/56,614,826.934=24.1661206956.
+market_cap_to_cash_profit=1,819,000,000/56,614,826.934=32.1293925727.
+discounted_net_cash_to_market_cap=0.2478500600.
+
+[dividend]
+Used the 2025 annual distribution of CNY 0.53 per 10 shares, total CNY 15,852,203.01, implemented in May 2026.
+forecast_dividend_yield=15,852,203.01/1,819,000,000=0.00871479.
+The field is a conservative forward proxy based on the latest implemented annual dividend, not a prediction of dividend growth.
+
+[quality and limitations]
+Core financial figures are from the audited annual report with a standard unmodified opinion.
+Market share was not independently verified; industry position is explicitly attributed to company disclosure.
+Owner-earnback cash and profit haircuts are analytical judgments and are sensitivity drivers.
+The protocol capex field follows cash-flow-statement cash capex; noncash bill-financed capex is separately disclosed.
+Market cap and PE TTM were reused from the task input and not independently reconstructed.
+
+[validation]
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok; errors=[]

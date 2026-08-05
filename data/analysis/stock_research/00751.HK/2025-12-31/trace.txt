@@ -1,0 +1,55 @@
+stock-research trace
+company=00751.HK SKYWORTH GROUP
+period=2025-12-31 annual
+generated_for_input=2026-08-03T17:11:12+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated all structured fields using protocol `set`; no complex JSON result was hand-written from scratch.
+4. Validation command and outcome are recorded at the end of this file.
+
+[reuse audit]
+- Expected annual fact package: stock_report/data/analysis/annual_review/00751.HK/2025-12-31/facts.json
+- Expected normalized facts: stock_report/data/normalized/facts/00751.HK/2025-12-31/annual-facts.json
+- Expected prior research: stock_report/data/analysis/stock_research/00751.HK/2025-12-31/result.json
+- None of these files existed in the workspace. Public filing research was therefore required.
+
+[model audit]
+- Input hint: financial_brokerage / requires_special_model.
+- Filing fact: subsidiaries manufacture and sell smart TVs, home access systems, photovoltaic products and white goods, and provide related operating services. Reportable segments are smart household appliances, smart systems technology and new energy, plus modern services and others.
+- Decision: override hint with ordinary_operating / applicable. The presence of treasury, loan and investment activities inside modern services does not turn the consolidated group into a brokerage.
+
+[primary evidence]
+- Skyworth Group Limited, Announcement of Annual Results for the year ended 31 December 2025, published 2026-03-27.
+  Landing/text: https://financialfilings.com/filings/skyworth-group-limited/earnings-release/2026/33058514/
+  Original filing linked by source: 49442_rns_2026-03-27_824ad3a5-2bcf-4913-92d1-e9612d611697.pdf
+- Skyworth investor-relations financial highlights:
+  https://investor.skyworth.com/en/ir_highlight.php
+- Market valuation: config/input.json; Tencent qt.gtimg.cn snapshot dated 2026/07/31 16:08:42.
+
+[calculations]
+- total_assets = 23,237m non-current assets + 53,267m current assets = 76,504m.
+- total_liabilities = 44,492m current liabilities + 8,952m non-current liabilities = 53,444m.
+- gross_margin = 9,013m / 70,324m = 0.1281653455.
+- parent_net_margin = 356m / 70,324m = 0.0050610275.
+- capex proxy = payment for property, plant and equipment = 1,395m.
+- operating_free_cash_flow = 2,258m - 1,395m = 863m.
+- cash position = 9,294m cash equivalents + 2,976m pledged/restricted deposits = 12,270m.
+- disclosed borrowings and other interest-bearing financial liabilities = 19,511m.
+- discounted detachable net cash = 0 because unrestricted cash is below interest-bearing debt; restricted deposits receive zero detachable value.
+- discounted sustainable cash profit = 300m, using 356m parent profit as anchor less 56m conservatism adjustment for cash-flow volatility, working-capital assistance and leverage.
+- operating business price = 7,080,458,302.890062 - 0 = 7,080,458,302.890062.
+- owner earnback years = 7,080,458,302.890062 / 300,000,000 = 23.6015276763.
+- forecast cash dividend = 0; board declared neither interim nor final dividend for 2025 and no new policy evidence supports a positive base forecast.
+
+[fact/inference/judgment separation]
+- Facts: reported financial statement amounts, segment data, dividend decision, pledged assets and input market snapshot.
+- Inference: revenue growth with falling margin indicates mix/cost pressure; operating cash improvement partly reflects receivable/payable movements.
+- Judgment: 300m sustainable cash profit and zero next-year dividend are conservative scenarios, not company guidance.
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

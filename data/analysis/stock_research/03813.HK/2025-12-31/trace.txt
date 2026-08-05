@@ -1,0 +1,59 @@
+stock-research trace
+task: 03813.HK, annual, period 2025-12-31
+generated context date: 2026-08-04 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+- No raw filing, annual facts package, normalized facts, or prior stock-research result existed for 03813.HK/2025-12-31.
+- Initialized outputs/result.json with protocol CLI from config/input.json.
+
+3. Primary-source retrieval
+- Retrieved official 2025 annual report from HKEX:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0421/2026042100610.pdf
+- Used annual report business review, audited consolidated statements and notes.
+- Market cap, timestamp and PE TTM retained from config/input.json (Tencent qt.gtimg.cn).
+
+4. Model audit
+- Input hint said financial_brokerage.
+- Annual report showed distribution and retailing of sportswear/footwear and concessionaire commission operations.
+- Overrode model to ordinary_operating; owner earnback applicability set to applicable.
+
+5. Core calculations (RMB)
+- gross_margin = 5,735,638,000 / 17,132,127,000 = 0.3347919290
+- net_margin = 210,771,000 / 17,132,127,000 = 0.0123026604
+- total_assets = 3,397,177,000 + 8,663,732,000 = 12,060,909,000
+- total_liabilities = 2,484,870,000 + 674,188,000 = 3,159,058,000
+- operating_free_cash_flow = 550,975,000 - 243,424,000 = 307,551,000
+- discounted detachable net cash:
+  cash equivalents 640,441,000 x 90% = 576,396,900
+  current time deposits 653,627,000 x 90% = 588,264,300
+  non-current time deposits 527,840,000 x 75% = 395,880,000
+  unlisted funds 220,581,000 x 50% = 110,290,500
+  amortised-cost bond 49,734,000 x 70% = 34,813,800
+  investment properties 120,700,000 x 50% = 60,350,000
+  less operating liquidity reserve = 800,000,000
+  total = 965,995,500? Recalculation check identified protocol value used as 965,996,150; see correction below.
+
+6. Calculation correction
+- Exact sum of the listed discounted rows is 965,995,500.
+- The initial structured value was 650 yuan too high due to manual addition.
+- Correct result must use 965,995,500 and all dependent metrics must be recomputed before final validation.
+
+7. Sustainable cash profit judgment
+- Reported OCF 550,975,000; capex 243,424,000; headline FCF 307,551,000.
+- Lease principal/related interest cash out 710,671,000 is classified in financing cash flow.
+- Trade and other payables fell 601,465,000, depressing reported OCF.
+- Used parent profit 210,771,000 and pre-working-capital cash generation as anchors; judgmental normalized distributable cash profit set to 250,000,000.
+
+8. Dividend estimate
+- FY2025 DPS: paid interim HK$0.0115 + paid special HK$0.0115 + proposed final HK$0.002 + proposed special HK$0.002.
+- Estimated RMB cash dividend: 128,000,000, using annual-report disclosed RMB relationship for paid dividends; FX-dependent.
+
+9. Protocol
+- All result.json edits performed after protocol initialization using protocol CLI set commands.
+- Final protocol validation performed after correcting arithmetic and dependent metrics.

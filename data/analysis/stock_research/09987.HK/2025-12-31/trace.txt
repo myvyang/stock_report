@@ -1,0 +1,75 @@
+stock-research trace
+generated_at=2026-08-05T04:24:59+08:00
+company=Yum China Holdings, Inc. (09987.HK / NYSE:YUMC)
+period=2025-12-31 annual
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated fields only through protocol set/append commands.
+4. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+5. Validation result: status=ok, errors=[]
+
+[reuse-check]
+No raw filing, annual facts package, normalized facts, or prior stock-research result existed under the paths supplied in config/input.json. Official sources were therefore retrieved.
+
+[model-review]
+Input hint: financial_brokerage / requires_special_model.
+Finding: rejected. Yum China operates and franchises restaurants; the 2025 balance sheet contains restaurant PP&E, lease ROU assets, deposits and ordinary operating liabilities, not brokerage client funds or proprietary securities financing.
+Final model: ordinary_operating / applicable.
+
+[primary-sources]
+SEC 2025 Form 10-K, filed 2026-02-27:
+https://www.sec.gov/Archives/edgar/data/1673358/000119312526082824/yumc-20251231.htm
+Company FY2025 results release, dated 2026-02-04:
+https://ir.yumchina.com/news-releases/news-release-details/yum-china-reports-fourth-quarter-2025-results/
+Federal Reserve G.5A 2025 annual average FX:
+https://www.federalreserve.gov/releases/g5a/current/
+CFETS 2025-12-31 central parity, republished by Xinhua:
+https://english.news.cn/20251231/2e3a0db7cea34ab389607f43fc271825/c.html
+Market snapshot: Tencent qt.gtimg.cn, supplied in config/input.json.
+
+[currency-conversion]
+Income statement and cash flow: USD x 7.1875 CNY/USD (2025 annual average).
+Balance sheet: USD x 7.0288 CNY/USD (2025-12-31 central parity).
+All source financial statement amounts were in USD millions; result.json uses absolute CNY yuan.
+
+[core-calculations]
+gross_profit_usd_m = 11797 - 9236 - 41 - 481 - 132 = 1907
+gross_margin = 1907 / 11797 = 0.1616512673
+net_margin = 929 / 11797 = 0.07874883445
+operating_fcf_usd_m = 1466 - 626 = 840
+
+discounted_detachable_net_cash_cny:
+  cash 506m x 7.0288 x 50% = 1,778,286,400
+  short-term investments 878m x 7.0288 x 95% = 5,862,722,080
+  long-term deposits/notes 678m x 7.0288 x 90% = 4,288,973,760
+  short-term borrowings -30m x 7.0288 = -210,864,000
+  total = 11,719,118,240
+Equity investments excluded from detachable cash.
+
+discounted_sustainable_cash_profit_cny:
+  operating FCF 840m x 7.1875 = 6,037,500,000
+  less NCI dividends 75m x 7.1875 = 539,062,500
+  subtotal = 5,498,437,500
+  sustainability discount 10% = 549,843,750
+  final = 4,948,593,750
+
+market_cap = 114,010,879,562.01077
+operating_business_price = 114,010,879,562.01077 - 11,719,118,240 = 102,291,761,322.01077
+owner_earnback_years = 102,291,761,322.01077 / 4,948,593,750 = 20.6708746949
+market_cap_to_cash_profit = 114,010,879,562.01077 / 4,948,593,750 = 23.0390461052
+
+[dividend-forecast]
+quarterly dividend assumption = USD 0.29/share
+shares = 354m at 2025-12-31
+annual forecast = 0.29 x 4 x 354m x 7.0288 = CNY 2,886,306,432
+forecast yield = 2,886,306,432 / 114,010,879,562.01077 = 0.02531606144
+This is an assumption based on the declared new quarterly rate, not company guidance for four guaranteed payments.
+
+[quality-notes]
+The company does not present a single gross-profit line. Gross profit was consistently constructed by subtracting direct company-restaurant, franchise, franchisee-transaction and other operating costs from total revenue; it is not identical to company restaurant profit.
+Single-year cash profit can vary with store-opening pace, maintenance/remodel capex and working capital.
+No buy/sell recommendation or target price was produced.

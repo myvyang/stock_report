@@ -1,0 +1,83 @@
+[2026-08-04 18:40:03+08:00] protocol init
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+result: initialized stock-research-result-v1 skeleton
+
+[source reuse check]
+checked:
+- stock_report/data/raw/filings/01415.HK/2025-12-31/metadata.json
+- stock_report/data/analysis/annual_review/01415.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/01415.HK/2025-12-31/annual_facts.md
+- stock_report/data/normalized/facts/01415.HK/2025-12-31/annual-facts.json
+- stock_report/data/analysis/stock_research/01415.HK/2025-12-31/*
+result: referenced files/directories were absent in the workspace; no prior facts or research result reused
+
+[primary filing]
+title: Cowell e Holdings Inc. Annual Report 2025
+release: HKEX, 2026-04-24 18:03
+url: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042402178.pdf
+pages used: 7, 10-13, 87-94, 111-114, 124-130, 143-145
+
+[analysis model verification]
+input hint: financial_brokerage / requires_special_model
+filing facts: manufacturing and sale of camera modules and optical components; one operating segment; ordinary manufacturing assets and liabilities
+decision: override hint with ordinary_operating / applicable
+reason: no brokerage customer funds, proprietary financial assets, margin financing or repo liabilities exist in the annual report
+
+[currency conversion]
+filing presentation currency: USD
+protocol output currency: CNY
+income statement and cash flow conversion rate: 7.15 CNY/USD, approximate 2025 period-average rate based on PBOC/CFETS monthly averages
+balance sheet and proposed dividend conversion rate: 7.0358 CNY/USD, PBOC/CFETS central parity published 2025-12-26
+market cap: 15,883,030,742.752552 CNY, taken directly from task input per protocol; source Tencent qt.gtimg.cn, timestamp 2026-08-03 09:48:04
+
+[reported USD facts and CNY conversions]
+revenue: USD 3,500,054,000 * 7.15 = CNY 25,025,386,100
+cost of sales: USD 3,141,326,000 * 7.15 = CNY 22,460,480,900
+gross profit: USD 358,728,000 * 7.15 = CNY 2,564,905,200
+operating profit: USD 239,945,000 * 7.15 = CNY 1,715,606,750
+net profit: USD 194,947,000 * 7.15 = CNY 1,393,871,050
+parent net profit: USD 196,904,000 * 7.15 = CNY 1,407,863,600
+operating cash flow: USD 316,306,000 * 7.15 = CNY 2,261,587,900
+capital expenditure: USD 74,083,000 * 7.15 = CNY 529,693,450
+operating free cash flow: CNY 2,261,587,900 - CNY 529,693,450 = CNY 1,731,894,450
+total assets: USD 1,543,702,000 * 7.0358 = CNY 10,861,178,531.60
+total liabilities: USD 812,271,000 * 7.0358 = CNY 5,714,976,301.80
+total equity: USD 731,431,000 * 7.0358 = CNY 5,146,202,229.80
+parent equity: USD 726,128,000 * 7.0358 = CNY 5,108,891,382.40
+minority interest: USD 5,303,000 * 7.0358 = CNY 37,310,847.40
+
+[ratios]
+gross margin = 358,728 / 3,500,054 = 0.10249213297851976
+net margin = 196,904 / 3,500,054 = 0.056257417742697685
+minority interest ratio = 5,303 / 731,431 = 0.007250648476789812
+
+[discounted detachable net cash]
+cash and cash equivalents: USD 149,439,000 * 7.0358 = CNY 1,051,422,916.20; 90% included = CNY 946,280,624.58
+bank deposits >3 months: USD 157,922,000 * 7.0358 = CNY 1,111,107,607.60; 90% included = CNY 999,996,846.84
+bank loans: USD 131,485,000 * 7.0358 = CNY 925,102,163.00; 100% deducted
+lease liabilities: USD 35,998,000 * 7.0358 = CNY 253,274,728.40; 100% deducted
+discounted detachable net cash = 946,280,624.58 + 999,996,846.84 - 925,102,163.00 - 253,274,728.40 = CNY 767,900,580.02
+
+[discounted sustainable cash profit]
+starting operating free cash flow: CNY 1,731,894,450
+judgment adjustment: -20% for 99% customer revenue concentration, working-capital variability and negative 2024 free cash flow
+discounted sustainable cash profit = CNY 1,731,894,450 * 0.80 = CNY 1,385,515,560
+
+[owner earnback]
+operating business price = 15,883,030,742.752552 - 767,900,580.02 = CNY 15,115,130,162.732552
+owner earnback years = 15,115,130,162.732552 / 1,385,515,560 = 10.909390409684429
+market cap to cash profit = 15,883,030,742.752552 / 1,385,515,560 = 11.463624950377715
+discounted net cash to market cap = 767,900,580.02 / 15,883,030,742.752552 = 0.04834723249342033
+
+[dividend]
+annual report proposed final dividend: HKD 0.35/share, disclosed aggregate USD 39,050,000
+forecast cash dividend = USD 39,050,000 * 7.0358 = CNY 274,747,990
+forecast dividend yield = 274,747,990 / 15,883,030,742.752552 = 0.01729820929329674
+2024 final dividend: nil
+
+[protocol population]
+method: all JSON fields were written with repeated `protocol set` commands; the initialized object was not replaced by a hand-written complex JSON file
+
+[validation]
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+result: status=ok, errors=[]

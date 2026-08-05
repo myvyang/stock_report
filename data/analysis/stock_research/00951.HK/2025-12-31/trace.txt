@@ -1,0 +1,55 @@
+stock-research trace
+created_at: 2026-08-03 Asia/Shanghai
+company: Chaowei Power Holdings Limited (00951.HK)
+period: 2025-12-31 annual
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- references/result-contract.md
+- references/report-contract.md
+- references/data-reuse.md
+
+2. Reuse check
+- Expected annual facts and raw filing directories under stock_report were absent.
+- No prior annual facts or stock-research result was reused.
+
+3. Primary disclosures obtained
+- HKEX 2025 Annual Report, released 2026-04-24:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042403282.pdf
+- HKEX 2025 Annual Results Announcement, released 2026-03-26:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032602086.pdf
+- Annual report PDF stored at stock_report/data/raw/filings/00951.HK/2025-12-31/annual-report-2025.pdf
+- Market cap, date, source and PE reused from config/input.json.
+
+4. Model verification
+- Input hint financial_brokerage / utility_operator rejected.
+- Filing note 1 identifies manufacturing and sales of lead-acid motive batteries, lithium-ion batteries and related products.
+- Selected ordinary_operating; owner earnback applicability = applicable.
+
+5. Key calculations (CNY yuan)
+- gross_margin = 3,656,712,000 / 54,400,453,000 = 0.06721841084668909
+- net_margin = 360,917,000 / 54,400,453,000 = 0.006634448430052595
+- capital_expenditure = 238,727,000 PP&E + 73,044,000 intangibles + 40,180,000 equipment deposits = 351,951,000
+- operating_free_cash_flow = 678,587,000 - 351,951,000 = 326,636,000
+- discounted detachable net cash = 3,752,375,000 * 70% + 3,360,660,000 * 0% - 9,867,013,000 borrowings - 4,534,000 lease liabilities = -7,244,884,500
+- parent FCF proxy = 326,636,000 * (360,917,000 / 516,025,000) = 228,454,988.05678022
+- discounted sustainable cash profit = parent FCF proxy * 80% = 182,763,990.4454242
+- operating business price = 1,282,337,377.6811361 - (-7,244,884,500) = 8,527,221,877.681136
+- owner earnback years = 8,527,221,877.681136 / 182,763,990.4454242 = 46.65701299746724
+- market cap to cash profit = 1,282,337,377.6811361 / 182,763,990.4454242 = 7.016356857583822
+- forecast dividend CNY = HKD61,831,000 * (RMB43,244,000 / HKD47,477,000) = 56,318,212.27120501
+- forecast dividend yield = 56,318,212.27120501 / 1,282,337,377.6811361 = 0.04391840497782714
+
+6. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated initialized paths using protocol set commands; arrays and subobjects were set into the initialized schema rather than composing result.json manually.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before handoff: status ok, errors [].
+
+7. Limitations
+- No product-level segment profit is disclosed.
+- Market cap and PE were not independently recomputed.
+- Sustainable cash profit is a conservative single-year analytical estimate, not company guidance.
+- No independently verifiable 2025 market-share figure was found.

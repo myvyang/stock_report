@@ -1,0 +1,73 @@
+stock-research trace
+task_input=config/input.json
+task_period=2025-12-31
+actual_fiscal_period_used=2025-03-31
+generated_context_date=2026-08-03 Asia/Shanghai
+
+[protocol]
+read .agents/skills/stock-research/SKILL.md
+read references/result-contract.md
+read references/report-contract.md
+read references/data-reuse.md
+initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+populated fields with protocol set commands; no complex JSON skeleton was handwritten
+validated with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_result=status ok, errors=[]
+
+[local_reuse]
+requested annual facts, normalized facts, filing metadata and prior stock research paths were absent under /workspace and /root/aicode/stock_report
+therefore retrieved primary public filing
+
+[primary_filing]
+title=AV Concept Holdings Limited Annual Report 2025
+url=https://www.hkexnews.hk/listedco/listconews/sehk/2025/0731/2025073100644.pdf
+publication_date=2025-07-31
+fiscal_year_end=2025-03-31
+key_pages=14-15 business review; 26 dividend; 96 profit or loss; 98-99 financial position; 102-103 cash flow; 137-139 segments; 150 dividend; 163-164 joint ventures; 175 financial guarantee; 182 contingent liabilities
+
+[model_review]
+input_hint=financial_brokerage
+overridden_to=investment_holding
+reason=company has no brokerage operating model; consolidated businesses are distribution/consumer products/venture capital, while equity-accounted AVPEL investment is about 80% of consolidated assets and supplies profit exceeding consolidated profit before tax
+owner_earnback_applicability=requires_special_model
+ordinary_owner_earnback_fields=all null as required
+
+[source_figures_hkd]
+revenue=1,189,997,000
+cost_of_sales=1,176,827,000
+gross_profit=13,170,000
+parent_net_profit=53,714,000
+total_assets=1,899,588,000
+total_liabilities=165,531,000
+parent_equity=1,734,057,000
+operating_cash_flow=18,453,000
+capital_expenditure=1,341,000
+operating_free_cash_flow=17,112,000
+joint_venture_investment=1,524,514,000
+share_of_joint_venture_profit=155,812,000
+joint_venture_dividend_received=78,671,000
+financial_guarantee_obligation=45,481,000
+joint_venture_facilities_utilised_under_cross_guarantees=3,497,254,000
+proposed_final_dividend_per_share=0.01
+proposed_final_dividend_total_approx=9,086,633
+
+[conversion]
+source=China Foreign Exchange Trade System authorised central parity, Xinhua reproduction, 2025-03-31
+rate=100 HKD : 92.283 CNY
+factor=0.92283 CNY per HKD
+all financial statement amounts in result.json converted to absolute CNY yuan
+market_cap retained exactly from input because protocol initialized it as CNY; original quote currency was not supplied
+
+[formula_checks]
+gross_margin=13,170,000 / 1,189,997,000 = 0.0110672548
+net_margin=53,714,000 / 1,189,997,000 = 0.0451379289
+forecast_cash_dividend=9,086,633 HKD * 0.92283 = 8,385,417.53 CNY
+forecast_dividend_yield=8,385,417.53 / 785,557,140.0928497 = 0.0106744845
+
+[limitations]
+task period is a calendar-year marker, while company fiscal year ends 31 March
+market snapshot is dated 2026-07-31 whereas filing period ends 2025-03-31
+input does not state the original Tencent market-cap currency
+ordinary earnback metrics intentionally null due to special investment-holding model

@@ -1,0 +1,66 @@
+stock-research trace
+company: 山外山 (688410.SH)
+period: 2025-12-31 annual
+generated_for_input: 2026-07-31T19:40:40+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Searched stock_report annual_review, normalized facts, raw filings, and prior stock_research paths supplied in config/input.json.
+- No 688410.SH filing, annual facts, normalized facts, or prior stock research artifacts existed in the workspace.
+- Therefore collected missing facts from public annual-report disclosure rather than fabricating a fact pack.
+
+3. Sources consulted
+- 山外山2025年年度报告公开HTML转录（公告编号页面 id=12283400）：
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12283400&stockid=688410
+- 山外山2025年年度报告摘要公开HTML转录（公告编号页面 id=12283389）：
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12283389&stockid=688410
+- Market cap, timestamp, source, and PE TTM: config/input.json (Tencent qt.gtimg.cn).
+- Search also surfaced the 2025 performance bulletin and secondary research, but core result numbers were taken from the audited annual report, not those secondary sources.
+
+4. Model decision
+- Confirmed ordinary_operating.
+- Revenue comes from equipment, consumables, and medical services; balance sheet is not a bank, broker, insurer, property developer, construction contractor, concession utility, or investment holding structure.
+- owner_earnback_applicability = applicable.
+
+5. Key reported facts transcribed
+- Total assets 2,346,693,651.27; liabilities 567,742,760.10; parent equity 1,778,950,891.17.
+- Revenue 806,907,836.67; cost 401,588,417.02; gross profit calculated 405,319,419.65.
+- Operating profit 182,990,702.30; net profit 144,242,405.21; parent net profit 145,885,505.04; deducted parent profit 139,061,503.50.
+- Operating cash flow 308,014,063.45; capex cash paid 156,142,095.83; operating FCF calculated 151,871,967.62.
+- Cash 572,884,468.29, of which restricted cash 20,902,230.70.
+- Trading financial assets 941,033,418.30: bank wealth products 168,439,401.92, structured deposits 292,671,953.80, trust plans 479,922,062.58.
+- Financial liabilities per financial-instrument note 248,243,364.99.
+- Proposed 2025 cash dividend 63,586,856.20, pending shareholder approval.
+
+6. Analytical calculations
+- Gross margin = 405,319,419.65 / 806,907,836.67 = 0.502301.
+- Net margin = 145,885,505.04 / 806,907,836.67 = 0.180670.
+- Discounted detachable net cash:
+  unrestricted cash 551,982,237.59 * 50% = 275,991,118.80
+  bank wealth + structured deposits 461,111,355.72 * 70% = 322,777,949.00
+  trust plans 479,922,062.58 * 30% = 143,976,618.77
+  less financial liabilities 248,243,364.99 * 100% = -248,243,364.99
+  total = 494,502,321.58.
+- Sustainable cash profit starts from 139,061,503.50 deducted parent profit and applies a 9,061,503.50 prudence adjustment; rounded result 130,000,000.00. 2025 FCF provides a cross-check, not the denominator itself.
+- Operating business price = 4,729,000,000.00 - 494,502,321.58 = 4,234,497,678.42.
+- Owner earnback = 4,234,497,678.42 / 130,000,000.00 = 32.5731 years.
+- Market cap / cash profit = 4,729,000,000.00 / 130,000,000.00 = 36.3769.
+- Forecast dividend yield = 63,586,856.20 / 4,729,000,000.00 = 0.0134468.
+
+7. Protocol writes and validation
+- All complex result sections were populated using protocol `set` commands after protocol initialization; result.json was not hand-written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].
+
+8. Limitations
+- No original filing PDF or prebuilt annual fact pack existed locally. Public HTML reproductions were used for the audited annual-report content.
+- Detachable-cash discounts and sustainable-cash-profit adjustment are analyst judgments and explicitly identified as such.
+- The largest sensitivity is whether cash-managed fundraising proceeds are truly excess and whether trust plans are fully recoverable.
+- Market-cap and PE values were accepted from the supplied input and not independently reconstructed.

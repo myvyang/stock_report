@@ -1,0 +1,85 @@
+stock-research trace
+company=000830.SZ 鲁西化工
+period=2025-12-31
+generated_at=2026-08-01T00:38:58+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar fields using protocol set; populated list fields using protocol append.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result={"status":"ok","errors":[]}
+
+[reuse_check]
+- Checked stock_report/data/analysis/annual_review/000830.SZ/2025-12-31: absent.
+- Checked stock_report/data/raw/filings/000830.SZ/2025-12-31: absent.
+- Checked stock_report/data/analysis/stock_research/000830.SZ/2025-12-31: absent.
+- Therefore no local annual fact pack, raw filing metadata, or historical research was available for reuse.
+
+[primary_sources]
+- 2025 annual report, official CNInfo PDF:
+  https://static.cninfo.com.cn/finalpage/2026-04-29/1225240360.PDF
+- 2025 profit distribution proposal, announcement 2026-011, official CNInfo PDF:
+  https://static.cninfo.com.cn/finalpage/2026-04-29/1225240350.PDF
+- Market snapshot: config/input.json; Tencent qt.gtimg.cn; market_cap=23937000000; timestamp=20260731114324; pe_ttm=25.69.
+- The CNInfo annual-report PDF was downloaded to /tmp/luxi_research/annual.pdf for source verification. Local pdftotext was unavailable, so the same disclosure was located through indexed annual-report text and cross-checked against the official PDF search result.
+
+[model_check]
+- Confirmed statement_model=ordinary_operating.
+- Basis: revenue comes from manufacturing and direct sale of chemical materials, basic chemicals and fertilizers; fixed assets, construction in progress, inventory and borrowings are ordinary heavy-manufacturing operating/funding items.
+- Owner earnback applicability=applicable, with heavy-asset and cyclical adjustments.
+
+[core_financials_cny]
+revenue=29143461223.18
+cost_of_sales=25946049592.73
+gross_profit=3197411630.45
+gross_margin=0.10971283081183429
+operating_profit=1068104358.96
+net_profit=908126620.38
+parent_net_profit=906707976.79
+net_margin=0.031111883720552264
+total_assets=35681918059.20
+total_liabilities=16604929075.10
+total_equity=19076988984.10
+parent_equity=18940612519.51
+minority_interest=136376464.59
+operating_cash_flow=4261621926.10
+capital_expenditure=2042803773.44
+operating_free_cash_flow=2218818152.66
+financing_cash_flow=-2684880734.51
+
+[owner_earnback_calculation]
+reported_cash=604332383.98
+restricted_cash=5420711.10
+unrestricted_cash=598911672.88
+cash_discount_rate=0.95
+discounted_cash=568966089.236
+financing_debt=short_term_borrowings 4261444800.00 + current_noncurrent_liabilities 1298452758.01 + long_term_borrowings 2529265500.00 + bonds_payable 3626000000.00 + long_term_payables 220843487.00 = 11936006545.01
+discounted_detachable_net_cash=568966089.236-11936006545.01=-11367040455.774
+operating_business_price=23937000000-(-11367040455.774)=35304040455.774
+discounted_sustainable_cash_profit=1100000000
+owner_earnback_years=35304040455.774/1100000000=32.09458223252182
+market_cap_to_cash_profit=23937000000/1100000000=21.76090909090909
+
+[cash_profit_judgment]
+- Starting fact: parent net profit=906707976.79; deducted nonrecurring parent profit=710856616.06; asset impairment loss=600809162.58; operating FCF=2218818152.66.
+- Inference: reported FCF is not fully sustainable because operating payables increased by about 1284265794.10 while inventory increased by about 702447884.36.
+- Judgment: use CNY 1.10bn as discounted sustainable distributable cash profit after partial noncash-impairment add-back, nonrecurring-item removal, and buffers for working-capital reversal and maintenance capital expenditure.
+
+[dividend]
+shares=1904319011
+dividend_per_share=0.20
+forecast_cash_dividend=380863802.20
+forecast_dividend_yield=380863802.20/23937000000=0.01591109170739859
+status=board proposal; subject to shareholder approval and implementation notice.
+
+[quality]
+status=complete
+limitations:
+- Market cap and PE were accepted from the input snapshot and not independently recalculated.
+- Sustainable cash profit is an analyst estimate, not company guidance.
+- Chemical-cycle, maintenance-capex and impairment recurrence can materially alter earnback years.
+- Dividend is a proposal at the research cutoff.

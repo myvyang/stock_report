@@ -1,0 +1,65 @@
+stock-research trace
+company=688513.SH 苑东生物
+period=2025-12-31
+generated_for=2026-08-01 task
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated initialized fields through repeated protocol set commands; did not construct result.json manually.
+5. Validated with protocol validate. Final validation status is recorded below.
+
+[reuse-check]
+Requested local annual-review paths and raw-filing paths were absent. Only config/input.json and the initialized result existed in the workspace.
+No prior stock-research result was available for reuse.
+
+[sources]
+Primary accounting source: 成都苑东生物制药股份有限公司2025年年度报告, disclosure date 2026-04-22, accessed as full-text announcement mirror:
+https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12134246&stockid=688513
+The report identifies SSE as its exchange disclosure venue and carries a standard unmodified audit opinion from ShineWing. Workspace limitation: original SSE PDF was not present locally, so the mirror is explicitly disclosed as a limitation.
+
+Market source: config/input.json; Tencent qt.gtimg.cn snapshot at 2026-07-31 11:43:48, market cap CNY 7,866,000,000 and PE TTM 28.68.
+
+[key-extraction]
+Revenue=1,331,390,248.33
+Cost of sales=329,515,498.72
+Gross profit=1,001,874,749.61
+Parent net profit=284,059,384.18
+Adjusted parent net profit=207,998,682.19
+Operating cash flow=264,941,204.22
+Capital expenditure=86,283,090.32
+Operating free cash flow=178,658,113.90
+Total assets=3,797,879,307.21
+Total liabilities=758,903,799.23
+Parent equity=2,932,838,202.30
+Cash and cash equivalents=836,878,171.24
+Cash balance=855,427,501.81; restricted/other deposits explain the difference.
+Trading financial assets=758,004,625.52; bank wealth-management products=757,671,264.48.
+Interest-bearing debt=110,713,599.13 + 4,400,000.00 + 31,533,333.32 = 146,646,932.45.
+Proposed cash dividend=85,432,925.90.
+
+[formulas]
+gross_margin=(revenue-cost_of_sales)/revenue=0.7525
+net_margin=parent_net_profit/revenue=0.213355
+operating_free_cash_flow=264,941,204.22-86,283,090.32=178,658,113.90
+discounted_cash_component=(836,878,171.24-300,000,000)*0.90=483,190,354.12
+discounted_bank_wealth=757,671,264.48*0.90=681,904,138.03
+discounted_net_cash=483,190,354.12+681,904,138.03-146,646,932.45=1,018,447,559.70
+discounted_cash_profit=178,658,113.90*0.90=160,792,302.51
+operating_business_price=7,866,000,000-1,018,447,559.70=6,847,552,440.30
+owner_earnback_years=6,847,552,440.30/160,792,302.51=42.5863
+market_cap_to_cash_profit=7,866,000,000/160,792,302.51=48.9203
+forecast_dividend_yield=85,432,925.90/7,866,000,000=0.0108613
+
+[judgment-boundaries]
+Fact: audited financial statement and annual-report disclosures above.
+Inference: ordinary_operating model applies because deposits, wealth-management products and borrowings are treasury items rather than customer funds or regulated operating liabilities.
+Judgment: CNY 300m operating reserve, 90% discounts on surplus cash/bank wealth and single-year FCF are conservative analyst assumptions, not company guidance.
+No buy/sell recommendation or target price is produced.
+
+[validation]
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

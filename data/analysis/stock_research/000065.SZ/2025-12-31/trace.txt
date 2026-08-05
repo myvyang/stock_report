@@ -1,0 +1,54 @@
+[2026-07-31] task initialized from config/input.json
+- command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- initialized schema: stock-research-result-v1
+
+[source reuse check]
+- requested annual facts: stock_report/data/analysis/annual_review/000065.SZ/2025-12-31/facts.json
+- requested annual facts markdown: stock_report/data/analysis/annual_review/000065.SZ/2025-12-31/annual_facts.md
+- requested normalized facts: stock_report/data/normalized/facts/000065.SZ/2025-12-31/annual-facts.json
+- result: none existed; returned to public filing
+
+[filings and sources]
+1. 北方国际合作股份有限公司2025年年度报告全文
+   - disclosure date: 2026-03-31
+   - source copy: https://pdf.dfcfw.com/pdf/H2_AN202603301820875873_1.pdf
+   - local raw copy: stock_report/data/raw/filings/000065.SZ/2025-12-31/annual-report-2025.pdf
+   - filing facts used: business, segments, orders, three statements, receivables, financing, guarantees and post-balance-sheet dividend
+2. 北方国际关于2025年度利润分配方案的公告（公告编号2026-019）
+   - official source: https://static.cninfo.com.cn/finalpage/2026-03-31/1225061103.PDF
+   - facts used: dividend amount 159,117,575.78 yuan, 1.37 yuan per 10 shares, payout ratio about 22%, retained-profit rationale
+3. Tencent qt.gtimg.cn snapshot supplied in config/input.json
+   - market cap: 10,801,000,000 yuan
+   - timestamp: 20260731114312
+   - PE TTM: 16.44
+
+[model decision]
+- input hint: ordinary_operating / applicable
+- reviewed fact: company states it belongs to civil engineering construction; international engineering contracting is its core business
+- reviewed balance-sheet facts: receivables 4.174bn, contract assets 0.676bn, prepayments 2.198bn, long-term receivables 3.432bn, contract liabilities 2.213bn, project-related borrowings and material guarantees
+- override: construction_project / requires_special_model
+- consequence: all ordinary owner-earnback fields remain null; no detachable cash or payback years fabricated
+
+[calculations]
+- gross profit = 13,553,927,839.78 - 11,618,417,727.67 = 1,935,510,112.11
+- gross margin = 1,935,510,112.11 / 13,553,927,839.78 = 0.142800679994
+- parent net margin = 723,310,917.63 / 13,553,927,839.78 = 0.053365410100
+- simplified operating free cash flow = 1,048,812,790.94 - 498,615,376.27 = 550,197,414.67
+- forecast/implemented dividend yield = 159,117,575.78 / 10,801,000,000 = 0.014731744818
+- project funding assets = receivables + contract assets + prepayments + long-term receivables = 10,495,123,718.84
+- interest-bearing borrowings and lease liabilities = short-term borrowings + current non-current liabilities + long-term borrowings + lease liabilities = 5,997,782,153.69
+
+[protocol writes]
+- outputs/result.json was initialized by the protocol CLI
+- all populated sections were written with protocol `set` commands; the complex result was not authored from scratch
+- sections set: analysis.sources_used, analysis_model, metrics, financials, asset_analysis, owner_earnback, dividend, business, risks, evidence, data_quality
+
+[validation]
+- command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- result: status=ok, errors=[]
+
+[limitations]
+- annual-report PDF local text extraction utilities were unavailable; filing text and line references were inspected through indexed PDF access, while the raw PDF was retained locally
+- market capitalization and PE use the supplied third-party snapshot
+- free cash flow is a simplified calculation and does not separate maintenance from growth capex
+- multi-currency guarantees are described separately; the structured asset-analysis amount records only the RMB component

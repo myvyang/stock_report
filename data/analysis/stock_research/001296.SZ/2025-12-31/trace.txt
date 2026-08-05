@@ -1,0 +1,71 @@
+stock-research trace
+company: 001296.SZ 长江材料
+period: 2025-12-31 annual
+generated_at: 2026-08-01 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result
+- command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- result: stock-research-result-v1 skeleton created
+
+3. Reuse check
+- No existing raw filing, annual facts, normalized facts, or prior stock-research output for 001296.SZ/2025-12-31 was present.
+- Therefore retrieved the official annual filing rather than fabricating missing facts.
+
+4. Official filing retrieval
+- CNINFO history-announcement query returned announcement ID 1225226034, title 2025年年度报告, disclosure date 2026-04-29.
+- source URL: https://static.cninfo.com.cn/finalpage/2026-04-29/1225226034.PDF
+- saved: stock_report/data/raw/filings/001296.SZ/2025-12-31/2025-annual-report.pdf
+- text extraction saved: stock_report/data/raw/filings/001296.SZ/2025-12-31/2025-annual-report.txt
+- PDF: 216 pages. Text extraction used pypdf in an isolated temporary virtual environment because pdftotext was unavailable.
+
+5. Model classification
+- Confirmed ordinary_operating/applicable.
+- Evidence: product manufacturing and direct sales; operating assets are mines, plants, inventory and receivables; financing is ordinary borrowings and leases.
+- Oil and gas exploration is a new asset/risk but does not make the consolidated statements a special oil-and-gas financial model.
+
+6. Core facts extracted from the annual report
+- Revenue 1,162,644,964.19
+- Cost of sales 869,944,446.77
+- Gross profit 292,700,517.42; gross margin 25.1754%
+- Parent net profit 123,948,760.04; net margin 10.6609%
+- Parent recurring net profit 124,246,250.02
+- Total assets 2,277,051,847.63
+- Total liabilities 465,395,113.94
+- Parent equity 1,786,475,411.15
+- Operating cash flow 208,963,782.31
+- Capital expenditure 157,354,285.44
+- Operating free cash flow 51,609,496.87
+
+7. Owner earnback calculations
+- included cash equivalents: 153,983,701.42 at 100%
+- included trading financial assets: 209,151,561.64 at 95% = 198,693,983.558
+- included one-year deposits and interest: 184,014,890.38 at 100%
+- deducted borrowings: 151,502,173.70
+- deducted lease liabilities: 27,709,977.60
+- discounted detachable net cash = 357,480,424.058
+- operating business price = 2,567,000,000 - 357,480,424.058 = 2,209,519,575.942
+- sustainable cash profit estimate: recurring parent profit + depreciation/amortization - estimated maintenance capex - prudence haircut = 98,000,000
+- owner earnback years = 2,209,519,575.942 / 98,000,000 = 22.5461
+- market cap / cash profit = 2,567,000,000 / 98,000,000 = 26.1939
+
+8. Dividend convention
+- 2025 profit-distribution basis uses 29,672,734.80 already distributed after Q3 plus 29,672,734.80 proposed at annual report = 59,345,469.60.
+- forecast yield = 59,345,469.60 / 2,567,000,000 = 2.3119%.
+- Limitation: final annual distribution was still a proposal at annual-report disclosure.
+
+9. Protocol writing and validation
+- All result fields were populated using protocol set commands after protocol initialization.
+- validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- validation result: status ok, errors []
+
+10. Important judgment limitations
+- Maintenance capex is not separately disclosed; estimate of 70,000,000 uses depreciation/amortization as anchor.
+- Industry position is primarily company-reported and lacks independent market-share verification.
+- Market cap and PE TTM are reused from the supplied Tencent quote snapshot.
+- No investment recommendation or target price produced.

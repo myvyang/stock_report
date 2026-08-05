@@ -1,0 +1,62 @@
+stock-research trace
+company: 湖南海利 (600731.SH)
+period: 2025-12-31 annual
+generated_at: 2026-08-01 Asia/Shanghai
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes source reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the input-declared raw filing, annual review, normalized facts, and prior stock research paths.
+- None of the declared 600731.SH/2025-12-31 filing or fact-package files existed in the workspace.
+- Therefore fetched and inspected the formal 2025 annual report rather than inferring from missing local facts.
+
+3. Primary sources
+-湖南海利化工股份有限公司2025年年度报告, disclosed 2026-03-31:
+  https://static.cninfo.com.cn/finalpage/2026-03-31/1225051202.PDF
+  Used for business, segment revenue/margins, three statements, cash restrictions, inventory, borrowings, capex, non-recurring items, dividend proposal, risks, and audit opinion.
+- 湖南海利2025年年度股东会会议资料, disclosed 2026-06-19:
+  https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-06-19/600731_20260619_VEY7.pdf
+  Used to cross-check 2025 financial results and the no-cash-dividend proposal submitted to the annual meeting.
+- config/input.json / Tencent qt.gtimg.cn snapshot:
+  market cap CNY 3,212,000,000; PE TTM 13.87; timestamp 2026-07-31 11:43:33.
+
+4. Model classification
+- Confirmed ordinary_operating / applicable.
+- Reason: manufacturing revenue is mainly pesticides and lithium materials; balance sheet contains ordinary cash, receivables, inventory, plant, construction projects, payables, and bank debt. No special-model customer deposits, insurance reserves, regulated presale cash, concession rights, or comparable balance-sheet-as-business structure.
+
+5. Core calculations
+- Gross profit = 1,810,165,821.69 - 1,208,549,805.56 = 601,616,016.13.
+- Gross margin = 601,616,016.13 / 1,810,165,821.69 = 0.3323540909.
+- Net margin = parent net profit 243,649,320.53 / revenue 1,810,165,821.69 = 0.1346005529.
+- Operating free cash flow = CFO 246,783,674.39 - capex 229,680,720.57 = 17,102,953.82.
+- Discounted detachable net cash:
+  * cash and equivalents 1,007,124,045.57 x 70% = 704,986,831.899;
+  * other non-current financial assets 15,643,008.60 x 50% = 7,821,504.30;
+  * less long-term debt, current portion, and lease liabilities 533,218,795.49;
+  * total = 179,589,540.709.
+- Sustainable cash profit:
+  * audited parent net profit 243,649,320.53;
+  * less non-recurring profit 60,974,378.29;
+  * further haircut 32,674,942.24 for cyclicality, inventory build, and capex/maintenance uncertainty;
+  * rounded result = 150,000,000.
+- Operating business price = 3,212,000,000 - 179,589,540.709 = 3,032,410,459.291.
+- Owner earnback years = 3,032,410,459.291 / 150,000,000 = 20.21606973.
+- Market cap / cash profit = 3,212,000,000 / 150,000,000 = 21.41333333.
+- Forecast cash dividend = 0 because the approved 2025 profit distribution pays no cash dividend. The 2025 buyback is disclosed separately and is not treated as a future cash dividend.
+
+6. Judgment controls
+- Cash was not treated as fully detachable because inventory increased CNY 205.56m, construction projects remain active, and the operating business needs working/project capital.
+- Actual capex was not treated as entirely recurring maintenance capex because the annual report identifies expansion/construction projects; absent a disclosed maintenance/growth split, cash profit was conservatively estimated between simple FCF and adjusted recurring profit.
+- Company claims on industry leadership are attributed to the annual report and not represented as independently verified market-share measurements.
+- No recommendation, target price, or ranking label was produced.
+
+7. Validation
+- Populated outputs/result.json using protocol set and append commands; did not hand-write the complex JSON object.
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].

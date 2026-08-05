@@ -1,0 +1,84 @@
+Stock research trace — CPRT
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the task requires deciding whether existing facts can be reused.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- Checked the annual review, normalized facts, raw filing and prior stock research paths specified by config/input.json.
+- No staged CPRT filing, annual facts package, normalized facts, or prior research output existed in the workspace; public-source retrieval was required.
+
+3. Company and period identity
+- Confirmed Copart, Inc., NASDAQ: CPRT, CIK 0000900075.
+- Task period is 2025-12-31 and report_type is annual, but Copart fiscal year ends July 31.
+- Used the most recent completed annual filing: FY ended 2025-07-31, Form 10-K filed 2025-09-26, accession 0001628280-25-042946.
+- Did not combine quarterly data into a synthetic annual report.
+
+4. Primary sources retrieved
+- SEC filing index: https://www.sec.gov/Archives/edgar/data/900075/000162828025042946/0001628280-25-042946-index.html
+- SEC Form 10-K: https://www.sec.gov/Archives/edgar/data/900075/000162828025042946/cprt-20250731.htm
+- SEC Companyfacts JSON: https://data.sec.gov/api/xbrl/companyfacts/CIK0000900075.json
+- Copart investor relations: https://www.copart.com/content/us/en/investor-relations
+- Federal Reserve/FRED AEXCHUS: https://fred.stlouisfed.org/series/AEXCHUS
+- Market cap, market-cap date and PE TTM were supplied by config/input.json and attributed there to Yahoo Finance yfinance.
+
+5. Financial statement extraction (reported USD)
+- Revenue: $4,646,958,000.
+- Facility operations: $1,944,318,000.
+- Cost of vehicle sales: $602,997,000.
+- Gross profit defined consistently as revenue less facility operations and vehicle cost: $2,099,643,000.
+- General and administrative expense: $402,929,000.
+- Operating income: $1,696,714,000.
+- Consolidated net income: $1,548,363,000.
+- Net loss attributable to redeemable noncontrolling interest: $4,086,000.
+- Net income attributable to Copart: $1,552,449,000.
+- Operating cash flow: $1,799,750,000.
+- Purchases of property and equipment: $568,990,000.
+- Operating free cash flow: $1,230,760,000.
+- Total assets: $10,090,902,000.
+- Total liabilities: $883,411,000.
+- Copart stockholders' equity: $9,187,033,000.
+- Redeemable noncontrolling interest: $20,458,000.
+- Cash, cash equivalents and restricted cash: $2,780,531,000.
+- Held-to-maturity securities: $2,008,539,000.
+- Revolving loan balance: zero.
+
+6. Currency conversion
+- Contract requires CNY absolute yuan.
+- Used Federal Reserve 2025 annual average: 1 USD = CNY 7.1875.
+- Applied consistently to both income/cash-flow and balance-sheet values for protocol comparability.
+- Limitation recorded: balance-sheet accounting translation would normally use a period-end rate.
+
+7. Model classification
+- Classified as ordinary_operating / applicable.
+- Reason: auction and remarketing service operations, own facilities and platform are the business; the balance sheet is not dominated by customer deposits, financial reserves, regulated project cash, concession rights, or investment-holding look-through assets.
+
+8. Owner earnback construction
+- Domestic cash: ($2,780.531m - $314.9m foreign cash) × 80%.
+- Foreign cash: $314.9m × 50%, reflecting permanent reinvestment intent and possible withholding tax.
+- Held-to-maturity securities: $2,008.539m × 95%; filing describes periodic excess-cash investment in U.S. Treasury Bills.
+- Deducted total liabilities $883.411m and redeemable NCI $20.458m at 100%.
+- Discounted detachable net cash: $3,134.19785m = CNY 22,527,047,046.875.
+- Reported FCF: $1,230.760m.
+- Removed after-tax net interest income because detachable cash and its earnings cannot both be counted. Effective tax rate = $347.218m / $1,895.581m; after-tax interest removed = $146.137m.
+- Applied a further 10% sustainability haircut to ex-interest FCF.
+- Discounted sustainable cash profit: $976.159962m = CNY 7,016,149,723.484367.
+- Operating business price = CNY 181,923,589,415.35547 - CNY 22,527,047,046.875 = CNY 159,396,542,368.48047.
+- Owner earnback years = 22.718520648861066.
+- Market cap / cash profit = 25.929262713197687.
+
+9. Dividend forecast
+- 10-K states Copart has not paid a cash dividend since becoming public in 1994.
+- No evidence of a new board dividend policy was used.
+- Forecast cash dividend = CNY 0; forecast dividend yield = 0.
+
+10. Output construction and validation
+- Populated the initialized JSON through repeated protocol `set` and `append` commands; did not replace it with a hand-written JSON object.
+- Generated outputs/report.md as a human-readable operating story and outputs/trace.txt as this audit trail.
+- Ran:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report/trace final checks: status=ok, errors=[].

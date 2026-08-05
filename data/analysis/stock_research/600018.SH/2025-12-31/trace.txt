@@ -1,0 +1,50 @@
+stock-research trace
+company=600018.SH 上港集团
+period=2025-12-31
+run_date=2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read result-contract.md, report-contract.md, and data-reuse.md completely.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result through protocol CLI set commands by JSON paths; did not replace the initialized skeleton with a hand-written result object.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse_audit]
+- Expected annual facts, normalized facts and historical research files for 600018.SH/2025-12-31 were absent in the workspace.
+- Existing user evaluation file contained no company-specific reusable annual fact package.
+- Fallback: retrieved and reviewed the published 2025 annual report; retained PDF and extracted text under stock_report/data/raw/filings/600018.SH/2025-12-31/.
+- Public document mirror URL: https://cniis.aastocks.com/CNSESH_STOCK/2026/2026-4/2026-04-01/12050038.pdf
+- Official-document discovery/cross-check: ChinaMoney annual-report listing and SSE/company disclosures; the PDF itself identifies company code 600018, reporting period 2025 and PwC standard unmodified audit opinion.
+
+[model_review]
+- Input hint: ordinary_operating/applicable.
+- Overridden to platform_financial_mixed/requires_special_model.
+- Evidence: long-term equity investments CNY 89,461,680,587.55 (40.35% of assets); equity-method investment income CNY 7,675,247,311.65 (42.15% of profit before tax); port fixed assets, intangibles and construction in progress are operating assets.
+- Consequence: all ordinary owner-earnback fields remain null as required by result contract.
+
+[key_calculations]
+- gross_profit = 39,611,497,351.53 - 25,302,860,494.14 = 14,308,636,857.39
+- gross_margin = 14,308,636,857.39 / 39,611,497,351.53 = 0.3612243367
+- net_margin = 13,564,589,175.03 / 39,611,497,351.53 = 0.3424407074
+- operating_free_cash_flow = 11,803,101,933.55 - 6,872,326,054.91 = 4,930,775,878.64
+- forecast_dividend_yield = 4,540,000,000 / 121,987,000,000 = 0.0372170805
+- minority_interest_ratio = 14,990,095,964.43 / 155,931,607,711.03 = 0.0961325044
+- interest-bearing debt and lease liabilities = short-term borrowing + current portion of non-current liabilities + long-term borrowing + bonds payable + lease liabilities = CNY 48,084,200,889.31.
+
+[source_pages]
+- Annual report pp. 13-19: business, throughput and segment revenue/margins.
+- Annual report pp. 23-24: major balance-sheet changes and restricted assets.
+- Annual report pp. 62: dividends.
+- Annual report pp. 106-107: key audit matter for equity-method investments.
+- Annual report pp. 110-112: consolidated balance sheet.
+- Annual report pp. 114-116: consolidated income statement.
+- Annual report pp. 118-119: consolidated cash-flow statement.
+- config/input.json: market cap, date, source and PE TTM.
+
+[limitations]
+- Market cap and PE are input-snapshot values, not annual-report values.
+- Dividend forecast uses the disclosed 2025 total as a base scenario, not management guidance for 2026.
+- Cash received from investment income and equity-method income are not identical scopes; comparison is diagnostic only.

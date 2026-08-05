@@ -1,0 +1,66 @@
+ACN stock research trace
+generated_at: 2026-08-04T20:10:25+08:00
+task_period: 2025-12-31
+financial_period_used: FY2025 ended 2025-08-31
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because SKILL.md identifies it as the reuse boundary.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked the configured annual_review, raw filing, normalized facts and prior stock_research paths.
+- No pre-existing ACN FY2025 facts package, normalized facts or research output was present.
+- Downloaded the official SEC inline-XBRL 10-K to stock_report/data/raw/filings/ACN/2025-12-31/acn-20250831.htm.
+
+3. Company and period resolution
+- SEC filing identity: Accenture plc, ticker ACN, CIK 0001467373.
+- Form 10-K filed 2025-10-10, fiscal year ended 2025-08-31.
+- The input period 2025-12-31 is retained as the task analysis period. It is not Accenture's fiscal year-end; no 2025-12-31 annual Accenture filing exists.
+- analysis_model_hint was independently confirmed as ordinary_operating/applicable because revenue comes from consulting and managed services, and balance-sheet working capital is ordinary operating working capital rather than a special financial statement model.
+
+4. Primary-source extraction (USD thousands in filing; converted below)
+- Total assets: 65,394,897.
+- Current liabilities: 20,352,097; non-current liabilities: 12,801,833; total liabilities calculated 33,153,930.
+- Total equity: 32,240,967; parent equity: 31,195,446; noncontrolling interests: 1,045,521.
+- Revenue: 69,672,977; cost of services: 47,437,576; gross profit calculated 22,235,401.
+- Operating income: 10,225,664.
+- Consolidated net income including NCI: 7,832,400; net income attributable to Accenture: 7,678,433.
+- Operating cash flow: 11,474,399; capex: 600,039; operating FCF calculated 10,874,360.
+- Financing cash flow: -2,948,334.
+- Dividends paid: 3,696,677; common share repurchases: 4,619,497.
+- Cash: 11,478,729; short-term investments: 5,945; debt used in earnback: 5,081,710.
+- Share-based compensation expense: 2,093,878.
+- Acquisition cash outflow: 1,168,698.
+- Source: https://www.sec.gov/Archives/edgar/data/1467373/000146737325000217/acn-20250831.htm
+
+5. Currency convention
+- Protocol requires absolute CNY yuan. All filing amounts were multiplied by 7.00 CNY/USD.
+- 7.00 is a transparent normalization assumption, not a claimed spot or average official exchange rate.
+- Market cap and PE were retained exactly from config/input.json: CNY 685,147,571,098.8047; PE TTM 13.241819; date 2026-08-03; source label Yahoo Finance yfinance.
+
+6. Formula checks
+- Gross margin = 155,647,807,000 / 487,710,839,000 = 0.3191395281.
+- Net margin = 53,749,031,000 / 487,710,839,000 = 0.1102067592.
+- NCI ratio = 7,318,647,000 / 225,686,769,000 = 0.0324283388.
+- Discounted detachable net cash = cash 80,351,103,000 * 50% + short-term investments 41,615,000 * 100% - debt 35,571,970,000 = 4,645,196,500.
+- Discounted sustainable cash profit = FCF 76,120,520,000 * (1 - 0.0324283388) - share-based compensation 14,657,146,000 = 58,994,911,990.44178.
+- Operating business price = 685,147,571,098.8047 - 4,645,196,500 = 680,502,374,598.8047.
+- Owner earnback years = 680,502,374,598.8047 / 58,994,911,990.44178 = 11.5349332958.
+- Market cap / cash profit = 685,147,571,098.8047 / 58,994,911,990.44178 = 11.6136722301.
+- Forecast FY2026 dividend = USD 1.63 * 4 quarters * approximately 620m shares * 7.00 = CNY 28,280,000,000.
+- Forecast dividend yield = 28,280,000,000 / 685,147,571,098.8047 = 0.0412757794.
+
+7. Judgment boundaries
+- Cash haircut is 50% because cash supports global payroll, tax, acquisitions and shareholder returns, despite disclosure that substantially all cash lacks regulatory or material tax restrictions on free flow.
+- Debt is deducted at 100%.
+- FCF is reduced by NCI proportion and full share-based compensation because dilution is an owner cost.
+- Acquisition spend is disclosed as a limitation but is not fully deducted. If acquisitions are required maintenance spending, sustainable cash profit is overstated.
+- No buy/sell recommendation, target price or ranking label was produced.
+
+8. Validation
+- Populated result fields through protocol CLI set/append commands after protocol initialization.
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final protocol result: status ok, errors [].

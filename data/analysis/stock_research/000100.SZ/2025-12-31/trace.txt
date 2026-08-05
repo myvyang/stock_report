@@ -1,0 +1,56 @@
+task=stock_research
+company=000100.SZ TCL科技
+period=2025-12-31
+generated_for=2026-08-01 Asia/Shanghai
+
+[protocol]
+initialized=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+updated=protocol set commands only; result.json was not hand-authored
+validated=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[local_reuse]
+checked=stock_report/data/raw/filings/000100.SZ/2025-12-31
+checked=stock_report/data/analysis/annual_review/000100.SZ/2025-12-31
+checked=stock_report/data/normalized/facts/000100.SZ/2025-12-31/annual-facts.json
+checked=stock_report/data/analysis/stock_research/000100.SZ/2025-12-31
+result=no filing, annual facts, normalized facts, or prior research existed in workspace
+
+[primary_sources]
+1=https://static.cninfo.com.cn/finalpage/2026-03-28/1225045623.PDF | TCL科技集团股份有限公司2025年年度报告全文 | core source
+2=https://static.cninfo.com.cn/finalpage/2026-03-28/1225045622.PDF | TCL科技集团股份有限公司2025年年度报告摘要 | cross-check and dividend proposal
+3=https://www.tcltech.com/investor-relations/financial-reports | company financial summary | cross-check
+4=https://www.tcltech.com/investor-relations/company-govern/talk | 2025 chairman statement | business narrative cross-check
+5=config/input.json | market cap 99,220,000,000; timestamp 20260731114300; source Tencent qt.gtimg.cn; PE TTM 19.61
+
+[model_review]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=core operations are display panels, photovoltaic/silicon materials, and distribution; assets are inventory, receivables, factories and manufacturing debt. Small finance-company balances are specially excluded/identified but do not change the dominant model.
+
+[calculations]
+gross_profit=184063390556-159857486840=24205903716
+gross_margin=24205903716/184063390556=0.1315085180
+net_margin=4516783411/184063390556=0.0245392818
+operating_free_cash_flow=44021698580-16278407000=27743291580
+unrestricted_cash=30460060493-3829065000=26630995493
+discounted_trading_financial_assets=14473193131*0.9=13025873817.9
+debt_and_lease_deduction=7552523460+30909784000+116139349491+7981874000+4148597798=166732128749
+discounted_detachable_net_cash=26630995493+13025873817.9-166732128749=-127075259438.1
+discounted_sustainable_cash_profit=2896878481 (2025 attributable recurring net profit anchor)
+operating_business_price=99220000000-(-127075259438.1)=226295259438.1
+owner_earnback_years=226295259438.1/2896878481=78.1169320
+market_profit_payback_years=99220000000/2896878481=34.2506600
+forecast_cash_dividend=20800862447*0.09=1872077620.23
+forecast_dividend_yield=1872077620.23/99220000000=0.0188679462
+
+[judgment_notes]
+cash_profit=Did not use consolidated FCF as attributable distributable cash because minority equity is 71.91bn versus parent equity 61.43bn, consolidated net profit is 0.214bn while parent-attributable profit is 4.517bn, and sustaining capex by ownership is not disclosed.
+cash_discount=Trading financial assets are mainly debt instruments and were discounted 10%; restricted cash was removed; financial debt and lease obligations were deducted at 100%.
+dividend=Cash yield uses proposed cash dividend only, excluding 799.912m buyback treated as dividend by the company.
+
+[limitations]
+market data was supplied by the task and not independently reconstructed from exchange trades.
+industry shares are company-reported and not independently verified with an industry association.
+the annual report does not disclose attributable sustaining capex or exact cash upstreaming constraints by subsidiary.
+profit distribution remains a board proposal at the cited filing date.

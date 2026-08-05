@@ -1,0 +1,64 @@
+stock-research trace
+company: 01203.HK / 粤海广南（集团）有限公司
+period: 2025-12-31 annual
+generated_at_context: 2026-08-03 Asia/Shanghai
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated scalar fields with protocol set and list fields with protocol append.
+4. Final validation command and result recorded below.
+
+[reuse audit]
+- No annual facts package, normalized facts, prior stock research result or filing metadata existed for 01203.HK/2025-12-31.
+- Downloaded official annual report PDF to stock_report/data/raw/filings/01203.HK/2025-12-31/annual-report-2025.pdf.
+- Core evidence therefore returned to HKEX issuer filings.
+
+[model audit]
+- Input hint: financial_brokerage / requires_special_model.
+- Filing evidence: fresh/live food sales and slaughtering, tinplate manufacturing/sales, property leasing.
+- Decision: override hint with ordinary_operating / applicable.
+- Reason: no brokerage client money, proprietary securities portfolio or repo funding; balance sheet is ordinary inventory/receivables/PPE/cash/borrowings structure.
+
+[sources]
+- 2025 annual report: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042701400.pdf
+  Key pages: 42-48 statements; 64-69 revenue/segments; 75 dividends; 81-86 inventory, receivables, cash and borrowings; 97 capital commitments; 105 five-year summary.
+- 2026 Q1 results: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042803517.pdf
+- 2025-12-31 CFETS-authorized central parity (reproduced by CE.cn): https://www.ce.cn/xwzx/gnsz/gdxw/202512/t20251231_2676993.shtml
+- Market data: config/input.json, Tencent qt.gtimg.cn, 2026/07/31 16:08:47.
+
+[currency normalization]
+- Filing presentation currency: HKD.
+- Result contract currency: CNY absolute yuan.
+- Conversion used for all filing amounts: 1 HKD = 0.90322 CNY, the 2025-12-31 central parity.
+- Ratios are computed from original HKD amounts and are currency invariant.
+- Limitation: income statement and cash flow were converted at closing rate rather than annual average rate for consistent deterministic normalization.
+
+[formula audit]
+- gross_margin = 543,059 / 12,140,367 = 0.0447316790.
+- net_margin = 111,616 / 12,140,367 = 0.0091937913.
+- reported net cash = (959,155 + 14,273 - 585,742 - 285,663) HKD thousand = 102,023 HKD thousand.
+- discounted detachable net cash = 102,023,000 * 0.90322 * 50% = CNY 46,074,607.03.
+- sustainable profit base = average of parent profit for 2023/2024/2025: (65,924 + 140,754 + 111,616) / 3 = 106,098 HKD thousand.
+- discounted cash profit = 106,098,000 * 0.90322 * 60% = CNY 57,497,901.34.
+- operating business price = 507,525,384.64426994 - 46,074,607.03 = CNY 461,450,777.61427.
+- owner earnback years = 461,450,777.61427 / 57,497,901.34 = 8.0255238346.
+- market cap / cash profit = 507,525,384.64426994 / 57,497,901.34 = 8.8268505954.
+- forecast dividend = 33,581,000 * 0.90322 = CNY 30,331,030.82.
+- forecast dividend yield = 30,331,030.82 / 507,525,384.64426994 = 0.0597625887.
+
+[judgment audit]
+- Cash haircut 50%: net cash is small versus operating working capital and 316.671m HKD capital commitments; pledged cash is not freely detachable.
+- Profit haircut 40%: 2025 food segment profit declined, ECL charge increased to 64.747m HKD, and 2026 Q1 parent result turned to an 8.608m HKD loss.
+- Dividend forecast: flat 2025 declared dividend baseline; no growth assumed and explicitly caveated for 2026 deterioration.
+
+[data quality]
+- status intended: complete.
+- Core statements, business, asset/liability explanations, dividend forecast, owner-earnback assumptions and evidence are present.
+- No unresolved incomplete reasons.
+
+[validation]
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+result: {"status":"ok","errors":[]}
+additional check: python3 -m json.tool outputs/result.json passed.

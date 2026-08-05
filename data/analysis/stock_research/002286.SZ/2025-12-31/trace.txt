@@ -1,0 +1,51 @@
+stock-research trace
+company: 保龄宝（002286.SZ）
+period: 2025-12-31 annual
+generated_for_input: 2026-08-01T00:51:23+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the configured annual-review, normalized-facts, raw-filing and prior stock-research paths.
+- No 002286.SZ/2025-12-31 filing or fact package existed in the workspace or configured sync source.
+- Rebuilt the necessary facts from the disclosed 2025 annual report and profit-distribution announcement.
+
+3. Primary facts used
+- 2025 annual report, disclosed 2026-04-25: business description, segment revenue/margins, three statements, asset restrictions, debt, investments, capex and project details.
+- 2025 profit-distribution proposal, announcement 2026-016: CNY 45,668,085.60 expected dividend, 30.32% payout; 2023-2025 dividend history.
+- config/input.json: market cap CNY 3,021,000,000, timestamp 20260731114327, Tencent qt.gtimg.cn, PE TTM 19.56.
+
+4. Formula audit
+- gross_profit = 2,751,024,230.13 - 2,386,307,232.75 = 364,716,997.38.
+- gross_margin = 364,716,997.38 / 2,751,024,230.13 = 0.1325749855.
+- net_margin = 150,626,576.28 / 2,751,024,230.13 = 0.0547529079.
+- operating_free_cash_flow = 259,361,180.20 - 189,295,465.20 = 70,065,715.00.
+- discounted detachable net cash:
+  (273,977,719.93 - 15,607,600.00) * 0.80
+  + 2,800,000.00 * 0.90
+  - (102,599,076.38 + 11,959,130.73 + 1,186,581.65)
+  = 93,471,307.184.
+- Long-term equity investments and other non-current financial assets were assigned zero detachable-cash value because liquidity and exit constraints are unclear.
+- discounted sustainable cash profit = CNY 90,000,000 judgment, bounded by 2025 FCF of CNY 70,065,715 and parent net profit of CNY 150,626,576.28, reflecting expansion capex but retaining a maintenance/cyclicality haircut.
+- operating business price = 3,021,000,000 - 93,471,307.184 = 2,927,528,692.816.
+- owner earnback years = 2,927,528,692.816 / 90,000,000 = 32.5281.
+- market cap / cash profit = 3,021,000,000 / 90,000,000 = 33.5667.
+- forecast dividend yield = 45,668,085.60 / 3,021,000,000 = 0.0151168771.
+
+5. Judgment boundaries
+- statement_model confirmed as ordinary_operating because the business is product manufacturing and its working capital, plant, debt and cash have ordinary operating meanings.
+- The CNY 90m cash-profit estimate, asset discounts and earnback years are analyst judgments, not reported facts or company guidance.
+- Maintenance versus expansion capex is not separately disclosed; this is the largest model limitation.
+- Company-claimed industry leadership was not converted into a verified market-share claim.
+
+6. Output construction and validation
+- outputs/result.json was initialized and populated through the stock-research protocol CLI; it was not hand-written from scratch.
+- First completed protocol validation: status ok, errors [].
+- outputs/report.md and outputs/trace.txt generated from the same figures and judgment boundaries.
+- Final validation to be run after cross-file consistency checks.

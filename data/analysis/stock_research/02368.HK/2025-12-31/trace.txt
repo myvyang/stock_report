@@ -1,0 +1,110 @@
+stock-research trace
+company: EAGLE NICE (INTERNATIONAL) HOLDINGS LIMITED / 02368.HK
+requested_period: 2025-12-31
+generated_at: 2026-08-04 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Read references/data-reuse.md because no local annual facts were available.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields using protocol set/append commands only.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[local_reuse_check]
+- stock_report/data/analysis/annual_review/02368.HK/2025-12-31: absent before research.
+- stock_report/data/normalized/facts/02368.HK/2025-12-31: absent before research.
+- stock_report/data/analysis/stock_research/02368.HK/2025-12-31: absent before research.
+- Downloaded official annual report PDF to stock_report/data/raw/filings/02368.HK/2025-12-31/annual_report_2025.pdf.
+
+[period_mapping]
+- 2025-12-31 is not Eagle Nice's fiscal year-end.
+- Latest complete audited annual report available by that cutoff: year ended 2025-03-31, published 2025-07-17.
+- Core financial statements use FY2025 audited numbers.
+- Market cap input is dated 2026-08-03, later than requested period.
+- FY2026 results announcement is used only for the forward dividend reference aligned with the later market-cap date, not to replace FY2025 core financials.
+
+[model_override]
+- Input hint: financial_brokerage / requires_special_model.
+- Official filing fact: revenue is sale of sportswear and garments and related subcontracting; assets are factories, ROU assets, inventory, receivables and cash; liabilities are bank borrowings and operating liabilities.
+- Decision: ordinary_operating / applicable.
+- Reason: no brokerage customer money, proprietary trading portfolio, margin finance or repo funding structure exists in the audited statements.
+
+[primary_sources]
+1. HKEX, Eagle Nice Annual Report 2025:
+   https://www.hkexnews.hk/listedco/listconews/sehk/2025/0717/2025071700163.pdf
+   Published 2025-07-17; audited year ended 2025-03-31.
+2. HKEX, Annual Results Announcement for year ended 2026-03-31:
+   https://www.hkexnews.hk/listedco/listconews/sehk/2026/0611/2026061100265.pdf
+   Published 2026-06-11; used for dividend reference only.
+3. Market snapshot supplied in config/input.json:
+   Tencent qt.gtimg.cn, 2026-08-03 09:20:05.
+4. Translation rate:
+   1 HKD = 0.9323 CNY at 2025-03-31, public historical exchange-rate reference.
+
+[source_facts_hkd_thousand]
+income_statement, annual report p.120:
+- revenue 4,807,899
+- cost_of_sales 4,035,190
+- gross_profit 772,709
+- profit_before_tax 323,821
+- net_profit 228,531
+- parent_net_profit 217,201
+- finance_costs 69,015
+
+balance_sheet, annual report pp.122-123:
+- total_assets 3,974,034 (2,012,004 non-current + 1,962,030 current)
+- total_liabilities 2,149,944 (1,913,783 current + 236,161 non-current)
+- total_equity 1,824,090
+- parent_equity 1,754,329
+- minority_interest 69,761
+- cash_and_bank_balances 387,390
+- inventory 962,565
+- accounts_receivable 460,403
+- ppe 1,319,765
+- right_of_use_assets 474,188
+- goodwill 163,922
+- bank_borrowings 1,447,502 (1,307,462 current + 140,040 non-current)
+- accounts_payable 319,398
+- accrued_and_other_payables 177,626
+
+cash_flow, annual report pp.125-127:
+- operating_cash_flow -146
+- cash_capex 245,060 (PPE 239,447 + leasehold land 5,613)
+- operating_free_cash_flow -245,206
+- financing_cash_flow 234,931
+- dividends_paid 172,254
+
+business and concentration, annual report pp.14-16 and notes 4-5:
+- ten production bases in mainland China, Vietnam and Indonesia
+- mainland China revenue 2,471,254; USA 985,367; Europe 609,789
+- customer A 2,821,707; customer B 1,050,785; customer C 623,871
+- top-three concentration = 4,496,363 / 4,807,899 = 93.52%
+- payment generally due 1-3 months after delivery
+
+[conversion_and_formulas]
+- All structured monetary amounts are CNY absolute yuan.
+- CNY amount = HKD thousand * 1,000 * 0.9323.
+- gross_margin = 772,709 / 4,807,899 = 0.1607165625.
+- net_margin = 217,201 / 4,807,899 = 0.0451758658.
+- discounted_detachable_net_cash = (387,390 - 1,447,502) * 1,000 * 0.9323 = -988,342,417.60 CNY.
+- operating_business_price = 1,358,413,707.0775032 - (-988,342,417.60) = 2,346,756,124.677503 CNY.
+- discounted_sustainable_cash_profit = 0 CNY because FY2025 OCF is approximately zero and FY2025/FY2024 FCF are both negative; accounting profit is not treated as demonstrated distributable cash.
+- owner_earnback_years = null because cash-profit denominator is not positive.
+- market_cap_to_cash_profit = null for the same reason.
+- forecast dividend shares approximately 574.175m; per-share baseline HKD 0.26.
+- forecast_cash_dividend = 574.175m * HKD 0.26 * 0.9323 = 139,178,871.65 CNY.
+- forecast_dividend_yield = 139,178,871.65 / 1,358,413,707.0775032 = 0.1024569105.
+
+[judgment_boundary]
+- Facts: audited financial statement numbers, production locations, customer concentration, payment terms and announced dividends.
+- Inference: expansion and working-capital growth are the principal reasons profit did not convert to cash.
+- Conservative judgment: sustainable distributable cash profit is set to zero until post-expansion cash conversion is demonstrated.
+- This does not assert future cash profit will remain zero and is not a buy/sell recommendation.
+
+[validation]
+- protocol validation status: ok
+- incomplete_reasons: []
+- data_quality.status: complete

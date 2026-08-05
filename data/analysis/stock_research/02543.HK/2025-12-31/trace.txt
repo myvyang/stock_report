@@ -1,0 +1,62 @@
+stock-research trace
+company: 02543.HK / 大行科工（深圳）股份有限公司
+period: 2025-12-31 annual
+generated_at_input: 2026-08-04T22:42:52+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields with protocol `set` commands; no complex JSON skeleton was hand-written.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[source acquisition]
+- No reusable local filing, annual facts package, normalized facts, or prior stock-research result existed for 02543.HK/2025-12-31.
+- Downloaded official HKEX filing:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042302975_c.pdf
+- Saved as stock_report/data/raw/filings/02543.HK/2025-12-31/2025-annual-report-zh.pdf.
+- Filing title: 2025 ANNUAL REPORT; HKEX release date: 2026-04-23.
+- PDF page references below are printed report page numbers, not zero-based PDF indices.
+
+[model review]
+- Input hint said financial_brokerage/requires_special_model.
+- Annual report pages 25-28 and note 5 show manufacturing and sale of DAHON bicycles plus trademark licensing.
+- Balance sheet pages 207-208 contains ordinary inventory, receivables, payables and contract liabilities; no brokerage customer funds, proprietary financial assets or repo financing.
+- Annual report page 80 states no borrowings at 2025-12-31.
+- Override: statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+
+[financial extraction; RMB'000 in filing, multiplied by 1,000 in result.json]
+- Income statement, page 206: revenue 641,470; cost of sales 427,220; gross profit 214,250; profit before tax 72,958; total net profit 61,123; parent net profit 63,509.
+- Operating profit in result uses EBIT convention: 73,687 = profit before tax 72,958 + finance costs 729. This field is non-core and is not used in owner-earnback formulas.
+- Balance sheet, pages 207-208: non-current assets 40,545; current assets 708,295; total assets 748,840; current liabilities 206,391; non-current liabilities 11,837; total liabilities 218,228; total equity 530,612; parent equity 528,098; NCI 2,514.
+- Cash flow, pages 211-212: CFO 37,903; PP&E additions 7,945; intangible additions 1,809; PP&E deposits 261; capex 10,015; operating FCF 27,888; financing cash flow 336,435; dividend paid 30,998.
+- 2024 cash flow: CFO 78,942; PP&E additions 955; intangible additions 355; capex 1,310; operating FCF 77,632.
+- Working capital, page 211: inventory increase 71,607; receivables increase 10,506; payables increase 33,738; contract liabilities increase 8,840.
+- Assets, page 207 and notes 18-20 (pages 275-277): inventory 184,035; trade/other receivables 54,962; pledged deposits 50,000; cash 419,298.
+- Liabilities, pages 207-208 and note 21: trade/other payables 157,858; contract liabilities 40,832 total; lease liabilities 14,518; income tax payable 5,020.
+- Dividend, note 12 pages 267-268: proposed FY2025 final dividend RMB1.118/share, aggregate 36,658.
+
+[formulas]
+- gross_margin = 214,250,000 / 641,470,000 = 0.3339984723.
+- net_margin = 63,509,000 / 641,470,000 = 0.09900540945.
+- forecast_dividend_yield = 36,658,000 / 824,244,831.2944174 = 0.04447464953.
+- discounted detachable net cash = 419,298,000 * 60% - 14,518,000 = 237,060,800.
+- Pledged deposit of 50,000,000 receives zero detachable value because it secures bills payable.
+- 2025 operating FCF = 37,903,000 - 10,015,000 = 27,888,000.
+- 2024 operating FCF = 78,942,000 - 1,310,000 = 77,632,000.
+- two-year average FCF = (27,888,000 + 77,632,000) / 2 = 52,760,000.
+- discounted sustainable cash profit = 52,760,000 * 85% = 44,846,000.
+- operating business price = 824,244,831.2944174 - 237,060,800 = 587,184,031.2944174.
+- owner earnback years = 587,184,031.2944174 / 44,846,000 = 13.09334236.
+- market cap / cash profit = 824,244,831.2944174 / 44,846,000 = 18.37945037.
+
+[judgment vs fact]
+- Facts: audited statement figures, business/channel mix, dividend proposal/approval, supplier concentration, no bank borrowing.
+- Inference: inventory build may reflect growth preparation but can become markdown/impairment risk.
+- Judgment: 60% cash recognition and 85% sustainable-profit haircut. Both are explicit scenarios, not reported facts.
+
+[quality]
+- status=complete under result-contract minimum requirements.
+- Main limitation: only two annual cash-flow observations are available around a recent listing; IPO cash use and inventory normalization remain uncertain.

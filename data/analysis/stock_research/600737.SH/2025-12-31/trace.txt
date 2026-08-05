@@ -1,0 +1,81 @@
+stock-research trace
+company=600737.SH 中粮糖业
+period=2025-12-31
+generated_for_input=2026-08-01T01:23:49+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the skill routes reuse decisions through it.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated scalar fields with protocol set and list rows with protocol append.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: status=ok, errors=[]
+
+[reuse-check]
+- Expected annual fact paths from config/input.json were absent.
+- No prior stock-research output for 600737.SH/2025-12-31 was present.
+- stock_report/data/notes/user_stock_evaluations.md was present but not needed for factual financial extraction.
+- Therefore public filing material was required.
+
+[sources]
+- Official SSE annual-report announcement location identified for 2026-04-28; local direct PDF retrieval did not produce a usable file in this environment.
+- Full filing text used for extraction: Sina announcement mirror of the SSE-disclosed 2025 annual report:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12230428&stockid=600737
+- Official dividend cross-check: SSE board resolution announcement 2026-009:
+  https://www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-28/600737_20260428_A161.pdf
+- Valuation snapshot: config/input.json, source Tencent qt.gtimg.cn, timestamp 20260731114332.
+
+[model-check]
+- Confirmed statement_model=ordinary_operating.
+- Confirmed owner_earnback_applicability=applicable.
+- Reason: revenue and assets arise from commodity procurement/trade, sugar and tomato processing, inventory, receivables, factories and ordinary borrowings. No bank deposits, brokerage client funds, insurance reserves, real-estate regulated pre-sales, concession rights or holding-company look-through structure were found.
+- Inventory, contract liabilities and derivatives were treated as operating items, not detachable cash.
+
+[extracted-core-facts-cny]
+revenue=26510979601.63
+cost_of_sales=23485362601.78
+gross_profit=3025616999.85
+operating_profit=1230087053.51
+net_profit=958209026.46
+parent_net_profit=951225734.55
+deducted_parent_net_profit=811740918.70
+operating_cash_flow=1287693122.07
+capital_expenditure=603019290.99
+operating_free_cash_flow=684673831.08
+total_assets=20899222995.43
+total_liabilities=9224837612.52
+total_equity=11674385382.91
+parent_equity=11425611649.34
+cash=1464737266.01
+inventory=9091698323.30
+short_term_borrowings=4437825547.22
+lease_liabilities=43139222.83
+forecast_cash_dividend=727208397.52
+
+[calculations]
+gross_margin=(26510979601.63-23485362601.78)/26510979601.63=0.1141269408114959
+net_margin=951225734.55/26510979601.63=0.03588044458724998
+operating_free_cash_flow=1287693122.07-603019290.99=684673831.08
+discounted_cash=1464737266.01*0.90=1318263539.409
+financing_debt=4437825547.22+43139222.83=4480964770.05
+discounted_detachable_net_cash=1318263539.409-4480964770.05=-3162701230.641
+discounted_sustainable_cash_profit=684673831.08*0.90=616206447.972
+operating_business_price=26821000000-(-3162701230.641)=29983701230.641
+owner_earnback_years=29983701230.641/616206447.972=48.65853210286991
+market_cap_to_cash_profit=26821000000/616206447.972=43.52599699057146
+forecast_dividend_yield=727208397.52/26821000000=0.02711339612691548
+
+[judgment-boundaries]
+- Cash haircut of 10% is an analytical assumption to preserve an operating liquidity buffer for a high-inventory seasonal business.
+- Short-term borrowings and lease liabilities were deducted at 100%.
+- Derivatives, contract liabilities and the one-year non-current liability line were not added to financing debt because disclosed facts indicate operating hedge/delivery/loss-contract content; this avoids double counting operating obligations in net cash.
+- Sustainable cash profit starts from the lower cash-conversion constraint: OCF less capex, then applies a 10% cycle/working-capital haircut.
+- The result is a single-year conservative estimate, not a complete cycle average or forecast.
+
+[outputs]
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

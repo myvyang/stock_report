@@ -1,53 +1,35 @@
-stock-research trace
+研究对象：老板电器（002508.SZ）
+报告期：2025-12-31 annual
+生成日期：2026-07-31 Asia/Shanghai
 
-Task:
-- Company: 老板电器 / 002508.SZ
-- Market: A share
-- Period: 2025-12-31 annual
-- Required outputs: outputs/result.json, outputs/report.md, outputs/trace.txt
+执行协议：
+1. 完整读取 stock-research/SKILL.md、result-contract.md、report-contract.md 和 data-reuse.md。
+2. 使用协议 CLI init，以 config/input.json 初始化 outputs/result.json。
+3. 优先复用 2025 年度事实包、原始年报和历史 stock_research；未重新下载财报。
+4. 使用协议 CLI set 更新结构化字段，并使用 validate 完成协议校验。
 
-Protocol and contracts:
-- Read /workspace/.agents/skills/stock-research/SKILL.md.
-- Read /workspace/.agents/skills/stock-research/references/result-contract.md.
-- Read /workspace/.agents/skills/stock-research/references/report-contract.md.
-- Initialized outputs/result.json with:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- Populated outputs/result.json through protocol CLI set/append commands from a local Python subprocess driver.
-- Validated with:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-- Validation result: ok.
+主要来源：
+- config/input.json：公司身份、149.21 亿元市值、20260731114257 行情时间、腾讯行情来源、PE TTM 12.21。
+- stock_report/data/raw/filings/002508.SZ/2025-12-31/1225237757.PDF：老板电器 2025 年年度报告全文。
+- stock_report/data/analysis/annual_review/002508.SZ/2025-12-31/facts.json：年度财务、业务、资产负债拆分和证据。
+- stock_report/data/analysis/annual_review/002508.SZ/2025-12-31/annual_facts.md：年度事实摘要。
+- stock_report/data/analysis/stock_research/002508.SZ/2025-12-31/result.json：历史研究中的分层折扣方法；只复用有年报事实支持的底层金额和估算口径。
 
-Local sources reused:
-- config/input.json
-- stock_report/data/analysis/annual_review/002508.SZ/2025-12-31/facts.json
-- stock_report/data/analysis/annual_review/002508.SZ/2025-12-31/annual_facts.md
-- stock_report/data/analysis/annual_review/002508.SZ/2025-12-31/extraction_trace.txt
-- stock_report/data/normalized/facts/002508.SZ/2025-12-31/annual-facts.json
-- stock_report/data/raw/filings/002508.SZ/2025-12-31/metadata.json
-- stock_report/data/raw/filings/002508.SZ/2025-12-31/1225237757.PDF
-- stock_report/data/analysis/stock_research/002508.SZ/2025-12-31/result.json
-- stock_report/data/analysis/stock_research/002508.SZ/2025-12-31/report.md
+模型复核：
+- statement_model = ordinary_operating。
+- 公司收入来自厨房电器研发、生产和销售；不存在客户存款、保险准备金、预售监管资金或特许收费权等特殊报表结构。
+- 普通控股回本口径适用。
 
-Additional local verification:
-- Converted official PDF to temporary text with pdftotext at /tmp/002508_2025.txt.
-- Searched for profit distribution, cash dividend, channel revenue, gross margin, sales/production/inventory and receivables terms.
-- Confirmed 2025年度利润分配预案: 944,938,916 shares, RMB 5 per 10 shares, total cash dividend RMB 472,469,458.
-- Confirmed 2024年度 and 2025中期 each disclosed RMB 472,469,458 cash dividend.
-- Confirmed channel and operating details used in report: 2025 engineering channel revenue RMB 1,074,797,193.30 and down 35.84%; direct gross margin 53.55%; agency gross margin 48.76%; sales volume down 11.77%, production volume down 7.95%, inventory volume up 13.95%.
+本次重算：
+- 折后可剥离净现金：6,400,317,559.909 元。
+- 折后可持续现金利润：816,925,806.390225 元。
+- 经营业务购买价：14,921,000,000 - 6,400,317,559.909 = 8,520,682,440.091 元。
+- 控股回本年：8,520,682,440.091 / 816,925,806.390225 = 10.430179060864289。
+- 市值/现金利润：14,921,000,000 / 816,925,806.390225 = 18.264816563858936。
+- 预测分红率：472,469,458 / 14,921,000,000 = 0.03166473145231553。
 
-Core calculations:
-- Gross margin = 5,077,431,807.01 / 10,116,069,396.20 = 0.5019174551.
-- Net margin = 1,255,879,806.22 / 10,116,069,396.20 = 0.1241470137.
-- Forecast dividend yield = 472,469,458 / 14,788,000,000 = 0.0319495170.
-- Discounted net cash / market cap = 6,400,317,559.909 / 14,788,000,000 = 0.4328048120.
-- Operating business price = 14,788,000,000 - 6,400,317,559.909 = 8,387,682,440.091.
-- Owner earnback years = 8,387,682,440.091 / 816,925,806.390225 = 10.2673735785.
-- Market cap to cash profit = 14,788,000,000 / 816,925,806.390225 = 18.1020110815.
-
-Data quality notes:
-- Market cap and PE are from config/input.json batch input as of 2026-07-24, not annual report data.
-- Core financial statement numbers use the annual fact pack extracted from the official CNINFO annual report PDF.
-- Historical stock_research result contained an old classification field; the new outputs do not carry classification labels and keep only sortable metrics, explanations and data quality.
-- Other non-current financial assets of RMB 800.45 million lack public look-through disclosure of underlying assets, redemption terms and exit timing.
-- Necessary operating cash is not disclosed by management; the cash deduction follows the reused owner earnback assumption.
-- 2023 capital expenditure was not extracted in the fact pack, so multi-year free cash flow validation remains incomplete.
+估算与限制：
+- 折后资金类资产 73.98 亿元、必要经营现金 8.00 亿元、摩擦准备 1.00 亿元沿用历史分层估算，非公司披露口径。
+- 其他非流动金融资产 8.00 亿元缺少底层资产和退出期限披露，历史口径已作保守折扣。
+- 折后现金利润从 2025 年扣非归母净利润出发，剔除资金收益后再打 0.85 折；折扣属于分析判断。
+- 2023 年资本开支未补抽，不影响 2025 年单年自由现金流，但限制三年自由现金流验证。

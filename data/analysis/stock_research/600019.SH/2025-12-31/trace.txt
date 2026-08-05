@@ -1,0 +1,131 @@
+stock-research trace
+company=宝钢股份
+code=600019.SH
+period=2025-12-31
+generated_for_input=2026-07-31T15:36:34+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields using protocol set and append commands only.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse audit]
+Expected local paths from config/input.json were checked.
+Missing:
+- stock_report/data/raw/filings/600019.SH/2025-12-31/metadata.json
+- stock_report/data/analysis/annual_review/600019.SH/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/600019.SH/2025-12-31/annual_facts.md
+- stock_report/data/normalized/facts/600019.SH/2025-12-31/annual-facts.json
+- prior stock research result/report/trace for this company-period
+Action: rebuilt the required research fields from the publicly disclosed 2025 annual report.
+
+[primary filing]
+Title: 宝山钢铁股份有限公司2025年年度报告
+Disclosure date: 2026-04-30
+Public PDF used for extraction:
+https://stockmc.xueqiu.com/202604/600019_20260430_LB2P.pdf
+Search cross-check:
+https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12277876&stockid=600019
+Audit opinion: Deloitte Touche Tohmatsu Certified Public Accountants LLP, standard unqualified opinion.
+Note: the public PDF mirror was used to extract the issuer's annual-report text. Core claims cite the report's page locations, not the mirror as an independent data provider.
+
+[market data]
+Source: config/input.json / Tencent qt.gtimg.cn
+Timestamp: 20260731114342
+Market cap: 134,613,000,000.00002 CNY
+PE TTM: 13.28
+
+[statement model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Evidence: annual report identifies steel manufacturing, processing/distribution and other operating segments. The balance sheet is composed of ordinary manufacturing cash, receivables, inventory, production assets, payables, customer advances and financing debt. No banking deposits, insurance reserves, real-estate regulatory funds or concession-right structure was identified.
+
+[financial extraction]
+Annual report pages 94-95:
+total_assets=363020038344.87
+total_liabilities=137829752534.84
+total_equity=225190285810.03
+parent_equity=206165304667.34
+minority_interest=19024981142.69
+
+Annual report pages 97-98:
+revenue=317507793966.66
+cost_of_sales=294522776086.63
+gross_profit=22985017880.03 (calculated revenue-cost)
+operating_profit=13992724269.51
+net_profit=11412105974.05
+parent_net_profit=10345621735.27
+gross_margin=0.0723919800294525
+net_margin=0.032583835521078096
+
+Annual report pages 99-100:
+operating_cash_flow=33597182967.75
+capital_expenditure_cash=18507325935.15
+operating_free_cash_flow=15089857032.60
+financing_cash_flow=-17525049020.63
+dividend_and_interest_cash_out=6733854103.30
+Field name dividend_and_buyback_cash_out follows protocol schema; annual-report cash-flow line includes distributions and interest and is not a pure dividend/buyback number.
+
+[detachable cash calculation]
+Annual report pages 128-144 and 165-175.
+unrestricted_cash = 19158391896.40 - 546088970.72
+                  = 18612302925.68
+discounted_short_term_wealth_management = 20361875074.89 * 0.80
+                                         = 16289500059.912
+discounted_large_certificates_of_deposit = 4208392132.26 * 0.95
+                                         = 3997972525.647
+interest_bearing_debt_ex_lease =
+  5251507266.14 short-term borrowings
+  + 12262199220.39 current portion of long-term borrowings
+  + 9000000000.00 current portion of bonds
+  + 3028432500.00 short-term financing notes including accrued interest
+  + 4841077595.94 long-term borrowings
+  + 5000000000.00 bonds payable
+  = 39383216582.47
+discounted_detachable_net_cash =
+  18612302925.68 + 16289500059.912 + 3997972525.647 - 39383216582.47
+  = -483441071.2309952
+Lease liabilities of 5766950511.60 were not deducted again in the simplified net-cash calculation because the selected cash-profit base uses operating cash flow after current lease-related cash effects. This is disclosed as a limitation.
+
+[cash profit normalization]
+2025 operating FCF = 33597182967.75 - 18507325935.15
+                   = 15089857032.60
+2024 operating FCF = 27735926936.12 - 19336433651.03
+                   = 8399493285.09
+2025 working-capital explanation from annual report page 19:
+- inventory decrease cash contribution: approximately 1.08bn
+- operating receivables increase cash use: approximately 2.26bn
+- operating payables increase cash contribution: approximately 3.64bn
+Net working-capital tailwind: approximately 2.46bn.
+Selected discounted_sustainable_cash_profit=8800000000.
+Rationale: anchors close to 2024 FCF, remains below 2025 parent net profit, and avoids capitalizing the full 2025 working-capital and cycle benefit.
+
+[earnback calculation]
+operating_business_price =
+  134613000000.00002 - (-483441071.2309952)
+  = 135096441071.23102
+owner_earnback_years =
+  135096441071.23102 / 8800000000
+  = 15.35186830354898
+market_cap_to_cash_profit =
+  134613000000.00002 / 8800000000
+  = 15.29693181818182
+
+[dividend]
+Annual report pages 2 and 51-52:
+2025 full-year proposed dividend per share=0.30 CNY
+forecast_cash_dividend=6413193627.60
+payout_ratio=0.6199
+2025 second-half proposal remained subject to shareholder approval at annual-report date.
+forecast_dividend_yield =
+  6413193627.60 / 134613000000.00002
+  = 0.04764171088676428
+
+[quality]
+status=complete
+Core identity, market data, financial statements, model classification, asset/liability explanations, owner-earnback breakdown, dividend forecast, business story and evidence are populated.
+Limitations are recorded in outputs/result.json and outputs/report.md.

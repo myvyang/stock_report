@@ -1,0 +1,56 @@
+stock-research trace
+generated_at=2026-08-03T15:23:20+08:00
+input=config/input.json
+
+1. Read skill and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+   - No annual facts, normalized facts, filing metadata, or prior stock-research result existed for 00168.HK/2025-12-31.
+   - Downloaded official HKEX annual report to stock_report/data/raw/filings/00168.HK/2025-12-31/annual_report_2025_cn.pdf.
+
+3. Protocol
+   - Initialized outputs/result.json with:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Updated all populated sections with repeated protocol set commands; result JSON was not created manually.
+
+4. Model correction
+   - Input hint financial_brokerage rejected.
+   - Official annual report states principal activities are beer manufacturing and sales.
+   - Selected statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+5. Primary evidence
+   - HKEX 2025 annual report, released 2026-03-26:
+     https://www.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032602740_c.pdf
+   - Valuation snapshot reused exactly from input: Tencent qt.gtimg.cn, 2026/07/31 16:08:44.
+
+6. Derived calculations
+   - gross_profit = 32,473,493,664 - 18,885,149,805 = 13,588,343,859
+   - gross_margin = 13,588,343,859 / 32,473,493,664 = 0.4184441625
+   - net_margin = 4,588,101,137 / 32,473,493,664 = 0.1412875739
+   - operating_free_cash_flow = 4,592,509,302 - 2,253,224,472 = 2,339,284,830
+   - forecast_dividend_yield = 3,205,858,534 / 54,690,553,131.944534 = 0.0586181406
+   - discounted_detachable_net_cash:
+       (12,859,566,861 - 484,000,000) * 90%
+       + 6,228,400,545 * 85%
+       + 5,322,652,795 * 90%
+       + 2,471,993,300 * 70%
+       - 114,466,142 lease liabilities
+       - 46,639,222 finance-company related-party deposits
+       - 4,000,000,000 operating cash buffer
+       = 18,791,828,099.65
+   - discounted_sustainable_cash_profit = 2,700,000,000 (judgment; below 2025 adjusted net profit and near recent free-cash-flow capacity)
+   - operating_business_price = 54,690,553,131.944534 - 18,791,828,099.65 = 35,898,725,032.29453
+   - owner_earnback_years = 35,898,725,032.29453 / 2,700,000,000 = 13.2958240860
+   - market_cap_to_cash_profit = 54,690,553,131.944534 / 2,700,000,000 = 20.2557604192
+
+7. Limitations
+   - Market cap and PE were not independently verified.
+   - Cash haircuts, CNY 4.0bn operating buffer, and CNY 2.7bn sustainable cash profit are analytical judgments.
+   - 2025 dividend was proposed in the annual report and subject to shareholder approval at that date.
+
+8. Validation
+   - See final protocol validate invocation in execution log; outputs/result.json data_quality.status=complete.

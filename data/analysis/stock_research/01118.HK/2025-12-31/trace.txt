@@ -1,0 +1,66 @@
+[2026-08-03 Asia/Shanghai] task=stock-research query=01118.HK period=2025-12-31
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse check
+   - config/input.json found.
+   - No annual facts, normalized facts, prior stock research result, or raw filing existed for the requested period.
+   - Conclusion: official filing retrieval required.
+
+3. Primary-source retrieval
+   - HKEX title search identified 2025 Annual Report released 2026-04-27.
+   - Downloaded: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042700598.pdf
+   - Local copy: stock_report/data/raw/filings/01118.HK/2025-12-31/annual-report-2025.pdf
+   - Extracted 152 pages with pypdf in an isolated /tmp virtual environment because pdftotext was unavailable.
+
+4. Model verification
+   - Input hint: financial_brokerage / requires_special_model.
+   - Annual report segments: metal products, building construction materials, medical imaging; other money-lending revenue HK$256k only.
+   - No brokerage client money, proprietary trading book, or repo financing found.
+   - Override: ordinary_operating / applicable.
+
+5. Core audited facts (HK$'000)
+   - Revenue 3,616,089; cost 2,920,813; gross profit 695,276.
+   - Profit before tax 210,173; net profit 170,863; parent profit 151,235.
+   - Total assets 2,856,149; liabilities 1,204,395; equity 1,651,754; parent equity 1,509,419.
+   - Cash 805,620; bank borrowings 444,841; inventories 509,599; trade/bills/loan/other receivables 894,883.
+   - CFO 1,568,260; PPE purchases 21,891; financing cash flow -1,347,216; shareholder/NCI dividends 49,624.
+   - Sources: annual report pp.72-78 and notes 6, 14, 17, 23-31.
+
+6. Cash-flow classification check
+   - Working-capital payables increase: HK$1,190,539k.
+   - Trust-receipt loan repayments in financing: HK$1,235,520k.
+   - Interpretation: reported CFO is materially inflated by supplier-finance presentation; do not use reported FCF as sustainable cash profit.
+
+7. Currency normalization
+   - Protocol requires absolute CNY yuan.
+   - Rate: 2025-12-31 CFETS central parity, HK$1 = CNY 0.90322.
+   - Applied the same closing rate to all statement values for consistent site comparison.
+   - Limitation: income/cash-flow items were not translated at annual average rates.
+
+8. Owner earnback assumptions
+   - Discounted cash: CNY727,652,096.40 * 75% = CNY545,739,072.30.
+   - Less 100% bank debt: CNY401,789,288.02.
+   - Discounted detachable net cash: CNY143,949,784.28.
+   - Sustainable cash profit: (parent profit CNY136,598,476.70 + imaging impairment CNY13,806,434.14) * 90% = CNY135,365,400.76.
+   - Operating business price: CNY563,315,839.93 - CNY143,949,784.28 = CNY419,366,055.65.
+   - Owner earnback: 3.0980 years; market cap / cash profit: 4.1614x.
+
+9. Dividend forecast
+   - 2025 DPS: HK$0.065 (interim HK$0.025 + proposed final HK$0.040).
+   - Shares: 574,378,128.
+   - Forecast assumes flat DPS: CNY33,721,337.83; yield 5.9862% on input market cap.
+
+10. Protocol operations
+    - Initialized outputs/result.json using protocol CLI.
+    - Populated fields using protocol CLI set operations; complex JSON was not handwritten from scratch.
+    - First completed validation: status=ok, errors=[].
+
+11. Output scope
+    - outputs/result.json: structured contract result.
+    - outputs/report.md: human-readable operating story.
+    - outputs/trace.txt: sources, transformations, assumptions, and validation record.
+

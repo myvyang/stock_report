@@ -1,0 +1,64 @@
+stock-research trace — CYD — period 2025-12-31
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read skill and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Checked reusable local data
+   - No pre-existing CYD raw filing, annual facts package, normalized facts, or stock research output was found under stock_report.
+
+3. Initialized protocol result
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   result: success
+
+4. Acquired and inspected primary filing
+   - SEC Form 20-F accession 0001193125-26-191559, filed 2026-04-29, period 2025-12-31.
+   - Saved filing HTML to stock_report/data/raw/filings/CYD/2025-12-31/form20f.html.
+   - Saved extracted XBRL instance to stock_report/data/raw/filings/CYD/2025-12-31/instance.xml.
+   - Primary URL: https://www.sec.gov/Archives/edgar/data/932695/000119312526191559/ck0000932695-20251231.htm
+   - Cross-checked business and operating explanations against company FY2025 results release dated 2026-02-24.
+   - Confirmed FY2025 dividend from SEC 6-K Exhibit 99.1 dated 2026-07-02.
+
+5. Model decision
+   - Confirmed ordinary_operating / applicable.
+   - Reason: engine manufacturing has ordinary manufacturing revenue, inventory, receivables, PPE, payables, capex and operating cash flow.
+   - Special handling: CYD owns 76.4% of Yuchai; consolidated cash and profit require minority-interest and dividend-path adjustments.
+
+6. Core extracted facts (CNY absolute yuan)
+   revenue 24,661,772,000; cost of sales 20,594,125,000; gross profit 4,067,647,000.
+   operating profit 1,090,885,000; net profit 810,501,000; parent net profit 537,390,000.
+   assets 31,958,501,000; liabilities 19,062,882,000; equity 12,895,619,000.
+   parent equity 9,580,961,000; NCI 3,314,658,000.
+   operating cash flow 2,718,305,000; PPE capex 483,117,000; operating FCF 2,235,188,000.
+   cash/bank/restricted/short-term deposits 7,913,083,000.
+   short-term borrowings 2,000,020,000; long-term borrowings 20,000,000; lease liabilities 77,672,000.
+
+7. Owner earnback calculations
+   parent attribution proxy = parent equity / total equity = 74.2921%.
+   attributed cash = 7,913,083,000 × 74.2921% = 5,879,123,725.10.
+   net financial cash proxy = 5,879,123,725.10 − 2,097,692,000 = 3,781,431,725.10.
+   detachable recognition = 30%; discounted detachable net cash = 1,134,429,517.53.
+   sustainable cash profit = 400,000,000, anchored to 2023-2025 parent profit average of 381,987,666.67.
+   operating business price = 11,939,669,176.29 − 1,134,429,517.53 = 10,805,239,658.76.
+   owner earnback = 10,805,239,658.76 / 400,000,000 = 27.0131 years.
+   market cap / cash profit = 29.8492 years.
+
+8. Dividend calculation
+   declared FY2025 dividend = USD 0.87/share.
+   estimated shares = 37,518,322 (FY2025 results weighted average share count).
+   translation = RMB 7.0288/USD (2025-12-31 rate disclosed in Form 20-F).
+   estimated cash dividend = RMB 229,426,640.06; yield on input market cap = 1.9215%.
+
+9. Protocol writes and validation
+   - Populated outputs/result.json using repeated protocol `set` commands; complex JSON was not authored as a replacement file.
+   - First completed validation: status ok, errors [].
+   - Final validation performed after report and trace creation; see final command output in task log.
+
+10. Data limitations
+   - Market cap and PE were reused from config/input.json and were not independently reconstructed.
+   - Parent attribution of consolidated cash is an analytical proxy, not a legal entity cash schedule.
+   - 30% detachable recognition is a conservative judgment reflecting working capital and cash-transfer constraints.
+   - Dividend total is estimated; per-share dividend is announced fact.

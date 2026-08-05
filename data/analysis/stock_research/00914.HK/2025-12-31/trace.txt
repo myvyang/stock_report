@@ -1,0 +1,63 @@
+stock-research trace
+company: 00914.HK / 安徽海螺水泥股份有限公司
+period: 2025-12-31 annual
+generated_for_input: 2026-08-03T13:47:36+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No annual facts, normalized facts, prior stock-research result, or raw filing existed locally for 00914.HK/2025-12-31.
+- Downloaded official HKEX 2025 annual report PDF to stock_report/data/raw/filings/00914.HK/2025-12-31/2025-annual-results-cn.pdf.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- The input model hint classified the company as financial_brokerage/requires_special_model.
+
+4. Model verification and override
+- Annual report says the group principally produces and sells cement and cement products.
+- Consolidated statements contain ordinary industrial cash, receivables, inventory, plant, mining-related intangibles, trade liabilities, bank loans and bonds.
+- No brokerage customer funds, proprietary trading balance-sheet structure, margin financing, or repo funding was identified.
+- Overrode model to ordinary_operating/applicable.
+
+5. Primary evidence
+- HKEX annual report: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0324/2026032401372_c.pdf
+- Statements: annual report pages 88-99.
+- Cash, debt and restricted assets: pages 194-197.
+- Business, capacity, cash-flow discussion, risks and 2026 capex plan: pages 14-21.
+- Dividend policy and 2025 distributions: pages 27-28.
+- Market data: config/input.json, Tencent qt.gtimg.cn snapshot as of 2026/07/31 16:08:42.
+
+6. Calculations (CNY yuan)
+- gross_profit = 82,532,050,796 - 62,589,049,730 = 19,943,001,066
+- gross_margin = 19,943,001,066 / 82,532,050,796 = 0.2416389275
+- parent_net_margin = 8,113,068,470 / 82,532,050,796 = 0.0983020284
+- operating_fcf = 16,643,907,685 - 9,636,323,135 = 7,007,584,550
+- discounted_cash_profit = 7,007,584,550 * 0.85 = 5,956,446,867.5
+- discounted_net_cash = (50,252,254,165 - 855,810,764) * 0.95 + 12,899,352,683 * 0.85 - 27,845,185,605 = 30,045,885,406.5
+- operating_business_price = 83,784,995,968.53018 - 30,045,885,406.5 = 53,739,110,562.03018
+- owner_earnback_years = 53,739,110,562.03018 / 5,956,446,867.5 = 9.0220075604
+- market_cap_to_cash_profit = 83,784,995,968.53018 / 5,956,446,867.5 = 14.0662711012
+- forecast_cash_dividend = 8,113,068,470 * 0.50 = 4,056,534,235
+- forecast_dividend_yield = 4,056,534,235 / 83,784,995,968.53018 = 0.0484159967
+
+7. Judgment boundaries
+- Cash haircut: explicit restricted cash excluded; remaining money funds discounted 5% for term, overseas mobility and operating liquidity.
+- Trading financial assets discounted 15% for maturity, credit and market risks.
+- Interest-bearing liabilities fully deducted using the annual-report cash-flow-note reconciliation total.
+- Working capital, plant, construction in progress, mining rights and equity investments were not treated as detachable cash.
+- Sustainable cash profit uses one-year operating FCF with an additional 15% cycle/capex haircut; no unsupported multi-year average was invented.
+- Dividend forecast is a scenario using flat parent profit and the 50% minimum shareholder-return policy; it is not guidance.
+
+8. Protocol population and validation
+- Populated the initialized result exclusively through protocol set/append commands in populate_result.sh.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].
+
+9. Output files
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

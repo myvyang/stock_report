@@ -1,0 +1,94 @@
+stock-research trace
+company: 02116.HK / 江苏创新环保新材料有限公司 / JS INNOV
+period: 2025-12-31 annual
+generated_for_input: 2026-08-04T17:37:13+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read result-contract.md and report-contract.md in full as requested.
+- Read data-reuse.md because local fact-package reuse was required by the skill.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- Expected raw filing, annual facts, normalized facts, and prior stock-research paths listed in config/input.json did not exist in /workspace.
+- Only config/input.json and stock_report/data/notes/user_stock_evaluations.md existed.
+- Therefore no prior financial facts or research conclusions were reused.
+
+3. Primary-source retrieval and identity check
+- HKEX issuer title search identified stock 02116 as Jiangsu Innovative Ecological New Materials Limited.
+- Primary audited filing used: HKEX 2025 Annual Report, published 2026-04-23:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042302048.pdf
+- Cross-check filing: HKEX annual results announcement, published 2026-03-23:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0323/2026032301386.pdf
+- Auditor: KPMG. Opinion on pages 135-140 is unmodified; annual-report financial statements are HKFRS-compliant.
+
+4. Analysis-model override
+- Input hint: financial_brokerage / requires_special_model.
+- Audited fact: note 1(b), page 147, says the group develops, manufactures and sells oil refining agents and fuel additives.
+- Balance sheet contains PPE, land-use rights, inventory, receivables, bank cash and ordinary operating payables; it does not contain brokerage client money, proprietary securities books or repurchase financing.
+- Page 185 states no bank loans at 2025 or 2024 year-end.
+- Decision: override hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+5. Audited financial facts (RMB absolute yuan)
+- Income statement, annual report p141:
+  revenue 203,882,000
+  cost_of_sales 157,755,000
+  gross_profit 46,127,000
+  operating_profit 19,733,000
+  net_profit / parent_net_profit 15,694,000
+- Balance sheet, annual report pp143-144:
+  total_assets = 40,824,000 non-current + 242,026,000 current = 282,850,000
+  total_liabilities = 35,441,000 current + 5,153,000 non-current = 40,594,000
+  total_equity / parent_equity = 242,256,000
+  minority_interest = 0
+- Cash flow, annual report p146:
+  operating_cash_flow 42,104,000
+  capital_expenditure 4,809,000
+  operating_free_cash_flow = 42,104,000 - 4,809,000 = 37,295,000
+  financing_cash_flow -4,428,000
+  dividends_paid 4,428,000
+
+6. Business and quality checks
+- Product revenue, note 3 p166: oil refining agents 117,832,000; fuel additives 66,466,000; others/raw-material trading 19,584,000.
+- Product gross profit, MD&A p14: 27,391,000; 18,099,000; 637,000 respectively.
+- Core product revenue grew only 2,098,000 (about 1.15%); almost all reported revenue growth of 21,682,000 came from newly reported low-margin trading.
+- Three largest customer groups, note 3 p166: 67,955,000 + 49,503,000 + 25,109,000 = 142,567,000, or about 69.93% of revenue.
+- Mainland China revenue, p167: 202,685,000, or about 99.41% of revenue.
+- OCF bridge, note 15 p179: receivables release 28,843,000 and prepayment release 5,101,000 were major positive drivers; inventories consumed 4,730,000 and payables consumed 5,432,000. Current FCF was not extrapolated.
+
+7. Owner-earnback calculations
+- Market cap reused exactly from input: 289,060,801.5060425 CNY at 2026/08/03 09:20:05, Tencent qt.gtimg.cn.
+- Cash facts, note 15 p179: cash equivalents 114,566,000; >3-month deposits 15,000,000; restricted deposits 2,068,000.
+- Haircuts:
+  114,566,000 * 70% = 80,196,200
+  15,000,000 * 90% = 13,500,000
+  2,068,000 * 0% = 0
+  interest-bearing debt deduction = 0
+  discounted detachable net cash = 93,696,200
+- Cash discounts preserve an operating buffer and recognize that the board explicitly retained cash. They are analytical assumptions, not reported fair values.
+- Sustainable cash-profit base: 2025 parent net profit 15,694,000. No FCF uplift was taken because working-capital release was not assumed recurring. A 10% safety discount for customer concentration and refining-cycle exposure gives 14,124,600.
+- operating_business_price = 289,060,801.5060425 - 93,696,200 = 195,364,601.5060425
+- owner_earnback_years = 195,364,601.5060425 / 14,124,600 = 13.8315139194
+- market_cap_to_cash_profit = 289,060,801.5060425 / 14,124,600 = 20.4650610641
+- discounted_net_cash_to_market_cap = 93,696,200 / 289,060,801.5060425 = 0.3241401100
+
+8. Dividend handling
+- Annual report p44: board did not recommend a 2025 final dividend; there is no predetermined payout ratio.
+- Forecast for the stated reporting period: cash dividend 0, yield 0%. This does not forecast that future years must remain at zero.
+- 2024 final dividend history: HK$0.01/share; 2025 cash-flow statement shows RMB4,428,000 paid.
+
+9. Market-data limitation
+- market cap, timestamp, source and PE TTM were supplied by config/input.json and preserved exactly.
+- No independent market-feed cross-check was available in the local research package.
+- PE TTM is presented as supplied; owner-earnback calculations use audited RMB figures and the supplied RMB market cap.
+
+10. Result construction and validation
+- All structured result sections were populated with protocol CLI `set`; the initialized complex JSON was not handwritten from scratch.
+- First validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- First validation result: status=ok, errors=[]
+- Final validation is rerun after report and trace creation; its result is appended below.
+- Final validation result: status=ok, errors=[]
+- JSON syntax check: passed (`python3 -m json.tool`).
+- Required outputs present: outputs/result.json, outputs/report.md, outputs/trace.txt.

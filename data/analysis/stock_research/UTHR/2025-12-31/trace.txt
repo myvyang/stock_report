@@ -1,0 +1,80 @@
+stock-research trace
+task_created_at=2026-08-05T04:47:00+08:00
+company=United Therapeutics Corporation
+ticker=UTHR
+period=2025-12-31
+
+[instructions]
+read=/workspace/.agents/skills/stock-research/SKILL.md
+read=/workspace/.agents/skills/stock-research/references/result-contract.md
+read=/workspace/.agents/skills/stock-research/references/report-contract.md
+read=/workspace/.agents/skills/stock-research/references/data-reuse.md
+
+[reuse_check]
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+decision=return_to_primary_filing
+
+[primary_sources]
+sec_10k_url=https://www.sec.gov/Archives/edgar/data/1082554/000108255426000006/uthr-20251231.htm
+sec_accession=0001082554-26-000006
+sec_filed_at=2026-02-25
+local_html=/workspace/stock_report/data/raw/filings/UTHR/2025-12-31/uthr-20251231.htm
+local_xbrl=/workspace/stock_report/data/raw/filings/UTHR/2025-12-31/uthr-20251231_htm.xml
+fx_source=Federal Reserve H.10 weekly release dated 2025-12-29
+fx_observation=2025-12-26 USD/CNY 7.0063
+market_data_source=config/input.json; Yahoo Finance yfinance
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=drug sales business funded by own capital; no customer deposits, insurance reserves, regulated project cash, concessions, or other special statement structure
+
+[reported_usd]
+revenue=3182700000
+cost_of_sales=384400000
+gross_profit=2798300000
+operating_profit=1492500000
+net_profit=1334700000
+operating_cash_flow=1561200000
+capital_expenditure=520500000
+operating_free_cash_flow=1040700000
+share_based_compensation=147700000
+share_repurchase=1000000000
+total_assets=7880000000
+total_liabilities=783800000
+stockholders_equity=7096200000
+cash_and_equivalents=1557100000
+available_for_sale_debt_fair_value=3050000000
+equity_securities=126900000
+
+[conversion]
+formula=CNY amount = USD amount * 7.0063
+note=single reporting-date translation rate used for consistent website output; it is not an average income-statement rate
+
+[owner_earnback]
+discounted_cash=10909509730
+discounted_debt_securities=20300754250
+discounted_equity_securities=444549735
+less_total_liabilities=-5491537940
+discounted_detachable_net_cash=26163275775
+base_operating_free_cash_flow=7291456410
+less_share_based_compensation=-1034830510
+sustainability_haircut_rate=0.10
+discounted_sustainable_cash_profit=5630963310
+market_cap=173984068216.70508
+operating_business_price=147820792441.70508
+owner_earnback_years=26.251421702427155
+market_cap_to_cash_profit=30.897744957373032
+
+[protocol]
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+population=protocol set and append commands only; initialized schema retained
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[outputs]
+result=/workspace/outputs/result.json
+report=/workspace/outputs/report.md
+trace=/workspace/outputs/trace.txt

@@ -1,0 +1,77 @@
+stock-research trace
+company: 豪鹏科技 (001283.SZ)
+period: 2025-12-31
+generated_at: 2026-08-01 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill requires preferential reuse of existing facts.
+- Initialized outputs/result.json using:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields using protocol `set`; no complex result object was handwritten from scratch.
+
+2. Reuse audit
+- Checked annual_review, normalized facts, raw filings and historical stock_research paths supplied in config/input.json.
+- No existing 2025 annual facts, raw filing or prior stock research output was present in /workspace/stock_report for 001283.SZ.
+- Therefore returned to public filings.
+
+3. Primary sources used
+- Shenzhen Highpower Technology Co., Ltd. 2025 Annual Report, disclosed 2026-04-03; full PDF mirrored by Sina from the exchange disclosure corpus:
+  https://file.finance.sina.com.cn/211.154.219.97%3A9494/MRGG/CNSESZ_STOCK/2026/2026-4/2026-04-03/12060409.PDF
+- Official CNINFO annual report summary:
+  https://static.cninfo.com.cn/finalpage/2026-04-03/1225077083.PDF
+- Official CNINFO 2024 profit distribution implementation announcement for dividend history:
+  https://static.cninfo.com.cn/finalpage/2025-06-05/1223766361.PDF
+- Market data: config/input.json, Tencent qt.gtimg.cn snapshot dated 2026-07-31 11:42:48.
+
+4. Key extracted facts
+- Revenue: 5,866,522,544.05
+- Cost of sales: 4,706,024,078.30
+- Gross profit: 1,160,498,465.75 (calculated)
+- Operating profit: 215,020,333.94
+- Parent net profit: 203,074,851.02
+- Deducted parent net profit: 192,702,261.29
+- Operating cash flow: 756,690,939.42
+- Capex (cash paid to acquire/build long-term assets): 713,176,307.72
+- Operating free cash flow: 43,514,631.70 (calculated)
+- Total assets: 8,548,957,635.56
+- Total liabilities: 5,038,897,105.13
+- Parent/total equity: 3,510,060,530.43; minority interest: 0
+- Cash and bank balances: 1,196,066,329.65
+- Restricted cash: 661,795,576.86; year-end cash equivalents: 534,270,752.79
+- Fixed assets: 3,906,059,155.68; construction in progress: 213,181,041.17
+- Consumer application revenue: 5,064,028,246.12, margin 19.83%
+- Energy-storage application revenue: 650,369,171.67, margin 5.77%
+- Top-five customers: 34.75% of revenue
+
+5. Model judgment
+- Confirmed ordinary_operating. Revenue is entirely from battery manufacturing; working assets are receivables, inventory and plants, while liabilities consist of trade funding and bank financing.
+- No banking deposits, brokerage client funds, insurance reserves, regulated presale cash, project settlement model, concession rights or holding-company look-through structure was found.
+- Ordinary owner earnback is applicable, with explicit exclusion of restricted cash and allowance for capital intensity.
+
+6. Owner earnback calculations
+- Cash equivalents 534,270,752.79 × 90% = 480,843,677.51.
+- Long-term equity investment plus other non-current financial assets 125,204,432.42 × 50% = 62,602,216.21.
+- Interest-bearing financing deducted at 100%: short-term debt 30,000,000.00 + current non-current liabilities 140,576,575.71 + long-term borrowings 1,405,104,223.67 + lease liabilities 45,237,740.72 = 1,620,918,540.10.
+- Discounted detachable net cash = 480,843,677.51 + 62,602,216.21 - 1,620,918,540.10 = -1,077,472,646.38.
+- Sustainable cash profit: deducted net profit 192,702,261.29 × 80% = 154,161,809.03. The 20% haircut is a judgment for capital intensity, uncertain maintenance capex and single-year profit normalization.
+- Operating business price = 5,553,000,000 - (-1,077,472,646.38) = 6,630,472,646.38.
+- Owner earnback = 6,630,472,646.38 / 154,161,809.03 = 43.00983 years.
+- Market cap / cash profit = 5,553,000,000 / 154,161,809.03 = 36.02059.
+
+7. Dividend
+- Proposal: 99,123,511 eligible shares × CNY 0.38 = CNY 37,666,934.18.
+- Forecast yield = 37,666,934.18 / 5,553,000,000 = 0.00678353 (0.68%).
+- Stock capitalization of 3 shares per 10 shares is not counted as cash return.
+
+8. Quality limitations
+- Maintenance capex is not separately disclosed from growth capex.
+- The dividend figure is based on the annual-report proposal, not a subsequently checked implementation notice.
+- Market cap date is after the reporting date.
+- Industry position is described from customer and operating evidence; no unverified market-share ranking is used.
+
+9. Validation
+- Protocol validation run after population:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[]

@@ -1,0 +1,54 @@
+stock-research trace
+task: 00661.HK, annual, period 2025-12-31
+generated_at: 2026-08-03T18:00:03+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No files existed under stock_report/data/raw/filings/00661.HK/2025-12-31.
+- No annual facts package existed under stock_report/data/analysis/annual_review/00661.HK/2025-12-31.
+- No normalized annual facts existed for this company and period.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized successfully.
+
+4. Company/model verification
+- Input hint said financial_brokerage, but its source tags described materials/resource extraction.
+- HKEX 2025 annual results announcement note 1 identifies subsidiaries as mining and processing mineral ores and selling/trading metal products.
+- Overrode hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+5. Primary evidence
+- HKEX 2025 annual results announcement, published 2026-03-31:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0331/2026033103505.pdf
+- Used audited annual-result figures for income statement, balance sheet, business output, liquidity, debt, dividend, and management explanation.
+- Market cap, market-cap date/source, and PE TTM reused from config/input.json as supplied by Tencent qt.gtimg.cn.
+
+6. Calculations
+- gross_margin = 1,281,123,000 / 66,050,939,000 = 0.01939594074520718.
+- net_margin = 53,548,000 / 66,050,939,000 = 0.0008107061088743712.
+- total_assets = 9,850,109,000 non-current assets + 19,353,148,000 current assets = 29,203,257,000.
+- total_liabilities = 14,262,046,000 current liabilities + 10,250,444,000 non-current liabilities = 24,512,490,000.
+- minority_interest_ratio = 1,553,608,000 / 4,690,767,000 = 0.3312061517018767.
+- forecast dividend = 0; forecast yield = 0 / 1,400,998,557.2993755 = 0.
+
+7. Owner earnback treatment
+- Ordinary operating model is conceptually applicable.
+- Cash and restricted deposits were not treated as detachable because disclosed net debt was RMB14,541,571,000 and working-capital needs are material.
+- Full annual report/cash-flow statement was unavailable in the workspace; the HKEX preliminary annual results announcement does not contain the consolidated cash-flow statement.
+- Operating cash flow, capex, operating free cash flow, discounted sustainable cash profit, operating business price, and payback metrics remain null.
+- data_quality.status set to partial; result must not enter formal owner-earnback sorting.
+
+8. Protocol updates and validation
+- All result fields were populated through protocol CLI set commands after protocol initialization.
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[].
+
+9. Outputs
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

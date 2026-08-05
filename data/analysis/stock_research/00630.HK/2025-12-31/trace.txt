@@ -1,0 +1,76 @@
+stock-research trace
+company: AMCO UNITED (00630.HK)
+period: 2025-12-31 annual
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as explicitly requested.
+- Read references/data-reuse.md because the skill requires reuse checks.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked stock_report/data/analysis/annual_review/00630.HK/2025-12-31, normalized facts, raw filing metadata, and historical stock research paths.
+- No annual facts package, normalized facts, prior research output, filing metadata, or filing existed in the workspace.
+- Only stock_report/data/notes/user_stock_evaluations.md existed, with no reusable company facts found.
+
+3. Primary-source acquisition
+- Located the HKEX title-search record for stock code 00630.
+- Confirmed Annual Report 2025 was released on 2026-04-30 and final results on 2026-03-30.
+- Downloaded the official HKEX annual report PDF to:
+  stock_report/data/raw/filings/00630.HK/2025-12-31/annual-report-2025.pdf
+- Source URL:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0430/2026043002793.pdf
+- Extracted text locally to annual-report-2025.txt using pypdf installed into a temporary directory; no project dependency was changed.
+
+4. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Annual report Note 1 and Note 6 identify four activities: medical products, plastic products, money lending, and securities investment.
+- No brokerage commissions, customer money, investment banking, asset management, margin financing, or repurchase financing were found.
+- Securities investments and unsecured lending are material business assets; 2025 earnings were dominated by securities fair-value gains.
+- Overrode hint with statement_model=platform_financial_mixed and owner_earnback_applicability=requires_special_model.
+- Ordinary owner-earnback fields were intentionally left null.
+
+5. Core extraction (HK$'000, annual-report page references)
+- Revenue 68,356; cost of sales 54,173; gross profit 14,183; profit attributable to owners 59,117 (p.87).
+- Total assets 227,893; total liabilities 108,656; equity attributable to owners 119,237 (p.88 and Note 6 reconciliation p.131).
+- Operating cash flow 11,652; financing cash flow -9,024; year-end cash 7,212 (pp.90-91).
+- No acquisition or disposal of PPE in 2025; capex treated as zero (Directors' Report p.65 and cash-flow statement).
+- Segment revenue: medical 57,694; plastic 71; money lending 10,591; securities zero (Note 6 p.129).
+- Segment profit/(loss): medical 5,281; plastic -1,894; money lending 13,612; securities 50,143 (Note 6 p.129).
+- Held-for-trading investments 109,024; securities gain 50,170; no dividend income (Notes 8 and 17, MD&A).
+- Loan and interest receivables gross 127,391; allowance 65,319; net 62,072. Credit-impaired gross balance 99,518 with 62.31% expected loss rate (Note 18).
+- Trade and other payables 83,756; bonds 24,900 (Notes 20-21).
+- No 2025 or 2024 dividend; no post-period proposal (Note 15).
+- Unmodified audit opinion; loan impairment assessment was a key audit matter (Auditor's Report pp.79-81).
+
+6. Currency conversion
+- Protocol requires CNY absolute yuan.
+- Used 2025-12-31 CFETS central parity published by Xinhua: RMB 90.322 per HKD 100, i.e. 1 HKD=0.90322 CNY.
+- Source: https://www1.xinhuanet.com/20251231/fe9f6466f6884589b5287e6ee946baed/c.html
+- Applied this closing rate to balance sheet, income statement, and cash flow for consistent display. This is disclosed as a limitation because annual-average translation was not used for flow items.
+- Market cap was retained exactly from input because the input supplies the protocol-currency amount: CNY 91,561,729.47704792 at 2026/07/31 16:08:47, Tencent qt.gtimg.cn; PE TTM 1.8.
+
+7. Derived figures
+- Gross margin = 14,183 / 68,356 = 20.7487%.
+- Net margin = 59,117 / 68,356 = 86.4840%; interpreted as securities-gain distortion, not product pricing power.
+- Operating profit stored as profit before tax plus finance cost: (59,117 + 2,220) HK$'000, because the statement does not present a separate operating-profit subtotal.
+- Operating free cash flow = operating cash flow - capex = HK$11,652,000; interpretation warns that working-capital and securities movements make it unsuitable as normalized distributable profit.
+- Forecast dividend amount=0 and yield=0 based on two consecutive zero-dividend years and no announced commitment.
+
+8. Structured-result construction
+- Used protocol CLI set and append commands for all result fields and list rows.
+- Did not hand-write the complex JSON object.
+- Populated analysis model, financial statements, asset/liability explanations, business story, risks, evidence, dividend, and data quality.
+
+9. Validation
+- Ran:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final protocol status: ok; errors: [].
+
+10. Known limitations
+- Full list and current valuation of all 30 securities were not disclosed in the annual report; only top holdings were described.
+- No loan-by-loan post-balance-sheet collection data or collateral exists; all reported loans were unsecured.
+- No disclosed medical-products market share.
+- PE TTM is heavily affected by 2025 fair-value gains and should not be used as a standalone operating valuation.

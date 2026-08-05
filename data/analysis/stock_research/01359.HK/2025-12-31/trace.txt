@@ -1,0 +1,73 @@
+Stock research trace — 01359.HK — period 2025-12-31
+Generated: 2026-08-03 Asia/Shanghai
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the skill identifies it as the reuse boundary.
+- Read /workspace/AGENTS.md instructions supplied in the task context.
+
+2. Reuse audit
+- Checked configured annual review, normalized facts, raw filing and prior stock-research paths.
+- No prior filing metadata, annual facts, normalized facts, or stock-research output existed for 01359.HK/2025-12-31.
+- Therefore obtained the primary filing from the issuer's official website.
+
+3. Protocol initialization
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initialization succeeded.
+
+4. Primary sources acquired and reviewed
+- China Cinda official 2025 Annual Report landing page, published 2026-04-29:
+  https://www.cinda.com.cn/home/wap/en/InvestorRelations/RegularReports/20260429/265025.shtml
+- Official annual report PDF:
+  https://www.cinda.com.cn/resource/2026/04/14687416444963220.pdf
+- Saved locally as stock_report/data/raw/filings/01359.HK/2025-12-31/2025-annual-report.pdf.
+- Extracted text locally to stock_report/data/raw/filings/01359.HK/2025-12-31/2025-annual-report.txt using pypdf in a temporary virtual environment.
+- China Cinda official 2025 results news release, published 2026-04-01:
+  https://www.cinda.com.cn/home/pc/cn/xdjt/gyxd/xdxw/20260401/264927.shtml
+- HKEX title search was used to confirm the annual report publication date and issuer identity.
+
+5. Model determination
+- Input hint classified the company as financial_brokerage.
+- Annual report business and segment disclosures show the listed issuer is a national financial asset management company with two segments: distressed asset management and financial services (banking, securities, futures, funds, trusts, leasing).
+- Overrode hint with statement_model=platform_financial_mixed.
+- Kept owner_earnback_applicability=requires_special_model.
+- Ordinary discounted net cash, cash profit, operating business price and payback fields remain null under the result contract.
+
+6. Key extracted facts (annual report amounts converted from RMB thousand/million to absolute RMB yuan)
+- Total income: RMB72,174,894,000.
+- Total assets: RMB1,721,226,840,000.
+- Total liabilities: RMB1,497,569,865,000.
+- Total equity: RMB223,656,975,000.
+- Equity attributable to company holders: RMB195,898,664,000.
+- Non-controlling interests: RMB27,758,311,000.
+- Group net profit: RMB293,200,000.
+- Profit attributable to company holders: RMB3,562,291,000.
+- Operating cash inflow: RMB26,633,909,000; no ordinary-company FCF was calculated.
+- Purchase of property/equipment/investment property/intangibles: RMB2,630,296,000.
+- Distressed asset segment income: RMB41,944.0 million; attributable profit RMB281.5 million.
+- Financial services segment income: RMB31,231.5 million; attributable profit RMB4,153.9 million.
+- Credit impairment plus other asset impairment: RMB21,503.936 million.
+- Capital adequacy ratio: 13.77%; ordinary-shareholder average ROE: 1.24%.
+- Proposed 2025 dividend: approximately RMB1.069 billion, RMB0.2801 per 10 shares, subject to shareholder approval.
+
+7. Valuation calculations
+- Market cap and PE TTM were reused exactly from config/input.json: RMB32,504,620,436.35309 and 9.58 at 2026/07/31 16:08:42, source Tencent qt.gtimg.cn.
+- Forecast dividend yield = 1,069,000,000 / 32,504,620,436.35309 = 0.0328876321464313.
+- Context calculations used only in report: market cap / parent equity ≈ 0.166; market cap / 2025 parent net profit ≈ 9.12.
+- These are not substituted for the prohibited ordinary owner-earnback fields.
+
+8. Structured result construction
+- Used protocol CLI `set` and `append` commands via outputs/populate_result.sh.
+- Did not hand-write outputs/result.json from scratch.
+- Populated analysis model, financials, asset/liability explanations, dividend, business, risks, evidence, and data quality.
+
+9. Validation
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[] before final report/trace completion.
+
+10. Known limitations
+- Proposed 2025 dividend remained subject to shareholder approval at the annual-report disclosure date.
+- Market data is an input-provided third-party quote snapshot rather than annual-report data.
+- Gross margin, net margin and ordinary FCF are not economically comparable for this mixed financial model and remain null where appropriate.
+- No buy/sell recommendation, target price, or ranking label was produced.

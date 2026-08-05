@@ -1,0 +1,68 @@
+stock-research trace
+company=002273.SZ 水晶光电
+period=2025-12-31
+generated_at=2026-08-03T11:36:07+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Read references/data-reuse.md because SKILL.md directly referenced reuse boundaries.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields with repeated protocol `set` commands; final JSON was not handwritten from scratch.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: {"status":"ok","errors":[]}
+
+[reuse check]
+Expected annual fact package, normalized facts, raw filing metadata and historical stock research files were absent under the paths supplied in config/input.json. No prior conclusion was reused.
+
+[filing retrieval]
+Annual report identified by web search as 浙江水晶光电科技股份有限公司2025年年度报告, disclosure date 2026-04-18.
+Search discovery URL: https://www.100est.com/res/financial-report/2025/SZ002273_202604171821306612.pdf
+Complete PDF obtained from the matching Eastmoney filing mirror:
+https://pdf.dfcfw.com/pdf/H2_AN202604171821306612_1.pdf
+Saved: stock_report/data/raw/filings/002273.SZ/2025-12-31/annual-report-2025.pdf
+Extracted text: stock_report/data/raw/filings/002273.SZ/2025-12-31/annual-report-2025.txt
+Official disclosure identity within PDF: 浙江水晶光电科技股份有限公司2025年年度报告; disclosed 2026-04-18; audit opinion standard unqualified, 天健审〔2026〕7337号.
+
+[key filing locations]
+pp.8-9: headline financials, quarterly data, non-recurring items.
+pp.19-22: revenue mix, segment/product margins, sales mode, customer concentration.
+pp.25-27: major assets, financial assets, restricted assets.
+p.49: 2025 interim and annual dividend amounts.
+pp.75-82: consolidated balance sheet, income statement and cash flow statement.
+pp.117-131: large certificates of deposit, investments, goodwill, other non-current assets and liabilities.
+pp.140,150-152: cash-flow reconciliation, working-capital movements, debt maturity and fair-value notes.
+
+[model decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: revenue arises from manufacturing and selling optical products; receivables, inventory, plant, equipment and supplier credit form a normal manufacturing operating cycle. Financial assets are treasury/investment assets rather than the business itself.
+
+[calculations]
+gross_profit=6928468248.87-4760761835.11=2167706413.76
+gross_margin=2167706413.76/6928468248.87=0.31286950244933903
+net_margin=1172419600.48/6928468248.87=0.16921772004529514
+operating_free_cash_flow=1347140797.70-746686839.50=600453958.20
+
+discounted cash components:
+unrestricted cash=(1330422216.08-12554949.98)*0.90=1186080539.49
+bank wealth product=125267632.72*0.95=119004251.084
+current large CDs=(711043781.91-21593055.62)*0.95=654978189.9755
+long large CDs=(374238543.98-50818055.60)*0.90=291078439.542
+financing and lease debt=-(95084430.56+26622340.52+31697452.56)=-153404223.64
+discounted_detachable_net_cash=2097737196.4515
+discounted_net_cash_to_market_cap=2097737196.4515/35169000000=0.05964733704260854
+operating_business_price=35169000000-2097737196.4515=33071262803.5485
+owner_earnback_years=33071262803.5485/600453958.20=55.07710017048981
+market_cap_to_cash_profit=35169000000/600453958.20=58.570685594990884
+
+forecast_cash_dividend=137589966.60+278033433.20=415623399.80
+forecast_dividend_yield=415623399.80/35169000000=0.011817890750376753
+
+[judgment boundaries]
+- Used full reported capex, without estimating maintenance capex, to keep cash profit conservative and reproducible.
+- Excluded listed/non-listed equity and long-term equity investments from detachable cash due to valuation and liquidity uncertainty.
+- Market cap and PE were reused exactly from config/input.json and were not independently refreshed.
+- Business statements marked as inference in report where annual report facts did not directly establish causality.

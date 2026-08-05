@@ -1,0 +1,55 @@
+2026-08-05 UAL stock-research trace
+
+1. Read instructions
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read result-contract.md and report-contract.md in full as explicitly requested.
+- Read data-reuse.md because no annual facts package was present.
+
+2. Existing-data check
+- Checked stock_report/data/analysis/annual_review/UAL/2025-12-31, raw filing directory, and normalized facts path.
+- No reusable UAL 2025 annual facts or filing files were found in the workspace.
+
+3. Protocol initialization
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- The initialized skeleton preserved the supplied identity, market cap, date, source, and PE TTM.
+
+4. Primary-source retrieval
+- Located SEC accession 0000100517-26-000023, filed 2026-02-12 for period 2025-12-31.
+- Retrieved SEC inline XBRL filing: https://www.sec.gov/Archives/edgar/data/100517/000010051726000023/ual-20251231.htm
+- Retrieved SEC Company Facts for CIK 0000100517 as a cross-check.
+- Used Federal Reserve H.10 2025-12-31 USD/CNY rate of 7.1875.
+
+5. Confirmed USD facts (millions unless stated)
+- Revenue 59,070; operating expenses 54,356; operating income 4,713; net income attributable to UAL 3,353.
+- Assets 76,448; liabilities 61,166; equity 15,282.
+- Cash 5,942; short-term investments 6,298; PP&E net 46,121; operating lease ROU assets 4,958.
+- Advance ticket sales 8,131; frequent-flyer deferred revenue current + noncurrent 7,777.
+- Debt principal 21,383; finance lease liability 474; operating lease liability 6,048.
+- Operating cash flow 8,431; capital expenditure 5,874; operating free cash flow 2,557.
+- Financing cash outflow 4,945; common-stock repurchases 637; ordinary cash dividends 0.
+
+6. Model classification
+- Confirmed ordinary_operating / applicable.
+- Aviation-specific handling: cash is operationally constrained; aircraft are necessary operating assets; debt, finance leases, ticket obligations, mileage obligations, and fleet capex require explicit treatment.
+
+7. RMB conversion and formulas
+- All statement amounts converted at 7.1875 CNY/USD.
+- Gross-profit protocol proxy = revenue - all operating expenses = operating income, because UAL does not report conventional gross profit.
+- Discounted detachable net cash = 50% × (cash + short-term investments) - debt and finance leases
+  = 50% × USD 12.240bn - USD 21.857bn = USD -15.737bn = CNY -113.1096875bn.
+- Operating business price = CNY 265.736554929bn - (-113.1096875bn) = CNY 378.846242429bn.
+- Operating FCF = USD 8.431bn - USD 5.874bn = USD 2.557bn = CNY 18.3784375bn.
+- Discounted sustainable cash profit = CNY 18.3784375bn × 80% = CNY 14.70275bn.
+- Owner earnback = 378.846242429 / 14.70275 = 25.7670 years.
+- Market cap / discounted cash profit = 265.736554929 / 14.70275 = 18.0739.
+- Forecast dividend = 0; forecast dividend yield = 0.
+
+8. Protocol updates and validation
+- Updated initialized result through protocol `set` commands, section by section.
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].
+
+9. Output files
+- outputs/result.json: protocol-initialized, populated, and validated.
+- outputs/report.md: human-readable operating story and owner-earnback analysis.
+- outputs/trace.txt: source, assumptions, calculations, and validation audit trail.

@@ -1,0 +1,57 @@
+task=AGNC annual stock research
+period=2025-12-31
+generated_at=2026-08-05T02:24:24+08:00
+
+[protocol]
+initialized=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+mutation_method=protocol set/append commands; result JSON was not authored from a blank object
+validation=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse_check]
+configured annual facts, normalized facts, raw filing metadata, and prior stock research paths were absent under /workspace/stock_report
+action=obtained primary disclosures from SEC and AGNC investor relations
+
+[primary_sources]
+1=https://www.sec.gov/Archives/edgar/data/1423689/000142368926000043/agnc-20251231.htm
+  filing=Form 10-K
+  filed=2026-02-23
+  used_for=business model, audited statements, operating statistics, leverage, risks
+2=https://ir.agnc.com/stock-information/dividend-history
+  used_for=monthly common dividend through July 2026
+3=https://www.federalreserve.gov/releases/g5a/current/
+  used_for=2025 annual average CNY per USD 7.1875
+4=https://www.federalreserve.gov/releases/g5/20260302/
+  used_for=December 2025 average CNY per USD 7.0432
+5=config/input.json
+  used_for=market cap CNY 83740106978.01562 dated 2026-08-03, PE TTM 8.328125, Yahoo Finance yfinance
+
+[model_decision]
+input_hint=ordinary_operating/applicable
+confirmed_model=platform_financial_mixed/requires_special_model
+reason=AGNC is a mortgage REIT whose Agency RMBS, repo funding, TBA off-balance-sheet financing, derivatives, restricted margin cash, and equity capital form one leveraged investment system. Ordinary detachable-net-cash and cash-profit payback metrics are economically invalid.
+ordinary_owner_earnback_fields=null
+special_metrics=TNAV per common share USD 8.88; year-end at-risk leverage 7.2x; 2025 average net interest spread 1.92%; economic return on tangible common equity 22.7%; net spread and dollar roll income USD 1.50/share; common dividends USD 1.44/share
+
+[currency_conversion]
+balance_sheet_rate=7.0432 CNY/USD (December 2025 average)
+income_cashflow_rate=7.1875 CNY/USD (2025 annual average)
+forecast_dividend_rate=7.0432 CNY/USD
+note=different period-average rates mean translated CNY statements are presentation amounts and will not strictly reconcile
+
+[key_calculations]
+total_assets=USD 115077m * 7.0432 = CNY 810511225600
+total_liabilities=USD 102684m * 7.0432 = CNY 723218268800
+total_equity=USD 12393m * 7.0432 = CNY 87292956800
+net_profit=USD 1670m * 7.1875 = CNY 12003125000
+parent_net_profit=USD 1509m * 7.1875 = CNY 10845337500
+operating_cash_flow=USD 653m * 7.1875 = CNY 4693187500
+financing_cash_flow=USD 25182m * 7.1875 = CNY 180982625000
+cash_dividends_paid=USD 1601m * 7.1875 = CNY 11507187500
+forecast_cash_dividend=USD 1.44/share * 1107.6m shares * 7.0432 = CNY 11232293600
+forecast_dividend_yield=CNY 11232293600 / CNY 83740106978.01562 = 0.1341357827
+2025 dividend coverage=USD 1.50 net spread and dollar roll income per share / USD 1.44 dividend per share = 1.0417x
+
+[limitations]
+- Market cap and PE are the supplied third-party snapshot, not SEC figures.
+- Forecast dividend uses year-end 2025 shares and annualizes the current monthly rate; it does not model 2026 share issuance.
+- GAAP operating cash flow is not analogous to ordinary-company free cash flow because core securities, repo, and derivative flows appear in investing and financing sections.

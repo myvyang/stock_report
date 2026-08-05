@@ -1,0 +1,57 @@
+stock-research trace
+company=603700.SH 宁水集团
+period=2025-12-31 annual
+generated_context=2026-07-31 Asia/Shanghai
+
+1. Protocol
+- Read SKILL.md, result-contract.md, report-contract.md and data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields through protocol set commands; did not construct result JSON from scratch.
+
+2. Reuse check
+- Searched stock_report annual-review/raw-filing paths and workspace files.
+- No reusable 603700 2025 fact package, normalized facts, or raw filing was present.
+- Used public 2025 annual report transcript plus official SSE annual-report summary.
+
+3. Primary facts (CNY)
+- total_assets=2508335054.58
+- total_liabilities=877601133.31
+- total_equity=1630733921.27
+- parent_equity=1631879479.14
+- revenue=1743261902.82
+- cost_of_sales=1387102548.47
+- gross_profit=356159354.35
+- operating_profit=94543682.77
+- parent_net_profit=93348943.50
+- operating_cash_flow=124639581.02
+- capex=30520396.00
+- operating_free_cash_flow=124639581.02-30520396.00=94119185.02
+- cash_and_cash_equivalents=420672280.63
+- accounts_receivable=807938356.87
+- credit_impairment_loss=59446035.24
+- disposal_gain_long_term_equity=40706722.76
+
+4. Formula checks
+- gross_margin=356159354.35/1743261902.82=0.2043062818
+- net_margin=93348943.50/1743261902.82=0.0535472958
+- discounted_cash=420672280.63*0.80=336537824.50
+- debt_like_deduction=530809.18+120336.78+1452995.03=2104140.99
+- discounted_net_cash=336537824.50-2104140.99=334433683.51
+- operating_business_price=2230000000.00-334433683.51=1895566316.49
+- discounted_cash_profit=60000000.00 (judgment; absorbs disposal gain, payable expansion, receivable/inventory use, impairments)
+- owner_earnback_years=1895566316.49/60000000=31.59277194
+- market_cap_to_cash_profit=2230000000/60000000=37.16666667
+- forecast_dividend_yield=59446930.20/2230000000=0.0266578162
+
+5. Model judgment
+- ordinary_operating/applicable: water-meter manufacturing and water-management solutions; no special financial, property-development, concession, or holding-company balance-sheet economics.
+
+6. Sources
+- Annual report transcript: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12098839&stockid=603700
+- Official SSE annual report summary: https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-17/603700_20260417_W1T2.pdf
+- Market snapshot: Tencent qt.gtimg.cn, 2026-07-31 11:43:21+08:00, market cap 2230000000, PE TTM 29.37.
+
+7. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Expected final status: ok, no errors.

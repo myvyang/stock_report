@@ -1,0 +1,73 @@
+stock-research trace
+generated_at=2026-08-04T14:30:26+08:00
+query=CSHR
+period=2025-12-31
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md in full.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated scalar fields with protocol set and list fields with protocol append.
+4. Final validation command and result are recorded below.
+
+[reuse audit]
+- config/input.json existed.
+- No raw filing, annual facts, normalized facts, or prior CSHR stock-research files existed under stock_report at task start.
+- Research therefore returned to primary public filings.
+
+[primary sources]
+- SEC Form 20-F, filed 2026-04-30, accession 0001213900-26-050434:
+  https://www.sec.gov/Archives/edgar/data/2087587/000121390026050434/ea0287072-20f_coinshares.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/2087587/000121390026050434/0001213900-26-050434-index.htm
+- FY2025 results release, SEC Exhibit 99.1:
+  https://www.sec.gov/Archives/edgar/data/2087587/000121390026050703/ea028870801ex99-1.htm
+- USD/CNY 2025-12-31 central parity: 7.0288, announced under authorization of the China Foreign Exchange Trade System.
+
+[source locations used]
+- 20-F lines 1954-2067: dual-engine business model and operating mechanics.
+- 20-F lines 2553-2554: management fees as share of revenue and capital-markets gains.
+- 20-F lines 3110-3138: 2025 net-income bridge and segment EBITDA table.
+- 20-F lines 3462-3489: AUM flows and price effects.
+- 20-F lines 3533-3558 and 3780-3815: available-capital definition and reconciliation.
+- 20-F lines 4382-4384: dividend policy.
+- 20-F lines 5738-5787: audited balance sheets.
+- 20-F lines 5800-5837: audited statements of operations.
+- 20-F lines 5905-5959: audited cash flows.
+- 20-F lines 6160-6166: digital-asset receivables composition.
+
+[model decision]
+- Input hint ordinary_operating/applicable was overridden.
+- Final model: platform_financial_mixed / requires_special_model.
+- Reason: $3.974713bn operating digital assets and $1.145428bn digital-asset ETPs coexist with $4.507440bn certificate liabilities. These balances support products, redemptions and hedging and cannot be treated as detachable cash.
+- Consequence: all ordinary owner-earnback sorting fields remain null.
+
+[currency conversion]
+- Protocol requires CNY absolute yuan.
+- Formula used for displayed statement amounts: USD thousands * 1000 * 7.0288.
+- A single closing rate was used for balance sheet, income statement, and cash flows to maintain a transparent deterministic conversion. This is a limitation for flow statements and is disclosed in result.json and report.md.
+
+[calculations]
+- total_assets=5,382,278,000*7.0288=37,830,955,606.4 CNY
+- total_liabilities=4,905,311,000*7.0288=34,478,449,956.8 CNY
+- total_equity=476,967,000*7.0288=3,352,505,649.6 CNY
+- revenue=165,677,000*7.0288=1,164,510,497.6 CNY
+- operating_profit=126,991,000*7.0288=892,594,340.8 CNY
+- parent_net_profit=114,272,000*7.0288=803,195,033.6 CNY
+- operating_cash_flow=123,575,000*7.0288=868,583,960.0 CNY
+- capital_expenditure=(1,721,000+338,000)*7.0288=14,472,299.2 CNY
+- operating_free_cash_flow=868,583,960.0-14,472,299.2=854,111,660.8 CNY
+- 2025 dividend paid=25,070,000*7.0288=176,212,016.0 CNY
+- forecast dividend=0 based on disclosed current intention not to pay foreseeable dividends.
+- gross_margin and net_margin left null because GAAP revenue excludes economically central net capital-markets gains and the resulting ratios are not comparable to ordinary operating companies.
+
+[market data]
+- market_cap=4,357,338,951.587036 CNY
+- market_cap_date=2026-08-03
+- pe_ttm=2.816092
+- source=Yahoo Finance yfinance, passed through from config/input.json.
+- Limitation: market data represents the post-business-combination listed company; 2025 operating financials primarily represent predecessor CSIL.
+
+[consistency notes]
+- The 20-F narrative around segment EBITDA contains inconsistent figures in nearby prose. The explicit 2025 segment table and audited reconciliation both show $131.340m; that figure was used.
+- Parent equity and parent net income equal consolidated totals because no noncontrolling interest is presented in the audited CSIL statements.

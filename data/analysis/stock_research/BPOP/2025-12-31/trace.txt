@@ -1,0 +1,22 @@
+2026-08-05 stock-research trace — BPOP / 2025-12-31 annual
+
+1. Read skill instructions and required contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+2. Checked configured reuse paths. No BPOP raw filing, annual facts, normalized facts, or prior stock-research files existed locally; only config/input.json and the user notes file were present.
+3. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Identified Popular, Inc. as a bank holding company from the 2025 Form 10-K and official business descriptions. Overrode the input hint ordinary_operating/applicable with financial_bank/requires_special_model.
+5. Primary sources retrieved:
+   - SEC 2025 Form 10-K, accession 0001193125-26-085756, filed 2026-03-02: https://www.sec.gov/Archives/edgar/data/763901/000119312526085756/d17859d10k.htm
+   - SEC company facts API for CIK 0000763901: https://data.sec.gov/api/xbrl/companyfacts/CIK0000763901.json
+   - Popular Q4/FY2025 earnings release: https://investor.popular.com/news-releases/news-release-details/popular-inc-announces-fourth-quarter-2025-financial-results
+   - Popular dividend history: https://investor.popular.com/shareholder-info/dividends-history
+   - PBOC 2025-12-26 USD/CNY central parity 7.0358: https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+6. Core USD facts used: assets 75,348,267,000; liabilities 69,099,188,000; equity 6,249,079,000; deposits 66,190,093,000; net loans 38,519,462,000; net interest income 2,541,203,000; noninterest income 658,019,000; provision 260,163,000; noninterest expense 1,932,266,000; net income 833,159,000; net income applicable to common 831,747,000; year-end common shares 65,719,385.
+7. Conversion convention: all structured financial statement and dividend amounts converted at RMB 7.0358 per USD. Input market cap was already supplied in RMB and was not retranslated.
+8. Special-bank metrics used from official FY2025 release: NIM 3.49%; FTE NIM 3.88%; NPL/loans 1.27%; NCO ratio about 0.52%; ACL/loans 2.05%; ACL/NPL 162.2%; CET1 15.72%; total capital 17.50%; ROTCE 13.04%; 2025 common dividend $2.90/share; 2025 buybacks $501.5m.
+9. Dividend forecast: $0.75 quarterly rate × 4 × 65,719,385 year-end shares × 7.0358 = RMB 1,387,105,424. Forecast yield = forecast cash dividend / input market cap. This is a run-rate scenario, not a board commitment.
+10. Filled result.json only through protocol CLI set/append commands, then ran protocol validation.

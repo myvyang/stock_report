@@ -1,0 +1,54 @@
+task=PRI annual stock research
+period=2025-12-31
+generated_at=2026-08-04 Asia/Shanghai
+
+[protocol]
+Read .agents/skills/stock-research/SKILL.md completely.
+Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+Populated initialized fields through protocol `set` commands executed by protocol_fill.py.
+Validated with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Validation result: status=ok, errors=[]
+
+[reuse check]
+No PRI annual facts, normalized facts, prior stock research, or raw filing existed under the paths supplied in config/input.json.
+Downloaded the official SEC inline-XBRL 10-K and SEC Companyfacts JSON into stock_report/data/raw/filings/PRI/2025-12-31/.
+
+[primary sources]
+1. SEC 2025 Form 10-K, accession 0001193125-26-082233, filed 2026-02-27.
+   Local: stock_report/data/raw/filings/PRI/2025-12-31/pri-20251231.htm
+   URL: https://www.sec.gov/Archives/edgar/data/1475922/000119312526082233/pri-20251231.htm
+2. SEC Companyfacts API for CIK 0001475922.
+   Local: stock_report/data/raw/filings/PRI/2025-12-31/companyfacts.json
+3. Primerica FY2025/Q4 earnings release dated 2026-02-11.
+   URL: https://investors.primerica.com/news-events/press-releases/detail/369/primerica-reports-fourth-quarter-2025-results
+4. Primerica Q1 2026 earnings release for post-year-end dividend continuity check.
+   URL: https://investors.primerica.com/news-events/press-releases/detail/376/primerica-reports-first-quarter-2026-results
+5. CFETS-authorized 2025-12-31 central parity: USD 1 = CNY 7.0288.
+6. config/input.json for market cap, market-cap date/source, and PE TTM.
+
+[model decision]
+Input hint ordinary_operating/applicable was overridden.
+Confirmed model: financial_insurance / requires_special_model.
+Reason: insurance investments, reinsurance recoverables, DAC, policy liabilities, separate accounts, and regulatory capital are integral to the underwriting model. They cannot be treated as detachable net cash.
+Required ordinary owner-earnback metrics remain null.
+
+[financial extraction, USD thousands unless noted]
+Balance sheet: assets 15,012,336; liabilities 12,566,434; equity 2,445,902; investments 4,536,093; cash 756,227; reinsurance recoverables 2,564,952; DAC 3,915,998; separate account assets/liabilities 2,281,520; future policy benefits 6,818,179.
+Income statement: revenue 3,291,713; continuing pretax income 974,564; net income 751,234.
+Cash flow: CFO 901,178; property/equipment and other investing outflow 26,052; dividends 136,052; repurchases 450,033; financing cash flow -599,637.
+Special metrics: Primerica Life statutory capital 807.990m, ordinary dividend capacity 310.3m; Canada statutory capital 903.3m, estimated dividend capacity 215.7m; estimated RBC 455%.
+
+[conversion and calculations]
+All filing amounts converted using CNY = USD * 7.0288.
+Net margin = 751.234 / 3,291.713 = 22.82197749%.
+Mechanical operating FCF = 901.178 - 26.052 = USD 875.126m; disclosed but not used as distributable insurance earnings.
+Forecast dividend scenario = USD 1.20 * 4 * 31,659,906 shares * 7.0288 = CNY 1,068,149,506.6.
+Forecast dividend yield = 1,068,149,506.6 / 67,329,081,184.71094 = 1.58646084%.
+2025 dividend plus buyback = USD 586.085m, about 78.0% of FY2025 adjusted net operating income.
+
+[quality]
+status=complete
+Key limitations are recorded in result.json: mixed FX/market-cap dates, dividend scenario is not guidance, gross margin is not meaningful for an insurer, mechanical FCF is not the owner-earnback denominator, RBC is an estimate.

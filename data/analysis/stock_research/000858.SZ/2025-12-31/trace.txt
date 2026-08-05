@@ -1,0 +1,97 @@
+stock-research trace
+company: 000858.SZ 五粮液
+period: 2025-12-31 annual
+generated_at: 2026-07-31T18:39:49+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields only through protocol set commands; complex JSON was not written from scratch.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: {"status":"ok","errors":[]}
+
+[reused local evidence]
+- config/input.json: company identity, report period, market cap, PE TTM, market-cap timestamp/source.
+- stock_report/data/raw/filings/000858.SZ/2025-12-31/metadata.json: official filing URL, sha256, import metadata.
+- stock_report/data/raw/filings/000858.SZ/2025-12-31/annual-report.pdf: local official annual report.
+- stock_report/data/analysis/annual_review/000858.SZ/2025-12-31/result.json: verified ROIC evidence, cash equivalents, operating cash outflow, financing debt, OCF and capex.
+- stock_report/data/analysis/annual_review/000858.SZ/2025-12-31/report.md: reviewed prior cash/ROIC reasoning.
+
+[official filing]
+source: 巨潮资讯《宜宾五粮液股份有限公司2025年度报告》
+url: https://static.cninfo.com.cn/finalpage/2026-04-30/1225273091.PDF
+local_sha256: 09133e1f44b3bb4b2cebe211529ad68f5b04b6be10b43870f2a78c947d5910a4
+audit_opinion: standard unqualified
+pages/sections used:
+- p2: proposed dividend, RMB 25.78 per 10 shares.
+- p6-7: revenue, parent net profit, OCF, balance-sheet headline data, quarterly mismatch and income-recognition adjustment.
+- p8-13: products, sales modes, margins, channel settlement, production/sales/inventory, industry statistics.
+- p17-18: restricted assets and financial assets.
+- p38-40: chairman investigation and finance-company transactions context.
+- p47: audit opinion and cash as key audit matter.
+- p50-60: consolidated balance sheet, income statement, cash-flow statement.
+- p95-96, p106-110: other current assets, restricted regulatory goods, regulatory commodity payments, lease liabilities, dividends payable.
+- p117: cash and cash equivalents composition (reused from verified annual-review evidence).
+- p123-124: financial asset/liability classification and credit-risk/advance-payment business description.
+- p134: subsequent-event dividend plan.
+
+[model decision]
+statement_model: ordinary_operating
+owner_earnback_applicability: applicable
+reason: autonomous liquor production and product sales through distribution/direct channels; no bank deposits, brokerage client funds, insurance reserves, property-development settlement model, concession rights, or other special-statement structure. Special treatment remains necessary for regulatory commodity payment/liability and related restricted goods.
+
+[key reported facts, CNY]
+revenue=40528509770.23
+cost_of_sales=9101956953.59
+gross_profit=31426552816.64
+parent_net_profit=8954257202.51
+deducted_parent_net_profit=8815635943.27
+operating_cash_flow=29706259919.13
+capex=1967407316.36
+operating_free_cash_flow=27738852602.77
+total_assets=189984270815.47
+total_liabilities=67803587170.33
+total_equity=122180683645.14
+parent_equity=119932271234.99
+cash_and_cash_equivalents=124114690633.67
+regulatory_commodity_payment=26314680956.00
+restricted_regulatory_goods=4906972184.40
+contract_liabilities=13459591156.56
+lease_financing_debt=408530653.28
+
+[derived metrics]
+gross_margin=(40528509770.23-9101956953.59)/40528509770.23=0.7754184152047013
+net_margin=8954257202.51/40528509770.23=0.22093724277736215
+forecast_dividend=3881608005*2.578=10006785436.89
+forecast_dividend_yield=10006785436.89/303891000000=0.03292886408906483
+
+[owner earnback judgments]
+cash_pool_start=124114690633.67
+less_required_operating_cash=16177026083.06 (25% of annual operating cash outflow)
+less_regulatory_commodity_payment=26314680956.00
+less_dividend_payable=5565976643.61
+less_proposed_2025_dividend=10006785436.89
+less_lease_financing_debt=408530653.28
+residual_cash=65641690860.83
+residual_cash_discount=0.80
+discounted_detachable_net_cash=52513352688.664
+
+sustainable_profit_start=8815635943.27 (2025 deducted parent net profit)
+sustainability_discount=0.80
+discounted_sustainable_cash_profit=7052508754.616001
+reason: did not capitalize 2025 FCF because sales cash receipts, reported revenue and regulatory commodity balances are severely mismatched after the disclosed income-recognition adjustment.
+
+operating_business_price=303891000000-52513352688.664=251377647311.336
+owner_earnback_years=251377647311.336/7052508754.616001=35.64371999493153
+market_cap_to_cash_profit=303891000000/7052508754.616001=43.089772813269825
+
+[quality]
+status=complete
+limitations:
+- Tencent market data was supplied by input and not verified by the annual report.
+- Annual report discloses amounts but not enough transaction-level terms to reconstruct the final economic disposition of regulatory commodities and payments.
+- Sustainable-profit and cash discounts are analytical judgments, explicitly separated from reported facts.
+- Proposed dividend was pending shareholder approval at annual-report publication.

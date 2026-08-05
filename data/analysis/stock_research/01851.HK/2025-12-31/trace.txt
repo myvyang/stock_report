@@ -1,0 +1,67 @@
+stock-research trace
+company: 01851.HK / GINGKO EDU
+period: 2025-12-31 annual
+generated context date: 2026-08-04 Asia/Shanghai
+
+1. Read instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- Requested raw filing, annual facts and normalized facts paths did not exist locally.
+- No prior stock-research output existed for this company/period.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initialization succeeded.
+
+4. Official source acquisition
+- Downloaded HKEX Annual Report 2025 PDF from:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042401066.pdf
+- Local copy:
+  stock_report/data/raw/filings/01851.HK/2025-12-31/annual-report-2025.pdf
+- HKEX release date: 2026-04-24.
+- Local pdftotext was unavailable; report contents were inspected through the web PDF text index.
+
+5. Model verification
+- Input hint classified the company as financial_brokerage.
+- Annual report pages 8-10 show one private higher-education institution with Chengdu and Yibin campuses; tuition and boarding fees dominate revenue.
+- Model overwritten to ordinary_operating / applicable.
+- Special constraints retained: prepaid tuition contract liabilities, capital commitments, secured debt, and contractual-arrangement (VIE) cash path.
+
+6. Core facts extracted (annual report page references)
+- pp. 4, 74: revenue RMB400.679m; gross profit RMB221.441m; parent profit RMB162.570m; operating profit RMB169.939m.
+- pp. 75-76: assets RMB1,595.061m; liabilities RMB494.582m; equity attributable to owners RMB1,100.479m; no minority interest.
+- p. 78: operating cash flow RMB211.397m; PPE purchases RMB89.552m; intangible purchases RMB4.069m; financing cash flow RMB-138.141m.
+- pp. 94-95: tuition RMB345.976m; boarding RMB29.142m; contract liabilities RMB219.479m.
+- pp. 114-115: cash and deposits RMB243.503m; wealth-management products RMB7.188m.
+- p. 118: bank borrowings RMB179.790m.
+- p. 122: contracted capital commitments RMB67.579m.
+- p. 130: no dividend paid, declared, or proposed for 2025; none paid or declared for 2024.
+- p. 40: contractual-arrangement entities contributed 100% of revenue and net profit, and 98% of assets.
+
+7. Calculations
+- Gross margin = 221,441,000 / 400,679,000 = 0.5526643523.
+- Net margin = 162,570,000 / 400,679,000 = 0.4057362627.
+- Capital expenditure = 89,552,000 + 4,069,000 = 93,621,000.
+- Operating free cash flow = 211,397,000 - 93,621,000 = 117,776,000.
+- Discounted detachable net cash = 0 due to contract liabilities, commitments, debt and VIE cash-path constraints.
+- Operating business price = 1,982,991,510.3316307 - 0 = 1,982,991,510.3316307.
+- Owner earnback years = 1,982,991,510.3316307 / 117,776,000 = 16.8369745138.
+- Forecast dividend = 0; forecast dividend yield = 0.
+
+8. Result construction
+- All result.json mutations were performed with protocol `set` commands after protocol initialization.
+- No complex result JSON was handwritten from scratch.
+
+9. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result before report/trace finalization: status ok, errors [].
+
+10. Data limitations
+- Market cap and PE TTM were supplied by the task from Tencent qt.gtimg.cn and were not independently re-queried.
+- One-year free cash flow is used as the sustainable-cash-profit proxy.
+- Growth and maintenance capital expenditure cannot be separated from disclosed data.
+- Zero detachable cash is a conservative analytical haircut, not a statement that all cash is legally restricted.

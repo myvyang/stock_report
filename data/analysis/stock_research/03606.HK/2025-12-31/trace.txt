@@ -1,0 +1,56 @@
+Stock research trace — 03606.HK — period 2025-12-31
+Generated for input created_at: 2026-08-05T04:51:36+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full, as requested.
+- Read references/data-reuse.md because the selected skill routes research through existing filing/fact/research layers first.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked stock_report/data/analysis/annual_review/03606.HK/2025-12-31 and stock_report/data/raw/filings/03606.HK/2025-12-31.
+- No annual facts package, normalized facts, metadata, or prior stock-research result existed in the workspace or stated sync target.
+- Therefore returned to the issuer/HKEX annual filing rather than fabricating missing facts.
+
+3. Primary sources used
+- Fuyao Glass Industry Group Co., Ltd. Annual Report 2025, issuer-hosted English PDF:
+  https://www.fuyaogroup.com/upfiles/investor/202603/1774340758671.pdf
+- Fuyao investor-relations annual report and announcement indexes:
+  https://www.fuyaogroup.com/en/investor_list_99.html
+  https://www.fuyaogroup.com/en/investor_list_1.html
+- HKEX title-search/result pages were used to confirm the annual report, annual results, AGM resolution and dividend announcements.
+- Market cap, PE TTM, market-cap date and quote source were preserved from config/input.json.
+- Downloaded the official annual-report PDF to stock_report/data/raw/filings/03606.HK/2025-12-31/2025-annual-report-en.pdf for reproducibility. No facts package was generated because this task requested only the three outputs.
+
+4. Input-model correction
+- Input hinted financial_brokerage and described securities customer funds, proprietary financial assets and repo financing.
+- Annual report business review says the company designs, manufactures and sells automotive-grade float glass, automotive glass, locomotive glass and vehicle accessories, serving OEM and aftermarket customers.
+- Financial statements show ordinary manufacturing assets and liabilities: factories/equipment, inventory, trade receivables, supplier payables, bank borrowings and leases.
+- Corrected analysis_model to ordinary_operating; owner_earnback_applicability=applicable.
+- Input relation tags describing an EV manufacturer/whole-vehicle sales were also rejected as a company-identity mismatch.
+
+5. Core calculations (RMB absolute yuan)
+- Gross margin = 16,830,231,000 / 45,787,436,000 = 36.7573%.
+- Parent net margin = 9,311,874,000 / 45,787,436,000 = 20.3372%.
+- Capital expenditure = PPE purchases 5,863,795,000 + intangible purchases 66,543,000 + land-use-right purchases 233,744,000 = 6,164,082,000.
+- Operating free cash flow = 12,055,090,000 - 6,164,082,000 = 5,891,008,000.
+- Book net funds for detachable-cash assessment = cash 19,240,786,000 + FVPL 10,916,000 + non-current FVOCI equity 88,338,000 - borrowings 16,964,111,000 - lease liabilities 524,290,000 - long-term payables 53,855,000 = 1,797,784,000.
+- Discounted detachable net cash = 1,797,784,000 * 50% = 898,892,000. The 50% haircut reflects global expansion, working-capital, cross-border cash and dividend constraints.
+- Discounted sustainable cash profit = 5,891,008,000 * 90% = 5,301,907,200. The 10% haircut absorbs single-year volatility and maintenance-capex uncertainty.
+- Operating business price = 133,250,387,978.25098 - 898,892,000 = 132,351,495,978.25098.
+- Owner earnback years = 132,351,495,978.25098 / 5,301,907,200 = 24.9630.
+- Market cap / cash profit = 133,250,387,978.25098 / 5,301,907,200 = 25.1325.
+- Forecast dividend = 2025 interim 2,348,769,000 + final 3,131,692,000 = 5,480,461,000; yield against input market cap = 4.1129%.
+
+6. Judgment boundaries
+- Fact: reported financial statement figures, product/geographic revenue, dividend per share, customer concentration and stated business activities.
+- Inference: integrated float-glass supply and global plant network support cost control and customer stickiness.
+- Subjective valuation judgment: 50% detachable-net-cash haircut and 10% free-cash-flow haircut.
+- No buy/sell recommendation, target price, ranking label, or unsupported market-share claim was produced.
+
+7. Validation
+- outputs/result.json was populated through protocol `set` and `append` commands after protocol initialization.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok; no protocol errors.

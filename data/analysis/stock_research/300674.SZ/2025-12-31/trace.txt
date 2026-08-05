@@ -1,0 +1,60 @@
+stock-research trace
+company: 300674.SZ 宇信科技
+period: 2025-12-31 annual
+generated_at: 2026-07-31 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as explicitly requested.
+- Read references/data-reuse.md because the skill requires prioritizing reusable facts.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All structured sections were populated using repeated protocol `set` commands; result.json was not hand-written from scratch.
+
+2. Reuse audit
+- stock_report/data/analysis/annual_review/300674.SZ/2025-12-31: no pre-existing fact package.
+- stock_report/data/normalized/facts/300674.SZ/2025-12-31: no pre-existing normalized facts.
+- stock_report/data/analysis/stock_research/300674.SZ/2025-12-31: no pre-existing research result.
+- stock_report/data/notes/user_stock_evaluations.md existed, but contained no task-specific annual fact package used here.
+
+3. Sources
+- Primary filing: 北京宇信科技集团股份有限公司2025年年度报告, disclosed 2026-03-30 on Shenzhen Stock Exchange disclosure infrastructure.
+- Downloaded local filing: stock_report/data/raw/filings/300674.SZ/2025-12-31/annual-report-2025.pdf
+- Official PDF URL used: https://disc.static.szse.cn/disc/disk03/finalpage/2026-03-30/27a8b789-547b-4642-a7a6-f3d7635b8988.pdf
+- Search-engine result initially exposed another SZSE UUID that returned HTTP 404; it was rejected. The working SZSE PDF was inspected as a 234-page PDF.
+- Search/read fallback for extractable text: Sina-hosted reproduction of the same annual report, bulletin id 12036396. Core values were matched to the annual report tables and SZSE indexed PDF content.
+- Market data: config/input.json, Tencent qt.gtimg.cn snapshot at 20260731114248: market cap CNY 11,800,000,000; PE TTM 28.14.
+
+4. Model determination
+- statement_model = ordinary_operating.
+- Reason: software and IT services company; 87.56% of revenue from bank IT solutions. No customer deposits, insurance reserves, regulated presale cash, concession rights, or other balance-sheet-as-business structure.
+- owner_earnback_applicability = applicable.
+
+5. Extracted core facts (CNY)
+- Total assets 6,818,799,864.19; liabilities 2,219,339,414.65; total equity 4,599,460,449.54; parent equity 4,563,184,754.76; minority interest 36,275,694.78.
+- Revenue 3,623,081,673.57; cost 2,460,083,482.86; gross profit 1,162,998,190.71; operating profit 458,080,199.28; net profit 437,894,932.51; parent net profit 431,843,595.03.
+- Operating cash flow 621,367,006.45; capex 246,497,728.16; operating free cash flow 374,869,278.29; financing cash flow 337,371,869.14.
+- Cash and cash equivalents 1,773,487,023.24; trading financial assets 1,506,662,319.18; debt investments 101,802,465.75.
+- Short-term borrowing 399,676,666.65; current portion of non-current liabilities 7,985,447.42; lease liabilities 14,870,025.83.
+- Proposed 2025 cash dividend 210,435,571.20.
+
+6. Calculations
+- gross margin = (3,623,081,673.57 - 2,460,083,482.86) / 3,623,081,673.57 = 0.3209969566.
+- net margin = 431,843,595.03 / 3,623,081,673.57 = 0.1191923434.
+- operating FCF = 621,367,006.45 - 246,497,728.16 = 374,869,278.29.
+- discounted cash = 1,773,487,023.24 * 90% = 1,596,138,320.916 (result JSON uses exact multiplication).
+- discounted trading financial assets = 1,506,662,319.18 * 90% = 1,355,996,087.262.
+- discounted debt investments = 101,802,465.75 * 80% = 81,441,972.60.
+- financial and lease debt = 399,676,666.65 + 7,985,447.42 + 14,870,025.83 = 422,532,139.90.
+- discounted detachable net cash = 1,596,138,320.916 + 1,355,996,087.262 + 81,441,972.60 - 422,532,139.90 = 2,611,044,240.878.
+- discounted sustainable cash profit = 380,000,000, selected conservatively between 2025 parent net profit and operating FCF, without adding back share-based compensation.
+- operating business price = 11,800,000,000 - 2,611,044,240.878 = 9,188,955,759.122.
+- owner earnback years = 9,188,955,759.122 / 380,000,000 = 24.1814625.
+- market cap / cash profit = 11,800,000,000 / 380,000,000 = 31.0526316.
+- forecast dividend yield = 210,435,571.20 / 11,800,000,000 = 0.017833523.
+
+7. Quality notes
+- Annual filing provides all three statements, business mix, dividend proposal, and key operating explanations required for complete status.
+- Market snapshot was supplied by the task and not independently reconciled to exchange historical market data.
+- Discount rates and sustainable cash profit are analyst assumptions, fully disclosed in result.json and report.md.
+- Final protocol validation is run after file creation; its outcome is recorded in the completion response.

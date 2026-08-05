@@ -1,0 +1,65 @@
+stock-research trace
+company=09906.HK HONLIV HEALTH
+target_period=2025-12-31
+research_as_of=2026-08-05 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No annual facts package, normalized facts, filing metadata, or prior stock-research result existed for 09906.HK/2025-12-31.
+- Downloaded official HKEX PDFs to stock_report/data/raw/filings/09906.HK/2025-12-31/:
+  - 2025-interim-results.pdf
+  - 2024-annual-report.pdf
+
+3. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Official 2025 interim filing states the group owns, operates and manages hospitals in the PRC.
+- Revenue streams are treatments/general healthcare, pharmaceutical sales and postnatal care.
+- Override: ordinary_operating / applicable.
+- Owner earnback remains uncalculated because evidence for FY2025 is incomplete, not because the model is intrinsically inapplicable.
+
+4. Primary evidence reviewed
+- HKEX 2025 interim results, published 2025-08-29:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2025/0829/2025082903356.pdf
+  Used for H1 income statement, 2025-06-30 balance sheet, operating cash flow summary, revenue mix, operating statistics, dividend, and医保 settlement uncertainty.
+- HKEX 2024 annual report, published 2025-04-29:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2025/0429/2025042904954.pdf
+  Used as audited full-year baseline and for 2024 capex/free-cash-flow context.
+- HKEX supplemental auditor/delay announcement, published 2026-04-21:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0421/2026042100378.pdf
+  Used for RMB63m unrecorded loan/fund-flow matter and RMB60.35m year-end outstanding principal.
+- HKEX supplemental resumption update, published 2026-07-06:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0706/2026070602099.pdf
+  Used for outstanding FY2025 results, forensic/internal-control review status, and continued suspension.
+- config/input.json
+  Used for market cap RMB805,240,804.195404, timestamp 2026/08/03 09:20:05, source Tencent qt.gtimg.cn, and PE TTM 27.82.
+
+5. Period handling
+- Requested report type is annual for FY2025.
+- As of research date, FY2025 audited annual results/report were still outstanding.
+- financials and margin fields therefore contain latest available unaudited H1 2025 figures, explicitly disclosed in data_quality.limitations.
+- FY2024 figures appear only as comparison/history in narrative/evidence, not as fabricated FY2025 values.
+
+6. Calculations
+- H1 2025 gross margin = 45,801,000 / 346,820,000 = 0.1320592815.
+- H1 2025 parent net margin = -673,000 / 346,820,000 = -0.0019404879.
+- 2025-06-30 minority interest ratio = 5,915,000 / 560,811,000 = 0.0105463347.
+- FY2024 simple operating FCF reference = 83,344,000 - 49,673,000 - 2,485,000 = 31,186,000; not used as FY2025 sustainable cash profit.
+- Forecast dividend = 0; yield = 0 / 805,240,804.195404 = 0. This is a conservative scenario, not company guidance.
+- All owner-earnback fields left null due missing FY2025 audited statements and unresolved accounting investigation.
+
+7. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result through protocol set/append commands; complex JSON was not handwritten from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+8. Data quality conclusion
+- status=partial
+- Reasons: missing FY2025 audited annual report; unresolved unrecorded-loan investigation; missing FY2025 full-year income statement, balance sheet, cash flow and capex.
+- Result should not enter formal ranking until these gaps are resolved.

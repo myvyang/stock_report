@@ -1,0 +1,81 @@
+[2026-08-04] Stock research trace — 02102.HK / TAK LEE MACH
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because local fact reuse was evaluated.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- Checked stock_report/data/analysis/annual_review/02102.HK/2025-12-31, normalized facts, raw filing directory, and prior stock research directory.
+- No reusable annual facts, normalized facts, raw filing, or prior research existed at task start.
+
+3. Primary-source acquisition
+- Located the issuer's Annual Report 2025 through HKEXnews title search.
+- Downloaded official filing:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2025/1031/2025103100507.pdf
+- Local copy:
+  stock_report/data/raw/filings/02102.HK/2025-12-31/annual-report-2025.pdf
+- PDF has 117 pages. Text was extracted locally with pypdf for research; no third-party transcription was used for core financial figures.
+
+4. Period and model resolution
+- Input period: 2025-12-31, annual.
+- Issuer fiscal year in audited filing: year ended 2025-07-31.
+- Result analysis.period corrected to 2025-07-31; mismatch recorded in data_quality.limitations.
+- Input model hint said financial_brokerage. Audited business facts show equipment sales, equipment leasing/operators, repair and logistics; balance sheet has machinery, inventory, trade/lease receivables and ordinary operating liabilities, with no brokerage customer funds or proprietary financial inventory.
+- Overrode model to ordinary_operating / applicable.
+
+5. Core filing evidence (all HK$'000 unless stated)
+- Annual report pp. 8-12 (printed pages): business model, revenue drivers, margin narrative, dividends, liquidity and no bank borrowings.
+- Consolidated P&L p. 52: revenue 330,652; cost 262,902; gross profit 67,750; operating profit 33,799; parent profit 28,163.
+- Consolidated financial position p. 53: total assets 490,864; current liabilities 25,801; non-current liabilities 23,121; total equity/parent equity 441,942.
+- Cash flow pp. 55-56: CFO 76,895; PPE purchases 2,768; financing cash flow -33,539; dividends paid 30,000.
+- Segment note pp. 87-91: sales revenue/result 208,617/8,009; lease plus operators 108,460/29,610; repair/logistics 13,575/1,208; all revenue and identifiable assets/liabilities in Hong Kong.
+- PPE note pp. 98-99: machinery transferred from inventory at cost 47,330 in FY2025, showing why direct PPE cash purchases understate economic fleet investment.
+- Inventory note p. 102: gross inventory 109,498, allowance 10,841, net 98,657.
+- Receivables note p. 103: gross 62,673, ECL 3,907, net 58,766; no collateral; 181+ day net balance 11,662.
+- Cash note p. 104: 118,515, split HKD 40,004 / USD 54,709 / JPY 23,802.
+- Payables/contract liabilities pp. 105-106; lease liabilities p. 107; tax/provision pp. 108-109.
+- Dividend note p. 97 and share capital p. 109: FY2025 HK$0.035/share on 1,000,000,000 shares.
+
+6. Currency conversion
+- Protocol requires CNY absolute yuan.
+- Used 1 HKD = CNY 0.91051, the PBOC/CFETS central parity published 2025-07-28, the nearest primary-source observation located to fiscal year-end.
+- Source: https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/5792618/index.html
+- Limitation: translation is approximate and not transaction-date accounting translation.
+
+7. Owner earnback judgments and calculations
+- Discounted detachable net cash:
+  (HK$118.515m cash × 80% - HK$2.428m lease liabilities) × 0.91051
+  = CNY 84,116,555.84.
+- 20% reserve is a judgment for equipment procurement, FX holdings and operating liquidity; operating inventory, receivables, fleet and investment property were not treated as detachable cash.
+- Normalized profit before prudence discount:
+  HK$28.163m reported parent profit
+  - HK$2.741m ECL reversal × (1 - 16.5%)
+  - HK$3.167m government grants × (1 - 16.5%)
+  + HK$0.409m investment-property impairment × (1 - 16.5%)
+  = HK$23.571335m.
+- Discounted sustainable cash profit:
+  HK$23.571335m × 85% × 0.91051 = CNY 18,242,645.80.
+- 15% prudence discount reflects project cyclicality, hidden economic fleet capex through inventory transfers, and one-year earnings acceleration.
+- Operating business price:
+  CNY 236,582,501.23 market cap - CNY 84,116,555.84 net cash = CNY 152,465,945.39.
+- Owner earnback years: 152,465,945.39 / 18,242,645.80 = 8.3577.
+- Market cap / cash profit: 236,582,501.23 / 18,242,645.80 = 12.9687.
+- Reported FCF 76.895m - 2.768m = HK$74.127m was retained as a reported field but explicitly not used as sustainable distributable cash.
+
+8. Dividend forecast scenario
+- Mechanical run-rate only: HK$0.035/share × 1bn shares × 0.91051 = CNY 31,867,850.
+- Forecast yield: 31,867,850 / 236,582,501.23 = 13.4701%.
+- Not company guidance. FY2025 total dividend HK$35m exceeds FY2025 parent profit HK$28.163m; sustainability limitation is explicit.
+
+9. Market data
+- Taken from task input without re-fetch: market cap CNY 236,582,501.23262405; timestamp 2026-08-03 09:20:05; source Tencent qt.gtimg.cn; PE TTM 9.76.
+- Market date is about one year after fiscal year-end; recorded as a limitation.
+
+10. Protocol population and validation
+- Populated initialized JSON exclusively through protocol `set` commands; did not hand-write result.json from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed validation result: status=ok, errors=[].

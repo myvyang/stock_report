@@ -1,0 +1,54 @@
+stock-research trace
+company: 08030.HK / 丰银禾控股有限公司
+period: 2025-12-31 annual
+run date: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked stock_report/data/analysis/annual_review/08030.HK/2025-12-31 and stock_report/data/raw/filings/08030.HK/2025-12-31.
+- No pre-existing annual facts, metadata, normalized facts, or research result was available.
+- Downloaded the official HKEX annual report to stock_report/data/raw/filings/08030.HK/2025-12-31/annual_report_2025_zh.pdf.
+- Local pdftotext was unavailable; used the searchable HKEX PDF rendition for page/line extraction.
+
+3. Primary source
+- Fengyinhe Holdings Limited Annual Report 2025:
+  https://www.hkexnews.hk/listedco/listconews/gem/2026/0427/2026042701269_c.pdf
+- Key pages used: financial highlights p.4; MD&A pp.6 onward; auditor report pp.64-70; statements pp.71-76; segment note pp.108-111; dividend note p.120; associate note pp.123-125; loan receivables note pp.125-127; financial risk note pp.142 onward.
+- Market cap and PE reused from config/input.json, source Tencent qt.gtimg.cn, timestamp 2026/08/03 09:47:58.
+
+4. Model decision
+- Input hint: financial_brokerage.
+- Filing evidence: operating segments are financial services platform and entrusted/pawn/other loans plus financial consultation. No securities brokerage, investment banking, proprietary trading, or client-money business was disclosed.
+- Override: platform_financial_mixed.
+- Owner earnback applicability: requires_special_model.
+- Reason ordinary model is withheld: cash and loan receivables are operating financial assets; operating cash flow is materially driven by changes in loan receivables. Ordinary detachable-net-cash and sustainable-cash-profit assumptions are therefore not comparable.
+
+5. Main extracted figures (RMB)
+- Revenue 113,651,000; cost of services 26,398,000; gross profit 87,253,000.
+- Parent net profit 47,503,000; ECL net reversal 6,488,000; associate contribution 3,260,000.
+- Total assets 341,241,000; liabilities 100,038,000; equity/parent equity 241,203,000.
+- Cash 173,454,000; net loans and interest receivable 117,257,000.
+- Operating cash flow 126,488,000; cash capex 0; financing cash flow 0.
+- Platform revenue 108,348,000; lending/consulting revenue 5,303,000.
+- No interim dividend and no proposed final dividend.
+
+6. Derived figures
+- Gross margin = 87,253,000 / 113,651,000 = 0.7677266377.
+- Net margin = 47,503,000 / 113,651,000 = 0.4179725651.
+- Approximate average-equity ROE = 47,503,000 / average(172,386,000, 241,203,000) = 22.97% (report-only inference).
+- Market cap / year-end parent equity = 480,873,290.50540924 / 241,203,000 = 1.99x (report-only inference).
+- Forecast dividend = 0 and yield = 0%, based on no 2025 interim/final dividend and no disclosed stable payout plan. This is a baseline assumption, not guidance.
+
+7. Result construction
+- Populated the initialized skeleton through protocol CLI set commands in fill_result.sh.
+- Ordinary owner-earnback fields were deliberately left null as required by the special-model contract.
+- Separated facts, inferences, judgments, risks, and limitations in result.json/report.md.
+
+8. Validation
+- Protocol validation after population returned status=ok with no errors.

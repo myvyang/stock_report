@@ -1,0 +1,53 @@
+任务：01127.HK LION ROCK GROUP，2025-12-31 年报研究
+生成时间口径：Asia/Shanghai；输入 created_at 2026-08-03T12:37:40+08:00
+
+1. 协议与初始化
+- 完整读取 .agents/skills/stock-research/SKILL.md。
+- 完整读取 references/result-contract.md、report-contract.md 和 data-reuse.md。
+- 使用命令初始化：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- 所有复杂结构通过 protocol set 写入，未从空文件手写 result.json。
+
+2. 复用和原始资料
+- 复用 stock_report/data/analysis/annual_review/01127.HK/2025-12-31/facts.json。
+- 复用同目录 annual_facts.md 与 extraction_trace.txt。
+- 对关键缺口回查 stock_report/data/raw/filings/01127.HK/2025-12-31/e1127_20260418_ar.txt。
+- 原始 PDF 元数据所列公司官网来源：https://www.lionrock.hk/pdf/investor/20260423/e1127_20260418_ar.pdf
+- 公司投资者关系摘要：https://www.lionrock.hk/InvestorRelations/InvestorRelations.aspx?tab=3
+
+3. 模型复核
+- 输入提示 financial_brokerage。
+- 年报 Note 6 和业务描述显示经营分部为 Printing 与 Publishing；金融资产仅 HK$2.456m，银行借款 HK$49.337m。
+- 未发现客户资金、自营证券组合或卖出回购融资。
+- 结论：覆盖输入提示为 ordinary_operating，owner_earnback_applicability=applicable。
+
+4. 财报抽取与换算
+- 损益表：收入 HK$2,407.213m，毛利 HK$794.528m，归母净利润 HK$187.668m。
+- 资产负债表：总资产 HK$2,687.028m，总负债 HK$782.127m，归母权益 HK$1,646.854m。
+- 现金流及附注：经营现金流 HK$572.290m，PPE 支出 HK$72.438m，预出版投入 HK$137.256m。
+- 资产与负债拆分来自年报 Notes 15-26 及年度事实包。
+- 2025 年末换算率采用 1 HKD = 0.90486 CNY，来源：中国人民银行授权中国外汇交易中心 2025-12-26 公告：https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- 选择 12 月 26 日是因为它是检索到的年末附近官方可核验工作日；作为 12 月 31 日近似写入 limitation。
+
+5. 控股回本假设
+- 现金起点 HK$590.102m；扣银行借款 HK$49.337m。
+- 保留 HK$200m 必要经营现金，用于营运周转与持续预出版投入。
+- 对剩余现金再打 20% 折扣，覆盖集团实体分布、汇兑及提取约束。
+- 折后可剥离净现金 CNY 246,675,694.32。
+- 利润起点为 2025 归母净利润；扣银行利息 HK$9.987m、应收减值转回 HK$4.858m，回加公允价值损失 HK$0.266m，再打 15% 折扣。
+- 折后持续现金利润 CNY 133,128,115.659。
+- 经营业务购买价 CNY 548,241,509.8216169；回本 4.1181497019450495 年；市值/现金利润 5.971069298222108。
+
+6. 分红
+- 年报主席报告及 Note 13：2025 年首期中期 3 港仙、第二期中期 9 港仙，全年 12 港仙；第二期按 770,000,000 股计算。
+- 预测仅假设维持 12 港仙，不含特别股息。
+- 近市值日换算采用 2026-07-17 SAFE 列示中间价 1 HKD = 0.86648 CNY：https://www.safe.gov.cn/AppStructured/hlw/RMBQuery.do?COLLCC=546877760
+- 预测现金分红 CNY 80,062,752；预测分红率 10.071835%。
+
+7. 行情
+- config/input.json：市值 CNY 794,917,204.1416168；日期 2026/07/31 16:08:47；来源 Tencent qt.gtimg.cn；PE TTM 4.92。
+- 按协议将输入 amount 视为已统一到人民币，未二次换算。
+
+8. 验证
+- 执行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- 首次完整填充后返回 status=ok，errors=[]。
+- 最终交付前再次执行协议校验、JSON 解析、必需文件存在性及报告/trace 非空检查。

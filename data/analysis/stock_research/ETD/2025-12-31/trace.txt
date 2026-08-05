@@ -1,0 +1,77 @@
+ETD stock-research trace
+generated_at=2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill requires checking reuse boundaries.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Expected annual fact pack and raw filing paths under stock_report/data/.../ETD/2025-12-31 did not exist.
+- No prior ETD annual facts or stock-research result was available for reuse.
+- Downloaded the official SEC HTML filings into stock_report/data/raw/filings/ETD/2025-12-31/ for local reproducibility.
+
+3. Identity and period handling
+- Issuer: Ethan Allen Interiors Inc.; NYSE ticker ETD; SEC CIK 896156.
+- Input archive period/report_type: 2025-12-31 / annual.
+- Ethan Allen fiscal year ends June 30. No annual financial statements end on 2025-12-31.
+- Used FY2025 Form 10-K (year ended 2025-06-30) for annual balance sheet, income statement and cash flow.
+- Used FY2026 Q2 Form 10-Q (period ended 2025-12-31) only to update cash/investments and regular dividend information.
+- Preserved analysis.period=2025-12-31 from input and disclosed this mixed-period treatment as a limitation.
+
+4. Primary sources
+- SEC FY2025 10-K: https://www.sec.gov/Archives/edgar/data/896156/000143774925027594/eth20250630_10k.htm
+  accession=0001437749-25-027594; filed 2025-08-22.
+- SEC/issuer-hosted FY2026 Q2 10-Q: https://ir.ethanallen.com/sec-filings/all-sec-filings/content/0001437749-26-003525/eth20251231_10q.htm
+  accession=0001437749-26-003525; period ended 2025-12-31.
+- Issuer FY2025 results: https://ir.ethanallen.com/news-events/press-releases/detail/304/ethan-allen-reports-fiscal-2025-and-fourth-quarter-results
+- Federal Reserve H.10 monthly USD/CNY: https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.M.CH&rel=H10
+- Market data: config/input.json, source labeled Yahoo Finance yfinance.
+
+5. Source figures in USD
+- FY2025 total assets=737,099,000; total liabilities=254,830,000; total equity=482,269,000; parent equity=482,355,000; noncontrolling interests=-86,000.
+- FY2025 revenue=614,649,000; cost of sales=242,528,000; gross profit=372,121,000; operating income=61,988,000; net income=51,596,000.
+- FY2025 operating cash flow=61,696,000; capex=11,268,000; operating FCF=50,428,000; financing cash flow=-52,599,000; cash dividends=50,084,000.
+- FY2025 year-end cash=76,178,000; short-term Treasury investments=59,955,000; long-term Treasury investments=60,030,000.
+- 2025-12-31 cash and investments=179,300,000; no outstanding debt reported.
+- FY2025 regular quarterly dividend=USD 0.39/share; FY2025 year-end shares outstanding=25,432,000.
+
+6. Currency conversion
+- Contract requires absolute CNY yuan.
+- Applied 2025-12 Federal Reserve H.10 monthly average: 1 USD=7.0432 CNY.
+- Conversion is a presentation convention; original filing currency is USD.
+
+7. Model classification
+- statement_model=ordinary_operating.
+- owner_earnback_applicability=applicable.
+- Reason: revenue comes from design/manufacture/retail of furniture; inventory, plants, stores, lease obligations and customer deposits are ordinary operating items. No bank deposits, insurance reserves, regulated project cash, development inventory, concession rights or holding-company look-through structure.
+
+8. Formulas and assumptions
+- gross_margin=372,121/614,649=0.6054203293.
+- net_margin=51,596/614,649=0.0839438444.
+- 2025-12-31 cash/investments CNY=179,300,000*7.0432=1,262,845,760.
+- discounted detachable net cash=1,262,845,760*80%=1,010,276,608.
+- FY2025 FCF CNY=(61,696,000-11,268,000)*7.0432=355,174,489.60.
+- discounted sustainable cash profit=355,174,489.60*80%=284,139,591.68.
+- operating business price=3,846,346,694.594055-1,010,276,608=2,836,070,086.594055.
+- owner earnback years=2,836,070,086.594055/284,139,591.68=9.9812562896.
+- market cap/cash profit=3,846,346,694.594055/284,139,591.68=13.5368206586.
+- discounted net cash/market cap=1,010,276,608/3,846,346,694.594055=0.2626587482.
+- forecast ordinary dividend=(0.39*4*25,432,000)*7.0432=279,431,353.344 CNY.
+- forecast dividend yield=279,431,353.344/3,846,346,694.594055=0.0726485092.
+- Special dividends excluded from forecast.
+- 80% cash factor preserves operating liquidity; 80% FCF factor reflects revenue decline, weaker OCF and cyclical demand. Both are analyst judgments, not reported facts.
+
+9. Protocol mutation and validation
+- Populated outputs/result.json exclusively through protocol set/append commands after protocol init; did not hand-author the full JSON object.
+- First completed validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}.
+
+10. Known limitations
+- Annual statements end 2025-06-30 while the archive period is 2025-12-31.
+- Input market-cap date 2026-08-03 is later than the research financial period, creating a timing mismatch.
+- CNY amounts are translated analytical displays, not issuer-reported functional-currency amounts.
+- Owner-earnback discounts are judgmental and scenario-sensitive.

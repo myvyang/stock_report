@@ -1,0 +1,54 @@
+stock-research trace — 00006.HK — period 2025-12-31
+generated_at: 2026-08-03T18:00:51+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md in full.
+- Read references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked annual review, normalized facts and raw filing paths supplied by config/input.json.
+- No reusable local filing metadata or annual facts were present at the time of research.
+- Downloaded the official 2025 annual report from Power Assets' corporate website for source verification; web-indexed official report pages were used to extract auditable statement figures.
+
+3. Model override
+- Input hint said financial_brokerage. Rejected based on audited statements and disclosed business.
+- Confirmed statement_model=investment_holding and owner_earnback_applicability=requires_special_model.
+- Basis: HK$66,004m joint-venture interests plus HK$27,225m associate interests represented about 94.8% of HK$98,325m total assets; HK$6,142m share of JV/associate results represented about 98.5% of HK$6,236m attributable profit.
+- Ordinary net-cash and cash-profit sorting fields were therefore kept null.
+
+4. Primary sources and extracted facts
+- Power Assets Holdings Limited Annual Report 2025, official company PDF:
+  revenue HK$771m; share of JV results HK$4,056m; share of associate results HK$2,086m; attributable profit HK$6,236m.
+  total assets HK$98,325m; total liabilities HK$7,600m; parent equity HK$90,725m.
+  JV interests HK$66,004m; associate interests HK$27,225m; bank deposits and cash HK$2,531m; bank loans HK$3,319m.
+  operating cash flow HK$884m; JV dividends received HK$2,958m; associate dividends received HK$1,423m; dividends paid HK$6,010m; capex HK$1m.
+  2025 dividend per share: interim HK$0.78 plus final HK$2.04.
+- Power Assets circular dated 2026-04-08:
+  base PAH consideration for UKPN GBP4,219.2m, approximately HK$44,301.6m, plus 4% accrued interest and less permitted leakage/other adjustments.
+- ENGIE / London Power Networks completion announcement dated 2026-05-07:
+  UKPN disposal completed on 2026-05-07.
+- Tencent qt.gtimg.cn snapshot supplied in input:
+  market cap CNY108,261,666,692.05666; PE TTM 20.18; timestamp 2026-07-31 16:08:44.
+
+5. Currency and calculations
+- Result protocol requires CNY absolute yuan. Analytical translation assumption: HK$1=CNY0.91.
+- This is a simplifying translation assumption, not a claim that all income-statement items were converted at accounting average rates.
+- Forecast/base dividend cash = HK$2.82 × 2,131,105,154 shares × 0.91 = CNY5,468,842,046.1948.
+- Forecast/base dividend yield = CNY5,468,842,046.1948 / CNY108,261,666,692.05666 = 0.0505150365.
+- Gross margin and net margin were left null because consolidated revenue excludes the revenue of equity-accounted operating companies and the ratios would be economically misleading.
+
+6. Protocol mutation and validation
+- Populated scalar fields with repeated protocol `set` commands.
+- Populated asset, liability, risk and evidence rows with protocol `append` commands.
+- Did not hand-write result.json from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation result: {"status":"ok","errors":[]}
+
+7. Data-quality judgment
+- status=complete under the special-model minimum requirements.
+- Ordinary owner-earnback fields remain null by contract.
+- Limitation retained: the completed UKPN disposal creates a post-balance-sheet discontinuity; final adjusted proceeds and a full remaining-portfolio look-through NAV/cash-distribution model were not available without unsupported assumptions.

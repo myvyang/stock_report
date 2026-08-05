@@ -1,0 +1,62 @@
+stock-research trace
+task: 03382.HK / annual / 2025-12-31
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because the skill directs reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields with protocol `set`; did not hand-write the result object.
+
+2. Reuse audit
+- Checked configured raw filing, annual review and normalized facts paths.
+- No pre-existing filing metadata, facts package, normalized facts or prior research outputs were present.
+- Downloaded the official 2025 annual report to:
+  stock_report/data/raw/filings/03382.HK/2025-12-31/annual-report-2025.pdf
+
+3. Identity and model verification
+- Input hint said financial_brokerage and supplied automobile/EV tags.
+- Official annual results identify cargo handling, sales and port ancillary services; the coal sales operator was disposed in December 2025.
+- Overrode the hint with statement_model=investment_holding and owner_earnback_applicability=requires_special_model.
+- Rationale: parent equity HKD14.522bn versus NCI HKD17.116bn; parent profit HKD0.667bn versus NCI profit HKD1.060bn. Consolidated cash/FCF cannot be fully assigned to listed-company shareholders.
+
+4. Primary sources
+- HKEX 2025 annual results, published 2026-03-27:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0327/2026032703070.pdf
+- HKEX 2025 annual report, published 2026-04-24:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042402767.pdf
+- Market snapshot copied from config/input.json: Tencent qt.gtimg.cn, timestamp 2026/08/03 09:33:46.
+
+5. Extracted original HKD facts
+- Continuing revenue 11,688,794,000; cost of sales 7,636,216,000; gross profit 4,044,666,000.
+- Consolidated net profit 1,726,879,000; parent net profit 666,741,000; NCI profit 1,060,138,000.
+- Total assets 41,170,297,000; liabilities 9,531,754,000; total equity 31,638,543,000; parent equity 14,522,151,000; NCI 17,116,392,000.
+- Operating cash inflow 2,757,000,000; cash capex 1,176,000,000; simple operating FCF 1,581,000,000; financing outflow 2,408,000,000.
+- Proposed final dividend 0.0433 per share and total 266,641,000; approximate payout 40%.
+- Throughput 457m tonnes; containers 20.81m TEU.
+
+6. Currency normalization
+- Contract requires absolute CNY yuan; the statutory accounts present HKD.
+- Used uniform research conversion HKD 1 = CNY 0.915.
+- Basis: annual report discloses RMB70.875m as approximately HKD77.436m for a 2025 asset disposal, implying 0.91535 CNY/HKD; rounded to 0.915.
+- This is an approximation. Balance sheet translation normally uses closing rate and flow statements average rates. The limitation is recorded in result.json.
+- Treated input market-cap amount as already normalized CNY because protocol init placed it directly in the CNY result. Input did not provide raw share price or FX rate; ambiguity is recorded as a limitation.
+
+7. Calculations
+- gross_margin = 4,044,666 / 11,688,794 = 0.34603.
+- net_margin = parent net profit 666,741 / continuing revenue 11,688,794 = 0.05705.
+- operating_free_cash_flow = (2,757 - 1,176) million HKD = 1,581m HKD = CNY1,446,615,000.
+- minority_interest_ratio = 17,116.392 / 31,638.543 = 0.54099.
+- forecast dividend = HKD266,641,000 * 0.915 = CNY243,976,515.
+- forecast dividend yield = CNY243,976,515 / CNY3,284,591,005.113125 = 0.07428.
+- All ordinary owner-earnback fields remain null under the result contract because applicability is not `applicable`.
+
+8. Output and validation
+- Wrote outputs/report.md using the report contract's operating-story sequence.
+- Wrote this trace with sources, model override, transformations and formulas.
+- Final protocol validation and JSON/report consistency checks performed after file creation; results reported below by the final command output appended during verification.
+
+validation: PASS
+consistency_checks: PASS

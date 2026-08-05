@@ -1,0 +1,71 @@
+stock-research trace
+company: First BanCorp. / PR (NYSE: FBP; CIK 0001057706)
+period: 2025-12-31 annual
+generated context date: 2026-08-04 Asia/Shanghai
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the task required checking reusable annual facts and prior research.
+- Checked stock_report paths specified by config/input.json. No raw filing, annual facts, normalized facts, or prior stock-research result existed in the workspace.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields through protocol CLI set/append commands; did not construct result.json manually.
+
+2. Primary filing acquired and reviewed
+- SEC filing detail: Form 10-K, accession 0001057706-26-000007, filed 2026-02-27, period 2025-12-31.
+- Filing URL: https://www.sec.gov/Archives/edgar/data/1057706/000105770626000007/fbp-20251231.htm
+- Filing identity checked against issuer name FIRST BANCORP /PR/, ticker FBP, CIK 0001057706, SIC 6022.
+- Reviewed business description, MD&A, consolidated balance sheet, consolidated income statement, loan/credit quality discussion, capital section, equity/dividend note, liquidity section and risk factors.
+
+3. Model decision
+- Input hint said ordinary_operating/applicable.
+- 10-K says issuer is a regulated financial holding company whose bank subsidiary takes deposits and makes loans.
+- Overrode hint to financial_bank/requires_special_model.
+- Ordinary detachable-net-cash, cash-profit, operating-business-price and payback fields left null per result contract.
+- Bank interpretation uses net interest margin, ROAA/ROAE, efficiency, asset quality, allowance coverage, regulatory capital, liquidity and regulated distribution capacity.
+
+4. Core extracted USD facts
+- Total assets: $19,132.892m.
+- Total liabilities: $17,166.027m.
+- Total equity / parent equity: $1,966.865m; no noncontrolling interest reported.
+- Gross loans held for investment: $13,125.356m.
+- Cash and due from banks: $657.149m.
+- Available-for-sale debt securities: $4,554.032m.
+- Deposits: $16,670.143m; long-term borrowings: $290.000m; other liabilities: $205.884m.
+- Net interest income: $868.940m; provision for credit losses: $85.961m; net income attributable to common shareholders: $344.866m.
+- Net interest margin 4.58%; ROAA 1.81%; ROAE 18.74%; efficiency ratio 49.77%.
+- Nonperforming assets $114.094m / 0.60% of assets; loan ACL $249.037m; ACL/nonaccrual loans 269.05%; ACL/loans 1.90%.
+- FBP CET1 16.76%; Tier 1 16.76%; total capital 18.01%; leverage 11.58%.
+- 2025 dividends declared $115.7m / $0.72 per share; 2025 common-stock repurchases $150.0m.
+- 2026-01-26 declared quarterly dividend $0.20 per share, annualized by issuer at $0.80.
+
+5. Currency conversion
+- Result contract requires absolute CNY yuan.
+- Used Federal Reserve H.10 China spot exchange rate, yuan per US dollar, 2025-12-31: 7.1875.
+- Source: https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Balance-sheet and income-statement amounts multiplied by 7.1875.
+- Market cap and PE were preserved exactly from config/input.json: CNY 29,805,042,099.46289, 2026-08-03, PE TTM 12.206752, source labeled Yahoo Finance yfinance.
+- Limitation: market cap uses its input quote-date conversion while financials use the reporting-date FX rate.
+
+6. Dividend forecast calculation
+- Shares outstanding at 2025-12-31: 156,618,996.
+- Annualized dividend scenario: $0.20 x 4 x 156,618,996 = $125,295,196.80.
+- CNY forecast cash dividend: $125,295,196.80 x 7.1875 = CNY 900,559,227.00.
+- Forecast yield: CNY 900,559,227.00 / CNY 29,805,042,099.46289 = 0.030214995972652186.
+- This is a scenario based on the announced Q1 rate, not a guarantee of four declarations.
+
+7. Null-field rationale
+- Bank revenue/gross profit/gross margin are not comparable to an ordinary operating company product margin.
+- Operating cash flow, capex and ordinary operating free cash flow are not used because deposit, loan and securities movements dominate bank cash-flow classification.
+- Ordinary owner earnback fields are null because deposits and financial assets are operating structure, not detachable net cash.
+
+8. Validation
+- Ran:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validator response before final file review: {"status":"ok","errors":[]}
+
+9. Output files
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

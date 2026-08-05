@@ -1,0 +1,51 @@
+stock-research trace
+company=00373.HK ALLIED GROUP
+period=2025-12-31 annual
+generated_for=2026-08-03
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated fields only through protocol set/append commands.
+3. Final validation command and result are recorded below.
+
+[reuse check]
+- Checked all paths supplied in config/input.json.
+- No raw filing metadata, annual facts, normalized facts, annual review, or prior stock-research result existed in the workspace.
+- Rebuilt facts from official HKEX annual report and audited results announcement.
+
+[primary sources]
+- HKEX Annual Report 2025, published 2026-04-27:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042700636.pdf
+- HKEX audited results announcement for 2025, published 2026-03-25:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0325/2026032501273.pdf
+- Company financial reports index:
+  https://www.alliedgroup.com.hk/eng/ir/reports.php
+- PBOC/CFETS 2025-12-31 RMB central parity: HKD/CNY=0.90322.
+- Valuation snapshot: config/input.json; Tencent qt.gtimg.cn; 2026/07/31 16:08:44.
+
+[key extraction]
+- Revenue HKD15,068.1m; parent profit HKD2,224.1m; total profit HKD3,350.2m.
+- Total assets HKD112,857.4m; liabilities HKD43,046.6m; total equity HKD69,810.8m.
+- Parent equity HKD45,438.9m; NCI HKD24,371.9m; NCI ratio=34.9114%.
+- Cash/bank balances HKD13,701.3m; borrowings and notes HKD17,860.3m.
+- Net operating cash flow HKD2,368.1m.
+- Declared 2025 dividend HKD0.10/share, aggregate HKD351.4m; 2024 dividend nil.
+- FX conversion for all structured financial amounts: HKD amount * 0.90322 CNY/HKD.
+
+[model decision]
+- Input hint financial_brokerage was overridden.
+- Annual report states the issuer is an investment holding company controlling property development/investment, investment management, consumer finance, healthcare/eldercare and services, plus a resource-investment associate.
+- Selected statement_model=platform_financial_mixed and owner_earnback_applicability=requires_special_model.
+- Ordinary owner-earnback fields remain null because consolidated cash, financial assets, property inventory and related liabilities are business assets/obligations, and material NCI prevents treating consolidated balances as wholly attributable detachable value.
+
+[limitations]
+- Gross margin, capex, ordinary operating FCF and ordinary owner-earnback ratios are null because a single ordinary-company definition is not economically comparable for this mixed financial/property platform.
+- Market cap and PE were accepted from the supplied input snapshot and not independently recomputed.
+- The annual report was available online but was not preloaded into the requested local stock_report paths.
+
+[validation]
+{
+  "status": "ok",
+  "errors": []
+}

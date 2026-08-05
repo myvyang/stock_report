@@ -1,0 +1,82 @@
+task=CGEN annual 2025-12-31
+generated_for_input=config/input.json
+
+[protocol]
+initialized=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+populated=protocol set/append commands only; result object not handwritten from scratch
+validated=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[source_inventory]
+existing_annual_facts=missing
+existing_raw_filing=missing_before_research
+existing_stock_research=missing
+primary_filing_downloaded=stock_report/data/raw/filings/CGEN/2025-12-31/20-f-2025.html
+primary_filing_url=https://www.sec.gov/Archives/edgar/data/1119774/000117891326000663/zk2634416.htm
+filing_accession=0001178913-26-000663
+filing_date=2026-03-02
+period=2025-12-31
+
+[currency]
+statement_currency=USD
+result_currency=CNY
+fx=7.0063 CNY per USD
+fx_date=2025-12-26
+fx_source=Federal Reserve H.10 release 2025-12-29
+fx_url=https://www.federalreserve.gov/releases/h10/20251229/
+reason=last available H.10 business-day observation close to fiscal year end
+
+[financial_extraction_usd_thousands]
+total_assets=156570
+total_liabilities=53839
+total_equity=102731
+parent_equity=102731
+minority_interest=0
+revenue=72764
+cost_of_revenue=9251
+gross_profit=63513
+operating_profit=31326
+net_profit=35343
+parent_net_profit=35343
+operating_cash_flow=31634
+capital_expenditure=306
+operating_free_cash_flow=31328
+financing_cash_flow=10604
+dividend_and_buyback_cash_out=0
+source=Form 20-F F-5 through F-10
+
+[revenue_quality]
+astrazeneca_royalty_interest_sale_upfront_usd_thousands=65000
+gilead_phase1_service_revenue_usd_thousands=7764
+total_revenue_usd_thousands=72764
+interpretation=65000 is a one-time payment for sale of a portion of existing rilvegostomig royalty interest; do not annualize
+
+[formulas]
+gross_margin=63513/72764=0.8728629542
+net_margin=35343/72764=0.4857209609
+reported_fcf_cny=(31634-306)*1000*7.0063=219493366.4
+one_time_cash_adjustment_cny=-65000*1000*7.0063=-455409500.0
+discounted_sustainable_cash_profit_cny=219493366.4-455409500.0=-235916133.6
+discounted_net_cash_cny=(90597+45759+9284*0.90-53839)*1000*7.0063=636680697.38
+discounted_net_cash_to_market_cap=636680697.38/1499904228.4444885=0.4244809004
+operating_business_price_cny=1499904228.4444885-636680697.38=863223531.0644885
+owner_earnback_years=null because sustainable cash profit is not positive
+market_cap_to_cash_profit=null because sustainable cash profit is not positive
+
+[dividend]
+history=company states it has never paid cash dividends
+forward_policy=company does not intend to pay cash dividends in foreseeable future
+forecast_cash_dividend_cny=0
+forecast_dividend_yield=0
+
+[market_data]
+market_cap_cny=1499904228.4444885
+market_cap_date=2026-08-03
+pe_ttm=6.1842103
+source=task input, Yahoo Finance yfinance
+note=market data reused as supplied; not independently reconstructed
+
+[quality]
+status=complete
+limitations=milestone revenue remains volatile; sustainable cash profit is a conservative normalization, not an earnings forecast
+limitations=discounted net cash is an analytical owner-valuation amount, not immediately distributable cash

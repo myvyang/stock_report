@@ -1,0 +1,61 @@
+stock-research trace: ODD / 2025-12-31 annual
+generated_at: 2026-08-04T18:58:53+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No usable annual facts package, normalized facts, raw filing metadata, or historical stock-research output was present under the configured ODD paths.
+- Returned to primary disclosures: SEC Form 20-F filed 2026-03-17 and company FY2025 results release.
+
+3. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated top-level sections with repeated protocol set commands.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+4. Model decision
+- Confirmed ordinary_operating / applicable.
+- Evidence: 97% online DTC revenue from beauty and wellness product sales; working assets are inventory, receivables, technology and brand investment. No special financial-statement model applies.
+
+5. Primary filing facts (USD thousands)
+- Revenue 809,844; cost of revenue 221,138; gross profit 588,706; operating income 118,770; net income 110,745.
+- Assets 1,137,792; liabilities 741,297; equity 396,495; no NCI.
+- OCF 87,581; PP&E purchases 3,936; capitalized software/intangibles 12,250; operating FCF defined here = 71,395.
+- Cash/equivalents 402,209; restricted cash 70; marketable securities 373,741.
+- Exchangeable Notes carrying amount 584,368; principal 600,000. Lease liabilities 23,465.
+- Dividend history and forecast: zero, based on explicit no-dividend policy.
+
+6. Currency normalization
+- Contract requires CNY absolute yuan.
+- Input market cap 4,413,503,474.521545 is economically a USD market cap (consistent with ODD share count/price), despite initialized CNY schema.
+- Applied one research conversion rate of 6.95 CNY/USD to market cap and all filing monetary facts.
+- CNY market cap = 30,673,849,147.925.
+- Limitation recorded: input did not provide an exact historical FX fixing; same-rate conversion leaves ratios/payback unchanged.
+
+7. Owner earnback calculations (USD)
+- Cash: 402.209m x 100% = 402.209m.
+- Marketable securities: 373.741m x 95% = 355.054m.
+- Less note principal: 600.000m.
+- Less lease liabilities: 23.465m.
+- Discounted detachable net cash = 133.797m USD = 929,889,150 CNY.
+- Sustainable cash profit = 85.000m USD = 590,750,000 CNY.
+- Basis: 2023/2024/2025 operating FCF approximately 81.649m/128.162m/71.395m; three-year mean about 93.735m, reduced about 9% for acquisition-cost and new-brand uncertainty.
+- Operating business price = 30,673,849,147.925 - 929,889,150 = 29,743,959,997.925 CNY.
+- Owner earnback years = 29,743,959,997.925 / 590,750,000 = 50.3495.
+- Market cap / cash profit = 51.9236.
+
+8. Source URLs
+- SEC 20-F: https://www.sec.gov/Archives/edgar/data/1907085/000110465926029490/odd-20251231x20f.htm
+- FY2025 release: https://investors.oddity.com/news-releases/news-release-details/oddity-tech-reports-record-full-year-2025-results
+- CFETS framework: https://www.chinamoney.com.cn/english/bmkcpr/
+- Market snapshot: config/input.json (Yahoo Finance yfinance, dated 2026-08-03)
+
+9. Known limitations
+- PE TTM was not independently rebuilt from post-2025 quarterly filings.
+- Sustainable cash profit and security discount are analyst estimates, clearly separated from filing facts.
+- No buy/sell recommendation or target price was produced.

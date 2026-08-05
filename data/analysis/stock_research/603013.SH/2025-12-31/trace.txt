@@ -1,0 +1,58 @@
+stock-research trace
+company=603013.SH 亚普股份
+period=2025-12-31 annual
+generated_at=2026-07-31T21:08:59+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the task required reuse-first research.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Expected annual facts, normalized facts, raw filing metadata and prior stock-research outputs were absent under the paths in config/input.json.
+- No reusable local facts package or prior conclusion was found.
+- Fell back to the statutory annual report PDF.
+
+3. Primary sources
+- Annual report: https://static.cninfo.com.cn/finalpage/2026-03-28/1225041185.PDF
+  title: 亚普汽车部件股份有限公司2025年年度报告
+  disclosure date: 2026-03-28
+  audited by: 信永中和会计师事务所（特殊普通合伙）
+- Market data: config/input.json; Tencent qt.gtimg.cn snapshot, 20260731114332.
+
+4. Model decision
+- statement_model=ordinary_operating
+- applicability=applicable
+- Basis: customized automotive component manufacturing and direct OEM supply; balance sheet dominated by receivables, inventory, plant/equipment and trade payables; no special-model balance-sheet items.
+
+5. Core calculations (CNY)
+- gross_profit = 9,133,196,053.57 - 7,754,397,028.73 = 1,378,799,024.84
+- gross_margin = gross_profit / revenue = 0.15096566599
+- net_margin = 528,211,936.71 / 9,133,196,053.57 = 0.05783429301
+- operating_free_cash_flow = 744,791,267.90 - 432,880,888.63 = 311,910,379.27
+- discounted detachable net cash = (1,069,951,414.24 + 442,217,533.18) * 90% - 10,007,180.56 - 111,230,041.01 = 1,239,714,831.11
+- discounted sustainable cash profit = 420,000,000.00; researcher estimate from 521,193,606.63 recurring parent profit, checked against CFO, depreciation/amortization and capex, then haircut for cyclicality/pricing and maintenance-capex uncertainty.
+- operating business price = 8,736,000,000.00 - 1,239,714,831.11 = 7,496,285,168.89
+- owner earnback = 7,496,285,168.89 / 420,000,000.00 = 17.8483 years
+- market cap / cash profit = 20.8 years
+- forecast dividend yield = 203,449,900.60 / 8,736,000,000.00 = 0.02328867910
+
+6. Dividend cash-flow field
+- Parent dividends paid in 2025: 179,409,742.40 + 25,573,053.20 = 204,982,795.60.
+- Share repurchase cash: 100,044,846.80.
+- dividend_and_buyback_cash_out = 305,027,642.40.
+
+7. Result construction and validation
+- Populated the initialized object only through protocol `set` commands.
+- Did not hand-write result.json.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Expected final status: ok, errors=[]
+
+8. Important limitations
+- Local facts/raw filing package absent.
+- Market snapshot supplied by input was not independently reconstructed.
+- Maintenance capex is not separately disclosed; sustainable cash profit contains judgment.
+- 2025 annual dividend is a proposal as of the annual report.

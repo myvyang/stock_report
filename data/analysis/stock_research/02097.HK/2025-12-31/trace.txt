@@ -1,0 +1,61 @@
+task: stock research for 02097.HK, period 2025-12-31
+generated_at: 2026-08-04 Asia/Shanghai
+
+protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields exclusively through protocol set commands.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+model review
+- Input hint classified MIXUE Group as financial_brokerage.
+- Official annual report says revenue is sales of goods/equipment to franchisees and franchise-related services.
+- Overrode hint to ordinary_operating; ordinary owner earnback model is applicable.
+
+primary sources
+1. MIXUE Group Annual Report 2025, published 2026-04-23 by HKEX:
+   https://www.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042301901.pdf
+   Local copy: stock_report/data/raw/filings/02097.HK/2025-12-31/annual-report-2025.pdf
+   Used for audited income statement, balance sheet, cash flow, revenue mix, stores, franchise model, inventory and cash composition.
+2. MIXUE Group Annual Results Announcement for year ended 2025-12-31, published 2026-03-24 by HKEX:
+   https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0324/2026032400179.pdf
+   Used to confirm no annual dividend was recommended.
+3. Tencent qt.gtimg.cn snapshot supplied in config/input.json:
+   market cap CNY 72,306,150,656.72397; PE TTM 12.9; timestamp 2026-08-03 09:48:13.
+
+audited figures (annual report units converted from RMB'000 to yuan)
+- Revenue 33,559,923,000; cost of sales 23,108,161,000; gross profit 10,451,762,000.
+- Profit before tax 7,550,164,000; finance costs 4,931,000; operating profit proxy 7,555,095,000.
+- Net profit 5,927,077,000; parent net profit 5,886,704,000.
+- Total assets 30,793,625,000 (= non-current assets 9,253,668,000 + current assets 21,539,957,000).
+- Total liabilities 6,024,867,000 (= current 5,621,101,000 + non-current 403,766,000).
+- Total equity 24,768,758,000; parent equity 24,449,037,000; NCI 319,721,000.
+- Operating cash flow 6,039,033,000.
+- Capex 691,535,000 (= PPE 685,130,000 + intangible 47,000 + ROU/land 6,358,000).
+- Operating free cash flow 5,347,498,000.
+
+formula checks
+- Gross margin = 10,451,762,000 / 33,559,923,000 = 0.3114358159.
+- Net margin = 5,886,704,000 / 33,559,923,000 = 0.1754087457.
+- 2024 FCF = 6,008,708,000 - (1,438,614,000 + 9,858,000 + 1,340,000) = 4,558,896,000.
+- Two-year average FCF = (5,347,498,000 + 4,558,896,000) / 2 = 4,953,197,000.
+- Discounted sustainable cash profit: rounded 90% of average FCF = 4,458,000,000.
+- Discounted detachable net cash:
+  cash equivalents 7,429,100,000 * 90% = 6,686,190,000
+  non-restricted time deposits 3,588,465,000 * 90% = 3,229,618,500
+  FVTPL financial assets 8,935,127,000 * 80% = 7,148,101,600
+  less bank and lease liabilities 187,262,000
+  total = 16,876,648,100.
+- Operating business price = 72,306,150,656.72397 - 16,876,648,100 = 55,429,502,556.72397.
+- Owner earnback years = 55,429,502,556.72397 / 4,458,000,000 = 12.4337152438.
+- Market cap / cash profit = 72,306,150,656.72397 / 4,458,000,000 = 16.2194146830.
+- Forecast dividend = 0; forecast yield = 0 / market cap = 0.
+
+limitations
+- No local annual facts package existed at task start, so the official annual report was retrieved.
+- pdftotext was unavailable; official PDF text was inspected through the web document parser and the PDF was retained locally.
+- Market price data was accepted from task input and not cross-checked against an exchange feed.
+- Cash discounts and sustainable profit haircut are analyst judgments, not disclosed company measures.

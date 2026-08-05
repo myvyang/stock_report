@@ -1,0 +1,50 @@
+stock-research trace
+company: 01471.HK / 众淼控股（青岛）股份有限公司
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- No raw filing, annual facts package, normalized facts, or prior stock-research result existed for 01471.HK/2025-12-31.
+- Downloaded the official 2025 annual report from HKEX:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042303246.pdf
+- Local copy: stock_report/data/raw/filings/01471.HK/2025-12-31/annual-report-2025.pdf
+- Extracted text: stock_report/data/raw/filings/01471.HK/2025-12-31/annual-report-2025.txt
+
+3. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Filing facts: insurance agency revenue RMB211.339m, banking technology RMB19.565m, insurance technology RMB17.018m; no brokerage customer funds, proprietary securities inventory, or repo funding.
+- Override: ordinary_operating / applicable.
+- Restricted cash RMB13.777m is excluded because it includes insurance-intermediary regulatory reserve and cash collected for other parties.
+
+4. Core filing facts (RMB)
+- Revenue 248,051,000; gross profit 90,876,000; parent net profit 51,700,000.
+- Total assets 1,033,353,000; liabilities 295,591,000; equity 737,762,000; parent equity 632,837,000.
+- Operating cash flow 89,230,000; disclosed capex approximately 1,500,000; operating FCF 87,730,000.
+- Cash equivalents 287,457,000; time deposits 369,606,000; restricted cash 13,777,000.
+- Bank loans 88,000,000; acquisition payable 55,000,000; contingent consideration 89,764,000.
+- Proposed 2025 dividend 22,591,296, subject to shareholder approval.
+
+5. Owner earnback calculation
+- 90% * (287,457,000 + 369,606,000) - 88,000,000 - 55,000,000 - 89,764,000
+  = discounted detachable net cash 358,592,700.
+- Sustainable cash profit starts from parent net profit 51,700,000, removes estimated after-tax deposit interest 6,422,000 and associate profit 413,000, then conservatively rounds to 45,000,000.
+- Operating business price = 979,055,817.1010017 - 358,592,700 = 620,463,117.1010017.
+- Owner earnback years = 620,463,117.1010017 / 45,000,000 = 13.7881.
+- Market cap / cash profit = 21.7568.
+
+6. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields using protocol set commands only.
+- First populated validation: status ok, errors [].
+
+7. Limitations
+- Market value and PE are reused from the supplied Tencent snapshot and were not independently reconstructed.
+- Kechuang Rongxin was consolidated only from 24 October 2025; sustainable cash profit is an analyst haircut, not company guidance.
+- Proposed dividend had not yet received shareholder approval at the reporting date.

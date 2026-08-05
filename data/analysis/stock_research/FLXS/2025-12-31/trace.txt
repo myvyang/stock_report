@@ -1,0 +1,67 @@
+FLXS stock-research trace
+generated_at=2026-08-04T22:58:46+08:00
+research_snapshot_period=2025-12-31
+annual_financial_period=FY ended 2025-06-30
+
+1. Protocol
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Every JSON field was populated through protocol `set` or `append`; complex result JSON was not handwritten.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+2. Reuse check
+- Expected raw filing, annual facts, normalized facts, annual review and historical research paths under stock_report/data did not exist in /workspace.
+- The mirrored /root/aicode/stock_report FLXS paths also returned no files.
+- Therefore core facts were reconstructed from primary SEC/company sources.
+
+3. Primary sources
+- SEC 10-K, FY ended 2025-06-30, filed 2025-08-22, accession 0000950170-25-110965:
+  https://www.sec.gov/Archives/edgar/data/37472/000095017025110965/flxs-20250630.htm
+- SEC 10-Q, period ended 2025-12-31:
+  https://www.sec.gov/Archives/edgar/data/37472/000119312526037679/flxs-20251231.htm
+- Company FY2025 results release:
+  https://ir.flexsteel.com/news-releases/news-release-details/flexsteel-industries-inc-reports-fourth-quarter-and-fiscal-year
+- Company 2025 dividend announcement: quarterly dividend USD 0.20.
+- Market snapshot came directly from config/input.json: CNY 2,036,014,593.369049 on 2026-08-03; PE TTM 13.509124; Yahoo Finance yfinance.
+
+4. Currency conversion
+- Financial statements are reported in USD thousands.
+- Research output requires CNY absolute yuan.
+- Fixed research translation assumption: USD 1 = CNY 7.20.
+- Example: revenue USD 441.073m * 7.20 = CNY 3,175,725,600.
+- Input market capitalization was already supplied in CNY and was not reconverted.
+
+5. FY2025 core calculations
+- gross_margin = 97.944 / 441.073 = 0.2220555936.
+- net_margin = 20.154 / 441.073 = 0.0456923190.
+- operating_free_cash_flow = (36.979 - 3.258)m USD = 33.721m USD = CNY 242,791,200.
+- total_assets = 282.486m USD = CNY 2,033,899,200.
+- total_liabilities = 114.624m USD = CNY 825,292,800.
+- equity = 167.862m USD = CNY 1,208,606,400; no minority interest.
+
+6. Analysis model
+- statement_model=ordinary_operating; applicability=applicable.
+- Basis: revenue comes from manufacturing/importing and delivering furniture. Inventory, receivables, PP&E and leased facilities are ordinary operating assets. There are no customer funds or regulated balance-sheet liabilities characteristic of special models.
+
+7. Owner earnback
+- Cash USD 40.006m * 7.20 = CNY 288,043,200.
+- Revolver debt at FY-end = 0; confirmed again at 2025-12-31.
+- Discounted detachable net cash = CNY 288,043,200 * 90% = CNY 259,238,880.
+- Sustainable cash profit estimate = USD 20.0m * 7.20 = CNY 144,000,000.
+- Rationale: FY2025 FCF USD 33.721m included USD 9.253m AR release and USD 7.441m inventory release. Sustainable estimate is deliberately below reported FCF and close to normalized recurring earnings/cash conversion.
+- operating_business_price = 2,036,014,593.369049 - 259,238,880 = CNY 1,776,775,713.369049.
+- owner_earnback_years = 1,776,775,713.369049 / 144,000,000 = 12.33872023.
+- market_cap_to_cash_profit = 2,036,014,593.369049 / 144,000,000 = 14.13899023.
+
+8. Dividend
+- FY2025 paid cash dividend = USD 3.556m = CNY 25,603,200.
+- Forecast uses annualized USD 0.80/share * 5.307m FY-end shares = USD 4.2456m = CNY 30,568,320.
+- forecast_yield = 30,568,320 / 2,036,014,593.369049 = 0.0150136492.
+
+9. Period handling and limitations
+- Input period is 2025-12-31 and report_type is annual, but Flexsteel fiscal year ends June 30. FY2025 audited annual income/cash flow and 2025-06-30 balance sheet are the core comparable annual set.
+- The 2025-12-31 interim filing was used only for subsequent validation: cash USD 36.771m, inventory USD 95.091m, no revolver borrowing, six-month CFO USD 5.121m.
+- USD/CNY translation is a fixed analytical assumption, not transaction-date accounting translation.
+- Sustainable cash profit is an analyst normalization, not management guidance.
+

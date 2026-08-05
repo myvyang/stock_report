@@ -1,0 +1,60 @@
+stock-research trace
+company: 002546.SZ 新联电子
+period: 2025-12-31 annual
+generated context date: 2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields only through protocol CLI set operations.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: status=ok, errors=[]
+
+[local reuse check]
+- annual facts, normalized facts, prior stock-research result, and filing metadata paths were absent.
+- No existing research conclusion was reused.
+
+[primary filing]
+- Located official filing via web search and downloaded:
+  https://static.cninfo.com.cn/finalpage/2026-03-25/1225028361.PDF
+- Local copy: stock_report/data/raw/filings/002546.SZ/2025-12-31/annual_report_2025.pdf
+- Extracted text: stock_report/data/raw/filings/002546.SZ/2025-12-31/annual_report_2025.txt
+- Filing: 南京新联电子股份有限公司2025年年度报告, published 2026-03-25, 186 pages.
+- Audit: 公证天业会计师事务所（特殊普通合伙）, standard unqualified opinion, report date 2026-03-23.
+
+[statement facts]
+- Revenue 688,126,841.89; cost 424,333,580.20; gross profit 263,793,261.69.
+- Parent net profit 578,304,154.34; non-recurring gain 444,642,158.97; deducted parent profit 133,661,995.37.
+- OCF 125,579,235.68; capex cash 7,183,897.38; operating FCF 118,395,338.30.
+- Total assets 4,147,177,312.98; liabilities 318,046,594.37; equity 3,829,130,718.61; parent equity 3,794,097,559.96.
+- Cash and cash equivalents 313,364,762.46. Other monetary funds 46,823,536.92 were mainly bill deposits and excluded from detachable cash.
+- Trading financial assets 3,108,279,902.53, all wealth-management products: level 1 115,593,846.81; level 2 2,992,686,055.72.
+- Short-term borrowing 24,019,308.33; deferred tax liability 49,014,798.48; no long-term borrowing.
+
+[model decision]
+- Confirmed ordinary_operating/applicable.
+- Reason: the operating business is manufacturing/data service; financial assets are surplus investment allocation rather than deposits or matched financial liabilities constituting the business itself.
+- Special handling: isolate the large wealth-management pool and remove its non-sustainable gains from cash-profit estimation.
+
+[formula audit]
+- gross margin = 263,793,261.69 / 688,126,841.89 = 0.3833497629.
+- net margin = 578,304,154.34 / 688,126,841.89 = 0.8404034244; interpreted as distorted by financial gains.
+- discounted net cash = 313,364,762.46 + 2,992,686,055.72*0.90 + 115,593,846.81*0.70 - 24,019,308.33 - 49,014,798.48 = 3,014,663,798.565.
+- discounted cash profit = (125,579,235.68 - 7,183,897.38)*0.90 = 106,555,804.47.
+- operating business price = 6,914,000,000 - 3,014,663,798.565 = 3,899,336,201.435.
+- owner earnback years = 3,899,336,201.435 / 106,555,804.47 = 36.5943105665.
+- market cap / cash profit = 6,914,000,000 / 106,555,804.47 = 64.8861883629.
+- forecast dividend yield = 100,085,891.52 / 6,914,000,000 = 0.0144758304.
+
+[market data]
+- Market cap 6,914,000,000, PE TTM 12.3, timestamp 20260731114321.
+- Source supplied in config/input.json: Tencent qt.gtimg.cn.
+- Not independently revalidated; limitation recorded.
+
+[limitations]
+- No product-by-product wealth-management underlying, maturity, or redemption restrictions; haircut rates are explicit analytical assumptions.
+- 2025 dividend was a board proposal at filing date and required shareholder approval.
+- No authoritative market-share dataset; industry position remains qualitative.

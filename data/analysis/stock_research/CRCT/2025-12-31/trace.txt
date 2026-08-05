@@ -1,0 +1,78 @@
+stock-research trace — CRCT — period 2025-12-31
+generated_at: 2026-08-04T17:03:58+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill requires reuse checks before refetching data.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked paths specified by config/input.json for raw filing metadata, annual facts JSON/Markdown, normalized facts, and prior stock-research outputs.
+- No CRCT annual fact package, normalized facts, raw filing metadata, or prior research output existed in the workspace.
+- Therefore returned to official public filings rather than fabricating missing facts.
+
+3. Primary sources used
+- SEC 2025 Form 10-K, accession 0001828962-26-000010, filed 2026-03-04:
+  https://www.sec.gov/Archives/edgar/data/1828962/000182896226000010/crct-20251231.htm
+- Cricut Q1 2026 earnings release, issued 2026-05-05, used for the latest recurring dividend confirmation:
+  https://investor.cricut.com/news-releases/news-release-details/cricut-inc-reports-first-quarter-2026-financial-results/
+- Banque de France daily exchange-rate parities for 2025-12-31:
+  https://www.banque-france.fr/en/statistics/rates-and-prices/exchange-rates-daily-parities-2025-12-31
+- Market cap and PE were reused exactly from config/input.json: Yahoo Finance yfinance, dated 2026-08-03.
+
+4. Filing facts extracted (USD)
+- Balance sheet: assets 580.806m; liabilities 237.245m; equity 343.561m; cash and equivalents 256.216m; marketable securities 19.434m; receivables 92.011m; inventory 102.664m; PP&E 40.260m; dividends payable 24.361m.
+- No non-controlling interest. Parent equity equals total equity.
+- Income statement: revenue 708.780m; cost of revenue 318.349m; gross profit 390.431m; operating income 96.033m; net income 76.705m.
+- Cash flow: CFO 200.230m; capex including capitalized software 24.417m; operating FCF 175.813m; financing cash flow -237.445m; dividends paid 202.103m; repurchases 24.748m.
+- CFO working-capital benefit included 41.161m from inventory and 12.618m from receivables.
+- Segment facts: platform revenue/gross profit 327.399m/291.409m; products revenue/gross profit 381.381m/99.022m.
+- User metrics: active users 5.871m; 90-day engaged users 3.695m; paid subscribers 3.091m; platform ARPU $55.77.
+
+5. Model classification
+- Confirmed ordinary_operating / applicable.
+- Reason: the business sells machines, consumables, subscriptions, and digital content. Its balance sheet contains ordinary cash, inventory, receivables, trade liabilities, deferred subscription revenue, and leases. It does not contain customer deposits, insurance reserves, development presales, project advances, concession assets, or brokerage client funds requiring a special model.
+
+6. Currency conversion
+- Protocol requires CNY absolute yuan.
+- Banque de France 2025-12-31 parities: EUR/USD 1.1750 and EUR/CNY 8.2262.
+- Cross-rate used: USD/CNY = 8.2262 / 1.1750 = 7.0010212766.
+- A single period-end rate was used for all statement translations for internal consistency. This is a presentation convention, not an average-rate accounting translation; limitation disclosed.
+
+7. Owner earnback judgments and formulas
+- Cash equivalents: USD 256.216m × 80% haircut inclusion.
+- Marketable U.S. Treasuries: USD 19.434m × 95% inclusion.
+- Declared dividends payable: USD 24.361m × 100% deduction.
+- Discounted detachable net cash:
+  (256.216m × 0.80 + 19.434m × 0.95 - 24.361m) × 7.0010212766
+  = CNY 1,393,722,009.72.
+- Sustainable cash profit starts from net income, not reported FCF:
+  76.705m + D&A 24.439m - capex 24.417m - prudence adjustment 6.727m
+  = USD 70.000m = CNY 490,071,489.36.
+- Prudence adjustment reflects stagnant revenue/user engagement and avoids capitalizing the 2025 inventory-release cash benefit.
+- Operating business price:
+  6,642,897,613.42 - 1,393,722,009.72 = CNY 5,249,175,603.70.
+- Owner earnback years:
+  5,249,175,603.70 / 490,071,489.36 = 10.7110 years.
+- Market cap / cash profit:
+  6,642,897,613.42 / 490,071,489.36 = 13.5550 times.
+
+8. Dividend forecast
+- Recurring dividend assumption: $0.10 per share semi-annually, or $0.20 annualized.
+- Shares: 56,748,942 Class A + 155,032,336 Class B as of 2026-02-27 = 211,781,278.
+- Forecast: $0.20 × 211,781,278 × 7.0010212766 = CNY 296,537,046.65.
+- Forecast yield: 296,537,046.65 / 6,642,897,613.42 = 4.46397%.
+- Special dividends excluded because they are non-recurring.
+
+9. Protocol writes and validation
+- All structured fields were populated through repeated protocol `set` commands; the complex result object was not hand-written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report creation: {"status":"ok","errors":[]}.
+
+10. Output status
+- outputs/result.json: initialized and populated through protocol CLI; data_quality.status = complete.
+- outputs/report.md: written from the validated facts and disclosed judgments.
+- outputs/trace.txt: this audit trail.

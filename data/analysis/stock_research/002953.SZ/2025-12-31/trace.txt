@@ -1,0 +1,70 @@
+task: stock research for 002953.SZ 日丰股份
+period: 2025-12-31 annual
+generated_timezone: Asia/Shanghai
+
+protocol:
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read result-contract.md and report-contract.md in full as requested.
+- Read data-reuse.md because no local annual facts package was present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields through repeated protocol `set` commands; did not construct result.json directly.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok, errors: []
+
+local_input_check:
+- config/input.json present.
+- No pre-existing annual facts, normalized facts, raw filing metadata, or stock-research result existed under the supplied local paths.
+
+official_filing:
+- Title: 广东日丰电缆股份有限公司2025年年度报告
+- Filing date: 2026-04-24
+- Source URL: https://static.cninfo.com.cn/finalpage/2026-04-24/1225168599.PDF
+- Alternate official SZSE URL found: https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-24/b67246a5-0e3e-41ca-ba39-4a4877a88034.PDF
+- Saved PDF: stock_report/data/raw/filings/002953.SZ/2025-12-31/annual_report_2025.pdf
+- Extracted text: stock_report/data/raw/filings/002953.SZ/2025-12-31/annual_report_2025.txt
+- PDF pages: 233
+- Extraction method: pypdf in temporary virtual environment /tmp/stock-research-pdf because pdftotext was unavailable.
+
+market_data:
+- Market cap: CNY 4,660,000,000
+- PE TTM: 29.74
+- Timestamp: 2026-07-31 11:43:36
+- Source: Tencent qt.gtimg.cn, supplied by config/input.json
+
+key_reported_facts:
+- Revenue: 4,518,026,496.36
+- Cost of sales: 4,013,517,311.12
+- Parent net profit: 158,288,325.08
+- Deducted-nonrecurring parent net profit: 147,358,094.24
+- Operating cash flow: 310,267,213.37
+- Capital expenditure: 147,547,120.21
+- Total assets: 3,744,781,588.64
+- Total liabilities: 1,547,060,476.65
+- Parent equity: 2,186,819,903.66
+- Cash and cash equivalents: 458,524,617.20
+- Restricted monetary funds: 49,455,527.38
+- Forecast/implemented 2025 annual cash dividend: 48,803,194.80
+
+calculation_trace:
+- Gross profit = 4,518,026,496.36 - 4,013,517,311.12 = 504,509,185.24
+- Gross margin = 504,509,185.24 / 4,518,026,496.36 = 0.11166583145
+- Net margin = 158,288,325.08 / 4,518,026,496.36 = 0.03503483771
+- Operating free cash flow = 310,267,213.37 - 147,547,120.21 = 162,720,093.16
+- Financing debt including lease liabilities = 228,543,447.20 + 55,278,138.71 + 173,946,125.00 + 3,217,153.09 + 209,230.53 = 461,194,094.53
+- Discounted detachable net cash = 458,524,617.20 - 461,194,094.53 = -2,669,477.33
+- Sustainable cash profit base = reported deducted-nonrecurring parent net profit 147,358,094.24
+- Subjective quality haircut = 10%, due to 11.17% gross margin, receivables concentration and one-year cash collection improvement
+- Discounted sustainable cash profit = 147,358,094.24 * 0.90 = 132,622,284.82
+- Operating business price = 4,660,000,000 - (-2,669,477.33) = 4,662,669,477.33
+- Owner earnback years = 4,662,669,477.33 / 132,622,284.82 = 35.1575
+- Market cap / cash profit = 4,660,000,000 / 132,622,284.82 = 35.1374
+- Forecast dividend yield = 48,803,194.80 / 4,660,000,000 = 0.01047279
+
+judgment_boundaries:
+- statement_model confirmed as ordinary_operating based on manufacturing, direct sales, identifiable operating working capital and ordinary bank debt.
+- Accounts receivable, receivable financing, inventory, notes payable and accounts payable treated as operating working capital, not detachable cash/net debt.
+- Market-share leadership was not asserted because no authoritative market-share evidence was available.
+- The 10% profit haircut is explicitly an analyst judgment, not a reported fact.
+- No buy/sell recommendation or target price was produced.

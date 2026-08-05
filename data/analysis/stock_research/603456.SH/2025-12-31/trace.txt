@@ -1,0 +1,107 @@
+stock-research trace
+company=603456.SH 九洲药业
+period=2025-12-31
+generated_at=2026-07-31T15:50:01+08:00 input creation time; result actual generated_at retained from protocol init
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields only through protocol set/append commands in populate_result.sh.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: {"status":"ok","errors":[]}
+
+[source discovery and reuse]
+- Checked requested annual facts, normalized facts, raw filing, and prior stock-research paths.
+- No pre-existing 603456.SH annual facts, filing, or stock-research result was present in the workspace.
+- Downloaded the 2025 annual report PDF from:
+  https://www.cnpharm.com/upload/resources/file/2026/04/24/187973.pdf
+- Local source:
+  stock_report/data/raw/filings/603456.SH/2025-12-31/annual-report-2025.pdf
+- Extracted searchable text:
+  stock_report/data/raw/filings/603456.SH/2025-12-31/annual-report-2025.txt
+- The report identifies the audit as 天健审〔2026〕8490号, unmodified opinion, dated 2026-04-23.
+- Market valuation was taken exactly from config/input.json:
+  market_cap=12899000000
+  timestamp=20260731114335
+  source=Tencent qt.gtimg.cn
+  pe_ttm=19.79
+
+[core financial extraction]
+Annual report consolidated statements:
+total_assets=10602987183.71
+total_liabilities=1812388861.22
+total_equity=8790598322.49
+parent_equity=8724119572.52
+minority_interest=66478749.97
+revenue=5508595171.33
+cost_of_sales=3478574735.98
+gross_profit=2030020435.35
+operating_profit=924945257.44
+net_profit=728543117.48
+parent_net_profit=730073370.43
+operating_cash_flow=1824246221.93
+capital_expenditure=660089439.90
+operating_free_cash_flow=1164156782.03
+financing_cash_flow=-912712697.90
+
+[formula checks]
+gross_margin=2030020435.35/5508595171.33=0.3685187342
+net_margin=730073370.43/5508595171.33=0.1325316828
+minority_interest_ratio=66478749.97/8790598322.49=0.0075624840
+operating_free_cash_flow=1824246221.93-660089439.90=1164156782.03
+
+[analysis model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: CDMO/API manufacturer whose cash, receivables, inventory, plants, equipment, and normal trade liabilities follow an ordinary operating-company model. No customer deposits, insurance reserves, regulated presale cash, concession rights, or comparable special-model balance-sheet structure.
+
+[discounted detachable cash]
+unrestricted_cash=1456099928.74*0.95=1383294932.30
+restricted_cash=86912190.87*0=0
+short_term_deposits=1289330483.66*0.90=1160397435.29
+long_term_certificates=112054777.83*0.85=95246561.16
+other_noncurrent_financial_assets=73645740.78*0.50=36822870.39
+less_financing_and_lease_liabilities=63618757.08
+discounted_detachable_net_cash=2612229618.17
+discounted_net_cash_to_market_cap=2612229618.17/12899000000=0.2025145049
+
+[sustainable cash profit]
+- Audited parent net profit: 730073370.43.
+- Reported OCF: 1824246221.93.
+- Reported capex: 660089439.90.
+- Reported FCF: 1164156782.03.
+- Cash-flow reconciliation includes inventory decrease 349330400.45, operating receivables decrease 162649253.74, and operating payables decrease 181320332.70.
+- Asset impairment was 337761490.03, including inventory impairment 163668787.51 plus goodwill and long-lived operating-asset impairments.
+- Because working-capital release cannot be perpetuated, inventory impairment has recurring operating content, capex remains material, and customer concentration is high, discounted sustainable cash profit was judgmentally set at 650000000. This is a conservative research normalization, not management guidance.
+
+[owner earnback]
+operating_business_price=12899000000-2612229618.17=10286770381.83
+owner_earnback_years=10286770381.83/650000000=15.8258005874
+market_cap_to_cash_profit=12899000000/650000000=19.8446153846
+
+[dividend]
+2025 attributable cash dividend=264513008.40
+2025 buyback=101991071.00
+cash dividend yield=264513008.40/12899000000=0.0205064741
+Buyback excluded from dividend yield.
+Annual report says the 2025 cash dividend includes the implemented interim dividend and proposed final dividend. Final implementation amount can vary with eligible share count.
+
+[key evidence locations in annual report]
+- Business model and industry: annual report pp. 11-16.
+- Segment revenue, margin, geography: pp. 23-24 and note on p. 175.
+- Customer concentration: p. 27.
+- Balance-sheet movement and restricted assets: pp. 30-31.
+- Dividend plan and history: pp. 57-59.
+- Consolidated statements: pp. 90-100.
+- Cash, deposits, debt investments: notes pp. 133 and 145.
+- Impairment: note p. 178.
+- Cash-flow reconciliation: notes pp. 182-183.
+
+[limitations]
+- Tencent market snapshot was supplied by the task and not independently reconciled to exchange tick data.
+- Sustainable cash profit and discount rates are explicit analyst judgments.
+- Proposed final dividend was not treated as an already-paid cash receipt.
+

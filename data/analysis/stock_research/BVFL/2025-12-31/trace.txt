@@ -1,0 +1,50 @@
+BVFL stock research trace
+generated_at=2026-08-04T23:08:05+08:00
+period=2025-12-31
+
+1. Read protocol and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized result through protocol CLI
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Local reuse audit
+- No existing raw filing metadata, annual facts package, normalized facts, or prior research result existed for BVFL/2025-12-31.
+- Downloaded the official SEC inline XBRL 10-K to stock_report/data/raw/filings/BVFL/2025-12-31/bvfl-20251231.htm.
+
+4. Primary evidence
+- SEC 2025 Form 10-K, accession 0001193125-26-128285, filed 2026-03-27:
+  https://www.sec.gov/Archives/edgar/data/1302387/000119312526128285/bvfl-20251231.htm
+- SEC 2026 Q1 Form 10-Q, accession 0001193125-26-216089:
+  https://www.sec.gov/Archives/edgar/data/1302387/000119312526216089/bvfl-20260331.htm
+- SEC 2026-05-05 repurchase authorization Form 8-K:
+  https://www.sec.gov/Archives/edgar/data/1302387/000119312526209167/bvfl-20260505.htm
+- SEC companyfacts API, CIK 0001302387, used to cross-check tagged values.
+- Federal Reserve H.10 release dated 2025-12-29; 2025-12-26 China yuan rate 7.0063 per USD:
+  https://www.federalreserve.gov/releases/h10/20251229/
+- Market cap, date, source and PE were reused unchanged from config/input.json.
+
+5. Model decision
+- Overrode input hint ordinary_operating/applicable.
+- Confirmed financial_bank/requires_special_model because BV Financial is a bank holding company, loans are the principal assets, deposits are the principal funding source, and net interest income is the main revenue source.
+- Kept all ordinary owner-earnback sorting metrics null as required by the contract.
+
+6. Currency conversion
+- Financial statement USD amounts multiplied by 7.0063 CNY/USD.
+- Market capitalization was already supplied in CNY and was not reconverted.
+
+7. Forecast and judgment boundaries
+- Forecast cash dividend set to zero because the 2025 10-K states the company has never paid a cash dividend, while 2026 disclosures continue to authorize repurchases.
+- This is a forecast scenario, not a board commitment.
+- Bank operating cash flow, capex, gross margin, net margin, detachable cash, cash profit, business price and earnback years remain null because they lack ordinary-company comparability.
+
+8. Protocol mutations
+- All result fields were populated with repeated protocol `set` commands after initialization; the complex result object was not handwritten from scratch.
+
+9. Validation
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

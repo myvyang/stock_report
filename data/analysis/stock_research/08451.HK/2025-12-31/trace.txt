@@ -1,0 +1,59 @@
+stock-research trace
+company: 08451.HK / SUNLIGHT (1977) HOLDINGS LIMITED
+requested_period: 2025-12-31
+actual_audited_period: 2025-09-30
+generated_at: 2026-08-04T17:52:27+08:00
+
+1. Read instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- No raw filing, annual facts package, normalized facts, or prior stock-research result existed in the workspace for 08451.HK/2025.
+- Initialized outputs/result.json with the protocol CLI.
+
+3. Primary-source retrieval
+- HKEX annual report/results announcement published 2025-12-12:
+  https://www1.hkexnews.hk/listedco/listconews/gem/2025/1212/2025121201294.pdf
+- Used audited period 2025-09-30 because the issuer's financial year does not end on the requested 2025-12-31 date.
+- Used SAFE/CFETS central parity for 2025-09-30: SGD 100 = CNY 551.31.
+- Used market cap, quote timestamp, source, and PE TTM exactly from config/input.json.
+
+4. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Annual-report finding: group supplies tissue products to corporate customers in Singapore; balance sheet contains operating property, inventory, receivables, cash, trade payables and lease liabilities, with no brokerage customer money, proprietary securities book, or repo financing.
+- Override: ordinary_operating / applicable.
+
+5. Currency conversion
+- Conversion rate: 1 SGD = 5.5131 CNY.
+- Annual report figures are SGD thousands; multiplied by 1,000 and then by 5.5131.
+- Period income and cash-flow data were also translated at the closing rate solely for protocol consistency; this is a disclosed limitation.
+
+6. Owner earnback assumptions
+- Cash and cash equivalents: SGD 4.578m; 70% recognized as detachable to preserve a 30% operating buffer.
+- Lease liabilities: SGD 0.150m; deducted in full.
+- Discounted detachable net cash: CNY 16,840,315.26.
+- 2025 operating FCF: SGD 1.081m = CNY 5,959,661.10.
+- Sustainable cash profit haircut: 20%, producing CNY 4,767,728.88.
+- Operating business price: CNY 50,241,520.26176453 - CNY 16,840,315.26 = CNY 33,401,205.00176453.
+- Owner earnback: 33,401,205.00176453 / 4,767,728.88 = 7.0056846441 years.
+- Market cap/cash profit: 50,241,520.26176453 / 4,767,728.88 = 10.5378308050.
+
+7. Dividend forecast
+- FY2024 and FY2025 dividends declared: zero.
+- FY2025 final dividend recommendation: zero.
+- Forecast cash dividend: zero; forecast yield: 0% until evidence of a changed distribution policy appears.
+
+8. Protocol actions
+- Initialized result with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields with repeated protocol `set` calls; the JSON was not constructed manually from a blank file.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report creation: status=ok, errors=[]
+
+9. Data-quality decision
+- status=complete: audited core statements, business facts, model verification, asset/liability explanations, owner-earnback components, dividend forecast, market data provenance and evidence are present.
+- Limitations retained in result.json: requested-period mismatch, closing-rate translation of flows, stale-to-report market quote, and unverified market-leader claim.

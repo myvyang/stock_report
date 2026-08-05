@@ -1,0 +1,56 @@
+stock-research trace — 603214.SH — period 2025-12-31
+generated: 2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated the initialized protocol object; it was not created as an ad-hoc JSON document.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: {"status":"ok","errors":[]}
+
+[reuse audit]
+- No raw filing, annual facts package, normalized annual facts, or prior stock-research output existed locally at task start.
+- Research therefore returned to the 2025 annual filing and public disclosure text.
+
+[primary sources]
+- SSE annual report URL:
+  https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-04/603214_20260404_D9QP.pdf
+- Disclosure date: 2026-04-04.
+- Auditor: Ernst & Young Hua Ming; standard unqualified opinion.
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, 2026-07-31 11:43:39, market cap CNY 1,779,000,000, PE TTM 21.35.
+
+[key extracted facts]
+- Revenue 3,782,095,383.71; cost 2,790,729,444.00; gross profit 991,365,939.71.
+- Parent net profit 81,456,834.99; recurring parent profit 58,069,377.11.
+- OCF 372,864,674.71; capex 38,515,145.01; reported OCF-capex 334,349,529.70.
+- Inventory fell by 125,184,344.13 in the cash-flow reconciliation; this release was not annualized.
+- Assets 2,377,003,195.78; liabilities 1,135,190,038.60; equity 1,241,813,157.18; parent equity 1,180,705,184.52.
+- Cash and equivalents 531,480,899.35; short-term borrowings 208,345,141.61; no major restricted assets disclosed.
+- Inventory 633,669,643.18; use-right assets 276,347,949.43; long-term lease liability 147,590,361.91; current lease liability approximately 127,579,690.01.
+- Store sales 2,654,584,183.61 at 27.70% gross margin; e-commerce 874,297,489.10 at 6.79%; supplier services 211,660,687.44 at 85.73%.
+- 534 leased stores; lease-related cash outflow 179,948,921.79.
+- Annual dividend proposal 35,050,629.11, CNY 2.53 per 10 shares; excludes interim dividend already implemented.
+
+[analysis judgments]
+- Model: ordinary_operating / applicable. This is a merchandise retail and supplier-service operation, not a special balance-sheet business.
+- Cash discount: 80% of cash and equivalents, reflecting necessary retail operating liquidity; subtract 100% of short-term borrowing.
+- No detachable value assigned to goodwill or long-term investments.
+- Lease liabilities are economically paired with store use-right assets and store operations; they are not deducted again as standalone financial debt in detachable cash. Lease economics remain reflected in profit and cash-outflow discussion.
+- Sustainable cash profit: recurring parent net profit 58,069,377.11. This avoids capitalizing a one-year inventory release and non-recurring gains.
+
+[formula checks]
+- gross margin = 991,365,939.71 / 3,782,095,383.71 = 0.2621208191.
+- net margin = 81,456,834.99 / 3,782,095,383.71 = 0.0215374883.
+- discounted net cash = 531,480,899.35 × 80% − 208,345,141.61 = 216,839,577.87.
+- operating business price = 1,779,000,000 − 216,839,577.87 = 1,562,160,422.13.
+- owner earnback years = 1,562,160,422.13 / 58,069,377.11 = 26.9016.
+- market cap / cash profit = 1,779,000,000 / 58,069,377.11 = 30.6358.
+- forecast dividend yield = 35,050,629.11 / 1,779,000,000 = 0.0197024335.
+
+[limitations]
+- Market data was supplied by the task and not independently re-queried from an exchange history endpoint.
+- The annual dividend is a proposal and only that pending annual amount is used for forecast yield.
+- Sustainable cash profit uses one year's recurring parent profit; store maturation and channel mix may materially change it.

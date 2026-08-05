@@ -1,0 +1,86 @@
+stock-research trace
+company: 裕同科技 (002831.SZ)
+period: 2025-12-31 annual
+generated context date: 2026-07-31 Asia/Shanghai
+
+1. Protocol
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Also read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields through protocol `set` commands; did not author the result object from an empty file.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+2. Reuse and source discovery
+- No pre-existing annual facts package, normalized facts, or stock-research output existed at the configured paths.
+- Queried the issuer annual-report page and official disclosure search.
+- CNInfo query resolved the full annual report to announcement ID 1225239696, disclosed 2026-04-28.
+- Saved source PDF and extracted text at:
+  stock_report/data/raw/filings/002831.SZ/2025-12-31/annual-report-2025.pdf
+  stock_report/data/raw/filings/002831.SZ/2025-12-31/annual-report-2025.txt
+- Saved official annual-report summary PDF/text in the same filing directory.
+
+3. Model determination
+- Fact: paper-products packaging revenue was CNY 16,075,337,544.03, 93.26% of total revenue; all revenue was direct-sales revenue.
+- Fact: core assets are receivables, inventory, fixed assets and use-right assets; financing is ordinary bank debt and supplier liabilities.
+- Inference: ordinary_operating is appropriate; no bank, brokerage, insurance, developer, construction-project, concession, or investment-holding economics were identified.
+- owner_earnback_applicability: applicable.
+
+4. Core audited figures (CNY)
+- total assets 22,573,687,459.14
+- total liabilities 10,196,599,567.98
+- total equity 12,377,087,891.16
+- parent equity 12,122,115,573.66
+- minority interest 254,972,317.50
+- revenue 17,238,032,669.07
+- cost of sales 12,840,046,130.17
+- gross profit = revenue - cost = 4,397,986,538.90
+- operating profit 1,940,488,417.71
+- net profit 1,580,148,667.05
+- parent net profit 1,592,353,960.25
+- operating cash flow 2,737,188,208.27
+- capex 886,143,681.72
+- operating free cash flow = OCF - capex = 1,851,044,526.55
+- financing cash flow -1,661,556,799.66
+
+5. Owner cash bridge (CNY)
+- cash and cash equivalents: 1,245,618,775.07 x 100% = 1,245,618,775.07
+- restricted term deposits and interest: 571,191,999.21 x 90% = 514,072,799.289
+- operating guarantees: 325,650,237.77 x 0% = 0
+- transferable certificates of deposit: 2,177,291,207.43 x 95% = 2,068,426,647.0585
+- equity instruments: 32,980,805.46 x 50% = 16,490,402.73
+- long-term equity investment: 49,983,776.58 x 50% = 24,991,888.29
+- FX derivatives: 20,119,274.56 x 0% = 0
+- bank debt: short-term 4,276,950,539.14 + current long-term 46,526,371.23 + long-term 425,948,633.43 = 4,749,425,543.80, deducted 100%
+- discounted detachable net cash = -879,825,031.3625
+- Lease liabilities were left with the operating business because they are paired with use-right assets; they were not treated as detachable financial debt.
+
+6. Sustainable cash-profit bridge (CNY)
+- audited OCF 2,737,188,208.27
+- less all reported purchases of fixed, intangible and other long-term assets 886,143,681.72
+- free cash flow 1,851,044,526.55
+- judgmental stability haircut 10% = 185,104,452.655
+- discounted sustainable cash profit = 1,665,940,073.895
+- Reason for haircut: single-year base, top-five customer share 39.13%, receivables equal 27.09% of assets, and cash conversion variability.
+
+7. Formula checks
+- gross margin = 4,397,986,538.90 / 17,238,032,669.07 = 0.25513274184653656
+- net margin = 1,592,353,960.25 / 17,238,032,669.07 = 0.09237446005698446
+- market cap from input = 34,205,000,000.00
+- operating business price = market cap - discounted net cash = 35,084,825,031.3625
+- owner earnback years = 35,084,825,031.3625 / 1,665,940,073.895 = 21.060076278334254
+- market cap / cash profit = 20.53195102031975
+- forecast direct cash dividend = 1,124,329,902.42
+- forecast dividend yield = 1,124,329,902.42 / 34,205,000,000 = 0.03287033774068119
+
+8. Dividend interpretation
+- 2025 annual report shows CNY 1,124,329,902.42 cash dividends attributable to the reporting period and CNY 150,070,550.18 repurchases, total CNY 1,274,400,452.60.
+- The detailed year-end plan is CNY 735,635,163.20; the annual cash-dividend total also includes the interim distribution.
+- Forecast yield uses direct cash dividends only, excluding repurchase, and is a baseline scenario rather than a company promise.
+
+9. Data-quality limitations
+- Market cap and PE TTM were reused from the supplied Tencent quote snapshot and not independently reconstructed.
+- Sustainable cash profit uses one annual free-cash-flow observation with an explicit haircut; no same-definition multi-year capex series was available in the prepared inputs.
+- Customers are anonymous in the filing, limiting direct assessment of individual counterparty quality and order persistence.

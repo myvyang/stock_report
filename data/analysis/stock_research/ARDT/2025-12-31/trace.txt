@@ -1,0 +1,76 @@
+ARDT stock-research trace
+task_created_at=2026-08-05T05:47:50+08:00
+period=2025-12-31
+report_type=annual
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the skill routes reuse decisions there.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields through repeated protocol `set` commands; the initialized skeleton was not replaced with a hand-written JSON object.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse check]
+- Searched stock_report/data/analysis/annual_review/ARDT/2025-12-31, stock_report/data/raw/filings/ARDT/2025-12-31, and stock_report/data/normalized/facts/ARDT/2025-12-31.
+- No ARDT filing, annual fact pack, normalized facts, or prior stock-research result existed locally.
+- stock_report/data/notes/user_stock_evaluations.md existed but did not supply the required annual facts.
+- Result: rebuilt the evidence chain from official public disclosures.
+
+[primary sources]
+- SEC 2025 Form 10-K, accession 0001628280-26-018174, filed 2026-03-16:
+  https://www.sec.gov/Archives/edgar/data/1756655/000162828026018174/ardt-20251231.htm
+- Ardent Health Q4 and full-year 2025 results, published 2026-03-04:
+  https://ir.ardenthealth.com/news/news-details/2026/Ardent-Health-Reports-Fourth-Quarter-2025-Results/default.aspx
+- Federal Reserve H.10 historical CNY/USD rates; 2025-12-31 rate=6.9931 CNY per USD:
+  https://www.federalreserve.gov/releases/h10/Hist/dat00_ch.htm
+- Valuation input supplied by task: Yahoo Finance yfinance, market-cap date 2026-08-03.
+
+[model decision]
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: the company earns fees for hospital and related healthcare services. Receivables, supplies, facilities, payables, debt, and leases are ordinary operating assets and obligations rather than customer financial balances or project settlement assets requiring a special financial-statement model.
+- Hospital reporting has no GAAP manufacturing-style gross profit. Analytical direct service cost was defined as labor and related expense + professional fees + supplies expense. This limitation is explicit in result.json and report.md.
+
+[source facts in USD]
+- Revenue: 6,324,339,000
+- Labor and related expense: 2,657,700,000
+- Professional fees: 1,192,645,000
+- Supplies expense: 1,082,908,000
+- Other operating expense: 647,308,000
+- Depreciation and amortization: 155,703,000
+- Consolidated net income: 230,135,000
+- Net income attributable to Ardent: 135,811,000
+- Total assets: 5,290,208,000
+- Total liabilities: 3,605,244,000
+- Total equity: 1,686,214,000
+- Parent equity: 1,287,898,000
+- Noncontrolling interest: 398,316,000
+- Cash and equivalents: 709,601,000
+- Debt and finance lease obligations: 1,099,226,000
+- Operating lease liability: 1,218,731,000
+- Operating cash flow: 470,510,000
+- Non-acquisition capital expenditures: 211,904,000
+- Financing cash flow: -103,465,000
+- Distributions to NCI: 88,239,000
+- Share repurchases: 3,153,000
+
+[conversion and formulas]
+- All filing amounts were converted at 6.9931 CNY/USD.
+- Analytical gross profit = revenue - labor - professional fees - supplies = USD 1,391,086,000; gross margin=21.9958%.
+- Net margin = parent net income / revenue = 2.1474%.
+- Reported operating FCF = OCF - capex = USD 258,606,000, but it was not used as sustainable cash profit because the 10-K attributes part of OCF improvement to accounts-payable timing and strategic cash management.
+- Sustainable cash profit = parent net income + D&A - all capex = USD 79,610,000 = CNY 556,720,691.
+- Discounted detachable net cash = cash * 80% - debt * 100% = CNY -3,717,148,738.12.
+- Operating lease liability haircut=0 in the net-cash bridge because rent is already expensed and reflected in cash profit; full subtraction would double count. It remains disclosed as a binding operating obligation.
+- Operating business price = market cap - discounted net cash = CNY 14,038,517,486.18.
+- Owner earnback years = operating business price / sustainable cash profit = 25.2164.
+- Market cap / cash profit = 18.5396.
+- Forecast cash dividend=0 based on the 10-K statement that no common-stock cash dividends are intended for the foreseeable future.
+
+[quality checks]
+- Formula and completion validation status: ok; errors=[]
+- data_quality.status=complete
+- incomplete_reasons=[]
+- Known limitations: cross-date FX/market-cap comparison; analytical rather than GAAP gross margin; maintenance capex not separately disclosed; all capex deducted conservatively; no reliance on unrealized 2026 guidance for cash-profit calculation.

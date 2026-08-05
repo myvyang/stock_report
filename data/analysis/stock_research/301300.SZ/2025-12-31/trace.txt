@@ -1,0 +1,72 @@
+stock-research trace
+company: 远翔新材 (301300.SZ)
+period: 2025-12-31 annual
+research_date: 2026-07-31 Asia/Shanghai
+
+1. Protocol and contract
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read .agents/skills/stock-research/references/result-contract.md in full.
+- Read .agents/skills/stock-research/references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result.json only through protocol set/append commands.
+
+2. Reuse check
+- Checked the paths supplied in config/input.json for raw filings, annual facts, normalized facts, and historical stock research.
+- None of those local stock_report files existed in this workspace; only config/input.json was present.
+- Therefore core facts were re-read from the public 2025 annual report.
+
+3. Sources
+- Primary financial/business source: 福建远翔新材料股份有限公司2025年年度报告, announcement 2026-007, disclosed 2026-04-29.
+  Web text used for extraction/checking: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12259183&stockid=301300
+  This is a mirror of the company annual report; figures were checked against the report's audited consolidated statements and notes.
+- Primary dividend source: 福建远翔新材料股份有限公司2025年年度权益分派实施公告, announcement 2026-020, disclosed 2026-05-22.
+  Key fact: total shares 64,921,000 less repurchased shares 1,922,355; distribution base 62,998,645; CNY 4 per 10 shares; total CNY 25,199,458.
+- Market snapshot from task input: Tencent qt.gtimg.cn; timestamp 2026-07-31 11:43:45; market cap CNY 1,855,000,000; PE TTM 21.68.
+
+4. Model classification
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: 99.14% of revenue came from silica manufacturing; assets comprise cash/deposits, receivables, inventory and manufacturing assets; liabilities comprise trade payables and small short-term borrowing. No customer deposits, insurance reserves, regulated presale funds, concession rights or comparable special-model balance-sheet items were found.
+
+5. Core audited figures (CNY)
+- Total assets 987,946,336.59
+- Total liabilities 160,160,695.49
+- Total/parent equity 827,785,641.10; minority interest 0
+- Revenue 513,652,092.80
+- Cost of sales 362,120,617.06
+- Gross profit 151,531,475.74
+- Operating profit 102,777,965.57
+- Net profit and parent net profit 89,908,808.16
+- Operating cash flow 67,076,202.77
+- Capital expenditure 15,252,197.31
+- Operating free cash flow 51,824,005.46
+- Financing cash flow -74,768,096.68
+- Dividend/profit/interest cash out 69,399,648.38
+
+6. Derived metrics
+- Gross margin = 151,531,475.74 / 513,652,092.80 = 0.294998.
+- Net margin = 89,908,808.16 / 513,652,092.80 = 0.175039.
+- Forecast/implemented annual dividend yield = 25,199,458 / 1,855,000,000 = 0.0135846.
+- Operating free cash flow = 67,076,202.77 - 15,252,197.31 = 51,824,005.46.
+
+7. Owner earnback assumptions and arithmetic
+- Cash 211,751,623.15 x 90% = 190,576,460.84.
+- Trading financial assets 30,115,000 x 95% = 28,609,250.00.
+- Current portion of non-current assets (time deposits/large certificates) 91,411,536.02 x 95% = 86,840,959.22.
+- Short-term borrowings deducted at 100% = -10,005,194.44.
+- Discounted detachable net cash = 296,021,475.61 (rounded from 296,021,475.614).
+- Operating business price = 1,855,000,000 - 296,021,475.61 = 1,558,978,524.39.
+- Discounted sustainable cash profit uses audited 2025 OCF less actual capex = 51,824,005.46. This is a scenario judgment, not management guidance.
+- Owner earnback years = 1,558,978,524.39 / 51,824,005.46 = 30.0822.
+- Market cap / cash profit = 1,855,000,000 / 51,824,005.46 = 35.7942.
+
+8. Material limitations
+- No local normalized annual facts or raw filing package was available; audited figures were extracted directly from the public report text.
+- 2025 margin and free cash flow improved sharply; one year may not represent normalized economics.
+- Receivables are material: receivable book value CNY 179,277,043.41, gross CNY 209,685,200, allowance CNY 30,408,200, and book value was 18.15% of assets. Receivables were not treated as detachable cash.
+- Cash haircuts and sustainable cash profit are analyst assumptions. PE and market cap were retained from the supplied market snapshot.
+
+9. Validation
+- Initial completed JSON validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed validation result: status=ok, errors=[]

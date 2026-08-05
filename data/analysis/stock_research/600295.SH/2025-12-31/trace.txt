@@ -1,0 +1,93 @@
+stock-research trace
+company=鄂尔多斯
+code=600295.SH
+period=2025-12-31
+generated_for_input=2026-07-31T15:07:24+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Read references/data-reuse.md because no existing annual fact pack was present.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields using protocol set commands; the JSON was not hand-written from scratch.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[local_reuse_check]
+No existing raw filing metadata, annual facts, normalized facts, or prior stock-research output existed for 600295.SH/2025-12-31.
+Downloaded a local copy of the 2025 annual report to:
+stock_report/data/raw/filings/600295.SH/2025-12-31/annual-report-2025.pdf
+Source URL:
+https://stockmc.xueqiu.com/202604/600295_20260415_E714.pdf
+The same filing text was cross-checked through the web-indexed PDF and Sina announcement page. Core figures are from the company filing, not third-party summaries.
+
+[source_map]
+Annual report pp. 25-27: segment/product revenue, cost, margin, customers and suppliers.
+Annual report pp. 72-74: consolidated balance sheet.
+Annual report pp. 76-77: consolidated income statement.
+Annual report pp. 79-80: consolidated cash flow statement.
+Annual report p. 159: restricted assets.
+Annual report pp. 200-201: contractual financial liabilities and liquidity.
+Annual report pp. 218-219: deposits at associated finance company.
+Annual report pp. 221-222: 2025 dividend proposal.
+Annual report pp. 222-223: segment financial information.
+config/input.json: market cap, timestamp, source, PE TTM.
+
+[calculations]
+gross_profit = 25,741,175,885.31 - 19,227,332,206.34
+             = 6,513,843,678.97
+gross_margin = 6,513,843,678.97 / 25,741,175,885.31
+             = 0.25305151979041207
+net_margin = 2,362,771,161.71 / 25,741,175,885.31
+           = 0.09178955818636042
+operating_free_cash_flow = 4,517,600,128.14 - 872,352,949.78
+                         = 3,645,247,178.36
+
+detachable_cash = ending cash and cash equivalents
+                = 2,277,884,106.18
+financing_like_obligations =
+  short-term borrowings 1,589,622,551.61
+  + long-term borrowings including current portion 1,947,566,666.66
+  + long-term payables including current portion 943,351,977.47
+  + lease liabilities including current portion 174,624,831.54
+  = 4,655,166,027.28
+discounted_detachable_net_cash =
+  2,277,884,106.18 - 4,655,166,027.28
+  = -2,377,281,921.10
+
+discounted_sustainable_cash_profit = 2,000,000,000.00
+Reason: starts from parent net profit 2,362,771,161.71; positive cross-check from
+free cash flow 3,645,247,178.36; downward buffer for commodity cyclicality,
+18.0% minority-interest share of total equity, and fixed-asset impairment risk.
+
+operating_business_price =
+  34,845,000,000.00 - (-2,377,281,921.10)
+  = 37,222,281,921.10
+owner_earnback_years =
+  37,222,281,921.10 / 2,000,000,000.00
+  = 18.61114096055
+market_cap_to_cash_profit =
+  34,845,000,000.00 / 2,000,000,000.00
+  = 17.4225
+
+forecast_cash_dividend = 2,798,776,254 shares * 0.70 yuan/share
+                       = 1,959,143,377.80
+forecast_dividend_yield =
+  1,959,143,377.80 / 34,845,000,000.00
+  = 0.05622451938011192
+
+[judgment_boundaries]
+Fact: statement figures, segment margins, restricted cash and dividend proposal.
+Inference: ordinary_operating model is applicable because assets and liabilities
+can be separated into manufacturing operations, funding and investments.
+Judgment: 2.0 billion yuan sustainable cash profit and exclusion of long-term
+investments/investment property from detachable cash are conservative analytical
+choices, not company guidance.
+
+[limitations]
+Market data was supplied by the task and not independently re-queried.
+The dividend was still a board proposal at annual-report publication.
+No multi-year normalized cash-profit model was available locally; the 2.0 billion
+estimate therefore emphasizes conservatism and is explicitly disclosed.
+

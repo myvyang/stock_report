@@ -1,0 +1,81 @@
+stock-research trace — GPOR — period 2025-12-31
+generated_at: 2026-08-04T20:22:00+08:00
+
+[1] Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All result fields were populated through repeated protocol `set` commands invoked from a Python subprocess driver; result.json was not constructed by direct file serialization.
+
+[2] Local reuse audit
+- Checked the input-designated paths under stock_report/data/raw/filings/GPOR/2025-12-31, annual_review/GPOR/2025-12-31, and normalized/facts/GPOR/2025-12-31.
+- No reusable files were present. Returned to primary SEC disclosure rather than inventing annual facts.
+
+[3] Primary sources
+- Gulfport Energy Corporation 2025 Form 10-K, filed 2026-02-25, SEC accession 0001628280-26-011487:
+  https://www.sec.gov/Archives/edgar/data/874499/000162828026011487/gpor-20251231.htm
+- Gulfport Energy FY2025 results and 2026 outlook, SEC Exhibit 99.1, furnished 2026-02-24:
+  https://www.sec.gov/Archives/edgar/data/874499/000121390026019884/ea027811201ex99-1_gulfport.htm
+- SEC Companyfacts API used only to cross-check tagged statement values:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0000874499.json
+- Federal Reserve G.5A 2025 annual exchange rates, released 2026-01-05:
+  https://www.federalreserve.gov/Releases/g5a/current/
+- Market capitalization, date, PE TTM, and market source reused exactly from config/input.json.
+
+[4] Model classification
+- Confirmed ordinary_operating / applicable.
+- Reason: Gulfport owns and develops oil and gas interests and sells produced commodities. It has no customer deposits, policy reserves, regulated presale cash, concession right, or other special-model balance sheet structure.
+- Special caution: upstream production declines naturally, so oil-and-gas capital expenditure must be deducted before estimating distributable cash. Reserve PV-10 is not detachable cash.
+
+[5] Currency conversion
+- Federal Reserve 2025 annual average: 1 USD = 7.1875 CNY.
+- Every filing amount was multiplied by 7.1875 and recorded as absolute CNY yuan.
+- Limitation: balance-sheet translation would conventionally use a period-end rate; the unified annual-average rate is a presentation convention and creates CNY translation error.
+
+[6] Statement extraction — source values in USD
+- Assets 3,029,540,000; liabilities 1,194,822,000; stockholders' equity 1,834,718,000.
+- Revenue 1,422,583,000; operating income 600,424,000; net income 427,810,000; net income attributable to common stockholders 396,158,000.
+- Operating cash flow 803,193,000; oil and gas property cash expenditures 527,569,000; operating FCF 275,624,000.
+- Financing cash flow -273,672,000.
+- Cash buybacks in cash-flow bridge 304,961,000 plus preferred dividends 1,666,000 = 306,627,000; converted result 2,203,881,562.5 CNY.
+
+[7] Constructed gross profit
+- Gulfport does not report GAAP gross profit.
+- Direct operating cost proxy = lease operating expense 84,242,000 + taxes other than income 29,908,000 + transportation/gathering/processing/compression 358,938,000 = 473,088,000 USD.
+- Constructed gross profit = total revenue 1,422,583,000 - 473,088,000 = 949,495,000 USD = 6,824,495,312.5 CNY.
+- Gross margin = 949,495,000 / 1,422,583,000 = 0.6674443600127374.
+- Parent net margin = 396,158,000 / 1,422,583,000 = 0.27847795172583956.
+- This is an analytical upstream operating-margin proxy; it excludes DD&A, G&A, interest, and tax and is not directly comparable with manufacturer gross margin.
+
+[8] Detachable net cash
+- Cash: 1,813,000 USD × 100% × 7.1875 = 13,030,937.5 CNY.
+- Derivative assets: 60,458,000 USD; derivative liabilities: 30,781,000 USD.
+- Net derivative position haircut: (60,458,000 - 30,781,000) × 50% × 7.1875 = 106,651,718.75 CNY.
+- Long-term debt: -788,187,000 USD × 100% × 7.1875 = -5,665,094,062.5 CNY.
+- Discounted detachable net cash = -5,545,411,406.25 CNY.
+- Accounts receivable, PP&E, deferred tax assets, operating liabilities, and reserve PV-10 were not treated as detachable cash.
+
+[9] Sustainable cash profit
+- 2023 FCF = (723,181,000 - 537,360,000) USD = 185,821,000 USD = 1,335,513,437.5 CNY.
+- 2024 FCF = (650,033,000 - 454,098,000) USD = 195,935,000 USD = 1,408,332,812.5 CNY.
+- 2025 FCF = (803,193,000 - 527,569,000) USD = 275,624,000 USD = 1,981,047,500 CNY.
+- Three-year average = 219,126,666.6667 USD.
+- Cycle/quality haircut = 20%, reflecting commodity price, derivative, and drilling-timing volatility.
+- Discounted sustainable cash profit = 175,301,333.3333 USD × 7.1875 = 1,259,978,333.3333 CNY.
+
+[10] Earnback formulas
+- Input market cap = 19,567,585,219.06494 CNY.
+- Operating business price = 19,567,585,219.06494 - (-5,545,411,406.25) = 25,112,996,625.31494 CNY.
+- Owner earnback years = 25,112,996,625.31494 / 1,259,978,333.3333 = 19.9312924365.
+- Market cap / cash profit = 19,567,585,219.06494 / 1,259,978,333.3333 = 15.5300965909.
+- Discounted net cash / market cap = -0.2833927366.
+
+[11] Dividend forecast
+- Common cash dividend forecast = 0 CNY; yield = 0.
+- Basis: no common cash dividend announced; 2026 capital-return language specifically emphasizes repurchases. Preferred stock was fully redeemed in September 2025.
+- Buybacks are described separately and not counted as dividends.
+
+[12] Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Status after population: ok; errors: [].

@@ -1,0 +1,54 @@
+task=stock_research
+company=01061.HK ESSEX BIO-TECH
+period=2025-12-31
+generated_at=2026-08-03T13:54:04+08:00
+
+[protocol]
+init: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+population: all result fields populated through protocol set/append commands; result.json was not handwritten from scratch
+validate: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validate_status=ok
+
+[source_reuse]
+annual_facts_json=missing
+annual_facts_md=missing
+raw_filing_metadata=missing
+historical_stock_research=missing
+action=used official HKEX annual report and post-period profit warning
+
+[sources]
+annual_report=https://www.hkexnews.hk/listedco/listconews/sehk/2026/0331/2026033101103.pdf
+annual_report_release=2026-03-31
+profit_warning=https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0717/2026071701001.pdf
+profit_warning_release=2026-07-17
+market_snapshot=config/input.json; Tencent qt.gtimg.cn; 2026/07/31 16:08:46
+
+[model_review]
+input_hint=financial_brokerage/requires_special_model
+confirmed_model=ordinary_operating/applicable
+reason=annual report states development, manufacture and sale of biologic drugs; balance sheet contains ordinary operating cash, receivables, inventory, PPE, development intangibles, payables and bank debt, not brokerage client assets/liabilities
+
+[currency]
+reporting_currency=HKD
+output_currency=CNY
+income_cashflow_fx=1672047/1813807=0.9218439448; derived from annual report 2025 financial highlights RMB/HKD turnover
+balance_sheet_fx=3137080/3490761=0.8986808321; derived from annual report 2025 financial highlights RMB/HKD total assets
+
+[core_formulas]
+gross_margin=1617886030/1813807257=0.8919845195
+net_margin=318091163/1813807257=0.1753731969
+capex_HKD=106661643 PPE cash purchases + 67100925 increase in other intangible assets = 173762568
+operating_fcf_CNY=(306318541-106661643-67100925)*0.9218439448=122195921.06
+discounted_cash_profit_CNY=122195921.06*(1-0.30)=85537144.74
+profit_stress_basis=2026-07-17 profit warning expects 2026H1 profit down approximately 30 percent
+discounted_net_cash_CNY=(782730099*0.80+(14562460+1411978)*0.50-325648643-21255447)*0.8986808321=258161533.69
+operating_business_price=1187377463.19-258161533.69=929215929.50
+owner_earnback_years=929215929.50/85537144.74=10.8633
+market_cap_to_cash_profit=1187377463.19/85537144.74=13.8814
+forecast_dividend_CNY=567006000*HKD0.14*0.8986808321*0.70=49936627.54
+forecast_dividend_yield=49936627.54/1187377463.19=0.04205624
+
+[quality]
+status=complete
+limitations=2026 interim results not yet formally published at valuation date; profit warning is unaudited. Market cap and PE reused from supplied snapshot. FX conversions use company-disclosed comparison columns rather than an external FX series.
+

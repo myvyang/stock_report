@@ -1,0 +1,50 @@
+stock-research trace
+generated_at_input: 2026-08-05T00:42:28+08:00
+query: BLBD
+
+1. Read required skill and contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse check:
+   - No annual facts, normalized facts, raw filing, or prior stock-research outputs for BLBD were present in the workspace.
+
+3. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Primary sources consulted:
+   - SEC FY2025 Form 10-K, accession 0001589526-25-000100, filed 2025-11-24:
+     https://www.sec.gov/Archives/edgar/data/1589526/000158952625000100/blbd-20250927.htm
+   - Federal Reserve G.5A annual FX release:
+     https://www.federalreserve.gov/releases/g5a/current/
+   - Market cap and PE: config/input.json (Yahoo Finance yfinance snapshot supplied by task).
+
+5. Period resolution:
+   - Input period 2025-12-31 does not match the issuer fiscal year.
+   - Used audited FY2025 ended 2025-09-27 and set analysis.period accordingly.
+
+6. Currency conversion:
+   - USD/CNY = 7.1875, Federal Reserve 2025 annual average.
+   - All filing monetary values converted from USD to absolute CNY yuan.
+
+7. Model decision:
+   - ordinary_operating / applicable.
+   - Rationale: school-bus manufacturing economics are represented by normal cash, receivables, inventory, PP&E, trade payables and bank debt; no special financial-statement model identified.
+
+8. Owner earnback calculations:
+   - Discounted detachable net cash = cash USD 229.313m * 80% - interest-bearing debt USD 90.324m = USD 93.1264m = CNY 669,346,000.
+   - Sustainable cash profit = net income 127.720m + D&A 15.586m - capex 22.872m - stock compensation 14.785m - undistributed equity-method income 9.476m = USD 96.173m = CNY 691,243,437.50.
+   - Operating business price = CNY 15,886,071,546.12378 - CNY 669,346,000 = CNY 15,216,725,546.12378.
+   - Owner earnback years = 22.0135551683.
+   - Market cap / cash profit = 22.9818768386.
+
+9. Dividend forecast:
+   - Forecast cash dividend = 0 based on the 10-K statement that the company does not expect to pay common-stock cash dividends.
+   - Repurchases disclosed separately and not treated as dividends.
+
+10. JSON updates were made using repeated protocol CLI set operations, not by replacing the initialized result with a handwritten object.
+
+11. Validation:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   status: ok; errors: []

@@ -1,0 +1,78 @@
+stock-research trace
+company=REYN
+period=2025-12-31
+generated_at=2026-08-05T05:27:19+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated result fields only through protocol set/append commands.
+4. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+5. Validation result: status=ok, errors=[]
+
+[reuse audit]
+No files existed under the configured REYN/2025-12-31 raw filing, annual review, normalized facts, or prior stock research paths. No historical result was reused.
+
+[primary sources]
+- SEC 2025 Form 10-K, accession 0001628280-26-005284:
+  https://www.sec.gov/Archives/edgar/data/1786431/000162828026005284/reyn-20251231.htm
+- Reynolds Consumer Products Q1 2026 results and FY2026 outlook, 2026-05-06:
+  https://investors.reynoldsconsumerproducts.com/news-releases/news-release-details/reynolds-consumer-products-reports-first-quarter-2026-financial/
+- Reynolds Consumer Products dividend history:
+  https://investors.reynoldsconsumerproducts.com/stock-information/dividend-history/
+- Federal Reserve H.10 release, 2025-12-29:
+  https://www.federalreserve.gov/releases/h10/20251229/
+- Market cap and PE: config/input.json, Yahoo Finance yfinance, date 2026-08-03.
+
+[model decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: household consumables manufacturing and retail distribution; balance sheet consists of normal working capital, manufacturing assets, goodwill/intangibles, leases, and corporate debt. No customer funds, insurance reserves, regulated project cash, concession rights, or investment-holding structure identified.
+
+[currency]
+Financial statements are in USD. Protocol output requires absolute CNY yuan.
+Translation rate used for all filing amounts: USD 1 = CNY 7.0063, Federal Reserve H.10 rate for 2025-12-26.
+This is a uniform presentation/analysis rate, not a statutory translation using average income-statement rates.
+
+[core extraction, USD millions]
+2025 revenue=3721
+cost_of_sales=2807
+gross_profit=914
+operating_profit=492
+net_income=301
+total_assets=4936
+total_liabilities=2683
+stockholders_equity=2253
+cash=147
+long_term_debt=1580
+operating_cash_flow=477
+capital_expenditure=161
+operating_free_cash_flow=316
+financing_cash_flow=-306
+dividends_paid=192
+
+[derived metrics]
+gross_margin=914/3721=0.2456328944
+net_margin=301/3721=0.0808922333
+discounted_detachable_net_cash=(147-1580)*7.0063m=-10040027900 CNY
+discounted_sustainable_cash_profit=(477-161)*7.0063m=2213990800 CNY
+operating_business_price=35475093164.24121-(-10040027900)=45515121064.24121 CNY
+owner_earnback_years=45515121064.24121/2213990800=20.5579540187
+market_cap_to_cash_profit=35475093164.24121/2213990800=16.0231438921
+forecast_dividend=210.3m shares*USD0.92*7.0063=1355550898.8 CNY
+forecast_dividend_yield=1355550898.8/35475093164.24121=0.0382113415
+
+[judgment log]
+- Cash included at 100%; long-term debt deducted at 100%.
+- Receivables, inventory, PP&E, ROU assets, goodwill, and intangible assets excluded from detachable cash because they support ongoing operations or are not cash-realizable at book value.
+- Lease liabilities were not deducted again because lease payments are already included in operating cash flow; this avoids double counting.
+- Sustainable cash profit uses 2025 operating cash flow less all capex. Treating all capex as maintenance is conservative and avoids relying on management adjusted EBITDA.
+- 2026 guidance and Q1 performance were used only as a cross-check, not substituted for audited 2025 cash flow.
+- Dividend forecast annualizes the maintained USD0.23 quarterly rate; future dividends remain discretionary.
+
+[limitations]
+- Market cap and PE were accepted from task input and were not independently reconstructed from official exchange data.
+- Uniform period-end FX creates presentation differences versus average-rate translation.
+- A single-year free-cash-flow denominator remains exposed to commodity, working-capital, and capex cycles.

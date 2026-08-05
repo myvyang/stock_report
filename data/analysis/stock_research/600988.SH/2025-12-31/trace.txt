@@ -1,0 +1,72 @@
+stock-research trace
+company=600988.SH 赤峰黄金
+period=2025-12-31 annual
+generated_at=2026-07-31T19:39:47+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar/array fields through protocol set/append commands (see outputs/populate_result.sh).
+5. Validated with protocol validate; final validation status recorded below.
+
+[reuse check]
+Input-declared paths stock_report/data/raw/filings/600988.SH/2025-12-31 and stock_report/data/analysis/annual_review/600988.SH/2025-12-31 did not exist in the workspace.
+No prior 2025 facts.json, annual_facts.md, extraction trace, normalized facts, research result, or report was available for reuse.
+stock_report/data/notes/user_stock_evaluations.md contained no entry for 600988.SH.
+
+[sources]
+Primary disclosure content:
+- 赤峰黄金2025年年度报告, disclosure date 2026-03-21, public announcement mirror: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12007578&stockid=600988
+- 赤峰黄金2025年年度报告摘要, public announcement mirror: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12007579&stockid=600988
+- 赤峰黄金2025年度利润分配方案公告, public announcement mirror: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12007593&stockid=600988
+Supporting financial table:
+- Sina Finance 600988 cash-flow table, 2025 annual column: https://money.finance.sina.com.cn/corp/go.php/vFD_CashFlow/stockid/600988/ctrl/2025/displaytype/4.phtml
+Input market snapshot:
+- Tencent qt.gtimg.cn; market cap CNY 74,876,000,000; timestamp 2026-07-31 11:43:24; PE TTM 20.87.
+
+[core extraction]
+revenue=12638506229.12
+cost_of_sales=6008408689.62
+gross_profit=6630097539.50
+parent_net_profit=3082367791.68
+net_profit=3447387967.50
+operating_cash_flow=5555589287.50
+capital_expenditure=2327035600.00 (financial table displayed 232703.56万元)
+operating_free_cash_flow=3228553687.50 (OCF - capex)
+total_assets=24980770851.47
+total_liabilities=8470126514.40
+total_equity=16510644337.07 (assets - liabilities)
+parent_equity=13415188878.23
+minority_interest=3095455458.84 (total equity - parent equity)
+cash=6820720561.54
+restricted_cash=118011032.64
+interest_bearing_debt=878011670.70
+inventory_net=2685277001.26
+provisions=1653501445.60
+
+[formula checks]
+gross_margin=(12638506229.12-6008408689.62)/12638506229.12=0.524599
+net_margin=3082367791.68/12638506229.12=0.243886
+forecast_dividend=0.32*1900411178=608131576.96
+forecast_dividend_yield=608131576.96/74876000000=0.00812185
+
+[owner earnback judgments]
+Statement model confirmed ordinary_operating. Mining assets and liabilities are operating assets/obligations, not a financial-special statement model.
+Cash bridge: 6820720561.54 - 118011032.64 restricted - 878011670.70 debt - 247000000 lease/long-term payable estimate - 2000000000 operating/tax/project reserve = 3577697858.20. Apply 80% detachability = 2862158286.56.
+Profit bridge: 2025 parent net profit 3082367791.68 - 382367791.68 cash conversion/minority constraint - 300000000 gold-cycle and sustaining-capex reserve = 2400000000.
+operating_business_price=74876000000-2862158286.56=72013841713.44
+owner_earnback_years=72013841713.44/2400000000=30.0058
+market_cap_to_cash_profit=74876000000/2400000000=31.1983
+These haircuts are analyst judgments, not reported facts or company guidance.
+
+[limitations]
+The local filing/fact packages specified by input were absent.
+The public annual-report HTML mirror did not preserve the consolidated cash-flow statement table cleanly; capex was cross-read from the annual financial-data table.
+2025 dividend is a board proposal at the research date; actual distribution depends on implementation-date eligible shares.
+2026 planned capital expenditure above CNY 3.5bn is used as a risk/context fact, not inserted into the 2025 free-cash-flow formula.
+
+[validation]
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Final result: status=ok, errors=[]

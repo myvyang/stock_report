@@ -1,0 +1,75 @@
+stock-research trace
+company=603167.SH 渤海轮渡
+period=2025-12-31
+generated_context=2026-07-31 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md in full.
+- Read references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields only through protocol set/append commands.
+
+2. Reuse check
+- config/input.json referenced annual facts, normalized facts and raw filing paths.
+- Those paths were absent in the workspace; no prior annual fact pack or research result was available to reuse.
+- Core facts were therefore reconstructed from the 2025 annual report disclosed on 2026-04-25.
+
+3. Primary evidence reviewed
+- SSE official announcement URL identified:
+  https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-25/603167_20260425_OM88.pdf
+- The SSE endpoint returned an access page in this environment, so the same disclosed annual-report text was reviewed through the indexed full-text mirror:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12190263&stockid=603167
+- Annual report sections reviewed: important notice and dividends; business and industry; segment revenue/cost; balance sheet; income statement; cash flow statement; financial asset and fund discussion.
+- Market cap, date, source and PE were preserved from config/input.json.
+
+4. Model decision
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Reason: revenue and asset base are dominated by passenger/vehicle roll-on roll-off transport and vessels. Financing lease and fund investments are ancillary rather than the statement model itself.
+- Special handling: vessels are operating assets, not detachable cash; financing lease receivables and private-equity fund interests are not treated as cash equivalents.
+
+5. Core facts and formulas
+- revenue=1,844,839,291.02
+- cost_of_sales=1,346,031,759.94
+- gross_profit=498,807,531.08
+- gross_margin=498,807,531.08 / 1,844,839,291.02 = 0.2703799369
+- parent_net_profit=263,262,142.05
+- net_margin=263,262,142.05 / 1,844,839,291.02 = 0.1427019380
+- operating_cash_flow=520,870,581.04
+- capital_expenditure=45,106,860.44
+- operating_free_cash_flow=475,763,720.60
+- total_assets=4,117,247,262.85
+- total_liabilities=382,429,306.03
+- total_equity=3,734,817,956.82
+- parent_equity=3,489,695,001.25
+
+6. Owner earnback assumptions
+- Cash: 87,894,324.09 x 80% = 70,315,459.27.
+- Other non-current financial assets: 145,327,124.72 x 50% = 72,663,562.36.
+- Financing liabilities deducted at 100%:
+  short-term loans 50,000,000.00
+  current non-current liabilities 788,170.97
+  lease liabilities 1,914,146.30
+  total 52,702,317.27.
+- discounted_detachable_net_cash=90,276,704.36.
+- Sustainable cash profit uses parent net profit x 80%:
+  263,262,142.05 x 80% = 210,609,713.64.
+- 20% profit haircut reflects subsidy weight, transport cyclicality and vessel maintenance/replacement capex uncertainty. It is an analyst assumption, not company guidance.
+- operating_business_price=4,072,000,000.00 - 90,276,704.36 = 3,981,723,295.64.
+- owner_earnback_years=3,981,723,295.64 / 210,609,713.64 = 18.90569636.
+- market_cap_to_cash_profit=4,072,000,000.00 / 210,609,713.64 = 19.33434090.
+
+7. Dividend forecast
+- Only the proposed 2026 interim dividend of CNY 0.35/share is forecast.
+- Shares=469,144,503.
+- forecast_cash_dividend=164,200,576.05.
+- forecast_dividend_yield=164,200,576.05 / 4,072,000,000 = 0.0403243065.
+- No unannounced 2026 final dividend was assumed.
+
+8. Known limitations
+- The local source package was absent.
+- The annual report was reviewed through a full-text mirror after identifying the official SSE announcement; core figures agree internally across report sections.
+- No vessel-by-vessel future replacement capex schedule was available.
+- Sustainable cash profit and asset discounts are explicit research judgments.

@@ -1,55 +1,67 @@
-Task: stock research output creation for 00428.HK, period 2025-12-31 annual.
+Task: stock research for 00428.HK, annual period ended 2025-12-31.
+Run timestamp context: 2026-08-03 Asia/Shanghai.
 
-Protocol and instructions read:
+Instructions read completely:
 - /workspace/.agents/skills/stock-research/SKILL.md
 - /workspace/.agents/skills/stock-research/references/result-contract.md
 - /workspace/.agents/skills/stock-research/references/report-contract.md
 - /workspace/.agents/skills/stock-research/references/data-reuse.md
 
-Input read:
+Input:
 - config/input.json
-- market cap from input: CNY 31,000,000, as of 2026-07-24, source described in input payload.
+- Market cap: CNY 26,677,903.13899517 at 2026/07/31 16:08:44, Tencent qt.gtimg.cn.
+- PE TTM: 3.17.
 
-Reused local sources:
+Reused primary local materials:
 - stock_report/data/raw/filings/00428.HK/2025-12-31/metadata.json
+- stock_report/data/raw/filings/00428.HK/2025-12-31/2025-annual-report.pdf
+- stock_report/data/raw/filings/00428.HK/2025-12-31/2025-annual-report.txt
 - stock_report/data/analysis/annual_review/00428.HK/2025-12-31/facts.json
 - stock_report/data/analysis/annual_review/00428.HK/2025-12-31/annual_facts.md
 - stock_report/data/normalized/facts/00428.HK/2025-12-31/annual-facts.json
+
+Historical research inspected only as a clue:
 - stock_report/data/analysis/stock_research/00428.HK/2025-12-31/result.json
 - stock_report/data/analysis/stock_research/00428.HK/2025-12-31/report.md
+- stock_report/data/analysis/stock_research/00428.HK/2025-12-31/trace.txt
 
-External sources checked or reused as context:
-- HKEXnews Annual Report 2025 PDF: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042403195.pdf
-- Yahoo Finance HKDCNY=X historical quote page; search result showed 2025-12-31 HKD/CNY close 0.8991.
-- IFEC Listed investment companies page for Chapter 21 business context.
-- FINRA Low-Priced Stocks Can Spell Big Problems for OTC/low-priced securities risk context.
+Model determination:
+- Input hint said financial_brokerage.
+- Annual Report 2025 states the company is a Main Board Chapter 21 investment company whose principal activities are investment holding and investment in listed and unlisted securities.
+- No customer brokerage, investment banking, client-money or brokerage balance-sheet model was identified.
+- Overrode statement_model to investment_holding.
+- Set owner_earnback_applicability to requires_special_model.
+- Kept discounted_net_cash, discounted_net_cash_to_market_cap, discounted_cash_profit, operating_business_price, owner_earnback_years and market_cap_to_cash_profit null as required by the contract.
+
+Currency:
+- Protocol requires CNY absolute yuan.
+- Annual-report figures are in HKD thousands.
+- Used 1 HKD = 0.8991 CNY at 2025-12-31, reused from the prior research record citing Yahoo Finance HKDCNY=X historical close.
+- Input market cap was already normalized to CNY and was not converted again.
+
+Selected calculations:
+- Total assets: HKD183,680,000 * 0.8991 = CNY165,146,688.00.
+- Total liabilities: HKD5,429,000 * 0.8991 = CNY4,881,213.90.
+- Parent equity: HKD178,251,000 * 0.8991 = CNY160,265,474.10.
+- Revenue: HKD319,000 * 0.8991 = CNY286,812.90.
+- Parent net profit: HKD9,789,000 * 0.8991 = CNY8,801,289.90.
+- Operating cash flow: HKD3,724,000 * 0.8991 = CNY3,348,248.40.
+- Capital expenditure: zero; operating free cash flow equals operating cash flow.
+- Net margin: 9,789 / 319 = 30.6865203762. Retained as a mechanical metric but report explains it is not comparable because revenue includes only dividends while investment gains sit outside revenue.
+- Gross margin kept null because there is no economically meaningful sales/cost-of-sales model.
+- Forecast dividend: zero and forecast yield zero, based on no recommended dividend for both 2025 and 2024 and no predetermined payout ratio.
 
 Protocol CLI actions:
-- Initialized outputs/result.json with:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- Populated outputs/result.json using repeated:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol set --result outputs/result.json --path <path> --json <json>
-- Validated outputs/result.json with:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-- Validation result: status ok, errors [].
+- Initialized outputs/result.json using `PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json`.
+- Populated initialized paths using protocol `set` and `append` commands; the result object was not hand-written from scratch.
+- First validation after population returned: {"status":"ok","errors":[]}.
 
-Currency and formula choices:
-- Result protocol requires CNY absolute yuan.
-- Annual report facts are HKD; converted annual-report-derived HKD amounts to CNY at 1 HKD = 0.8991 CNY, using 2025-12-31 HKD/CNY historical quote.
-- Input market cap already stated as normalized to CNY, so market_cap stayed CNY 31,000,000.
-- Gross margin = HKD gross profit / HKD revenue = 1.0 because revenue is dividend income and cost of sales is not separately applicable.
-- Net margin = HKD parent net profit / HKD revenue = 30.68652; marked through report text as not economically comparable to product-company margin.
-- Discounted net cash reused from prior owner_earnback clue: HKD 58,891,500, converted to CNY 52,949,347.65.
-- Operating business price = CNY 31,000,000 - CNY 52,949,347.65 = CNY -21,949,347.65.
-- Discounted sustainable cash profit set to null because investment assets are the principal business assets and were already included in detachable cash analysis. Related dividends, disposal gains and fair value movements cannot be counted again as sustainable distributable cash profit.
-- Owner earnback years and market cap to cash profit set to null because denominator is null.
+Key limitations:
+- Actual bid depth, disposal costs, taxes and exit timing for OTC and unlisted holdings are not established by the annual report.
+- Perfect Path mining licence progress and realizable value remain uncertain.
+- The special investment-holding valuation is not compressed into a single haircut value without position-level exit evidence.
 
-Key unresolved items:
-- Real exit price, tax/friction cost and timing for OTC and unlisted investments.
-- Perfect Path mining licence status, sale path and realizable value.
-- Three-year ordinary operating profit median, because 2023 annual report was not extracted in the reused fact package.
-
-Outputs written:
+Outputs:
 - outputs/result.json
 - outputs/report.md
 - outputs/trace.txt

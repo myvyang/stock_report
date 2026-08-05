@@ -1,0 +1,56 @@
+stock-research trace: TRV / 2025-12-31
+generated_at_input: 2026-08-04T17:24:35+08:00
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+   - No files were present under the configured TRV raw filing, annual review, normalized facts, or prior stock research paths.
+   - Research therefore returned to primary public disclosure.
+
+3. Primary sources reviewed
+   - SEC Form 10-K, accession 0000086312-26-000065, filed 2026-02-12:
+     https://www.sec.gov/Archives/edgar/data/86312/000008631226000065/trv-20251231.htm
+   - Travelers FY2025 earnings release, dated 2026-01-21:
+     https://investor.travelers.com/newsroom/press-releases/news-details/2026/Travelers-Reports-Excellent-Fourth-Quarter-and-Full-Year-Results/default.aspx
+   - PBOC-authorized CFETS 2025-12-31 central parity, reproduced by China Economic Net:
+     https://www.ce.cn/xwzx/gnsz/gdxw/202512/t20251231_2676993.shtml
+   - Market cap and PE: input.json Yahoo Finance yfinance snapshot; not independently reproduced.
+
+4. Model determination
+   - Input hint ordinary_operating/applicable rejected.
+   - Confirmed financial_insurance/not_applicable because investments, loss reserves, unearned premium reserves, and regulatory capital are integral to insurance operations.
+   - All ordinary owner-earnback numeric fields intentionally left null.
+
+5. Key source figures in USD millions
+   - Revenue 48,828; premium 43,914; net investment income 3,959; net income 6,288.
+   - Total assets 143,708; total liabilities 110,814; equity 32,894.
+   - Investments 101,182; claims reserves 65,737; unearned premium reserves 22,431; debt 9,267.
+   - Operating cash flow 10,606; dividends paid 979; financing cash flow -2,663.
+   - Combined ratio 89.9%; catastrophe losses 3,690; favorable prior-year reserve development 1,040.
+   - Holding-company liquidity 2,410; 2026 ordinary upstream dividend capacity without prior CT approval 5,920.
+
+6. Currency conversion
+   - Output contract requires absolute CNY yuan.
+   - All filing USD amounts were multiplied by 7.0288 CNY/USD, the 2025-12-31 central parity.
+   - This is a presentation conversion, not an accounting translation using historical/average rates.
+
+7. Dividend forecast
+   - Annualized 2026 declared quarterly dividend: USD 1.10 * 4 * 217.5m year-end shares = USD 957.0m.
+   - Converted forecast: CNY 6,726,561,600.
+   - Forecast yield: CNY 6,726,561,600 / CNY 526,898,334,578.0625 = 0.0127663368.
+
+8. Protocol commands
+   - Initialized with:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Populated only through protocol set calls in populate_result.sh.
+   - Validation command:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+9. Known limitations
+   - No ordinary gross margin, capex, or operating free cash flow is reported because those fields do not have comparable insurance economics.
+   - The dividend forecast is a simple run-rate scenario and may change.
+   - The supplied 2026-08-03 market snapshot lies after the filing date and was accepted from task input.

@@ -1,0 +1,78 @@
+task=stock_research
+company=601218.SH 吉鑫科技
+period=2025-12-31
+generated_at=2026-07-31T22:15:42+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the workflow required checking reusable facts.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields only through protocol set commands.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   validation_status=ok
+
+[local_reuse]
+checked=stock_report/data/analysis/annual_review/601218.SH/2025-12-31
+checked=stock_report/data/raw/filings/601218.SH/2025-12-31
+checked=stock_report/data/normalized/facts/601218.SH/2025-12-31
+checked=stock_report/data/analysis/stock_research/601218.SH/2025-12-31
+result=no local filing, annual facts, normalized facts, or prior stock-research result existed
+action=obtained public 2025 annual-report disclosure and dividend documents
+
+[sources]
+S1=江苏吉鑫风能科技股份有限公司2025年年度报告；披露日2026-03-31；原始披露平台上交所；公开全文镜像 https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12036636&stockid=601218
+S2=江苏吉鑫风能科技股份有限公司2025年年度报告摘要；披露日2026-03-31；公开全文镜像 https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12036639&stockid=601218
+S3=江苏吉鑫风能科技股份有限公司关于2025年度利润分配方案的公告；公告编号2026-009；公开PDF镜像 https://stockmc.xueqiu.com/202603/601218_20260331_9WEO.pdf
+S4=Tencent qt.gtimg.cn market snapshot supplied in config/input.json; timestamp=20260731114339; market_cap=4419000000; pe_ttm=27.91
+
+[model_review]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Revenue and profit arise from wind-turbine castings and wind-farm electricity sales. Customer deposits, insurance reserves, property pre-sales, project contract assets, or investment-holding look-through do not dominate the statements. Bank structured deposits are treasury assets. Wind-farm sale-and-leaseback payable is treated as financing debt.
+
+[financial_facts]
+total_assets=3663377272.12 S1 consolidated balance sheet
+total_liabilities=696116940.88 S1 consolidated balance sheet
+total_equity=2967260331.24 S1 consolidated balance sheet
+parent_equity=2966677374.87 S1 consolidated balance sheet
+revenue=1406076959.77 S1 income statement
+cost_of_sales=1135278242.60 S1 income statement
+gross_profit=270798717.17 derived revenue-cost
+gross_margin=0.192592 derived gross_profit/revenue
+parent_net_profit=135148459.51 S1 income statement
+net_margin=0.096118 derived parent_net_profit/revenue
+operating_cash_flow=225937996.97 S1 cash-flow statement
+capital_expenditure=22132355.50 S1 purchases of fixed/intangible/other long-term assets
+operating_free_cash_flow=203805641.47 derived OCF-capex
+manufacturing_revenue=1195329768.78 S1 segment table
+manufacturing_margin=0.1066 S1 segment table
+wind_power_revenue=193624034.01 S1 segment table
+wind_power_margin=0.6774 S1 segment table
+
+[owner_earnback]
+available_cash=236881559.55-2466469.10=234415090.45
+structured_deposits=530850346.88*0.95=504307829.54
+other_debt_investments=(356661888.13+20870465.75)*0.90=339779118.49
+financing_debt=70045986.12+75445213.38+268291250.00+326285.82=414108735.32
+discounted_net_cash=234415090.45+504307829.54+339779118.49-414108735.32=664393303.16
+operating_business_price=4419000000.00-664393303.16=3754606696.84
+sustainable_cash_profit=115180554.55
+sustainable_cash_profit_basis=2025 disclosed parent net profit excluding non-recurring items; selected below annual operating free cash flow to avoid treating working-capital movement as permanently distributable
+owner_earnback_years=3754606696.84/115180554.55=32.59757
+market_cap_to_cash_profit=4419000000.00/115180554.55=38.36585
+
+[dividend]
+2025_interim_cash_dividend=9690335.12 S2/S3
+2025_final_cash_dividend=33916172.92 S2/S3
+2025_full_year_cash_dividend=43606508.04 S2/S3
+forecast_basis=use implemented 2025 full-year distribution as a reference, not a 2026 commitment
+forecast_dividend_yield=43606508.04/4419000000=0.009868
+
+[limitations]
+- No local annual facts package was available; public annual-report text was re-read.
+- Other debt investments were not expanded instrument by instrument; a 90% discount was applied.
+- Sustainable cash profit is an analytical estimate, not company guidance.
+- The dividend reference does not imply a future dividend commitment.

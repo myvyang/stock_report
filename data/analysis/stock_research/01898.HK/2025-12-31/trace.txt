@@ -1,0 +1,55 @@
+stock-research trace
+task: 01898.HK / 2025-12-31 / annual
+generated_at: 2026-08-04T21:35:46+08:00
+
+1. Read skill and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+   - No local raw filing, annual facts package, normalized facts, or prior stock-research result existed for this company/period.
+   - Downloaded official 2025 annual report to stock_report/data/raw/filings/01898.HK/2025-12-31/annual_report_2025.pdf.
+   - Official source URL: https://www.chinacoalenergy.com/cms_files/filemanager/50/attach/202510/3874DFC57F39A289DDBC4D49C8B5B912.pdf
+   - Local pdftotext was unavailable; extraction and page/line verification used the web PDF parser.
+
+3. Protocol actions
+   - Initialized outputs/result.json with:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Populated initialized fields with repeated protocol `set` commands; result was not authored as a standalone JSON object.
+   - Final validation command:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Validation result: status=ok, errors=[]
+
+4. Model override
+   - Input hint classified the company as financial_brokerage.
+   - Annual report shows coal revenue CNY 120.397bn and core coal/mining assets; brokerage activities are absent.
+   - Final model: ordinary_operating / applicable.
+   - Special consolidation treatment: finance subsidiary deposits CNY 39.340301bn are operating financial liabilities and cannot support a naive cash deduction.
+
+5. Core source facts (CNY unless stated)
+   - Revenue: 148,056,698,000; cost of sales: 107,357,222,000; parent net profit: 17,883,577,000.
+   - Total assets: 370,254,237,000; liabilities: 169,638,408,000; parent equity: 160,133,083,000.
+   - Operating cash flow: 29,791,934,000; long-term asset purchases: 21,787,133,000; operating FCF: 8,004,801,000.
+   - Monetary funds: 88,717,371,000; restricted: 11,482,439,000; absorbed deposits: 39,340,301,000.
+   - Financing balances used in owner view: 72,808,289,000 (annual report financing-liability reconciliation).
+   - Proposed total 2025 cash dividend: 5,073,982,200; per share CNY 0.383; final component pending shareholder approval.
+   - Market cap input: 121,592,522,838.51207; PE TTM: 8.81; timestamp: 2026/08/03 09:47:53.
+
+6. Calculations
+   - Gross profit = revenue - cost = 40,699,476,000.
+   - Gross margin = 40,699,476,000 / 148,056,698,000 = 0.2748872211.
+   - Parent net margin = 17,883,577,000 / 148,056,698,000 = 0.1207893590.
+   - Operating FCF = 29,791,934,000 - 21,787,133,000 = 8,004,801,000.
+   - Discounted sustainable cash profit = 8,004,801,000 * 0.80 = 6,403,840,800.
+   - Detachable net cash = 0 (conservative floor after restricted cash, absorbed deposits, and financing obligations).
+   - Operating business price = market cap - 0 = 121,592,522,838.51207.
+   - Owner earnback years = 121,592,522,838.51207 / 6,403,840,800 = 18.9874409131.
+   - Forecast dividend yield = 5,073,982,200 / 121,592,522,838.51207 = 0.0417293836.
+
+7. Quality and limitations
+   - data_quality.status=complete under the result contract.
+   - Market quote was supplied by task input and not independently exchange-verified.
+   - Maintenance and growth capex were not separately disclosed; full cash capex was deducted and the residual was discounted 20%.
+   - Finance subsidiary assets were not fully looked through; detachable net cash was therefore floored at zero.

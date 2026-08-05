@@ -1,62 +1,53 @@
-柳药集团 603368.SH 股票研究 trace
+2026-07-31 stock-research trace
 
-本次任务日期：
-- 2026-07-27 Asia/Shanghai
+1. Read skill instructions:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
 
-协议和契约：
-- 已读取 /workspace/.agents/skills/stock-research/SKILL.md
-- 已读取 /workspace/.agents/skills/stock-research/references/result-contract.md
-- 已读取 /workspace/.agents/skills/stock-research/references/report-contract.md
-- 已读取 /workspace/.agents/skills/stock-research/references/data-reuse.md
+2. Read task input:
+   - config/input.json
+   - company 603368.SH 柳药集团
+   - annual period 2025-12-31
+   - market cap CNY 6,204,000,000 at 20260731114345
+   - PE TTM 9.45
 
-初始化与校验：
-- 运行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- 使用 protocol set 写入 metrics、financials、asset_analysis、owner_earnback、dividend、business、risks、data_quality。
-- 使用 protocol append 补充分红证据。
-- 运行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-- 校验结果：status ok，errors []
+3. Reused primary annual fact package and filing metadata:
+   - stock_report/data/analysis/annual_review/603368.SH/2025-12-31/facts.json
+   - stock_report/data/analysis/annual_review/603368.SH/2025-12-31/annual_facts.md
+   - stock_report/data/raw/filings/603368.SH/2025-12-31/metadata.json
+   - primary filing: https://static.cninfo.com.cn/finalpage/2026-04-30/1225261492.PDF
 
-主要复用来源：
-- 年度事实包：stock_report/data/analysis/annual_review/603368.SH/2025-12-31/facts.json
-- 年度事实说明：stock_report/data/analysis/annual_review/603368.SH/2025-12-31/annual_facts.md
-- 年报抽取 trace：stock_report/data/analysis/annual_review/603368.SH/2025-12-31/extraction_trace.txt
-- 原始年报：stock_report/data/raw/filings/603368.SH/2025-12-31/603368_2025_annual_report.pdf
-- 原始年报元数据：stock_report/data/raw/filings/603368.SH/2025-12-31/metadata.json
-- 历史股票研究输出：stock_report/data/analysis/stock_research/603368.SH/2025-12-31/result.json 和 report.md
+4. Reused prior same-period stock research only for established owner-earnback assumptions and detailed evidence:
+   - stock_report/data/analysis/stock_research/603368.SH/2025-12-31/result.json
+   - stock_report/data/analysis/stock_research/603368.SH/2025-12-31/report.md
 
-核心年报来源：
-- 巨潮资讯《广西柳药集团股份有限公司2025年年度报告》
-- URL：https://static.cninfo.com.cn/finalpage/2026-04-30/1225261492.PDF
-- 本地文件：stock_report/data/raw/filings/603368.SH/2025-12-31/603368_2025_annual_report.pdf
+5. Confirmed analysis model from filing business facts:
+   - ordinary_operating
+   - owner earnback applicable
+   - receivables, inventory and minimum operating cash treated as operating capital, not detachable cash
+   - discounted commercial acceptance bills conservatively treated as financing/contingent pressure because recourse details are incomplete
 
-本次定向补查：
-- 使用 pdftotext -layout 从本地 PDF 搜索利润分配、现金分红、每10股派息、股利等关键词。
-- 确认 2025 年度利润分配预案：每10股派发现金股利6.80元，拟派发现金红利263,838,888.20元。
-- 确认年报披露回购金额198,638,245.73元视同现金分红，但本次预测分红率只采用现金红利。
+6. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
 
-核心计算：
-- 毛利率 = 2,311,694,519.99 / 20,926,270,790.40 = 0.1104685370
-- 净利率 = 709,463,803.15 / 20,926,270,790.40 = 0.0339030212
-- 预测分红率 = 263,838,888.20 / 6,109,000,000.00 = 0.0431885559
-- 折后净现金/市值 = -3,606,984,424.81 / 6,109,000,000.00 = -0.5904377844
-- 经营业务购买价 = 6,109,000,000.00 - (-3,606,984,424.81) = 9,715,984,424.81
-- 控股回本年 = 9,715,984,424.81 / 499,229,587.57 = 19.4619563157
-- 市值/现金利润 = 6,109,000,000.00 / 499,229,587.57 = 12.2368548502
+7. Populated result fields through protocol CLI set/append commands. Did not hand-write result.json.
 
-复用 owner_earnback 口径：
-- 折后可剥离净现金：-3,606,984,424.81 元
-- 折后可持续可分配现金利润：499,229,587.57 元
-- 经营业务购买价：9,715,984,424.81 元
-- 必要经营现金：800,000,000.00 元
-- 摩擦准备：50,000,000.00 元
-- 已贴现商业承兑汇票按融资性或有偿付压力全额扣除。
+8. Recalculated market-dependent values:
+   - forecast dividend yield = 263,838,888.20 / 6,204,000,000 = 0.0425272224693746
+   - operating business price = 6,204,000,000 - (-3,606,984,424.81) = 9,810,984,424.81
+   - owner earnback years = 9,810,984,424.81 / 499,229,587.57 = 19.652249524241874
+   - market cap / cash profit = 6,204,000,000 / 499,229,587.57 = 12.427148058667695
+   - discounted net cash / market cap = -3,606,984,424.81 / 6,204,000,000 = -0.5813965868488072
 
-仍无法公开确认：
-- 已贴现商业承兑汇票逐笔追索权和对应应收资产质量；公开年报只披露合计金额。
-- 大额定期存单逐笔提前支取条件；公开年报只披露金额和列报期限。
-- 最低必要经营现金；年报没有直接披露，本次沿用历史专题估算。
+9. First validation identified historical asset rows using business_substance instead of mandatory explanation. Mapped business_substance into explanation for each asset and liability row without changing amounts or interpretations.
 
-输出文件：
-- outputs/result.json
-- outputs/report.md
-- outputs/trace.txt
+10. Final validation command:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Expected final status: ok, errors: []
+
+Known limitations:
+- Minimum operating cash CNY 800,000,000 is an estimate because the annual report does not disclose a precise minimum.
+- Deposit early-withdrawal conditions and discounted-bill recourse details are not disclosed item by item.
+- Market data is the task input snapshot, not a filing-period-end value.

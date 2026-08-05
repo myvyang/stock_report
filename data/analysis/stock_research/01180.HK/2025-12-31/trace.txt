@@ -1,0 +1,58 @@
+stock-research trace
+company: 01180.HK Paradise Entertainment Limited
+period: 2025-12-31 annual
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse audit
+- config/input.json present.
+- No annual facts, normalized facts, raw filing, or prior stock-research result existed for 01180.HK/2025-12-31.
+- Downloaded official HKEX annual report to stock_report/data/raw/filings/01180.HK/2025-12-31/annual-report-2025.pdf.
+- Extracted searchable text to annual-report-2025.txt using pypdf in temporary venv /tmp/stock-research-pdf.
+
+3. Model verification
+- Input hint financial_brokerage rejected.
+- Annual report business facts show gaming equipment/system sales and leasing, discontinued casino management, and new casino advisory services.
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Transition handling: discontinued casino management results excluded from sustainable cash profit.
+
+4. Core source locations
+- Business/profile and cessation: annual report PDF pp.4-7.
+- MD&A and reported revenue/profit: PDF pp.7-21.
+- Consolidated statements: PDF pp.87-93.
+- Revenue/segment/customer data: notes 5-6, PDF pp.108-113.
+- Dividend: note 12, PDF p.119, and MD&A p.16.
+- Discontinued operation: note 13, PDF pp.120-122.
+- Cash/debt/security details: MD&A pp.18-22 and note 40, PDF pp.143-145.
+
+5. Currency normalization
+- Filing currency: HKD; output currency: CNY.
+- Conversion rate: 1 HKD = 0.90322 CNY, CFETS/PBOC middle rate dated 2025-12-31, publicly reproduced at https://finance.sina.com.cn/jjxw/2025-12-31/doc-inhervyw3857837.shtml.
+- All filing amounts multiplied by 0.90322; market cap retained as supplied in input.
+
+6. Key calculations
+- Total revenue: (HK$201.245m continuing + HK$633.109m discontinued) * 0.90322 = CNY753,605,219.88.
+- Total gross profit: (HK$152.291m + HK$294.370m) * 0.90322 = CNY403,433,148.42.
+- Gross margin: 446.661 / 834.354 = 53.5338%.
+- Parent net margin: 141.539 / 834.354 = 16.9639%.
+- Operating FCF: (HK$253.478m CFO - HK$11.916m PPE purchases) * 0.90322 = CNY218,183,629.64.
+- Continuing CFO inference: HK$253.478m consolidated CFO - HK$263.836m disclosed discontinued-operation CFO = negative HK$10.358m.
+- Discounted detachable net cash: [HK$378.122m cash * 70% - HK$106.966m interest-bearing debt - HK$13.410m lease liabilities] * 0.90322 = CNY130,343,136.27.
+- Operating business price: CNY905,199,061.7161989 market cap - CNY130,343,136.27 = CNY774,855,925.4461989.
+- Sustainable cash profit: 0; payback years and market-cap/cash-profit left null.
+- 2025 dividend: HK$105.219m * 0.90322 = CNY95,035,905.18; / supplied market cap = 10.4989%.
+
+7. Protocol usage
+- Initialized outputs/result.json with protocol CLI init.
+- Populated scalar and list fields only through protocol CLI set/append.
+- Final validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json.
+
+8. Data limitations
+- Continuing operations have no standalone cash-flow statement; continuing CFO is inferred by subtraction.
+- 2025 dividend basis combines the paid interim dividend and the final dividend proposed in the annual report; it is not a claim of future sustainability.
+- Input PE TTM contains discontinued earnings and is not a standalone valuation of continuing operations.

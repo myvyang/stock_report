@@ -1,0 +1,54 @@
+task: stock research 08616.HK
+generated_at_input: 2026-08-04T12:52:17+08:00
+input_period: 2025-12-31
+actual_financial_period_used: year ended 2026-03-31
+
+1. Read instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No annual facts, normalized facts, raw filing metadata, or prior stock research result for 08616.HK existed under /workspace/stock_report.
+- No matching long-term files were found under the configured /root/aicode sync target.
+- Returned to primary public filing.
+
+3. Primary sources and extraction
+- HKEX title search identified Annual Report 2025/26, released 2026-06-26.
+- Filing URL: https://www1.hkexnews.hk/listedco/listconews/gem/2026/0626/2026062601949.pdf
+- Used audited consolidated statements on pages 85-90 and notes/business review on pages 5-12 and 109-128.
+- Market cap, date, source, and PE TTM were reused from config/input.json as instructed.
+
+4. Model determination
+- Overrode input hint financial_brokerage.
+- Confirmed business is building protection contracting and product supply.
+- Selected construction_project because revenue is recognized over project progress; projects normally run 1-4 years; contract assets, retention receivables, contract liabilities, and project working capital are economically central.
+- Selected requires_special_model. All ordinary owner-earnback sorting fields remain null.
+
+5. Currency normalization
+- Filing currency: HKD thousands.
+- Result contract currency: CNY yuan.
+- Applied approximate conversion 1 HKD = 0.91 CNY to all filing-derived absolute monetary fields.
+- Margins were calculated from original HKD values, so exchange conversion does not affect ratios.
+- Exact 2026-03-31 historical HKD/CNY fixing was not obtained; recorded as a limitation.
+
+6. Core calculations
+- gross_margin = 54,278 / 177,479 = 0.3058281834
+- net_margin = 4,228 / 177,479 = 0.0238203990
+- operating_profit proxy = profit before tax 6,033 + finance costs 702 = HKD 6,735 thousand
+- operating_free_cash_flow = operating cash flow 33,319 - property/equipment purchases 3,211 = HKD 30,108 thousand
+- forecast_cash_dividend = 0 because FY2025 and FY2026 paid/proposed dividends were nil
+- forecast_dividend_yield = 0 / 56,779,800.29582977 = 0
+
+7. Protocol usage
+- Initialized outputs/result.json using protocol CLI init.
+- Populated fields using protocol CLI set and append; did not hand-write the JSON object.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors []
+
+8. Known limitations
+- Input period is 2025-12-31, but the issuer's statutory year-end is 31 March. Latest audited FY2026 statements are used and the mismatch is disclosed.
+- HKD-to-CNY conversion is approximate.
+- Tencent market data was not independently reconstructed from share count or exchange rate.

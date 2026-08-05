@@ -1,0 +1,55 @@
+UTMD stock-research trace
+generated_at=2026-08-04 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- Paths specified for annual facts, normalized facts and raw filing did not exist in /workspace.
+- No prior stock-research output was available; research returned to the official filing.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initialization succeeded. Subsequent structured updates were made with protocol set commands.
+
+4. Primary filing
+- SEC Form 10-K filed 2026-03-27, accession 0001096906-26-000395:
+  https://www.sec.gov/Archives/edgar/data/706698/000109690626000395/utmd-20251231_10k.htm
+- Used audited balance sheet, income statement, cash flow statement, revenue/product tables, liquidity discussion, commitments and risk disclosures.
+
+5. Other official sources
+- Federal Reserve H.10 daily USD/CNY rate, 2025-12-31: 7.1875 CNY/USD.
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- UTMD official/SEC dividend disclosures: quarterly dividend $0.310 per share in 2026.
+  https://www.utahmed.com/press-releases.html
+- Market cap CNY 1,515,178,677.6686096, date 2026-08-03, PE TTM 21.5: supplied input, source Yahoo Finance yfinance.
+
+6. Currency conversion
+- All filing amounts converted from USD to CNY at 7.1875. Filing tables are in USD thousands.
+- Market cap was already supplied as a CNY absolute amount and was not reconverted.
+
+7. Owner earnback calculations
+- Reported cash: USD 85.756m = CNY 616.372m.
+- Cash haircut: 15%, reflecting operating buffer, cross-border/tax and capital-allocation uncertainty.
+- Discounted cash less all reported liabilities: 616.372m * 85% - 23.532m = CNY 500.384m.
+- Operating business price: 1,515.179m - 500.384m = CNY 1,014.795m.
+- Operating FCF: (USD 14.692m CFO - USD 0.371m capex) * 7.1875 = CNY 102.932m.
+- Less after-tax cash interest/dividend income: USD 2.808m * 80% * 7.1875 = CNY 16.143m.
+- Less net working-capital release: USD 0.317m * 7.1875 = CNY 2.278m.
+- Less stock compensation: USD 0.373m * 7.1875 = CNY 2.681m.
+- Discounted sustainable cash profit: CNY 81.830m.
+- Owner earnback: 1,014.795m / 81.830m = 12.401 years.
+- Market cap/cash profit: 1,515.179m / 81.830m = 18.517 years.
+
+8. Dividend forecast
+- Shares: 3,185,025 (10-K, 2026-03-26).
+- Annualized dividend: $0.310 * 4 = $1.24/share.
+- Forecast: 3,185,025 * $1.24 * 7.1875 = CNY 28.383m.
+- Yield: CNY 28.383m / CNY 1,515.179m = 1.873%.
+
+9. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}

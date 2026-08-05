@@ -1,0 +1,59 @@
+stock-research trace
+company: 普洛药业 (000739.SZ)
+period: 2025-12-31 annual
+generated_for: 2026-07-31 task
+
+1. Read instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- Expected annual facts paths and prior stock-research outputs did not exist in /workspace.
+- No local 2025 facts package was available, so primary filing retrieval was required.
+
+3. Primary sources
+- Full annual report: https://static.cninfo.com.cn/finalpage/2026-03-20/1225019234.PDF
+- Local copy: stock_report/data/raw/filings/000739.SZ/2025-12-31/annual_report_2025.pdf
+- Filing publisher: CNINFO / 巨潮资讯; published 2026-03-20.
+- Market snapshot was supplied in config/input.json: Tencent qt.gtimg.cn, 2026-07-31 11:43:00, market cap CNY 23,343,000,000, PE TTM 26.19.
+- pdftotext was unavailable. Filing facts were read from the web parser's page/line extraction and checked across summary tables and audited statements.
+
+4. Model determination
+- Confirmed ordinary_operating / applicable.
+- Basis: manufacturer and R&D service provider whose balance sheet consists of ordinary cash, receivables, inventory, production assets, trade payables and borrowings. No special financial, property-development, concession or holding-company structure was identified.
+
+5. Key filing facts (CNY)
+- Revenue 9,783,600,915.27; cost of sales 7,204,943,429.04; gross profit calculated 2,578,657,486.23.
+- Operating profit 1,070,863,560.26; net profit 890,681,701.93; parent net profit 890,677,997.16; recurring parent profit 769,277,165.57.
+- Total assets 12,318,263,291.99; total liabilities 5,971,914,136.16; total equity 6,346,349,155.83; parent equity 6,338,427,056.50; minority interest 7,922,099.33.
+- Operating cash flow 1,220,201,280.75; capital expenditure 386,214,539.82; operating FCF calculated 833,986,740.93.
+- Cash and cash equivalents 2,924,290,064.23; total monetary cash 3,786,431,020.05.
+- Interest-bearing debt definition: short-term borrowings 1,026,696,131.96 + current non-current liabilities 42,362,674.11 + long-term borrowings 468,299,858.33 + lease liabilities 18,914,675.40 = 1,556,273,339.80. This is conservative because current maturities may include some leases and the entire line was treated as debt.
+- Dividend proposal 267,966,883.68; 2.38 yuan per 10 shares based on 1,125,911,276 shares.
+
+6. Calculations
+- Gross margin = (revenue - cost) / revenue = 0.2635693655702264.
+- Net margin = parent net profit / revenue = 0.09103785046769967.
+- Operating FCF = OCF - capex = 833,986,740.93.
+- Discounted cash = cash equivalents * 0.90 = 2,631,861,057.807.
+- Discounted detachable net cash = discounted cash - interest-bearing debt = 1,075,587,718.007.
+- Discounted sustainable cash profit = operating FCF * 0.90 = 750,588,066.837.
+- Operating business price = market cap - discounted net cash = 22,267,412,281.993.
+- Owner earnback years = operating business price / discounted cash profit = 29.666621767421006.
+- Market cap / cash profit = 31.099615130264564.
+- Forecast dividend yield = 267,966,883.68 / 23,343,000,000 = 0.011479539205757614.
+
+7. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated the initialized object through repeated protocol set commands; the complex result object was not handwritten from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+
+8. Limitations
+- Balance-sheet inputs are at 2025-12-31 while market cap is at 2026-07-31.
+- Sustainable cash profit is a discounted single-year FCF, not a complete-cycle average.
+- Forecast dividend yield includes the year-end proposal only; it excludes assumptions about future interim dividends and does not treat buybacks as cash dividends.

@@ -1,0 +1,86 @@
+STRA stock-research trace
+generated_at: 2026-08-04 Asia/Shanghai
+period: 2025-12-31 annual
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated individual paths using protocol set commands; the result object was not handwritten from scratch.
+3. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse audit]
+- Expected annual facts, normalized facts, raw filing metadata, and prior stock-research outputs were absent under the paths in config/input.json.
+- Only stock_report/data/notes/user_stock_evaluations.md existed and contained no reusable STRA annual facts.
+- Therefore primary sources were retrieved for this task.
+
+[primary sources]
+- SEC 2025 Form 10-K, filed 2026-02-27:
+  https://www.sec.gov/Archives/edgar/data/1013934/000101393426000006/stra-20251231.htm
+- SEC Companyfacts XBRL:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0001013934.json
+- SEC 2025 results / dividend release:
+  https://www.sec.gov/Archives/edgar/data/1013934/000101393426000002/stra-20260226xexhibit991.htm
+- Strategic Education dividend history:
+  https://sei.strategiceducation.com/about/investor-relations/stock-information/dividends/default.aspx
+- Federal Reserve H.10 series via FRED, DEXCHUS (CNY per USD):
+  https://fred.stlouisfed.org/graph/fredgraph.csv?id=DEXCHUS&cosd=2025-01-01&coed=2025-12-31
+- Market capitalization and PE TTM: config/input.json, source recorded there as Yahoo Finance yfinance.
+
+[model decision]
+- statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+- Evidence: revenue comes from tuition, subscriptions and employer education services. No customer deposits, insurance reserves, development inventory, concession rights or project finance structure. 2025 year-end debt was zero.
+- Contract and lease liabilities remain operating obligations; cash supporting operations was not assumed fully detachable.
+
+[FX]
+- 250 valid DEXCHUS daily observations in 2025.
+- Arithmetic mean: 7.1875432 CNY/USD, used for income statement, cash flow and forecast dividend.
+- 2025-12-31: 6.9931 CNY/USD, used for balance-sheet and net-cash amounts.
+- Input market capitalization was already stated in CNY and was not reconverted.
+
+[reported USD facts; USD thousands unless noted]
+- Revenue 1,268,220; instructional and support costs 647,111; derived gross profit 621,109.
+- Operating income 174,231; net income attributable to parent 126,614.
+- Operating cash flow 198,198; purchases of PP&E 44,252; derived operating FCF 153,946.
+- Financing cash flow -206,155; dividends 57,543; repurchases 138,892.
+- Assets 2,038,540; liabilities 392,134; parent equity 1,646,406; minority interest 0.
+- Cash 140,757; current securities 7,297; non-current securities 5,000; restricted cash 8,254.
+- Tuition receivable current 78,202 and non-current 6,217.
+- PP&E 107,373; lease ROU asset 91,140; goodwill 1,242,413; intangibles 249,243.
+- Accounts payable/accruals 105,791; contract liabilities current 96,247 and long-term 35,577; lease liabilities current 15,905 and long-term 93,216.
+- Segment revenue: USHE 868,239; ANZ 251,584; ETS 148,397.
+- Adjusted segment operating income: USHE 101,872; ANZ 35,454; ETS 58,814; total 196,140, before restructuring 21,909.
+
+[derived CNY financials]
+- Gross profit = (1,268,220 - 647,111) * 1,000 * 7.1875432 = 4,464,247,769.41.
+- Gross margin = 621,109 / 1,268,220 = 0.4897486241.
+- Net margin = 126,614 / 1,268,220 = 0.0998359906.
+- Operating FCF = (198,198 - 44,252) * 1,000 * 7.1875432 = 1,106,493,525.47.
+- Balance sheet identity after translation: assets 14,255,714,074.00 = liabilities 2,742,232,275.40 + equity 11,513,481,798.60.
+
+[owner earnback]
+- Detachable net cash USD = cash 140.757m + securities 12.297m - operating reserve 50.000m = 103.054m.
+- Restricted cash 8.254m excluded. No interest-bearing debt deduction because year-end debt was zero.
+- Discounted detachable net cash = 103.054m * 6.9931 = CNY 720,666,927.40.
+- Base FCF = CNY 1,106,493,525.47.
+- Tax-effected stock compensation disclosed by company = USD 16.942m; deduction = CNY 121,771,356.89.
+- Sustainable cash profit = (USD 153.946m - USD 16.942m) * 90% * 7.1875432 = CNY 886,249,951.72.
+- Operating business price = 12,577,544,133.994995 - 720,666,927.40 = CNY 11,856,877,206.59.
+- Owner earnback years = 11,856,877,206.59 / 886,249,951.72 = 13.3787056165.
+- Market cap / cash profit = 12,577,544,133.994995 / 886,249,951.72 = 14.1918700358.
+- Net cash / market cap = 720,666,927.40 / 12,577,544,133.994995 = 0.0572979049.
+
+[dividend]
+- 2025 and first two declared 2026 quarterly dividends were USD 0.60/share.
+- Annualized dividend per share assumption = USD 2.40.
+- Shares outstanding at 2026-01-30 = 22,730,391.
+- Forecast cash dividend = 22,730,391 * 2.40 * 7.1875432 = CNY 392,101,601.44.
+- Forecast yield = 392,101,601.44 / 12,577,544,133.994995 = 0.0311747347.
+- This is an annualization assumption, not a board commitment.
+
+[quality checks]
+- SEC statement values cross-checked against Companyfacts where standard XBRL tags existed.
+- Segment revenues sum to consolidated revenue; adjusted segment profits sum to adjusted consolidated operating income.
+- Asset categories and liability categories sum to their translated totals (subject to displayed rounding).
+- All protocol formula checks passed.
+- No buy/sell recommendation, target price, ranking label, or unsupported certainty included.

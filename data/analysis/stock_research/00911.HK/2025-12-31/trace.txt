@@ -1,0 +1,60 @@
+2026-08-03T13:34:41+08:00 INIT
+- Read config/input.json.
+- Initialized outputs/result.json with protocol CLI:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+LOCAL REUSE CHECK
+- Expected raw filing, annual facts, normalized facts, and prior research paths did not exist in /workspace.
+- No prior company-specific conclusion was reused.
+
+PRIMARY SOURCES
+- HKEX 2025 Annual Report, released 2026-04-29:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042902040.pdf
+- HKEX 2025 Annual Results Announcement, released 2026-03-18:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0318/2026031801530.pdf
+- CFETS/PBOC central parity for 2025-12-31, surfaced through SAFE historical exchange-rate entry: 1 HKD = 0.90322 CNY.
+  https://www.safe.gov.cn/safe/rmbhlzjj/
+- Market cap and PE TTM were supplied by config/input.json from Tencent qt.gtimg.cn at 2026-07-31 16:08:47.
+
+MODEL REVIEW
+- Input hint: financial_brokerage / requires_special_model.
+- Filing fact: group principally sells electronic components, healthcare products and food; revenue is recognized when goods are supplied.
+- No brokerage customer funds, proprietary financial assets, repo financing, investment banking, brokerage, or asset-management operations were found.
+- Override: ordinary_operating / applicable.
+
+NORMALIZATION
+- Filing currency: HKD; output contract currency: CNY.
+- Conversion rate: 0.90322 CNY per HKD, applied to all statement amounts.
+- Market cap was already supplied in CNY and was not converted again.
+
+KEY REPORTED FACTS (HKD'000)
+- Revenue 677,121; cost of sales 653,523; gross profit 23,598; parent net profit 5,941.
+- Total assets 408,386; total liabilities 17,186; total equity/parent equity 391,200.
+- Cash 61,385; net trade receivables 222,670; inventory 54,855; inventory prepayments 49,021; PPE 19,649.
+- Operating cash flow 38,312; capex 14; operating free cash flow 38,298; financing cash flow -648.
+- No dividend for 2025 or 2024.
+- Largest/five largest customer shares: 69%/92%; largest/five largest supplier shares: 26%/90%.
+
+FORMULAS AND JUDGMENT
+- Gross margin = 23,598 / 677,121 = 3.4850%.
+- Net margin = 5,941 / 677,121 = 0.8774%.
+- Cash-profit proxy before haircut = parent profit + depreciation - capex
+  = (5,941 + 1,519 - 14) HKD'000 = 6.725 million CNY after FX.
+- Sustainable cash profit = proxy x 50% = CNY 3,362,688.06.
+- Detachable cash = (cash - HKD 10m operating buffer) x 80% x FX
+  = CNY 37,129,567.76.
+- Operating business price = market cap - discounted detachable cash
+  = CNY 51,791,040.70.
+- Owner earnback years = operating business price / sustainable cash profit = 15.4017.
+- Market cap / sustainable cash profit = 26.4433.
+- Haircuts reflect low gross margin, 69% largest-customer concentration, rapid receivable growth, and OCF driven mainly by inventory reduction. These are research judgments, not reported facts.
+
+OUTPUT CONSTRUCTION
+- outputs/result.json was initialized and populated through protocol CLI set commands; it was not authored as a complex JSON object from scratch.
+- outputs/report.md explains business, statements, cash conversion, owner earnback, and falsifiers without buy/sell advice.
+- Final validation command and result are appended below.
+
+VALIDATION
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}
+- Additional parse check: python3 -m json.tool outputs/result.json succeeded.

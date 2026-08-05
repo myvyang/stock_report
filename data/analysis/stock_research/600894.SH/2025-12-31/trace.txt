@@ -1,51 +1,58 @@
-stock-research trace for 600894.SH / 广日股份 / 2025 annual
+stock-research trace: 600894.SH / 广日股份 / 2025 annual
 
-Run context:
-- Input file: config/input.json.
-- Required outputs: outputs/result.json, outputs/report.md, outputs/trace.txt.
-- Current run created_at: 2026-07-28T18:13:05+08:00.
+Run context
+- Input: config/input.json
+- Required outputs: outputs/result.json, outputs/report.md, outputs/trace.txt
+- Input created_at: 2026-07-31T15:04:13+08:00
 
-Protocol and contracts:
-- Read .agents/skills/stock-research/SKILL.md.
-- Read .agents/skills/stock-research/references/result-contract.md.
-- Read .agents/skills/stock-research/references/report-contract.md.
-- Read .agents/skills/stock-research/references/data-reuse.md to apply reuse boundary.
+Skill and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely as requested.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
 - Initialized outputs/result.json with:
   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- Populated major result sections through protocol set commands, using structured JSON loaded from existing fact/research artifacts rather than hand-writing a complex JSON object from scratch.
+- Populated structured sections with protocol set commands. The complex result was not handwritten from scratch.
 
-Sources reused:
-- config/input.json for company identity and market cap 6,464,000,000 yuan. The current input has market_cap.date empty and pe_ttm null.
-- stock_report/data/analysis/annual_review/600894.SH/2025-12-31/facts.json for 2025 annual financial statements, business segments, asset/liability categories and annual report evidence.
-- stock_report/data/analysis/annual_review/600894.SH/2025-12-31/annual_facts.md for narrative cross-check.
-- stock_report/data/analysis/annual_review/600894.SH/2025-12-31/extraction_trace.txt for annual-report page references and prior owner_earnback calculation summary.
-- stock_report/data/analysis/stock_research/600894.SH/2025-12-31/result.json and report.md as prior stock-research material. Reused owner_earnback figures, business/risk framing and source checks, while adapting fields to the current result contract.
+Sources and reuse
+- Primary filing: stock_report/data/raw/filings/600894.SH/2025-12-31/600894_2025_annual_report.pdf
+- Filing text: stock_report/data/raw/filings/600894.SH/2025-12-31/600894_2025_annual_report.txt
+- Filing metadata: stock_report/data/raw/filings/600894.SH/2025-12-31/metadata.json
+- Annual facts: stock_report/data/analysis/annual_review/600894.SH/2025-12-31/facts.json
+- Annual narrative cross-check: stock_report/data/analysis/annual_review/600894.SH/2025-12-31/annual_facts.md
+- Existing stock-research result/report were inspected only as reusable historical research. The old result failed the current protocol because analysis_model was absent. Financial and owner-earnback components were retained only where supported by the annual facts, then migrated with protocol set and recalculated for the current market snapshot.
+- Market snapshot: config/input.json, market cap CNY 6,659,000,000, timestamp 20260731114325, source Tencent qt.gtimg.cn, PE TTM 9.36.
 
-Market data handling:
-- Current config/input.json does not include a market-cap date.
-- The same stock_report owner_earnback snapshot in the prior stock_research trace records 2026-07-24; outputs/result.json uses 2026-07-24 with this limitation disclosed.
-- PE TTM is set to 9.3775, displayed as 9.38, by formula 6,464,000,000 / 689,310,453.92 using 2025 parent net profit as the trailing annual profit proxy.
+Analysis-model decision
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable from filing facts.
+- Consolidated operations are elevator equipment, components, installation, maintenance and logistics; balance sheet structure is ordinary manufacturing/service rather than a special financial, property-development, concession or pure holding-company model.
+- Material equity investments are handled separately: they are not detachable cash, while their actual cash distributions may enter sustainable cash profit with a haircut.
 
-Key calculations:
+Core statement calculations
 - Gross margin = 1,127,858,025.66 / 7,245,603,231.30 = 0.15566102499068815.
-- Net margin = 689,310,453.92 / 7,245,603,231.30 = 0.09513499869027806.
-- Discounted detachable net cash reused from prior owner_earnback result = 2,798,660,754.635.
-- Operating business price = 6,464,000,000 - 2,798,660,754.635 = 3,665,339,245.365.
-- Discounted sustainable cash profit reused from prior owner_earnback result = 533,193,750.3675.
-- Owner earnback years = 3,665,339,245.365 / 533,193,750.3675 = 6.874310216199442.
-- Market cap to cash profit = 6,464,000,000 / 533,193,750.3675 = 12.123172853291573.
-- Forecast cash dividend uses the disclosed 2025 cash dividend amount = 425,839,181.00 yuan.
-- Forecast dividend yield = 425,839,181.00 / 6,464,000,000 = 0.06587858616955446.
+- Parent net margin = 689,310,453.92 / 7,245,603,231.30 = 0.09513499869027806.
+- Operating free cash flow = 350,669,162.04 - 197,731,093.62 = 152,938,068.42.
+- Input PE TTM is retained as 9.36. Static market cap / 2025 parent net profit = about 9.66; this difference is disclosed as a source-method difference.
 
-Contract adjustments:
-- asset_analysis rows from the prior result used interpretation; copied the same text to the contract-required explanation field.
-- Dividend basis changed from payout-ratio backsolve to the disclosed 2025 cash dividend amount.
-- No buy/sell advice, target price or ranking label was added.
+Owner-earnback calculations
+- Discounted detachable net cash = CNY 2,798,660,754.635.
+- Discounted sustainable cash profit = CNY 533,193,750.3675.
+- Operating business price = 6,659,000,000 - 2,798,660,754.635 = CNY 3,860,339,245.365.
+- Owner earnback years = 3,860,339,245.365 / 533,193,750.3675 = 7.240030931916003.
+- Market cap / cash profit = 6,659,000,000 / 533,193,750.3675 = 12.488893569008136.
+- Discounted net cash / market cap = 2,798,660,754.635 / 6,659,000,000 = 0.4202824379989488.
+- Cash-profit logic: 2025 operating FCF plus cash investment distributions, remove CNY 81,198,392.31 of interest associated with cash already deducted from market cap, then apply a 0.75 sustainability haircut.
 
-Data quality decisions:
-- Marked result complete because core sortable metrics, financial statements, business description, dividend basis, risks and evidence are filled and formulas validate.
-- Limitations retained: current input market date is blank; other asset/liability categories are partly reverse-calculated; cash deposit term and group transfer restrictions are not fully disclosed; necessary operating cash is an owner_earnback estimate; maintenance/growth capex split is not disclosed; future Hitachi Elevator dividend policy is not guaranteed by public filings; dividend yield is estimated from the disclosed 2025 cash dividend amount, not company guidance.
+Dividend calculation
+- Reference cash dividend from 2025 annual report = CNY 425,839,181.
+- Forecast dividend yield = 425,839,181 / 6,659,000,000 = 0.0639494189818291.
+- This is an estimate using the disclosed 2025 dividend amount, not 2026 company guidance.
 
-Validation:
-- Ran PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json.
-- Validation status: ok; errors: [].
+Quality and limitations
+- data_quality.status=complete; incomplete_reasons=[].
+- Important limitations retained in result.json: deposit terms and group transfer restrictions are not fully disclosed; necessary operating cash is an analytical estimate; maintenance/growth capex is not split; future affiliate dividends cannot be guaranteed; some residual asset/liability categories are reverse-calculated.
+- No buy/sell advice, target price, ranking label, or unsupported certainty was added.
+
+Validation
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed-result validation: status ok, errors [].
+- Final validation and consistency checks performed after writing all outputs.

@@ -1,0 +1,69 @@
+Stock research trace — AGO — period 2025-12-31
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Read instructions and contracts
+   - /workspace/AGENTS.md (provided in task context)
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized the protocol result
+   Command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+   - Checked the configured annual_review, normalized facts, raw filing, and prior stock_research paths.
+   - No reusable AGO 2025 facts package or prior research output existed locally.
+   - Returned to primary filing sources.
+
+4. Primary sources acquired and reviewed
+   - SEC Form 10-K HTML:
+     https://www.sec.gov/Archives/edgar/data/1273813/000127381326000011/ago-20251231.htm
+     Local copy: stock_report/data/raw/filings/AGO/2025-12-31/ago-20251231.htm
+     Filing date: 2026-02-27; accession: 0001273813-26-000011.
+   - SEC Company Facts XBRL API for CIK 0001273813, used to cross-check consolidated statement values.
+   - Assured Guaranty FY2025 results release dated 2026-02-26.
+   - Assured Guaranty dividend declarations dated 2026-02-20 and 2026-05-01.
+   - Federal Reserve H.10 USD/CNY data: 2025-12 monthly average 7.0432 CNY per USD.
+   - Market cap and PE were preserved from config/input.json: CNY 24,718,230,728.23755 on 2026-08-03; PE TTM 9.475373; Yahoo Finance yfinance.
+
+5. Model determination
+   - Overrode input hint ordinary_operating/applicable.
+   - Confirmed financial_insurance/not_applicable.
+   - Reason: investments and cash support claims, insurance obligations, regulatory capital and ratings; unearned premium and loss reserves are integral operating liabilities. They cannot be treated as detachable net cash.
+   - Consequently kept discounted net cash, discounted cash profit, operating business price, owner earnback years, and market-cap-to-cash-profit null.
+
+6. Key source facts captured (USD unless stated)
+   - Total assets 12,176m; liabilities 6,387m; total equity 5,789m; parent equity 5,663m.
+   - Revenue 1,110m; total net income 543m; parent net income 503m.
+   - Net earned premiums 380m; net investment income 359m; equity in investee earnings 102m.
+   - Operating cash flow 259m; financing cash flow -616m; dividends 68m; buybacks 500m.
+   - Investments 8,487m; cash 388m; premium receivables 1,572m; salvage/subrogation recoverable 449m.
+   - Unearned premium reserve 3,625m; loss/LAE reserve 309m; long-term debt 1,704m.
+   - Adjusted operating income 445m; GWP 256m; PVP 286m; gross par written 32,916m.
+   - Net par outstanding 277.1bn; BIG 8.8bn / 3.2%; over-20-year expected amortization bucket 69.2bn.
+   - 2025 U.S. primary insured municipal par share approximately 58%; all-municipal issuance penetration 4.4%.
+   - 2026 quarterly dividend 0.38/share; forecast annual dividend calculated at 1.52/share using 45,184,791 year-end shares.
+
+7. Currency conversion
+   - Protocol requires absolute CNY yuan.
+   - Converted filing USD amounts at 7.0432 CNY/USD for consistent presentation.
+   - Market cap was not reconverted because input already supplies it in protocol currency.
+   - Forecast dividend: USD 0.38 × 4 × 45,184,791 × 7.0432 = CNY 483,733,190.36.
+   - Forecast dividend yield: 483,733,190.36 / 24,718,230,728.23755 = 0.0195698954.
+
+8. Result construction
+   - All JSON fields were populated through protocol CLI `set` and `append` operations using /tmp/populate_ago_result.sh.
+   - The complex result object was not hand-written from scratch.
+
+9. Validation
+   Command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[].
+
+10. Known limitations
+   - CNY conversions use one monthly average rate for comparable display, not transaction-date historical rates.
+   - Valuation date is later than the financial statement date.
+   - Gross margin, net margin, capex-based free cash flow and ordinary owner-earnback metrics are economically non-comparable for this insurance model and remain null.
+   - The January 2026 acquisition of Assured Life Re is subsequent to the reporting period; full annuity reinsurance economics are not in 2025 statements.

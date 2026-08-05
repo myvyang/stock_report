@@ -1,0 +1,84 @@
+task=PUK annual 2025-12-31
+generated_at=2026-08-04T23:49:55+08:00
+
+[protocol]
+read .agents/skills/stock-research/SKILL.md
+read .agents/skills/stock-research/references/result-contract.md
+read .agents/skills/stock-research/references/report-contract.md
+read .agents/skills/stock-research/references/data-reuse.md
+initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+populated fields only through protocol set commands in a temporary helper script; helper removed after successful population
+
+[reuse audit]
+No existing raw filing, annual facts package, normalized facts, or prior stock-research output was present under the input-declared PUK paths.
+Downloaded the official Prudential plc Annual Report 2025 PDF to /tmp/puk_research/ar2025.pdf for local reference; the environment lacked pdftotext, so the searchable official annual report/20-F and FY2025 release were used for extraction.
+
+[identity and model]
+Resolved PUK as Prudential plc ADR, not the unrelated US company Prudential Financial, Inc.
+Overrode input hint ordinary_operating/applicable.
+Final model: financial_insurance / requires_special_model.
+Reason: 2025 insurance contract liabilities were USD174.498bn against total liabilities of USD190.835bn. Investments and cash substantially support policyholder liabilities and regulatory capital, so detachable net cash and ordinary cash-profit payback are economically invalid.
+
+[official sources]
+1. Prudential plc Annual Report 2025:
+   https://www.prudentialplc.com/content/dam/prudential-plc/investor/results-and-reports/lastest-annual-report/prudential-plc-ar-2025.pdf.coredownload.inline.pdf
+2. Prudential plc 2025 Form 20-F:
+   https://www.prudentialplc.com/content/dam/prudential-plc/investor/results-and-reports/all-reports/2025/Prudential%20plc%202025%20Form%2020-F.pdf
+3. Prudential plc FY2025 results release, published 2026-03-18:
+   https://www.prudentialplc.com/en/newsroom/company-news/2026/prudential-plc-2025-full-year-results.coredownload.inline.pdf/
+4. Prudential plc dividend information:
+   https://www.prudentialplc.com/en/investors/shareholder-centre/dividend-information/
+5. Market snapshot supplied in config/input.json: Yahoo Finance yfinance, dated 2026-08-03.
+
+[extracted USD facts]
+Balance sheet at 2025-12-31, USDm:
+  total assets 212195
+  total liabilities 190835
+  total equity 21360
+  shareholders' equity 20117
+  non-controlling interests 1243
+  debt securities 92051
+  equity securities and collective investment schemes 89558
+  cash and cash equivalents 7706
+  insurance contract liabilities 174498
+  core structural borrowings 4459
+  operational borrowings 831
+  investment contract liabilities without DPF 715
+Income/results, USDm:
+  IFRS profit after tax 4119
+  profit attributable to shareholders 3978
+  adjusted operating profit before tax 3306
+  adjusted operating profit after tax 2772
+  new business profit 2782
+  operating free surplus generated 3059
+  Group TEV equity 37803
+Capital and operating facts:
+  free surplus ratio 221%
+  GWS shareholder surplus over GPCR USD17.1bn; cover ratio 262%
+  APE sales USD6.661bn; life weighted premium income USD28.106bn
+  new business margin 42%; Eastspring FUM/advice USD277.7bn
+  2025 dividend USD0.2660 per ordinary share
+
+[CNY conversion]
+Protocol requires CNY absolute yuan. Applied:
+  balance sheet: 7.1884 CNY/USD
+  income statement and 2025 historical cash dividend: 7.1429 CNY/USD
+  static forecast dividend: 7.14 CNY/USD
+  2024 historical cash dividend: approximately 7.1986 CNY/USD
+The input did not provide a verifiable FX source; this is disclosed as a limitation. Original USD facts remain above for reproduction.
+
+[dividend forecast]
+Estimated year-end ordinary shares = USD37.803bn TEV equity / USD14.83 TEV equity per share = approximately 2.549bn shares.
+Static dividend = 2.549bn * USD0.266 = approximately USD678m.
+CNY forecast cash dividend = approximately CNY4.841bn.
+Forecast yield = CNY4.841bn / CNY253.974bn = 1.9062%.
+This is a no-growth baseline, not management guidance.
+
+[null fields]
+Kept revenue, gross profit/margin, operating cash flow, capex, operating FCF, discounted net cash, discounted cash profit, operating business price, owner earnback years, and market-cap/cash-profit null because ordinary operating-company definitions are not economically comparable for an insurer.
+
+[validation]
+Ran:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Result before report handoff: status=ok, errors=[]

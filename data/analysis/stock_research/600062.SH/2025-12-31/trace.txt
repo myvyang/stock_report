@@ -1,0 +1,105 @@
+stock-research trace
+company=600062.SH 华润双鹤
+period=2025-12-31
+generated_for=2026-07-31
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Read references/data-reuse.md because the skill routes reuse decisions there.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields only through protocol CLI `set`.
+6. Validated with protocol CLI; final expected status: ok.
+
+[local data audit]
+- config/input.json exists.
+- stock_report/data/analysis/annual_review/600062.SH/2025-12-31 does not exist.
+- stock_report/data/raw/filings/600062.SH/2025-12-31 does not exist.
+- stock_report/data/normalized/facts/600062.SH/2025-12-31 does not exist.
+- No prior stock_research result exists for this period.
+- Therefore no annual facts package or historical research could be reused.
+
+[primary sources]
+1. 华润双鹤药业股份有限公司2025年年度报告
+   URL: https://static.cninfo.com.cn/finalpage/2026-03-20/1225018795.PDF
+   Published: 2026-03-20
+   Used for: business, industry position, segment revenue/margins, three statements,
+   assets/liabilities, restricted cash, impairments, customer concentration.
+2. 华润双鹤药业股份有限公司2025年年度权益分派实施公告
+   URL: https://paper.cnstock.com/html/2026-07/22/content_2247320.htm
+   Used for: annual dividend 393,622,771.67 yuan at 0.379 yuan/share.
+3. Input market snapshot
+   Source: Tencent qt.gtimg.cn
+   Timestamp: 2026-07-31 11:43:37
+   Used for: market cap 16,742,000,000 yuan and PE TTM 10.3.
+
+[model decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Drug manufacturing/sales business with conventional receivables, inventory,
+plants, intangible assets and borrowings. No customer deposits, insurance reserves,
+regulated presale cash, concession rights or similar special statement structure.
+
+[core calculations]
+gross_profit = 11,000,795,324.94 - 4,618,797,557.93
+             = 6,381,997,767.01
+gross_margin = 6,381,997,767.01 / 11,000,795,324.94
+             = 0.5801396174
+net_margin = 1,646,949,551.48 / 11,000,795,324.94
+           = 0.1497118617
+
+operating_free_cash_flow = 1,489,514,452.20 - 619,632,268.59
+                         = 869,882,183.61
+discounted_cash_profit = 869,882,183.61 * 0.90
+                       = 782,893,965.249
+
+cash_equivalents_unrestricted = 1,907,768,229.98
+trading_financial_assets_discounted = 500,866,430.75 * 0.95
+                                    = 475,823,109.2125
+financing_and_lease_debt =
+  105,548,167.50 short-term borrowing
+  + 14,245,171.86 current portion of long-term borrowing
+  + 1,036,617,327.69 long-term borrowing
+  + 29,505,205.28 total lease liability
+  = 1,185,915,872.33
+discounted_detachable_net_cash =
+  1,907,768,229.98 + 475,823,109.2125 - 1,185,915,872.33
+  = 1,197,675,466.8625
+
+operating_business_price =
+  16,742,000,000 - 1,197,675,466.8625
+  = 15,544,324,533.1375
+owner_earnback_years =
+  15,544,324,533.1375 / 782,893,965.249
+  = 19.855
+market_cap_to_cash_profit =
+  16,742,000,000 / 782,893,965.249
+  = 21.385
+
+forecast_cash_dividend =
+  approximately 103,865,700.90 interim dividend
+  + 393,622,771.67 annual dividend
+  = 497,488,472.57
+forecast_dividend_yield =
+  497,488,472.57 / 16,742,000,000
+  = 0.0297145326
+
+[judgment notes]
+- Excluded receivables, notes, inventory, long-term equity investments, property,
+  goodwill, development expenditure and intangible assets from detachable cash.
+- Used cash flow statement cash equivalents rather than balance-sheet monetary funds,
+  thereby excluding 6,725,308.84 yuan restricted funds.
+- Deducted all identified borrowing and lease liabilities.
+- Used OCF less total reported capex, not accounting earnings, as cash-profit base.
+- Applied an additional 10% sustainability haircut because 2025 OCF fell 18.39%
+  and free cash flow was materially below parent net profit.
+- Dividend total includes interim plus annual distribution. Interim amount is inferred
+  from the company's disclosed full-year total and annual implementation amount and is
+  subject to minor rounding.
+
+[data quality]
+status=complete
+limitations=No local annual fact pack; market snapshot not independently recomputed;
+single-year FCF is not a full-cycle maintenance-capex estimate; interim dividend inferred
+with minor rounding.

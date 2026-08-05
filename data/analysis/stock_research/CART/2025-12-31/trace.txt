@@ -1,0 +1,59 @@
+Stock research trace: CART / Maplebear Inc. / 2025-12-31
+Generated for task timestamp: 2026-08-05T05:00:09+08:00
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the requested annual fact paths were empty and the reuse boundary was relevant.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked stock_report/data/analysis/annual_review/CART/2025-12-31, stock_report/data/raw/filings/CART/2025-12-31, and stock_report/data/normalized/facts/CART/2025-12-31.
+- No reusable annual facts, normalized facts, or filing metadata existed at task start.
+
+3. Primary sources retrieved and reviewed
+- SEC Form 10-K HTML: https://www.sec.gov/Archives/edgar/data/1579091/000157909126000018/cart-20251231.htm
+  Filing date: 2026-02-26; accession: 0001579091-26-000018.
+  Local copy: stock_report/data/raw/filings/CART/2025-12-31/cart-20251231.htm
+  Reviewed business overview, risk factors, dividend policy, MD&A, consolidated balance sheets, statements of operations, statements of cash flows, revenue recognition, marketable securities, stock compensation, preferred stock, and repurchases.
+- Federal Reserve H.10 release: https://www.federalreserve.gov/releases/h10/20260105/
+  2025-12-31 rate: 6.9931 Chinese yuan per U.S. dollar.
+- Market value and PE: config/input.json, sourced there to Yahoo Finance yfinance, snapshot date 2026-08-03.
+
+4. Model decision
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Basis: Instacart is an agency-model marketplace, advertising, and retailer software platform. It does not pre-purchase or control grocery inventory; transaction and fulfillment revenue is recognized net. No interest-bearing borrowing existed at 2025 year-end. It is not a bank, insurer, broker, property developer, construction contractor, concession utility, or investment holding company.
+
+5. Currency conversion and formulas
+- All filing amounts converted from USD to CNY at 6.9931 CNY/USD.
+- Gross margin = 2,758 / 3,742 = 0.7370390166.
+- Net margin uses income attributable to common stockholders: 438 / 3,742 = 0.1170497060.
+- Operating free cash flow = USD 971m operating cash flow - USD 61m capex = USD 910m.
+- Discounted detachable net cash:
+  70% * USD 637m unrestricted cash
+  + 90% * USD 131m marketable securities
+  + 0% * USD 190m restricted cash
+  - 100% * USD 196m Series A preferred claim
+  = USD 367.8m = CNY 2,572,062,180.
+- Sustainable cash profit begins with USD 910m operating FCF, deducts USD 352m stock compensation in full, then normalizes downward by USD 58m to USD 500m = CNY 3,496,550,000.
+- Operating business price = CNY 70,734,754,750.35059 - CNY 2,572,062,180 = CNY 68,162,692,570.350586.
+- Owner earnback years = operating business price / sustainable cash profit = 19.4942708013.
+- Market cap / cash profit = 20.2298708013.
+- Forecast dividend = zero because the company states it has never paid a cash dividend and does not expect to do so in the foreseeable future.
+
+6. Protocol construction
+- Used stock_analysis.stock_research.protocol set for analysis sources, model, metrics, financials, asset/liability rows, owner earnback breakdown, dividend, business, risks, evidence, and data quality.
+- Did not create outputs/result.json as an unvalidated handwritten object.
+
+7. Validation
+- Ran:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok
+- Final validation errors: []
+
+8. Judgment flags
+- USD 500m sustainable cash profit is an analyst normalization, not company guidance.
+- The 70% cash and 90% securities inclusion rates are conservative judgment calls reflecting working-capital needs and liquidity; restricted cash is excluded.
+- Period income and cash flow are converted at the period-end FX rate for protocol consistency, not the annual average rate.
+- Market cap and PE are taken from task input and were not independently exchange-verified.

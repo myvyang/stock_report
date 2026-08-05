@@ -1,0 +1,88 @@
+stock-research trace
+company=600312.SH 平高电气
+period=2025-12-31
+generated_for_input_created_at=2026-08-01T00:32:47+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated initialized fields using protocol set commands; no complex result JSON was created from scratch.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[reuse and source audit]
+- Declared annual facts, normalized facts, extraction trace, and prior stock research paths were absent from /workspace.
+- The external sync target /root/aicode/stock_report also contained no matching 600312.SH/2025-12-31 files.
+- Therefore fetched the official 2025 annual report from CNINFO, matching the report linked by the company's investor-relations page to SSE.
+- Official annual report URL: https://static.cninfo.com.cn/finalpage/2026-04-11/1225093676.PDF
+- Saved source: stock_report/data/raw/filings/600312.SH/2025-12-31/annual_report_2025.pdf
+- Extracted source text: stock_report/data/raw/filings/600312.SH/2025-12-31/annual_report_2025.txt
+- Company investor-relations page: https://www.pinggao.com/Investment/list.html
+- Company profile: https://www.pinggao.com/about/company.html
+- Market snapshot source was supplied by config/input.json: Tencent qt.gtimg.cn, timestamp 20260731114323.
+
+[model determination]
+- Confirmed statement_model=ordinary_operating.
+- Company manufactures and directly sells power transmission/distribution switchgear and provides lifecycle service.
+- Receivables, inventories, contract assets, payables and customer advances are ordinary project-manufacturing working capital.
+- No bank, brokerage, insurance, real-estate-development, concession, construction-project, or investment-holding balance-sheet model identified.
+- Ordinary owner earnback is applicable, with special haircut to deposits held at the group finance company.
+
+[core extracted facts, CNY]
+revenue=12516931784.56
+cost_of_sales=9523386172.29
+gross_profit=2993545612.27
+parent_net_profit=1119833030.96
+operating_cash_flow=810660127.91
+capital_expenditure=299150556.76
+operating_free_cash_flow=511509571.15
+total_assets=22126102877.25
+total_liabilities=10357757668.24
+total_equity=11768345209.01
+parent_equity=11247334360.08
+minority_interest=521010848.93
+cash_and_deposits=7179894369.14
+deposits_at_group_finance_company=7022242522.79
+restricted_cash=91408945.70
+long_term_borrowings=74200000.00
+accounts_receivable=6168086527.59
+contract_assets=719573295.53
+inventory=1765011278.21
+notes_payable=1962072292.56
+accounts_payable=5775543004.91
+contract_liabilities=1729533919.45
+2025_full_year_cash_dividend=449140955.06
+
+[calculations]
+gross_margin=(12516931784.56-9523386172.29)/12516931784.56=0.239159696944472
+net_margin=1119833030.96/12516931784.56=0.08946545768838868
+operating_free_cash_flow=810660127.91-299150556.76=511509571.15
+
+External bank deposits included at 100%: 79606307.25
+Group finance company deposits included at 70%: 7022242522.79*0.70=4915565765.953
+Restricted cash included at 0%: 0
+Debt and lease deduction: 74200000+531825.40+2432828.08=77164653.48
+discounted_detachable_net_cash=79606307.25+4915565765.953-77164653.48=4918011419.723001
+discounted_net_cash_to_market_cap=4918011419.723001/26650000000=0.18454076621849907
+
+discounted_sustainable_cash_profit=850000000.00
+Rationale: conservative research midpoint between 2025 FCF of 511.51m and parent net profit of 1119.83m. It allows partial normalization of the supplier-payment timing shock but retains haircuts for project working-capital volatility, maintenance capex, capitalized R&D, and minority cash leakage.
+
+operating_business_price=26650000000-4918011419.723001=21731988580.277
+owner_earnback_years=21731988580.277/850000000=25.567045388561176
+market_cap_to_cash_profit=26650000000/850000000=31.352941176470587
+forecast_dividend_yield=449140955.06/26650000000=0.01685331913921201
+
+[fact/inference/judgment separation]
+- Facts: audited statement amounts, segment results, customer concentration, deposits at finance company, dividends.
+- Calculations: margins, FCF, ratios, operating business price, earnback years.
+- Judgments: 70% finance-company-deposit recovery factor and CNY 850m sustainable cash profit. Both are explicitly labeled as research estimates in result.json and report.md.
+
+[limitations]
+- No prebuilt annual facts package was available; this run used the official annual report directly.
+- Market cap and PE TTM were accepted from the supplied Tencent snapshot and not independently reconstructed.
+- PE TTM and audited FY2025 earnings are not necessarily identical periods.
+- 2023 dividend was derived from the annual report's three-year cumulative dividend less 2024 and 2025 amounts; it is not material to the forecast, which uses FY2025 as the stable baseline.

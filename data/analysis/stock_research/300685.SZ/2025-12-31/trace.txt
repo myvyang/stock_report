@@ -1,0 +1,30 @@
+2026-07-31T18:02:00+08:00 START query=300685.SZ period=2025-12-31 report_type=annual
+INPUT config/input.json market_cap=6823000000 market_cap_at=20260731114257 source="Tencent qt.gtimg.cn" pe_ttm=19.17
+SKILL read .agents/skills/stock-research/SKILL.md
+CONTRACT read .agents/skills/stock-research/references/result-contract.md
+CONTRACT read .agents/skills/stock-research/references/report-contract.md
+PROTOCOL init command="PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json" status=ok
+REUSE_CHECK missing=stock_report/data/analysis/annual_review/300685.SZ/2025-12-31/facts.json
+REUSE_CHECK missing=stock_report/data/analysis/annual_review/300685.SZ/2025-12-31/annual_facts.md
+REUSE_CHECK missing=stock_report/data/raw/filings/300685.SZ/2025-12-31/metadata.json
+SOURCE acquired annual_report_2025.pdf url=https://pdf.dfcfw.com/pdf/H2_AN202604151821241491_1.pdf pages=191 disclosure_date=2026-04-16 audit="立信会计师事务所，标准无保留意见"
+MODEL statement_model=ordinary_operating applicability=applicable reason="肿瘤体外诊断经营业务；现金理财与低额融资可分离，不存在特殊模型资金负债"
+FACT revenue=1197733641.14 cost_of_sales=208514045.82 gross_profit=989219595.32 parent_net_profit=361255321.05
+FACT total_assets=2347635386.33 total_liabilities=291688982.06 parent_equity=2055946404.27 minority_interest=0
+FACT operating_cash_flow=364824059.51 capital_expenditure=70225194.79 operating_free_cash_flow=294598864.72
+FACT cash=1065871209.55 trading_financial_assets=275963477.56 receivables=644944826.42
+FACT debt_components="short 1995284.18 + long 94420000 + current_noncurrent 7449289.68 + lease 4737592.05" debt_total=108602165.91
+CALC gross_margin=989219595.32/1197733641.14=0.825912
+CALC net_margin=361255321.05/1197733641.14=0.301617
+CALC discounted_net_cash=1065871209.55*0.90+275963477.56*0.80-108602165.91=1071452704.73
+CALC adjusted_profit=361255321.05-17853822.73=343401498.32
+CALC sustainable_cash_profit=min(343401498.32,294598864.72)*0.90=265138978.25
+CALC operating_business_price=6823000000-1071452704.73=5751547295.27
+CALC owner_earnback_years=5751547295.27/265138978.25=21.6926
+CALC market_cap_to_cash_profit=6823000000/265138978.25=25.7337
+CALC forecast_dividend_yield=174227329.80/6823000000=0.025536
+JUDGMENT excluded="应收账款、其他权益工具投资、固定资产等经营资产不计可剥离现金"
+JUDGMENT sustainability_haircut="扣非利润与经营自由现金流孰低再九折；收入增8.01%而利润增41.74%，费用下降不可无条件外推"
+PROTOCOL populate method="protocol set for all scalar and complex paths; no hand-written result object"
+PROTOCOL validate status=ok errors=[]
+FINAL_FILES outputs/result.json outputs/report.md outputs/trace.txt

@@ -1,0 +1,66 @@
+stock-research trace
+generated_at=2026-08-03T16:06:50+08:00
+query=00677.HK
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read .agents/skills/stock-research/references/result-contract.md in full.
+- Read .agents/skills/stock-research/references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- Paths declared by config/input.json under stock_report/data/raw/filings, annual_review and normalized/facts did not exist in /workspace.
+- No prior annual facts or research result was available for reuse.
+
+3. Company and period reconciliation
+- HKEX issuer title search identified stock 00677 as Golden Resources Development International Limited.
+- HKEX 2026 Annual Report states the statutory year end is 31 March 2026 and describes food, convenience store, packaging, securities, property and retailtainment operations.
+- The input period 2025-12-31 does not match the statutory annual period. The latest audited annual report available before the 2026-07-31 valuation date was used, and analysis.period was normalized to 2026-03-31.
+- The input analysis_model_hint was rejected because it simultaneously described brokerage and EV manufacturing, neither of which matches the audited business facts.
+
+4. Primary evidence
+- HKEX 2026 Annual Report:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0728/2026072800362.pdf
+- Profit or loss statement: annual report p.89.
+- Financial position: annual report pp.91-92.
+- Cash flows: annual report pp.95-96.
+- Dividends: annual report pp.125-126.
+- Segment/business facts: annual report pp.7-8 and 116-117.
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, timestamp 2026/07/31 16:08:47.
+
+5. Currency normalization
+- Annual report figures are in HKD thousands.
+- Converted to CNY absolute yuan using 1 HKD = 0.8796 CNY at 2026-03-31.
+- Input market cap was consumed as protocol-normalized CNY because no explicit source currency was supplied. This is disclosed as a limitation.
+
+6. Model and calculations
+- statement_model=ordinary_operating.
+- Revenue mix is operating retail/food/packaging; securities and property are ancillary, so ordinary owner earnback is applicable.
+- Gross margin = 813,133 / 2,104,187 = 38.6436%.
+- Net margin = 27,233 / 2,104,187 = 1.2942%, using parent profit.
+- Lease-adjusted operating free cash flow:
+  HKD 261.705m operating cash flow
+  - HKD 26.975m PP&E purchases
+  - HKD 139.289m lease principal
+  - HKD 33.339m lease interest
+  = HKD 62.102m = CNY 54.625m.
+- Discounted detachable net cash:
+  CNY 356.125m cash/deposits * 70%
+  + CNY 27.124m current FVPL assets * 50%
+  - CNY 19.923m bank loans
+  + CNY 0.574m rounding/FX alignment
+  = CNY 243.500m.
+- Discounted sustainable cash profit = CNY 26.388m, after a CNY 28.237m buffer against the latest lease-adjusted free cash flow for weak prior years, the still-lossmaking convenience segment and unknown Niseko development needs.
+- Operating business price = CNY 518.400m market cap - CNY 243.500m discounted net cash = CNY 274.899m.
+- Owner earnback years = 274.899 / 26.388 = 10.42.
+- Market cap / cash profit = 518.400 / 26.388 = 19.65.
+- Forecast dividend = HKD 39.040m * 0.8796 = CNY 34.340m; yield = 6.624%.
+
+7. Output construction and validation
+- Populated outputs/result.json through repeated protocol CLI set commands; no complex JSON was hand-written from scratch.
+- Wrote outputs/report.md and outputs/trace.txt.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[].
+

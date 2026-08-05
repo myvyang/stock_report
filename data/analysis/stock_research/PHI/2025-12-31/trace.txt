@@ -1,0 +1,57 @@
+[2026-08-05 Asia/Shanghai] task initialized
+- Read config/input.json.
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+
+[local reuse audit]
+- Checked annual facts, raw filing, normalized facts, and prior stock-research paths from input.
+- No local PHI filing/facts/research files existed; only config/input.json was present.
+
+[protocol]
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated scalar/object fields with protocol `set` and list fields with protocol `append`.
+- Did not construct outputs/result.json directly.
+
+[primary-source retrieval]
+- PSE Form 17-A summary for FY ended 2025-12-31: https://edge.pse.com.ph/downloadHtml.do?file_id=1873502
+- U.S. SEC filing index, accession 0001193125-26-182147, filed 2026-04-27: https://www.sec.gov/Archives/edgar/data/78150/0001193125-26-182147-index.html
+- Audited PLDT 2025 Form 20-F: https://www.sec.gov/Archives/edgar/data/78150/000119312526182147/phi-20251231.htm
+- FY2025 results and dividend disclosure: https://www.sec.gov/Archives/edgar/data/78150/000119312526073891/phi-ex99_1.htm
+- Historical FX reference: https://www.exchange-rates.org/exchange-rate-history/php-cny-2025-12-31
+- Market cap and PE were reused exactly from task input; no replacement quote was introduced.
+
+[model decision]
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: recurring telecom service revenue and ordinary consolidated operating statements; no customer deposits, regulated project cash, insurance reserves, or investment-holding structure that makes the ordinary model invalid.
+- Special handling: network capex is necessary; cash must be evaluated against interest-bearing debt and leases.
+
+[audited figures, PHP million]
+- Revenue 218,388; expenses 168,040; derived subtotal 50,348.
+- Net income 28,869; attributable to PLDT equity holders 28,662.
+- Total assets 634,828; liabilities 506,745; equity 128,083; parent equity 126,889.
+- Operating cash flow 98,738; cash purchase of property/equipment including capitalized interest 62,864; operating FCF 35,874.
+- Cash 11,866; short-term investments 10; interest-bearing financial liabilities 295,048; leases 64,173; property/equipment 327,989.
+
+[conversion and calculations]
+- FX assumption: 1 PHP = 0.1188 CNY at 2025-12-31. All financial statement amounts converted to absolute CNY yuan.
+- Gross-margin protocol proxy: (218,388 - 168,040) / 218,388 = 23.05%. This is not narrow product gross margin because reported expenses include depreciation and operating costs.
+- Net margin: 28,662 / 218,388 = 13.12%.
+- Net cash: (11,866 + 10 - 295,048) * 0.1188 = CNY -33,640,833,600.
+- Reported operating FCF: (98,738 - 62,864) * 0.1188 = CNY 4,261,831,200.
+- Sustainable cash profit: reported FCF * 80% = CNY 3,409,464,960.
+- Operating business price: CNY 28,706,926,323.9375 - (-33,640,833,600) = CNY 62,347,759,923.9375.
+- Owner earnback: 62,347,759,923.9375 / 3,409,464,960 = 18.2867 years.
+- Market cap/cash profit: 28,706,926,323.9375 / 3,409,464,960 = 8.4198x.
+- Dividend forecast: PHP94 * 216,055,775 shares * 0.1188 = CNY 2,412,738,050.58; yield = 8.4047%.
+
+[quality notes]
+- Audited 20-F figures were preferred over summary disclosure where reported net-income definitions differed.
+- Input market-cap date differs from statement/FX date; currency movement can affect comparability.
+- Sustainable cash profit uses one-year FCF with a 20% haircut; no multi-year maintenance-capex split was available locally.
+- Lease liabilities were explained as operating constraints but excluded from the detachable-net-cash formula to avoid an unarticulated double count.
+
+[validation]
+- First effective populated-result validation: status ok, errors [].
+- Final validation after report and trace creation: status ok, errors [].
+- JSON syntax check with `python3 -m json.tool`: passed.

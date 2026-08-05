@@ -1,0 +1,53 @@
+stock-research trace
+company: 01111.HK HUASHI GROUP
+period: 2025-12-31
+run date: 2026-08-03 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill defines reuse of annual facts and raw filings.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reused inputs
+- stock_report/data/analysis/annual_review/01111.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/01111.HK/2025-12-31/annual_facts.md
+- stock_report/data/raw/filings/01111.HK/2025-12-31/metadata.json
+- stock_report/data/raw/filings/01111.HK/2025-12-31/imported_from_agent_runs/ea6eb47edf63-01111_2025_annual_report_hkex.txt
+- stock_report/data/raw/filings/01111.HK/2025-12-31/imported_from_agent_runs/260ee32084d9-01111_2024_annual_report_hkex.txt
+
+3. Model decision
+- Input hint said financial_brokerage.
+- Annual report describes branding, event execution, advertising placement, media rebates and online advertising.
+- No brokerage client money, proprietary trading assets or repo funding were found.
+- Overrode hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+4. Key extracted facts (filing unit converted from RMB'000 to RMB)
+- Revenue 290,937,000; gross profit 180,019,000; parent net profit 71,356,000.
+- Total assets 659,900,000; liabilities 245,300,000; parent equity 414,600,000.
+- Cash 120,277,000; restricted deposit 5,000,000; borrowings 132,510,000; shareholder amount due 993,000.
+- Trade receivables 384,256,000 net of allowance 23,808,000.
+- Operating cash flow 62,498,000; capex 56,723,000; operating FCF 5,775,000.
+- No final dividend for 2025; no dividend paid or declared for 2023-2024; no distributable reserves at listed parent at 2025 year-end.
+
+5. Calculations
+- gross_margin = 180,019,000 / 290,937,000 = 0.6187483522.
+- net_margin = 71,356,000 / 290,937,000 = 0.2452575664.
+- detachable net cash = 0 because unrestricted cash is below financing liabilities and is required for operations.
+- sustainable cash profit = 62,498,000 operating cash flow - 20,000,000 estimated maintenance capex = 42,498,000.
+- operating business price = 143,205,538.74611855 - 0 = 143,205,538.74611855.
+- owner earnback years = 143,205,538.74611855 / 42,498,000 = 3.3696931348.
+- forecast dividend = 0; forecast yield = 0.
+
+6. Judgment flags
+- RMB20,000,000 maintenance capex is an analyst estimate, not company disclosure.
+- Market cap and PE TTM were reused from config/input.json and not independently refreshed.
+- Offshore distributability of PRC subsidiary cash is not established by the filing.
+- Zero dividend forecast is a baseline derived from current facts, not company guidance.
+
+7. Protocol writes and validation
+- All structured fields were written with repeated protocol `set` commands after initialization; result.json was not authored directly.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial post-population validation result: status=ok, errors=[]

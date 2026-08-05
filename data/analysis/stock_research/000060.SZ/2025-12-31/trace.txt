@@ -1,0 +1,84 @@
+stock-research trace
+company: 000060.SZ 中金岭南
+period: 2025-12-31 annual
+generated_at: 2026-08-01 Asia/Shanghai
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields only through repeated protocol `set` commands; did not hand-write the result object.
+
+2. Reuse audit
+- Checked paths declared in config/input.json.
+- No annual facts, normalized facts, filing metadata, extraction trace, or prior stock-research outputs existed for 000060.SZ/2025-12-31.
+- Only stock_report/data/notes/user_stock_evaluations.md existed under stock_report.
+- Consequently fetched the missing primary annual filing instead of reusing absent facts.
+
+3. Primary filing
+- Source: company official website PDF.
+- URL: https://www.nonfemet.com/upload/file/2026/04/27/6C11449F11553D6479B8AD1D1DF19099.pdf
+- Local PDF: stock_report/data/raw/filings/000060.SZ/2025-12-31/annual-report-2025.pdf
+- Local extracted text: stock_report/data/raw/filings/000060.SZ/2025-12-31/annual-report-2025.txt
+- PDF length: 251 pages.
+- Filing states disclosure date 2026-04-22; audit opinion is standard unmodified.
+- Python pypdf was installed in an ephemeral temporary venv because no system PDF text utility/library was available. The venv was not stored in the workspace.
+
+4. Extracted facts
+- Revenue: 60,474,648,764.60
+- Cost of sales: 56,538,988,207.67
+- Gross profit (calculated): 3,935,660,556.93
+- Gross margin (calculated): 0.0650795107921952
+- Operating profit (calculated as profit before tax - non-operating income + non-operating expense): 1,140,447,977.29
+- Net profit: 820,062,354.63
+- Parent net profit: 801,756,079.53
+- Net margin (calculated): 0.013257721969595355
+- Total assets: 49,338,567,819.60
+- Total liabilities: 28,922,763,571.40
+- Total equity (calculated): 20,415,804,248.20
+- Parent equity: 19,475,171,856.16
+- Minority interest (calculated): 940,632,392.04
+- Operating cash flow: 2,409,708,434.66
+- Capital expenditure proxy: cash paid to acquire fixed assets, intangible assets, and other long-lived assets, 985,397,515.21
+- Operating free cash flow (calculated): 1,424,310,919.45
+- Financing cash flow: -451,339,960.57
+- Dividend and buyback cash out proxy: ordinary dividends payable in retained-earnings note, 325,171,303.50; no buyback reported.
+- 2025 proposed dividend: 244,264,485.19, CNY 0.55 per 10 shares.
+
+5. Model classification
+- Confirmed ordinary_operating/applicable.
+- Reason: operating assets are mines, mineral rights, smelters, inventories, receivables, and production projects. The balance sheet is not a bank, broker, insurer, property developer, construction contractor, concession operator, or investment holding model.
+- Special handling: excluded restricted cash and business-dedicated cash; netted full interest-bearing financing; normalized cash profit conservatively.
+
+6. Owner earnback calculations
+- Reported cash: 3,592,736,875.65
+- Restricted cash excluded: 171,576,867.51
+- Business-dedicated cash excluded: 773,243,511.11
+- Remaining cash: 2,647,916,497.03
+- Remaining cash inclusion rate: 80%
+- Discounted included cash: 2,118,333,197.624
+- Interest-bearing financing: approximately 19,806,628,900.00, from financing-liability movement note stated in CNY 10,000 units; conversion may contain CNY 10,000-level rounding.
+- Discounted detachable net cash: -17,688,295,702.376
+- Market cap from input: 27,979,000,000.000004
+- Operating business price: 45,667,295,702.37601
+- Sustainable cash profit judgment: 800,000,000. This is close to 2025 parent profit, below single-year FCF, and does not add back impairment mechanically.
+- Owner earnback years: 57.08411962797001
+- Market cap / cash profit: 34.97375
+
+7. Valuation and dividend
+- Market cap, timestamp, source, and PE were copied from config/input.json without alteration.
+- Forecast dividend uses the annual-report board proposal, not an assumed payout.
+- Forecast yield: 244,264,485.19 / 27,979,000,000.000004 = 0.008730279323421136.
+
+8. Validation
+- Command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final protocol result: status ok; errors []
+
+9. Limitations
+- No pre-existing 2025 annual facts package was available.
+- Market data is an input snapshot and was not part of the audited filing.
+- The proposed dividend was subject to shareholder approval when the annual report was issued.
+- Sustainable cash profit is an analyst normalization judgment, not company guidance.
+- Proposed private placement of up to approximately CNY 1.306 billion may reduce debt and increase shares; if completed, earnback and per-share figures require recomputation.

@@ -1,0 +1,56 @@
+stock-research trace
+company: 300993.SZ 玉马科技
+period: 2025-12-31 annual
+generated context: 2026-08-01 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full as requested.
+3. Read references/data-reuse.md because the skill routes reuse decisions there.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields with repeated protocol set commands; did not hand-write the JSON skeleton.
+
+[reuse audit]
+- config/input.json existed.
+- No files existed under the supplied raw filing, annual review, normalized facts, or prior stock research paths for 300993.SZ/2025-12-31.
+- Therefore no annual fact pack or prior result was reusable; research returned to public filing evidence.
+
+[primary evidence]
+- 山东玉马遮阳科技股份有限公司2025年年度报告, disclosed 2026-04-22; audit opinion standard unqualified, report no. 上会师报字(2026)第5454号.
+- Official annual-report summary PDF: https://static.cninfo.com.cn/finalpage/2026-04-22/1225135342.PDF
+- Official 2025 profit-distribution proposal PDF: https://static.cninfo.com.cn/finalpage/2026-04-22/1225135351.PDF
+- Full report searchable mirror used to locate filing lines and cross-check tables: https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12129339&stockid=300993
+- Market snapshot supplied by input: Tencent qt.gtimg.cn, 2026-07-31 11:43:15, market cap CNY 2,989,000,000, PE TTM 20.41.
+
+[financial extraction]
+- Revenue 745,333,374.75; cost of sales 456,644,249.26; gross profit 288,689,125.49.
+- Operating profit 172,896,724.68; net profit and parent net profit 148,778,212.41.
+- Total assets 1,704,453,887.18; liabilities 135,515,961.40; equity and parent equity 1,568,937,925.78; minority interest zero.
+- Operating cash flow 185,947,893.26; capex 145,260,289.57; operating FCF 40,687,603.69; financing cash flow -31,357,468.87.
+- Nonrestricted cash and equivalents 304,692,915.85; restricted LC deposit 20,730,000; trading financial assets 60,477,278.66; other noncurrent financial assets 20,000,000.
+- Lease liabilities including current portion 23,102,502.43; no bank borrowings.
+
+[derived metrics]
+- gross_margin = (745,333,374.75 - 456,644,249.26) / 745,333,374.75 = 0.3872614963.
+- net_margin = 148,778,212.41 / 745,333,374.75 = 0.1996129999.
+- reported operating FCF = 185,947,893.26 - 145,260,289.57 = 40,687,603.69.
+- discounted detachable net cash = (304,692,915.85 - 100,000,000) * 90% + 60,477,278.66 * 90% + 20,000,000 * 50% - 23,102,502.43 = 225,550,672.63.
+- Cash reserve rationale: round CNY 100m operating buffer retained for inventory, receivables, payroll, tax, overseas operations and expansion; restricted deposits excluded before calculation.
+- Sustainable cash profit begins at parent net profit 148,778,212.41, removes a conservative CNY 20m for interest/government/financial-asset income, treats approximately CNY 71.44m depreciation and amortization as a maintenance-capex proxy, and retains an additional safety haircut; rounded result CNY 125m.
+- operating_business_price = 2,989,000,000 - 225,550,672.63 = 2,763,449,327.37.
+- owner_earnback_years = 2,763,449,327.37 / 125,000,000 = 22.107594619.
+- market_cap_to_cash_profit = 2,989,000,000 / 125,000,000 = 23.912.
+- forecast dividend = 303,541,602 shares * CNY 0.20 = 60,708,320.40; yield = 0.0203105789.
+
+[judgment boundaries]
+- Statement model confirmed ordinary_operating based on manufacturing business, ordinary working-capital assets, productive fixed assets, no financial-sector balance-sheet model, and no bank debt.
+- The CNY 125m sustainable cash profit is an analyst estimate, not management guidance.
+- Actual 2025 FCF is retained in result/report as a sensitivity warning; capex was not assumed entirely maintenance because fixed-asset/in-progress expansion and overseas build-out were visible.
+- No buy/sell recommendation, target price, ranking label, or unsupported certainty was produced.
+
+[validation]
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Output: {"status":"ok","errors":[]}
+- JSON syntax check: python3 -m json.tool outputs/result.json completed successfully.
+- Null/placeholder scan found no null core fields and no prohibited ranking labels; the only "incomplete" text is the required empty incomplete_reasons array.

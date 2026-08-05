@@ -1,0 +1,52 @@
+陕西旅游 603402.SH 2025 股票研究轨迹
+生成时区：Asia/Shanghai
+
+1. 协议与初始化
+- 已完整读取 .agents/skills/stock-research/SKILL.md。
+- 已完整读取 references/result-contract.md、references/report-contract.md 和 data-reuse.md。
+- 使用命令初始化：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. 复用的数据
+- 年度事实包：stock_report/data/analysis/annual_review/603402.SH/2025-12-31/facts.json
+- 人读事实摘要：stock_report/data/analysis/annual_review/603402.SH/2025-12-31/annual_facts.md
+- 提取轨迹：stock_report/data/analysis/annual_review/603402.SH/2025-12-31/extraction_trace.txt
+- 原始披露元数据：stock_report/data/raw/filings/603402.SH/2025-12-31/metadata.json
+- 原始年报：stock_report/data/raw/filings/603402.SH/2025-12-31/annual-report.pdf
+- 官方来源：https://static.cninfo.com.cn/finalpage/2026-04-20/1225123877.PDF
+- PDF SHA256：bb59b93bc2ed72f2b538b81b089b22ebe8ffb694eafc2905801bd3cd82ae6993
+
+3. 定向补充核对
+- 现有年度事实包缺少分红预案、行业位置和部分风险原文。
+- 本地缺少 pdftotext，创建临时 Python 虚拟环境并安装 pypdf，仅用于读取现有本地 PDF；提取文本写入临时 work/annual-report.txt，不作为最终来源。
+- 年报 PDF 第2、47页核对：每股派现2.00元，共154,666,668.00元，占归母净利润40.25%，披露时尚需股东会审议。
+- 年报 PDF 第11-18页核对业务与分产品收入；第31-32页核对竞争、天气、特许经营、资源使用费和募投风险；第74-76页核对募集资金用途与投入进度。
+
+4. 财报模型判断
+- 结论：ordinary_operating；普通控股回本口径 applicable。
+- 原因：收入来自演艺、索道、客运和餐饮服务，资产负债以现金、经营设施和普通借款为主，不属于资产负债即生意本身的金融、地产、工程施工或投资控股模型。
+- 特别处理：IPO募集资金虽然会计披露受限现金为0，但已有项目用途，不计为可剥离现金；索道特许经营期限和未定资源费率纳入风险。
+
+5. 核心公式复核
+- 毛利率 = 696,379,029.61 / 1,029,710,639.73 = 67.6286%。
+- 归母净利率 = 384,237,623.58 / 1,029,710,639.73 = 37.3151%。
+- 经营自由现金流 = 515,071,746.47 - 116,926,700.26 = 398,145,046.21元。
+- 归母份额 = 384,237,623.58 / 464,470,638.64 = 82.7259%。
+- 折后现金利润 = 398,145,046.21 × 82.7259% × 90% = 296,432,248.46元。
+- 经营必要现金 = 534,290,930.41 × 25% = 133,572,732.60元。
+- 折后可剥离净现金 = (2,763,925,329.57 - 1,521,926,929.58 - 133,572,732.60) × 90% - 212,049,959.56 = 785,533,141.09元。
+- 经营业务购买价 = 6,618,000,000.00 - 785,533,141.09 = 5,832,466,858.91元。
+- 控股回本年 = 5,832,466,858.91 / 296,432,248.46 = 19.6755年。
+- 市值/现金利润 = 6,618,000,000.00 / 296,432,248.46 = 22.3255倍。
+- 预测分红率 = 154,666,668.00 / 6,618,000,000.00 = 2.3371%。
+
+6. 关键判断边界
+- 现金折扣中的25%年度经营现金流出是经营必要现金的近似，不是公司披露数字。
+- 维护性资本开支无法从成长资本开支中精确分拆，因此先全额扣除2025年购建长期资产现金支出，再对归母自由现金流打九折。
+- 合并自由现金流按归母净利润占合并净利润比例分配，是对少数股东归属的估算，不代表法律上的实际分配比例。
+- 2025年拟分红是年报董事会预案，不将资本公积转增计为现金回报。
+- 市值6,618,000,000元、PE TTM 18.85及时间2026-07-31 16:15:00直接使用config/input.json提供的腾讯行情快照。
+
+7. 协议写入与验证
+- outputs/result.json 由协议 CLI init 后，通过 protocol set/append 命令逐字段写入，未从空文件手写复杂 JSON。
+- 最终验证命令：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- 最终验证结果：status=ok，errors=[]。

@@ -1,0 +1,74 @@
+stock-research trace
+generated_at: 2026-08-04T11:25:21+08:00
+company: 08413.HK ASIA GROCERY
+
+1. Read skill and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse check
+   - No usable annual facts, normalized facts, metadata, or prior research outputs were present under the configured 08413.HK paths.
+   - Returned to the primary filing rather than relying on third-party summaries.
+
+3. Primary evidence
+   - HKEX 2025 Annual Report PDF downloaded to:
+     stock_report/data/raw/filings/08413.HK/2025-12-31/annual-report-2025.pdf
+   - URL: https://www.hkexnews.hk/listedco/listconews/gem/2025/0626/2025062601216.pdf
+   - Filing publication date: 2025-06-26
+   - Actual financial year end: 2025-03-31
+   - PDF text extracted locally with pypdf in an isolated /tmp virtual environment.
+
+4. Model verification
+   - Input hint: financial_brokerage / requires_special_model.
+   - Filing fact: one operating segment, trading and distribution of food and beverage grocery products in Hong Kong.
+   - No brokerage client money, proprietary financial assets, repo liabilities, or capital-markets revenue found.
+   - Override: ordinary_operating / applicable.
+
+5. Currency conversion
+   - Filing currency: HKD.
+   - Result contract currency: CNY absolute yuan.
+   - Rate used: 1 HKD = 0.92257 CNY.
+   - Source: PBOC/CFETS central parity announcement dated 2025-04-01.
+   - URL: https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/5648456/index.html
+
+6. Key reported HKD figures (HK$'000)
+   - Revenue 302,544; cost of sales 231,138; gross profit 71,406.
+   - Operating profit 2,550; parent net profit 1,061.
+   - Total assets 125,133; liabilities 25,201; parent equity 99,932.
+   - Operating cash flow 23,942; capex 2,362; lease principal paid 6,783.
+   - Cash equivalents 60,873; pledged deposits 576; lease liabilities 4,762.
+   - Dividend FY2025 nil; FY2024 nil.
+
+7. Owner earnback calculations (CNY)
+   - Discounted detachable net cash
+     = cash 56,159,603.61 * 85%
+     + pledged deposits 531,400.32 * 50%
+     - lease liabilities 4,393,278.34
+     = 43,608,084.89.
+   - Normalized cash profit before haircut
+     = parent profit 978,846.77
+     + PPE and ROU depreciation 7,639,491.36
+     + one-off subsidiary disposal loss 3,073,260.67
+     - capex 2,179,110.34
+     - lease principal 6,257,959.31
+     = 3,254,826.96.
+   - Discounted sustainable cash profit = 3,254,826.96 * 70% = 2,278,378.87.
+   - Operating business price = market cap 45,983,035.24 - 43,608,084.89 = 2,374,950.35.
+   - Owner earnback years = 2,374,950.35 / 2,278,378.87 = 1.0424.
+   - Market cap / cash profit = 45,983,035.24 / 2,278,378.87 = 20.1823.
+   - Discounted net cash / market cap = 94.8352%.
+
+8. Protocol operations
+   - Initialized outputs/result.json using:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - All result fields were populated through protocol `set` commands.
+   - Validation command:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Validation result: status=ok, errors=[]
+
+9. Important limitations
+   - Configured period 2025-12-31 differs from the company's actual FY2025 balance-sheet date 2025-03-31.
+   - Market-cap timestamp is about 16 months after the balance-sheet date.
+   - Income statement amounts use a period-end FX rate for contract normalization, not a historical average rate.
+   - Cash-profit normalization and haircuts are analyst estimates, not management guidance.

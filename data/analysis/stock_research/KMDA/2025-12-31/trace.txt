@@ -1,0 +1,57 @@
+stock-research trace
+company: Kamada Ltd. (NASDAQ/TASE: KMDA)
+period: 2025-12-31 annual
+generated_at: 2026-08-05T05:04:25+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar fields with protocol set and list fields with protocol append.
+5. Validated with protocol validate; status=ok, errors=[].
+
+[reuse check]
+- Checked paths named in config/input.json.
+- No raw filing, annual facts, normalized facts, or prior stock-research files for KMDA/2025-12-31 were present locally.
+- Therefore obtained primary-source data from the SEC filing and Kamada's official announcement.
+
+[primary sources]
+- Kamada 2025 Form 20-F, filed 2026-03-11, SEC accession 0001213900-26-025934:
+  https://www.sec.gov/Archives/edgar/data/1567529/000121390026025934/ea0276358-20f_kamada.htm
+- Kamada FY2025 results / dividend announcement, 2026-03-11:
+  https://www.kamada.com/news/kamada-declares-cash-dividend-of-0-25-per-share-to-be-paid-in-accordance-with-an-adopted-annual-cash-dividend-policy/
+- Federal Reserve H.10 USD/CNY historical rate, 2025-12-31 = 7.1875 CNY/USD:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Market cap, date, source and PE TTM were taken unchanged from config/input.json.
+
+[source figures in USD thousands]
+- Total assets 378,710; total liabilities 109,640; equity attributable to shareholders 269,070; minority interest 0.
+- Revenue 180,460; cost of revenue 104,053; gross profit 76,407; operating income 26,233; net income 20,198.
+- Operating cash flow 25,490; purchase of property/equipment/intangibles 9,846; operating FCF 15,644.
+- Financing cash flow -18,345; dividends paid 11,534.
+- Cash 75,469; trade receivables 27,007; inventories 84,943; PP&E 41,367; ROU assets 8,900; intangibles/other long-term assets 97,511; goodwill 30,313; contract asset 7,544.
+- Acquisition-related obligations used for net-cash adjustment: current maturities of other long-term liabilities 9,923; contingent consideration 20,372; other long-term liabilities 30,113; total 60,408.
+
+[conversion and formulas]
+- All filing amounts converted to CNY absolute yuan at 7.1875 CNY/USD.
+- Gross margin = 76,407 / 180,460 = 0.4234013078.
+- Net margin = 20,198 / 180,460 = 0.1119250804.
+- Discounted detachable net cash = (75,469 - 9,923 - 20,372 - 30,113) * 1,000 * 7.1875 = CNY 108,250,937.5.
+- Sustainable cash profit = (25,490 - 9,846) * 1,000 * 7.1875 = CNY 112,441,250.0.
+- Operating business price = CNY 2,779,751,529.537781 - CNY 108,250,937.5 = CNY 2,671,500,592.037781.
+- Owner earnback years = 2,671,500,592.037781 / 112,441,250 = 23.7590794485.
+- Market cap / cash profit = 2,779,751,529.537781 / 112,441,250 = 24.7218127648.
+- Forecast dividend = USD 14.4m * 7.1875 = CNY 103,500,000; forecast yield = 0.0372335437.
+
+[judgment boundaries]
+- Confirmed ordinary_operating model: assets and liabilities describe a drug manufacturer/distributor rather than a bank, insurer, developer, concession, construction contractor, or investment holding company.
+- Receivables, inventories, PP&E, ROU assets, intangibles, goodwill and contract asset were not treated as detachable cash.
+- Cash received a 100% factor; acquisition-related payment obligations received a 100% deduction. Lease liabilities were described as operating obligations and were not additionally deducted from detachable cash.
+- Sustainable cash profit uses reported 2025 operating FCF, not adjusted EBITDA. No optimistic reversal of the 2025 working-capital outflow was made.
+- 2026 declared dividend is used as forecast basis; the policy remains subject to board discretion and Israeli distribution tests.
+
+[quality]
+- result.json protocol validation: ok.
+- data_quality.status: complete.
+- Main limitations: mixed market/filing dates, currency translation, single-year FCF volatility, input PE not independently recomputed, and dividend policy discretion.

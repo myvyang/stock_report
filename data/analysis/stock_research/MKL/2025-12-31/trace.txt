@@ -1,0 +1,58 @@
+stock-research trace
+task: MKL annual research, period 2025-12-31
+generated_at: 2026-08-04T16:06:41+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full, as requested.
+- Read references/data-reuse.md because no annual fact package was present and the reuse boundary was relevant.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Existing-data check
+- Checked annual_review, normalized facts, raw filing, prior stock_research, and outputs locations.
+- No reusable MKL 2025 annual fact package or prior research output was present before this run.
+
+3. Primary sources obtained and reviewed
+- SEC 2025 Form 10-K filing index, accession 0001096343-26-000020, filed 2026-02-26.
+- Downloaded the filing to stock_report/data/raw/filings/MKL/2025-12-31/mkl-20251231.htm.
+- Filing URL: https://www.sec.gov/Archives/edgar/data/1096343/000109634326000020/mkl-20251231.htm
+- SEC 2025 results release, accession 0001096343-26-000008, exhibit 99.1.
+- SAFE 2025-12-31 currency conversion page and CFETS/PBOC central parity evidence; USD/CNY rate used: 7.0288.
+- Market cap and PE were taken from config/input.json as instructed: CNY 157,377,628,976.64258 on 2026-08-03; PE TTM 10.384178; source Yahoo Finance yfinance.
+
+4. Model override
+- Input hint was ordinary_operating/applicable.
+- Filing facts show insurance is the cornerstone, insurance float was USD 18.827bn, investments were USD 32.836bn consolidated, and policy-related liabilities dominate the balance sheet.
+- Markel also consolidates industrial, financial, and consumer businesses.
+- Overrode model to platform_financial_mixed / requires_special_model.
+- Kept all ordinary owner-earnback sorting fields null as required by result-contract.md.
+
+5. Financial extraction
+- Audited consolidated balance sheet: assets USD 68.905050bn; liabilities USD 49.802861bn; total equity USD 18.596125bn; shareholders' equity USD 18.597756bn.
+- Income statement: operating revenue USD 15.513233bn; operating income USD 3.194852bn; net income USD 2.152405bn; net income to common shareholders USD 2.080901bn.
+- Cash flow: CFO USD 2.761256bn; additions to property/equipment USD 0.206894bn; mechanical CFO less capex USD 2.554362bn; financing cash flow USD -1.210056bn.
+- Segment data: adjusted operating income USD 2.303778bn; Insurance 1.379067bn; Industrial 0.343183bn; Financial 0.326572bn; Consumer and Other 0.174636bn; Corporate/eliminations 0.080320bn.
+- Insurance metrics: 2025 combined ratio 94.6%; 2025 insurance ROE 14%; five-year average insurance ROE 13%.
+- All structured financial amounts converted to CNY absolute yuan at 7.0288.
+
+6. Dividend and capital return
+- Form 10-K states the strategy is to retain earnings and that Markel has not paid and does not expect to pay common cash dividends.
+- Forecast common cash dividend set to CNY 0 and forecast yield to 0.
+- 2025 common share repurchases were USD 429.519m; this is discussed separately from dividends.
+
+7. Result construction
+- Used protocol CLI `set` operations for each result section; did not hand-write the complex JSON object from scratch.
+- Populated analysis_model, metrics, financials, asset_analysis, owner_earnback interpretation, dividend, business, risks, evidence, and data_quality.
+- data_quality.status set to complete; incomplete_reasons is empty; limitations disclose FX and market-data constraints.
+
+8. Validation
+- Ran protocol validate after population.
+- Validation response: {"status":"ok","errors":[]}.
+
+9. Output files
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt
+
+No buy/sell recommendation, target price, ranking label, or unsupported certainty was produced.

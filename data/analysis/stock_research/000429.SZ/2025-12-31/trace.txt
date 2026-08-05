@@ -1,0 +1,77 @@
+stock-research trace
+company: 000429.SZ 粤高速A
+period: 2025-12-31 annual
+generated_at: 2026-08-03T11:16:55+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Reused the prior official-filing extraction and populated each initialized result section using protocol set commands; no complex result JSON was handwritten from scratch.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[reuse_check]
+- Expected local annual facts: stock_report/data/analysis/annual_review/000429.SZ/2025-12-31/facts.json — absent.
+- Expected normalized facts: stock_report/data/normalized/facts/000429.SZ/2025-12-31/annual-facts.json — absent.
+- Expected local raw filing metadata — absent.
+- A prior stock-research result, report, and trace were present and contained official CNINFO filing extraction, calculations, and source identifiers; these were reused under the data-reuse protocol.
+
+[primary_sources]
+- CNINFO queryAnnouncement API identified official filing:
+  title: 粤高速A 2025年年度报告
+  announcementId: 1225008769
+  disclosure date: 2026-03-14
+  url: https://static.cninfo.com.cn/finalpage/2026-03-14/1225008769.PDF
+- CNINFO filing:
+  title: 2025年度利润分配预案公告
+  announcementId: 1225008780
+  disclosure date: 2026-03-14
+  url: https://static.cninfo.com.cn/finalpage/2026-03-14/1225008780.PDF
+- CNINFO filing:
+  title: 2025年年度股东会决议公告
+  announcementId: 1225376285
+  disclosure date: 2026-06-18
+  url: https://static.cninfo.com.cn/finalpage/2026-06-18/1225376285.PDF
+  relevant fact: the 2025 profit distribution plan was approved on 2026-06-17.
+- Market snapshot reused exactly from config/input.json:
+  market_cap=30442000000.0 CNY
+  date=20260731161427
+  source=Tencent qt.gtimg.cn
+  pe_ttm=19.08
+
+[key_extraction]
+- Revenue 4,469,738,160.51; cost 1,586,145,349.99; parent net profit 1,801,337,614.93.
+- Operating cash flow 3,559,494,395.28; purchases of fixed/intangible/other long-term assets 2,430,180,575.90.
+- Total assets 26,790,914,410.82; liabilities 12,587,167,111.22; parent equity 11,116,100,975.79; minority interest 3,087,646,323.81.
+- Cash 6,545,379,942.11; fixed assets 8,268,301,855.93; construction in progress 4,760,350,219.82; long-term equity investments 4,362,638,936.45.
+- Long-term loans 10,036,331,513.04; short-term loans 259,163,958.03; current portion of long-term loans 291,115,030.82.
+- Toll revenue 4,382,615,622.73, 98.05% of revenue. Road transportation gross margin 64.61%.
+- Credit impairment gain 309,703,904.28 mainly from reversal related to Guangfo expressway maintenance advances.
+- 2025 dividend plan 1,262,846,900.10, or 0.604 yuan/share, 70.11% of parent net profit; approved by the annual shareholders meeting.
+
+[calculations]
+- gross_profit = revenue - cost = 2,883,592,810.52.
+- gross_margin = gross_profit / revenue = 0.6451335238.
+- net_margin = parent_net_profit / revenue = 0.4030096427.
+- operating_free_cash_flow (mechanical only) = OCF - capex = 1,129,313,819.38.
+- forecast_dividend_yield = 1,262,846,900.10 / 30,442,000,000 = 0.0414835393.
+- minority_interest_ratio = 3,087,646,323.81 / 14,203,747,299.60 = 0.2173825044.
+
+[model_judgment]
+- Confirmed statement_model=utility_concession from audited business mix and asset structure, overriding no input facts.
+- owner_earnback_applicability=requires_special_model.
+- Ordinary discounted net cash, cash profit, business price, owner earnback years and market-cap/cash-profit fields remain null as required by result-contract.
+- Required special model: road-by-road remaining concession cash flow, including traffic, tariffs, maintenance and expansion capex, project debt service, minority ownership, and upstreamable associate dividends.
+
+[quality_judgment]
+- status=partial, not complete.
+- Missing decision-critical data: full remaining toll period for each core road; project-level future capex schedule; project-level debt amortization; forecast upstreamable dividends.
+- These gaps prevent a reliable special-model earnback number and formal ranking.
+
+[limitations]
+- The 2025 proposed dividend yield uses a later market-cap snapshot and is a static ratio, not a future return forecast.
+- OCF minus total capex is disclosed only as a mechanical bridge; expansion capex is not equivalent to maintenance capex.
+- Facts, calculations, model inference, and judgment are separately labeled in result/report.

@@ -1,0 +1,55 @@
+stock-research trace
+company=02328.HK PICC P&C / 中国人民财产保险股份有限公司
+period=2025-12-31
+generated_for_input=2026-08-04T12:21:42+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md as requested.
+3. Read references/data-reuse.md because the selected skill defines the reuse boundary.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields through protocol `set` commands; the result was not authored as a standalone JSON object.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse audit]
+- No annual facts package, normalized facts, or prior stock-research output for 02328.HK/2025-12-31 existed in the workspace at research time.
+- Downloaded the official English annual report to:
+  stock_report/data/raw/filings/02328.HK/2025-12-31/annual-report-2025-en.pdf
+- PDF source URL:
+  https://property.picc.com.cn/tzzgx/en/gongsibaogao/202604/694715418761261056.pdf
+- Extracted text locally only for source inspection; /tmp extraction files are not research outputs.
+
+[model correction]
+- Input hint: financial_brokerage.
+- Confirmed model: financial_insurance.
+- Basis: the annual report states that the group is mainly engaged in property and casualty insurance. Investment assets of RMB760.366bn support insurance operations and coexist with RMB433.224bn insurance contract liabilities plus solvency-capital requirements.
+- Owner earnback applicability: requires_special_model.
+- All ordinary owner-earnback sorting fields remain null by contract.
+
+[core facts; annual report pages]
+- pp. 4, 12, 94: insurance revenue RMB511.594bn; underwriting profit RMB12.535bn; net profit RMB40.377bn; parent net profit RMB40.370bn.
+- pp. 12-14: combined ratio 97.5%; comprehensive loss ratio 73.9%; comprehensive expense ratio 23.6%.
+- pp. 15-20: premium and segment/channel composition; motor premium RMB305.745bn and motor underwriting profit RMB14.258bn.
+- pp. 20-22: investment assets RMB760.366bn; fixed income RMB438.281bn; equities RMB212.481bn; total investment income RMB38.639bn; total investment yield 5.8%.
+- p. 23: Hua Xia Bank carrying value RMB51.113bn, fair value RMB17.610bn, share of profit RMB4.151bn, cash dividend RMB1.038bn.
+- pp. 24, 102: operating cash flow RMB43.048bn; investing cash flow -RMB43.120bn; financing cash flow RMB4.012bn.
+- pp. 96-97: total assets RMB860.498bn; liabilities RMB571.795bn; parent equity RMB285.974bn; insurance contract liabilities RMB433.224bn.
+- pp. 5, 10: comprehensive/core solvency margin ratios 232.4%/213.4%; market share 31.6%.
+- pp. 5, 173-174: 2025 interim dividend RMB0.24/share and proposed final dividend RMB0.44/share.
+
+[calculations]
+- Forecast annual cash dividend = RMB0.68/share * 22.242bn shares = RMB15.12456bn.
+- Forecast dividend yield = RMB15.12456bn / RMB316.691719181bn = 0.0477579901.
+- Auxiliary net margin = parent net profit RMB40.370bn / insurance revenue RMB511.594bn = 0.0789102296. Gross margin is null because it lacks comparable meaning for an insurer.
+- Market cap / 2025 year-end parent equity = 1.1074x. This is discussed only as a specialist insurance valuation reference, not an ordinary earnback result.
+
+[limitations]
+- Market cap and PE TTM are reused from config/input.json (Tencent qt.gtimg.cn snapshot) and were not independently reconciled to exchange tick data.
+- Proposed final dividend remains subject to shareholder approval; FX and taxes can change H-shareholders' realized receipts.
+- Operating cash flow is disclosed but is not treated as ordinary free cash flow. Capex and operating FCF remain null because these measures do not have comparable economic meaning in this insurance model.
+
+[validation]
+status=ok
+errors=[]

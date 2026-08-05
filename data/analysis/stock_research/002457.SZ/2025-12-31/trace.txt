@@ -1,0 +1,89 @@
+stock-research trace
+company: 青龙管业 (002457.SZ)
+period: 2025-12-31
+generated_for: 2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields using protocol `set` commands; result was not authored as a complex JSON object from scratch.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+6. Final validation response: {"status":"ok","errors":[]}
+
+[reuse audit]
+- config/input.json existed and was used for company identity, reporting period, market cap, PE TTM and quote timestamp.
+- No annual facts package, normalized facts, prior stock research output, or raw filing metadata existed in the workspace or stated sync location.
+- Downloaded filing mirror to stock_report/data/raw/filings/002457.SZ/2025-12-31/2025-annual-report.pdf.
+- Core figures were cross-checked against the searchable full text of the same 2025 annual report. Official CNINFO 2025 performance forecast was used as an additional official source for the stated reasons for earnings decline.
+
+[sources]
+S1 青龙管业集团股份有限公司2025年年度报告, disclosed 2026-04-18, reporting date 2025-12-31.
+   searchable full text: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12108885&stockid=002457
+   filing PDF mirror: https://pdf.dfcfw.com/pdf/H2_AN202604171821299990_1.pdf
+S2 青龙管业集团股份有限公司2025年度业绩预告, CNINFO, 2026-01-24.
+   https://static.cninfo.com.cn/finalpage/2026-01-24/1224948263.PDF
+S3 config/input.json market snapshot: Tencent qt.gtimg.cn, 2026-07-31 11:42:51, market cap CNY 3,475,000,000, PE TTM 27.01.
+
+[model decision]
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Evidence: 2025 revenue was 88.20% non-metal mineral products and 11.80% water conservancy technical services. Pipe manufacturing is the core; installation/construction is ancillary to the product-plus-service offering.
+- The balance sheet is not structured around contract assets and project advances as the core business. Nevertheless, project receivables are economically important and were excluded from detachable cash.
+
+[financial facts and calculations]
+- revenue = 2,624,587,535.00
+- cost_of_sales = 1,844,565,723.26
+- gross_profit = 780,021,811.74
+- gross_margin = 780,021,811.74 / 2,624,587,535.00 = 0.2971978649361375
+- parent_net_profit = 129,629,361.85
+- net_margin = 129,629,361.85 / 2,624,587,535.00 = 0.049390374724156416
+- total_assets = 4,685,981,764.60
+- total_liabilities = 1,916,142,949.91
+- total_equity = 2,769,838,814.69
+- parent_equity = 2,545,278,339.34
+- minority_interest = 224,560,475.35
+- operating_cash_flow = 565,322,794.86
+- capital_expenditure = 156,683,151.14
+- operating_free_cash_flow = 408,639,643.72
+- OCF normalization warning: operating receivables decreased by 152,508,517.93 and operating payables increased by 50,255,529.62. The company attributed OCF improvement to collections and increased advances.
+
+[detachable cash]
+- cash and cash equivalents 653,305,859.40 * 80% = 522,644,687.52
+- trading financial assets 116,000,000.00 * 90% = 104,400,000.00
+- other non-current financial assets 102,095,503.40 * 50% = 51,047,751.70
+- debt and lease-related liabilities deducted at 100%:
+  short-term borrowings 588,157,831.00
+  long-term borrowings 100,000.00
+  current non-current liabilities 5,912,486.12
+  lease liabilities 15,787,629.72
+  total deduction 609,957,946.84
+- discounted detachable net cash = 68,134,492.38
+- Receivables, inventory, productive fixed assets, investment property and long-term equity investments were not treated as detachable cash.
+
+[sustainable cash profit]
+- starting point: 2025 recurring parent net profit = 119,977,160.33
+- safety adjustment = -29,977,160.33
+- discounted sustainable distributable cash profit = 90,000,000.00
+- Rationale: 2025 revenue and margins declined; unusually high OCF reflected working-capital release; capex of 156.68m exceeded depreciation plus amortization of about 115.03m; project receivables remain material.
+- This is an analytical assumption, not company guidance.
+
+[owner earnback formulas]
+- operating business price = 3,475,000,000.00 - 68,134,492.38 = 3,406,865,507.62
+- owner earnback years = 3,406,865,507.62 / 90,000,000.00 = 37.854061195777774
+- market cap to cash profit = 3,475,000,000.00 / 90,000,000.00 = 38.611111111111114
+- discounted net cash to market cap = 68,134,492.38 / 3,475,000,000.00 = 0.019607048166906473
+
+[dividend]
+- 2025 interim dividend: 0.4 yuan per 10 shares on 330,325,100 eligible shares = 13,213,004.00, implemented.
+- 2025 annual proposed dividend: 1.2 yuan per 10 shares on 330,325,100 eligible shares = 39,639,012.00.
+- 2025 attributable-period baseline total = 52,852,016.00.
+- forecast dividend yield = 52,852,016.00 / 3,475,000,000.00 = 0.015209213237410072.
+- This baseline is not a forecast or commitment for the 2026 attributable period.
+
+[data limitations]
+- No pre-generated annual facts package was available, so the filing had to be reacquired.
+- The annual-report PDF was available through a filing mirror; core values were checked against searchable annual-report text, while the official CNINFO performance forecast supplied official cross-checking.
+- The cited PCCP production ranking covers 2015-2022, not current 2025 market share.
+- Sustainable cash profit and haircuts are judgmental scenario inputs and are explicitly identified as such.

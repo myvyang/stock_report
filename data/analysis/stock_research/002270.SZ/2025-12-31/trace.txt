@@ -1,0 +1,98 @@
+stock-research trace
+company=华明装备
+code=002270.SZ
+period=2025-12-31
+generated_at=2026-08-01T00:42:51+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md as requested.
+3. Read references/data-reuse.md because the selected skill routes reuse decisions through it.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields with repeated protocol `set` commands; result.json was not hand-written from scratch.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result={"status":"ok","errors":[]}
+
+[local reuse check]
+- config/input.json exists and was used.
+- stock_report/data/raw/filings/002270.SZ/2025-12-31: no files available.
+- stock_report/data/analysis/annual_review/002270.SZ/2025-12-31: no facts.json, annual_facts.md, or extraction_trace.txt available.
+- stock_report/data/normalized/facts/002270.SZ/2025-12-31: no normalized annual facts available.
+- stock_report/data/analysis/stock_research/002270.SZ/2025-12-31: no prior research outputs available.
+- Consequence: core facts were reconstructed from public 2025 annual-report disclosures instead of reused from a local fact pack.
+
+[primary and corroborating sources]
+1. 华明电力装备股份有限公司2025年年度报告, disclosed 2026-02-27. Annual-report full text inspected through a public filing mirror:
+   https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=11972985&stockid=002270
+   Used for audited statements, business model, segment/product revenue and margins, industry position, audit opinion and key audit matters.
+2. Shenzhen Stock Exchange official 2025 annual-report summary PDF, disclosed 2026-02-27:
+   https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-02-27/7ade92ba-e3f8-49ef-ac2a-c8803c5d17d7.PDF
+   Used to corroborate issuer, annual-report period and disclosure.
+3. 关于2025年度利润分配预案的公告〔2026〕014, CNInfo, disclosed 2026-02-27:
+   https://static.cninfo.com.cn/finalpage/2026-02-27/1224986249.PDF
+   Used for the proposed dividend amount and payout basis.
+4. 2025年度权益分派实施公告, Shenzhen Stock Exchange, disclosed 2026-04-24:
+   https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-24/7fc2210d-611d-4581-a6c0-12acc1302e6e.PDF
+   Used to confirm that the RMB 188,155,636.62 distribution was implemented.
+5. config/input.json / Tencent qt.gtimg.cn snapshot:
+   market_cap=18095000000.00
+   market_cap_date=20260731114336
+   pe_ttm=25.8
+
+[model determination]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: the company manufactures and services transformer tap changers and CNC equipment. Cash, receivables, inventory, production assets, borrowings and lease liabilities have ordinary manufacturing meanings. The shrinking power-engineering unit is not large enough to make the consolidated company a construction-project model; its 2025 revenue was only RMB 28.90m and management intends to exit it.
+
+[audited 2025 facts, CNY]
+total_assets=5208442684.19
+total_liabilities=2036070254.77
+total_equity=3172372429.42
+parent_equity=3142189795.97
+minority_interest=30182633.45
+revenue=2426794600.12
+cost_of_sales=1104448872.37
+operating_profit=834263846.37
+net_profit=719626911.41
+parent_net_profit=709737360.27
+operating_cash_flow=604031442.90
+capital_expenditure=112136511.96
+financing_cash_flow=-586998119.85
+
+[calculations]
+gross_profit = 2426794600.12 - 1104448872.37 = 1322345727.75
+gross_margin = 1322345727.75 / 2426794600.12 = 0.5448969082
+net_margin = 709737360.27 / 2426794600.12 = 0.2924587748
+operating_free_cash_flow = 604031442.90 - 112136511.96 = 491894930.94
+discounted_sustainable_cash_profit = 491894930.94 * 0.90 = 442705437.85
+
+discounted cash components:
+  cash = 1292412414.14 * 0.80 = 1033929931.31
+  trading_financial_assets = 2477162.55 * 0.70 = 1734013.79
+deducted financing constraints:
+  short_term_borrowings = 220034333.35
+  current_portion_noncurrent_liabilities = 105974508.37
+  long_term_borrowings = 392718975.00
+  long_term_payables = 161016878.03
+  lease_liabilities = 336424995.89
+discounted_detachable_net_cash = -180505746.22
+
+operating_business_price = 18095000000.00 - (-180505746.22) = 18275505746.22
+owner_earnback_years = 18275505746.22 / 442705437.85 = 41.282548
+market_cap_to_cash_profit = 18095000000.00 / 442705437.85 = 40.87368
+forecast_cash_dividend = 188155636.62
+forecast_dividend_yield = 188155636.62 / 18095000000.00 = 0.0103987641
+
+[judgment boundaries]
+- The 80% cash haircut, 70% trading-asset haircut and full deduction of financing/lease obligations are conservative owner-control assumptions, not accounting facts.
+- The 10% haircut to 2025 operating free cash flow reflects a 32.08% year-on-year decline in operating cash flow and receivables being a key audit matter. It is a judgment and a sensitivity point.
+- Company-stated domestic/global market positions were attributed to the annual report; no independent market-share dataset was available.
+- The result-contract field is named forecast_cash_dividend, but as of the research date the RMB 188,155,636.62 distribution had already been implemented; the static yield still uses the later 2026-07-31 market cap.
+- The 2025 cash-flow line for dividends/profit/interest includes interest and minority distributions and was not represented as pure common-stock dividend history.
+
+[quality]
+status=complete
+incomplete_reasons=[]
+limitations are recorded in outputs/result.json and outputs/report.md.

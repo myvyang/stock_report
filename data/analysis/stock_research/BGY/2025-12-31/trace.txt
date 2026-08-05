@@ -1,0 +1,75 @@
+stock-research trace — BGY — period 2025-12-31
+generated_at_input: 2026-08-04T15:12:15+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized the result with the required protocol CLI
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+- No existing BGY 2025 annual facts package or raw filing was present under the input-provided stock_report paths.
+- Research therefore returned to the primary annual filing.
+
+4. Primary filing
+- SEC Form N-CSR, accession 0001193125-26-093596
+- Period of report: 2025-12-31; filed 2026-03-05
+- Filing URL: https://www.sec.gov/Archives/edgar/data/1314966/000119312526093596/d28275dncsr.htm
+- BlackRock PDF: https://www.blackrock.com/us/individual/literature/annual-report/ar-retail-equity-trust.pdf
+
+5. Model classification
+- The filing identifies BGY as a closed-end registered management investment company.
+- Its operating assets are dividend-paying non-U.S. equities and derivatives.
+- Overrode input hint ordinary_operating/applicable with investment_holding/not_applicable.
+- Ordinary owner-earnback fields remain null because investments and options are the business itself.
+
+6. Extracted USD facts
+- Total assets: 585,138,251
+- Total liabilities: 14,590,420
+- Net assets: 570,547,831
+- Investments, unaffiliated: 568,428,848
+- Investments, affiliated: 8,533,259
+- Cash pledged for OTC derivatives: 6,845,349
+- Options written liability: 8,837,872
+- Deferred foreign capital gain tax: 2,460,170
+- Shares outstanding: 90,614,455
+- NAV/share: 6.30; market price/share: 5.88; same-date discount: 6.6667%
+- Net investment income: 8,690,620
+- Net realized gain: 30,252,136
+- Net unrealized appreciation: 44,262,009
+- Increase in net assets resulting from operations: 83,204,765
+- 2025 distributions: 47,020,037; return of capital: 8,171,337
+- 2024 distributions: 41,087,555
+- Monthly distribution/share at year-end: 0.042600; annualized: 0.511200
+- Total expense ratio: 1.21%; after waiver/reimbursement: 1.20%
+- Portfolio turnover: 61%
+- Call overwrite: 43.6%; estimated 3.2% out of money; average maturity 59.7 days
+- 2025 total return: NAV 16.51%, market 21.03%, call-overwrite benchmark 28.36%, broad ex-US benchmark 32.39%
+
+7. Currency conversion
+- Banque de France daily parities, 2025-12-31: EUR/USD 1.1750; EUR/CNY 8.2262.
+- Cross rate used: 8.2262 / 1.1750 = 7.0010212766 CNY per USD.
+- URL: https://www.banque-france.fr/en/statistics/rates-and-prices/exchange-rates-daily-parities-2025-12-31
+- All filing amounts in result.json were converted to absolute CNY yuan using that rate.
+- Input market cap was already CNY and was not reconverted.
+
+8. Dividend forecast
+- Mechanical continuation only: 90,614,455 shares × USD 0.5112 × 7.0010212766 = CNY 324,302,073.46.
+- Forecast yield: CNY 324,302,073.46 / input market cap CNY 3,534,275,764.75 = 9.1759%.
+- Distribution is not guaranteed and may include return of capital.
+
+9. Market data carried from input
+- Market cap: CNY 3,534,275,764.754242
+- Date: 2026-08-03
+- Source: Yahoo Finance yfinance
+- PE TTM: 6.4222226
+- PE is retained as an input market field but judged economically weak for a closed-end fund.
+
+10. Protocol writes and validation
+- outputs/result.json was initialized and populated through protocol init/set commands, not handwritten from a blank JSON object.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed-result validation status: ok; errors: [].
+

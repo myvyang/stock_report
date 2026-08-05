@@ -1,0 +1,71 @@
+Stock research trace — NEM — period 2025-12-31
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill requires reuse assessment.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields exclusively through protocol CLI `set` commands; the complex JSON object was not hand-written from scratch.
+
+2. Reuse audit
+- Checked the configured annual-review, normalized-facts, raw-filing, and prior stock-research paths.
+- No local NEM 2025 filing, annual facts package, normalized facts, or prior research result was present.
+- Therefore retrieved the official SEC filing and used the official Newmont results release for supplemental operating and forward-looking information.
+
+3. Primary sources
+- SEC Form 10-K, accession 0001164727-26-000010, filed 2026-02-19:
+  https://www.sec.gov/Archives/edgar/data/1164727/000116472726000010/nem-20251231.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/1164727/000116472726000010/0001164727-26-000010-index.htm
+- Newmont FY2025 results and enhanced capital allocation framework, dated 2026-02-19:
+  https://investors.newmont.com/investors/news-release/news-details/2026/Newmont-Reports-Fourth-Quarter-and-Full-Year-2025-Results-Provides-2026-Guidance-and-Announces-Enhanced-Capital-Allocation-Framework/default.aspx
+- Market cap, market date, PE TTM and market source were reused verbatim from config/input.json.
+
+4. Extraction and conversion
+- SEC inline XBRL facts used (USD millions): revenue 22,669; costs applicable to sales excluding DDA 8,085; DDA 2,521; reclamation/mine shutdown/environment expense 249; total costs and expenses 11,708; consolidated net income 7,167; NCI income 82; parent net income 7,085; operating cash flow 10,334; productive-asset additions 3,035; financing cash flow -7,040; dividends paid 1,106; repurchases 2,303.
+- Balance sheet facts used (USD millions): assets 57,121; liabilities 23,079; total equity 34,042; parent equity 33,867; NCI 175; cash 7,647; PP&E/mine development net 33,310; long-term debt 5,115; lease and other financing obligations 474; ARO and environmental contingencies 7,190; long-term investments 4,186; goodwill 2,658.
+- All statement amounts converted at the research convention USD/CNY = 7.00. This is a rounded comparability assumption, not a quoted spot rate.
+
+5. Derived financial formulas
+- Gross profit research convention = revenue - costs applicable to sales excluding DDA - DDA - reclamation/mine shutdown/environment expense
+  = 22,669 - 8,085 - 2,521 - 249 = USD 11,814m = CNY 82,698m.
+- Gross margin = 82,698 / 158,683 = 52.1150%.
+- Operating profit = revenue - total costs and expenses = 22,669 - 11,708 = USD 10,961m = CNY 76,727m.
+- Parent net margin = 49,595 / 158,683 = 31.2525%.
+- Operating free cash flow = 10,334 - 3,035 = USD 7,299m = CNY 51,093m.
+- Dividend and buyback cash out = (1,106 + 2,303) * 7 = CNY 23,863m.
+
+6. Model decision
+- statement_model = ordinary_operating.
+- owner_earnback_applicability = applicable.
+- Reason: cash, financing debt, mine operating assets and operating obligations can be economically separated. Mining-specific constraints are handled through cash and profit haircuts rather than switching to a special statement model.
+- Mining-specific treatment: do not treat all cash as detachable because the business requires working liquidity, taxes, ongoing mine development, and reclamation funding; normalize record-year cash generation.
+
+7. Owner earnback assumptions and formulas
+- Book net cash base = cash 7,647 - long-term debt 5,115 - lease/other financing 474 = USD 2,058m = CNY 14,406m.
+- Detachable cash haircut = 50%; discounted detachable net cash = CNY 7,203m.
+- Sustainable cash-profit base = 2025 operating FCF USD 7,299m.
+- Cycle/distributability haircut = 20%; discounted sustainable cash profit = 7,299 * 80% * 7 = CNY 40,874.4m.
+- Operating business price = 666,307,669,485.5156 - 7,203,000,000 = CNY 659,104,669,485.5156.
+- Owner earnback years = 659,104,669,485.5156 / 40,874,400,000 = 16.1251.
+- Market cap / cash profit = 666,307,669,485.5156 / 40,874,400,000 = 16.3013.
+- These haircuts are explicit research judgments, not reported facts or forecasts.
+
+8. Dividend forecast
+- Management's annual sustainable cash-dividend target = USD 1.1bn.
+- Forecast cash dividend = 1.1bn * 7.00 = CNY 7.7bn.
+- Forecast yield = 7.7bn / 666,307,669,485.5156 = 1.15555%.
+- Future quarterly dividends remain subject to board approval; annual target is non-binding.
+
+9. Data-quality limitations
+- Financial period is 2025-12-31 while market data is dated 2026-08-03.
+- Fixed FX assumption may differ from spot, average, or transaction-date FX.
+- Gross profit is a disclosed-component research construction because the mining income statement does not present a single gross-profit subtotal matching the protocol field.
+- Owner cash and sustainable cash profit depend on subjective but disclosed haircuts.
+
+10. Validation
+- Command executed after population:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[]

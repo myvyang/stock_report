@@ -1,0 +1,62 @@
+TS WONDERS (01767.HK) stock research trace
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the task required determining reuse boundaries.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked stock_report/data/analysis/annual_review/01767.HK/2025-12-31, raw filing directory, normalized facts path and prior stock-research path.
+- No annual facts package, extraction trace, raw filing metadata or prior research result was available in the workspace.
+- Returned to primary public filing rather than inventing missing facts.
+
+3. Primary sources
+- HKEX Annual Report 2025, released 2026-04-27:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042701058.pdf
+- Relevant annual-report locations:
+  pp. 13-16: product revenue, gross margins and management discussion.
+  pp. 109-111: income statement and balance sheet.
+  pp. 113-114: cash-flow statement.
+  p. 158: dividends.
+  pp. 31, 43-44: seasonality, customer/supplier relationships and risks.
+- Market-cap snapshot and PE: config/input.json, source identified there as Tencent qt.gtimg.cn.
+- FX sources: ECB annual-average CNY/EUR 8.1185 and SGD/EUR 1.4765; 2025-12-31 CNY/EUR 8.2262, SGD/EUR 1.5105.
+
+4. Model override
+- Input hint: financial_brokerage / requires_special_model.
+- Filing evidence: the group manufactures and sells nuts, chips and other snack foods. Balance-sheet structure is ordinary manufacturing/distribution, with PPE, inventories, receivables, cash, trade payables and small lease/borrowing balances.
+- Decision: ordinary_operating / applicable. The hint was factually incorrect and was overridden.
+
+5. Currency conversion
+- Income statement and cash flows: 1 SGD = 8.1185 / 1.4765 = 5.498476126 CNY (2025 average cross-rate).
+- Balance sheet: 1 SGD = 8.2262 / 1.5105 = 5.446011255 CNY (2025-12-31 cross-rate).
+- Dividend: 1 HKD = 8.2262 / 9.1464 = 0.899392 CNY (2025-12-31 cross-rate).
+- Amounts in outputs/result.json are absolute CNY yuan as required by the contract.
+
+6. Core calculations
+- Gross margin = S$18,968,464 / S$72,798,681 = 26.0561%.
+- Net margin = S$2,964,566 / S$72,798,681 = 4.0723%.
+- Operating free cash flow = S$2,532,596 operating cash flow - S$845,038 PPE purchases = S$1,687,558 = CNY9,278,997.
+- Forecast cash dividend = HKD2,300,000 = approximately CNY2,068,602.
+- Forecast dividend yield = CNY2,068,602 / CNY275,296,001 = 0.7514%.
+
+7. Owner earnback judgment
+- Reported cash: CNY210,346,957.
+- Cash haircut: retain 60%; reserve 40% for working capital, seasonal inventory, tax and operations.
+- Lease liabilities plus short-term borrowing: CNY8,415,182, deducted at 100%.
+- Discounted detachable net cash = CNY210,346,957 x 60% - CNY8,415,182 = CNY117,792,992.
+- Sustainable cash profit starts from 2025 parent net profit CNY16,300,595 and applies a 20% haircut for margin decline, expense growth, inventory cash absorption and non-core interest income: CNY13,040,476.
+- Operating business price = CNY275,296,001 - CNY117,792,992 = CNY157,503,010.
+- Owner earnback years = CNY157,503,010 / CNY13,040,476 = 12.0780.
+- Market cap / discounted cash profit = 21.1109.
+- Haircuts are analyst judgments, clearly separated from filing facts.
+
+8. Validation
+- Populated result.json through protocol CLI set commands after protocol initialization; did not construct the complete JSON from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report/trace final checks: status ok, no errors.
+

@@ -1,0 +1,73 @@
+Stock research trace — 01587.HK — period 2025-12-31
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reused sources
+- stock_report/data/analysis/annual_review/01587.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/01587.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/01587.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/01587.HK/2025-12-31/metadata.json
+- stock_report/data/raw/filings/01587.HK/2025-12-31/imported_from_agent_runs/2a2c024bd9c0-shineroad_annual_report_2025.txt
+- Underlying PDFs: 2025 sha256 aa64c71467eedd507ceef16b4881a7199e78a3fe865dd5cef5f5af7aded392da; 2024 sha256 53ff87c844804d5c6b8deb4e8b7807b4e44ccdff8b9afb233921ca38ad8c0b90.
+
+3. Identity and model review
+- The input hint said financial_brokerage. This was rejected after checking the annual report.
+- Annual report note 5 and business review show revenue from distributing food ingredients and food additives, recognized on delivery.
+- FVTPL assets are a listed investment reclassified after loss of associate status, not securities inventory of a brokerage.
+- Final model: ordinary_operating; owner_earnback_applicability: applicable.
+
+4. Unit conversion and formulas
+- Annual report unit RMB'000 was multiplied by 1,000. Result JSON uses absolute CNY yuan.
+- Gross margin = 120,905,000 / 651,482,000 = 0.1855845595.
+- Net margin = 57,616,000 / 651,482,000 = 0.0884383605.
+- Operating free cash flow = 56,764,000 - 39,610,000 = 17,154,000.
+- Forecast dividend yield = 9,213,000 / 292,502,001.52397156 = 0.0314972204.
+
+5. Owner earnback assumptions
+- Cash and equivalents: +186,819,000 at 100%.
+- Non-pledged time deposit: +30,000,000 at 100%.
+- Operating cash reserve: -65,000,000, analyst assumption approximately 10% of annual revenue.
+- Pledged deposits: 19,566,000 at 0%, because pledged for letters of credit and land development obligations.
+- Bank borrowings: -97,134,000 at 100%.
+- Lease liabilities: -2,158,000 at 100%.
+- FVTPL listed investment: 132,751,000 at 50% = +66,375,500 due to undisclosed disposal plan, tax basis and liquidity restrictions.
+- Deferred tax liabilities: -7,963,000.
+- Discounted detachable net cash = 110,939,500.
+- Operating business price = market cap 292,502,001.52397156 - 110,939,500 = 181,562,501.52397156.
+
+6. Sustainable cash profit
+- Start with 2025 parent net profit 57,616,000.
+- Remove deemed disposal gain 16,288,000.
+- Remove FVTPL fair-value gain 9,563,000.
+- Unrounded adjusted profit = 31,765,000.
+- Adopt 30,000,000 after allowing for working-capital volatility and uncertainty over maintenance capex.
+- Owner earnback years = 181,562,501.52397156 / 30,000,000 = 6.0520833841.
+- Market cap to cash profit = 292,502,001.52397156 / 30,000,000 = 9.7500667175.
+
+7. Dividend
+- 2025 annual report: proposed final dividend HKD 0.015 per share, approximately CNY 0.0135 per share, 680,000,000 shares, total CNY 9,213,000; shareholder approval required.
+- 2024 dividend paid in 2025: CNY 14,099,000.
+
+8. Data limitations
+- Imported filing manifest has no HKEX/company primary URL.
+- No split of listed parent cash versus Mainland subsidiary cash.
+- No intended disposal plan, tax basis or liquidity restriction detail for the listed FVTPL investment.
+- No separately disclosed maintenance capex.
+- Market cap and PE were reused from the input Tencent snapshot and not refreshed.
+
+9. Protocol mutations and validation
+- outputs/result.json was initialized, then populated using protocol set and append commands; it was not hand-written from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed-result validation status: ok; errors: [].
+
+10. Output consistency checks
+- Required outputs: outputs/result.json, outputs/report.md, outputs/trace.txt.
+- No buy/sell recommendation or target price included.
+- Facts, inferences and analyst assumptions are labeled separately in the report and structured result.

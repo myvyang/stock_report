@@ -1,0 +1,47 @@
+stock-research trace: 01099.HK / 2025-12-31 annual
+generated for task created_at: 2026-08-03T14:12:18+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill's reuse workflow applied.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- No annual facts, normalized facts, prior stock-research result, or filing metadata existed for 01099.HK/2025-12-31.
+- Downloaded the official 2025 annual report to stock_report/data/raw/filings/01099.HK/2025-12-31/annual-report-2025.pdf.
+- Official source: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042400680.pdf
+- HKEX release date: 2026-04-24.
+
+3. Model override
+- Input hint: financial_brokerage / requires_special_model.
+- Filing evidence: company profile and segment reporting show pharmaceutical distribution, medical-device distribution, retail pharmacy, and other operating businesses.
+- Decision: override to ordinary_operating / applicable.
+- Constraint: cash and borrowings are evaluated with the distribution working-capital cycle; receivables, inventory, restricted deposits, and supplier finance are not detachable financial assets.
+
+4. Core extraction (annual report page references)
+- P100 consolidated profit or loss: revenue RMB575,167,877,000; cost RMB533,495,864,000; gross profit RMB41,672,013,000; operating profit RMB16,038,224,000; net profit RMB10,834,434,000; parent profit RMB7,155,094,000.
+- P102-P104 financial position: assets RMB390,361,212,000; liabilities RMB256,201,470,000; total equity RMB134,159,742,000; parent equity RMB83,953,384,000; NCI RMB50,206,358,000.
+- P107 cash flow: OCF RMB14,138,206,000; PPE purchases RMB1,495,748,000; intangible purchases RMB108,460,000; derived operating FCF RMB12,533,998,000; financing cash flow RMB-18,686,650,000.
+- P102/P193-P194 liquidity: cash equivalents RMB48,796,132,000; pledged/restricted/>3-month deposits RMB12,764,286,000; RMB8,784,547,000 explicitly pledged for notes, LCs, guarantees and other uses.
+- P102 and P195-P196: receivables RMB205,622,310,000; inventory RMB63,341,334,000; interest-bearing borrowings RMB66,966,648,000.
+- P150 segments: external revenue pharma RMB415,312,406,000; devices RMB115,182,314,000; retail RMB37,932,797,000; operating profit pharma RMB11,878,259,000; devices RMB2,571,905,000; retail RMB600,251,000.
+- P69/P161 dividends: proposed 2025 DPS RMB0.69, total RMB2,153,253,000; 2024 DPS RMB0.68, total RMB2,122,046,000.
+
+5. Derived figures and judgments
+- Gross margin = 41,672,013,000 / 575,167,877,000 = 0.072454.
+- Parent net margin = 7,155,094,000 / 575,167,877,000 = 0.012440.
+- Operating FCF = 14,138,206,000 - 1,495,748,000 - 108,460,000 = 12,533,998,000.
+- Detachable net cash = RMB0: all RMB61.56bn funds excluded because borrowings are RMB66.97bn and cash supports working capital; restricted/pledged funds are not detachable.
+- Sustainable distributable cash profit = RMB6.50bn, a 9.2% haircut to parent profit and below annual operating FCF.
+- Operating business price = RMB46,660,091,343.10484 - RMB0 = RMB46,660,091,343.10484.
+- Owner earnback = 46,660,091,343.10484 / 6,500,000,000 = 7.178475591247 years.
+- Forecast yield = 2,153,253,000 / 46,660,091,343.10484 = 0.04614764.
+- Market valuation source was not independently recomputed: config/input.json, Tencent qt.gtimg.cn, 2026/07/31 16:08:45.
+
+6. Protocol writes and validation
+- Populated outputs/result.json only through protocol set commands after protocol initialization; did not hand-write the result object.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].

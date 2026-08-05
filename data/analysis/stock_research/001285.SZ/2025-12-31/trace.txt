@@ -1,0 +1,59 @@
+task=stock_research
+company=001285.SZ 瑞立科密
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-03T11:12:52+08:00
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+populate=protocol set commands in /workspace/update_result.sh
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse_check]
+annual_facts_json=missing
+annual_facts_md=missing
+annual_extraction_trace=missing
+normalized_facts_json=missing
+prior_stock_research=missing
+decision=download and inspect official 2025 annual report; do not substitute older-period data
+
+[sources]
+official_annual_report=https://static.cninfo.com.cn/finalpage/2026-04-15/1225100249.PDF
+official_annual_report_local=stock_report/data/raw/filings/001285.SZ/2025-12-31/annual-report-2025.pdf
+annual_report_date=2026-04-15
+market_snapshot=config/input.json; Tencent qt.gtimg.cn; 2026-07-31T16:14:21+08:00
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=automotive electronics and precision die-casting manufacturer; receivables, inventory, production assets and trade payables are ordinary operating structure
+special_handling=IPO proceeds invested in low-risk wealth-management products are not treated as fully detachable
+
+[core_formulas]
+gross_profit=2392748154.09-1691838478.21=700909675.88
+gross_margin=700909675.88/2392748154.09=0.2929308188
+net_margin=333030600.76/2392748154.09=0.1391833069
+operating_fcf_2025=367308750.68-190975416.28=176333334.40
+operating_fcf_2024=491663191.64-147798413.05=343864778.59
+two_year_fcf_average=(176333334.40+343864778.59)/2=260099056.50
+discounted_cash_profit=260099056.50*0.90=234089150.85
+discounted_net_cash=602114286.15*0.80+1603717662.51*0.50-36783118.89=1246767141.28
+operating_business_price=7461000000.00-1246767141.28=6214232858.72
+owner_earnback_years=6214232858.72/234089150.85=26.5464368437
+market_cap_to_cash_profit=7461000000.00/234089150.85=31.8724724023
+forecast_dividend_yield=100179070.30/7461000000.00=0.0134270299
+
+[judgment_boundaries]
+fact=financial statement amounts, business mix, customer concentration, low-risk wealth-management classification and dividend proposal are from annual report
+inference=ordinary operating model applies because the balance sheet is not the business itself
+assumption=cash discount 80%, wealth-management discount 50%, two-year FCF haircut 10%
+limitation=market snapshot not independently reconciled to exchange close; dividend was a proposal at annual-report publication
+
+[validation]
+status=ok
+data_quality=complete
+incomplete_reasons=[]

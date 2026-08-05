@@ -1,0 +1,71 @@
+APAM stock-research trace
+generated_at: 2026-08-04T23:57:57+08:00
+period: 2025-12-31 annual
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because no annual fact package was present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked stock_report/data/analysis/annual_review/APAM/2025-12-31 and raw filing directory.
+- No usable pre-existing annual facts package was found, so returned to the primary filing.
+
+3. Primary sources acquired
+- SEC 2025 Form 10-K, accession 0001517302-26-000047, filed 2026-02-20:
+  https://www.sec.gov/Archives/edgar/data/1517302/000151730226000047/apam-20251231.htm
+- SEC 2025 earnings release exhibit:
+  https://www.sec.gov/Archives/edgar/data/1517302/000151730226000025/artisanye2025earningsrelea.htm
+- SEC Companyfacts for CIK 0001517302 used to cross-check XBRL facts.
+- IRS 2025 yearly average exchange rate: USD/CNY 7.129.
+- Market cap and PE reused exactly from config/input.json (Yahoo Finance yfinance, 2026-08-03).
+
+4. Model determination
+- Confirmed ordinary_operating / applicable.
+- Reason: client AUM is off balance sheet; APAM earns advisory fees and does not fund customer assets like a bank or broker.
+- Required special handling: exclude consolidated investment products belonging economically to third parties; use APAM-attributable earnings only; recognize 13% Holdings limited-partner ownership and Up-C TRA structure.
+
+5. Currency convention
+- All USD filing amounts multiplied by 7.129 to satisfy the result contract's CNY absolute-yuan rule.
+- The same research translation rate was used for comparability; limitation recorded because it is not a balance-sheet-date spot rate.
+
+6. Key filing facts (USD)
+- Revenue 1,196.688m; management fees 1,167.564m; performance fees 29.124m.
+- Operating income 399.631m; total net income 377.879m; APAM net income 290.320m.
+- Assets 1,577.292m; liabilities 794.873m; total equity 478.156m; APAM equity 438.831m.
+- Company cash 214.446m; company investment securities 228.044m; borrowings 189.140m.
+- Consolidated investment product assets 461.975m and liabilities 14.755m excluded from owner cash.
+- Operating cash flow 171.988m; physical capex and leasehold improvements 0.677m.
+- Ending AUM 179,928m; average AUM 173,004m; net client outflow 12,662m.
+- Paid dividends 257.105m; 2025-related dividend disclosed at USD 3.87/share.
+
+7. Owner earnback calculation
+- Discounted company cash: CNY 1,528,785,534 x 80% = CNY 1,223,028,427.
+- Discounted company investments: CNY 1,625,725,676 x 50% = CNY 812,862,838.
+- Less borrowings: CNY 1,348,379,060 x 100%.
+- Discounted detachable net cash: CNY 687,513,631.
+- Starting APAM net income: CNY 2,069,691,280.
+- Less estimated after-tax APAM share of nonconsolidated investment gains: CNY 194,859,000.
+- Less capex: CNY 4,826,333.
+- Apply 90% sustainability factor: CNY 1,683,156,900.
+- Operating business price: CNY 18,798,412,533.101807 - CNY 687,513,631 = CNY 18,110,898,902.101807.
+- Owner earnback: 10.7601 years. Market cap/cash profit: 11.1685x.
+
+8. Dividend forecast
+- 70,472,750 Class A shares x USD 3.87/share x 7.129 = CNY 1,944,288,908.
+- Forecast yield on input market cap = 10.3428%.
+- This is based on disclosed 2025-related dividends, not a guaranteed future dividend.
+
+9. Known limitations
+- Service-company gross margin is 100% only because the filing reports no cost of sales; operating margin is economically more useful.
+- Consolidated fund securities trading distorts GAAP operating cash flow.
+- Grandview closed after the reporting date, and its purchase price allocation is absent from 2025 statements.
+- Market snapshot is a third-party input and was not replaced.
+
+10. Protocol validation
+- outputs/result.json was populated through protocol `set` commands after protocol initialization.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Expected/final status: ok, errors: [].

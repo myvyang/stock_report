@@ -1,0 +1,71 @@
+stock-research trace
+task: BNT / Brookfield Wealth Solutions Ltd. / annual 2025-12-31
+generated context date: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the selected skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- Checked stock_report/data/raw/filings/BNT/2025-12-31, annual_review, normalized facts, and prior stock_research paths.
+- No BNT filing, annual fact package, normalized fact package, or prior research output existed in the workspace.
+- Therefore returned to primary public disclosures.
+
+3. Identity and model verification
+- SEC Form 20-F filing: accession 0001837429-26-000008, filed 2026-03-25.
+- Official issuer FAQ confirms former ticker BNRE changed to BNT and Class A exchangeable shares trade on NYSE and TSX.
+- Form 20-F confirms insurance operations in Annuities, P&C, Life Insurance, and Corporate and Other.
+- Form 20-F confirms each Class A exchangeable share is intended to be economically equivalent to, and exchangeable 1:1 for, a BN Class A share; distributions are synchronized.
+- Overrode input hint ordinary_operating/applicable with financial_insurance/not_applicable.
+
+4. Core financial extraction (USD millions, audited unless noted)
+- Total assets 157,181; total liabilities 139,264; total equity 17,917.
+- Parent-class equity 17,586 (= total equity 17,917 - NCI 331); NCI 331.
+- Revenue 11,635; net income 863; parent net income 766 (= 16 Class A/B + 750 Class C); NCI net income 97.
+- Investments 109,569; cash/cash equivalents/short-term investments 13,489.
+- Policyholder account balances 92,992; future policy benefits 16,249; policy and contract claims 7,277; market risk benefits 4,536.
+- Corporate borrowings 628; non-recourse borrowings 4,857.
+- Financing cash flow 7,810; return of capital to common stockholders 112.
+- DOE 1,699 (non-GAAP): Annuities 1,663; P&C 399; Life 153; Corporate and Other -516.
+- Sources: audited statements and MD&A in 2025 Form 20-F; results release used as cross-check.
+
+5. Currency conversion
+- Protocol requires CNY absolute yuan.
+- Used Federal Reserve H.10 USD/CNY spot rate 7.1875 for 2025-12-31.
+- Applied that year-end rate to both stock and flow statement amounts for consistent display.
+- Limitation recorded: flow translations are not average-rate translations.
+
+6. Dividend estimate
+- Official 2026-02-12 results release declared quarterly return of capital of USD 0.07 per share, annualized USD 0.28.
+- 2025-12-31 shares: Class A 65,307,416; Class B 36,000; Class C 272,687,160; total 338,030,576.
+- Forecast total distribution = 338,030,576 * USD 0.28 * 7.1875 = CNY 680,286,534.20.
+- Forecast yield = CNY 680,286,534.20 / CNY 79,965,241,579.03711 = 0.0085072779.
+- Estimate assumes equal per-share distribution for all three ordinary classes and static year-end share count; limitation recorded.
+
+7. Special-model handling
+- Kept gross margin null because insurance benefits and investment income do not form a comparable cost-of-sales gross margin.
+- Kept operating cash flow, capex, and operating free cash flow null because policyholder deposits/withdrawals and investment purchases/sales are core insurance balance-sheet flows rather than ordinary working capital.
+- Kept all ordinary owner-earnback fields null as required by contract.
+- Explained that investment assets are matched to insurance liabilities and cannot be treated as detachable net cash.
+- Flagged mismatch between quoted Class A economics and consolidated Class C profit attribution; input PE is retained as supplied market data but not interpreted as direct Class A claim on BNT consolidated income.
+
+8. Result construction and validation
+- Populated initialized result exclusively with repeated protocol `set` commands; did not hand-write result.json from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation response: {"status":"ok","errors":[]}.
+
+9. Primary URLs consulted
+- https://www.sec.gov/Archives/edgar/data/1837429/000183742926000008/bnt-20251231.htm
+- https://www.sec.gov/Archives/edgar/data/1837429/000117184326000766/exh_991.htm
+- https://bnt.brookfield.com/stock-distributions/faqs
+- https://bnt.brookfield.com/stock-distributions/distributions
+- https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+
+10. Output files
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

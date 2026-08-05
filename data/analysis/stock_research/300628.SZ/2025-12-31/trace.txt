@@ -1,0 +1,61 @@
+stock-research trace
+company=300628.SZ 亿联网络
+period=2025-12-31 annual
+generated_date=2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields exclusively through repeated protocol set commands.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[sources]
+official_filing=stock_report/data/raw/filings/300628.SZ/2025-12-31/annual-report.pdf
+official_url=https://static.cninfo.com.cn/finalpage/2026-04-22/1225142083.PDF
+official_sha256=5ba5d667d55c02fc48599dd7d48e4967333e3bec5a384d627d165adacdc807c9
+filing_disclosed=2026-04-22
+reused_review=stock_report/data/analysis/annual_review/300628.SZ/2025-12-31/result.json
+reused_review_report=stock_report/data/analysis/annual_review/300628.SZ/2025-12-31/report.md
+market_snapshot=Tencent qt.gtimg.cn; 20260731114345; market_cap=49828000000; pe_ttm=18.49
+
+[filing_checks]
+PDF pages 16-24: business model, industry position, product and region revenue, margins, customers.
+PDF pages 86-95: consolidated balance sheet, income statement, cash flow statement.
+PDF page 146 and page 164: trading financial assets and other non-current financial assets.
+PDF pages 208-210: receivable concentration and financial instrument risks.
+PDF page 218: annual dividend proposal and cumulative 2025 dividend.
+
+[core_calculations]
+gross_profit=6033175769.11-2212995506.01=3820180263.10
+gross_margin=3820180263.10/6033175769.11=0.6331955854
+net_margin=2600608389.66/6033175769.11=0.4310513218
+operating_fcf_2025=1832386223.28-52960102.89=1779426120.39
+operating_fcf_2024=2508929797.03-140117334.32=2368812462.71
+two_year_avg_fcf=(1779426120.39+2368812462.71)/2=2074119291.55
+discounted_sustainable_cash_profit=1900000000.00
+
+[discounted_cash]
+bank_wealth=875105899.47*0.90=787595309.52
+securities_asset_management=3246940220.47*0.75=2435205165.35
+transferable_certificates_of_deposit=807174046.59*0.95=766815344.26
+noncurrent_securities_asset_management=100106445.54*0.60=60063867.32
+lease_liabilities=-(4725814.41+4081540.70)=-8807355.11
+cash_and_equivalents_discounted=0; reason: 834944541.01 < 3995813487.59*25%=998953371.90 required operating cash
+discounted_detachable_net_cash=4040872331.35
+
+[earnback]
+operating_business_price=49828000000.00-4040872331.35=45787127668.65
+owner_earnback_years=45787127668.65/1900000000.00=24.09848825
+market_cap_to_cash_profit=49828000000.00/1900000000.00=26.22526316
+discounted_net_cash_to_market_cap=4040872331.35/49828000000.00=0.0810964183
+forecast_dividend_yield=1646825741.60/49828000000.00=0.0330502075
+
+[judgment_boundaries]
+statement_model=ordinary_operating; confirmed from standardized equipment sales, outsourced manufacturing, own cash/investments, and absence of special-model balance sheet items.
+Securities asset-management discount rates are analyst assumptions due to incomplete underlying asset, maturity, and exit-cost disclosure.
+Sustainable cash profit is an analyst estimate based on two-year operating FCF with an additional working-capital and durability haircut; it is not company guidance.
+No buy/sell recommendation or target price was produced.

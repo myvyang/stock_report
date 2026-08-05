@@ -1,0 +1,69 @@
+task=stock-research 600546.SH period=2025-12-31
+generated_at=2026-07-31T19:32:32+08:00
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+populate=outputs/build_result.sh (protocol set commands)
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse_check]
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+historical_stock_research=missing
+decision=return to disclosed annual report
+
+[sources]
+1. 山煤国际能源集团股份有限公司2025年年度报告，披露日2026-04-24；全文镜像 https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12169526&stockid=600546
+2. 山煤国际2025年度利润分配方案，上交所公告：https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-24/600546_20260424_8ITM.pdf
+3. Tencent qt.gtimg.cn market snapshot supplied in config/input.json, timestamp=20260731114330
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=coal mining and sales are ordinary operating activities; mine assets and working liabilities are operating assets/liabilities, while restricted restoration funds, debt, minority interests and cyclicality require explicit adjustments.
+
+[core_extraction]
+revenue=20472192649.15
+cost_of_sales=13182615000.27
+gross_profit=7289577648.88
+operating_profit=3260723674.23
+net_profit=1689226029.39
+parent_net_profit=1166433540.93
+parent_net_profit_ex_nonrecurring=1252646366.10
+total_assets=39423639558.87
+total_liabilities=20190325730.23
+total_equity=19233313828.64
+parent_equity=16164962141.07
+minority_interest=3068351687.57
+operating_cash_flow=3355765384.80
+capital_expenditure=1218488571.08
+operating_free_cash_flow=2137276813.72
+cash_and_cash_equivalents=3250422372.85
+restricted_cash=2812543570.81
+long_term_borrowing=6008971783.92
+current_portion_long_term_borrowing=377446809.05
+forecast_cash_dividend=703771929.70
+
+[calculations]
+gross_margin=(20472192649.15-13182615000.27)/20472192649.15=0.3560711786
+net_margin=1166433540.93/20472192649.15=0.0569774595
+operating_free_cash_flow=3355765384.80-1218488571.08=2137276813.72
+forecast_dividend_yield=703771929.70/25038000000=0.0281089519
+discounted_detachable_net_cash=max(0,3250422372.85-6406412890.87)=0
+discounted_sustainable_cash_profit=1252646366.10-152646366.10=1100000000.00
+operating_business_price=25038000000-0=25038000000
+owner_earnback_years=25038000000/1100000000=22.7618181818
+
+[judgment]
+Cash: restricted restoration/reclamation funds discounted to zero; unrestricted consolidated cash offset by interest-bearing debt, so detachable net cash is zero.
+Profit: use ex-nonrecurring parent profit rather than consolidated FCF; apply 152.65m buffer for coal-price cyclicality and sustaining safety/environmental capital needs.
+Dividend: use announced 2025 annual proposal, not a mechanically assumed payout ratio.
+
+[quality]
+status=complete
+limitations=annual report extracted from a full-text mirror because no filing package was preloaded; sustainable profit is an analyst normalization, not management guidance; market data is the supplied 2026-07-31 snapshot.

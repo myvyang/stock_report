@@ -1,0 +1,69 @@
+stock-research trace
+company: 600885.SH 宏发股份
+period: 2025-12-31 annual
+generated_at: 2026-07-31T22:46:40+08:00
+
+1. Read required instructions
+- /workspace/.agents/skills/stock-research/SKILL.md
+- /workspace/.agents/skills/stock-research/references/result-contract.md
+- /workspace/.agents/skills/stock-research/references/report-contract.md
+- /workspace/.agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse audit
+- Expected annual facts, normalized facts, raw filing metadata and prior stock-research outputs were absent under /workspace/stock_report.
+- Sync target /root/aicode/stock_report had no files for 600885.SH.
+- Therefore returned to the original annual filing layer.
+
+4. Sources acquired and checked
+- Official SSE annual-report summary: https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-02/600885_20260402_6JGM.pdf
+- Official SSE full-report URL identified: https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-02/600885_20260402_GU3L.pdf (direct CLI download rejected by SSE anti-bot at retrieval time).
+- Full 225-page report mirror downloaded: https://pdf.dfcfw.com/pdf/H2_AN202604011820952598_1.pdf
+- Full filing text cross-check: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12054908&stockid=600885
+- Market value and PE: config/input.json, Tencent qt.gtimg.cn snapshot dated 20260731114319.
+- Local source copies: stock_report/data/raw/filings/600885.SH/2025-12-31/annual-report-2025.pdf and annual-report-2025.txt.
+
+5. Model decision
+- Confirmed ordinary_operating/applicable.
+- Annual report describes relay and electrical-product R&D, manufacturing and sales; balance sheet is a normal industrial structure.
+- Input tags suggesting vehicle manufacturing, battery materials and vehicle sales were rejected as inconsistent with filing facts.
+- Special handling: consolidated group contains material minority interests, so consolidated cash and FCF were converted to a parent-share proxy.
+
+6. Core reported facts (CNY)
+- revenue 17,202,480,686.91
+- cost of sales 11,298,643,249.35
+- gross profit 5,903,837,437.56
+- parent net profit 1,757,527,714.75
+- consolidated net profit 2,339,023,700.15
+- operating cash flow 2,968,662,719.38
+- capex cash paid 1,182,866,508.11
+- operating FCF 1,785,796,211.27
+- total assets 23,364,096,633.21
+- total liabilities 7,353,631,467.01
+- parent equity 12,630,510,893.72
+- minority interest 3,379,954,272.48
+
+7. Owner earnback calculations
+- parent-share proxy = parent net profit / consolidated net profit = 0.7513937180872904
+- nonrestricted cash = 3,624,238,044.97 - 10,195.43 = 3,624,227,849.54
+- discounted trading financial assets = 300,538,330.33 * 0.80 = 240,430,664.264
+- interest-bearing and lease debt = 601,696,904.96 + 60,058,585.16 + 168,905,695.48 + 14,675,109.45 + 55,432,736.55 = 900,769,031.60
+- discounted detachable net cash = (3,624,227,849.54 + 240,430,664.264 - 900,769,031.60) * 0.7513937180872904 = 2,227,047,938.0330772
+- parent-share FCF = 1,785,796,211.27 * 0.7513937180872904 = 1,341,836,054.9323618
+- discounted sustainable cash profit = 1,341,836,054.9323618 * 0.90 = 1,207,652,449.4391258
+- operating business price = 54,955,000,000 - 2,227,047,938.0330772 = 52,727,952,061.96692
+- owner earnback years = 52,727,952,061.96692 / 1,207,652,449.4391258 = 43.661528684395535
+- market cap / cash profit = 45.505641979629935
+- forecast dividend yield = 537,015,226.61 / 54,955,000,000 = 0.009771908408879993
+
+8. Protocol operations
+- All structured fields were populated with repeated `protocol set` calls; result JSON was not handwritten from scratch.
+- Initial validation command returned status=ok and errors=[].
+
+9. Known limitations
+- SSE direct PDF endpoint blocked the CLI request; the full report mirror was cross-checked against the official SSE summary and filing HTML.
+- Industry market-share claim is the annual report's citation of an industry-association study; the underlying study was not independently obtained.
+- Parent-share conversion is an analytical proxy, not a legal cash-distribution ratio through each subsidiary.
+- 2025 dividend is a board proposal pending final implementation.

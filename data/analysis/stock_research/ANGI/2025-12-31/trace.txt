@@ -1,0 +1,71 @@
+ANGI stock research trace
+Generated: 2026-08-04 Asia/Shanghai
+Period: 2025-12-31 annual
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields only through protocol set/append commands.
+
+2. Reuse audit
+- Checked configured raw filing, annual review, normalized facts, and prior stock-research paths.
+- No ANGI local filing/fact/research files existed; only config/input.json was present.
+- Therefore retrieved the primary annual filing and official supporting sources.
+
+3. Primary sources
+- SEC filing index: accession 0001705110-26-000011, filed 2026-02-20, period 2025-12-31.
+  https://www.sec.gov/Archives/edgar/data/1705110/000170511026000011/0001705110-26-000011-index.htm
+- Angi Inc. 2025 Form 10-K (audited statements, business, risks, debt, repurchases):
+  https://www.sec.gov/Archives/edgar/data/1705110/000170511026000011/angi-20251231.htm
+- Angi investor FAQ (cash dividend history/policy):
+  https://ir.angi.com/faqs
+- Federal Reserve H.10, RXI_N.A.CH, 2025-12-31 USD/CNY = 7.1875:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Market cap CNY 1,547,588,080.7328186, date 2026-08-03, PE TTM 13.500001: config/input.json (identified there as Yahoo Finance yfinance).
+
+4. Model determination
+- Confirmed statement_model=ordinary_operating.
+- Confirmed owner_earnback_applicability=applicable.
+- Reason: revenue comes from leads, ads, memberships, and platform services; balance sheet does not contain customer financial balances, insurance reserves, regulated project cash, concession rights, or another special-model structure.
+
+5. Source financials (USD thousands; 2025)
+- Revenue 1,030,535; cost of revenue 47,436; gross profit 983,099.
+- Operating income 65,406; net earnings attributable to Angi shareholders 43,832.
+- Assets 1,680,368; liabilities 753,002 (assets less equity); equity 927,366; NCI zero.
+- Cash 303,701; accounts receivable 33,054; capitalized software/equipment 99,101; goodwill 890,066; intangibles 167,142.
+- Long-term debt net 497,667; senior-note face value 500,000.
+- Operating cash flow 105,073; capex 59,600; operating FCF 45,473; financing cash flow -158,342.
+- Repurchases on trade-date basis 148,700; cash dividends zero.
+
+6. Currency and formulas
+- All filing amounts multiplied by 1,000 and 7.1875 to produce CNY absolute yuan.
+- Gross margin = 983,099 / 1,030,535 = 0.9539695401.
+- Net margin = 43,832 / 1,030,535 = 0.0425332473.
+- OCF CNY 755,212,187.5; capex CNY 428,375,000; FCF CNY 326,837,187.5.
+
+7. Owner earnback judgments
+- Cash haircut: 20%; discounted cash = USD 303.701m * 80% = USD 242.9608m.
+- Debt: deducted USD 500m note face value, not USD 497.667m accounting carrying amount.
+- Discounted detachable net cash = (242.9608 - 500)m * 7.1875 = CNY -1,847,469,250.
+- Sustainable cash-profit bridge:
+  CNY 326,837,187.5 2025 FCF
+  - CNY 106,073,125 stock-compensation owner cost
+  - CNY 41,076,562.5 revenue/execution buffer
+  = CNY 179,687,500 (USD 25m).
+- Operating business price = market cap - discounted net cash
+  = 1,547,588,080.7328186 - (-1,847,469,250)
+  = CNY 3,395,057,330.7328186.
+- Owner earnback years = 3,395,057,330.7328186 / 179,687,500 = 18.8942321015.
+- Market cap / cash profit = 1,547,588,080.7328186 / 179,687,500 = 8.6126641015.
+- Dividend forecast = 0 based on explicit company policy; forecast yield = 0.
+
+8. Limitations
+- Filing translation uses the 2025-12-31 spot rate while market cap is a 2026-08-03 input snapshot.
+- Sustainable cash profit is an analyst haircut, not company guidance; normal working capital and maintenance software capex remain uncertain.
+- PE TTM was accepted from input and not independently recomputed using 2026 interim filings.
+
+9. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result before report/trace completion: status=ok, errors=[].

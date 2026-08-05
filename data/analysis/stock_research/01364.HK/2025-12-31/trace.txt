@@ -1,0 +1,65 @@
+stock-research trace
+company: 01364.HK GUMING / 古茗控股有限公司
+period: 2025-12-31 annual
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- Expected local raw filing, annual facts and normalized facts paths did not exist.
+- No prior stock-research result existed for this company/period.
+- Fell back to primary public disclosure rather than third-party financial summaries.
+
+3. Primary sources
+- HKEX 2025 annual report, released 2026-04-24:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042401574.pdf
+- HKEX 2025 annual results announcement, released 2026-03-25:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0325/2026032501364_c.pdf
+- Market cap and PE TTM copied from config/input.json; source named there as Tencent qt.gtimg.cn, timestamp 2026/07/31 16:08:47.
+
+4. Model override
+- Input hint: financial_brokerage / requires_special_model.
+- Filing evidence: subsidiaries operate a franchised retail network and trade ingredients, related products and equipment for freshly-made beverages; 96.5% of 2025 revenue came from franchised stores.
+- Final model: ordinary_operating / applicable.
+- Reason: the input relation snapshot misclassified the company; no brokerage client money, proprietary securities book or repo funding model exists in the audited filing.
+
+5. Key extraction (annual report pages)
+- P9-P11: store count 13,554; 82% in second-tier and below cities; GMV RMB32.732bn; store openings 4,292 and closures 652.
+- P18-P23: franchise-store revenue share 96.5%; goods/equipment revenue share 79.5%; adjusted profit and adjusted core profit reconciliations.
+- P25-P26: restricted cash RMB6.482bn and interest-bearing borrowings RMB6.462bn; collateral/yield-management explanation.
+- P225: revenue RMB12.914bn; gross profit RMB4.262bn; operating profit RMB3.276bn; parent net profit RMB3.109bn.
+- P227-P228: assets RMB16.650bn; liabilities RMB10.808bn; equity RMB5.842bn; parent equity RMB5.824bn.
+- P231-P233: CFO RMB2.409bn; PP&E purchases RMB0.248bn; financing cash flow RMB0.070bn; dividend paid RMB1.493bn.
+- P81-P82 and P289: proposed final dividend HKD0.50/share, HKD1.189bn total; historical/pre-listing and special dividend details.
+
+6. Deterministic calculations
+- Gross margin = 4,262,183,000 / 12,913,774,000 = 0.3300493721.
+- Net margin = 3,109,118,000 / 12,913,774,000 = 0.2407598275.
+- Operating FCF = 2,408,612,000 - 248,323,000 = 2,160,289,000.
+- Discounted sustainable cash profit = operating FCF * 90% = 1,944,260,100, reflecting 10% PRC dividend withholding friction.
+- Discounted detachable net cash = 4,320,595,000 cash + 411,860,000 non-pledged deposits + 90% * 1,347,282,000 FVTPL assets - 57,685,000 lease liabilities = 5,887,323,800.
+- Restricted cash and matched bank borrowing were excluded together. The small positive spread was assigned zero value. FVOCI equity investment was also excluded.
+- Operating business price = 47,834,392,246.22309 - 5,887,323,800 = 41,947,068,446.22309.
+- Owner earnback years = 41,947,068,446.22309 / 1,944,260,100 = 21.57482347.
+- Market cap / cash profit = 47,834,392,246.22309 / 1,944,260,100 = 24.60287708.
+- Forecast dividend CNY estimate: annual-report implied HKD/CNY conversion from RMB2.01bn special dividend divided by HKD0.93 * 2,378,185,860 shares; applied to HKD1,189,092,930 = RMB1,080,645,161.29. Yield = 0.0225913848.
+
+7. Protocol use
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated all result fields through repeated protocol `set` commands; complex JSON was not hand-written from scratch.
+- Final validation command and result are recorded at the end of this file after generation.
+
+8. Limitations
+- No local annual facts package existed, so the task did not create a separate annual-review layer.
+- Market cap and PE are accepted from the task input and not independently reconstructed.
+- RMB forecast dividend is an estimate based on an annual-report-implied conversion rate.
+- Sustainable cash profit uses one high-growth year and a judgmental withholding-tax haircut; it is not company guidance.
+
+9. Final validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}

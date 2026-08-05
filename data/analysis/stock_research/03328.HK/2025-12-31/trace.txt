@@ -1,0 +1,57 @@
+stock-research trace
+company=03328.HK BANKCOMM / 交通银行
+period=2025-12-31
+report_type=annual
+generated_context_date=2026-08-05 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md; no local annual facts, normalized facts, filing metadata, or prior stock-research result existed for the requested period.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated scalar/object/list fields through protocol set/append commands. The JSON was not authored as a complex object from scratch.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[model decision]
+statement_model=financial_bank
+owner_earnback_applicability=not_applicable
+reason=Customer deposits, wholesale funding, loans, central-bank balances and securities are the operating balance sheet of a bank. They cannot be converted into detachable net cash without impairing the franchise or violating liquidity/capital constraints. Ordinary owner-earnback metrics remain null.
+
+[primary sources]
+S1 Bank of Communications Annual Report 2025 H Share, audited, HKEX publication 2026-04-27
+   https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042700612.pdf
+   Used pages/sections:
+   p9: ROA, ROE, NIM, NPL ratio, provision coverage, capital ratios.
+   pp49-50: income composition, average asset yields and liability costs, NIM explanation.
+   pp55-61: asset composition, loan composition, investment and liability composition.
+   pp130-131: 2024 dividend history and 2025 interim/final ordinary dividend plan.
+   pp174-176: audited income statement and statement of financial position.
+S2 Bank of Communications official 2025 results release, 2026-03-27
+   https://www.bocomgroup.com/BankCommSite/shtml/jyjr/cn/7158/7162/7053553.shtml?channelId=7158
+   Cross-check: assets, operating income, parent net profit, NPL ratio and provision coverage.
+S3 Market snapshot supplied in config/input.json
+   Tencent qt.gtimg.cn; timestamp=2026/08/03 09:48:06
+   market_cap=580027743923.0162 CNY; pe_ttm=6.37
+
+[unit conversion]
+Annual report unit was RMB million. All result.json monetary fields were multiplied by 1,000,000 to absolute CNY yuan.
+
+[derived calculations]
+minority_interest_ratio = 11,050 / 1,280,282 = 0.008630911
+forecast_dividend_yield = 28,692,000,000 / 580,027,743,923.0162 = 0.049466598
+static_market_cap_to_2025_parent_profit = 580,027,743,923.0162 / 95,622,000,000 = 6.0659; disclosed only in interpretation/report, not in ordinary cash-profit sorting fields.
+2025 ordinary dividend per 10 shares = 1.563 interim + 1.684 final = RMB3.247, tax inclusive.
+
+[null policy]
+gross_margin and net_margin=null: not economically comparable for a bank under this contract.
+operating_cash_flow, capital_expenditure and operating_free_cash_flow=null: bank cash flows are dominated by balance-sheet funding and asset movements and do not represent ordinary-company distributable FCF.
+discounted_net_cash, discounted_cash_profit, operating_business_price, owner_earnback_years and market_cap_to_cash_profit=null: mandatory because owner_earnback_applicability is not applicable.
+
+[quality]
+status=complete
+limitations:
+- Market cap and PE are taken from the supplied single-source snapshot and were not independently reconstructed.
+- Dividend yield is a static announced-2025-distribution-to-2026-08-03-market-cap ratio, not a future guarantee.
+- No ordinary-company cash earnback estimate is produced.

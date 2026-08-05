@@ -1,0 +1,52 @@
+task: 02361.HK / 2025-12-31 annual
+generated_at: 2026-08-05 Asia/Shanghai
+
+[protocol]
+initialized_with: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+populated_with: repeated stock_analysis.stock_research.protocol set calls against the initialized result
+validated_with: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_result: status=ok, errors=[]
+
+[source 1]
+title: Sinohealth Technology Holdings Limited 2025 Annual Results Announcement
+issuer/date: Sinohealth Technology Holdings Limited / 2026-03-27
+url: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0327/2026032703244.pdf
+local_file: stock_report/data/raw/filings/02361.HK/2025-12-31/2025-annual-results.pdf
+used_for: audited headline results, business review, balance sheet, segment revenue and margins, dividend proposal
+
+[source 2]
+title: Sinohealth Technology Holdings Limited 2025 Annual Report
+issuer/date: Sinohealth Technology Holdings Limited / 2026-04-23
+url: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042300662.pdf
+local_file: stock_report/data/raw/filings/02361.HK/2025-12-31/2025-annual-report.pdf
+extracted_text: stock_report/data/raw/filings/02361.HK/2025-12-31/2025-annual-report.txt
+used_for: complete cash flow statement, cash/deposit denomination and maturity, financial assets, receivables impairment, contract liabilities, dividends
+
+[source 3]
+title: Task input market snapshot
+local_file: config/input.json
+provider/date: Tencent qt.gtimg.cn / 2026-08-03 09:20:05
+used_for: market_cap=1873329068.7602758, pe_ttm=21.05
+
+[model verification]
+input_hint: financial_brokerage / requires_special_model
+verified_model: ordinary_operating / applicable
+reason: Annual report note 1 says subsidiaries principally provide Commercial Solutions and Data-driven Publications and Events. Revenue is customer-contract service revenue. There are no bank borrowings and no brokerage client-money, proprietary securities or repo-financing balance-sheet items. The input hint is therefore overridden.
+
+[calculations]
+gross_margin = 249053000 / 419090000 = 0.594264
+net_margin = parent_net_profit 93437000 / 419090000 = 0.222955
+operating_free_cash_flow = 71318000 - 4226000 PPE purchases - 668000 intangible additions = 66424000
+discounted_net_cash = 583496000 cash_and_time_deposits * 0.80 + 74588000 FVTPL_assets * 0.50 - 112765000 total_liabilities = 391325900
+discounted_cash_profit = 66424000 * 0.80 = 53139200
+operating_business_price = 1873329068.7602758 - 391325900 = 1482003168.7602758
+owner_earnback_years = 1482003168.7602758 / 53139200 = 27.8891
+market_cap_to_cash_profit = 1873329068.7602758 / 53139200 = 35.2532
+forecast_cash_dividend = RMB 28000000 (annual report note; proposed HKD 0.0712/share)
+forecast_dividend_yield = 28000000 / 1873329068.7602758 = 0.01494665
+
+[judgment boundaries]
+fact: reported financial statement amounts and disclosed business descriptions.
+inference: ordinary-operating model classification and interpretation of cash conversion.
+judgment: 80% cash/deposit discount, 50% FVTPL discount, 20% sustainable-cash-profit discount.
+limitations: market snapshot not independently reconstructed; no verifiable market share; owner-earnback values are assumption-sensitive.

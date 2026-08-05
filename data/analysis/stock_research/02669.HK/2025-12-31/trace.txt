@@ -1,0 +1,55 @@
+stock-research trace
+company=02669.HK CHINA OVS PPT / China Overseas Property Holdings Limited
+period=2025-12-31
+generated_at=2026-08-04T17:13:45+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized result using protocol CLI
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+- No existing annual facts, normalized facts, or prior stock-research outputs were present for 02669.HK/2025-12-31.
+- Therefore fetched the official 2025 annual report from HKEX.
+
+4. Primary sources
+- Annual Report 2025: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042900389.pdf
+  local: stock_report/data/raw/filings/02669.HK/2025-12-31/annual-report-2025.pdf
+  extracted text: stock_report/data/raw/filings/02669.HK/2025-12-31/annual-report-2025.txt
+- Annual Results Announcement: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032600518.pdf
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, 2026/08/03 09:45:34
+
+5. Model correction
+- Input hint said financial_brokerage.
+- Annual report shows property management, non-resident and resident value-added services, and car-parking trading; no brokerage customer funds, proprietary financial assets, or repo financing.
+- Overrode to ordinary_operating / applicable.
+
+6. Core calculations (RMB yuan)
+- gross_margin = 2,247,278,000 / 14,959,871,000 = 0.15022041299687677
+- net_margin = 1,366,779,000 / 14,959,871,000 = 0.09136302044315757
+- operating_free_cash_flow = 1,153,458,000 - 160,900,000 = 992,558,000
+- discounted_cash = 6,270,725,000 * 70% = 4,389,507,500
+- financing_and_lease_liabilities = 50,000,000 + 95,936,000 = 145,936,000
+- discounted_detachable_net_cash = 4,389,507,500 - 145,936,000 = 4,243,571,500
+- discounted_sustainable_cash_profit = 992,558,000 * 90% = 893,302,200
+- operating_business_price = 9,732,780,422.708988 - 4,243,571,500 = 5,489,208,922.708988
+- owner_earnback_years = 5,489,208,922.708988 / 893,302,200 = 6.144851006422002
+- market_cap_to_cash_profit = 9,732,780,422.708988 / 893,302,200 = 10.895283167005509
+- forecast recurring dividend = 2025 interim RMB270,641,000 + final RMB289,186,000 = RMB559,827,000
+- forecast_dividend_yield = 559,827,000 / 9,732,780,422.708988 = 0.057519740062540084
+
+7. Judgment flags
+- 70% cash recognition and 10% cash-profit haircut are analyst assumptions, not reported facts.
+- Cash discount reflects onshore RMB location, working-capital, performance and distribution constraints.
+- Profit discount reflects rising receivables, contract assets and impairment.
+- Forecast dividend excludes the one-off HK1 cent listing-anniversary special dividend.
+- Input market cap was accepted under the protocol's RMB unit; FX construction was not independently verified.
+
+8. Validation
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

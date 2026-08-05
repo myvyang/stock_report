@@ -1,0 +1,76 @@
+CTSH stock research trace
+generated_at=2026-08-04T18:24:24+08:00
+period=2025-12-31
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read result-contract.md, report-contract.md, and referenced data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields only through protocol set commands.
+
+2. Reuse audit
+- Checked requested raw filing, annual review, normalized facts, and prior stock research paths.
+- No CTSH 2025 files were present in the workspace; no existing fact pack or prior result could be reused.
+- Researched primary public sources instead.
+
+3. Primary sources
+- SEC 2025 Form 10-K, accession 0001058290-26-000008, filed 2026-02-12:
+  https://www.sec.gov/Archives/edgar/data/1058290/000105829026000008/ctsh-20251231.htm
+- Cognizant FY2025 results release, 2026-02-04:
+  https://investors.cognizant.com/news-and-events/news/news-details/2026/Cognizant-Reports-Fourth-Quarter-and-Full-Year-2025-Results/default.aspx
+- SAFE/CFETS 2025-12-31 exchange-rate material:
+  https://www.safe.gov.cn/safe/2025/1231/26980.html
+- Market capitalization and PE TTM were supplied in config/input.json from Yahoo Finance yfinance, dated 2026-08-03.
+
+4. Model determination
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Basis: revenue is earned from consulting and IT/professional services contracts. Customer receivables, deferred revenue, employee accruals and leases are ordinary operating working capital. The balance sheet does not carry bank deposits, insurance reserves, property-development obligations, concession rights, or brokerage customer funds.
+- Special treatment: USD733m restricted cash for the 3Cloud acquisition was excluded from detachable cash.
+
+5. Currency conversion
+- Reporting currency in filing: USD.
+- Protocol currency: CNY absolute yuan.
+- FX used: 1 USD = CNY 7.0288, based on official 2025-12-31 material.
+- The same rate was used for balance sheet, income statement and cash flow for consistent presentation. This is a limitation for income/cash-flow translation because an annual average rate was not used.
+
+6. Core source figures (USD millions)
+- Assets 20,692; liabilities 5,677; equity/parent equity 15,015; minority interest 0.
+- Revenue 21,108; cost of revenue excluding D&A 13,991; gross profit derived 7,117; operating income 3,389; net/parent income 2,230.
+- CFO 2,883; capex 288; operating FCF derived 2,595; financing cash flow -2,272; dividends plus repurchases 1,988.
+- Cash 1,901; short-term investments 13; short-term debt 33; long-term debt 543.
+- Restricted cash 733 for 3Cloud was in other noncurrent assets and excluded from cash used in owner earnback.
+
+7. Derived ratios
+- gross_margin=(21,108-13,991)/21,108=0.33717074095129806
+- net_margin=2,230/21,108=0.105647148000758
+- operating_free_cash_flow=(2,883-288)*7.0288m=CNY18,239,736,000
+
+8. Owner earnback
+- Discounted detachable net cash in USD millions:
+  (1,901+13)*80%-33-543=955.2
+- Converted discounted net cash: 955.2*7.0288m=CNY6,713,909,760.
+- Sustainable cash profit in USD millions:
+  (2,883-288)*90%=2,335.5
+- Converted sustainable cash profit: 2,335.5*7.0288m=CNY16,415,762,400.
+- Operating business price:
+  168,241,732,142.50195-6,713,909,760=CNY161,527,822,382.50195.
+- Owner earnback years:
+  161,527,822,382.50195/16,415,762,400=9.839800214366038.
+- Market cap/cash profit:
+  168,241,732,142.50195/16,415,762,400=10.248791864976186.
+- Judgment: 20% liquidity haircut reflects cross-border operating cash needs; 10% FCF haircut reflects one-year working-capital/project/cycle uncertainty. These are analyst assumptions, not reported facts.
+
+9. Dividend forecast
+- Announced Q1 2026 dividend: USD0.33/share.
+- Annualized dividend: USD1.32/share.
+- Shares used: 479m at 2025-12-31.
+- Forecast cash dividend: 0.33*4*479m*7.0288=CNY4,444,169,664.
+- Forecast dividend yield: 4,444,169,664/168,241,732,142.50195=0.02641538224437535.
+- Limitation: simple annualization; future quarterly declarations and share count may differ.
+
+10. Validation
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final status: ok; errors: none.

@@ -1,0 +1,85 @@
+stock-research trace
+company: 02199.HK / REGINA MIRACLE / 维珍妮国际（控股）有限公司
+task period: 2025-12-31
+generated timezone: Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Read references/data-reuse.md completely because the skill directly defines reuse boundaries.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- No annual facts package, normalized facts, raw filing metadata, or prior stock-research outputs existed for 02199.HK/2025-12-31.
+- Downloaded the official HKEX annual and interim PDF files into stock_report/data/raw/filings/02199.HK/2025-12-31/ for local retention.
+- pdftotext was unavailable, so numerical and narrative extraction used the official HKEX PDF text exposed through the web reader.
+
+3. Identity and model correction
+- Input hint: financial_brokerage / requires_special_model.
+- Official annual report says the group is a global intimate-wear manufacturer using an IDM model, with intimate wear, sports products, consumer electronics components, and bra pads/accessories.
+- Balance sheet contains ordinary manufacturing cash, inventory, receivables, PPE, payables, bank debt, and lease liabilities; no brokerage client-money model was found.
+- Overrode hint with ordinary_operating / applicable.
+
+4. Reporting-period decision
+- Company fiscal year ends 31 March, not 31 December.
+- Used audited FY2025 statements for the year ended 2025-03-31 as the annual base.
+- Used unaudited 1HF2026 statements for the six months ended 2025-09-30 to test continuation and support the dividend forecast.
+- Retained analysis.period=2025-12-31 as required by task input.
+- Retained supplied market cap dated 2026-08-03; explicitly disclosed the timing mismatch.
+
+5. Primary sources
+- HKEX 2024/25 Annual Report, released 2025-07-25:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2025/0725/2025072501531.pdf
+- HKEX 2025/26 Interim Report, released 2025-12-17:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2025/1217/2025121701238.pdf
+- PBOC/CFETS 2025-04-01 central parity (1 HKD = CNY 0.92257), used as a 31 March approximation:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/5648456/index.html
+- Valuation snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026/08/03 09:46:47.
+
+6. FY2025 audited base, HKD thousand
+- Revenue 7,840,043
+- Cost of sales 6,007,476
+- Gross profit 1,832,567
+- Operating profit 535,642
+- Parent net profit 183,891
+- Total assets 8,894,096
+- Total liabilities 5,730,181
+- Parent/total equity 3,163,915; no minority interest shown
+- Operating cash flow 1,194,851
+- Cash capex definition: PPE 365,241 + intangible assets 10,202 + land-use right 47,728 = 423,171
+- Operating FCF: 1,194,851 - 423,171 = 771,680
+- Financing cash flow -341,048
+- Dividends paid 57,540
+
+7. Currency conversion
+- All statement amounts in result.json converted to CNY absolute yuan using 0.92257 CNY/HKD.
+- Ratios calculated from unrounded values.
+- Gross margin = 1,832,567 / 7,840,043 = 0.2337445104.
+- Net margin = 183,891 / 7,840,043 = 0.0234553554.
+
+8. Owner earnback assumptions
+- CNY cash book value: 837,537,645.67; applied 50% detachable factor = 418,768,822.835.
+- CNY bank borrowings: 3,906,912,351.98; deducted 100%.
+- CNY lease liabilities: 126,501,875.83; deducted 100%.
+- Discounted detachable net cash = -3,614,645,404.975.
+- Investment property, insurance-policy investment, and associate interests were not credited against market cap, to avoid overstating detachability and double counting earnings.
+- FY2025 adjusted profit was HKD 402.351m. Rolling adjusted profit through 2025-09 was approximately HKD 452.35m using FY2025 less 1HF2025 plus 1HF2026.
+- Selected sustainable cash profit = HKD 300m = CNY 276.771m, roughly two thirds of the rolling adjusted amount, to reflect recurring restructuring risk, leverage, maintenance capex, customer/order cyclicality, and the possibility that working-capital cash release is not permanent.
+- Operating business price = 2,538,263,545.2246666 - (-3,614,645,404.975) = CNY 6,152,908,950.199667.
+- Owner earnback = 6,152,908,950.199667 / 276,771,000 = 22.2310464254 years.
+- Market cap / sustainable cash profit = 9.1709880920 years.
+
+9. Dividend forecast
+- FY2025 DPS: HKD 0.068; company-reported payout ratio about 45.3%.
+- 1HF2026 declared DPS: HKD 0.057; company-reported payout ratio 48.2%.
+- Forecast full-year DPS: HKD 0.103, explicitly an estimate rather than guidance.
+- Forecast cash dividend = 1,224,250,000 shares * HKD 0.103 * 0.92257 = CNY 116,334,001.2175.
+- Forecast yield = 116,334,001.2175 / 2,538,263,545.2246666 = 0.0458321207.
+
+10. Validation
+- Populated result.json only through protocol CLI set commands after initialization.
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final protocol response: status=ok, errors=[].

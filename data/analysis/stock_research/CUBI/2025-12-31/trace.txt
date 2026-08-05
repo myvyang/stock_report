@@ -1,0 +1,69 @@
+stock-research trace — CUBI — period 2025-12-31
+generated_at: 2026-08-05T03:47:40+08:00
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely as requested.
+- Read references/data-reuse.md because the selected skill routes source reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked configured annual review, normalized facts, raw filing, and prior stock research paths.
+- No pre-existing CUBI annual facts, normalized facts, or prior research output was present.
+- Returned to primary filings as required by the reuse policy.
+
+3. Primary sources acquired and checked
+- SEC 2025 Form 10-K, accession 0001488813-26-000029, filed 2026-02-27:
+  https://www.sec.gov/Archives/edgar/data/1488813/000148881326000029/cubi-20251231.htm
+  Local copy: stock_report/data/raw/filings/CUBI/2025-12-31/cubi-20251231.htm
+- SEC company facts for CIK 0001488813 used to extract and cross-check tagged audited facts.
+- Customers Bancorp FY2025 earnings release dated 2026-01-22:
+  https://www.customersbank.com/investor-relations/press-releases/press-release/Customers-Bancorp-Reports-Results-for-Fourth-Quarter-and-Full-Year-2025-1777/
+- 2025-12-31 PBOC-authorized CFETS central parity: USD 1 = CNY 7.0288; source page recorded in evidence.
+- Valuation snapshot was reused unchanged from config/input.json (Yahoo Finance yfinance, 2026-08-03).
+
+4. Model decision
+- Input hint ordinary_operating/applicable was rejected after filing review.
+- Confirmed statement_model=financial_bank and owner_earnback_applicability=not_applicable.
+- Reason: loans, deposits, securities, interbank balances, and wholesale funding are the bank's operating structure. Detachable net cash and ordinary free-cash-flow payback are economically invalid.
+- All ordinary owner-earnback sorting metrics therefore remain null under the result contract.
+
+5. Key USD facts and CNY conversion
+- Total assets: USD 24,895,868,000 -> CNY 174,988,076,998.4
+- Total liabilities: USD 22,780,351,000 -> CNY 160,118,531,108.8
+- Parent equity: USD 2,115,517,000 -> CNY 14,869,545,889.6
+- Parent net income: USD 224,088,000 -> CNY 1,575,069,734.4
+- Net income available to common: USD 209,183,000 (reported in narrative and report)
+- Cash and cash equivalents: USD 4,411,463,000 -> CNY 31,007,291,134.4
+- Net financing receivables excluding accrued interest: USD 16,600,758,000 -> CNY 116,683,407,830.4
+- Deposits: USD 20,778,704,000 -> CNY 146,049,354,675.2
+- AFS securities: USD 1,906,535,000; HTM: USD 729,134,000; equity securities: USD 31,111,000; FHLB/FRB stock: USD 110,411,000.
+- FHLB advances: USD 1,325,068,000; other borrowings: USD 99,208,000.
+- Conversion formula for all result.json financial amounts: USD amount × 7.0288.
+
+6. Special-model indicators
+- Net interest income: USD 750.489m, +14.7% YoY.
+- FY tax-equivalent NIM: 3.32% vs 3.15% in 2024.
+- ROCE: 11.22%; core ROCE (non-GAAP): 13.65%.
+- NPL ratio: 0.26%; allowance: USD 155.656m, approximately 0.93% of gross loans and leases.
+- Estimated uninsured deposits: USD 8.6bn, approximately 41.4% of total deposits.
+- Estimated CET1 ratio: 13.0% at 2025-12-31.
+- Market cap / parent common book proxy: approximately 1.21x.
+
+7. Dividend forecast
+- Form 10-K states no historical common cash dividend and none expected in the foreseeable future.
+- Forecast common cash dividend set to CNY 0; forecast yield set to 0.0.
+- Preferred dividends were not treated as common shareholder distributions.
+
+8. Protocol writes and validation
+- Populated result fields using repeated protocol `set` and `append` commands; the JSON was not composed from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report/trace final review: status=ok, errors=[]
+
+9. Known limitations
+- Income-statement amounts use the period-end FX rate for protocol consistency, not an annual average FX rate.
+- Market cap and PE were not independently reconstructed.
+- Bank revenue/gross margin/ordinary operating cash flow/capex/free cash flow are null because they lack ordinary-company comparability.
+- CET1 13.0% was disclosed as an estimate in the FY2025 earnings release.

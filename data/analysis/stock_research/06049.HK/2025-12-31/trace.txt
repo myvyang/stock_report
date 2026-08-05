@@ -1,0 +1,58 @@
+stock-research trace
+company=06049.HK 保利物业服务股份有限公司
+period=2025-12-31 annual
+generated_at=2026-08-04T12:31:15+08:00
+
+[protocol]
+1. Read stock-research/SKILL.md completely.
+2. Read result-contract.md and report-contract.md completely as requested.
+3. Read data-reuse.md because the selected skill routes reuse decisions through it.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result.json exclusively through protocol set/append commands after initialization.
+
+[reuse audit]
+- Expected annual facts path missing: stock_report/data/analysis/annual_review/06049.HK/2025-12-31/facts.json
+- Expected raw filing directory missing: stock_report/data/raw/filings/06049.HK/2025-12-31
+- Sync target root missing: /root/aicode/stock_report
+- No prior stock-research result for the requested company/period was available.
+- Result: returned to primary official filing.
+
+[official sources]
+- HKEX annual report 2025, published 2026-04-30:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0430/2026043001632.pdf
+- HKEX annual results announcement, published 2026-03-31:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0331/2026033100920.pdf
+- Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026/08/03 09:47:49.
+
+[model review]
+- input hint: financial_brokerage / requires_special_model
+- verified filing facts: property management, non-property-owner value-added services, community value-added services; no brokerage client funds, proprietary financial assets, repo funding or margin finance.
+- final model: ordinary_operating / applicable
+- reason for override: input hint conflicts with company identity, source tags and audited financial statements.
+
+[core calculations]
+- gross_margin = 2,985,088,000 / 17,126,068,000 = 0.17430083776381128
+- net_margin = 1,549,450,000 / 17,126,068,000 = 0.0904731897596109
+- operating_free_cash_flow = 1,827,154,000 - 44,979,000 - 3,715,000 = 1,778,460,000
+- discounted cash:
+  non-Poly-Finance cash 8,740,632,000 * 0.80 = 6,992,505,600
+  Poly Finance deposits 1,969,295,000 * 0.50 = 984,647,500
+  bank time deposits 2,239,378,000 * 0.80 = 1,791,502,400
+  less lease liabilities 101,649,000 * 1.00 = -101,649,000
+  total discounted detachable net cash = 9,667,006,500
+- sustainable cash profit = 1,778,460,000 - 378,460,000 prudential adjustment = 1,400,000,000
+- operating_business_price = 13,376,520,870.693327 - 9,667,006,500 = 3,709,514,370.693327
+- owner_earnback_years = 3,709,514,370.693327 / 1,400,000,000 = 2.649653121923805
+- market_cap_to_cash_profit = 13,376,520,870.693327 / 1,400,000,000 = 9.554657764780949
+- forecast_dividend_yield = 775,220,093 / 13,376,520,870.693327 = 0.05795379086189988
+
+[judgment boundaries]
+- The 80%/50% cash discounts and RMB1.4bn sustainable cash profit are analyst assumptions, not company guidance.
+- No buy/sell recommendation or target price is produced.
+- Facts, calculations and judgment assumptions are separately identified in result.json and report.md.
+
+[validation]
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}
+- JSON parse check: passed.

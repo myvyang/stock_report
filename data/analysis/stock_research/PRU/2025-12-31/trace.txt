@@ -1,0 +1,72 @@
+stock-research trace
+company=Prudential Financial, Inc. (NYSE: PRU)
+period=2025-12-31
+generated_at=2026-08-04T11:34:32+08:00
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated fields using repeated protocol `set` commands; the result was not constructed by hand from a blank JSON object.
+3. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+4. Final validation result: {"status":"ok","errors":[]}
+
+[local-reuse-check]
+- Read result-contract.md, report-contract.md, and data-reuse.md.
+- Checked configured annual review, raw filing, normalized facts, and prior stock research paths.
+- No PRU/2025-12-31 local fact package, raw filing metadata, or prior result existed, so official sources were retrieved.
+
+[model-review]
+- Input hint classified PRU as financial_brokerage and referenced source_company_id HK.02378.
+- Official 2025 10-K identifies PRU as an insurance/retirement and asset-management group.
+- Overrode hint with statement_model=financial_insurance.
+- owner_earnback_applicability=requires_special_model.
+- Reason: USD 470.519bn investments support USD 266.914bn future policy benefits, USD 191.307bn policyholder funds, and USD 196.251bn separate-account liabilities. These are operating balance-sheet items, not detachable cash/debt.
+
+[primary-sources]
+- SEC 2025 Form 10-K HTML:
+  https://www.sec.gov/Archives/edgar/data/1137774/000113777426000048/pru-20251231.htm
+- SEC filing index, accession 0001137774-26-000048:
+  https://www.sec.gov/Archives/edgar/data/1137774/000113777426000048/0001137774-26-000048-index.htm
+- Prudential Financial FY/Q4 2025 results release, 2026-02-03:
+  https://investor.prudential.com/news/news-details/2026/Prudential-Financial-Inc--Announces-Full-Year-and-Fourth-Quarter-2025-Results/default.aspx
+- Official dividend history:
+  https://investor.prudential.com/stock-info/dividend-history/default.aspx
+- SEC Companyfacts endpoint used to cross-check XBRL facts:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0001137774.json
+
+[key-original-currency-facts]
+- Total assets: USD 773.740bn
+- Total liabilities: USD 738.159bn
+- Prudential Financial equity: USD 32.438bn
+- Noncontrolling interests: USD 0.349bn
+- Revenue: USD 60.774bn
+- Net income attributable to Prudential Financial: USD 3.576bn
+- Net cash provided by operating activities: USD 6.271bn
+- Investments: USD 470.519bn
+- Cash and cash equivalents: USD 19.712bn
+- Future policy benefits: USD 266.914bn
+- Policyholder funds: USD 191.307bn
+- Separate account assets/liabilities: USD 196.251bn each
+- Long-term debt: USD 18.856bn
+- Common dividends paid: USD 1.926bn
+- After-tax adjusted operating income: USD 5.161bn
+- Parent highly liquid assets: USD 3.8bn
+- Total AUM: USD 1.6091tn; PGIM AUM: USD 1.4661tn
+- PICA statutory capital and surplus: USD 15.907bn
+
+[conversion-and-calculations]
+- Reporting conversion assumption: USD/CNY=7.20 for all filing amounts.
+- Supplied market cap was already CNY 286,125,004,458.3867 and was not converted again.
+- Net margin = 3.576 / 60.774 = 0.0588370020.
+- Forecast annual dividend = USD 1.40 x 4 x 352.4m diluted shares = USD 1.97344bn = CNY 14.2067712bn.
+- Forecast dividend yield = CNY 14.2067712bn / CNY 286.125004458bn = 0.0496525451.
+- Gross margin omitted because it lacks comparable economic meaning for this insurance model.
+- Capex and operating free cash flow omitted because insurer cash-flow classification does not support an ordinary-company FCF interpretation.
+- All ordinary owner-earnback sorting fields remain null as required by the result contract.
+
+[data-quality-notes]
+- Market cap and PE TTM were accepted from config/input.json (Yahoo Finance yfinance, date 2026-08-03).
+- The input did not state the exchange rate behind its CNY market cap; filing conversion uses an explicit 7.20 research assumption.
+- The 2025 PICA RBC ratio had not yet been filed when the 10-K was submitted. The latest specific disclosed PICA ratio was 409% for 2024; it was not used as a 2025 value.
+- Japan sales-practice misconduct remained ongoing after year-end and could not be quantified from the filing.

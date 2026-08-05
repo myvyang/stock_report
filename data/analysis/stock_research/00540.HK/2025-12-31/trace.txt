@@ -1,0 +1,95 @@
+stock-research trace
+company: 00540.HK SPEEDY GLOBAL
+period: 2025-12-31
+generated_at: 2026-08-03T14:19:55+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full as requested.
+3. Read references/data-reuse.md because the skill requires reuse checks before re-fetching filings.
+4. Ran protocol init:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result paths only through protocol set commands; result.json was not constructed by directly writing a complex JSON object.
+6. Ran protocol validate after population; status: ok, errors: [].
+
+[local reuse audit]
+- config/input.json existed.
+- No local annual facts, normalized facts, prior stock-research result, extraction trace, filing metadata, or raw filing existed for 00540.HK/2025-12-31.
+- Therefore the existing-data reuse path could not support the research and the official filing had to be obtained.
+
+[official filing]
+- Source: Hong Kong Exchanges and Clearing / HKEXnews.
+- Document: Speedy Global Holdings Limited, 2025 Annual Report.
+- Release date: 2026-04-24.
+- URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042401000.pdf
+- Local copy: stock_report/data/raw/filings/00540.HK/2025-12-31/annual-report-2025.pdf
+- Text extraction: 194-page PDF extracted locally to annual-report-2025.txt using pypdf in a temporary /tmp virtual environment because pdftotext was unavailable.
+
+[model verification]
+- Input hint: financial_brokerage / requires_special_model.
+- Filing facts: the group is principally engaged in apparel supply chain servicing; management reports one operating segment; assets comprise mainly inventories, trade receivables and cash; liabilities comprise mainly trade payables and a small bank loan.
+- No broker client money, proprietary securities portfolio, margin financing or repurchase liabilities were found.
+- Decision: override hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+[currency conversion]
+- Filing presentation currency: HKD.
+- Result protocol currency: CNY yuan.
+- Applied rate: 1 HKD = CNY 0.90486.
+- Official rate source: People's Bank of China / CFETS central parity announcement dated 2025-12-26.
+- Limitation: this is a near-year-end spot central parity, not an average income-statement rate; all filing amounts were converted consistently for protocol comparability.
+
+[key extracted facts, HKD]
+- Revenue: 370,654,000; 2024: 660,549,000; change: -43.9%.
+- Cost of sales: 326,350,000.
+- Gross profit: 44,304,000; gross margin: 11.9529%.
+- Operating profit: 9,784,000.
+- Parent net profit: 7,627,000; parent net margin: 2.0577%.
+- Total assets: 221,894,000.
+- Total liabilities: 127,907,000.
+- Parent equity/total equity: 93,987,000; no minority interest.
+- Cash and cash equivalents: 57,258,000.
+- Inventories: 93,665,000; turnover days 95 vs 38.
+- Trade and other receivables, net: 66,473,000; trade receivable turnover days 73 vs 40.
+- Trade and other payables: 115,352,000; trade payable turnover days 105 vs 51.
+- Bank borrowings: 4,716,000.
+- Operating cash flow: 38,760,000.
+- Capital expenditure: 27,000.
+- Operating free cash flow: 38,733,000.
+- Financing cash flow: -71,336,000.
+- 2025 largest customer revenue: 295,310,000, or 79.6727% of group revenue.
+- 2025 and 2024 dividends: zero.
+
+[cash-flow interpretation]
+- Cash generated from operations benefited from trade and other receivables decreasing by HKD36.626m and prepayments decreasing by HKD10.692m.
+- This was partly offset by inventories increasing by HKD19.256m.
+- Therefore reported operating FCF was treated as working-capital release rather than a sustainable annual cash-profit run rate.
+
+[owner earnback assumptions, CNY]
+- Reported cash after conversion: 51,810,473.88.
+- Cash inclusion: 80%; discounted cash: 41,448,379.104.
+- Bank debt deducted in full: 4,267,319.76.
+- Discounted detachable net cash: 37,181,059.344.
+- 2025 parent net profit after conversion: 6,901,367.22.
+- Sustainable cash-profit inclusion: 70%; discounted sustainable cash profit: 4,830,957.054.
+- Market cap from input: 105,300,720.54862976.
+- Operating business price: 68,119,661.20462976.
+- Owner earnback years: 14.100655510532256.
+- Market cap / cash profit: 21.79707237542952.
+- These haircut percentages are explicit analyst judgment, not filing facts.
+
+[dividend forecast]
+- Forecast cash dividend: CNY 0.
+- Forecast dividend yield: 0.
+- Basis: no dividend declared for either 2024 or 2025, revenue contraction, higher inventory, and ongoing working-capital needs. This is a baseline estimate, not a statement of certainty.
+
+[market data]
+- Market cap: CNY 105,300,720.54862976.
+- PE TTM: 16.05.
+- Timestamp: 2026/07/31 16:08:46.
+- Source: Tencent qt.gtimg.cn, supplied in config/input.json.
+- Limitation: no archived raw Tencent API response was present locally; input snapshot was reused as instructed.
+
+[data quality]
+- status: complete.
+- Rationale: audited annual report supports identity, model, business, three statements, asset/liability interpretation, cash-profit bridge and dividend history; market fields are present in input; all formulas validate.
+- Important limitations are recorded in outputs/result.json and report.md.

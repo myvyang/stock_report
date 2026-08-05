@@ -1,0 +1,92 @@
+stock-research trace
+company: 华利集团 (300979.SZ)
+period: 2025-12-31
+generated_for: 2026-08-01 task
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because no annual fact package was present.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields with protocol `set`; no complex JSON was hand-written from an empty file.
+6. Validated with protocol `validate`; result: {"status":"ok","errors":[]}.
+
+[source discovery]
+- Workspace initially contained no 300979 filing, annual facts, normalized facts, or prior stock-research result.
+- Located the 2025 annual report disclosed 2026-04-10, announcement 2026-011.
+- Downloaded a PDF copy to:
+  stock_report/data/raw/filings/300979.SZ/2025-12-31/2025-annual-report.pdf
+- Annual report disclosure page used for text extraction:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12074247&stockid=300979
+- Annual profit distribution announcement (official SZSE static PDF, announcement 2026-013):
+  https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-10/2ad5b524-446e-4b0a-a8a6-2a9f7aad7aa3.PDF
+- Market data source was supplied by config/input.json: Tencent qt.gtimg.cn, timestamp 20260731114306.
+
+[model review]
+statement_model: ordinary_operating
+owner_earnback_applicability: applicable
+reason: The company develops and manufactures footwear under customer orders. Assets are cash, receivables, inventory, factories and equipment; liabilities are trade payables, payroll, taxes, borrowings and leases. No customer funds, insurance reserves, regulated presale cash, concessions, or underlying investment-holding structure were found.
+
+[core extracted facts, CNY]
+revenue = 24,980,125,148.09
+cost_of_sales = 19,512,520,159.71
+parent_net_profit = 3,206,670,242.12
+net_profit = 3,206,629,939.93
+operating_cash_flow = 3,743,180,887.85
+capital_expenditure = 2,689,607,644.96
+total_assets = 22,436,514,980.12
+total_liabilities = 6,186,361,601.75
+total_equity = 16,250,153,378.37
+parent_equity = 16,239,101,528.22
+minority_interest = 11,051,850.15
+cash = 5,817,968,854.71
+bank_wealth_management = 394,157,217.88
+accounts_receivable = 4,043,112,820.43
+inventory = 2,878,180,144.04
+short_term_borrowings = 2,044,123,234.45
+current_noncurrent_liabilities = 55,951,265.56
+lease_liabilities = 95,374,524.81
+fixed_asset_depreciation = 742,150,999.87
+right_of_use_depreciation = 56,296,219.60
+intangible_amortization = 28,521,340.31
+long_term_deferred_expense_amortization = 245,567,353.24
+
+[calculations]
+gross_profit = 24,980,125,148.09 - 19,512,520,159.71 = 5,467,604,988.38
+gross_margin = 5,467,604,988.38 / 24,980,125,148.09 = 0.2188782064
+net_margin = 3,206,670,242.12 / 24,980,125,148.09 = 0.1283688622
+operating_free_cash_flow = 3,743,180,887.85 - 2,689,607,644.96 = 1,053,573,242.89
+
+discounted cash:
+cash discounted amount = 5,817,968,854.71 * 0.70 = 4,072,578,198.30
+wealth management discounted amount = 394,157,217.88 * 0.80 = 315,325,774.30
+debt and lease deduction = 2,044,123,234.45 + 55,951,265.56 + 95,374,524.81 = 2,195,449,024.82
+discounted detachable net cash = 4,072,578,198.30 + 315,325,774.30 - 2,195,449,024.82 = 2,192,454,947.78
+
+sustainable cash-profit cross-check:
+depreciation/amortization proxy = 742,150,999.87 + 56,296,219.60 + 28,521,340.31 + 245,567,353.24 = 1,072,535,913.02
+OCF less proxy maintenance amount = 3,743,180,887.85 - 1,072,535,913.02 = 2,670,644,974.83
+selected discounted sustainable cash profit = 2,700,000,000.00
+selection is also 84.20% of 2025 parent net profit; this is an analytical estimate, not a reported figure.
+
+operating business price = 41,802,000,000.00 - 2,192,454,947.78 = 39,609,545,052.22
+owner earnback years = 39,609,545,052.22 / 2,700,000,000.00 = 14.6702018712
+market cap to cash profit = 41,802,000,000.00 / 2,700,000,000.00 = 15.4822222222
+
+forecast dividend:
+2025 interim paid = 1,167,000,000.00
+2025 final board proposal = 1,283,700,000.00
+total = 2,450,700,000.00
+forecast dividend yield = 2,450,700,000.00 / 41,802,000,000.00 = 0.0586263815
+
+[judgment boundaries]
+- Fact: total 2025 capital expenditure was CNY 2.690bn.
+- Inference: a material portion was growth capex because China, Vietnam and Indonesia new factories were ramping and total new-factory output was about 14.52m pairs.
+- Judgment: CNY 2.700bn sustainable distributable cash profit. Maintenance capex was not separately disclosed.
+- Judgment: 70% cash and 80% bank-wealth-management realization factors, reflecting operating buffer, overseas location, expansion and transfer constraints.
+- Fact qualified as company statement: globally second largest athletic-shoe manufacturer by revenue; not independently re-ranked.
+
+[quality]
+status: complete
+limitations are recorded in outputs/result.json and report.md.

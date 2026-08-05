@@ -1,0 +1,65 @@
+stock-research trace
+company: 603599.SH 广信股份
+period: 2025-12-31 annual
+generated: 2026-07-31 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- config/input.json exists.
+- No local raw filing, annual facts package, normalized facts, or prior stock-research result was present under the paths declared by the input.
+- Therefore public filing retrieval was required.
+
+3. Result initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result was initialized with stock-research-result-v1 schema and input valuation data.
+
+4. Filing source and extraction
+- Filing: 安徽广信农化股份有限公司2025年年度报告, disclosed in April 2026.
+- Search discovery: web search located the full annual-report text mirrored by Sina Finance (bulletin id 12200869), which identifies the SSE filing and reproduces the audited report.
+- Retrieval URL: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12200869&stockid=603599
+- The HTML was decoded from GB18030 and table rows were normalized for extraction.
+- Audit opinion in report: standard unmodified opinion by 容诚会计师事务所（特殊普通合伙）.
+- Limitation: the local workspace did not contain the SSE PDF; figures should ultimately be checked against the exchange PDF.
+
+5. Model determination
+- Confirmed ordinary_operating/applicable.
+- Reason: pesticide and chemical-intermediate manufacturing has separable cash/investments, operating working capital, physical production assets, operating liabilities, and financing debt. It is not a financial, property-development, construction, concession, or holding-company statement model.
+
+6. Core extracted facts (CNY)
+- Revenue 3,532,344,150.04; cost of sales 2,389,156,347.74; gross profit 1,143,187,802.30.
+- Parent net profit 656,907,533.17; recurring parent net profit 509,138,703.21.
+- Operating cash flow 390,906,319.92; capex 88,067,476.56; operating FCF 302,838,843.36.
+- Total assets 14,127,437,805.91; liabilities 4,047,775,563.73; parent equity 10,079,662,242.18.
+- No minority interest.
+- Board dividend proposal 200,259,255.90.
+
+7. Owner earnback assumptions
+- Cash and investment discounts were written item by item to owner_earnback.cash_breakdown.
+- Restricted assets excluded: 398,034,720.89 in total, allocated to cash, current deposits, and non-current deposits per filing note.
+- 450,000,000委托贷款 and 57,964,586.06 equity financial assets were assigned zero detachable value.
+- Short-term borrowing 2,404,000,517.50 was deducted in full.
+- Discounted detachable net cash = 6,562,192,706.60.
+- Sustainable cash profit = (390,906,319.92 - 88,067,476.56) * 90% = 272,554,959.02.
+- Operating business price = 9,631,000,000.00 - 6,562,192,706.60 = 3,068,807,293.40.
+- Owner earnback years = 3,068,807,293.40 / 272,554,959.02 = 11.2594.
+- Market cap / cash profit = 35.3360.
+- These are conditional estimates, not factual recovery periods.
+
+8. Protocol population
+- All scalar/object fields were populated using protocol set.
+- Repeating rows were populated using protocol append.
+- outputs/result.json was not authored from a blank JSON object.
+
+9. Outputs
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt
+
+10. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}

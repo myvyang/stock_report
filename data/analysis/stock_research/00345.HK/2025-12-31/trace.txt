@@ -1,0 +1,58 @@
+stock-research trace
+company: 00345.HK VITASOY INT'L
+task_period: 2025-12-31
+actual_fiscal_period_used: FY2024/2025 ended 2025-03-31
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- /workspace/AGENTS.md
+
+2. Reuse check
+- No annual facts, normalized facts, raw filing metadata, or prior stock research result existed at the configured paths.
+- Official-source supplementation was therefore required.
+
+3. Sources consulted
+- Vitasoy Annual Report FY2024/2025:
+  https://www.vitasoy.com/wp-content/uploads/2025/07/EW00345-AR.pdf
+  Relevant pages: 4-5, 15-18, 124-132, 162-164.
+- Vitasoy FY2024/2025 Results Announcement:
+  https://www.vitasoy.com/wp-content/uploads/2025/06/ew_00345-Results-Announcement-Eng-20250624-HKEx.pdf
+- Vitasoy 1H FY2025/2026 results press release (subsequent risk signal):
+  https://www.vitasoy.com/wp-content/uploads/2025/11/Press-Release-Vitasoy-Announces-Business-Results-for-1H-FY20252026_1125_with-captions_EN.pdf
+- PBOC central parity announcement, 2025-04-01: 1 HKD = 0.92257 CNY.
+- Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026-07-31 16:08:41.
+
+4. Model verification
+- Input hint said financial_brokerage.
+- Audited statements and business disclosures show branded food and beverage manufacturing/distribution.
+- Overrode model to ordinary_operating; owner earnback applicability set to applicable.
+
+5. Currency and calculations
+- All filing amounts converted from HKD to CNY at 0.92257.
+- Gross margin = 3,217.546 / 6,273.585 = 51.2872%.
+- Net margin = 234.674 / 6,273.585 = 3.7407%.
+- Operating FCF = operating cash flow 859.017m - capex 124.685m = HKD734.332m.
+- Discounted net cash = CNY1,170.257m * 75% - CNY244.848m bank loans = CNY632.845m.
+- Discounted cash profit = CNY216.503m parent profit * 85% = CNY184.028m.
+- Operating business price = CNY5,675.631m - CNY632.845m = CNY5,042.787m.
+- Owner earnback years = 5,042.787 / 184.028 = 27.4023.
+- Market cap / discounted cash profit = 30.8412.
+- Forecast dividend = HKD0.142 * 1,071.477m weighted-average shares * 0.92257 = CNY140.369m.
+- Forecast dividend yield = 140.369 / 5,675.631 = 2.4732%.
+
+6. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields through repeated protocol set commands.
+- Validation result: status=ok, errors=[].
+
+7. Known limitations
+- Task period is a calendar-year label; Vitasoy's actual year-end is 31 March.
+- Filing figures and valuation snapshot have different dates.
+- Input market cap is treated as CNY under the result protocol; source quote mechanics were not independently reconstructed.
+- Single-year FCF includes working-capital effects; sustainable profit uses discounted parent profit.
+- No reliable comparable market-share dataset was obtained.
+

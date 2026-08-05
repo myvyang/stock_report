@@ -1,48 +1,43 @@
-stock-research trace for 00966.HK 中国太平
+stock-research trace for 00966.HK CHINA TAIPING
 period: 2025-12-31
-created_at: 2026-07-27T03:32:14+08:00
+task created_at: 2026-08-03T11:53:53+08:00
 
-Protocol:
-- Read /workspace/.agents/skills/stock-research/SKILL.md.
-- Read result contract: /workspace/.agents/skills/stock-research/references/result-contract.md.
-- Read report contract: /workspace/.agents/skills/stock-research/references/report-contract.md.
-- Initialized outputs/result.json with: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json.
-- Populated initialized result from reusable annual facts, local annual report evidence, prior stock_research calculations, and targeted dividend extraction from the annual report PDF.
-- Validated final JSON with: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json.
+Protocol and contracts read:
+- /workspace/.agents/skills/stock-research/SKILL.md
+- /workspace/.agents/skills/stock-research/references/result-contract.md
+- /workspace/.agents/skills/stock-research/references/report-contract.md
+- /workspace/.agents/skills/stock-research/references/data-reuse.md
 
-Files read/reused:
+Initialization:
+- PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+Sources read/reused:
 - config/input.json
 - stock_report/data/analysis/annual_review/00966.HK/2025-12-31/facts.json
 - stock_report/data/analysis/annual_review/00966.HK/2025-12-31/annual_facts.md
 - stock_report/data/analysis/annual_review/00966.HK/2025-12-31/extraction_trace.txt
-- stock_report/data/analysis/stock_research/00966.HK/2025-12-31/result.json
-- stock_report/data/analysis/stock_research/00966.HK/2025-12-31/report.md
-- stock_report/data/analysis/stock_research/00966.HK/2025-12-31/trace.txt
-- stock_report/data/notes/user_stock_evaluations.md
 - stock_report/data/raw/filings/00966.HK/2025-12-31/imported_from_agent_runs/9021fae692c9-china-taiping-2025-annual-report.pdf
+- stock_report/data/analysis/stock_research/00966.HK/2025-12-31/result.json (facts reused selectively; prior ordinary owner-earnback treatment rejected)
+- stock_report/data/analysis/stock_research/00966.HK/2025-12-31/report.md (research leads reused selectively)
 
-External verification used:
-- HKEXnews annual results announcement, published 2026-03-25: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0325/2026032501078.pdf
-- China Taiping listed-company official profile: https://www.ctih.cntaiping.com/
-- China Taiping official 2025 results release: https://www.cntaiping.com/news/121893.html
-- Xinhua/China Securities Journal insurance industry statistics, 2026-02-03: https://www.news.cn/money/20260203/06dc22e48e2c42ac8512257151d7a42d/c.html
-- Swiss Re Institute sigma 3/2025 for P&C and reinsurance context.
+Model review:
+- Input hint classified the company as financial_brokerage.
+- Annual report business and balance-sheet facts show an insurance holding group.
+- Overrode statement_model to financial_insurance.
+- Set owner_earnback_applicability to requires_special_model.
+- Kept all ordinary owner-earnback sorting fields null because insurance investments and cash match policy liabilities, liquidity and solvency requirements.
 
-Key calculations:
-- Annual report HKD thousand amounts were converted to CNY absolute yuan using 1 HKD = 0.90322 CNY, consistent with reused prior research.
-- Gross margin = gross profit / insurance service revenue = 22.66%.
-- Net margin = parent net profit / insurance service revenue = 24.10%.
-- Forecast cash dividend = HKD 1.23 per share * 3,594,018,538 shares * 0.90322 = RMB 3.9928 billion.
-- Forecast dividend yield = RMB 3.9928 billion / RMB 61.84 billion = 6.46%.
-- Operating business price = market cap - discounted detachable net cash = RMB 61.84 billion - (RMB -4.2101 billion) = RMB 66.0502 billion.
-- Owner earnback years = RMB 66.0502 billion / RMB 4.1886 billion = 15.77 years.
-- Market cap to cash profit = RMB 61.84 billion / RMB 4.1886 billion = 14.77x.
+Currency and calculations:
+- Annual-report HKD thousand values converted to CNY absolute yuan at 1 HKD = 0.90322 CNY, consistent with the reusable verified fact set.
+- Forecast dividend = HKD 1.23/share * 3,594,018,538 shares * 0.90322 = CNY 3,992,812,991.39.
+- Forecast dividend yield = CNY 3,992,812,991.39 / input market cap CNY 68,084,391,841.73 = 5.8644%.
+- Ordinary gross margin, net margin and operating free cash flow comparables were left null because insurance-service and cash-flow lines do not have ordinary-company economic meaning.
 
-Data limitations:
-- input.json raw_filing_metadata path does not exist in this workspace.
-- No public bridge was found for excess regulatory capital immediately distributable from insurance subsidiaries to the listed holding company.
-- Insurance companies do not fit ordinary-company free cash flow, inventory, receivables, selling expense, or R&D expense analysis cleanly; result fields avoid invented values.
-- Market capitalization was reused from the input 2026-07-24 snapshot rather than replacing it with real-time exchange data.
+Known limitations:
+- stock_report/data/raw/filings/00966.HK/2025-12-31/metadata.json does not exist.
+- No public bridge was available for excess regulatory capital immediately distributable from insurance subsidiaries to the listed holding company.
+- Proposed 2025 final dividend remains subject to shareholder approval.
 
-Validation result:
-- outputs/result.json protocol validation status: ok.
+Validation:
+- PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- status: ok

@@ -1,0 +1,66 @@
+BOTJ stock research trace
+generated_at=2026-08-04T22:21:02+08:00
+period=2025-12-31
+
+[1] Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill directed reuse decisions to it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+[2] Local reuse audit
+- Checked stock_report/data/analysis/annual_review/BOTJ/2025-12-31, raw filing path, normalized facts path, and historical stock-research path.
+- No BOTJ filing, annual facts package, normalized facts, or prior stock research existed locally.
+- Only config/input.json and the generic user evaluation notes were present; therefore public primary-source retrieval was necessary.
+
+[3] Primary sources reviewed
+- SEC audited 2025 Form 10-K:
+  https://www.sec.gov/Archives/edgar/data/1275101/000127510126000010/botj-20251231x10k.htm
+  Used for company identity, business model, audited statements, loan mix, asset quality, deposits, capital, dividends, and risks.
+- SEC Form 8-K dated 2026-01-27:
+  https://www.sec.gov/Archives/edgar/data/1275101/000127510126000005/botj-20260127x8k.htm
+  Used for the declared $0.10 quarterly dividend.
+- Bank of the James official Q1 2026 earnings release dated 2026-04-30:
+  https://www.bankofthejames.bank/wp-content/uploads/2026/05/2026-1Q-Earnings-Release-Final.pdf
+  Used only as subsequent confirmation of operating direction and the second $0.10 quarterly dividend; it did not replace the 2025 annual period.
+- Federal Reserve H.10 Data Download Program, China spot exchange rate, 2025-12-31: 7.1875 CNY per USD.
+- Market cap, market date, PE TTM, and Yahoo Finance yfinance attribution were inherited exactly from config/input.json.
+
+[4] Model determination
+- Overrode input hint ordinary_operating/applicable.
+- Confirmed statement_model=financial_bank and owner_earnback_applicability=not_applicable.
+- Rationale: customer deposits, loans, securities, and liquidity are the operating balance sheet. Detaching cash/securities without matched funding and regulatory constraints would be economically false.
+- All ordinary owner-earnback sortable fields remain null as required by result-contract.md.
+
+[5] Core USD facts and derived calculations
+- Total assets: $1,039.024m; liabilities: $958.976m; equity: $80.048m.
+- Cash equivalents: $84.475m; securities including restricted stock: $219.546m; net loans: $661.357m.
+- Deposits: $937.129m; other borrowings: $8.796m; interest payable and other liabilities: $13.051m.
+- Net interest income: $32.807m; noninterest income: $15.852m; analytical bank revenue=$48.659m.
+- Net income: $9.022m; analytical net margin=9.022/48.659=18.5413%. This is not comparable to an industrial gross/net margin framework.
+- NIM 3.39%; ROE 12.68%; ROA 0.88%; efficiency ratio 77.17%.
+- NPL ratio 0.26%; ACL/loans 0.97%; ACL/NPL 378.50%.
+- CET1 11.73%; total capital 12.54%; leverage 9.05%.
+- CRE loans=$150.085m+$215.301m+$16.339m=$381.725m; CRE share=$381.725m/$667.807m=57.16%.
+- Forecast dividend=$0.10*4 quarters*4,543,338 shares=$1,817,335.20.
+- Forecast dividend CNY=$1,817,335.20*7.1875=13,062,096.75.
+- Forecast yield=13,062,096.75/829,004,558.0324249=1.5756363%.
+- Indicative 2025 year-end P/B=829,004,558.0324249/(80,048,000*7.1875)=1.4409x.
+- Indicative market cap/2025 profit=829,004,558.0324249/(9,022,000*7.1875)=12.7843x; kept distinct from input PE TTM 10.687748.
+
+[6] Currency treatment
+- Protocol requires absolute CNY amounts.
+- All filing-derived USD monetary facts were multiplied by 7.1875 CNY/USD.
+- Ratios were calculated from same-currency values and are FX invariant.
+- Market snapshot was not reconverted because input already supplies CNY market cap.
+
+[7] Output construction
+- Used protocol CLI set commands to populate outputs/result.json; did not hand-write the complex JSON object.
+- Wrote outputs/report.md as a human-readable operating story under report-contract.md.
+- Wrote this trace with sources, decisions, formulas, and limitations.
+
+[8] Validation
+- Ran:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[]

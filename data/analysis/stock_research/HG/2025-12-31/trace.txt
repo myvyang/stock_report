@@ -1,0 +1,55 @@
+stock-research trace
+company=Hamilton Insurance Group, Ltd. (NYSE: HG)
+period=2025-12-31
+generated_for_input=2026-08-04T13:41:53+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely as requested.
+3. Read references/data-reuse.md because the skill directly identified it as the reuse boundary.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields with repeated protocol `set` commands; no complex result object was hand-written from scratch.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Final validation status: ok; errors: [].
+
+[reuse audit]
+- No files existed in the configured raw filing, annual review, normalized facts, or prior stock research directories for HG/2025-12-31.
+- Therefore fetched and reviewed the primary 2025 Form 10-K rather than fabricating an annual fact pack.
+
+[primary sources]
+- SEC Form 10-K HTML, accession 0001593275-26-000021, filed 2026-02-25:
+  https://www.sec.gov/Archives/edgar/data/1593275/000159327526000021/hg-20251231.htm
+  Local research copy: stock_report/data/raw/filings/HG/2025-12-31/hg-20251231.htm
+- Hamilton investor relations Q4 / full-year 2025 results, released 2026-02-19:
+  https://investors.hamiltongroup.com/financials/quarterly-results/default.aspx
+- Market snapshot from config/input.json: market cap CNY 24,085,270,474.00049 as of 2026-08-03; PE TTM 5.904762; source Yahoo Finance yfinance.
+
+[model decision]
+- Input hint ordinary_operating/applicable was rejected after filing review.
+- Final model: financial_insurance / requires_special_model.
+- Basis: investments and cash support insurance reserves, unearned premiums, reinsurance settlements, statutory solvency capital, ratings, and claims liquidity.
+- As required by contract, discounted net cash, discounted cash profit, operating business price, owner earnback years, and market-cap-to-cash-profit remain null.
+
+[key extracted USD facts]
+- Total assets: 9,571.613m; total liabilities: 6,749.342m; shareholders' equity: 2,822.099m; TS Hamilton Fund NCI: 0.172m.
+- Total revenue: 2,905.524m; net premiums earned: 2,109.776m; total net income: 840.029m; common shareholder net income: 576.670m.
+- Gross premiums written: 2,923.145m; combined ratio: 92.9%; underwriting income: 148.8m.
+- Net investment income in company performance presentation: 511.8m, including Two Sigma Hamilton Fund return 300.9m and fixed income/short-term/cash return 210.9m.
+- Operating cash flow: 842.350m; financing cash flow: -376.166m; 2025 share repurchases: approximately 93.4m.
+- Loss reserves: 4,415.176m; unearned premiums: 1,377.474m; Two Sigma investments: 1,587.658m; cash: 1,062.359m; restricted cash: 109.731m.
+- 2025 subsidiary distributions to holding company: 220.5m; management-estimated 2026 subsidiary dividend capacity: 620.1m.
+- Special dividend declared 2026-02-18 and paid 2026-03-30: USD 2.00 per share, approximately 206.0m aggregate.
+
+[translation and calculations]
+- All filing USD amounts in result.json translated at research convention USD/CNY 7.1886 for protocol consistency.
+- Input market cap was retained exactly as supplied and not retranslated.
+- Net margin = common shareholder net income / GAAP total revenue = 576.670 / 2,905.524 = 19.8474%.
+- Observational P/B = input market cap / translated 2025 year-end parent equity = approximately 1.19x; reported only in narrative because it is not a v1 core field.
+- Forecast dividend is zero because the USD 206m special dividend had already been paid by the research date and no recurring ordinary dividend policy or new future dividend was disclosed. It is retained in dividend history, not double-counted as forecast.
+
+[limitations]
+- Currency translation uses one research rate rather than separate closing and average rates.
+- The task-supplied Yahoo Finance market snapshot was not replaced; its date post-dates the filing and special dividend.
+- Gross margin, capex, ordinary free cash flow, and owner earnback fields are intentionally null because they do not carry comparable economic meaning for this insurer.

@@ -1,0 +1,71 @@
+stock-research trace
+company: 伯特利 (603596.SH)
+period: 2025-12-31 annual
+generated: 2026-08-01 Asia/Shanghai
+
+[skill and contracts]
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because reuse eligibility had to be determined.
+
+[local reuse check]
+- config/input.json exists.
+- stock_report/data/raw/filings/603596.SH/2025-12-31: absent.
+- stock_report/data/analysis/annual_review/603596.SH/2025-12-31: absent.
+- stock_report/data/normalized/facts/603596.SH/2025-12-31: absent.
+- stock_report/data/analysis/stock_research/603596.SH/2025-12-31: absent.
+- Therefore no annual fact pack or prior research result could be reused.
+
+[protocol]
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated initialized paths with protocol set commands; the JSON was not created manually from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: []
+
+[primary research sources]
+1. 伯特利2025年年度报告（披露日期2026-03-28）全文镜像：
+   https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12032178&stockid=603596
+   Used for business, products, customer concentration, financial statements, notes, cash flow and risks.
+2. 伯特利2025年度利润分配及资本公积金转增股本预案公告（官方PDF）：
+   https://static.cninfo.com.cn/finalpage/2026-03-28/1225047596.PDF
+   Used to cross-check revenue, net profit, total assets and proposed dividend rationale.
+3. 伯特利2025年年度权益分派实施公告：
+   https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12280665&stockid=603596
+   Used for implemented cash dividend of CNY 230,474,992.82 and implementation dates.
+4. config/input.json / Tencent qt.gtimg.cn snapshot:
+   Market cap CNY 23,536,000,000; timestamp 20260731114320; PE TTM 18.0.
+
+[key calculations]
+- gross_profit = 12,014,080,628.71 - 9,653,698,401.12 = 2,360,382,227.59
+- gross_margin = 2,360,382,227.59 / 12,014,080,628.71 = 0.19646465
+- net_margin = 1,309,438,112.97 / 12,014,080,628.71 = 0.10899201
+- operating_free_cash_flow = 866,961,398.49 - 784,843,231.44 = 82,118,167.05
+- minority_interest = 8,414,718,144.62 - 7,997,937,599.48 = 416,780,545.14
+- interest-bearing debt and lease liabilities = 2,733,496,208.96 (annual report financing liability reconciliation)
+- discounted cash assets:
+  unrestricted cash 1,706,647,803.41 * 95%
+  + trading financial assets 2,512,132,788.79 * 90%
+  + current large CDs 391,988,217.04 * 95%
+  + debt-investment large CDs 242,556,516.67 * 90%
+  - debt and leases 2,733,496,208.96
+  = discounted detachable net cash 1,739,428,385.38
+- normalized cash profit base:
+  parent net profit 1,309,438,112.97
+  + depreciation/amortization 354,117,979.71
+  - estimated maintenance capex 470,905,938.86 (60% of 2025 capex)
+  - normalized working-capital reinvestment 103,874,060.09 (5% of revenue increase)
+  = 1,088,776,093.73
+- discounted sustainable cash profit = 1,088,776,093.73 * 80% = 871,020,874.98
+- operating business price = 23,536,000,000 - 1,739,428,385.38 = 21,796,571,614.62
+- owner earnback years = 21,796,571,614.62 / 871,020,874.98 = 25.024167
+- market cap / cash profit = 23,536,000,000 / 871,020,874.98 = 27.021166
+- forecast dividend yield = 230,474,992.82 / 23,536,000,000 = 0.00979217
+
+[judgment boundaries]
+- statement_model confirmed ordinary_operating because assets and liabilities represent manufacturing operations, not customer funds, insurance reserves, regulated project cash or concession rights.
+- Receivables, notes, inventory, fixed assets and construction in progress are treated as operating assets and not detachable cash.
+- Restricted monetary funds of CNY 75,048,060.83 are excluded.
+- Maintenance capex split and normalized working-capital reinvestment are analyst estimates because the annual report does not disclose the split; the sustainable cash profit is therefore a sensitivity anchor, not a forecast certainty.
+- No buy/sell recommendation, target price or ranking label is produced.

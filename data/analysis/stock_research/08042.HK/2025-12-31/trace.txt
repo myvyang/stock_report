@@ -1,0 +1,74 @@
+stock-research trace
+company: 08042.HK / KOS INTERNATIONAL TALENT GROUP LIMITED (2026 name; 2025 annual report issuer name KOS International Holdings Limited)
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked configured raw filing and annual review directories.
+- No pre-existing metadata.json, facts.json, annual_facts.md or extraction_trace.txt was available.
+- Downloaded official/company-hosted 2025 annual report to:
+  stock_report/data/raw/filings/08042.HK/2025-12-31/annual-report-2025.pdf
+- Official source URL:
+  https://cdn-01.cms-ap-v2i.applyflow.com/kos-international/wp-content/uploads/2026/04/Annual-Report-EW08042_AR25-compressed.pdf
+- Company reports index:
+  https://www.kos-intl.com/investor-relations/reports/
+
+3. Analysis-model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Annual report pp. 7, 12-14: business is recruitment, secondment and payroll services.
+- Annual report pp. 95, 137-139: balance sheet contains ordinary cash, receivables, pledged deposits, office leases and a bank loan; no brokerage customer funds, proprietary trading book or repo financing.
+- Conclusion: override hint with ordinary_operating / applicable.
+
+4. Primary extracted facts (HK$000 unless stated)
+- AR p. 94: revenue 257,200; staff costs 227,987; PBT 3,808; tax 1,253; net and parent profit 2,555.
+- AR p. 95: total assets 93,127; total liabilities 32,496; equity/parent equity 60,631; cash 41,405; pledged deposit 2,000; bank borrowing 5,000; lease liabilities 7,241.
+- AR p. 97: operating cash flow 16,713; PPE purchase 355; financing cash flow 93.
+- AR pp. 12-13: recruitment revenue 80,075 (31.2%); secondment/payroll revenue 177,125 (68.8%).
+- AR p. 14: seconded staff cost 158,913; internal staff cost 69,074.
+- AR pp. 90, 133-135, 144: net trade receivables 36,320; overdue 8,032; overdue >90 days 720; largest/top-five receivable concentration 16%/37%.
+- AR p. 23: no 2025 final dividend (2024: nil).
+- AR p. 17: internal staff 132; seconded staff 3,035 (2024: 999).
+
+5. Currency conversion
+- Contract requires absolute CNY yuan.
+- ECB 2025-12-31 euro reference rates: CNY 8.2262/EUR and HKD 9.1464/EUR.
+- Cross rate = 8.2262 / 9.1464 = 0.89938, rounded to 0.8994 CNY/HKD.
+- All annual-report amounts in result.json use HKD amount * 0.8994.
+- Market cap was supplied by input and retained as CNY 50,241,520.26176453.
+
+6. Derived operating metrics
+- Statutory gross profit is not presented because expenses are classified by nature.
+- Proxy direct cost = seconded staff cost 158,913,000 HKD.
+- Proxy contribution/gross profit = 257,200,000 - 158,913,000 = 98,287,000 HKD.
+- Proxy gross margin = 98,287 / 257,200 = 0.3821423017.
+- Net margin = 2,555 / 257,200 = 0.0099339036.
+- Operating profit proxy = PBT 3,808 + finance cost 795 = 4,603 HKD000.
+- Operating FCF = 16,713 - 355 = 16,358 HKD000.
+
+7. Owner earnback assumptions
+- Unpledged bank cash 41,405,000 HKD converted to CNY 37,239,657; apply 50% detachable discount because payroll must be settled while customer receivables turn over.
+- Pledged deposit 2,000,000 HKD: 0% detachable.
+- Bank borrowing 5,000,000 HKD: deduct 100%.
+- Discounted detachable net cash = CNY 14,122,828.50.
+- Sustainable cash profit starts from CNY 2,297,967 parent profit. Deduct combined CNY 679,047 for ECL reversal and recovery-stage conservatism, yielding CNY 1,618,920.
+- Operating business price = 50,241,520.26176453 - 14,122,828.50 = CNY 36,118,691.76176453.
+- Owner earnback years = 36,118,691.76176453 / 1,618,920 = 22.3103623.
+- Market cap / cash profit = 50,241,520.26176453 / 1,618,920 = 31.0339734.
+- Forecast dividend = 0 because 2025 and 2024 final dividends were nil and no new payout policy was disclosed.
+
+8. Known limitations
+- Gross profit/margin is an explicitly labelled proxy, not a statutory line item.
+- One closing-date FX rate is used for both balance-sheet and income/cash-flow conversion.
+- Only one restored-profit year follows a loss year; sustainable cash profit and cash detachability are judgmental and sensitivity is high.
+
+9. Validation
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final status: ok; errors: []

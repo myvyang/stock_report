@@ -1,0 +1,54 @@
+stock-research trace
+generated_at: 2026-08-04T10:54:12+08:00
+query: 08080.HK
+
+1. Read instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- config/input.json existed.
+- No annual facts, normalized facts, prior stock-research result, or filing metadata existed at the configured paths.
+- Downloaded official annual report to stock_report/data/raw/filings/08080.HK/2025-12-31/annual-report-2025.pdf.
+
+3. Identity and model verification
+- Official issuer: North Asia Strategic Holdings Limited / 北亞策略控股有限公司, stock code 8080.
+- Official reporting date: year ended 2025-03-31, not input period 2025-12-31.
+- Official businesses: hi-tech distribution and services, leasing, electronic payment solution, property and investment holding.
+- Overrode input hint financial_brokerage -> ordinary_operating.
+- Reason: no brokerage client money, proprietary securities inventory, margin financing, or repo funding structure; leasing receivables/assets are operating items.
+
+4. Primary source
+- HKEX annual report URL: https://www.hkexnews.hk/listedco/listconews/gem/2025/0724/2025072401147.pdf
+- Audited by Ernst & Young; unmodified opinion.
+- Key pages: p.57 dividend; p.73 customer/supplier concentration; p.84 income statement; p.86-87 balance sheet; p.90-91 cash flow; p.92 business description; p.168 segment results; p.182 dividend note; p.203-204 financial assets/inventory/cash; p.211-212 borrowings/payables.
+
+5. Currency conversion
+- Filing presentation currency: HKD, figures reported in HK$'000.
+- Result contract currency: CNY absolute yuan.
+- Conversion used: 1 HKD = 0.9323 CNY at 2025-03-31.
+- Market cap was retained as supplied in input (CNY 172,042,794.8963642).
+
+6. Core calculations
+- gross_margin = 289,401 / 1,375,299 = 0.2104276961.
+- net_margin = -7,904 / 1,375,299 = -0.0057471139.
+- operating_free_cash_flow = (28,186 - 95,118) HK$'000 * 0.9323 = -62,400,703.60 CNY.
+- discounted detachable net cash = [321.450m HKD * 50% + 88.836m HKD * 60% - 12.559m HKD bank debt - 43.917m HKD lease liabilities] * 0.9323 = CNY 146,884,424.38.
+- operating_business_price = CNY 172,042,794.8963642 - CNY 146,884,424.38 = CNY 25,158,370.516364217.
+- discounted sustainable cash profit = 0 because attributable profit and operating free cash flow were negative and maintenance versus growth capex was not reliably separable.
+- owner earnback years and market cap/cash profit = null because denominator was not positive.
+- forecast cash dividend = 0; forecast yield = 0 because FY2024 and FY2025 dividends were nil and no positive distribution basis was established.
+
+7. Data-quality decision
+- status: partial.
+- Reason 1: requested 2025-12-31 annual period does not match issuer's 2025-03-31 statutory year-end.
+- Reason 2: market-cap date 2026-08-03 is approximately 16 months after the balance-sheet date.
+- Result is explanatory but should not enter strict same-period production ranking.
+
+8. Protocol commands
+- Initialized with: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated exclusively through protocol set commands after initialization.
+- Validated with: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].

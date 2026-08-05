@@ -1,0 +1,71 @@
+stock-research trace
+company: 江苏新能 (603693.SH)
+period: 2025-12-31 annual
+generated_for: 2026-08-01 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated all result fields using protocol set/append commands; no complex JSON result was handwritten from scratch.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse audit]
+- Expected annual facts, normalized facts, filing metadata and raw filing directory from config/input.json were absent from the workspace.
+- No prior stock-research result existed for this company/period.
+- Research therefore used the disclosed 2025 annual report and related announcements available publicly.
+
+[core sources]
+- 江苏新能《2025年年度报告》, disclosed 2026-04-25; financial statements audited by 天衡会计师事务所, report 天衡审字（2026）00083号, unmodified opinion.
+  Public readable copy: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12183280&stockid=603693
+- 江苏新能《2025年年度报告摘要》, 上海证券报, 2026-04-25.
+  https://paper.cnstock.com/html/2026-04/25/content_2205962.htm
+- 江苏新能《关于2025年度利润分配预案的公告》, 2026-04-25.
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12183283&stockid=603693
+- 江苏新能《2025年年度权益分派实施公告》, 2026-06; confirms shareholder approval and RMB 0.15/share implementation.
+- Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, market cap RMB 10,867,000,000, timestamp 20260731114336, PE TTM 23.98.
+
+[model decision]
+- Input hint: ordinary_operating/applicable.
+- Overridden to: utility_concession/requires_special_model.
+- Evidence: business is construction and long-term operation of wind, solar and storage stations; fixed assets RMB 9,876,586,791.96, construction in progress RMB 517,063,216.27, right-of-use assets RMB 630,470,903.18; long-term borrowings RMB 5,348,866,696.43, lease liabilities RMB 559,531,678.93, long-term payables RMB 1,052,632,672.93.
+- Consequence: discounted detachable net cash, discounted sustainable cash profit, operating business price, ordinary owner earnback years and market-cap-to-cash-profit remain null. Appropriate analysis is project/portfolio equity cash flow after capex, debt service and minority distributions.
+
+[calculations]
+gross_profit = revenue - cost_of_sales
+= 2,086,839,063.62 - 1,043,920,539.97
+= 1,042,918,523.65
+
+gross_margin = gross_profit / revenue
+= 1,042,918,523.65 / 2,086,839,063.62
+= 0.4997534568
+
+net_margin = parent_net_profit / revenue
+= 507,458,165.84 / 2,086,839,063.62
+= 0.2431726249
+
+operating_free_cash_flow = operating_cash_flow - capital_expenditure
+= 1,140,476,144.37 - 688,653,634.19
+= 451,822,510.18
+Note: this is a mechanical statement-level measure, not sustainable distributable cash; maintenance and growth capex are not reliably separated.
+
+forecast_dividend_yield = implemented 2025 cash dividend / input market cap
+= 133,721,382 / 10,867,000,000
+= 0.012305262 (about 1.23%)
+
+minority_interest_ratio = minority_interest / total_equity
+= 1,315,263,410.27 / 8,384,598,180.82
+= 0.156867796
+
+[data limitations]
+- No verified project-by-project remaining operating term, maintenance capex, contracted/mechanism price mix or debt amortization schedule was available; no project DCF was produced.
+- Accounts receivable cannot be split into all settlement/subsidy vintages from the cited public tables.
+- Market cap and PE are the supplied Tencent snapshot and were not independently reconciled to an exchange close.
+- The 2025 dividend is implemented and used as the next observable cash distribution proxy; it is not a forecast guarantee for later years.
+
+[final checks]
+- result.json protocol validation: ok, zero errors.
+- Cross-file model treatment: utility_concession/requires_special_model in result and report; ordinary owner-earnback fields null.
+- Currency: CNY absolute yuan in result.json; report displays亿元 for readability.

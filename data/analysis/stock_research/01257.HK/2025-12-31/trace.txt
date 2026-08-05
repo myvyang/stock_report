@@ -1,0 +1,62 @@
+stock-research trace
+company: 01257.HK / China Everbright Greentech Limited
+period: 2025-12-31 annual
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because no reusable annual facts or prior research were present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- config/input.json existed.
+- No prior filing metadata, annual facts, normalized facts, or stock-research outputs existed for 01257.HK/2025-12-31.
+- Therefore retrieved the official annual report from HKEX.
+
+3. Primary sources
+- HKEX 2025 Annual Report, published 2026-04-22:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0422/2026042201664.pdf
+  Local copy: stock_report/data/raw/filings/01257.HK/2025-12-31/2025-annual-report.pdf
+- HKEX 2025 Annual Results Announcement, published 2026-03-18:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0318/2026031800235.pdf
+- 2025-12-31 CFETS central parity reported by Xinhua/China.org.cn: 100 HKD = 90.322 CNY.
+  https://www.china.org.cn/china/Off_the_Wire/2025-12/31/content_118255014.shtml
+- Market cap and PE TTM: task input, Tencent qt.gtimg.cn, timestamp 2026/07/31 16:08:47.
+
+4. Model decision
+- Input hint classified the company as financial_brokerage. This was rejected after reading the annual report.
+- Confirmed model: utility_concession.
+- Reason: operations comprise biomass power, hazardous/solid waste treatment, remediation, solar and wind projects. BOT/BOO service concession assets, intangible operating rights, government-related receivables and project borrowings are the economics of the business.
+- owner_earnback_applicability: requires_special_model.
+- All ordinary owner-earnback ranking fields remain null as required by the result contract.
+
+5. Currency and calculations
+- All structured amounts are CNY absolute yuan.
+- Translation factor: HKD amount x 0.90322.
+- Gross margin = HKD 1,578,175,000 / HKD 6,729,234,000 = 0.2345252075.
+- Parent net margin = HKD 113,112,000 / HKD 6,729,234,000 = 0.0168090454.
+- Capital expenditure proxy = purchase of PPE HKD 366,869,000 + additions to intangible assets HKD 96,446,000 = HKD 463,315,000.
+- Operating free cash flow = operating cash flow HKD 3,455,001,000 - capex HKD 463,315,000 = HKD 2,991,686,000; translated CNY 2,702,150,628.92.
+- This FCF was not used as sustainable distributable cash profit because working-capital release and renewable subsidy collection were material.
+- Forecast/declared 2025 cash dividend = HKD 0.056 per share x inferred 2,067,861,060 shares x 0.90322 = CNY 104,593,074.15.
+- Forecast dividend yield = CNY 104,593,074.15 / CNY 1,350,860,273.04 = 0.0774270117.
+
+6. Key interpretation checks
+- 2025 operating cash flow includes material decreases in receivables and contract assets.
+- Unbilled renewable tariff subsidy contract assets declined from HKD 3,106,104,000 to HKD 128,159,000.
+- Interest-bearing borrowings were HKD 18,384,896,000 versus cash and cash equivalents HKD 2,276,140,000.
+- Perpetual medium-term notes of HKD 3,248,653,000 are accounting equity but treated as prior-ranking financing in the narrative.
+- Hazardous/solid waste adjusted EBITDA remained negative and long-lived asset impairments were HKD 614,562,000.
+
+7. Protocol writes and validation
+- Populated scalar/object fields using repeated protocol `set` commands.
+- Populated asset_analysis, liabilities, risks and evidence using protocol `append` commands.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+
+8. Data-quality decision
+- status=complete under the special-model minimum requirements.
+- Limitations retained in result.json: end-date FX translation, market-data source mismatch risk, lack of project-level remaining concession terms/maintenance capex/restricted cash, and non-repeatable working-capital contribution to 2025 FCF.

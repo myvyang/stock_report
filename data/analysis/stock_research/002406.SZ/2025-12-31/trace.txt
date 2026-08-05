@@ -1,0 +1,82 @@
+stock-research trace
+company=002406.SZ 远东传动
+period=2025-12-31 annual
+generated_for_input=2026-08-01T03:23:32+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because local-data reuse boundaries became relevant.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields only through protocol set/append commands in scripts/populate_stock_result.sh.
+6. Validated with protocol CLI; status=ok, errors=[].
+
+[local-data-audit]
+- config/input.json present.
+- No pre-existing annual facts, normalized facts, raw filing metadata, or prior stock-research output was present for 002406.SZ/2025-12-31.
+- Downloaded a 169-page PDF mirror for local reference to stock_report/data/raw/filings/002406.SZ/2025-12-31/annual-report.pdf.
+- Core financial evidence was checked against the online text of the company's 2025 annual report disclosed through the designated information-disclosure channel; third-party mirrors were not used as substitutes for core figures.
+
+[primary-filing]
+title=许昌远东传动轴股份有限公司2025年年度报告
+announcement_no=2026-004
+announcement_date=2026-03-28
+audit_report=大华审字[2026]0011004115号
+audit_opinion=标准无保留意见
+designated_disclosure_site=http://www.cninfo.com.cn
+
+[model-review]
+input_hint=ordinary_operating/applicable
+confirmed=ordinary_operating/applicable
+reason=Company manufactures and sells driveshafts and parts. Its balance sheet consists mainly of cash, wealth-management products, receivables, inventory, production assets, and ordinary supplier liabilities. No customer funds, insurance reserves, regulated presale funds, concession rights, or investment-holding structure was found.
+
+[core-facts-yuan]
+revenue=1568895822.93
+cost_of_sales=1140707325.21
+gross_profit=428188497.72
+operating_profit=221608294.17
+net_profit=163004221.92
+parent_net_profit=156217047.47
+operating_cash_flow=82860111.00
+capital_expenditure=38087975.44
+operating_free_cash_flow=44772135.56
+total_assets=5130944614.14
+total_liabilities=1018426538.44
+total_equity=4112518075.70
+parent_equity=4072886771.40
+minority_interest=39631304.30
+
+[derived-metrics]
+gross_margin=(1568895822.93-1140707325.21)/1568895822.93=0.27292347360600033
+net_margin=156217047.47/1568895822.93=0.09957133238984345
+2024_fcf=108316168.82-42136927.79=66179241.03
+two_year_average_fcf=(44772135.56+66179241.03)/2=55475688.295
+discounted_cash_profit=55475688.295*0.90=49928119.4655
+
+[owner-earnback]
+cash_equivalents=663548641.95; discount=0.90; discounted=597193777.755
+trading_financial_assets=411616219.55; discount=0.80; discounted=329292975.64
+short_term_borrowing=2407235.89; deduction=100%
+discounted_detachable_net_cash=597193777.755+329292975.64-2407235.89=924079517.505
+market_cap=4841000000.00
+operating_business_price=4841000000.00-924079517.505=3916920482.495
+owner_earnback_years=3916920482.495/49928119.4655=78.4511919221
+market_cap_to_cash_profit=4841000000.00/49928119.4655=96.9593898554
+
+[dividend]
+shares=730225082
+proposal_per_share=0.30
+forecast_cash_dividend=219067524.60
+forecast_dividend_yield=219067524.60/4841000000.00=0.0452525355505
+qualification=Board proposal; not treated as a perpetual run rate because it exceeds 2025 parent net profit and free cash flow.
+
+[judgment-boundaries]
+- Facts: reported statements, business description, volumes, expense lines, receivable movement, dividend proposal.
+- Inference: receivable growth is the main reason profit conversion weakened, supported by the cash-flow reconciliation.
+- Subjective conservative estimates: cash 90%, trading financial assets 80%, two-year average FCF 90%.
+- Limitation: the trading-financial-asset portfolio was not penetrated product by product; full-cycle normalized cash flow is unavailable from only two years.
+
+[final-validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+expected=status ok; errors empty

@@ -1,0 +1,69 @@
+stock-research trace
+company: WABC / Westamerica Bancorporation
+period: 2025-12-31
+generated_at: 2026-08-04T19:25:00+08:00
+
+1. Read skill and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+   - No WABC raw filing, annual facts, normalized facts, or prior research output existed locally.
+   - Downloaded the official SEC filing and SEC Companyfacts rather than relying on third-party financial statements.
+
+3. Protocol initialization
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   result: initialized stock-research-result-v1 structure.
+
+4. Primary documents
+   - SEC 2025 10-K, accession 0001171843-26-001195, filed 2026-02-27:
+     https://www.sec.gov/Archives/edgar/data/311094/000117184326001195/wabc20251231_10k.htm
+     local: stock_report/data/raw/filings/WABC/2025-12-31/wabc20251231_10k.htm
+   - SEC Companyfacts XBRL:
+     https://data.sec.gov/api/xbrl/companyfacts/CIK0000311094.json
+     local: stock_report/data/raw/filings/WABC/2025-12-31/companyfacts.json
+   - Westamerica Q4 2025 Financial Highlights:
+     https://www.westamerica.com/wp-content/uploads/2026/01/Financial-Highlights-Q4-2025-print.pdf
+   - Westamerica Q4 2025 results:
+     https://www.westamerica.com/westamerica-bancorporation-reports-fourth-quarter-2025-financial-results/
+   - Westamerica dividend announcement, 2026-04-23:
+     https://www.westamerica.com/westamerica-bancorporation-declares-quarterly-cash-dividend-37/
+   - Federal Reserve H.10 via FRED DEXCHUS:
+     https://fred.stlouisfed.org/series/DEXCHUS
+
+5. Model decision
+   - Input hint ordinary_operating/applicable was overridden.
+   - Confirmed financial_bank/not_applicable because customer deposits fund loans, securities, and liquidity assets.
+   - Ordinary discounted cash, operating-business price, and earnback fields retained as null.
+
+6. Currency conversion
+   - Protocol requires absolute CNY yuan.
+   - Used 2025-12-31 DEXCHUS = 6.9931 CNY per USD for all filing and dividend amounts.
+   - This consistent point-in-time conversion is disclosed as a limitation for historical flow amounts.
+
+7. Key extracted USD facts
+   - Assets 5,960,180,000; liabilities 5,026,671,000; equity 933,509,000.
+   - Net income 116,173,000; net interest income 217,268,000; noninterest income 40,790,000; noninterest expense 101,922,000.
+   - Cash and due from banks 567,801,000; AFS debt securities 3,468,734,000; HTM debt securities 819,574,000; net loans 714,909,000.
+   - Deposits 4,840,019,000; allowance for loan credit losses 11,573,000; nonaccrual loans 1,474,000; nonperforming assets 1,800,000.
+   - 2025 dividend cash 46,936,000; repurchases 103,785,000; year-end shares 24,623,000.
+   - Tier 1 leverage 15.22%; Tier 1 risk-based capital 22.75%; total risk-based capital 23.05%.
+   - FTE NIM 3.82%; efficiency ratio 40.3%; ROA 1.91%; ROE 11.2%.
+
+8. Dividend forecast
+   - Annualized announced quarterly dividend: USD 0.48 x 4 = USD 1.92/share.
+   - Forecast USD cash dividend: 1.92 x 24,623,000 = 47,276,160.
+   - Forecast CNY cash dividend: 330,606,914.50.
+   - Yield: 330,606,914.50 / 9,336,332,611.95227 = 3.54118934%.
+
+9. Result construction
+   - Used protocol set/append commands for all structured fields; result JSON was not written from scratch.
+   - Market cap and PE were preserved exactly from config/input.json.
+
+10. Validation
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: {"status":"ok","errors":[]}
+   - Confirmed all ordinary owner-earnback sorting fields remain null for financial_bank/not_applicable.
+   - Confirmed data_quality.status=complete and incomplete_reasons is empty.

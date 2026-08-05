@@ -1,0 +1,91 @@
+task=stock_research
+company=002616.SZ 长青集团
+period=2025-12-31
+generated_context_date=2026-07-31 Asia/Shanghai
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+mutation=all result.json field and list mutations performed through protocol set/append commands
+
+[reuse_check]
+expected_annual_facts=stock_report/data/analysis/annual_review/002616.SZ/2025-12-31/facts.json
+expected_normalized_facts=stock_report/data/normalized/facts/002616.SZ/2025-12-31/annual-facts.json
+expected_prior_research=stock_report/data/analysis/stock_research/002616.SZ/2025-12-31/result.json
+status=not_found
+action=downloaded and extracted 2025 annual report; no prior annual fact or research conclusion reused
+
+[primary_source]
+title=广东长青（集团）股份有限公司2025年年度报告
+disclosure_date=2026-03-31
+mirror_url=http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESZ_STOCK/2026/2026-3/2026-03-31/12042914.PDF
+local_file=stock_report/data/raw/filings/002616.SZ/2025-12-31/annual-report-2025.pdf
+pages=202
+audit=众华会字（2026）第02247号；标准无保留意见
+note=报告内容为上市公司公开年报全文；核心数字均回到合并报表、附注或年报业务章节。
+
+[market_source]
+market_cap=4038000000.0000005
+market_cap_date=20260731114306
+pe_ttm=13.52
+source=Tencent qt.gtimg.cn as provided in config/input.json
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=公司直接运营并合并热电、供热和垃圾发电项目，不属于金融、地产或投资控股；虽带公用事业和项目融资特征，但收入、成本、经营资产与现金流可按普通经营公司分析。特殊处理为全额扣除项目债务、折价现金、正常化补贴回款及资本开支。
+
+[financial_facts_CNY]
+total_assets=9637714176.53
+total_liabilities=6009340813.50
+total_equity=3628373363.03
+parent_equity=3620273637.94
+minority_interest=8099725.09
+revenue=3665891878.00
+cost_of_sales=2857191156.75
+gross_profit=808700721.25
+operating_profit=380918241.49
+net_profit=282518337.75
+parent_net_profit=280223854.25
+operating_cash_flow=811402879.60
+capital_expenditure=136710985.08
+operating_free_cash_flow=674691894.52
+gross_margin=0.22060135654933793
+net_margin=0.0764408399308497
+
+[owner_earnback_CNY]
+cash_and_cash_equivalents=804741194.25
+cash_haircut=0.20
+adjusted_cash=643792955.40
+short_term_borrowings=385365138.88
+current_long_term_borrowings=1233566126.00
+long_term_borrowings=3114886218.26
+current_lease_liabilities=2643006.50
+noncurrent_lease_liabilities=8811048.21
+interest_bearing_debt_and_lease_total=4745271537.85
+discounted_detachable_net_cash=-4101478582.45
+discounted_sustainable_cash_profit=300000000.00
+operating_business_price=8139478582.45
+owner_earnback_years=27.131595274833337
+market_cap_to_cash_profit=13.46
+formula_net_cash=804741194.25*0.8-4745271537.85
+formula_operating_price=4038000000-(-4101478582.45)
+formula_owner_years=8139478582.45/300000000
+normalization=2025 OCF benefited from subsidy receivable collection; remove 148851943.47 disposal gain, recognize 143378678.23 impairment as noncash but economically cautionary, and avoid annualizing 674691894.52 single-year FCF. 300m is a conservative analyst judgment, not company guidance.
+
+[dividend]
+2025_interim=742025996 shares * CNY0.15 = CNY111303899.40; implemented 2025-09-24
+2025_final_proposal=859216368 shares * CNY0.25 = CNY214804092.00
+forecast_yield=214804092/4038000000=0.05319566419019316
+note=forecast uses final proposal only; interim distribution is separately recorded as history
+
+[quality]
+status=complete
+limitations=No local annual facts package; sustainable cash profit is analyst-normalized; market snapshot accepted from input; independent market share unavailable; project-level subsidy expiry schedule and long-run maintenance capex not fully quantified.
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+final_result=status ok, errors []

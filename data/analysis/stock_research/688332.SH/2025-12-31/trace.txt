@@ -1,0 +1,47 @@
+stock-research trace
+company=688332.SH 中科蓝讯
+period=2025-12-31 annual
+generated_for=2026-08-01
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+populate=protocol set commands executed by temporary populate_stock_result.py
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[sources]
+official_filing=stock_report/data/raw/filings/688332.SH/2025-12-31/annual-report.pdf
+official_url=https://static.cninfo.com.cn/finalpage/2026-04-09/1225086477.PDF
+filing_sha256=efd4d00371de41de24bfe466ad5586d3a9372fa605d09dd6e0c8cb029f40c379
+reused_fact_pack=stock_report/data/analysis/annual_review/688332.SH/2025-12-31/result.json
+market_snapshot=config/input.json; Tencent qt.gtimg.cn; 20260731114321
+
+[filing_checks]
+pages_150_163=consolidated balance sheet, income statement, cash flow statement
+pages_54_60=operations, product/channel mix, customers and suppliers
+pages_196_253=financial assets, inventory, debt, investment returns, fair value and cash flow notes
+pages_271_272=post-balance-sheet dividend proposal
+analysis_model=ordinary_operating/applicable; Fabless chip design business, no special financial-statement model
+
+[core_formulas]
+gross_profit=1841575191.81-1433014208.00=408560983.81
+gross_margin=408560983.81/1841575191.81=0.22185408753711763
+net_margin=1415455005.76/1841575191.81=0.7686110304129445
+operating_fcf=64051503.68-25175858.72=38875644.96
+discounted_net_cash=1014402410.55*0.95+1758274750.97*0.90+1273573780.54*0.50+60999553.77*0.95+342899686.90*0.30-143198336.41=3200537601.907
+discounted_cash_profit=186601454.23*0.80=149281163.384
+operating_business_price=14929000000-3200537601.907=11728462398.093
+owner_earnback_years=11728462398.093/149281163.384=78.56625800753949
+market_cap_to_cash_profit=14929000000/149281163.384=100.00591944475758
+forecast_dividend_yield=241196400/14929000000=0.016156232835420992
+
+[judgment_boundaries]
+fact=2025 parent net profit 1415455005.76; nonrecurring profit 1182265302.35; operating FCF 38875644.96
+reused_verified_calculation=operating NOPAT 186601454.23 after removing 1350319282.45 financial/investment returns
+judgment=haircuts of 95% deposits, 90% wealth management, 50% other noncurrent financial assets, 30% VC fund
+judgment=discounted sustainable cash profit equals 80% of operating NOPAT
+limitation=market snapshot not refreshed; underlying investment-level values, lockups and tax costs incomplete

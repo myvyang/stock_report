@@ -1,0 +1,71 @@
+stock-research trace
+company: 02283.HK / 东江集团（控股）有限公司
+period: 2025-12-31 annual
+generated_for_input: 2026-08-04T12:30:40+08:00
+
+1. Protocol initialization
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   result: initialized stock-research-result-v1 template.
+
+2. Local reuse check
+   checked:
+   - stock_report/data/analysis/annual_review/02283.HK/2025-12-31/facts.json
+   - stock_report/data/normalized/facts/02283.HK/2025-12-31/annual-facts.json
+   - stock_report/data/raw/filings/02283.HK/2025-12-31/
+   result: no pre-existing annual facts or filing available; fresh official filing retrieval required.
+
+3. Official sources retrieved
+   - HKEX annual report 2025, published 2026-04-23:
+     https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042300918.pdf
+     saved: stock_report/data/raw/filings/02283.HK/2025-12-31/annual_report_2025.pdf
+   - HKEX annual results announcement, published 2026-03-30:
+     https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0330/2026033002322.pdf
+   - PBOC RMB central parity, 2025-12-26: HKD 1 = CNY 0.90486:
+     https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+   - Market snapshot supplied by input: Tencent qt.gtimg.cn, 2026-08-03 09:42:05.
+
+4. Model override
+   input hint: financial_brokerage / requires_special_model.
+   filing evidence: group manufactures, sells, subcontracts, fabricates and modifies molds and plastic components; balance sheet contains ordinary manufacturing working capital and no brokerage client-money structure.
+   selected: ordinary_operating / applicable.
+
+5. Currency normalization
+   protocol currency: CNY absolute yuan.
+   filing currency: HKD thousand.
+   transform for every filing amount: HKD'000 * 1,000 * 0.90486.
+   limitation: balance-sheet-date-near rate used for both stock and flow items; no annual average rate applied.
+
+6. Key reported HKD figures
+   revenue 2,394,622,000; cost of sales 1,805,795,000; gross profit 588,827,000;
+   operating profit 240,364,000; profit attributable/annual profit 218,000,000;
+   total assets 2,779,366,000; total liabilities 974,354,000; total equity 1,805,012,000;
+   cash and cash equivalents 1,174,377,000; bank borrowings nil;
+   operating cash flow 391,229,000; PP&E purchases 132,277,000; intangible purchases 3,069,000;
+   operating free cash flow = 391,229,000 - 132,277,000 - 3,069,000 = 255,883,000.
+
+7. Owner earnback calculations (CNY)
+   operating cash reserve = revenue * 15% = 325,019,649.44.
+   discounted detachable net cash = (cash - operating reserve) * 80% - lease liabilities
+     = 490,932,661.67.
+   discounted sustainable cash profit = parent net profit * 80% = 157,807,584.00.
+   operating business price = market cap - discounted net cash = 720,550,407.65.
+   owner earnback years = operating business price / discounted cash profit = 4.5660.
+   market cap / cash profit = 7.6770.
+   investment assets excluded from detachable cash.
+
+8. Dividend forecast
+   sustainable ordinary dividend assumption: 2025 interim HKD0.043 + final HKD0.062 = HKD0.105/share.
+   shares: 833,260,000.
+   forecast cash dividend: HKD87,492,300 * 0.90486 = CNY79,168,671.67.
+   forecast yield = CNY79,168,671.67 / CNY1,211,483,069.31 = 6.5349%.
+   2025 special dividend HKD0.10/share excluded from forecast.
+
+9. Protocol population and validation
+   result fields were populated through repeated protocol `set` commands, not by constructing result.json manually.
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   final validation: status=ok, errors=[]
+
+10. Output set
+   - outputs/result.json
+   - outputs/report.md
+   - outputs/trace.txt

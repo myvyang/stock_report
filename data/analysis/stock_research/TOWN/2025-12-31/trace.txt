@@ -1,0 +1,48 @@
+stock-research trace
+company=TOWN / TowneBank
+period=2025-12-31
+generated_for_input=2026-08-05T05:17:59+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields only through protocol set/append commands.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse audit]
+- No pre-existing TOWN annual facts, normalized facts, raw filing metadata, or stock research result was present under the paths given in config/input.json.
+- Research therefore used the issuer's 2025 annual results release and annual report.
+
+[model decision]
+- Input hint: ordinary_operating / applicable.
+- Overridden to: financial_bank / not_applicable.
+- Reason: deposits are operating funding and loans, securities, and cash balances are matched banking assets subject to liquidity and capital constraints. They are not detachable cash. Ordinary owner earnback fields remain null.
+
+[primary sources]
+1. TowneBank, “TowneBank Reports Full Year and Fourth Quarter Financial Results for 2025,” 2026-01-28.
+   https://investor.townebank.com/news/news-details/2026/TowneBank-Reports-Full-Year-and-Fourth-Quarter-Financial-Results-for-2025/default.aspx
+   Used for income statement, balance sheet, NIM, deposits, loans, asset quality, capital ratios, dividends, acquisitions, and business description.
+2. TowneBank, 2025 Annual Report.
+   https://www.townebank.com/TowneBank/media/PDFs/2025-TowneBank-Annual-Report.pdf
+   Used as issuer annual-report cross-check. Direct automated download was blocked in this environment; the official indexed document was available as a public source.
+3. People's Bank of China / China Foreign Exchange Trade System, late-December 2025 RMB central parity announcement.
+   2025-12-30 USD/CNY central parity 7.0348 used for all filing-value conversions.
+4. config/input.json / Yahoo Finance yfinance.
+   Used for CNY market cap 23,355,565,707.22119, PE TTM 18.225962, valuation date 2026-08-03.
+
+[conversion and calculations]
+- Filing amounts were reported in USD and converted to CNY at 7.0348 CNY/USD.
+- Bank “revenue” = GAAP net interest income 563.607m USD + noninterest income 272.110m USD = 835.717m USD.
+- Net margin = attributable net income 169.526m / revenue 835.717m = 20.2851%. This is retained for display but is less informative than NIM/ROE for a bank.
+- Forecast dividend = 0.27 USD latest quarterly dividend * 4 * 78,964,038 year-end shares * 7.0348 = CNY 599,935,911.68.
+- Forecast dividend yield = CNY 599,935,911.68 / CNY 23,355,565,707.22119 = 2.5687%.
+- Market cap / 2025 year-end attributable equity = approximately 1.37x.
+- Gross margin, operating cash flow, capex, operating FCF, detachable net cash, discounted cash profit, business purchase price, owner earnback years, and market-cap/cash-profit were left null because they lack comparable economic meaning under the bank model.
+
+[limitations]
+- The issuer's January 2026 full-year tables label 2025 as unaudited. The later annual report was used as a cross-check, but no searchable SEC 10-K body was obtained.
+- Valuation is dated seven months after the reporting period.
+- Dividend forecast is a flat run-rate scenario, not management guidance.

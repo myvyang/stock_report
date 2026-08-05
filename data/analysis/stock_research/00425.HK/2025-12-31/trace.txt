@@ -1,0 +1,65 @@
+stock-research trace
+company=00425.HK MINTH GROUP
+period=2025-12-31
+generated_at=2026-08-03T14:56:10+08:00
+
+[protocol]
+1. Read stock-research/SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated fields only through protocol set/append commands.
+4. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   status=ok, errors=[]
+
+[source discovery and reuse]
+- No annual facts package, normalized facts, prior research result, or raw filing was present for 00425.HK/2025-12-31.
+- Located official 2025 Annual Report on Minth Group's website:
+  https://www.minthgroup.com/ENG/upload/files/2026/4/e_00425ar-20260429.pdf
+- Downloaded PDF to stock_report/data/raw/filings/00425.HK/2025-12-31/annual_report_2025.pdf.
+- Extracted text locally for deterministic inspection. Core references: annual report pp. 14-19 (MD&A), 63-69 (three statements), note 6 (segments), notes 13, 15, 23-31.
+- Cross-check source: https://www.minthgroup.com/ENG/contents/113/1183.html
+- Market cap and PE reused from config/input.json as instructed: RMB27,875,303,097.233772, 2026/07/31 16:08:47, Tencent qt.gtimg.cn, PE TTM 10.87.
+
+[model override]
+- Input hint=financial_brokerage/requires_special_model.
+- Filing facts show design, development, manufacture, processing and sale of automotive parts and moulds, with inventory, receivables, PPE, supplier payables and bank loans.
+- No brokerage client money, proprietary securities book, margin finance or repo funding model exists.
+- Final classification=ordinary_operating; owner_earnback_applicability=applicable.
+
+[core calculations]
+All source amounts below were reported in RMB'000 and converted to absolute RMB.
+- total_assets=(24,319,095+17,979,965)*1000=42,299,060,000
+- total_liabilities=(15,541,195+2,345,389)*1000=17,886,584,000
+- gross_margin=7,206,930/25,737,192=0.2800200581
+- net_margin=2,692,150/25,737,192=0.1046015432
+- capital_expenditure=(2,209,754 PPE purchases+103,273 intangible purchases)*1000=2,313,027,000
+- operating_free_cash_flow=4,912,275,000-2,313,027,000=2,599,248,000
+- forecast_dividend_yield=807,645,000/27,875,303,097.233772=0.0289734966
+
+[discounted detachable net cash]
+- cash and deposits=6,799,598,000; disclosed pledged deposits=275,997,000.
+- unpledged cash/deposits=(6,799,598,000-275,997,000)*90%=5,871,240,900.
+- structured deposit=1,156,549,000*80%=925,239,200.
+- listed equities=37,713,000*50%=18,856,500.
+- Nissan HQ underlying trust=1,182,958,000*0%=0 due long-term asset/lease and liquidity constraints.
+- borrowings and leases=-(8,952,783,000+88,613,000)=-9,041,396,000.
+- discounted detachable net cash=-2,226,059,400.
+
+[discounted sustainable cash profit]
+- Start with after-tax operating cash flow=4,912,275,000.
+- Estimated maintenance capex=depreciation of PPE 1,608,327,000 + depreciation of ROU assets 44,763,000 + intangible amortization 46,256,000 =1,699,346,000.
+- Pre-NCI sustainable cash profit=3,212,929,000.
+- Parent share factor=2,692,150/2,770,139=0.9718465391; after NCI=3,122,440,703.
+- Apply 15% uncertainty/cycle discount for auto cycle, overseas ramp-up, FX and maintenance-capex estimation.
+- discounted sustainable cash profit=2,654,102,839.694145.
+
+[earnback]
+- operating_business_price=27,875,303,097.233772-(-2,226,059,400)=30,101,362,497.233772.
+- owner_earnback_years=30,101,362,497.233772/2,654,102,839.694145=11.3414454207.
+- market_cap_to_cash_profit=27,875,303,097.233772/2,654,102,839.694145=10.5027215526.
+
+[limitations]
+- Annual report does not split maintenance and growth capex; depreciation/amortization is used as a proxy and a further 15% discount is applied.
+- Market snapshot and RMB conversion were supplied by input and not independently reconstructed.
+- Discounts are analyst judgments, not reported facts or management guidance.

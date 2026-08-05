@@ -1,0 +1,69 @@
+stock-research trace
+company=002262.SZ 恩华药业
+period=2025-12-31
+generated_for=2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated scalar and list fields only through protocol set/append commands.
+4. Final validation command and result recorded below.
+
+[reuse check]
+- config/input.json exists.
+- No local files were present under the supplied raw_filing, annual_review, normalized_facts, or stock_research paths.
+- Therefore no annual facts package or historical stock-research result was reused.
+
+[source retrieval]
+- Located the 2025 annual report disclosed on 2026-04-18 through public announcement search.
+- Downloaded a copy of the full annual report PDF from Sina's announcement mirror for extraction; report identifies the official disclosure venues as Shenzhen Stock Exchange and CNINFO.
+- Core figures were checked against the annual report's audited consolidated statements and notes.
+- Auditor: Lixin Certified Public Accountants, report 信会师报字[2026]第ZA11336号, standard unqualified opinion, dated 2026-04-16.
+- Market valuation was taken from config/input.json: market cap CNY 22,144,000,000, PE TTM 20.62, Tencent qt.gtimg.cn snapshot 2026-07-31 11:43:15.
+
+[model review]
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: pharma R&D, manufacturing and sales business; balance sheet contains ordinary cash/investments, receivables, inventory, production/R&D assets and normal operating liabilities. No customer deposits, insurance reserves, regulated presale cash, concession rights or similar special-model structure.
+
+[key audited figures CNY]
+revenue=5,911,188,872.18
+cost_of_sales=1,647,615,667.02
+gross_profit=4,263,573,205.16
+parent_net_profit=1,057,334,353.51
+operating_cash_flow=1,078,389,756.83
+capital_expenditure=437,407,150.19
+operating_free_cash_flow=640,982,606.64
+total_assets=9,223,231,920.16
+total_liabilities=1,195,335,887.37
+parent_equity=8,057,134,574.75
+cash=1,449,605,634.51
+cash_equivalents=1,342,781,677.22
+structured_deposits=2,569,000,000.00
+
+[owner earnback calculations]
+discounted_cash_equivalents=1,342,781,677.22*0.90=1,208,503,509.498
+discounted_structured_deposits=2,569,000,000*0.95=2,440,550,000
+interest_and_lease_debt=30,000,000+230,000+19,694,594.05+17,794,114.83=67,718,708.88
+discounted_detachable_net_cash=1,208,503,509.498+2,440,550,000-67,718,708.88=3,581,334,800.618
+operating_business_price=22,144,000,000-3,581,334,800.618=18,562,665,199.382
+base_free_cash_flow=1,078,389,756.83-437,407,150.19=640,982,606.64
+discounted_sustainable_cash_profit=640,982,606.64*0.90=576,884,345.976
+owner_earnback_years=18,562,665,199.382/576,884,345.976=32.1774465348
+market_cap_to_cash_profit=22,144,000,000/576,884,345.976=38.3855102924
+
+[dividend]
+Board proposal: CNY 4.00 per 10 shares on 1,015,786,583 shares, forecast cash dividend CNY 406,314,633.20.
+forecast_dividend_yield=406,314,633.20/22,144,000,000=0.01834874608.
+Proposal requires shareholder approval and may be adjusted for the implementation share base.
+
+[limitations]
+- No local annual facts package/raw filing archive was available.
+- Only one-year owner cash-profit baseline is used; maintenance versus growth capex could not be reliably separated.
+- Market cap and PE were not independently verified beyond the supplied Tencent snapshot.
+- Industry position is mainly company-reported and lacks official market-share cross-checking.
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

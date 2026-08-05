@@ -1,0 +1,70 @@
+stock-research trace
+company: 青岛港国际股份有限公司 (06198.HK / 601298.SH)
+period: 2025-12-31 annual
+generated_at_input: 2026-08-04T17:31:00+08:00
+
+1. Read protocol instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No annual facts package, normalized facts, prior stock-research result, or local filing existed for this company/period.
+- Downloaded official HKEX annual report to:
+  stock_report/data/raw/filings/06198.HK/2025-12-31/2025-annual-report.pdf
+- Official annual-results source:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0327/2026032700659.pdf
+- Official annual-report source:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042901494.pdf
+
+3. Protocol initialization
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Filing facts: port stevedoring, stacking, logistics, liquid/dry bulk and container handling, port ancillary services; operating assets are terminal infrastructure and equity interests in port JVs/associates.
+- Override: ordinary_operating / applicable.
+- Reason: no brokerage customer funds, proprietary securities book, margin finance, or repo funding; input hint is a master-data classification error.
+
+5. Core facts (CNY yuan)
+- revenue: 18,806,323,315
+- cost_of_sales: 11,911,816,346
+- gross_profit: 6,894,506,969
+- parent_net_profit: 5,271,506,093
+- operating_cash_flow: 5,548,596,729
+- capital_expenditure: 2,464,233,800
+- operating_free_cash_flow: 3,084,362,929
+- total_assets: 66,578,767,145
+- total_liabilities: 16,462,273,693
+- total_equity: 50,116,493,452
+- parent_equity: 45,712,869,441
+- cash: 14,486,405,958
+- long_term_equity_investments: 15,588,269,337
+- equity-method investment income: 1,532,954,213
+- cash received from investment income: 467,822,085
+- announced 2025 cash dividend: 2,242,025,900
+
+6. Formula checks
+- gross_margin = 6,894,506,969 / 18,806,323,315 = 0.36660578750663686
+- net_margin = 5,271,506,093 / 18,806,323,315 = 0.28030498065485376
+- financing/lease/long-term payable = 99,836,576 + 569,728,091 + 3,140,172,638 + 179,673,327 + 346,424,839 = 4,335,835,471
+- discounted_net_cash = 14,486,405,958 * 50% - 4,335,835,471 - 2,452,100,000 = 455,267,508
+- parent_share proxy = 45,712,869,441 / 50,116,493,452 = 0.912132240153281
+- discounted_cash_profit = (5,548,596,729 - 2,464,233,800) * 0.912132240153281 * 90% = 2,532,012,181.0870547
+- operating_business_price = 40,290,679,596.91942 - 455,267,508 = 39,835,412,088.91942
+- owner_earnback_years = 39,835,412,088.91942 / 2,532,012,181.0870547 = 15.732709497399457
+- market_cap_to_cash_profit = 40,290,679,596.91942 / 2,532,012,181.0870547 = 15.912514125276303
+- forecast_dividend_yield = 2,242,025,900 / 40,290,679,596.91942 = 0.0556462666410676
+
+7. Key judgment controls
+- Cash haircut: 50%, because RMB12.511bn is deposited with related Shandong Port Finance Co. and substantial operating/expansion liquidity is needed.
+- Capex: all 2025 capex deducted because maintenance/growth split is unavailable.
+- Minority interests: consolidated FCF allocated using parent equity / total equity as a proxy.
+- Sustainability: additional 10% haircut for cargo cycles, associate-profit cash timing, and future capital requirements.
+- Expansion warning: two Dongjiakou projects have stated estimates of RMB9.097bn and RMB6.615bn; annual cash schedule was not available.
+
+8. Protocol validation
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status: ok
+errors: []

@@ -1,0 +1,76 @@
+stock-research trace — 01113.HK — period 2025-12-31
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked the configured annual_review, normalized facts, raw filing, and prior stock_research paths.
+- No 2025 annual facts package, normalized facts, extraction trace, or prior result existed.
+- Downloaded the official 2025 annual report to:
+  stock_report/data/raw/filings/01113.HK/2025-12-31/annual-report-2025.pdf
+- Source URL: https://www.ckah.com/sites/default/files/2026-04/E_2025-Annual-Report.pdf
+- Extracted text with pypdf in an isolated /tmp virtual environment because pdftotext was unavailable. Temporary parser environment is not part of the outputs.
+
+3. Identity and model correction
+- Input hint said financial_brokerage. This was rejected based on Annual Report 2025 note 3 and the business review.
+- Confirmed activities: property development/investment, hotels and serviced suites, property/project management, UK pub operation, and investments in infrastructure and utility operations through joint ventures.
+- Selected statement_model=real_estate_developer and owner_earnback_applicability=requires_special_model.
+- Reason: cash, properties for sale, customer deposits, loans, investment properties, and JV infrastructure interests are tied to projects and capital allocation. They cannot be treated as ordinary detachable cash.
+
+4. Primary-source extraction (HK$ million)
+- Consolidated income statement p.136:
+  group revenue 57,935; profit before tax 14,555; profit for year 11,108; parent profit 10,847.
+- Chairman's statement p.11:
+  pre-investment-property-revaluation profit 11,960; parent profit 10,847; full-year dividend HK$1.78/share.
+- Statement of financial position p.138:
+  total assets 509,498; total liabilities 100,817; total equity 408,681; shareholders' funds 396,442; perpetual securities 7,929; NCI 4,310.
+  fixed assets 72,868; investment properties 151,694; JVs 86,348; associates 7,118; investments 7,123; properties for sale 122,799; cash/deposits 41,743.
+  bank/other loans 51,360; customer deposits 7,330; lease liabilities total 5,249; current tax 1,189; deferred tax liabilities 14,889.
+- Cash flow statement pp.141-142:
+  OCF 18,670; acquisition investment properties 229; acquisition fixed assets 2,468; financing CF -13,417; shareholder dividends paid 6,090.
+  working-capital movements: properties for sale +9,049 cash; customer deposits -3,600 cash; total working-capital contribution +4,410.
+- Note 3 pp.148-149:
+  revenue including JV 85,848; total segment contribution 18,347.
+  property sales contribution 2,733; rental 4,614; hotel 1,658; management 367; pub 313; infrastructure/utilities 8,662.
+- Note 8 p.154:
+  pub fixed-asset impairment 1,620.
+- Note 9 p.155:
+  investment properties 151,694; gross rental 5,508; direct operating expenses 504; valuation cap rates 4%-8%.
+- Note 7 p.152:
+  2025 dividends declared/proposed 6,230; interim 0.39/share; final 1.39/share.
+- Subsequent event / analyst presentation:
+  proposed UKPN cash consideration about 22,150.8; expected gain about 8,400; not recorded in 2025 closing cash.
+
+5. Currency conversion and calculations
+- Result contract requires CNY absolute yuan.
+- Applied HKD/RMB 0.897878955 at 2025-12-31, disclosed in China CITIC Bank 2025 annual report hosted by HKMA:
+  https://vpr.hkma.gov.hk/statics/assets/doc/100342/ar_25/ar_25_eng.pdf
+- Used the same closing rate for balance sheet, income statement, and cash-flow fields for consistent display. Limitation disclosed: income/cash flow were not translated at an annual average rate.
+- Example: total assets = 509,498m HKD × 0.897878955 × 1,000,000 = CNY 457,467,531,814.59.
+- Net margin = parent profit / group revenue = 10,847 / 57,935 = 0.1872270648. Comparability limitation disclosed because JV profit is included but JV revenue is excluded.
+- Capex proxy = investment-property acquisitions 229 + fixed-asset acquisitions 2,468 = 2,697m HKD.
+- Operating FCF = 18,670 - 2,697 = 15,973m HKD. Not treated as sustainable distributable cash because project working capital is material.
+- Forecast dividend baseline = 6,230m HKD × 0.897878955 = CNY 5,593,785,889.65.
+- Forecast dividend yield = CNY 5,593,785,889.65 / input market cap CNY 144,039,513,570.46365 = 0.0388350790.
+- Gross margin left null: annual report presents operating expenses by nature and does not provide a reliable consolidated cost-of-sales/gross-profit pair.
+- Ordinary owner earnback fields left null as required for requires_special_model.
+
+6. Market data
+- Used input snapshot without alteration:
+  market cap CNY 144,039,513,570.46365; timestamp 2026/07/31 16:08:42; source Tencent qt.gtimg.cn; PE TTM 15.44.
+
+7. Result construction
+- All result fields were populated through protocol CLI set/append commands; the complex JSON object was not hand-written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+
+8. Data-quality decision
+- status=complete.
+- Minimum fields for a special model are present: identity, period, valuation, model confirmation, total assets/liabilities/equity/parent equity, parent profit, dividend baseline, asset/liability explanations, business story, evidence, and null ordinary earnback metrics with explanation.
+- Known limitations are recorded in result.json and report.md.

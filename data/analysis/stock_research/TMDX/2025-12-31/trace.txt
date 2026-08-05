@@ -1,0 +1,59 @@
+TMDX stock research trace
+Generated: 2026-08-05 Asia/Shanghai
+Period: FY ended 2025-12-31
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because local-data reuse boundaries applied.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse check
+- Checked the input-declared raw filing and annual review paths under stock_report/.
+- No TMDX/2025-12-31 filing, facts.json, annual_facts.md, or extraction trace existed in /workspace or the supplied sync tree.
+- Therefore returned to primary public sources rather than fabricating an annual fact package.
+
+3. Primary sources used
+- SEC 2025 Form 10-K, accession 0001193125-26-067032, filed 2026-02-24:
+  https://www.sec.gov/Archives/edgar/data/1756262/000119312526067032/tmdx-20251231.htm
+- SEC filing index and XBRL Company Facts API for CIK 0001756262.
+- TransMedics FY2025 results release:
+  https://investors.transmedics.com/news-releases/news-release-details/transmedics-reports-fourth-quarter-and-full-year-2025-financial/
+- SAFE RMB central parity historical data (source stated by SAFE as CFETS); USD/CNY 7.0288 on 2025-12-31:
+  https://www.safe.gov.cn/safe/rmbhlzjj/
+- Market cap and PE were reused exactly from config/input.json: Yahoo Finance yfinance snapshot dated 2026-08-03.
+
+4. Financial extraction (USD, Form 10-K)
+- Total assets 1,068,373,000; liabilities 595,273,000; equity attributable to parent 473,100,000; minority interest zero.
+- Revenue 605,494,000; cost of revenue 242,688,000; gross profit 362,806,000; operating income 108,583,000; net income attributable to parent 190,291,000.
+- Operating cash flow 192,840,000; capex 59,251,000; operating free cash flow 133,589,000; financing cash flow 16,857,000; dividend/buyback cash out zero.
+- Cash 488,366,000; restricted cash 500,000; financing debt 512,391,000 (convertible notes 452,804,000 plus bank debt 59,587,000).
+- Deferred tax benefit was 83,543,000 in the cash-flow reconciliation; reported income-tax benefit was 82,769,000. This makes reported PE a poor proxy for sustainable operating earnings.
+
+5. Currency conversion
+- All protocol monetary fields are absolute CNY yuan.
+- Converted all USD statement figures at USD/CNY 7.0288 as of 2025-12-31.
+- Limitation recorded: period income and cash-flow figures were converted at the closing rate for protocol consistency, not at an annual average rate.
+
+6. Analysis model
+- Confirmed ordinary_operating and owner_earnback applicable.
+- Rationale: medical-device consumables plus outsourced clinical/logistics service; ordinary receivables, inventory, fixed assets, operating liabilities and corporate financing debt. No bank deposits, insurance reserves, regulated presale cash, concession rights, or similar special-model balance-sheet structure.
+- Special attention: owned aircraft and facilities are operating assets; they are not detachable investments.
+
+7. Owner earnback calculations
+- Discounted detachable net cash = cash 488,366,000 - financing debt 512,391,000 = -24,025,000 USD = -168,866,920 CNY. Restricted cash excluded.
+- Operating business price = market cap 17,843,436,416.3313 - (-168,866,920) = 18,012,303,336.3313 CNY.
+- 2025 operating FCF = 192,840,000 - 59,251,000 = 133,589,000 USD.
+- Deducted stock-based compensation economic dilution of 36,861,000 USD.
+- Applied 20% sustainability haircut to the remaining 96,728,000 USD because annual profitability is recent, 2023-2024 FCF was negative, and aircraft/facility capex is volatile.
+- Discounted sustainable cash profit = 77,382,400 USD = 543,905,413.12 CNY.
+- Owner earnback = 18,012,303,336.3313 / 543,905,413.12 = 33.1166098035 years.
+- Market cap / cash profit = 17,843,436,416.3313 / 543,905,413.12 = 32.8061386887.
+- Forecast dividend = 0; forecast yield = 0 because no 2025 dividend/buyback cash out and no announced dividend evidence was found, while the company remains in expansion.
+
+8. Output construction and validation
+- outputs/result.json was initialized and populated through the stock-research protocol CLI; it was not hand-written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validator result: status=ok, errors=[]

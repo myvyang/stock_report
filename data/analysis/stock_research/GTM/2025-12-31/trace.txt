@@ -1,0 +1,56 @@
+Stock research trace — GTM — period 2025-12-31
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Expected annual facts and prior stock-research files were absent from the staged workspace.
+- Returned to the primary filing rather than using third-party summaries for core figures.
+
+3. Primary sources acquired/read
+- SEC filing index: https://www.sec.gov/Archives/edgar/data/1794515/0001794515-26-000012-index.html
+- 2025 Form 10-K HTML: https://www.sec.gov/Archives/edgar/data/1794515/000179451526000012/zi-20251231.htm
+- SEC Companyfacts API for CIK 0001794515: https://data.sec.gov/api/xbrl/companyfacts/CIK0001794515.json
+- Local raw filing saved at stock_report/data/raw/filings/GTM/2025-12-31/zi-20251231.htm.
+- Market cap CNY 6,562,899,369.91, date 2026-08-03, and PE TTM 8.25 reused from config/input.json (Yahoo Finance yfinance).
+- FX reference: Bank of China exchange-rate page, 2026-07-27 USD middle rate 679.39 per USD 100; reporting conversion rounded to 1 USD = CNY 6.80.
+
+4. Model decision
+- Confirmed ordinary_operating/applicable.
+- Reason: B2B subscription software and data platform; customer receivables, deferred revenue, acquired intangibles and debt have ordinary SaaS/acquisition-financing meanings. No bank deposits, insurance reserves, property-development inventory, concession rights, or other special-model balance-sheet structure.
+
+5. Core USD facts from 2025 Form 10-K / SEC XBRL
+- Revenue 1,249.5m; gross profit 1,049.9m; operating income 225.7m; parent net income 124.2m.
+- Total assets 6,439.5m; liabilities 4,930.8m; parent equity 1,508.7m; no reported noncontrolling interest.
+- Operating cash flow 465.4m; productive-asset purchases/capex 76.1m; operating FCF 389.3m.
+- Financing cash flow -347.9m; common-stock repurchases 411.1m; no common cash dividend identified.
+- Cash 175.9m; short-term investments 4.0m; current plus noncurrent long-term debt 1,324.0m.
+- Share-based compensation 116.2m.
+
+6. Conversion and formulas
+- All filing amounts multiplied by 6.80 and stored as absolute CNY yuan.
+- Gross margin = 1,049.9 / 1,249.5 = 0.8402561024.
+- Net margin = 124.2 / 1,249.5 = 0.0993997599.
+- FCF = 465.4m - 76.1m = USD 389.3m = CNY 2,647.24m.
+- Discounted detachable net cash = (175.9m + 4.0m - 1,324.0m) × 6.80 = CNY -7,779.88m.
+- Discounted sustainable cash profit = (389.3m - 116.2m SBC) × 6.80 = CNY 1,857.08m.
+- Operating business price = 6,562.899m - (-7,779.88m) = CNY 14,342.779m.
+- Owner earnback = 14,342.779 / 1,857.08 = 7.7233 years.
+- Market cap / cash profit = 6,562.899 / 1,857.08 = 3.5340x.
+- Forecast cash dividend = 0; forecast dividend yield = 0.
+
+7. Judgment notes
+- Cash and short-term investments received no haircut because no material restriction was identified; all interest-bearing debt was deducted.
+- SBC was deducted in full from FCF as an economic cost because dilution is real and the company spends cash on repurchases. This is conservative and is not company guidance.
+- Contract liabilities were explained as customer prepayments and performance obligations, not treated as interest-bearing debt in detachable net cash.
+- Share repurchases were not treated as dividends.
+
+8. Validation
+- result.json populated through protocol CLI set commands, not handwritten from scratch.
+- Protocol validation after population: status ok, errors [].
+- Final workspace validation repeated after report.md and trace.txt creation.

@@ -1,0 +1,71 @@
+stock-research trace
+company: 百洋医药 (301015.SZ)
+period: 2025-12-31 annual
+generated context date: 2026-07-31 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Read references/data-reuse.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Requested annual facts, normalized facts and raw filing directories did not exist locally.
+- Existing stock_report contained only data/notes/user_stock_evaluations.md.
+- No prior stock research result was reused.
+
+3. Official filing retrieval
+- Queried the CNINFO announcement API for 百洋医药, annual-report category, 2026-01-01 through 2026-07-31.
+- Found official announcement:
+  title: 2025年年度报告
+  secCode: 301015
+  announcementId: 1225231772
+  announcement date: 2026-04-29
+  source URL: https://static.cninfo.com.cn/finalpage/2026-04-29/1225231772.PDF
+- Downloaded PDF to stock_report/data/raw/filings/301015.SZ/2025-12-31/2025-annual-report.pdf.
+- Extracted 267 pages to adjacent 2025-annual-report.txt using pypdf in an isolated /tmp virtual environment.
+
+4. Key filing facts (CNY absolute yuan)
+- Revenue 7,506,514,889.15; cost 4,693,728,991.01; gross profit 2,812,785,898.14.
+- Parent net profit 474,685,025.56; consolidated net profit 571,929,272.87.
+- Operating cash flow 934,453,604.86; capex 288,930,824.87; reported operating FCF 645,522,779.99.
+- Total assets 8,112,249,985.54; liabilities 5,370,401,614.58; total equity 2,741,848,370.96; parent equity 2,463,146,954.84.
+- Cash and cash equivalents 1,923,942,541.85; restricted cash excluded from that amount 225,361,378.76.
+- Financing debt calculation:
+  short-term borrowings 1,932,284,973.10
+  long-term borrowings including current portion 516,646,794.09
+  bonds including current portion 787,159,458.62
+  lease liabilities including current portion 143,864,075.64
+  total 3,379,955,301.45.
+- Equity/innovation investments excluded from cash: long-term equity investment 887,039,463.33 + trading equity instruments 264,459,992.60 + other non-current financial assets 14,736,794.88 = 1,166,236,250.81.
+- Proposed dividend 300,131,347.97 (5.71 yuan per 10 shares, base 525,624,077 shares).
+
+5. Model confirmation
+- statement_model: ordinary_operating.
+- Reason: revenue and working capital arise from sale and commercialization of medical products; receivables, inventory, supplier payables, marketing and manufacturing assets have ordinary operating meaning. No customer deposits, insurance reserves, regulated presale funds or concession rights were found.
+- owner_earnback_applicability: applicable.
+
+6. Calculations
+- gross margin = 2,812,785,898.14 / 7,506,514,889.15 = 0.3747126249.
+- parent net margin = 474,685,025.56 / 7,506,514,889.15 = 0.0632364063.
+- net cash = 1,923,942,541.85 - 3,379,955,301.45 = -1,456,012,759.60.
+- normalized OCF removes temporary working-capital release:
+  934,453,604.86 - operating receivables decrease 150,190,559.20 - operating payables increase 61,810,383.76 = 722,452,661.90.
+- normalized FCF = 722,452,661.90 - capex 288,930,824.87 = 433,521,837.03.
+- discounted sustainable cash profit = 400,000,000.00 after a further 33,521,837.03 prudence adjustment for falling revenue/profit, Q4 parent loss and innovation spending uncertainty.
+- operating business price = market cap 11,832,000,000.00 - (-1,456,012,759.60) = 13,288,012,759.60.
+- owner earnback = 13,288,012,759.60 / 400,000,000.00 = 33.220031899 years.
+- market cap/cash profit = 11,832,000,000.00 / 400,000,000.00 = 29.58.
+- forecast dividend yield = 300,131,347.97 / 11,832,000,000.00 = 0.0253660707.
+
+7. Protocol population and validation
+- Populated every result section through repeated protocol `set` commands; complex JSON was not created from an empty file by hand.
+- First validation completed successfully: {"status":"ok","errors":[]}.
+- Data quality marked complete; limitations remain explicit in result.json and report.md.
+
+8. Separation of evidence and judgment
+- Company-reported facts: financial statements, business split, company-stated brand rankings, pipeline status and dividend proposal.
+- Derived facts: margins, FCF, net financing debt, operating business price and ratios.
+- Subjective judgment: equity investments discounted to zero for cash treatment; sustainable cash profit set at 400,000,000 yuan.

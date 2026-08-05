@@ -1,0 +1,65 @@
+task=stock_research
+company=00941.HK CHINA MOBILE
+period=2025-12-31
+generated_for=2026-08-03 Asia/Shanghai
+
+[protocol]
+1. Read stock-research/SKILL.md, result-contract.md, report-contract.md and data-reuse.md.
+2. Ran protocol init against config/input.json to create outputs/result.json.
+3. Populated result fields exclusively through protocol set commands in populate_result.sh.
+4. Ran protocol validate; result: {"status":"ok","errors":[]}.
+
+[reuse-check]
+No annual facts, normalized facts, raw filing, or prior stock-research files existed in the workspace for 00941.HK/2025-12-31. Research therefore returned to official HKEX/company disclosures.
+
+[model-review]
+Input hint said financial_brokerage. Rejected because the annual results identify principal businesses as communications, computing and AI services; balance sheet does not show brokerage customer funds or securities-financing liabilities. Final model: ordinary_operating; owner earnback: applicable.
+
+[primary-sources]
+- HKEX 2025 annual results, published 2026-03-26: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032600468.pdf
+- HKEX Annual Report 2025 listing, published 2026-04-23: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042300752.pdf
+- China Mobile dividend history: https://www.chinamobileltd.com/en/ir/dividend.php
+- Market cap/PE: config/input.json, Tencent qt.gtimg.cn snapshot dated 2026-07-31 16:08:42.
+
+[reported-figures-rmb]
+revenue=1050187000000
+operating_profit=148932000000
+net_profit=137264000000
+parent_net_profit=137095000000
+total_assets=2128182000000
+total_liabilities=695331000000
+total_equity=1432851000000
+parent_equity=1428475000000
+operating_cash_flow=232919000000
+capital_expenditure=150900000000
+operating_free_cash_flow=82019000000
+2025_attributable_dividend=103532000000
+
+[gross-margin-proxy]
+Company presents expenses by nature and does not report statutory gross profit.
+proxy_gross_profit = revenue - network_operation_support - depreciation_amortisation - cost_of_products_sold
+= 1050187m - 285698m - 189999m - 152992m = 421498m.
+proxy_gross_margin=421498/1050187=0.4013551872.
+This is explicitly flagged as non-statutory and not automatically cross-company comparable.
+
+[discounted-net-cash]
+cash_equivalents: 97267m * 100% = 97267m
+bank_deposits: 135512m * 95% = 128736.4m
+FVPL+FVOCI assets: 422525m * 70% = 295767.5m
+amortised-cost financial assets: 12464m * 85% = 10594.4m
+less borrowings+lease liabilities: 101197m
+less proposed final dividend: 49266m
+discounted_detachable_net_cash=381902.3m
+
+[cash-profit-and-formulas]
+discounted_sustainable_cash_profit=82019m*90%=73817.1m
+operating_business_price=1560447.5924901248m-381902.3m=1178545.2924901248m
+owner_earnback_years=1178545.2924901248/73817.1=15.9657490269
+market_cap_to_cash_profit=1560447.5924901248/73817.1=21.1393781724
+forecast_dividend_yield=103532/1560447.5924901248=0.0663476303
+
+[limitations]
+- Market snapshot was supplied by the task and was not independently reproduced.
+- Gross margin is a documented research proxy because no statutory subtotal is disclosed.
+- Asset discounts and the 10% FCF safety haircut are analyst assumptions.
+- 2026 dividend forecast holds 2025 attributable dividend flat because no full-year 2026 profit forecast was available.

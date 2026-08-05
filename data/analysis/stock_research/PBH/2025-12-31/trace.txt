@@ -1,0 +1,101 @@
+PBH STOCK RESEARCH TRACE
+generated_for_period=2025-12-31
+report_type_input=annual
+currency=CNY
+unit=yuan
+
+[1] Protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read result-contract.md, report-contract.md and data-reuse.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields through protocol `set`; did not construct result.json from scratch.
+
+[2] Reuse audit
+- Checked configured annual-review, normalized-facts and prior stock-research paths.
+- No PBH filing package, annual facts package, normalized facts or prior research result existed in the workspace.
+- Therefore downloaded official SEC filings and SEC Companyfacts to stock_report/data/raw/filings/PBH/2025-12-31/.
+
+[3] Primary sources
+- SEC FY2025 Form 10-K, fiscal year ended 2025-03-31, filed 2025-05-09:
+  https://www.sec.gov/Archives/edgar/data/1295947/000129594725000017/pbh-20250331.htm
+- SEC Form 10-Q, period ended 2025-12-31, filed 2026-02-05, accession 0001295947-26-000008:
+  https://www.sec.gov/Archives/edgar/data/1295947/000129594726000008/pbh-20251231.htm
+- SEC Companyfacts, CIK 0001295947:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0001295947.json
+- Market cap and PE: config/input.json, source supplied as Yahoo Finance yfinance, market date 2026-08-03.
+
+[4] Period treatment
+- PBH fiscal year ends March 31, so 2025-12-31 is an interim reporting date rather than a statutory annual-report date.
+- Balance sheet uses the 2025-12-31 10-Q instant.
+- Income statement and cash flow use trailing twelve months calculated as:
+  FY ended 2025-03-31 + nine months ended 2025-12-31 - nine months ended 2024-12-31.
+- These TTM figures are constructed from audited annual plus unaudited interim data.
+
+[5] Source figures in USD
+Balance sheet at 2025-12-31:
+- total_assets=3,494,743,000
+- total_liabilities=1,665,292,000
+- stockholders_equity=1,829,451,000
+- cash=62,373,000
+- accounts_receivable=190,456,000
+- inventory=163,594,000
+- goodwill=581,248,000
+- intangible_assets=2,301,536,000
+- PP&E=128,214,000
+- long_term_debt_net=1,033,547,000
+- finance_lease_liabilities_current_and_noncurrent=21,266,000
+
+TTM calculations in USD:
+- revenue=1,137,762,000 + 807,088,000 - 841,244,000 = 1,103,606,000
+- cost_of_sales=503,299,000 + 357,809,000 - 376,791,000 = 484,317,000
+- gross_profit=634,463,000 + 449,279,000 - 464,453,000 = 619,289,000
+- operating_profit=336,775,000 + 233,917,000 - 248,347,000 = 322,345,000
+- parent_net_profit=214,605,000 + 136,373,000 - 164,477,000 = 186,501,000
+- operating_cash_flow=251,515,000 + 214,786,000 - 189,667,000 = 276,634,000
+- capex=8,224,000 + 5,968,000 - 4,745,000 = 9,447,000
+- operating_free_cash_flow=276,634,000 - 9,447,000 = 267,187,000
+- financing_cash_flow=-182,075,000 + (-117,963,000) - (-170,587,000) = -129,451,000
+- share_repurchase_cash_out=51,509,000 + 155,593,000 - 40,196,000 = 166,906,000
+
+[6] Currency translation
+- Uniform research translation assumption: USD/CNY=7.15.
+- Absolute CNY fields equal USD source amount multiplied by 7.15.
+- This is a presentation convention, not transaction-date accounting translation.
+- Ratios are not affected by the chosen uniform FX rate.
+
+[7] Model decision
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Reason: PBH sells branded OTC products through normal retail/e-commerce channels. Receivables, inventory, brand intangibles and debt reflect an ordinary operating/acquisition model; there are no customer deposits, insurance reserves, regulated project cash or similar special-model balances.
+
+[8] Owner earnback
+- cash CNY=62,373,000*7.15=445,966,950
+- long-term debt net CNY=1,033,547,000*7.15=7,389,861,050
+- finance lease liabilities CNY=21,266,000*7.15=152,051,900
+- discounted_detachable_net_cash=445,966,950-7,389,861,050-152,051,900=-7,095,946,000
+- TTM operating FCF CNY=267,187,000*7.15=1,910,387,050
+- sustainability factor=85%
+- discounted_sustainable_cash_profit=1,910,387,050*0.85=1,623,828,992.5
+- market_cap=16,053,696,620.31665
+- operating_business_price=16,053,696,620.31665-(-7,095,946,000)=23,149,642,620.31665
+- owner_earnback_years=23,149,642,620.31665/1,623,828,992.5=14.2562072282
+- market_cap_to_cash_profit=16,053,696,620.31665/1,623,828,992.5=9.8863222017
+- 15% FCF haircut reflects declining TTM revenue/net income, disclosed eye-care shortages, working-capital timing and ongoing brand support. It is an analyst judgment, not company guidance.
+
+[9] Dividend
+- Filing states no common-stock dividends had been declared or paid through 2025-12-31.
+- Baseline forecast_cash_dividend=0 and forecast_dividend_yield=0.
+- Nine-month open-market repurchases were USD155.6m, but buybacks are not classified as dividends.
+
+[10] Important limitations
+- Input labels report_type as annual although period 2025-12-31 is PBH Q3 FY2026.
+- Market cap date is about seven months later than the financial cutoff.
+- Owner earnback excludes control premium, deal costs and debt prepayment costs.
+- FY2026 full-year filing and post-period acquisitions/financing may change the economics and require refresh.
+
+[11] Validation
+- Protocol validation is run after all outputs are written.
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final result: status=ok, errors=[]
+- JSON syntax check: passed with python3 -m json.tool.

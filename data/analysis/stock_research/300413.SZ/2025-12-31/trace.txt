@@ -1,0 +1,72 @@
+stock-research trace
+company=300413.SZ 芒果超媒
+period=2025-12-31 annual
+generated_from_input=2026-07-31T21:32:06+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md in full.
+3. Initialized outputs/result.json using:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields only through protocol `set` commands.
+5. Validated result using protocol `validate`; status=ok, errors=[].
+
+[reuse check]
+- config/input.json existed.
+- No annual facts package, normalized facts, historical stock-research result, or raw filing metadata existed for 300413.SZ/2025-12-31.
+- Therefore retrieved the official annual report from CNINFO and parsed it locally.
+
+[primary sources]
+- CNINFO annual report PDF: https://static.cninfo.com.cn/finalpage/2026-04-25/1225178669.PDF
+  title=芒果超媒股份有限公司2025年年度报告全文
+  disclosed=2026-04-25
+  local_copy=stock_report/data/raw/filings/300413.SZ/2025-12-31/annual-report-2025.pdf
+- CNINFO dividend proposal PDF: https://static.cninfo.com.cn/finalpage/2026-04-25/1225178682.PDF
+  title=关于2025年度利润分配预案的公告
+  disclosed=2026-04-25
+- Subsequent status check: 2025 annual shareholder meeting approved the plan on 2026-06-05; the company later published its 2025 annual equity-distribution implementation announcement. As of the task date, the 2025 history item is classified as implemented.
+- Market snapshot: config/input.json / Tencent qt.gtimg.cn
+  market_cap=30886000000
+  timestamp=20260731114251
+  pe_ttm=29.48
+
+[model decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Revenue comes from memberships, advertising, operator distribution, content operations and commerce. Deposits and financial assets are treasury assets rather than customer funds or regulated reserves. Borrowings are immaterial. Content assets, receivables and operating liabilities retain ordinary operating-company economic meaning.
+
+[key audited facts CNY]
+total_assets=33171867484.43
+total_liabilities=9752527035.53
+total_equity=23419340448.90
+parent_equity=23368627338.67
+revenue=13813480305.41
+cost_of_sales=10623649547.25
+gross_profit=3189830758.16
+operating_profit=892177465.65
+parent_net_profit=1227146306.33
+operating_cash_flow=1183693380.43
+capital_expenditure=135029125.00
+operating_free_cash_flow=1048664255.43
+
+[formula checks]
+gross_margin=(13813480305.41-10623649547.25)/13813480305.41=0.2309215844
+net_margin=1227146306.33/13813480305.41=0.0888368665
+discounted_net_cash=1879413287.38*0.90+814752177.03*0.90+3285390646.91*0.90+7205199268.53*0.90+886501614.30*0.50-32042666.66-138301746.61=12139186235.745
+operating_business_price=30886000000-12139186235.745=18746813764.255
+discounted_cash_profit=900000000
+owner_earnback_years=18746813764.255/900000000=20.8297930714
+market_cap_to_cash_profit=30886000000/900000000=34.3177777778
+forecast_dividend_yield=486387411.90/30886000000=0.0157478279
+
+[judgment boundaries]
+- 90% discounts on cash, structured deposits, time deposits and certificates of deposit are analyst judgments reflecting restrictions, maturity and working-capital needs.
+- 50% discount on listed securities/funds reflects market-price volatility and non-cash-equivalent nature.
+- Sustainable cash profit starts from 2025 operating FCF of 1048664255.43 and is reduced by 148664255.43 because the annual report attributes the cash-flow rebound partly to receivable collection and receivables/contract assets remain large.
+- Reported net profit was not used as sustainable cash profit because it includes 410301614.30 fair-value gain, 251467222.41 investment income and negative income-tax expense of 321177373.77.
+- Dividend amount for 2025 was initially sourced from the board proposal, then status-updated using the shareholder-meeting resolution and equity-distribution implementation announcement available before 2026-07-31.
+
+[outputs]
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

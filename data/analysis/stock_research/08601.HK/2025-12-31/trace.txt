@@ -1,0 +1,64 @@
+stock-research trace
+company=08601.HK BOLTEK
+period=2025-12-31
+generated_at=2026-08-04T16:20:16+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields only through protocol `set` and `append` operations.
+5. Validation command and result are recorded at the end of this trace.
+
+[reuse audit]
+No prior raw filing, annual facts package, normalized facts, or prior stock-research result existed for 08601.HK/2025-12-31 under stock_report.
+
+[primary source acquisition]
+HKEX title search issuer id=197550, stock code=08601.
+HKEX result: Annual Report 2025, released 2026-04-02 21:33.
+URL=https://www1.hkexnews.hk/listedco/listconews/gem/2026/0402/2026040203022.pdf
+Local PDF=stock_report/data/raw/filings/08601.HK/2025-12-31/annual-report-2025.pdf
+Local extracted text=stock_report/data/raw/filings/08601.HK/2025-12-31/annual-report-2025.txt
+PDF pages=190
+
+[model verification]
+Input hint=financial_brokerage/requires_special_model.
+Annual report evidence=engineering design, landscape architecture and consultancy services; balance sheet contains trade receivables, contract assets, cash, ordinary payables and leases, with no brokerage customer money, proprietary financial assets or repo funding.
+Final model=ordinary_operating/applicable.
+
+[financial facts, source currency HKD thousand]
+Annual report p101: revenue=186836; cost_of_services=128148; gross_profit=58688; profit_before_tax=26765; parent_net_profit=22576.
+Annual report p102: total_assets=177983; total_liabilities=29255; equity=148728; cash=42996; trade_and_other_receivables=87714; contract_assets=38846.
+Annual report pp104-105: operating_cash_flow=19878; capex=414; financing_cash_flow=-13626; dividend_paid=10000.
+Annual report pp143-145: civil engineering revenue=150129; remaining performance obligations=284067; customer B revenue=27621.
+Annual report pp159-162 and pp182-184: net trade receivables=71426; >365-day invoice-age receivables=11724; >90-day past-due gross receivables=33992; total trade/contract ECL=5045.
+Annual report p147: staff_costs=119775; subconsultancy_fees=22654.
+Annual report p150: 2025 dividend=10000; shares=800000 thousand; EPS=2.82 HK cents.
+
+[currency convention]
+Result contract requires CNY absolute yuan. All HKD filing values were multiplied by 0.90. This is an analysis convention, not an audited translation rate; disclosed in data_quality.limitations and report.
+
+[owner earnback]
+Cash discount: 80% x CNY 38,696,400 = CNY 30,957,120.
+Less lease liabilities: CNY 2,103,300.
+Less amounts due to directors: CNY 2,124,000.
+Discounted detachable net cash=CNY 26,729,820.
+2025 operating FCF=CNY 17,517,600.
+2024 operating FCF=(HKD 17,550,000 - HKD 1,037,000) x 0.90 = CNY 14,861,700.
+Two-year mean=CNY 16,189,650; 10% prudence haircut gives discounted sustainable cash profit=CNY 14,570,685.
+Operating business price=CNY 168,618,800.87852478 - CNY 26,729,820 = CNY 141,888,980.87852478.
+Owner earnback years=9.737976, rounded display=9.7380.
+Market cap / cash profit=11.572469, rounded display=11.5725.
+
+[market data]
+Source=config/input.json, upstream source label=Tencent qt.gtimg.cn.
+market_cap=CNY 168618800.87852478
+market_cap_time=2026/08/03 09:45:59
+pe_ttm=8.68
+No independent quote verification performed.
+
+[validation]
+Command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Result={"status":"ok","errors":[]}
+Independent arithmetic checks: assets=liabilities+equity; operating business price and both payback ratios reconcile to result.json.

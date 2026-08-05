@@ -1,21 +1,20 @@
-运行对象：
+任务对象
 - 公司：600612.SH 老凤祥
 - 报告期：2025-12-31
 - 报告类型：annual
-- 时区：Asia/Shanghai
-- 本次输入：config/input.json
+- 输入：config/input.json
+- 生成时区：Asia/Shanghai
 
-已读取协议：
-- /workspace/.agents/skills/stock-research/SKILL.md
-- /workspace/.agents/skills/stock-research/references/result-contract.md
-- /workspace/.agents/skills/stock-research/references/report-contract.md
+协议与技能
+- 已完整读取 .agents/skills/stock-research/SKILL.md
+- 已完整读取 references/result-contract.md
+- 已完整读取 references/report-contract.md
+- 已读取 references/data-reuse.md
+- 已使用协议 CLI init 初始化 outputs/result.json
+- 已使用协议 CLI set 填充结构化字段
+- 已使用协议 CLI validate 校验；最终结果 status=ok，errors=[]
 
-协议 CLI：
-- 已运行 PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- 已运行 PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-- 初次完成后的 validate 结果：status ok，errors []
-
-复用文件：
+复用资料
 - stock_report/data/analysis/annual_review/600612.SH/2025-12-31/facts.json
 - stock_report/data/analysis/annual_review/600612.SH/2025-12-31/annual_facts.md
 - stock_report/data/analysis/annual_review/600612.SH/2025-12-31/extraction_trace.txt
@@ -23,39 +22,58 @@
 - stock_report/data/raw/filings/600612.SH/2025-12-31/600612_2025_annual_report.txt
 - stock_report/data/analysis/stock_research/600612.SH/2025-12-31/result.json
 - stock_report/data/analysis/stock_research/600612.SH/2025-12-31/report.md
-- stock_report/data/analysis/stock_research/600612.SH/2025-12-31/trace.txt
 
-关键处理：
-- 旧 stock_research/result.json 含标签式分类字段，本次 outputs/result.json 未保留该类字段，按新版 contract 只保留可排序数字、解释和数据质量。
-- owner_earnback 专题文件 stock_report/data/analysis/owner_earnback/600612.SH/2025-12-31/result.json 在当前工作区未同步存在；本次复用既有 stock_research/result.json 中记录的折后可剥离净现金、折后现金利润、回本年和解释，并在 data_quality.limitations 中披露。
-- 分红预测基准来自年报利润分配章节：2025 年度现金分红合计 863,144,310.60 元，占归母净利润 49.18%；按输入市值 18,116,000,000 元计算预测分红率约 4.76%。
-- 市值与 PE 使用 config/input.json 中截至 2026-07-24 的批次快照。
+模型判断
+- statement_model：ordinary_operating
+- owner_earnback_applicability：applicable
+- 依据：公司以黄金珠宝加工、批发加盟、零售和黄金交易为主；资产负债核心为货币资金、黄金珠宝存货、经营应付款和短期融资，不属于银行、保险、券商、地产、施工、收费权或投资控股特殊模型。
+- 特别处理：黄金采购和渠道结算需要大量营运现金，货币资金不得机械全额扣市值。
 
-核心数字：
-- 营业收入：52,823,382,917.63 元
-- 营业成本：48,020,176,065.36 元
-- 毛利：4,803,206,852.27 元
-- 归母净利润：1,754,963,856.38 元
-- 经营现金流：5,962,470,282.18 元
-- 资本开支：171,306,954.07 元
-- 总资产：20,726,405,618.57 元
-- 总负债：5,201,464,179.48 元
-- 归母权益：13,185,906,274.73 元
-- 货币资金：10,049,402,984.53 元
-- 存货：8,572,059,759.24 元
-- 折后可剥离净现金：3,589,667,218.02 元
-- 折后可持续可分配现金利润：1,398,090,123.69 元
-- 经营业务购买价：14,526,332,781.98 元
-- 控股回本年：10.39 年
+本次更新
+- 旧研究采用 2026-07-24 市值 18,116,000,000 元、PE TTM 10.32；本次按输入更新为 2026-07-31 行情时间戳对应市值 18,885,000,000 元、PE TTM 11.18。
+- 折后可剥离净现金和折后现金利润复用既有研究并用年度事实包复核；经营业务购买价、回本年、市值/现金利润和分红率均按新市值重算。
+- 旧结果缺少 analysis_model，本次基于年报业务与资产负债事实补齐。
+- 旧利润调整中“剥离资金对应税后利息”金额为 null。本次以年报利息收入 74,457,865.55 元乘 75%税后口径，补为 55,843,399.16 元，使利润桥可勾稽：1,803,456,053.77 - 55,843,399.16，再乘 0.80，等于 1,398,090,123.69 元。
+- 年报官方链接定位为上海证券交易所：
+  https://www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-24/600612_20260424_CI2B.pdf
 
-行业和外部资料：
-- 新华网客户端引用中国黄金协会统计：2025 年黄金消费量、黄金首饰、金条金币数据；已通过网页打开核查。
-- 国家统计局：2025 年 12 月社会消费品零售总额及金银珠宝类零售额；已通过网页打开核查。
-- 世界黄金协会：2025 年黄金市场增值税新政解读；已通过网页打开核查。
-- 国家税务总局：黄金有关税收征管事项公告；已通过网页打开核查。
-- 新华网：金价和税收新政下黄金市场洗牌报道；已通过网页打开核查。
+核心财务数字（人民币元）
+- 营业收入：52,823,382,917.63
+- 营业成本：48,020,176,065.36
+- 毛利：4,803,206,852.27
+- 归母净利润：1,754,963,856.38
+- 经营现金流：5,962,470,282.18
+- 资本开支：171,306,954.07
+- 经营自由现金流：5,791,163,328.11
+- 总资产：20,726,405,618.57
+- 总负债：5,201,464,179.48
+- 归母权益：13,185,906,274.73
+- 货币资金：10,049,402,984.53
+- 存货：8,572,059,759.24
 
-仍有限制：
-- metadata 记录巨潮接口按测试参数未直接返回 2025 年年报条目，当前年报 PDF 来源为雪球托管副本，后续应补入巨潮或上交所正式 PDF URL。
-- 必要经营现金 30.00 亿元是估算前提，公开资料无法确认公司最低现金模型。
-- 2026 年以后税收新政对老凤祥毛利率和加盟渠道成本的量化影响，需要后续披露或管理层说明验证。
+控股回本计算（人民币元）
+- 市值：18,885,000,000.00
+- 资金类资产账面额：10,290,634,669.72
+- 必要经营现金：3,000,000,000.00
+- 融资及交易性金融负债扣减：2,742,738,018.99
+- 摩擦准备：150,000,000.00
+- 折后可剥离净现金：3,589,667,218.02
+- 经营业务购买价：15,295,332,781.98
+- 近三年扣非归母净利润中位数：1,803,456,053.77
+- 剥离资金对应估算税后利息扣减：55,843,399.16
+- 利润折扣：0.80
+- 折后可持续可分配现金利润：1,398,090,123.69
+- 控股回本年：10.9402
+- 市值/现金利润：13.5077
+- 折后净现金/市值：0.1901
+
+分红
+- 2025 年度现金分红基准：863,144,310.60 元
+- 预测假设：下一周期金额不增长
+- 按本次市值计算预测分红率：0.045706
+
+主要限制
+- 30.00 亿元必要经营现金是估算，公开资料无法确认最低经营现金模型。
+- 2025 年经营现金流受存货减少 32.47 亿元显著推动，不能外推为常态现金利润。
+- 折后现金利润属于研究口径，不是公司指引。
+- 黄金税收新政对后续毛利率和加盟渠道成本的量化影响仍待披露。

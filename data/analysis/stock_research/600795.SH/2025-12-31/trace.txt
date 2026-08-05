@@ -1,0 +1,46 @@
+2026-08-01T02:14:53+08:00 INIT
+- Read config/input.json.
+- Read stock-research SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+- Ran protocol CLI init to create outputs/result.json.
+
+SOURCE REUSE CHECK
+- Checked configured raw filing, annual review, normalized facts, and historical stock-research paths.
+- No 600795.SH/2025-12-31 filing or fact package existed in the workspace; only config/input.json and notes were present.
+- Therefore retrieved and reviewed the disclosed 2025 annual report from a public mirror of the formal filing.
+
+PRIMARY DOCUMENT REVIEW
+- Document: 国电电力发展股份有限公司2025年年度报告, disclosed 2026-04-15, 323 pages.
+- Public document URL: https://pdf.dfcfw.com/pdf/H2_AN202604141821195047_1.pdf
+- Cross-check discovery: SSE/company-announcement search results and annual-report announcement listings identified the same report.
+- Reviewed management discussion, operating data, customer/supplier concentration, dividend section, consolidated balance sheet, consolidated income statement, consolidated cash flow statement, restricted-assets disclosure, and liquidity-risk maturity table.
+
+MODEL DECISION
+- Confirmed statement_model=utility_concession and owner_earnback_applicability=requires_special_model.
+- Basis: power-generation infrastructure is the core earning asset; fixed assets plus construction in progress were CNY 413.492bn; financing obligations are project-linked; CNY 5.2bn of borrowings were secured by future electricity-charge rights; consolidated cash is not detachable from capex and debt service.
+- All ordinary owner-earnback sorting fields remain null as required by the result contract.
+- Appropriate alternative: project-by-project remaining cash-flow analysis by generation type, electricity volume and price, capacity/ancillary revenue, fuel, maintenance capex, debt service, minority interests, and remaining operating life.
+
+CALCULATIONS
+- Gross profit = 170,243,994,133.70 - 143,791,677,120.80 = 26,452,317,012.90.
+- Gross margin = 26,452,317,012.90 / 170,243,994,133.70 = 0.1553788558.
+- Parent net margin = 7,161,419,062.53 / 170,243,994,133.70 = 0.0420656194.
+- Operating cash flow less purchases of long-term assets = 53,668,239,032.25 - 45,813,800,346.23 = 7,854,438,686.02. This is not treated as sustainable distributable cash profit because maintenance and expansion capex are not separated.
+- Forecast/static dividend yield = 4,298,384,198.76 / 89,713,000,000 = 0.0479126124.
+- Minority interest ratio = 78,643,162,523.54 / 138,113,885,671.05 = 0.5694080805.
+- Liability ratio = 382,037,891,180.01 / 520,151,776,851.06 = 0.7344738751.
+- Interest-bearing financing proxy = short-term borrowings + current portion of non-current liabilities + long-term borrowings + bonds payable = CNY 284,186,892,297.47.
+
+PROTOCOL OPERATIONS
+- Populated outputs/result.json using protocol CLI set commands after protocol init.
+- Added sources, financials, asset/liability explanations, business narrative, risks, evidence, dividend data, special-model interpretation, and data-quality status.
+- Ordinary owner-earnback fields were intentionally not populated.
+
+LIMITATIONS
+- Market capitalization and PE TTM were supplied by the input and were not independently reconstructed.
+- Consolidated annual report does not provide complete project-level remaining operating lives, maintenance capex, project debt, or upstreamable cash.
+- Capital spending combines maintenance and expansion; no unsupported split was introduced.
+- 2025 dividend is compared with the 2026-07-31 market capitalization, so the yield is a cross-date static indicator.
+
+VALIDATION
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[].

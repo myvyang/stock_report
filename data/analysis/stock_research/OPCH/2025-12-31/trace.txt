@@ -1,0 +1,65 @@
+OPCH stock-research trace
+generated_at: 2026-08-05 Asia/Shanghai
+period: 2025-12-31 annual
+
+1. Protocol and instructions
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the paths declared in config/input.json.
+- No local OPCH 2025 annual facts, normalized facts, raw filing, or prior stock-research result existed under stock_report/.
+- Therefore retrieved primary public disclosures rather than fabricating or relying on an absent fact package.
+
+3. Primary sources inspected
+- SEC 2025 Form 10-K, accession 0001014739-26-000008:
+  https://www.sec.gov/Archives/edgar/data/1014739/000101473926000008/bios-20251231.htm
+- SEC Companyfacts JSON for CIK 0001014739:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0001014739.json
+- Company FY2025 results release dated 2026-02-24:
+  https://investors.optioncarehealth.com/news-releases/news-release-details/option-care-health-announces-financial-results-fourth-quarter-1
+- January 2026 investor presentation filed with SEC:
+  https://www.sec.gov/Archives/edgar/data/1014739/000110465926002887/tm262606d1_ex99-2.htm
+- 2025-12-31 RMB central parity announcement, 1 USD = 7.0288 CNY:
+  https://www.ce.cn/xwzx/gnsz/gdxw/202512/t20251231_2676993.shtml
+- Valuation snapshot: config/input.json, source Yahoo Finance yfinance, market-cap date 2026-08-03.
+
+4. Model decision
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Rationale: the company purchases drugs and provides infusion/pharmacy/clinical services; receivables, inventory, sites, leases, and debt have ordinary operating-company meanings. It is not an insurer, bank, brokerage, or investment holding platform.
+- Receivables and drug inventory were treated as required operating assets, not detachable cash.
+- Operating leases were described as operating obligations and were not added again to net debt, avoiding double counting with ongoing rent expense.
+
+5. Currency normalization
+- All USD filing amounts multiplied by 7.0288 and stored as absolute CNY yuan.
+- This closing-rate convention was also used for income-statement and cash-flow items solely to satisfy the common display currency. It is disclosed as a limitation because an annual average rate was not used.
+
+6. Core source figures (USD)
+- Revenue 5,649,519,000; cost of revenue 4,561,624,000; gross profit 1,087,895,000.
+- Operating income 337,906,000; parent net income 207,585,000.
+- Total assets 3,455,769,000; total liabilities 2,129,376,000; parent equity 1,326,393,000.
+- CFO 258,447,000; capex 41,307,000; operating FCF 217,140,000.
+- Cash 232,624,000; current debt 6,780,000; noncurrent debt 1,154,052,000.
+- Share-based compensation 39,956,000; repurchases and related excise taxes 309,951,000.
+
+7. Owner-earnback calculations
+- Discounted detachable net cash = (cash 232,624,000 - interest-bearing debt 1,160,832,000) * 7.0288 = -6,524,188,390.40 CNY.
+- Operating business price = market cap 23,277,593,807.178223 - (-6,524,188,390.40) = 29,801,782,197.578224 CNY.
+- Sustainable cash profit = (CFO 258,447,000 - capex 41,307,000 - share-based compensation 39,956,000) * 7.0288 = 1,245,390,899.20 CNY.
+- Owner earnback years = 29,801,782,197.578224 / 1,245,390,899.20 = 23.9296611343.
+- Market cap / cash profit = 23,277,593,807.178223 / 1,245,390,899.20 = 18.6909939860.
+- Forecast cash dividend = 0; forecast yield = 0, based on no 2025 common cash dividend and no announced cash dividend evidence.
+
+8. Protocol population and validation
+- Populated result fields exclusively through protocol `set` and `append` commands after initialization.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Expected final result: {"status":"ok","errors":[]}
+
+9. Limitations
+- Market cap and PE TTM were accepted from the task input and were not independently recomputed.
+- Sustainable cash profit is an analytical estimate, not company guidance.
+- Acquisition cash spending was not treated as annually recurring; stock compensation was treated as a full shareholder cost.
+- No buy/sell recommendation or target price was produced.

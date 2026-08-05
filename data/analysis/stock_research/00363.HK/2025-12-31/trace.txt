@@ -1,0 +1,69 @@
+stock-research trace
+task: 00363.HK / annual / 2025-12-31
+generated: 2026-08-03 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+- /workspace/AGENTS.md instructions supplied in task context
+
+2. Reuse audit
+- Checked annual-review, normalized-facts, stock-research and raw-filing paths for 00363.HK/2025-12-31.
+- No reusable annual facts or prior stock-research result was present at task start.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result skeleton created successfully.
+
+4. Primary-source retrieval
+- Company annual-report index: https://www.sihl.com.hk/AnnualReports
+- 2025 annual report PDF: https://www.sihl.com.hk/storage/file/20260416/1776333575723571.pdf
+- Local retained copy: stock_report/data/raw/filings/00363.HK/2025-12-31/annual-report-2025.pdf
+- HKEX title search confirmed release of ANNUAL REPORT 2025 on 2026-04-16 and annual results on 2026-03-30.
+
+5. Model verification
+- Input hint financial_brokerage rejected.
+- Annual report note 1 identifies the company as an investment holding company.
+- Business structure comprises infrastructure/environmental protection, real estate and consumer products, with subsidiaries, joint ventures and associates.
+- Selected statement_model: investment_holding.
+- Selected owner_earnback_applicability: requires_special_model.
+- Reason: consolidated cash, project debt, property inventory, concession assets and 38.6% minority equity cannot be treated as wholly detachable parent cash.
+
+6. Financial extraction (original reporting currency HKD, amounts below HK$000)
+- Revenue 20,831,514; cost of sales 14,629,646; gross profit 6,201,868.
+- Net profit 1,771,910; parent net profit 2,019,868.
+- Total assets 164,965,711; total liabilities derived as 83,236,045; total equity 81,729,666.
+- Parent equity 50,155,543; minority interest 31,574,123.
+- Operating cash flow 8,787,009.
+- Capex proxy 2,576,427: concession rights 1,043,818 + investment-property subsequent expenditure 387,802 + PPE 362,762 + non-current-asset deposits 535,361 + toll-road right additions 246,684.
+- Operating FCF proxy 6,210,582.
+- Financing cash flow -9,716,126.
+- Cash/bank/pledged deposits 31,524,346; bank and other loans 55,621,108.
+
+7. Segment and dividend extraction
+- Infrastructure/environmental profit HK$1.801bn, real-estate loss HK$0.632bn, consumer profit HK$0.756bn.
+- 2025 dividend per share HK$1.12 = interim 0.42 + ordinary final 0.50 + special 0.20.
+- Forecast assumption excludes the one-off special dividend and carries HK$0.92/share as a non-company-guidance baseline.
+
+8. Currency normalization
+- Contract requires CNY absolute yuan.
+- Income statement/cash flow translated with approximate 2025 average 1 HKD = 0.919 CNY.
+- Balance sheet translated with approximate 2025 year-end 1 HKD = 0.903 CNY.
+- Rates are cross-rate approximations using Federal Reserve G.5A 2025 annual USD/CNY and USD/HKD data; translated CNY amounts are estimates and this is recorded in data_quality.limitations.
+
+9. Result construction
+- Used protocol CLI `set` commands to populate the initialized skeleton.
+- Ordinary owner-earnback fields retained as null as required for a special model.
+- Asset and liability rows, business story, risks, evidence, dividend forecast and data-quality limitations populated.
+
+10. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final completed result status after report review: ok; errors: [].
+- JSON parse check: passed.
+
+11. Output files
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

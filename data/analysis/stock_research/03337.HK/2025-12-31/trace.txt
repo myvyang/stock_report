@@ -1,0 +1,52 @@
+stock-research trace
+company: 03337.HK / ANTON OILFIELD
+period: 2025-12-31 annual
+generated_at: 2026-08-04T14:02:23+08:00
+
+1. Read skill and required contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse check:
+   - No local raw filing, annual facts, normalized facts, or prior stock-research outputs existed for the requested company-period.
+   - Used the official HKEX 2025 Annual Report (published 2026-04-29) and issuer annual-results release.
+   - Official filing URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042902044.pdf
+
+3. Analysis-model override:
+   - Input hint: financial_brokerage / requires_special_model.
+   - Filing fact: group provides oilfield technology services and manufactures/trades related products; operating assets and liabilities are ordinary cash, receivables, equipment, payables and borrowings.
+   - Final model: ordinary_operating / applicable.
+   - Reason: no brokerage client money, proprietary securities book, repo financing, or other brokerage balance-sheet structure.
+
+4. Core figures extracted from annual report (RMB thousand, converted to absolute RMB in result.json):
+   - Revenue 5,571,722; cost of sales 3,978,023; gross profit 1,593,699.
+   - Operating profit 712,066; net profit 383,180; parent net profit 373,090.
+   - Total assets 11,595,331; total liabilities 7,826,671; total equity 3,768,660; parent equity 3,681,782.
+   - Operating cash flow 1,369,650; net investing cash outflow / management-disclosed capex 207,752; management-disclosed FCF 1,043,400.
+   - Cash and cash equivalents 2,609,985; restricted deposits 573,942; borrowings 2,160,349.
+   - Proposed 2025 dividend 112,000.
+
+5. Formula checks:
+   - gross_margin = 1,593,699 / 5,571,722 = 0.286034.
+   - net_margin = 373,090 / 5,571,722 = 0.066961.
+   - forecast_dividend_yield = 112,000,000 / 2,104,629,327.9653788 = 0.053216.
+   - discounted cash = 2,609,985,000 * 0.90 = 2,348,986,500.
+   - restricted deposits included at 0% because pledged/restricted.
+   - discounted detachable net cash = 2,348,986,500 - 2,160,349,000 = 188,637,500.
+   - operating business price = 2,104,629,327.9653788 - 188,637,500 = 1,915,991,827.9653788.
+   - 2025 working-capital movements net to approximately +441 million cash, largely driven by accruals/other payables.
+   - sustainable cash profit = 1,043.4 million issuer-disclosed FCF - approximately 441 million non-recurring working-capital release - rounding buffer = 600 million.
+   - owner earnback years = 1,915,991,827.9653788 / 600,000,000 = 3.19332.
+   - market cap to cash profit = 2,104,629,327.9653788 / 600,000,000 = 3.507716.
+
+6. Protocol operations:
+   - Initialized outputs/result.json with protocol CLI from config/input.json.
+   - Populated fields using protocol set/append commands; JSON was not constructed from scratch.
+   - Final validation recorded after report generation.
+
+7. Important distinctions and limitations:
+   - Structured operating_free_cash_flow uses CFO less disclosed capex: 1,369.650 - 207.752 = 1,161.898 million.
+   - Issuer-disclosed FCF is 1,043.4 million; the difference reflects issuer definition. Owner earnback starts from the lower issuer figure.
+   - Market cap and PE are supplied Tencent snapshot values and were not replaced.
+   - Sustainable cash profit is an analytical estimate, not company guidance.

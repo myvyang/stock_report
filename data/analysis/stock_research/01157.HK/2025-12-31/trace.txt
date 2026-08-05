@@ -1,0 +1,71 @@
+stock-research trace
+company: 01157.HK / ZOOMLION / 中联重科股份有限公司
+period: 2025-12-31 annual
+generated for task input created_at: 2026-08-03T18:00:15+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields exclusively with protocol `set` commands after initialization.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: {"status":"ok","errors":[]}
+
+[local reuse audit]
+- No raw filing, annual facts package, normalized facts, or prior stock-research output existed for 01157.HK/2025-12-31.
+- Downloaded the official HKEX annual report to stock_report/data/raw/filings/01157.HK/2025-12-31/annual_report_2025.pdf for audit reuse.
+
+[primary sources]
+- HKEX 2025 Annual Report, published 2026-04-27:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042700632.pdf
+- HKEX 2025 annual results announcement, published 2026-03-30:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0330/2026033001708.pdf
+- HKEX final dividend announcement, updated 2026-05-29:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0529/2026052900654.pdf
+- Market data: Tencent qt.gtimg.cn snapshot supplied by config/input.json, dated 2026/07/31 16:08:42.
+
+[model review]
+- Input hint: financial_brokerage / requires_special_model.
+- Finding: incorrect. Annual report product disaggregation shows RMB51.509bn product revenue and only RMB0.447bn financial services revenue. Principal activities are manufacturing and selling construction/agricultural machinery.
+- Final model: ordinary_operating / applicable.
+- Qualification: finance lease receivables, loans, pledged deposits and large installment-sale receivables support equipment sales and are not detachable cash.
+
+[statement basis]
+- IFRS figures used consistently for the three statements because the HK annual report presents complete IFRS statements in RMB millions.
+- Revenue 52,107m; cost of sales 37,497m; gross profit 14,610m; operating profit 5,813m; profit 5,027m; parent profit 4,779m.
+- Total assets 133,107m; current liabilities 48,966m; non-current liabilities 24,303m; liabilities 73,269m; equity 59,838m; parent equity 57,534m; NCI 2,304m.
+- Operating cash flow 4,573m. Capex is PPE 4,353m + ROU assets 233m + intangibles 69m = 4,655m. Operating FCF = -82m.
+- Financing cash flow 466m. Dividend and buyback cash out = shareholder dividends 2,784m + NCI dividends 210m + own-share repurchase 96m = 3,090m.
+- PRC GAAP parent profit 4,858.487m and recurring parent profit 3,369.676m are used only where explicitly described.
+
+[formulas]
+- gross_margin = 14,610m / 52,107m = 0.2803845932.
+- net_margin = 4,779m / 52,107m = 0.09171512465.
+- discounted detachable net cash:
+  cash 11,872m * 100% = 11,872m
+  FVPL financial assets 2,071m * 50% = 1,035.5m
+  other financial assets 1,730m * 30% = 519m
+  loans and borrowings 32,942m * -100% = -32,942m
+  lease liabilities 650m * -100% = -650m
+  total = -20,165.5m.
+- Excluded from detachable cash: pledged deposits, trade/contract receivables, finance lease receivables, loans and advances, inventories, associates. These are restricted or operationally tied assets.
+- sustainable cash profit proxy = PRC GAAP recurring parent profit 3,369,675,970.93 * 90% = 3,032,708,373.837.
+- operating business price = market cap 56,323,333,716.45153 - (-20,165,500,000) = 76,488,833,716.45154.
+- owner earnback years = 76,488,833,716.45154 / 3,032,708,373.837 = 25.2212953861.
+- market cap / cash profit = 56,323,333,716.45153 / 3,032,708,373.837 = 18.5719583862.
+- dividend forecast = 8,649m year-end shares * RMB0.40 = RMB3,459.6m.
+- forecast dividend yield = 3,459.6m / 56,323.333716m = 0.06142392099.
+
+[judgment boundaries]
+- Fact: 2025 operating FCF calculated from reported cash flow was negative RMB82m.
+- Judgment: recurring parent profit less a 10% haircut is used as a normalized sustainable cash-profit proxy because one year's capex includes continuing smart-factory/global capacity investment. This is not management guidance and is explicitly flagged as needing future cash-flow verification.
+- Fact: other net income included RMB908m government grants and preferential taxation.
+- Inference: headline PE understates the effective price of the operating business under a control perspective because detachable net cash is negative.
+- Forecast: next-12-month dividend assumes the 2025 RMB0.40/share distribution repeats; no company commitment is asserted.
+
+[quality]
+- status: complete
+- protocol validation: passed
+- key limitations are recorded in outputs/result.json data_quality.limitations.

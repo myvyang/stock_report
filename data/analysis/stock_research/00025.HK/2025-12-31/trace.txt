@@ -1,0 +1,50 @@
+stock-research trace
+generated_at=2026-08-04T13:19:37+08:00
+query=00025.HK
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md in full.
+3. Initialized outputs/result.json with the required CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Reused the prior source-backed research fields through protocol set commands, then updated the current market timestamp, source wording and data-quality reason through protocol set commands. No complex JSON result was hand-written from scratch.
+5. Validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse audit]
+- Input-referenced annual facts, normalized facts, extraction trace and raw filing directories were absent from /workspace.
+- A prior stock-research result, report and trace existed at stock_report/data/analysis/stock_research/00025.HK/2025-12-31/.
+- The prior work cited primary disclosures and contained the required financial facts, so those facts were reused; the valuation timestamp was updated from the current input.
+
+[identity and model audit]
+- Input hint financial_brokerage contradicted source tags describing an EV manufacturer.
+- HKEX FY2025 disclosure identifies a diversified group with construction and engineering, property investment, property development and operations, healthcare investment, car dealership, insurance and investment, and other activities.
+- Selected statement_model=platform_financial_mixed.
+- Selected owner_earnback_applicability=requires_special_model.
+- Ordinary owner-earnback ranking fields intentionally remain null.
+
+[primary sources]
+- HKEX FY2025 results announcement: https://www.hkexnews.hk/listedco/listconews/sehk/2025/0626/2025062601514.pdf
+- HKEX Annual Report 2025: https://www.hkexnews.hk/listedco/listconews/sehk/2025/0724/2025072400734.pdf
+- Chevalier corporate overview: https://www.chevalier.com/en/About/overview.aspx
+- PBOC 2025-04-01 central parity: https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/5648456/index.html
+- Market cap, timestamp and PE TTM reused from config/input.json, cited there to Tencent qt.gtimg.cn; the historical snapshot was not independently reproduced.
+
+[period and currency]
+- Requested period: 2025-12-31, annual.
+- Company's statutory year end: 31 March.
+- Financial statement basis: audited FY ended 2025-03-31.
+- FX conversion: HKD amounts multiplied by 0.92257 CNY/HKD, the next business day's PBOC central parity; income statement and cash-flow conversions are display approximations rather than average-rate translations.
+
+[key calculations]
+- gross_margin = 638,992 / 9,265,045 = 0.06896804063013186.
+- net_margin = -473,089 / 9,265,045 = -0.05106170558264963.
+- capex = -(103,808 + 7,130) HKD thousand = -110,938 HKD thousand.
+- operating_free_cash_flow = -370,630 - 110,938 = -481,568 HKD thousand; CNY=-444,280,189.76.
+- forecast dividend = 48,202 HKD thousand * 0.92257 = CNY 44,469,719.14.
+- forecast dividend yield = 44,469,719.14 / 1,264,804,463.5897875 = 0.03515936290561891.
+- FY2025 PE is not meaningful because parent net profit is negative; input PE TTM 3.52 reflects a later rolling period.
+
+[data quality]
+- status=partial.
+- Reasons: requested date does not match the statutory annual period; valuation date is about sixteen months after FY2025 year-end and PE reflects later earnings; available disclosures are insufficient for reliable segment NAV, distributable cash and upstreaming analysis.

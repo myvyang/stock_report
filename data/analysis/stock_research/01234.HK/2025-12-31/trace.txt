@@ -1,0 +1,55 @@
+stock-research task trace
+company: 01234.HK / CHINA LILANG
+period: 2025-12-31 annual
+generated_at: 2026-08-03T13:36:30+08:00
+
+1. Read required skill and contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Checked reusable local data:
+   - No annual facts, normalized facts, raw filing metadata, or prior stock-research result existed for this company/period.
+
+3. Retrieved primary filing:
+   - China Lilang Limited Annual Report 2025
+   - HKEX publication date: 2026-03-23
+   - URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0323/2026032300678.pdf
+   - Local PDF: stock_report/data/raw/filings/01234.HK/2025-12-31/annual-report-2025.pdf
+   - Local extracted text: stock_report/data/raw/filings/01234.HK/2025-12-31/annual-report-2025.txt
+   - PDF SHA256: 1cc723e81b6d4cc490a51da46936209465f294b34d860bff3779ac06ca00cda4
+
+4. Model review:
+   - Input hint said financial_brokerage/requires_special_model.
+   - Filing shows branded menswear sales through distribution, consignment, direct retail, and online channels.
+   - Overrode hint with ordinary_operating/applicable.
+
+5. Key calculations (CNY yuan):
+   - gross_margin = 2,017,796,000 / 4,069,716,000 = 0.4958092116
+   - net_margin = 502,438,000 / 4,069,716,000 = 0.1234577548
+   - capex = 137,685,000 PPE + 2,351,000 intangible = 140,036,000
+   - operating_free_cash_flow = 538,315,000 - 140,036,000 = 398,279,000
+   - discounted_net_cash = 90% * (1,117,497,000 + 874,612,000) - 809,333,000 = 983,565,100
+   - pledged deposits of 822,172,000 excluded because they secure bank loans and bills payable
+   - operating_business_price = 3,574,778,799.625039 - 983,565,100 = 2,591,213,699.625039
+   - owner_earnback_years = 2,591,213,699.625039 / 398,279,000 = 6.5060264278
+   - market_cap_to_cash_profit = 3,574,778,799.625039 / 398,279,000 = 8.9755643647
+   - forecast_dividend_yield = 347,710,000 / 3,574,778,799.625039 = 0.0972675568
+
+6. Market data:
+   - Reused input snapshot only: market cap CNY 3,574,778,799.625039, PE TTM 7.47.
+   - Snapshot timestamp: 2026/07/31 16:08:47.
+   - Input source: Tencent qt.gtimg.cn.
+
+7. Protocol operations:
+   - Initialized outputs/result.json with protocol CLI.
+   - Populated scalar fields with protocol set.
+   - Populated arrays with protocol append.
+   - Final validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Final validation status: ok; errors: []
+
+8. Limitations:
+   - Forecast dividend assumes the 2025 attributable dividend amount as a baseline, not a commitment.
+   - Sustainable cash profit is based on one annual free-cash-flow observation.
+   - DTC transition raised inventory and working-capital requirements; normalized long-run cash conversion needs future filings.

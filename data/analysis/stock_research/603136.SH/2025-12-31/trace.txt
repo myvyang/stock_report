@@ -1,0 +1,60 @@
+stock-research trace
+company: 天目湖 (603136.SH)
+period: 2025-12-31 annual
+generated for task date: 2026-07-31 Asia/Shanghai
+
+1. Instructions and contracts read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse audit
+- config/input.json found and used.
+- stock_report/data/notes/user_stock_evaluations.md inspected; no entry for 603136.SH.
+- No local raw filing, annual-review facts, normalized facts, or prior stock-research result existed for 603136.SH / 2025-12-31.
+- Therefore public disclosure retrieval was required.
+
+3. Sources used
+- Shanghai Stock Exchange, 江苏天目湖旅游股份有限公司2025年年度报告摘要, disclosed 2026-04-20:
+  https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-20/603136_20260420_T0HX.pdf
+- Full 2025 annual report searchable mirror of the disclosed filing, Sina Finance announcement id 12114945:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12114945&stockid=603136
+- config/input.json market snapshot: market cap CNY 2,399,000,000; PE TTM 26.09; timestamp 20260731114323; source Tencent qt.gtimg.cn.
+
+4. Core extracted facts (CNY)
+- Revenue 508,070,184.47; cost of sales 252,346,873.64; gross profit 255,723,310.83.
+- Operating profit 137,678,085.45; consolidated net profit 103,785,251.91; parent net profit 95,321,089.57.
+- Total assets 1,707,749,451.41; liabilities 203,570,459.11; equity 1,504,178,992.30; parent equity 1,371,095,270.28; minority interest 133,083,722.02.
+- Cash and cash equivalents balance-sheet item 668,737,617.01; short-term borrowing 35,000,000; current and non-current lease liabilities 7,002,145.87 + 46,189,448.44.
+- Operating cash flow 188,873,497.83; capex cash outflow 37,848,252.92; operating free cash flow 151,025,244.91; financing cash flow -151,736,896.19.
+- Proposed 2025 cash dividend 54,025,342.00.
+
+5. Model decision
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: revenue and assets are ordinary self-operated tourism businesses and facilities; no financial-customer funds, insurance reserves, regulated property presales, or similar special-model balance-sheet structure.
+
+6. Analyst calculations and assumptions
+- Gross margin = (508,070,184.47 - 252,346,873.64) / 508,070,184.47 = 0.5033228059.
+- Parent net margin = 95,321,089.57 / 508,070,184.47 = 0.1876140196.
+- Reported operating FCF = 188,873,497.83 - 37,848,252.92 = 151,025,244.91.
+- Discounted detachable net cash = 668,737,617.01 * 95% - 35,000,000 - 7,002,145.87 - 46,189,448.44 = 547,109,141.8495.
+- Sustainable distributable cash profit normalized to 85,000,000. This is analyst judgment, not management guidance. Rationale: reported FCF benefited from capex substantially below depreciation plus right-of-use and intangible amortization (~96.42m); cross-checks were parent profit 95.32m, recurring parent profit 89.42m, and minority claims.
+- Operating business price = 2,399,000,000 - 547,109,141.8495 = 1,851,890,858.1505.
+- Owner earnback years = 1,851,890,858.1505 / 85,000,000 = 21.78695127.
+- Market cap / cash profit = 2,399,000,000 / 85,000,000 = 28.22352941.
+- Forecast dividend yield = 54,025,342 / 2,399,000,000 = 0.0225199425.
+
+7. Protocol operations and validation
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields through repeated protocol `set` commands; complex JSON was not authored from a blank file.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed-result validation status: ok; errors: [].
+
+8. Known limitations
+- No local original filing package or annual facts package was supplied.
+- The complete filing was examined through a searchable mirror; SSE summary provided the primary exchange cross-check.
+- Maintenance capex was not separately disclosed, so the sustainable cash-profit adjustment is inherently judgmental.
+- Market snapshot was accepted from task input and not independently reconstructed.

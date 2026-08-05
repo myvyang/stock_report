@@ -1,0 +1,63 @@
+2026-08-05 stock research trace — WBS / 2025-12-31
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No WBS raw filing, annual facts, normalized facts, or prior stock-research output existed under stock_report.
+- Returned to primary official disclosure as required.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initialized from config/input.json; retained supplied market cap, date, source, and PE TTM.
+
+4. Primary sources reviewed
+- SEC 2025 Form 10-K, filed 2026-02-27, accession 0000801337-26-000008:
+  https://www.sec.gov/Archives/edgar/data/801337/000080133726000008/wbs-20251231.htm
+- Company Q4 / FY2025 earnings release, dated 2026-01-23:
+  https://investors.websterbank.com/News--Events/news-releases/news-details/2026/Webster-Reports-Fourth-Quarter-2025-EPS-of-1-55-Adjusted-EPS-of-1-59/default.aspx
+- SEC Form 8-K for Banco Santander transaction, filed 2026-02-03:
+  https://www.sec.gov/Archives/edgar/data/801337/000119312526041328/d103982d8k.htm
+- Banque de France daily parities, 2025-12-31:
+  https://www.banque-france.fr/en/statistics/rates-and-prices/exchange-rates-daily-parities-2025-12-31
+- Market cap and PE: supplied input, Yahoo Finance yfinance, dated 2026-08-03.
+
+5. Model determination
+- Filing identifies Webster as a bank holding company and Webster Bank, N.A. as its principal bank subsidiary.
+- Loans, securities, deposits, FHLB advances, and regulatory capital are the operating model.
+- Overrode input hint ordinary_operating/applicable with financial_bank/requires_special_model.
+- All ordinary owner-earnback ranking metrics intentionally remain null.
+
+6. Currency translation
+- Result contract requires CNY absolute yuan.
+- Banque de France 2025-12-31 parities: EUR/USD 1.1750 and EUR/CNY 8.2262.
+- Derived USD/CNY = 8.2262 / 1.1750 = 7.0010212766.
+- USD filing amounts translated at that rate; raw USD figures and source pages retained in evidence/report.
+
+7. Key extracted facts (USD)
+- Assets 84,073.663m; liabilities 74,581.427m; equity 9,492.236m.
+- Loans and leases 56,597.110m; ACL 719.411m; deposits 68,759.813m.
+- Net interest income 2,497.894m; non-interest income 401.519m.
+- Net income 1,002.802m; income applicable to common 974.861m.
+- NIM 3.42%; NPL ratio 0.88%; ACL/loans 1.27%; ACL/NPL about 144%; CET1 about 11.2%.
+- Adjusted uninsured deposits 22.3% of deposits; immediately available liquidity 27,260.769m; coverage 178%.
+- Common dividend 1.60/share in 2023, 2024, and 2025; Q1 2026 declaration 0.40/share.
+
+8. Dividend forecast
+- Mechanical annual run-rate: USD 1.60 * 161,216,008 year-end shares = USD 257,945,612.8.
+- CNY forecast = 1,805,882,724.82.
+- Forecast yield = 1,805,882,724.82 / 84,432,477,273.33691 = 2.13884844%.
+- Limitation: pending Santander transaction can alter listing continuity and payment arrangements.
+
+9. Protocol population and validation
+- Populated initialized result exclusively with protocol CLI set commands.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation response: {"status":"ok","errors":[]}.
+
+10. Output status
+- outputs/result.json: protocol-valid, data_quality.status=complete.
+- outputs/report.md: completed human-readable operating report.
+- outputs/trace.txt: completed source/method trace.

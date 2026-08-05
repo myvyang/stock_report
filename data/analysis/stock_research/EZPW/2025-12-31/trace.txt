@@ -1,0 +1,47 @@
+stock-research trace — EZPW — FY2025
+
+1. Read required skill and contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check:
+   - No local EZPW annual facts, normalized facts, prior stock-research result, or raw filing existed.
+   - Downloaded SEC Form 10-K HTML for accession 0000876523-25-000094 to stock_report/data/raw/filings/EZPW/2025-12-31/ezpw-20250930.htm.
+   - Queried SEC Companyfacts API for cross-checking standard XBRL facts.
+
+4. Period resolution:
+   - Input period: 2025-12-31.
+   - EZCORP fiscal year end and latest annual Form 10-K period: 2025-09-30.
+   - Corrected analysis.period to 2025-09-30 and recorded limitation.
+
+5. Currency conversion:
+   - Source financial statements: USD.
+   - Result protocol: CNY absolute yuan.
+   - Applied 2025-09-30 central parity rate: USD 1 = CNY 7.1055.
+   - Source: China Foreign Exchange Trade System rate reported by Xinhua.
+
+6. Model classification:
+   - Overrode ordinary_operating hint.
+   - Selected platform_financial_mixed / requires_special_model.
+   - Reason: cash funds pawn loans; redeemed loans generate service charges; forfeited collateral becomes inventory; cash, pawn loans, inventory, and financing are inseparable parts of the operating cycle.
+   - Kept all ordinary owner-earnback sorting fields null as required.
+
+7. Core source facts (USD thousands, FY2025 unless noted):
+   - Revenue 1,274,280; gross profit 746,065; operating income 149,169; net income 109,613.
+   - Assets 1,951,209; liabilities 925,724; equity 1,025,485.
+   - OCF 148,985; capex 38,561; derived OCF less capex 110,424.
+   - Cash 469,524; restricted cash 15,189; pawn loans 307,496; PSC receivable 48,733; inventory 248,457; debt 518,076; lease liabilities 245,964.
+   - Loans made 1,006,505; cash loan repayments 557,761; principal recovered through sale of forfeited collateral 393,203.
+   - No dividends; buybacks 6,999.
+
+8. Protocol population:
+   - Used repeated protocol `set` and `append` commands to populate the initialized skeleton.
+   - Did not construct result.json from scratch.
+
+9. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

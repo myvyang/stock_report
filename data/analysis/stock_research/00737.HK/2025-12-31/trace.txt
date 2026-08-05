@@ -1,0 +1,48 @@
+stock-research trace
+company: 00737.HK Shenzhen Investment Holdings Bay Area Development Company Limited
+period: 2025-12-31 annual
+generated_for_input: 2026-08-03T15:47:22+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized result through protocol CLI
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+- No existing annual facts, normalized facts, or prior stock-research outputs were found for 00737.HK/2025-12-31.
+- Downloaded official annual report to stock_report/data/raw/filings/00737.HK/2025-12-31/annual-report-2025.pdf.
+- Local pdftotext was unavailable; extracted and cross-checked indexed text from official HKEX PDFs.
+
+4. Official sources
+- 2025 Annual Report, released 2026-04-28:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042804321.pdf
+- Final Results for year ended 2025-12-31, released 2026-03-18:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0318/2026031801296.pdf
+- Market cap and PE: Tencent qt.gtimg.cn snapshot supplied in config/input.json, timestamp 2026/07/31 16:08:47.
+
+5. Model audit
+- Input hint financial_brokerage rejected: official report identifies expressway investment, construction, and operation.
+- Chosen model: utility_concession.
+- Owner earnback applicability: requires_special_model.
+- Reason: concession rights are finite-life operating assets; main profits include equity-accounted JVs with their own debt and capex; cash and borrowings are tied to operating, debt service, dividends, and reconstruction/expansion.
+- Ordinary owner-earnback sorting fields intentionally left null per result contract.
+
+6. Key calculations
+- gross_margin = 307,262,000 / 786,413,000 = 0.3907120331.
+- net_margin = parent profit 467,534,000 / consolidated revenue 786,413,000 = 0.5945145884; flagged as non-comparable because JV profit is outside revenue.
+- operating_free_cash_flow = 570,955,000 - 21,230,000 = 549,725,000; flagged as incomplete economic view because JV dividends are investing cash flow and JV capex is not consolidated.
+- minority_interest_ratio = 3,204,695,000 / 7,850,484,000 = 0.4082187888.
+- dividend baseline = 467,534,000, consistent with 2025 parent profit and disclosed 100% regular payout.
+- forecast_dividend_yield = 467,534,000 / 5,216,583,931.179047 = 0.0896302939.
+
+7. Protocol writes
+- All result fields were populated with protocol CLI set/append commands; result.json was not constructed manually.
+- Final validation command and its output are appended below.
+
+8. Final protocol validation
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+output: {"status":"ok","errors":[]}

@@ -1,0 +1,58 @@
+stock-research trace
+company: ADTIGER CORP (01163.HK)
+period: 2025-12-31 annual
+generated_for_input: 2026-08-03T11:59:54+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Protocol initialization
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+result: initialized stock-research-result-v1 skeleton.
+
+3. Reuse check
+- Input-referenced annual review, normalized facts, and raw filing directories were absent in /workspace.
+- No historical 01163.HK research result was available locally.
+- Downloaded official 2025 annual report to stock_report/data/raw/filings/01163.HK/2025-12-31/annual-report-2025.pdf.
+
+4. Primary evidence
+- HKEX annual report URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0409/2026040900688.pdf
+- Profit or loss statement, page 103: revenue RMB346.387m; cost RMB293.453m; gross profit RMB52.934m; profit attributable to parent RMB5.563m.
+- Financial position, page 105: assets RMB786.206m; liabilities RMB580.685m; equity RMB205.521m; cash RMB476.401m; receivables RMB223.978m; current FVTPL assets RMB57.725m.
+- Cash flow, pages 107-108: OCF RMB78.001m; equipment purchases RMB0.143m; financing CF RMB10.956m.
+- MD&A, pages 12-14: CPA revenue RMB290.016m / margin 1.4%; CPC/CPM revenue RMB56.371m / margin 86.9%.
+- Note 16, pages 142-143: gross trade receivables RMB235.842m, impairment RMB11.864m.
+- Directors' report, page 94: top-five suppliers 92.2% of cost of sales.
+- Note 10, page 135: no dividend paid or declared since incorporation.
+- Market snapshot reused from config/input.json: market cap RMB131,866,784.68704224; PE TTM 24.89; Tencent qt.gtimg.cn; 2026/07/31 16:08:47.
+
+5. Model override
+- Input hint financial_brokerage rejected.
+- Confirmed ordinary_operating because all revenue is online advertising and statements contain no brokerage customer funds, proprietary securities inventory, or repo funding.
+- owner_earnback applicability: applicable.
+
+6. Key calculations
+- gross margin = 52,934,000 / 346,387,000 = 0.15281641439357943.
+- net margin = 5,563,000 / 346,387,000 = 0.01606007153702512.
+- total liabilities = 580,532,000 current + 153,000 non-current = 580,685,000.
+- total assets = 16,895,000 non-current + 769,311,000 current = 786,206,000.
+- capex = RMB143,000; operating FCF = 78,001,000 - 143,000 = RMB77,858,000.
+- cash test = 476,401,000 + 80% * 57,725,000 - 580,685,000 = -58,104,000; floored at zero. Operating receivables excluded from detachable cash.
+- sustainable cash profit = zero because net profit RMB5.563m is below interest income RMB6.864m and OCF is largely explained by RMB67.021m increase in trade/other payables.
+- operating business price = 131,866,784.68704224 - 0 = RMB131,866,784.68704224.
+- owner earnback years and market-cap/cash-profit are null because sustainable cash profit is not positive.
+- forecast dividend = zero; yield = zero.
+
+7. Protocol population
+- Used protocol CLI set commands to populate initialized result; complex result was not authored from scratch.
+
+8. Validation
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+result: {"status":"ok","errors":[]}
+
+9. Data-quality judgment
+- status complete under result contract.
+- limitations retained in result.json: market snapshot not independently verified from exchange; dividend is an inference; zero sustainable cash profit is a conservative owner-perspective normalization, not an accounting-profit forecast.

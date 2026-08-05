@@ -1,0 +1,77 @@
+Stock research trace — BCE — period 2025-12-31
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Checked reusable local data
+   - config/input.json existed.
+   - No staged raw filing, annual facts, normalized facts, or prior BCE stock-research result was present under the paths declared in config/input.json.
+   - Decision: obtain official primary sources rather than reconstruct from third-party financial summaries.
+
+3. Initialized protocol result
+   Command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Official sources used
+   - BCE 2025 Integrated Annual Report, dated 2026-03-05, audited IFRS statements:
+     https://www.bce.ca/cs-assets/2025-bce-integrated-annual-report.pdf-blt14a3fcac20d37443
+     Key pages: p.156 income statement; p.157 statement of financial position; p.169 segment note; p.113-114 selected financial data; p.144 FCF reconciliation; p.145 net debt reconciliation.
+   - BCE Q4/full-year 2025 results and 2026 guidance, 2026-02-05:
+     https://www.bce.ca/news-and-media/newsroom?article=bce-reports-2025-q4-and-full-year-results-announces-2026-financial-targets
+   - BCE common-share dividend schedule, accessed 2026-08-05:
+     https://www.bce.ca/investors/shares-and-dividends/bce.to
+   - Bank of Canada 2025 annual average exchange rates:
+     https://www.bankofcanada.ca/rates/exchange/annual-average-exchange-rates/
+   - Market cap and PE: Yahoo Finance yfinance snapshot supplied by config/input.json, dated 2026-08-03.
+
+5. Model classification
+   - Confirmed statement_model = ordinary_operating.
+   - Confirmed owner_earnback_applicability = applicable.
+   - Reason: BCE earns recurring service revenue using owned/leased telecom networks and spectrum. It is capital intensive and regulated, but is not a single concession project with a finite tolling term. Ordinary statements remain interpretable if debt, capex, leases, and one-off gains are handled explicitly.
+
+6. Currency normalization
+   - Bank of Canada 2025 annual average: CNY 1 = CAD 0.1944.
+   - Therefore CAD 1 = CNY 5.1440329218107.
+   - Applied this rate to all CAD financial-statement and forecast-dividend amounts.
+   - Limitation: balance-sheet amounts use annual average rather than 2025-12-31 spot FX.
+
+7. Key extracted CAD amounts (millions unless stated)
+   - Revenue 24,468; operating costs 13,810; adjusted EBITDA proxy 10,658.
+   - Net earnings 6,514; attributable to common shareholders 6,305.
+   - Net gains on investments 5,217; interest expense 1,775.
+   - Assets 80,165; liabilities 56,855; total equity 23,310; BCE equity 23,020; NCI 290.
+   - Cash 314; cash equivalents 6; debt due within one year 6,155; long-term debt 34,904.
+   - CFO 6,993; capex 3,700; company FCF 3,178; lease principal 1,127; FCF after leases 2,051.
+   - 2025 common dividends paid 2,026.
+   - 2026 annualized common dividend guidance CAD 1.75/share; expected weighted average shares about 933 million.
+
+8. Calculation decisions
+   - Gross profit proxy = revenue - operating costs = CAD 10,658m; gross margin proxy = 43.5589%. BCE does not disclose manufacturing-style cost of sales.
+   - Net margin = CAD 6,305m common shareholder earnings / CAD 24,468m revenue = 25.7684%; flagged as distorted by the MLSE sale gain.
+   - Operating FCF in financials = CFO - capex = CAD 3,293m.
+   - Sustainable distributable cash profit = company FCF after lease principal = CAD 2,051m. This excludes reliance on the MLSE accounting gain and recognizes leases as recurring business use of cash.
+   - Detachable net cash = cash and equivalents CAD 320m - total interest-bearing debt CAD 41,059m = CAD -40,739m. All included at 100%; operating assets and pension assets excluded.
+   - CNY discounted net cash = -209,562,757,201.65.
+   - CNY sustainable cash profit = 10,550,411,522.63.
+   - Operating business price = market cap - discounted net cash = CNY 345,988,153,652.94.
+   - Owner earnback = 32.7938 years.
+   - Market cap / cash profit = 12.9308 years.
+   - Forecast dividend = CAD 1.75 × 933m × FX = CNY 8,398,919,753.09.
+   - Forecast dividend yield = 6.1564%.
+
+9. Protocol population
+   - Populated result exclusively through repeated protocol `set` commands after protocol initialization; did not hand-write outputs/result.json.
+   - Populated analysis sources, model, metrics, all three statements, asset/liability explanations, owner earnback haircuts and profit adjustments, dividends, business story, risks, evidence, and data quality.
+
+10. Validation
+    Command:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Result: status=ok, errors=[]
+
+11. Data-quality status
+    - complete
+    - Known limitations are recorded in outputs/result.json and the report: annual-average FX for balance sheet, EBITDA-like gross margin proxy, input-provided market data, and forecast share-count uncertainty.

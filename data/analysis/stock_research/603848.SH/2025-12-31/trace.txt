@@ -1,0 +1,76 @@
+[2026-08-01 Asia/Shanghai] task_start
+- input: config/input.json
+- company: 广东好太太科技集团股份有限公司 / 603848.SH
+- period: 2025-12-31 annual
+
+[protocol]
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+[reuse_check]
+- Checked stock_report/data/raw/filings/603848.SH/2025-12-31.
+- Checked stock_report/data/analysis/annual_review/603848.SH/2025-12-31.
+- Checked stock_report/data/normalized/facts/603848.SH/2025-12-31.
+- Checked stock_report/data/analysis/stock_research/603848.SH/2025-12-31 and outputs.
+- Result: referenced filing, facts, normalized facts, and prior research files were absent. No historical result could be reused.
+
+[source_research]
+- Located the 2025 annual report disclosed 2026-04-22 through public search.
+- SSE static PDF URL was identified, but direct retrieval returned an anti-bot HTML challenge rather than the PDF.
+- Used the complete public HTML text mirror of the SSE-disclosed annual report for line-level extraction and cross-checking.
+- Core source: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12135668&stockid=603848
+- Dividend implementation source: https://dataclouds.cninfo.com.cn/shgonggao/hsomarket/2026/20260602/3200eea157c746599457d32d822bc122.PDF
+- Market quote: config/input.json / Tencent qt.gtimg.cn / 20260731114323.
+
+[model_review]
+- Confirmed statement_model=ordinary_operating.
+- Reason: revenue comes from branded smart-home and drying-rack manufacturing/sales; no bank deposits, brokerage client funds, insurance reserves, real-estate presales, construction contract assets as primary model, concession rights, or holding-company economics.
+- Owner earnback applicability confirmed as applicable.
+
+[financial_extraction]
+- total_assets=3,547,225,769.38
+- total_liabilities=584,847,743.21
+- total_equity=2,962,378,026.17
+- parent_equity=2,564,319,480.38
+- minority_interest=398,058,545.79
+- revenue=1,543,547,996.13
+- cost_of_sales=790,625,558.52
+- gross_profit=752,922,437.61
+- operating_profit=232,738,200.81
+- net_profit=203,076,339.34
+- parent_net_profit=203,222,640.58
+- operating_cash_flow=215,190,002.68
+- capital_expenditure=118,551,134.47
+- operating_free_cash_flow=96,638,868.21
+- financing_cash_flow=-22,469,734.43
+- dividend_and_buyback_cash_out=84,534,410.26
+
+[owner_earnback]
+- Unrestricted cash = 206,354,165.09 - 9,734,921.22 = 196,619,243.87; 90% included.
+- Bank wealth products = 200,233,328.76; 95% included.
+- Large certificates of deposit = 141,577,635.63 + 203,702,465.74 = 345,280,101.37; 95% included.
+- Debt and lease liabilities = 195,621,568.25 + 2,519,512.95 = 198,141,081.20; 100% deducted.
+- Discounted detachable net cash = 497,053,996.9065.
+- Reported capex 118,551,134.47 less international-center annual addition 94,541,169.28 gives estimated maintenance/conventional capex 24,009,965.19.
+- Normalized cash profit before sustainability discount = 215,190,002.68 - 24,009,965.19 = 191,180,037.49.
+- 90% sustainability factor applied because revenue, net profit, and operating cash flow weakened.
+- Discounted sustainable cash profit = 172,062,033.741.
+- Operating business price = 5,167,000,000 - 497,053,996.9065 = 4,669,946,003.0935.
+- Owner earnback years = 27.1410601256.
+- Market cap / cash profit = 30.0298670640.
+
+[dividend]
+- Forecast/approved 2025 distribution = 80,481,302.20 based on CNY 0.20 per share and 402,406,511 shares.
+- Yield on input market cap = 1.5576021328%.
+
+[quality]
+- data_quality.status=complete.
+- Limitations recorded in result.json: local source package absent; SSE PDF anti-bot; valuation discounts and maintenance-capex split are analyst estimates; industry share not quantified.
+
+[validation]
+- Initial post-population validation:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[]

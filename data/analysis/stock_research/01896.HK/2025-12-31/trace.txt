@@ -1,0 +1,88 @@
+stock-research trace
+company=01896.HK MAOYAN ENT
+period=2025-12-31 annual
+generated_at=2026-08-04T13:38:39+08:00
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+mutation=protocol set/append only; result JSON not authored from scratch
+
+[reuse audit]
+No existing annual facts, normalized facts, raw filing metadata, or prior stock-research output existed for 01896.HK/2025-12-31.
+Downloaded official annual report PDF to stock_report/data/raw/filings/01896.HK/2025-12-31/annual-report-2025.pdf.
+Local pdftotext was unavailable; extraction used HKEX's parsed PDF text and page/line references.
+
+[model audit]
+input_hint=financial_brokerage/requires_special_model
+verified_model=ordinary_operating/applicable
+reason=Annual report revenue and accounting policies identify online ticketing commissions, entertainment content services, advertising and other services. No brokerage customer funds, proprietary securities trading, repo financing, or capital-market business structure exists. Ticket proceeds payable to cinemas/promoters are operating settlement liabilities.
+
+[primary sources]
+1. Maoyan Entertainment Annual Report 2025, HKEX, released 2026-04-28
+   https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042803187.pdf
+   pages 13-19: revenue mix, margins, adjusted profit, liquidity, capex
+   pages 108-115: audited income statement, balance sheet, cash flow
+   pages 127-131: revenue recognition and business economics
+   pages 178-181: EPS and dividends
+   pages 195-202: receivables, film rights/prepayments, cash, borrowings, payables
+   pages 212-213: cash generated from operations reconciliation
+2. Maoyan Entertainment annual results announcement for year ended 2025-12-31, HKEX, released 2026-03-26
+   https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032601936.pdf
+3. config/input.json market data: Tencent qt.gtimg.cn, 2026/08/03 09:47:59
+
+[reported figures CNY]
+revenue=4,631,482,000
+cost_of_sales=2,627,403,000
+gross_profit=2,004,079,000
+operating_profit=724,378,000
+net_profit=563,099,000
+parent_net_profit=563,649,000
+total_assets=12,724,503,000
+total_liabilities=3,431,866,000
+total_equity=9,292,637,000
+parent_equity=9,283,828,000
+operating_cash_flow=1,197,240,000
+capex=4,969,000+773,000=5,742,000
+operating_free_cash_flow=1,197,240,000-5,742,000=1,191,498,000
+
+[derived metrics]
+gross_margin=2,004,079,000/4,631,482,000=0.4327082017
+net_margin=563,649,000/4,631,482,000=0.1217001432
+
+[cash discount]
+cash_equivalents=2,138,935,000*0.80=1,711,148,000
+term_deposits=65,994,000*0.90=59,394,600
+restricted_deposits=47,360,000*0=0
+borrowings_and_lease_liabilities=(94,539,000+10,263,000)*-1=-104,802,000
+discounted_detachable_net_cash=1,665,740,600
+
+[sustainable cash profit]
+adjusted_net_profit=677,100,000
+less_share_based_compensation=25,100,000
+less_capex=5,742,000
+discounted_sustainable_cash_profit=646,258,000
+judgment=Use adjusted net profit as anchor but restore dilution cost and deduct capex. Do not annualize 2025 operating cash flow because working-capital release was material.
+
+[owner earnback]
+market_cap=4,464,268,783.259392
+operating_business_price=4,464,268,783.259392-1,665,740,600=2,798,528,183.259392
+owner_earnback_years=2,798,528,183.259392/646,258,000=4.3303575093
+market_cap_to_cash_profit=4,464,268,783.259392/646,258,000=6.9078739192
+discounted_net_cash_to_market_cap=1,665,740,600/4,464,268,783.259392=0.3731273095
+
+[dividend estimate]
+proposal=HKD0.22/share for FY2025
+weighted_average_shares=1,148,107,000
+approx_fx=0.90625 CNY/HKD, inferred from FY2024 disclosed HKD0.32 equivalent to RMB0.29
+estimate=0.22*1,148,107,000*0.90625≈229,000,000 CNY
+forecast_yield=229,000,000/4,464,268,783.259392=0.0512961945
+limitation=Actual record-date shares, FX, and scrip elections may differ.
+
+[quality]
+status=complete
+core statements, business model, asset/liability explanations, owner-earnback bridge, dividend estimate, risks, and evidence are present.
+validation_pending_after_report_creation=false

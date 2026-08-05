@@ -1,0 +1,66 @@
+stock-research trace
+company: 动力新科 (600841.SH)
+period: 2025-12-31
+run date: 2026-07-31 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md to apply the required reuse boundary.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All JSON mutations were made through protocol set/append commands; the result was not hand-written from scratch.
+
+2. Reused local evidence
+- Primary annual fact pack:
+  stock_report/data/analysis/annual_review/600841.SH/2025-12-31/facts.json
+- Human-readable fact summary:
+  stock_report/data/analysis/annual_review/600841.SH/2025-12-31/annual_facts.md
+- Extraction trace:
+  stock_report/data/analysis/annual_review/600841.SH/2025-12-31/extraction_trace.txt
+- Prior ROIC analysis was used only as supporting evidence:
+  stock_report/data/analysis/annual_review/600841.SH/2025-12-31/result.json
+- Raw official filing:
+  stock_report/data/raw/filings/600841.SH/2025-12-31/annual-report.pdf
+  sha256: 480a4355a68633e7bfb8d3f52585c6ecf77e3448817219930c648e1ef1afb3c6
+  official URL: https://static.cninfo.com.cn/finalpage/2026-03-28/1225047973.PDF
+- No duplicate filing download was performed.
+
+3. Additional filing verification
+- The annual fact pack covered the three statements, segment facts, asset/liability categories and profit/cash conversion.
+- The official PDF was additionally checked for the dividend proposal.
+- Annual report page 2 states that consolidated and parent-company retained earnings were both negative and the 2025 proposal was no dividend, no capitalization and no bonus shares, subject to shareholder approval.
+
+4. Model determination
+- Confirmed statement_model = ordinary_operating.
+- Confirmed owner_earnback_applicability = applicable.
+- Reason: the year-end continuing entity manufactures and sells diesel engines; receivables, inventory, plant/equipment and supplier payables are ordinary manufacturing operating assets and liabilities.
+- Special handling: SAIC Hongyan left the consolidation scope in December 2025. The 2025 income and cash-flow statements include its January-November activity, while the year-end balance sheet excludes it. One-off disposal gains were removed and 2025 cash flow was not annualized as steady state.
+
+5. Core calculations
+- Gross margin = 474,906,642.00 / 5,739,540,950.49 = 0.0827429660.
+- Reported net margin = 2,872,004,645.93 / 5,739,540,950.49 = 0.5003892595; explicitly marked as distorted by disposal gains.
+- Operating free cash flow reference = 519,062,459.91 - 157,227,526.24 = 361,834,933.67.
+- Required operating cash estimate = 5,374,549,059.66 * 25% = 1,343,637,264.92.
+- Excess cash = 4,040,057,634.05 - 1,343,637,264.92 = 2,696,420,369.14.
+- Discounted other non-current financial assets = 913,995,307.89 * 50% = 456,997,653.95.
+- Discounted other equity instruments = 30,395,434.34 * 50% = 15,197,717.17.
+- Financing lease liabilities deducted = 57,315,652.63.
+- Discounted detachable net cash = 2,696,420,369.14 + 456,997,653.95 + 15,197,717.17 - 57,315,652.63 = 3,111,300,087.62.
+- Discounted net cash / market cap = 3,111,300,087.62 / 8,063,000,000.00 = 0.3858737551.
+- Operating business price = 8,063,000,000.00 - 3,111,300,087.62 = 4,951,699,912.38.
+- Sustainable cash-profit proxy = reported 2025 deducted-nonrecurring parent net profit = -849,092,110.49.
+- Because the sustainable cash-profit denominator is not positive, owner_earnback_years and market_cap_to_cash_profit were set to null under the result contract.
+- Forecast cash dividend = 0; forecast dividend yield = 0.
+
+6. Judgment boundaries and limitations
+- The 25% operating-cash reserve is an estimate because the filing does not disclose minimum operating cash.
+- The 50% financial-investment haircuts are conservative judgments, not observable transaction prices.
+- Long-term equity investments were not treated as detachable cash because business linkage, dividend path and exit restrictions were not sufficiently resolved.
+- Positive 2025 operating free cash flow was not treated as sustainable cash profit because restructuring and working-capital release materially affected it.
+- Negative sustainable cash profit is evidence that a positive earnback denominator cannot yet be established; it is not a deterministic forecast of future losses.
+
+7. Validation
+- Ran:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[].

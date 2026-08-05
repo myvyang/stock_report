@@ -1,0 +1,77 @@
+stock-research trace
+generated_at=2026-08-03T13:16:59+08:00
+query=00321.HK
+archive_period=2025-12-31
+filing_period_end=2025-03-31
+
+[skill_and_contract]
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Read references/data-reuse.md because no annual facts package was present.
+
+[workspace_reuse]
+- config/input.json present.
+- No raw filing, annual facts, normalized facts, or prior stock-research result existed for 00321.HK/2025-12-31.
+- Downloaded HKEX annual report to temporary path /tmp/texwinca/annual2025.pdf for inspection; output evidence points to the permanent HKEX URL.
+
+[primary_sources]
+- HKEX 2025 annual report: https://www.hkexnews.hk/listedco/listconews/sehk/2025/0721/2025072100249.pdf
+- HKEX annual results announcement: https://www1.hkexnews.hk/listedco/listconews/sehk/2025/0612/2025061200155.pdf
+- PBOC HKD/CNY chart: https://wzdt.pbc.gov.cn/huilv/llChart4.jsp
+- Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026/07/31 16:08:44.
+
+[model_decision]
+- Input hint financial_brokerage rejected.
+- Annual report note 4 identifies knitted fabric/yarn/garment manufacturing and dyeing, casual apparel retail/distribution, franchise services, and property investment.
+- Selected statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+[currency]
+- Reporting currency: HKD.
+- Output currency required by contract: CNY absolute yuan.
+- Applied 2025-03-31 PBOC midpoint: 1 HKD = 0.92283 CNY.
+- Market cap was already supplied as CNY and was not converted.
+
+[core_extraction_hkd_thousand]
+revenue=5585488
+cost_of_sales=4265792
+gross_profit=1319696
+parent_net_profit=116068
+total_assets=6887651
+total_liabilities=2118482
+total_equity=4769169
+parent_equity=4764147
+cash_and_cash_equivalents=1633407
+bank_borrowings=846242
+lease_liabilities=417302
+operating_cash_flow=508967
+capital_expenditure=295279
+operating_free_cash_flow=213688
+
+[formula_checks]
+gross_margin=1319696/5585488=0.2362722827
+net_margin=116068/5585488=0.0207802792
+discounted_cash=1507356981.81*0.80=1205885585.45 CNY
+discounted_detachable_net_cash=1205885585.45-780937504.86-385098804.66=39849275.93 CNY
+discounted_sustainable_cash_profit=140000000 HKD*0.92283=129196200.00 CNY
+operating_business_price=1343203603.00-39849275.93=1303354327.07 CNY
+owner_earnback_years=1303354327.07/129196200.00=10.0882
+market_cap_to_cash_profit=1343203603.00/129196200.00=10.3966
+forecast_regular_dividend=1381700000 shares*0.02 HKD*0.92283=25501484.22 CNY
+forecast_dividend_yield=25501484.22/1343203603.00=0.0189856
+
+[judgment_notes]
+- Cash discounted to 80% for working-capital, cross-border transfer, and balance volatility.
+- Bank debt and lease liabilities deducted at 100%.
+- Investment property excluded from detachable cash despite potential realizable value.
+- Sustainable cash profit set at HKD140m using adjusted core earnings plus depreciation less capex as a cross-check; FY2025 free cash flow was not annualized because inventory reduction contributed HKD316.1m to operating cash flow.
+- Forecast dividend excludes HKD0.08/share anniversary special dividends and uses recurring HKD0.02/share.
+- Market cap date is later than the filing date; this mismatch is disclosed as a limitation.
+
+[protocol]
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields only through protocol set commands.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok; errors: none.

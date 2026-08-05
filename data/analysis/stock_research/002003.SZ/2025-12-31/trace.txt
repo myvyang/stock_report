@@ -1,0 +1,55 @@
+stock-research trace
+company=002003.SZ 伟星股份
+period=2025-12-31
+generated_for_input=2026-08-01T02:09:39+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar fields with protocol set and list fields with protocol append.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[reuse audit]
+- No existing annual facts, normalized facts, raw filing, or prior stock-research result was present for 002003.SZ/2025-12-31.
+- Existing stock_report/data/notes/user_stock_evaluations.md was not used for core financial facts.
+
+[primary source]
+- Zhejiang Weixing Industrial Development Co., Ltd. 2025 Annual Report, announcement 2026-009.
+- URL: https://static.cninfo.com.cn/finalpage/2026-04-17/1225112913.PDF
+- Saved PDF: stock_report/data/raw/filings/002003.SZ/2025-12-31/annual-report-2025.pdf
+- Extracted searchable text: stock_report/data/raw/filings/002003.SZ/2025-12-31/annual-report-2025.txt
+
+[market source]
+- Market cap CNY 12,650,000,000; PE TTM 19.85; timestamp 20260731114336.
+- Source supplied by config/input.json: Tencent qt.gtimg.cn.
+
+[model decision]
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Basis: apparel-accessory manufacturing and direct sales; balance sheet mainly contains industrial fixed assets, inventory, receivables, ordinary operating payables, and bank debt. No special-model customer funds, insurance reserves, regulated presale cash, concession rights, or holding-company look-through structure.
+
+[formula checks]
+- gross_profit = 4,800,314,902.13 - 2,782,528,503.50 = 2,017,786,398.63
+- gross_margin = 2,017,786,398.63 / 4,800,314,902.13 = 0.42034458983819295
+- net_margin = 644,598,106.67 / 4,800,314,902.13 = 0.1342824626742671
+- operating_free_cash_flow = 1,134,512,903.69 - 871,313,695.13 = 263,199,208.56
+- discounted_detachable_net_cash = 0
+- operating_business_price = 12,650,000,000 - 0 = 12,650,000,000
+- owner_earnback_years = 12,650,000,000 / 600,000,000 = 21.083333333333332
+- market_cap_to_cash_profit = 12,650,000,000 / 600,000,000 = 21.083333333333332
+- forecast_dividend_yield = 592,444,826.50 / 12,650,000,000 = 0.046833583122529644
+
+[judgment log]
+- Discounted detachable net cash set to zero. Cash CNY 1,215,608,844.47 includes CNY 290,887,009.10 restricted to fundraising projects and CNY 19,008,312.49 guarantee deposits; bank borrowings due within one year total CNY 1,023,160,217.85. The residual after those constraints is negative.
+- Sustainable cash profit set to CNY 600,000,000. Starting point was recurring parent profit CNY 628,571,380.04, conservatively reduced for FX volatility, overseas ramp risk, maintenance-capex uncertainty, and minority interests.
+- Full-capex FCF CNY 263,199,208.56 was retained as a downside cross-check, not used as the central sustainable figure, because 2025 capex included land, factories, and capacity expansion. The annual report does not split maintenance and growth capex.
+- Forecast dividend uses 2025 attributable-year total cash distribution: interim CNY 116,888,965.30 plus annual proposal CNY 475,555,861.20. This is a flat-run-rate assumption, not company guidance.
+
+[limitations]
+- Maintenance versus growth capex is not separately disclosed.
+- Annual dividend proposal status in the annual report was pending shareholder approval.
+- Tencent market snapshot was supplied by the task and not independently reconstructed from exchange tick data.

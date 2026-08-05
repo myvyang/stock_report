@@ -1,0 +1,106 @@
+task=stock_research
+query=GNTX
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-04T19:43:01+08:00
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+mutation=protocol set/append commands only; result JSON was not authored from a blank object
+
+[reuse_check]
+configured_raw_filing_dir=stock_report/data/raw/filings/GNTX/2025-12-31
+configured_annual_review_dir=stock_report/data/analysis/annual_review/GNTX/2025-12-31
+result=missing
+decision=return to original filing and official investor-relations disclosures
+
+[identity_and_model]
+company=Gentex Corporation
+ticker=GNTX
+CIK=0000355811
+SEC_accession=0000355811-26-000010
+filing_date=2026-02-24
+period=2025-12-31
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=89% of 2025 revenue came from manufactured automotive products; receivables, inventory, PP&E and trade payables are ordinary manufacturing operating items; investments are not matched to financial-customer liabilities
+
+[sources]
+1=https://www.sec.gov/Archives/edgar/data/355811/000035581126000010/gntx-20251231.htm | Gentex 2025 Form 10-K | primary source for business, financial statements, segments, customers, acquisitions and risks
+2=https://ir.gentex.com/node/5931 | Gentex dividends/splits | company source for declared dividends
+3=https://www.irs.gov/individuals/international-taxpayers/yearly-average-currency-exchange-rates | IRS yearly average rates | 2025 USD/CNY=7.129 and 2024 USD/CNY=7.189
+4=config/input.json | Yahoo Finance yfinance snapshot supplied by task | market_cap, date and PE TTM
+
+[currency]
+output_currency=CNY
+output_unit=yuan
+translation_rate_2025=7.129 CNY/USD
+translation_policy=all 2025 filing amounts, including balance-sheet values, translated at one annual-average rate for internal comparability
+limitation=balance sheet does not use closing rate; market cap retains the supplied CNY value and may embed another rate
+
+[reported_usd_2025]
+revenue=2534268965
+cost_of_sales=1667560025
+gross_profit=866708940
+operating_profit=473935754
+net_profit=384682077
+parent_net_profit=384841367
+total_assets=2928592834
+total_liabilities=437660897
+parent_equity=2487829724
+operating_cash_flow=587126291
+capital_expenditure=129088778
+operating_free_cash_flow=458037513
+cash_dividends_paid=106860563
+share_repurchases=315499459
+
+[formula_checks]
+gross_margin=866708940/2534268965=0.3419956413
+net_margin=384841367/2534268965=0.1518549816
+operating_free_cash_flow=587126291-129088778=458037513 USD
+dividend_and_buyback_cash_out=(106860563+315499459)*7.129=3011004597 CNY
+
+[discounted_cash]
+cash=145645715*7.129=1038308302 CNY; discount=0.80; discounted=830646642
+short_term_investments=5386566*7.129=38400829 CNY; discount=0.90; discounted=34560746
+long_term_investments=272975939*7.129=1946045469 CNY; discount=0.50; discounted=973022735
+short_term_debt=3795925*7.129=27061149 CNY; deduction=100%; discounted=-27061149
+discounted_detachable_net_cash=1811168973 CNY
+
+[sustainable_cash_profit]
+2023_fcf_usd=537249592-183678460=353571132
+2024_fcf_usd=498213220-144669002=353544218
+2025_fcf_usd=587126291-129088778=458037513
+three_year_average_fcf_usd=388384288
+three_year_average_stock_comp_usd=(39197422+39539362+36649818)/3=38462201
+post_stock_comp_usd=349922087
+selected_sustainable_cash_profit_usd=350000000
+selected_sustainable_cash_profit_cny=350000000*7.129=2495150000
+rationale=normalize working-capital volatility, treat stock compensation as an owner cost, round conservatively; acquisition purchase cash excluded from recurring capex
+
+[owner_earnback]
+market_cap=33568298778.83203
+operating_business_price=33568298778.83203-1811168973.1411=31757129805.690933
+owner_earnback_years=31757129805.690933/2495150000=12.7275433564
+market_cap_to_cash_profit=33568298778.83203/2495150000=13.4534191447
+discounted_net_cash_to_market_cap=1811168973.1411/33568298778.83203=0.0539547442
+
+[dividend_forecast]
+assumption=annualized 0.48 USD/share based on 2026 declared quarterly rate of 0.12 USD
+shares=215445024 at 2025-12-31
+forecast_cash_dividend=0.48*215445024*7.129=737235637 CNY
+forecast_dividend_yield=737235637/33568298778.83203=0.021962258
+warning=board declaration is discretionary; this is a run-rate estimate, not guidance
+
+[quality]
+status=complete
+known_limitations=missing local fact pack; uniform average-rate translation; supplied market valuation not independently rebuilt; 2025 includes nine months of VOXX while 2024 does not
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok; errors=[]
+cross_checks=margin formulas, free-cash-flow formula, operating-business-price formula and earnback formula all passed

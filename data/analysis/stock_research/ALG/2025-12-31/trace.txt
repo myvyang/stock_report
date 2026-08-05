@@ -1,0 +1,76 @@
+stock-research trace
+company=Alamo Group Inc. (NYSE: ALG)
+period=2025-12-31
+generated_for_input=2026-08-05T01:04:19+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated scalar/object/list fields only through protocol set/append commands.
+4. Validated with protocol validate; final expected status: ok.
+
+[reuse audit]
+Configured annual facts, normalized facts and raw filing directories were absent in /workspace and /root/aicode at research time.
+No prior stock-research result was reused.
+Research therefore returned to primary public filings.
+
+[primary sources]
+SEC 2025 Form 10-K, accession 0000897077-26-000016, filed 2026-03-02:
+https://www.sec.gov/Archives/edgar/data/897077/000089707726000016/alg-20251231.htm
+Company annual-report rendering used for business/MD&A cross-check:
+https://www.sec.gov/Archives/edgar/data/897077/000089707726000045/alamoannualreport_10-k20.htm
+Alamo Group 2026 dividend releases:
+https://www.alamo-group.com/2026-press-release/
+Federal Reserve G.5A annual FX rates (2025 USD/CNY=7.1875):
+https://www.federalreserve.gov/releases/g5a/current/
+Market snapshot: config/input.json, Yahoo Finance yfinance, market cap date 2026-08-03.
+
+[model audit]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: equipment manufacturing and distribution; balance sheet consists of ordinary cash, receivables, inventory, PP&E, goodwill/intangibles, operating payables and corporate debt. No customer funds, regulated project cash, insurance reserves, concession rights, or financial balance-sheet model.
+
+[currency]
+Contract requires CNY absolute yuan.
+All USD filing amounts converted at 7.1875 CNY/USD, the Federal Reserve 2025 annual average.
+This is a presentation conversion. A separate period-end rate was not used for balance-sheet items; limitation is recorded in result.json.
+
+[reported 2025 USD facts]
+USD thousands unless noted:
+revenue=1,603,715; cost_of_sales=1,205,898; gross_profit=397,817; operating_profit=151,613; net_income=103,801.
+total_assets=1,606,616; total_liabilities=457,913; equity=1,148,703; minority_interest=0.
+operating_cash_flow=177,543; capex=30,627; operating_free_cash_flow=146,916; financing_cash_flow=-30,794.
+dividends_paid=14,415; buybacks=3,022; combined=17,437.
+cash=309,659; total_debt=205,748; accounts_receivable=276,866; inventory=383,252.
+Vegetation revenue=654,053, operating income=22,968.
+Industrial revenue=949,662, operating income=128,645.
+
+[formulas]
+gross_margin=397817/1603715=0.24805966147351619
+net_margin=103801/1603715=0.06472534084921573
+reported_net_cash=(309659-205748)*1000*7.1875=746,860,312.50 CNY
+discounted_detachable_net_cash=reported_net_cash*50%=373,430,156.25 CNY
+
+FCF 2023=(131154-37745)=93,409 USD thousand
+FCF 2024=(209778-24993)=184,785 USD thousand
+FCF 2025=(177543-30627)=146,916 USD thousand
+three_year_average_FCF=(93409+184785+146916)/3=141,703.333333 USD thousand
+three_year_average_SBC=(7424+9141+9938)/3=8,834.333333 USD thousand
+discounted_sustainable_cash_profit=(141703.333333-8834.333333)*85%*1000*7.1875=811,746,546.875 CNY
+
+market_cap=13,062,374,016.537964 CNY
+operating_business_price=market_cap-373430156.25=12,688,943,860.287964 CNY
+owner_earnback_years=12688943860.287964/811746546.875=15.631657330895829
+market_cap_to_cash_profit=13062374016.537964/811746546.875=16.091690277987013
+
+forecast annual dividend per share=USD 0.34*4=USD 1.36
+forecast shares=12,121,294 (10-K cover, 2026-02-20)
+forecast dividend=1.36*12121294*7.1875=118,485,648.85 CNY
+forecast dividend yield=118485648.85/13062374016.537964=0.009070759166747799
+
+[judgment boundaries]
+Facts: audited financial statement values, segment values, product/channel descriptions, declared dividends.
+Inference: ordinary operating model; Industrial division is the current profit engine.
+Judgment: 50% haircut to reported net cash; three-year FCF normalization; SBC deduction; 15% sustainability haircut.
+No target price, trading recommendation, or leaderboard label produced.

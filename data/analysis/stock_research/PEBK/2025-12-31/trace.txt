@@ -1,0 +1,64 @@
+PEBK stock-research trace
+generated_for_period=2025-12-31
+task_created_at=2026-08-04T19:45:46+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked configured raw filing, annual review, normalized facts, and prior stock research paths.
+- No PEBK 2025 files existed under the configured stock_report paths, so no annual facts package or historical research result was reusable.
+
+3. Primary sources obtained and checked
+- SEC Form 10-K, accession 0001654954-26-002154, filed 2026-03-11, period 2025-12-31:
+  https://www.sec.gov/Archives/edgar/data/1093672/000165495426002154/pebk_10k.htm
+- SEC annual report Exhibit 13 with audited statements and MD&A:
+  https://www.sec.gov/Archives/edgar/data/1093672/000165495426002154/pebk_ex13.htm
+- SEC filing index and XBRL instance/companyfacts used to cross-check statement values:
+  https://www.sec.gov/Archives/edgar/data/1093672/000165495426002154/0001654954-26-002154-index.htm
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0001093672.json
+- SEC 2026 Q2 earnings release, filed as 8-K Exhibit 99(a) on 2026-07-20, used only for latest operating and dividend context:
+  https://www.sec.gov/Archives/edgar/data/1093672/000165495426006729/pebk_ex99a.htm
+- Year-end translation rate: USD/CNY 7.0288 on 2025-12-31, CFETS central parity; Federal Reserve H.10 used as an official cross-check:
+  https://www.federalreserve.gov/releases/h10/20251229/
+- Market cap, market-cap date, source, and PE TTM were used unchanged from config/input.json.
+
+4. Model decision
+- Input hint ordinary_operating/applicable was rejected after primary-source review.
+- PEBK is a bank holding company whose operations are conducted principally through Peoples Bank.
+- Deposits fund loans and securities; cash is required for liquidity and regulation. These are operating financial assets/liabilities, not detachable cash and ordinary working-capital liabilities.
+- Set statement_model=financial_bank and owner_earnback_applicability=requires_special_model.
+- Kept every ordinary owner-earnback sorting field null, per result contract.
+
+5. Key USD facts before CNY translation
+- Total assets 1,702,148,000; liabilities 1,545,030,000; shareholders' equity 157,118,000.
+- Net loans 1,194,262,000; securities and other investments 379,958,000; cash and cash equivalents 58,105,000.
+- Deposits 1,509,225,000; junior subordinated debentures 15,464,000.
+- Net interest income 59,017,000; noninterest income 30,980,000; noninterest expense 63,209,000; pretax earnings 25,850,000; net earnings 19,830,000.
+- Net interest margin 3.57%; ROA 1.17%; ROE 13.33%.
+- ACL-loans 10,126,000 / total loans 0.84%; nonaccrual loans 4,176,000 / total loans 0.35%; ACL/nonaccrual 242.48%; net charge-offs/average loans 0.05%.
+- Company CET1 13.83%; Tier 1 risk-based 14.96%; total risk-based 15.82%; leverage 11.33%.
+- 2025 dividends declared 5,247,000 and 0.96 per share.
+- 2026 H1 cash dividends 0.59 per share; 2026 Q2 dividend 0.21 per share.
+
+6. Translation and forecast conventions
+- All financial statement amounts in result.json are CNY absolute yuan using USD amount * 7.0288.
+- 2026 dividend scenario: 0.59 already reported for H1 + 0.21 for each of Q3 and Q4 = 1.01 USD/share.
+- Forecast cash dividend = 1.01 * 5,459,441 shares * 7.0288 = approximately CNY 38,757,100.
+- Forecast yield = 38,757,100 / 1,544,057,527.0569763 = 0.0251008.
+- The forecast includes a potentially special H1 dividend and is explicitly marked as a scenario, not guidance.
+
+7. Protocol mutation and validation
+- Populated outputs/result.json through repeated protocol `set` calls after protocol initialization; did not construct the full result object manually.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].
+
+8. Important limitations
+- Financial statements use the 2025 year-end FX rate while input market cap reflects a 2026-08-03 market date and upstream conversion; cross-date FX movement can slightly affect valuation comparisons.
+- Revenue, gross margin, operating cash flow, capex, and ordinary free cash flow are null because they do not have comparable economic meaning for this bank model.
+- No buy/sell advice or target price was produced.

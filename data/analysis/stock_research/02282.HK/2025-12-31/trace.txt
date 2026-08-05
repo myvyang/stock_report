@@ -1,0 +1,70 @@
+stock-research trace — 02282.HK — period 2025-12-31
+generated for input created_at: 2026-08-04T18:20:35+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as explicitly requested.
+- Read references/data-reuse.md because the skill routes reuse decisions through that reference.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All result mutations were made with protocol `set` or `append`; result.json was not authored from scratch.
+
+2. Reuse audit
+- No files existed under the input-provided annual-review, normalized-facts, or raw-filing paths.
+- Therefore no prior annual fact pack or research result could support the task.
+
+3. Primary filing retrieval
+- Located the 2025 annual report on the issuer investor-relations page and HKEX title search.
+- Downloaded official HKEX PDF:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0330/2026033000784.pdf
+  local: stock_report/data/raw/filings/02282.HK/2025-12-31/annual-report-2025.pdf
+- Extracted the 283-page PDF to local text using pypdf in a temporary virtual environment because pdftotext was unavailable:
+  local: stock_report/data/raw/filings/02282.HK/2025-12-31/annual-report-2025.txt
+- Used issuer 2025 results release as operational cross-check:
+  https://cn.mgmchinaholdings.com/media-releases?item=840
+
+4. Model override
+- Input hint said financial_brokerage. This was rejected as factually wrong.
+- Annual report pp.24–28 confirms that MGM China owns and operates MGM MACAU and MGM COTAI and depends on a 2023–2032 Macau gaming concession.
+- Selected statement_model=utility_concession and owner_earnback_applicability=requires_special_model.
+- Rationale: the concession has a fixed end date; properties and cash support the concession operation; the contract includes MOP19.7bn investment commitments and a MOP5bn minimum net asset requirement; year-end net debt was HK$13.879bn.
+- Consequently every ordinary owner-earnback sorting field remains null, per result contract.
+
+5. Financial extraction (reported currency HK$000)
+- Annual report p.155: revenue 34,787,468; operating profit 6,709,200; attributable profit 5,074,768.
+- Annual report pp.156–157: total assets 29,673,625; total liabilities 26,426,166; total equity and parent equity 3,247,459; no non-controlling interest.
+- Annual report pp.159–160: operating cash flow 8,737,668; property/equipment purchases 1,566,447; financing cash flow -8,091,452; dividends paid 2,148,158; share repurchases 558,218.
+- Annual report p.192: casino revenue 30,471,812; food/beverage 2,524,195; rooms 1,471,561; retail/other 319,900.
+- Annual report p.203: 2025 interim dividend 1,194,800 and recommended final dividend 1,341,400.
+- Annual report pp.214–215 and p.243: cash 4,396,610; pledged deposits 680,000; borrowings 18,955,647; trade receivables 1,414,926; concession payable 1,610,519.
+- Annual report does not report cost of sales/gross profit on a comparable basis; expenses are presented by nature, so gross profit and margin remain null.
+
+6. Currency and calculations
+- Result contract requires CNY absolute yuan.
+- Used 2025-12-31 CFETS/PBOC central parity of 1 HKD = CNY0.90322, cross-checked through:
+  https://www.ce.cn/xwzx/gnsz/gdxw/202512/t20251231_2676993.shtml
+- Conversion formula: HK$000 × 1,000 × 0.90322.
+- Net margin = 5,074,768 / 34,787,468 = 0.1458791999463715.
+- Simplified operating FCF = (8,737,668 - 1,566,447) × 1,000 × 0.90322 = CNY6,477,190,231.62.
+- Forecast dividend cash = (1,194,800 + 1,341,400) × 1,000 × 0.90322 = CNY2,290,746,564.
+- Forecast dividend yield = 2,290,746,564 / 36,746,105,930.45175 = 0.06233984543384344.
+- Forecast means static run-rate from dividends declared for FY2025, not management guidance for FY2026.
+
+7. Market data
+- Reused supplied snapshot without alteration:
+  market cap CNY36,746,105,930.45175;
+  PE TTM 8.42;
+  date 2026/08/03 09:47:51;
+  source Tencent qt.gtimg.cn.
+
+8. Quality decisions
+- data_quality.status=complete because special-model minimum fields, explained asset/liability rows, dividend basis, business story, evidence, market snapshot, and model rationale are present.
+- Limitations recorded: no comparable gross margin; FX translation; dividend is a static basis; no annual breakdown of remaining concession investment commitment, preventing a robust cumulative cash-to-2032 model.
+
+9. Validation
+- Ran:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result:
+  {"status":"ok","errors":[]}
+- Cross-file spot check confirmed: model=utility_concession; all ordinary owner-earnback fields=null; revenue, profit, cash flow, dividend amount/yield and market snapshot agree between result.json, report.md and this trace.
+- Workspace is not a Git repository, so no Git diff/status evidence is available; direct file and protocol checks completed normally.

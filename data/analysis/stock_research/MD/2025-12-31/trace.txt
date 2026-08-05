@@ -1,0 +1,57 @@
+Stock research trace — MD / Pediatrix Medical Group, Inc.
+Generated for period: 2025-12-31 annual
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local-data reuse check
+- Checked the paths declared in config/input.json under stock_report/data/raw/filings/MD/2025-12-31 and stock_report/data/analysis/annual_review/MD/2025-12-31.
+- Those filing/fact directories were absent, so no local annual fact pack or prior research result was available for reuse.
+
+3. Primary sources obtained and checked
+- SEC Form 10-K filing, accession 0001193125-26-058074, filed 2026-02-19, period 2025-12-31:
+  https://www.sec.gov/Archives/edgar/data/893949/000119312526058074/md-20251231.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/893949/000119312526058074/0001193125-26-058074-index.html
+- SEC Companyfacts XBRL for CIK 0000893949:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0000893949.json
+- Federal Reserve H.10 release for the last available 2025 year-end business-day USD/CNY observation, 2025-12-26, 7.0063 CNY per USD:
+  https://www.federalreserve.gov/releases/h10/20251229/
+- Market cap, date, source and PE were retained from config/input.json: CNY 14,690,746,563.77417 at 2026-08-03, Yahoo Finance yfinance, PE TTM 12.868933.
+
+4. Financial extraction (Form 10-K amounts in USD thousands)
+- Balance sheet: assets 2,246,696; liabilities 1,380,842; parent/total equity 865,854; cash 375,241; short-term investments 124,482; receivables net 229,665; goodwill 1,260,732; PP&E net 39,180; debt and finance leases 597,338 gross presentation across current/non-current balance-sheet lines (owner cash bridge uses DebtInstrumentCarryingAmount 596,875 from XBRL to avoid lease-classification duplication).
+- Income statement: revenue 1,913,849; practice salaries and benefits 1,340,874; practice supplies and other operating expense 79,272; operating income 208,813; net/parent income 165,388.
+- Cash flow: CFO 271,091; PP&E purchases 18,458; derived operating FCF 252,633; financing cash flow -107,494; repurchases 86,683.
+- Research gross profit is derived as revenue less practice salaries/benefits and practice supplies/other operating expenses: USD 493,703 thousand. It is not a company-reported GAAP subtotal.
+- All statement amounts were multiplied by 7.0063 to conform to the result contract's CNY absolute-yuan requirement.
+
+5. Model and owner-earnback decisions
+- Model confirmed ordinary_operating because the single reporting segment sells physician services; its balance sheet is not itself a banking, insurance, development, concession or investment-holding business.
+- Detachable net cash = cash + short-term investments - debt carrying amount = USD -97.152 million = CNY -680,676,057.60.
+- Sustainable cash-profit bridge:
+  adjusted net income USD 174.172m
+  + D&A USD 21.827m
+  - capex USD 18.458m
+  = USD 177.541m pre-haircut
+  - 10% steady-state haircut USD 17.7541m
+  = USD 159.7869m = CNY 1,119,514,957.47.
+- The haircut addresses payer/reimbursement, physician compensation, contract renewal and working-capital normalization. It is an analyst judgment, explicitly disclosed as such.
+- Operating business price = market cap - discounted net cash = CNY 15,371,422,621.37417.
+- Owner earnback = operating business price / discounted sustainable cash profit = 13.7304308 years.
+- Market cap / discounted sustainable cash profit = 13.1224210.
+- Dividend forecast is zero because the issuer paid no cash dividend in 2023-2025 and made no recurring dividend commitment. Repurchases are separately disclosed and not counted as dividends.
+
+6. Protocol population and validation
+- Populated scalar fields with protocol `set` and list rows with protocol `append`; the initialized JSON was not replaced by a hand-written complex object.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok; errors [].
+
+7. Known limitations
+- The supplied market cap is already in CNY but its conversion details were not supplied. Financial statements use the stated Federal Reserve year-end rate, so cross-date FX can slightly affect valuation ratios.
+- GAAP gross profit is unavailable; the stated margin is a clearly labeled research contribution-margin proxy.
+- Sustainable cash profit and its 10% haircut are estimates, not issuer guidance.

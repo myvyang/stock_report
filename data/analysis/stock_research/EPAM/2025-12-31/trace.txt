@@ -1,0 +1,59 @@
+2026-08-04 stock-research trace: EPAM FY2025
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- references/result-contract.md
+- references/report-contract.md
+
+2. Initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: initialized stock-research-result-v1 skeleton.
+
+3. Reuse check
+- Expected raw filing, annual facts, normalized facts and prior stock-research files were absent.
+- Only stock_report/data/notes/user_stock_evaluations.md existed; no EPAM-specific reusable facts found.
+
+4. Primary sources consulted
+- SEC Form 10-K: https://www.sec.gov/Archives/edgar/data/1352010/000135201026000015/epam-20251231.htm
+  Accession 0001352010-26-000015; filed 2026-02-26; period 2025-12-31.
+- Federal Reserve G.5A: https://www.federalreserve.gov/releases/g5a/current/
+  2025 average USD/CNY = 7.1875.
+- PBOC-authorized CFETS central parity, Xinhua mirror:
+  https://www1.xinhuanet.com/20251231/fe9f6466f6884589b5287e6ee946baed/c.html
+  2025-12-31 USD/CNY = 7.0288.
+- Market cap and PE: config/input.json, Yahoo Finance yfinance.
+
+5. Financial extraction (USD thousands from 10-K)
+- Revenue 5,457,056; cost of revenues 3,883,535; operating income 520,003; net income 377,678.
+- Assets 4,902,136; liabilities 1,224,328; equity 3,677,808; parent equity 3,677,226.
+- CFO 654,934; capex 42,243; financing cash flow -651,200; repurchases 662,159.
+- Cash 1,296,077; short-term investments approximately 6,100; debt 25,034.
+- SBC 176,764.
+
+6. Conversion
+- Income statement and cash flow: USD x 7.1875.
+- Balance sheet: USD x 7.0288.
+- Market cap input treated as CNY absolute yuan per result contract.
+
+7. Owner earnback judgment
+- Model confirmed ordinary_operating/applicable.
+- Gross profit defined as revenue less disclosed cost of revenues exclusive of D&A.
+- Detachable cash: retain USD300m operating cash; 85% haircut excess cash; 90% short investments; subtract 100% debt.
+- Sustainable cash profit: CFO - capex - SBC = CNY 3,133,225,312.5.
+- Discounted net cash CNY 5,813,671,247.76.
+- Operating business price CNY 31,401,036,919.61.
+- Earnback 10.021953 years; market cap/cash profit 11.877444.
+
+8. Dividend forecast
+- Forecast 0 because 10-K states no historical cash dividends and none anticipated in foreseeable future.
+- Repurchases discussed separately and not treated as forecast dividend.
+
+9. Protocol population and validation
+- All result.json mutations performed with protocol set commands after init.
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}.
+
+10. Known limitations
+- Mixed average/year-end FX means translated CNY statements do not preserve cross-statement identities.
+- Market data was supplied and not independently reproduced.
+- Sustainable cash profit uses one fiscal year; operating cash reserve and haircuts are analyst judgments.

@@ -1,0 +1,91 @@
+stock-research trace
+company=欧福蛋业
+code=920371.BJ
+period=2025-12-31
+generated_at=2026-08-03T11:39:58+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields through repeated protocol set commands; did not hand-write the complex JSON from scratch.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse-check]
+Requested annual facts, normalized facts, extraction trace, and raw filing paths were absent under /workspace at task start.
+No prior stock-research result for 920371.BJ/2025-12-31 was available for reuse.
+Therefore the research returned to the original annual filing.
+
+[sources]
+Primary filing: 欧福蛋业2025年年度报告, announcement 2026-008, disclosed 2026-04-24 on the Beijing Stock Exchange; retrieved from the CNINFO official disclosure mirror:
+https://dataclouds.cninfo.com.cn/sjother2/bse_onmarket/2026/20260424/17e25f1a3fd711f18649fa163e296ac0.pdf
+Local retained copy: stock_report/data/raw/filings/920371.BJ/2025-12-31/annual-report-2025.pdf
+Dividend evidence: 2025 annual report, annual dividend proposal, and 2025 annual dividend implementation announcement.
+Market data: config/input.json; Tencent qt.gtimg.cn snapshot dated 20260731153820.
+
+[identity-and-model]
+The filing identifies the issuer as 苏州欧福蛋业股份有限公司, security code 920371.
+Business facts: purchases eggs and manufactures/sells egg liquid, egg powder, and prepared egg products, all through direct sales.
+Balance sheet facts: production fixed assets, receivables, inventory, cash; no period-end bank loans; liabilities are predominantly ordinary operating liabilities.
+Conclusion: statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+
+[financial-extraction]
+All values CNY absolute yuan, consolidated statements, FY2025:
+revenue=905219834.31
+cost_of_sales=689893439.14
+gross_profit=215326395.17
+operating_profit=109935830.99
+net_profit=86544086.12
+parent_net_profit=86544086.12
+total_assets=754670278.15
+total_liabilities=136901683.48
+total_equity=617768594.67
+parent_equity=617768594.67
+minority_interest=0
+operating_cash_flow=120430869.54
+capital_expenditure=102788716.99
+operating_free_cash_flow=17642152.55
+financing_cash_flow=-22016270.81
+dividend_cash_out=20544553.60
+
+[formula-checks]
+gross_profit = 905219834.31 - 689893439.14 = 215326395.17
+gross_margin = 215326395.17 / 905219834.31 = 0.2378719278
+net_margin = 86544086.12 / 905219834.31 = 0.0956067099
+operating_free_cash_flow = 120430869.54 - 102788716.99 = 17642152.55
+forecast_dividend = 205445536 shares * CNY 0.10/share = 20544553.60
+forecast_dividend_yield = 20544553.60 / 1444000000 = 0.0142275302
+
+[owner-earnback-assumptions]
+Cash and bank deposits are unrestricted, but not all cash is detachable because the business must fund egg purchases, payroll, taxes, and receivables.
+Cash breakdown:
+  cash=111596211.01 at 100%
+  structural_deposit=20000000 at 95% => 19000000
+  minimum_operating_cash=-72000000 (analyst assumption, about 8% of annual revenue)
+  lease_debt=-3580802.75 at 100%
+  rounding=-15408.26
+discounted_detachable_net_cash=55000000
+
+Profit normalization:
+  2025 parent net profit=86544086.12
+  2025 adjusted parent net profit=85247537.88
+  2023-2025 parent-net-profit mean=(43161415.83+45599946.13+86544086.12)/3=58435149.36
+  The 2025 filing attributes the margin expansion mainly to lower egg input prices; egg liquid and egg powder margins rose 8.27 and 5.29 percentage points.
+  discounted_sustainable_cash_profit=60000000, rounded near the three-year mean after a cycle discount to 2025 adjusted profit.
+
+operating_business_price=1444000000-55000000=1389000000
+owner_earnback_years=1389000000/60000000=23.15
+market_cap_to_cash_profit=1444000000/60000000=24.0666666667
+discounted_net_cash_to_market_cap=55000000/1444000000=0.0380886427
+
+[quality-and-limitations]
+status=complete because identity, model, three statements, asset/liability explanations, dividend, business story, evidence, and owner-earnback fields are present.
+No independent annual-facts package existed; extraction was performed directly from the filing.
+No independently verified exact market-share figure was found, so the report attributes qualitative industry-position claims to the company filing.
+The CNY 72m operating-cash reserve and CNY 60m sustainable cash profit are analyst assumptions and are the main valuation sensitivities.
+
+[validation]
+protocol_validate_status=ok
+protocol_validate_errors=[]

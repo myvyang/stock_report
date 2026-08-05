@@ -1,0 +1,83 @@
+stock-research trace
+company=阳光电源
+code=300274.SZ
+period=2025-12-31
+generated_for_input=2026-07-31T15:07:14+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md in full.
+- Read references/report-contract.md in full.
+- Read references/data-reuse.md in full because the skill requires reuse of existing annual facts when sufficient.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reused local sources
+- stock_report/data/analysis/annual_review/300274.SZ/2025-12-31/result.json
+  Reused verified NOPAT, financing debt, excess cash, separable wealth-management products, operating cash flow, capex and formula limitations.
+- stock_report/data/analysis/annual_review/300274.SZ/2025-12-31/report.md
+  Reused the ROIC review's pairing logic and explanation of necessary operating cash.
+- stock_report/data/raw/filings/300274.SZ/2025-12-31/metadata.json
+  Confirmed official filing URL, source type and local PDF hash.
+
+3. Filing gap fill
+- Existing annual review did not contain all stock-research contract fields.
+- Read the existing local official PDF; no new filing was downloaded.
+- PDF: stock_report/data/raw/filings/300274.SZ/2025-12-31/annual-report.pdf
+- Official URL: https://static.cninfo.com.cn/finalpage/2026-04-01/1225066678.PDF
+- Checked annual report pages 8-10 for headline financials; pages 27-35 for business and revenue mix; pages 43-44 for risks; pages 55-56 for dividends; pages 105-115 for the three statements; pages 196-204 and 229 for notes used by the annual review.
+
+4. Analysis model
+- Confirmed statement_model=ordinary_operating.
+- Confirmed owner_earnback_applicability=applicable.
+- Reason: product R&D/manufacturing, system delivery and project development drive the economics. Project assets and contract liabilities are operating items, not detachable cash. The company has project-development characteristics but does not require a real-estate, construction-project or concession model for the consolidated business.
+
+5. Key calculations (CNY)
+- gross_profit = 89,184,357,325.77 - 60,795,459,298.16 = 28,388,898,027.61
+- gross_margin = 28,388,898,027.61 / 89,184,357,325.77 = 0.3183170107276982
+- net_margin = 13,461,279,955.37 / 89,184,357,325.77 = 0.1509376796448623
+- operating_fcf = 16,917,778,579.11 - 3,008,018,823.60 = 13,909,759,755.51
+- discounted_detachable_net_cash
+  = excess cash 4,535,208,936.435001
+  + wealth-management products 10,480,152,637.81 * 0.90
+  - financing debt 8,074,769,130.91
+  = 5,892,577,179.554001
+- discounted_sustainable_cash_profit
+  = verified NOPAT 13,542,647,878.437845 * 0.85
+  = 11,511,250,696.672169
+- operating_business_price
+  = market cap 219,138,000,000 - discounted net cash 5,892,577,179.554001
+  = 213,245,422,820.44598
+- owner_earnback_years
+  = 213,245,422,820.44598 / 11,511,250,696.672169
+  = 18.524956882582178
+- market_cap_to_cash_profit
+  = 219,138,000,000 / 11,511,250,696.672169
+  = 19.036854098169492
+- forecast_cash_dividend
+  = 2025 interim implemented 1,949,898,142.95
+  + 2025 second-half annual-report proposal 1,416,448,050.09
+  = 3,366,346,193.04
+- forecast_dividend_yield
+  = 3,366,346,193.04 / 219,138,000,000
+  = 0.015361763788297785
+
+6. Judgment boundaries
+- Fact: the annual report numbers and disclosed business mix.
+- Inference: ordinary-operating model applicability and the economic meaning of operating assets/liabilities.
+- Judgment: 90% haircut value for explicit wealth-management products and 85% sustainable-profit factor.
+- The 85% factor is used because maintenance versus growth capex is not disclosed, financial income cannot be perfectly paired to detachable assets, and overseas/storage/project/quality-warranty outcomes can vary.
+- No buy/sell recommendation, target price or ranking label was produced.
+
+7. Data limitations
+- Wealth-management income is not separately disclosed from other financial-asset gains.
+- Capex is not split between maintenance and growth.
+- 2025 second-half dividend was still a proposal in the annual report.
+- Shipment and industry-position statements are mainly company disclosures; independent global market-share data was not obtained.
+
+8. Protocol operations and validation
+- Populated initialized fields using protocol `set`.
+- Added assets, liabilities, cash haircuts, profit adjustments, dividend history, risks and evidence using protocol `append`.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[].

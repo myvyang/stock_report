@@ -1,18 +1,19 @@
-Task: stock research output for 01051.HK 国际资源
+Task: stock research output for 01051.HK G-RESOURCES
 Period: 2025-12-31 annual
+Created from input: 2026-08-03T12:03:56+08:00
 Timezone: Asia/Shanghai
-Created: 2026-07-27
 
-Protocol:
-- Read /workspace/.agents/skills/stock-research/SKILL.md.
-- Read /workspace/.agents/skills/stock-research/references/result-contract.md.
-- Read /workspace/.agents/skills/stock-research/references/report-contract.md.
-- Read /workspace/.agents/skills/stock-research/references/data-reuse.md.
-- Initialized outputs/result.json with:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- Filled the initialized skeleton, preserving the stock-research-result-v1 structure.
+Protocol and contracts read:
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
 
-Input files read:
+Protocol initialization:
+- PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All result sections were populated with protocol `set`; the JSON was not authored from an empty object.
+
+Sources read and reused:
 - config/input.json
 - stock_report/data/analysis/annual_review/01051.HK/2025-12-31/facts.json
 - stock_report/data/analysis/annual_review/01051.HK/2025-12-31/annual_facts.md
@@ -25,57 +26,50 @@ Input files read:
 - stock_report/data/analysis/stock_research/01051.HK/2025-12-31/trace.txt
 
 Reuse decision:
-- Annual fact pack was sufficiently clear for business, statements, asset/liability categories and cash-flow conversion.
-- Existing stock_research files were reused only as historical research evidence and owner earnback clues.
-- No separate owner_earnback directory existed in this workspace, so the reusable stock_research output/report were used to recover the discounted net cash line and then formulas were recalculated under the current protocol.
+- The annual fact pack was sufficient for company identity, business segments, statements, asset/liability categories, cash conversion and dividend facts.
+- The prior stock-research result was used only as a cross-check and source trail. Its ordinary discounted-net-cash treatment was rejected under the current result contract because investment assets are the company's business and ordinary earnback fields must be null for a special model.
+- No new filing download was required.
 
-Key source facts:
-- Annual report source: HKEXnews 2026042800512.pdf.
-- Reporting currency/unit: USD'000.
-- Revenue: USD 31,059k.
-- Profit before taxation: USD 99,698k.
-- Profit attributable to owners: USD 98,671k.
-- Operating cash flow: USD 8,680k.
-- Capital expenditure: USD 5k.
-- Cash and cash equivalents: USD 498,422k.
-- Time deposits over three months: USD 152,000k.
-- Bank trust accounts: USD 32,974k, treated as customer money and excluded from detachable cash.
-- FVTPL financial assets: USD 663,792k.
-- Debt instruments at amortised cost: USD 246,040k.
-- Investment properties: USD 48,400k.
-- Perpetual notes at FVTOCI: USD 3,187k.
-- Total liabilities: USD 37,435k, with no bank borrowings.
-- Dividend: HKD 0.18 per share for 2025, payout ratio 10.5%; equity movement recognized USD 6.9m dividend payable.
+Analysis-model decision:
+- Input hint: financial_brokerage / requires_special_model.
+- Final: platform_financial_mixed / requires_special_model.
+- Evidence: 2025 segment revenue was USD 2.813m financial services, USD 27.292m principal investment, and USD 0.954m real property. Principal investment was about 88% of segment revenue. Assets are dominated by cash, deposits, financial investments and property, while licensed brokerage introduces customer-fund and regulatory-liquidity constraints.
+- Consequence: discounted net cash, discounted cash profit, operating business price, owner earnback years and market-cap-to-cash-profit are all null.
 
-Currency and valuation:
-- USD/CNY conversion rate used: 7.1875.
-- Rate source carried from reusable research: Federal Reserve G.5A / FRED annual exchange rate table, 2025 Chinese Yuan Renminbi to One U.S. Dollar.
-- Input market cap used without refresh: CNY 3,455,000,000 as of 2026-07-24 from config/input.json.
+Key source facts (USD thousand):
+- Revenue 31,059; parent net profit 98,671.
+- FVTPL and perpetual-note fair-value gain 77,245.
+- Total assets 1,707,141; total liabilities 37,435; parent equity 1,669,706.
+- Operating cash flow 8,680; capital expenditure 5; pre-working-capital operating cash 1,204.
+- Cash and equivalents 498,422; deposits over three months 152,000; customer trust accounts 32,974.
+- FVTPL assets 663,792; amortized-cost debt instruments 246,040; investment property 48,400; FVTOCI perpetual notes 3,187.
+- Accounts and other payables 36,840; bank borrowing nil.
+- Dividend recognized USD 6.9m; HKD 0.18 per share; payout ratio 10.5%.
 
-Owner earnback calculations:
-- Reused discounted detachable net cash clue: USD 584,663,450.
-- Converted discounted detachable net cash: CNY 4,202,268,546.88.
-- Operating business price: CNY 3,455,000,000.00 - CNY 4,202,268,546.88 = CNY -747,268,546.88.
-- Discounted net cash to market cap: 1.216286120658466.
-- Discounted sustainable cash profit: null.
-- Owner earnback years: null.
-- Market cap to cash profit: null.
-- Reason: profit is dominated by investment fair value changes, and returns from assets whose principal has already been deducted cannot be double-counted as operating cash profit.
+Currency conversion:
+- USD/CNY 7.1875, carried from the annual 2025 Federal Reserve G.5A / FRED table.
+- All monetary result fields are CNY absolute yuan.
 
-Data gaps:
-- No parent/subsidiary split of cash, deposits or listed securities.
-- No disclosed absolute minimum liquid capital requirement for licensed financial subsidiaries.
-- No ordinary cost of sales or gross profit structure.
-- No public borrower names or underlying collateral loan portfolio quality for the three fintech borrowers.
-- Market cap was not refreshed from live market data.
+Market input used without refresh:
+- Market cap CNY 3,125,951,684.2865944.
+- Timestamp 2026/07/31 16:08:42.
+- Source Tencent qt.gtimg.cn.
+- PE TTM 4.73.
 
-Output files:
-- outputs/result.json
-- outputs/report.md
-- outputs/trace.txt
+Calculated checks:
+- Net margin = 709,197,812.5 / 223,236,562.5 = 3.1768891465. This ratio is mechanically correct but economically non-comparable because fair-value gains are outside revenue.
+- Forecast dividend yield = 49,593,750 / 3,125,951,684.2865944 = 0.0158647506.
+- Market cap / closing parent equity = 3,125,951,684.2865944 / 12,001,011,875 = approximately 0.26047.
+- Parent profit / closing parent equity = 709,197,812.5 / 12,001,011,875 = approximately 0.05909; not presented as strict average-equity ROE.
 
-Validation:
-- Ran:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-- Result:
-  {"status": "ok", "errors": []}
+Known limitations:
+- No entity-level split for cash, deposits or securities.
+- No absolute regulatory minimum liquid-capital disclosure.
+- No ordinary gross-profit structure.
+- Limited portfolio look-through, segment profit detail and borrower collateral data.
+- No full three-year average-equity ROE series.
+
+Final validation command:
+- PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}
+- Additional null-field assertion passed for all ordinary owner-earnback metrics under the special model.

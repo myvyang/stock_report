@@ -1,0 +1,62 @@
+stock-research trace
+company: Financial Street Property Co., Limited / 01502.HK
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No annual facts, normalized facts, metadata, or prior stock-research result existed for 01502.HK/2025-12-31.
+- Downloaded official annual report to stock_report/data/raw/filings/01502.HK/2025-12-31/2025-annual-report.pdf.
+- Official URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0416/2026041601916.pdf
+
+3. Model verification
+- Input hint said financial_brokerage, but source tags said property management.
+- Annual report pp.55 and 86 confirms property management and related services.
+- Overrode hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+4. Primary evidence extracted
+- Income statement: annual report p.80.
+- Balance sheet: annual report pp.81-82.
+- Cash flow: annual report pp.84-85.
+- Business/revenue mix and operating scale: annual report pp.9-17 and note 6 pp.116-117.
+- Goodwill: annual report pp.140-141.
+- Trade receivables and ageing: annual report pp.143-144.
+- Cash, term deposits, restricted deposits: annual report p.147.
+- Dividend proposal and historical dividends: annual report pp.4, 56, 121.
+- AGM approval and payment details: HKEX announcement dated 2026-06-12, pp.2-3.
+  URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0612/2026061201492.pdf
+- Market cap and PE: config/input.json, Tencent qt.gtimg.cn snapshot dated 2026-08-03 09:20:05.
+
+5. Calculations (RMB yuan)
+- gross_margin = 283,740,000 / 1,999,238,000 = 0.1419240731
+- net_margin = 107,350,000 / 1,999,238,000 = 0.0536954580
+- capex = PPE purchases 5,724,000 + intangible purchases 118,000 = 5,842,000
+- operating_free_cash_flow = 156,336,000 - 5,842,000 = 150,494,000
+- discounted_sustainable_cash_profit = 150,494,000 * 80% = 120,395,200
+- dividend = 0.145 * 373,500,000 shares = 54,157,500
+- forecast_dividend_yield = 54,157,500 / 642,644,103.3482552 = 0.0842729276
+- discounted cash = (1,509,025,000 + 117,166,000) * 50% = 813,095,500
+- restricted deposits 69,080,000 assigned 0% and excluded
+- lease liabilities = 11,190,000 + 22,667,000 = 33,857,000
+- discounted_detachable_net_cash = 813,095,500 - 33,857,000 = 779,238,500
+- operating_business_price = 642,644,103.3482552 - 779,238,500 = -136,594,396.65174484
+- owner_earnback_years = -136,594,396.65174484 / 120,395,200 = -1.1345501868
+- market_cap_to_cash_profit = 642,644,103.3482552 / 120,395,200 = 5.3377884114
+
+6. Judgment flags
+- 50% cash haircut is a research judgment covering PRC transfer constraints, deposits at a related finance company, and operating working-capital needs.
+- 80% FCF retention is a research judgment covering receivable impairment, acquisition goodwill impairment, and annual working-capital volatility.
+- Negative earnback years is the mechanical protocol formula and means discounted cash exceeds market cap; it is not a claim that cash is immediately distributable.
+
+7. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields using protocol set and append commands only.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation expected status: ok, errors: [].

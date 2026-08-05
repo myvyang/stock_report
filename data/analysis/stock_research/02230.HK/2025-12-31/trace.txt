@@ -1,0 +1,65 @@
+stock-research trace
+generated_at=2026-08-04T12:38:53+08:00
+company=MEDIALINK GROUP (02230.HK)
+input_period=2025-12-31
+effective_filing_period=year ended 2026-03-31
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No raw filing, annual facts package, normalized facts, or historical stock-research result existed under the input paths.
+- Returned to primary sources.
+
+3. Primary sources consulted
+- HKEX title search for stock 02230.
+- Medialink Group Limited 2026 Annual Report, published 2026-07-30:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0730/2026073000388.pdf
+- Company business overview:
+  https://www.medialink.com.hk/en/AboutUs.aspx
+- Market-cap snapshot and PE TTM from config/input.json, source Tencent qt.gtimg.cn, as of 2026/08/03 09:41:44.
+
+4. Model verification
+- Input hint financial_brokerage rejected.
+- Filing reports only media content distribution and brand licensing segments.
+- No customer funds, proprietary securities portfolio, repo financing, brokerage revenue, or external interest-bearing borrowings.
+- Final model: ordinary_operating; owner earnback applicable.
+
+5. Period handling
+- Input calendar period does not match issuer fiscal year-end.
+- Latest audited annual report available at task date covers year ended 2026-03-31 and includes 2025 comparative figures.
+- Used FY2026 audited annual report as the effective filing period and disclosed this limitation.
+
+6. Currency handling
+- Filing currency: HKD thousands.
+- Result contract currency: CNY yuan.
+- Applied simplified translation rate HKD 1 = CNY 0.91 to filing amounts.
+- Market cap was reused directly from normalized input.
+
+7. Key reported facts (HKD)
+- Revenue 641,613,000; gross profit 314,179,000; parent profit 55,900,000.
+- Total assets 990,433,000; liabilities 348,191,000; equity 642,242,000.
+- Cash 241,150,000; licensed assets 327,251,000; trade receivables 310,805,000.
+- Operating cash flow -51,410,000.
+- PPE capex 1,867,000; intangible capex 3,802,000; operating FCF -57,079,000.
+- Dividends paid 28,375,000; FY2026 declared/proposed DPS 1.47 HK cents.
+
+8. Owner earnback assumptions
+- Cash haircut: 50%, because cash supports licensed assets, receivables and expansion while current-year OCF is negative.
+- Deducted 100% of lease liabilities.
+- Sustainable cash profit: 65% of FY2026 parent profit, reflecting working-capital absorption and licensed-asset impairment risk.
+- Discounted detachable net cash CNY 96,916,820.
+- Discounted sustainable cash profit CNY 33,064,850.
+- Operating business price CNY 256,107,286.84.
+- Owner earnback 7.745675 years; market cap/cash profit 10.676786.
+
+9. Protocol operations
+- Initialized outputs/result.json using:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields with repeated protocol set commands; complex result object was not hand-written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]

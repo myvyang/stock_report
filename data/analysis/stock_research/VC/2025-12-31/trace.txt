@@ -1,0 +1,93 @@
+task=stock_research
+company=Visteon Corporation
+ticker=VC
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-04T19:29:24+08:00
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+set=protocol CLI used for all completed result sections
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[reuse_check]
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+prior_stock_research=missing
+decision=return_to_primary_filing
+
+[primary_sources]
+sec_10k=https://www.sec.gov/Archives/edgar/data/1111335/000111133526000006/vc-20251231.htm
+sec_accession=0001111335-26-000006
+filing_period=2025-12-31
+earnings_release=https://investors.visteon.com/investors/investor-news/news-details/2026/Visteon-Delivers-Record-Gross-Margin-and-Adjusted-EBITDA-in-2025/default.aspx
+market_snapshot=config/input.json (Yahoo Finance yfinance, 2026-08-03)
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=single Electronics operating segment selling automotive electronic products and engineering services; ordinary manufacturing working-capital and fixed-asset structure
+
+[currency]
+filing_currency=USD
+output_currency=CNY
+fx_assumption_usd_cny=7.20
+note=research conversion assumption, not a claimed historical spot rate
+
+[core_usd_millions]
+revenue=3768
+cost_of_sales=3236
+gross_profit=532
+operating_profit_derived=322
+net_income=213
+parent_net_income=201
+total_assets=3386
+total_liabilities=1735
+total_equity=1651
+parent_equity=1568
+minority_interest=83
+operating_cash_flow=410
+capital_expenditure_including_intangibles=133
+operating_free_cash_flow=277
+financing_cash_flow=-116
+
+[owner_earnback_usd_millions]
+cash_and_equivalents=771
+less_joint_venture_partner_cash=104
+less_operating_cash_reserve=200
+less_foreign_cash_friction=47
+less_interest_bearing_debt=301
+discounted_detachable_net_cash=119
+operating_free_cash_flow=277
+less_nci_dividend=21
+less_sustainability_buffer=6
+discounted_sustainable_cash_profit=250
+
+[formula_checks]
+gross_margin=532/3768=0.1411889597
+net_margin=201/3768=0.0533439490
+operating_free_cash_flow=(410-133)*7.2m=1994400000
+discounted_net_cash=119*7.2m=856800000
+cash_profit=250*7.2m=1800000000
+operating_business_price=18831913708.60547-856800000=17975113708.60547
+owner_earnback_years=17975113708.60547/1800000000=9.9861742826
+market_cap_to_cash_profit=18831913708.60547/1800000000=10.4621742826
+forecast_dividend=(0.375*4*26.8m)*7.2=289440000
+forecast_dividend_yield=289440000/18831913708.60547=0.0153696509
+
+[judgment_flags]
+operating_cash_reserve_usd_millions=200 (subjective conservative assumption)
+foreign_cash_haircut=20% of permanently reinvested USD235m (subjective friction allowance)
+sustainable_cash_profit_usd_millions=250 (2025 FCF less NCI distribution and rounding buffer)
+forecast_dividend=annualized Q1 2026 declared rate; not guaranteed
+
+[quality]
+status=complete
+known_limitations=FX assumption; market snapshot later than filing period; subjective cash/profit haircuts; annualized dividend forecast
+no_buy_sell_recommendation=true

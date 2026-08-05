@@ -1,0 +1,60 @@
+RCMT stock research trace
+generated_at: 2026-08-04T21:14:47+08:00
+
+1. Read required skill and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+   - No usable files existed under the configured raw filing, annual review, or normalized facts paths.
+   - Initialized outputs/result.json with the protocol CLI from config/input.json.
+
+3. Primary evidence retrieved
+   - SEC Form 10-K, accession 0001437749-26-011236, filed 2026-04-03, fiscal year ended 2026-01-03.
+   - SEC Companyfacts API for CIK 0000700841 for cross-checking standardized XBRL values.
+   - Federal Reserve H.10 annual RMB/USD series: 2025 average 7.1875 CNY per USD.
+   - Market cap, date, source, and PE were reused exactly from config/input.json.
+
+4. Period treatment
+   - Input normalized period: 2025-12-31.
+   - Legal fiscal year end: 2026-01-03; fiscal 2025 had 53 weeks.
+   - Financial statements in the result are the legal FY2025 figures, not a fabricated calendar-year adjustment.
+
+5. Currency treatment
+   - All USD filing amounts multiplied by 7.1875 for protocol-required CNY absolute yuan presentation.
+   - This is an analytical translation for comparability, not the issuer's accounting translation.
+
+6. Key source values (USD)
+   - Revenue 319.404m; cost of services 231.461m; gross profit 87.943m.
+   - Operating income 25.093m; net income attributable to parent 16.334m.
+   - CFO 18.965m; capex 1.595m; FCF 17.370m; financing cash flow -19.038m.
+   - Assets 134.397m; liabilities 88.423m; equity 45.974m; no NCI.
+   - Cash 2.922m; revolving credit 24.673m; finance lease 1.223m.
+   - Stock-based compensation 3.732m; repurchases 7.359m; dividends 0.
+
+7. Model decision
+   - statement_model: ordinary_operating
+   - owner_earnback_applicability: applicable
+   - Reason: professional staffing/services economics; receivables, contract assets, payroll, deferred revenue, and debt are ordinary operating/funding items rather than a special financial-statement model.
+
+8. Owner earnback formulas
+   - Discounted detachable net cash = cash - revolving credit - finance lease
+     = (2.922 - 24.673 - 1.223)m USD * 7.1875 = -165,125,625 CNY.
+   - Discounted sustainable cash profit = CFO - capex - stock compensation
+     = (18.965 - 1.595 - 3.732)m USD * 7.1875 = 98,023,125 CNY.
+   - Operating business price = 1,353,032,115.8494263 - (-165,125,625)
+     = 1,518,157,740.8494263 CNY.
+   - Owner earnback years = 1,518,157,740.8494263 / 98,023,125
+     = 15.4877508838.
+   - Market cap / cash profit = 1,353,032,115.8494263 / 98,023,125
+     = 13.8031930307.
+
+9. Dividend forecast
+   - Forecast cash dividend 0 and yield 0.
+   - Basis: no dividends declared in FY2024 or FY2025; 10-K states no current plan for future dividends and credit agreement restricts dividends.
+
+10. Data quality and validation
+   - Complete: all ordinary-company minimum fields, asset/liability explanations, owner earnback breakdown, dividend forecast, business story, risks, and evidence populated.
+   - Protocol CLI validation passed after population.

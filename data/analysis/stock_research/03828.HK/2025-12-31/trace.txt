@@ -1,0 +1,65 @@
+stock-research trace
+generated_at=2026-08-04T12:42:06+08:00
+query=03828.HK
+period=2025-12-31
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+- No annual facts, normalized facts, raw filing metadata, or prior stock-research result existed for 03828.HK/2025-12-31 in the workspace.
+- Retrieved official 2025 annual report from HKEX:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0422/2026042200446.pdf
+- HKEX release date: 2026-04-22; audited statements approved 2026-03-26.
+
+4. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Annual report principal activities: manufacturing and trading hospitality supplies; trading OS&E; manufacturing and trading health care and hygienic products.
+- No brokerage customer money, proprietary securities book, or repo financing found.
+- Overrode hint with ordinary_operating / applicable.
+
+5. Primary extracted facts (annual report amounts HK$'000)
+- Revenue 2,238,747; cost of sales 1,754,075; gross profit 484,672; operating profit 120,732.
+- Net profit 98,621; parent net profit 100,735.
+- Total assets 2,004,007; total liabilities 690,086; total equity 1,313,921; parent equity 1,375,140; NCI -61,219.
+- Cash 418,365; pledged deposit 11,664; receivables net 639,223; inventory 290,291.
+- Borrowings 11,595; lease liabilities 10,986; loans from NCI 17,003.
+- Operating cash flow 205,757; PPE capex 30,383; intangible capex 968; financing cash flow -92,459; dividends paid 72,340.
+- 2025 dividend 7 HK cents/share; payout ratio 50.4%.
+
+6. Currency conversion
+- Protocol requires CNY absolute yuan.
+- Applied research conversion assumption HKD/CNY=0.92 uniformly.
+- Limitation recorded: no split between closing and annual-average exchange rates.
+
+7. Calculations
+- gross_margin=484,672/2,238,747=0.2164952.
+- net_margin=100,735/2,238,747=0.0449960.
+- operating_free_cash_flow=(205,757-30,383-968)*1,000*0.92=CNY160,453,520.
+- discounted cash=418,365,000*0.92*70%=CNY269,427,060.
+- pledged deposit discount=0%.
+- financing deductions=(11,595+10,986+17,003)*1,000*0.92=CNY36,417,280.
+- discounted detachable net cash=CNY233,009,780.
+- sustainable cash profit=100,735,000*0.92*80%=CNY74,140,960.
+- operating business price=486,396,416.5341854-233,009,780=CNY253,386,636.5341854.
+- owner earnback years=253,386,636.5341854/74,140,960=3.4176.
+- market cap/cash profit=486,396,416.5341854/74,140,960=6.5604.
+- forecast dividend=100,735,000*50.4%*0.92=CNY46,708,805 (rounded); yield≈9.60%.
+
+8. Judgment separation
+- Facts: audited financials, segment mix, margins, cash flow, dividends, receivable provisions.
+- Inferences: margin compression indicates weak pricing/cost pressure; 2025 FCF includes working-capital release.
+- Subjective assumptions: 70% cash recognition, full financing deductions, 20% profit haircut, flat 7 HK cents dividend forecast.
+
+9. Populated via protocol CLI
+- config/populate_result.sh calls protocol set/append; result.json was not composed as a complex object by hand.
+
+10. Validation
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok

@@ -1,12 +1,13 @@
 stock-research trace for 600583.SH 海油工程, period 2025-12-31 annual
 
 Protocol and contracts
-- Read /workspace/.agents/skills/stock-research/SKILL.md.
-- Read /workspace/.agents/skills/stock-research/references/result-contract.md.
-- Read /workspace/.agents/skills/stock-research/references/report-contract.md.
+- Read /workspace/.agents/skills/stock-research/SKILL.md completely.
+- Read /workspace/.agents/skills/stock-research/references/result-contract.md completely.
+- Read /workspace/.agents/skills/stock-research/references/report-contract.md completely.
+- Read /workspace/.agents/skills/stock-research/references/data-reuse.md.
 - Initialized outputs/result.json with:
   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- Populated result fields through protocol set calls.
+- Populated result fields through protocol set and append calls, reusing verified annual facts and the prior research result as allowed by data-reuse.md.
 - Validated with:
   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
 
@@ -17,66 +18,61 @@ Local sources reused
 - stock_report/data/analysis/annual_review/600583.SH/2025-12-31/facts.json
 - stock_report/data/analysis/annual_review/600583.SH/2025-12-31/annual_facts.md
 - stock_report/data/analysis/annual_review/600583.SH/2025-12-31/extraction_trace.txt
+- stock_report/data/normalized/facts/600583.SH/2025-12-31/annual-facts.json
+- stock_report/data/analysis/stock_research/600583.SH/2025-12-31/result.json
+- stock_report/data/analysis/stock_research/600583.SH/2025-12-31/report.md
+- stock_report/data/analysis/stock_research/600583.SH/2025-12-31/trace.txt
 
-Primary filing identity
-- Report title: 海洋石油工程股份有限公司2025年年度报告
-- Primary URL: https://www.cnoocengineering.com/tzzgx/dqbg/ndbg/202603/P020260323570343235267.pdf
-- Source site: 海洋石油工程股份有限公司官网
-- Downloaded at: 2026-07-23T20:22:19+08:00
-- Local PDF recorded by metadata: /root/aicode/stock_report/data/raw/filings/600583.SH/2025-12-31/600583_2025_annual_report.pdf
+Primary filing
+- Title: 海洋石油工程股份有限公司2025年年度报告
+- URL: https://www.cnoocengineering.com/tzzgx/dqbg/ndbg/202603/P020260323570343235267.pdf
+- Site: 海洋石油工程股份有限公司官网
+- Local PDF: stock_report/data/raw/filings/600583.SH/2025-12-31/600583_2025_annual_report.pdf
 
-Key extraction references
-- Business and order intake: annual_facts.md; annual review trace says 2025年报第12页 disclosed market awards RMB 48.849bn.
-- Balance sheet: 2025 annual report text lines 3529-3650; facts.json statements.balance_sheet.
-- Income statement: 2025 annual report text lines 3748-3838; facts.json statements.income_statement.
-- Cash flow statement: 2025 annual report text lines 3860-3975; facts.json statements.cash_flow.
-- Cash flow reconciliation: 2025 annual report text lines 8578-8614.
-- Dividend proposal: 2025 annual report text lines 36-38 and 2028-2035.
-- Funds assets and restricted cash: annual_facts.md; facts.json asset_liability_categories.assets.funds_assets.
-- Liabilities by substance: facts.json asset_liability_categories.liabilities.
+Analysis model decision
+- statement_model = construction_project.
+- owner_earnback_applicability = applicable.
+- Reason: revenue is earned from project-based EPC and engineering services; receivables, contract assets, payables and contract liabilities are operating project balances. Ordinary owner earnback is retained only because money-like assets are largely verifiable deposits/CDs and explicit borrowing is low. Project assets are excluded from detachable cash, necessary operating cash is retained, and sustainable profit is discounted.
 
-Market data handling
-- config/input.json supplied market_cap.amount = RMB 25,069,000,000 but market_cap.date was blank and pe_ttm was null.
-- annual_review extraction_trace.txt records market cap source as stock_report rough_screen_row, quote_time=20260723161454, Tencent qt.gtimg.cn.
-- outputs/result.json therefore uses market_cap_date = 2026-07-23T16:14:54+08:00 and market_cap_source referencing that trace.
-- PE TTM was calculated as market cap / 2025 parent net profit = 25,069,000,000 / 2,084,436,100 = 12.0267539024.
+Market input
+- Market cap = RMB 25,069,000,000.
+- Snapshot time = 20260731114334.
+- Source = Tencent qt.gtimg.cn.
+- PE TTM = 12.65.
 
-Core calculations in yuan
-- Revenue = 2,716,343.32 万元 * 10,000 = 27,163,433,200.
-- Cost of sales = 2,340,154.01 万元 * 10,000 = 23,401,540,100.
-- Gross profit = 376,189.31 万元 * 10,000 = 3,761,893,100.
+Core annual facts and calculations, yuan
+- Revenue = 27,163,433,200.
+- Cost of sales = 23,401,540,100.
+- Gross profit = 3,761,893,100.
 - Gross margin = 3,761,893,100 / 27,163,433,200 = 0.1384910763.
-- Parent net profit = 208,443.61 万元 * 10,000 = 2,084,436,100.
+- Parent net profit = 2,084,436,100.
 - Net margin = 2,084,436,100 / 27,163,433,200 = 0.0767368427.
-- Operating cash flow = 359,373.11 万元 * 10,000 = 3,593,731,100.
-- Capital expenditure = 108,770.09 万元 * 10,000 = 1,087,700,900.
-- Operating free cash flow = 3,593,731,100 - 1,087,700,900 = 2,506,030,200.
-- 2025 dividend forecast = 866,585,540.80.
+- Operating cash flow = 3,593,731,100.
+- Capital expenditure = 1,087,700,900.
+- Operating free cash flow = 2,506,030,200.
+- Forecast dividend = 866,585,540.80.
 - Forecast dividend yield = 866,585,540.80 / 25,069,000,000 = 0.0345680139.
 
-Discounted net cash calculation
-- Money-like assets included before deductions:
-  - Cash and bank balances = 7,438,955,600.
-  - Less restricted cash = 111,539,500.
-  - Structured deposits = 9,494,292,300 at 95%.
-  - One-year current debt investments / CDs = 2,453,179,900 at 98%.
-  - Longer CDs and term deposits = 803,966,600 at 95%.
-- Deductions:
-  - Estimated necessary operating cash = 2,300,000,000, based on roughly one month of 2025 operating cash outflow.
-  - Interest-bearing borrowings = 220,006,700.
-  - CNOOC Fluor equity purchase payable = 859,000,000.
-  - Minority interest protection deduction = 2,035,818,000.
+Discounted detachable net cash
+- Cash less restricted cash: 7,327,416,100 at 100%.
+- Structured deposits: 9,494,292,300 at 95% = 9,019,577,685.
+- Current CDs: 2,453,179,900 at 98% = 2,404,116,302.
+- Longer CDs and term deposits: 803,966,600 at 95% = 763,768,270.
+- Necessary operating cash deduction: 2,300,000,000.
+- Interest-bearing borrowing deduction: 220,006,700.
+- CNOOC Fluor equity purchase payable deduction: 859,000,000.
+- Minority interest protection deduction: 2,035,818,000.
 - Discounted detachable net cash = 14,100,053,657.
 - Discounted net cash / market cap = 0.5624497849.
 
-Owner earnback calculation
-- Operating business price = market cap - discounted detachable net cash = 25,069,000,000 - 14,100,053,657 = 10,968,946,343.
-- Sustainable cash profit basis = deducted non-recurring parent net profit 1,844,875,300.
-- Applied 10% haircut due to project cash-flow volatility and undisclosed maintenance/growth capex split.
+Owner earnback
+- Deducted non-recurring parent net profit = 1,844,875,300.
+- 10% haircut for project cash-flow volatility and undisclosed maintenance/growth capex split.
 - Discounted sustainable cash profit = 1,660,387,770.
+- Operating business price = 25,069,000,000 - 14,100,053,657 = 10,968,946,343.
 - Owner earnback years = 10,968,946,343 / 1,660,387,770 = 6.6062558043.
-- Market cap to cash profit = 25,069,000,000 / 1,660,387,770 = 15.0982803252.
+- Market cap / discounted cash profit = 15.0982803252.
 
-Data quality notes
-- result.json is marked complete because identity, period, valuation timestamp/source, PE estimate, three-statement core fields, asset/liability explanations, owner-earnback fields, dividend forecast, business fields, evidence, and limitations are populated.
-- Limitations retained in result.json: missing direct input market date/PE, capex split not disclosed, necessary operating cash estimated, lease liability treatment judgmental.
+Data quality
+- status = complete; incomplete_reasons is empty.
+- Limitations: maintenance/growth capex is not split; necessary operating cash is estimated; lease treatment is judgmental; project settlement creates cash-flow volatility.

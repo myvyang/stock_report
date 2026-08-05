@@ -1,0 +1,66 @@
+stock-research trace
+company: 新兴铸管（000778.SZ）
+period: 2025-12-31 annual
+generated_for: 2026-07-31 task input
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read result-contract.md and report-contract.md in full.
+- Also read data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Expected annual facts, normalized facts, raw filing and prior stock-research paths were absent under stock_report.
+- Only stock_report/data/notes/user_stock_evaluations.md existed; it did not provide reusable company research facts for this task.
+- Therefore public filings had to be obtained and checked.
+
+3. Primary sources used
+- Full annual report: 新兴铸管股份有限公司2025年年度报告, 巨潮资讯网, disclosed 2026-04-10:
+  https://static.cninfo.com.cn/finalpage/2026-04-10/1225090852.PDF
+- Annual report summary and dividend proposal: 新兴铸管股份有限公司2025年年度报告摘要, 巨潮资讯网, disclosed 2026-04-10:
+  https://static.cninfo.com.cn/finalpage/2026-04-10/1225090851.PDF
+- Search/discovery cross-check: Sina-hosted rendered annual report, bulletin id 12074711. It was used to extract searchable filing text; all core figures were tied back to the official filing URL above.
+- Valuation snapshot: config/input.json, Tencent qt.gtimg.cn, market cap 15,297,999,999.999998 yuan as of 2026-07-31 11:42:57, PE TTM 15.19.
+
+4. Statement-model review
+- Annual-report revenue is entirely classified as metal products; products are ductile iron pipe/castings, ordinary steel, special steel and related products.
+- Balance sheet is characteristic of an ordinary heavy manufacturer: fixed assets, inventory, receivables, payables and interest-bearing debt.
+- No bank, brokerage, insurance, property-development, construction-project, concession or investment-holding structure was identified.
+- Result: statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+
+5. Core filing facts transcribed (CNY)
+- Revenue 37,022,353,505.97; cost of sales 34,173,554,663.54; gross profit 2,848,798,842.43; gross margin 7.6946%.
+- Operating profit 1,131,002,057.45; net profit 1,013,543,797.63; parent net profit 947,163,232.55; parent net margin 2.5584%.
+- Total assets 52,098,602,050.44; liabilities 22,946,738,343.02; equity 29,151,863,707.42; parent equity 26,375,389,739.30; minority interest 2,776,473,968.12.
+- Operating cash flow 3,527,917,147.21; capex cash paid 1,103,814,247.90; operating FCF 2,424,102,899.31.
+- Cash and cash equivalents 6,380,597,935.50; restricted cash and interest excluded from cash equivalents 1,162,825,715.69.
+- Interest-bearing debt: short-term borrowings 2,321,101,006.00 + long-term borrowings including current portion 7,491,586,950.05 + bonds including current portion 1,013,896,832.71 + lease liabilities including current portion 4,875,600.00 approximately = 10,831,460,386.01.
+- Long-term equity investments 4,216,626,848.49; other equity instrument investments 836,047,500.00.
+- 2025 dividend proposal: 3,963,182,285 shares * 0.075 yuan/share = 297,238,671.375; yield versus input market cap = 1.94298909%.
+
+6. Owner-earnback judgments
+- Available cash haircut: 50%. Reason: heavy manufacturing requires operating liquidity and 4,413,676,313.08 yuan was deposited with the group finance company.
+- Restricted cash haircut: 0% inclusion.
+- Long-term equity investments included at 30%; other equity instruments at 50%, because item-level realizable values and disposal paths were not sufficiently disclosed.
+- All interest-bearing debt deducted at 100%.
+- Discounted detachable net cash = 3,190,298,967.75 + 1,264,988,054.547 + 418,023,750.00 - 10,831,460,386.01 = -5,958,149,613.713.
+- Reported OCF benefited from working-capital net release: receivables decrease 1,289,389,424.87, less inventory increase 167,096,212.73 and payables decrease 475,745,889.02 = 646,547,323.12 net release.
+- FCF less that release = 1,777,555,576.19. Further haircut of 577,555,576.19 for cyclicality, minority attribution and maintenance-capex uncertainty gives selected discounted sustainable cash profit of 1,200,000,000.
+- Operating business price = 15,298,000,000 - (-5,958,149,613.713) = 21,256,149,613.713.
+- Owner earnback = 21,256,149,613.713 / 1,200,000,000 = 17.7135 years.
+- Market-cap/cash-profit = 15,298,000,000 / 1,200,000,000 = 12.7483.
+
+7. Quality limitations
+- Market snapshot was supplied by the task and not independently reconstructed from exchange close data.
+- Haircuts and sustainable cash profit are analytical scenarios, not issuer guidance.
+- Long-term investments were not valued line by line; conservative portfolio haircuts were used.
+- Dividend is a board proposal as disclosed in the annual report summary; final implementation may differ.
+
+8. Validation
+- result.json was populated with protocol `set` and `append` commands after protocol initialization; no complex result object was written from scratch.
+- Initial completed-result validation:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+  status: ok; errors: []
+- After arithmetic normalization of debt, net-cash and earnback fields, the same validation command was run again.
+  final status: ok; errors: []

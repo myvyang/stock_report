@@ -1,0 +1,85 @@
+stock-research trace
+company=利尔化学
+code=002258.SZ
+period=2025-12-31
+generated_for_task=2026-08-01
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the skill routes reuse decisions there.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields with protocol `set` commands; did not construct result.json by hand.
+6. Validated with protocol `validate`; initial completed result returned status=ok and errors=[].
+
+[reuse_check]
+- Expected annual facts, normalized facts, raw filing metadata and historical stock-research files were absent under /workspace/stock_report and /root/aicode/stock_report.
+- Therefore core facts were re-read from the public 2025 annual report.
+
+[primary_sources]
+- 利尔化学股份有限公司2025年年度报告, disclosed 2026-03-28.
+  Official PDF mirror discovered from disclosure page: http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESZ_STOCK/2026/2026-3/2026-03-28/12025903.PDF
+  Readable announcement text: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12025903&stockid=002258
+- 利尔化学股份有限公司关于2025年度中期分配预案的公告, 2025-08-28.
+  https://static.cninfo.com.cn/finalpage/2025-08-28/1224587084.PDF
+- Market-cap and PE snapshot was supplied by config/input.json: Tencent qt.gtimg.cn, timestamp 20260731114312.
+
+[model_classification]
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Evidence: 95.74% of revenue came from pesticides and intermediates; core assets are manufacturing plants, construction in progress, inventory and receivables. Deposits, insurance reserves, regulated presale funds or other special-model balances are not the business itself.
+
+[reported_financials_cny]
+revenue=9007754105.58
+cost_of_sales=7303939785.06
+gross_profit=1703814320.52
+operating_profit=721774144.95
+net_profit=580714772.49
+parent_net_profit=478767144.51
+operating_cash_flow=1296665107.94
+capital_expenditure=1083205059.16
+total_assets=16123592031.84
+total_liabilities=6869251116.32
+total_equity=9254340915.52
+parent_equity=7888606714.70
+minority_interest=1365734200.82
+
+[derived_metrics]
+gross_margin=(9007754105.58-7303939785.06)/9007754105.58=0.18914973705427238
+net_margin=478767144.51/9007754105.58=0.05315055660915743
+operating_free_cash_flow=1296665107.94-1083205059.16=213460048.78
+minority_interest_ratio=1365734200.82/9254340915.52=0.1475776841686904
+
+[owner_earnback]
+unrestricted_cash_and_equivalents=937262600.93
+transaction_financial_assets_mainly_term_deposits=171865902.78
+financing_liabilities=3456019191.50
+discounted_detachable_net_cash=937262600.93+171865902.78-3456019191.50=-2346890687.79
+market_cap=12247000000.00
+operating_business_price=12247000000.00-(-2346890687.79)=14593890687.79
+reported_operating_free_cash_flow=213460048.78
+sustainability_haircut=20%
+discounted_sustainable_cash_profit=213460048.78*0.8=170768039.024
+owner_earnback_years=14593890687.79/170768039.024=85.4603166447262
+market_cap_to_cash_profit=12247000000/170768039.024=71.71716715842119
+discounted_net_cash_to_market_cap=-2346890687.79/12247000000=-0.19162984304646036
+
+[judgment_notes]
+- Restricted monetary funds of 65,513,196.97 were excluded. Cash and cash equivalents of 937,262,600.93 were used instead of balance-sheet monetary funds.
+- Transaction financial assets were described in the filing as term deposits and counted at 100%.
+- Financing liabilities followed the filing's financing-liability reconciliation: short-term borrowings, long-term borrowings, lease liabilities, long-term payables and current maturities, total 3,456,019,191.50.
+- Trade payables, notes payable and contract liabilities were treated as operating obligations, not detachable cash or financing debt.
+- The 20% profit haircut is an analyst assumption, not a company-reported fact. It reflects agricultural-chemical cyclicality, falling product selling prices, continued expansion and possible one-year working-capital effects.
+
+[dividend]
+2025_interim_announced_cash_dividend=160087445.60
+2025_annual_proposed_cash_dividend=160087445.60
+forecast_cash_dividend=160087445.60
+forecast_dividend_yield=160087445.60/12247000000=0.013071564105495223
+- Forecast field uses the latest auditable annual proposal only; it does not assume the interim-plus-final pattern continues.
+
+[limitations]
+- No local annual fact pack or raw filing archive was supplied.
+- The market snapshot is later than the financial period and was accepted from task input without replacing it.
+- One-year free cash flow is not a normalized cycle average. The conservative haircut is explicit so later research can replace it with a multi-year maintenance-capex estimate.
+- Forecast dividend is based on an announced proposal, not forward management guidance.

@@ -1,0 +1,87 @@
+task: stock research 01755.HK, period 2025-12-31
+generated_at: 2026-08-04T11:41:05+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields using protocol set commands only; the complex JSON object was not authored from a blank file.
+5. Validated result with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[reuse_check]
+Checked configured annual-review, normalized-facts, raw-filing and prior stock-research paths. No reusable filing, facts package or prior result existed in /workspace; config/input.json was the only task file.
+
+[company_and_model]
+Input hint: financial_brokerage / requires_special_model.
+Override: ordinary_operating / applicable.
+Reason: 2025 annual report identifies revenue from property management, community-related value-added services and developer-related value-added services. There are no brokerage customer funds, repo financing or proprietary trading operations. Ordinary owner earnback is economically relevant, subject to unusually severe governance and cash-detachability discounts.
+
+[primary_sources]
+S1 2025 Annual Report, HKEX published 2026-07-15:
+https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0715/2026071501552.pdf
+Key pages: 4-5 business model; 9-10 financial and segment summary; 32 dividend; 101-109 auditor report; 110-116 primary statements; 213 trade receivables/ECL; 215-216 cash; 243-244 related-party balances.
+
+S2 2025 Results Announcement, HKEX published 2026-06-29:
+https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0629/2026062902585.pdf
+Used as announcement cross-check; annual report is the controlling source.
+
+S3 Independent Forensic Investigation Findings, HKEX published 2025-09-30:
+https://www1.hkexnews.hk/listedco/listconews/sehk/2025/0930/2025093002436.pdf
+Key fact: former auditor identified related-party fund transfers omitted from journal entries/financial statements and inconsistencies in bank statements provided to it.
+
+S4 Internal Control Review Findings, HKEX published 2025-12-31:
+https://www1.hkexnews.hk/listedco/listconews/sehk/2025/1231/2025123102769.pdf
+Key fact: control review identified deficiencies in risk-management/internal-control evaluation planning and approval processes; remediation was initiated.
+
+S5 Market snapshot supplied in config/input.json:
+market cap RMB2,098,899,729.9355268; date 2026/08/03 09:20:05; source Tencent qt.gtimg.cn; PE TTM 14.87.
+Limitation: shares had remained suspended since 2025-04-01, so this is a stale carried quote rather than contemporaneous price discovery.
+
+[financial_extraction_rmb]
+Revenue 4,665,521,000
+Cost of sales/services 3,731,998,000
+Gross profit 933,523,000
+Operating profit 174,595,000
+Net profit 156,780,000
+Parent net profit 148,156,000
+Total assets 5,637,552,000
+Total liabilities 3,469,769,000
+Total equity 2,167,783,000
+Parent equity 2,033,054,000
+NCI 134,729,000
+Operating cash flow 688,695,000
+PPE capex 24,218,000
+Intangible capex 356,000
+Total capex 24,574,000
+Operating free cash flow 664,121,000
+Cash equivalents 2,145,597,000
+Restricted cash 34,507,000
+Lease liabilities 15,545,000
+
+[formula_checks]
+gross_margin = 933,523,000 / 4,665,521,000 = 0.20008976489442443
+net_margin = 148,156,000 / 4,665,521,000 = 0.03175551026348397
+operating_free_cash_flow = 688,695,000 - 24,574,000 = 664,121,000
+minority_interest_ratio = 134,729,000 / 2,167,783,000 = 0.06215066803361067
+
+[owner_earnback_judgments]
+Unrestricted cash: 2,145,597,000 x 50% = 1,072,798,500.
+Restricted cash: zero credit.
+Financial assets, related-party loans and other receivables: zero credit.
+Lease liabilities: deduct 15,545,000 in full.
+Discounted detachable net cash = 1,072,798,500 - 15,545,000 = 1,057,253,500.
+Discounted net cash / market cap = 0.5037179646654566.
+Sustainable cash profit = 148,156,000, anchored to 2025 parent net profit. No uplift from free cash flow because working-capital timing, ECL and related-party lending impair distributability.
+Operating business price = 2,098,899,729.9355268 - 1,057,253,500 = 1,041,646,229.9355268.
+Owner earnback years = 1,041,646,229.9355268 / 148,156,000 = 7.030739422875394.
+Market cap / cash profit = 2,098,899,729.9355268 / 148,156,000 = 14.166822335481026.
+
+[dividend]
+Board did not recommend a 2025 final dividend and disclosed 2024 final dividend as nil. Forecast cash dividend set to 0 and forecast yield to 0 until a formal resumption is disclosed.
+
+[quality]
+status=complete because identity, period, market snapshot, model, three statements, asset/liability interpretation, dividend forecast, business story, evidence and formulas are populated and protocol validation passes.
+Important limitations are preserved in data_quality: stale suspended-market valuation, subjective 50% cash haircut, limited independent evidence on related-party collateral/recovery, and zero dividend based on the current board decision rather than a perpetual assumption.

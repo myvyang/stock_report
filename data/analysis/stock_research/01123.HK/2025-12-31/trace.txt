@@ -1,0 +1,75 @@
+stock-research trace
+generated_at=2026-08-03T12:05:34+08:00
+query=01123.HK
+input=config/input.json
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely as requested.
+3. Read references/data-reuse.md; no reusable annual facts, normalized facts, raw filing, or prior stock-research output existed.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields using repeated protocol `set` commands; did not hand-write the JSON object.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: {"status":"ok","errors":[]}
+
+[source acquisition]
+- Downloaded official HKEX FY2024/25 annual report:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2025/0710/2025071000213.pdf
+- Saved to stock_report/data/raw/filings/01123.HK/2025-12-31/annual-report-2024-25.pdf
+- Extracted text locally with pypdf into annual-report-2024-25.txt for searchable verification.
+- Reviewed HKEX issuer title search for FY2025/26 results and dividend announcement:
+  https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&market=SEHK&stockId=2527
+- Market valuation reused exactly from config/input.json: CNY 110127003.57377529 at 2026/07/31 16:08:47, source Tencent qt.gtimg.cn, PE TTM 16.9.
+
+[period decision]
+- Input period is 2025-12-31, but the issuer's statutory year end is 31 March.
+- Used audited FY2024/25 statements ended 2025-03-31, the relevant annual report published in 2025.
+- Kept protocol analysis.period unchanged at 2025-12-31 and disclosed the mismatch in data_quality.limitations and report.md.
+
+[model verification]
+- Input hint financial_brokerage was rejected.
+- Annual report principal activities: distribution/retail of photographic, skincare, consumer electronics, appliances and AV products; imaging/AV services; investment properties.
+- No brokerage customer funds, proprietary securities book, repo funding, or margin-finance structure.
+- Final model: ordinary_operating; owner earnback applicable with cash discounts.
+
+[financial extraction]
+Source: Annual Report 2024/25, HKD'000 unless stated.
+- Revenue 1,000,748; cost of sales 745,096; gross profit 255,652; operating profit 7,139.
+- Net loss 2,058; parent net loss 2,316.
+- Total assets 892,331; liabilities 217,615; equity 674,716; parent equity 674,888; NCI -172.
+- Operating cash flow 70,615; PPE purchases 17,395; intangible purchases 1,785; total capex 19,180.
+- Financing cash flow -62,237; shareholder dividends paid 11,853; lease principal paid 47,093.
+- Cash equivalents 210,043; >3 month unpledged deposits 28,771; inventories 173,639; investment properties 230,427.
+- Lease liabilities 66,787; current tax payable 10,148.
+- Company-disclosed adjusted parent net profit HKD 16.4m.
+
+[currency]
+- Protocol requires absolute CNY amounts; issuer reports in HKD.
+- Used a uniform research convenience rate of HKD 1 = CNY 0.925, referenced to HKMA daily exchange-rate framework.
+- Formula: reported HKD'000 * 1000 * 0.925.
+
+[owner earnback calculations]
+- Discounted cash equivalents = 210.043m HKD * 0.925 * 60% = CNY 116,573,865.
+- Discounted >3 month deposits = 28.771m HKD * 0.925 * 80% = CNY 21,290,540.
+- Less lease liabilities = 66.787m HKD * 0.925 = CNY 61,777,975.
+- Less current tax payable = 10.148m HKD * 0.925 = CNY 9,386,900.
+- Discounted detachable net cash = CNY 66,699,530.
+- Investment properties excluded from detachable net cash.
+- Adjusted profit base = 16.4m HKD * 0.925 = CNY 15,170,000.
+- Sustainability haircut 20%; discounted sustainable cash profit = CNY 12,136,000.
+- Operating business price = 110,127,003.57377529 - 66,699,530 = CNY 43,427,473.57377529.
+- Owner earnback years = 43,427,473.57377529 / 12,136,000 = 3.5784009207.
+- Market cap / cash profit = 110,127,003.57377529 / 12,136,000 = 9.0744070183.
+
+[dividend]
+- FY2024/25: no final dividend.
+- As known before the market-cap date, FY2025/26 proposed final dividend = HKD 0.0032/share.
+- Shares = 1,185,318,349.
+- Forecast cash dividend = 0.0032 * 1,185,318,349 * 0.925 = CNY 3,508,542.31304.
+- Forecast yield = 3,508,542.31304 / 110,127,003.57377529 = 0.03185905545.
+
+[quality]
+- status=complete because company identity, audited core statements, model, valuation, assets/liabilities, dividend basis, business story, evidence, and owner-earnback inputs are present.
+- Explicit limitations: non-calendar fiscal year; approximate uniform FX conversion; management-defined adjusted profit; IFRS 16 lease cash-flow classification and working-capital volatility.

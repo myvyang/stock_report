@@ -1,0 +1,72 @@
+Stock research trace — NKSH — period 2025-12-31
+Generated at: 2026-08-05T00:05:07+08:00
+
+1. Required instructions read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- /workspace/AGENTS.md (provided in task context)
+
+2. Protocol lifecycle
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated the initialized object using protocol `set` operations.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: {"status":"ok","errors":[]}
+
+3. Reuse check
+- Checked the paths specified by config/input.json.
+- No NKSH files existed in the annual review, normalized facts, raw filing, or prior stock research directories.
+- Therefore the research returned to the primary filing rather than fabricating or reusing missing facts.
+
+4. Primary sources
+- SEC 2025 Form 10-K, accession 0001193125-26-128311, filed 2026-03-27:
+  https://www.sec.gov/Archives/edgar/data/796534/000119312526128311/nksh-20251231.htm
+- SEC company facts API for CIK 0000796534, used to cross-check core statement values:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0000796534.json
+- SEC Form 8-K, accession 0001193125-26-221751, filed 2026-05-13, used for the declared $0.75 2026 semiannual dividend:
+  https://www.sec.gov/Archives/edgar/data/796534/000119312526221751/nksh-20260513.htm
+- Federal Reserve H.10 release dated 2025-12-29, rate for 2025-12-26: 7.0063 CNY per USD:
+  https://www.federalreserve.gov/releases/h10/20251229/
+- Market capitalization and PE were taken as supplied in config/input.json (Yahoo Finance yfinance; 2026-08-03), not independently overwritten.
+
+5. Model decision
+- Input hint: ordinary_operating / applicable.
+- Filing fact: NBI is a financial holding company operating mainly through The National Bank of Blacksburg.
+- Balance-sheet fact: loans plus available-for-sale securities are about 90.7% of total assets; deposits are about 99.2% of liabilities.
+- Override: financial_bank / requires_special_model.
+- Consequence: discounted net cash, cash profit, operating business price, owner earnback years, and market-cap-to-cash-profit remain null.
+
+6. Currency conversion
+- Conversion factor used for all filing amounts: USD × 7.0063 = CNY.
+- The source filing is in USD thousands; values were first restored to absolute USD and then converted.
+- Examples:
+  total assets: $1,824,506,000 × 7.0063 = CNY 12,783,036,387.8
+  total liabilities: $1,639,598,000 × 7.0063 = CNY 11,487,515,467.4
+  equity: $184,908,000 × 7.0063 = CNY 1,295,520,920.4
+  net income: $15,826,000 × 7.0063 = CNY 110,881,703.8
+  deposits: $1,626,933,000 × 7.0063 = CNY 11,398,780,677.9
+  gross loans: $999,926,000 × 7.0063 = CNY 7,005,781,533.8
+  AFS securities: $654,377,000 × 7.0063 = CNY 4,584,761,575.1
+
+7. Bank-specific metrics retained in narrative/evidence
+- 2025 net interest margin 2.66%; 2024 2.19%.
+- 2025 ROA 0.87%; ROE 9.29%; efficiency ratio 60.70%.
+- Nonperforming loans / loans 0.02%; ACL / loans 0.99%; net charge-offs / average loans 0.03%.
+- Commercial real-estate loans $467.783 million, 46.8% of total loans.
+- 83.7% of loans secured by real estate.
+- Uninsured deposits 41.7%; uninsured non-municipal deposits 19.75%.
+- NBB CET1 16.16%, total capital 17.02%, leverage 10.42%; classified well capitalized.
+
+8. Dividend forecast
+- Fact: 2026 first semiannual dividend declared at $0.75/share.
+- Assumption: second 2026 semiannual dividend equals $0.75/share.
+- Forecast: $1.50 × 6,368,410 shares × 7.0063 = CNY 66,928,486.4745.
+- Forecast yield: CNY 66,928,486.4745 / CNY 1,744,745,642.6000977 = 3.8360%.
+- The undeclared second-half dividend is explicitly labeled as an inference in result.json and report.md.
+
+9. Data-quality judgment
+- Status: complete under the special financial-bank model minimum requirements.
+- Ordinary gross margin, operating cash flow, capex, free cash flow, and owner-earnback fields remain null because they lack comparable economic meaning for a deposit-funded bank.
+- Limitations are recorded in outputs/result.json.

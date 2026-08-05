@@ -1,0 +1,68 @@
+stock-research trace
+company: YADEA / 01585.HK
+period: 2025-12-31 annual
+generated_at: 2026-08-04T15:10:54+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- No annual facts, normalized facts, raw filing metadata, or prior stock-research output existed for 01585.HK/2025-12-31.
+- Downloaded official HKEX filings into stock_report/data/raw/filings/01585.HK/2025-12-31/:
+  - 2025-annual-report.pdf: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042401612.pdf
+  - 2025-annual-report-supplement.pdf: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0723/2026072301060.pdf
+- Extracted text locally with pypdf in an isolated /tmp virtual environment.
+
+3. Model override
+- Input hint said financial_brokerage/requires_special_model.
+- Official annual report says the group designs, researches, manufactures and sells electric scooters, electric bicycles, batteries and accessories through a distributor network.
+- Overrode to ordinary_operating/applicable. Financial assets are treasury products funded by operating surplus, not customer funds or brokerage inventory.
+
+4. Core reported facts (annual report page references)
+- Revenue RMB37,008,236,000; gross profit RMB7,071,414,000; operating profit RMB3,638,754,000; parent net profit RMB2,911,585,000: p.57.
+- Total assets RMB29,996,707,000; liabilities RMB19,534,786,000; parent equity RMB10,461,677,000: pp.59-60.
+- Operating cash flow RMB5,989,810,000: p.62.
+- Capex definition used: PP&E and other long-term assets RMB755,253,000 + land use rights RMB26,798,000 + intangible assets RMB5,270,000 = RMB787,321,000: p.62.
+- Operating free cash flow = RMB5,202,489,000.
+- Cash RMB5,991,384,000; term deposits RMB3,822,881,000; pledged deposits RMB4,359,805,000: pp.114-115.
+- Wealth management and structured deposits RMB4,600,791,000; related FVTPL gain RMB179,527,000: MD&A pp.12-13.
+- Borrowings RMB1,462,379,000: p.118. Government financing used in cash deduction = RMB361,104,000 non-current + RMB163,176,000 current reclassification: pp.115, 117.
+- Proposed 2025 dividend RMB1,453,424,000: p.121.
+
+5. Research calculations
+- Gross margin = 7,071,414,000 / 37,008,236,000 = 0.19107676464233528.
+- Net margin = 2,911,585,000 / 37,008,236,000 = 0.07867397408511986.
+- Forecast dividend yield = 1,453,424,000 / 28,625,794,409.143925 = 0.05077322848150315.
+- Discounted detachable net cash:
+  cash 5,991,384,000 * 100%
+  + term deposits 3,822,881,000 * 95%
+  + bank wealth management/structured deposits 4,600,791,000 * 85%
+  + pledged deposits 4,359,805,000 * 0%
+  - borrowings and government financing 1,986,659,000
+  = RMB11,547,134,300.
+- Sustainable cash profit:
+  parent profit 2,911,585,000
+  + depreciation and amortization 483,662,000
+  - capex 787,321,000
+  - FVTPL gains 179,527,000
+  - sustainability buffer 128,399,000
+  = RMB2,300,000,000.
+- Sustainability buffer reflects the 2025 gross-margin step-up and the RMB2,298,275,000 increase in trade and bills payables that boosted operating cash flow.
+- Operating business price = RMB17,078,660,109.143925.
+- Owner earnback = 7.425504395279967 years.
+- Market cap / cash profit = 12.445997569193011.
+
+6. Data limitations
+- Market cap and PE were accepted from config/input.json; no independent share-count/FX reconstruction.
+- No independent market-share evidence; company position is qualified as company-reported.
+- Cash haircuts and sustainable profit are analyst judgments, explicitly separated from reported facts.
+
+7. Protocol mutation and validation
+- All result fields were populated through protocol set/append commands after initialization; no complex result object was handwritten from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].

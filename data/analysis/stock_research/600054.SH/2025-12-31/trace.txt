@@ -1,0 +1,79 @@
+stock-research trace
+company=600054.SH 黄山旅游
+period=2025-12-31 annual
+generated_for=2026-08-01
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the expected annual fact package was absent.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated all result fields with protocol set commands; result.json was not constructed from scratch.
+
+[reuse audit]
+Expected annual facts and raw filing metadata under stock_report/data/.../600054.SH/2025-12-31 were absent.
+No prior stock_research result existed for the requested period.
+Therefore returned to the disclosed annual report and dividend announcements.
+
+[primary sources]
+- 黄山旅游发展股份有限公司2025年年度报告, disclosure date 2026-04-18, CNINFO PDF:
+  https://static.cninfo.com.cn/finalpage/2026-04-18/1225118314.PDF
+- 黄山旅游关于2025年年度利润分配预案的公告, SSE disclosure, 2026-04-18.
+- 黄山旅游2025年年度权益分派实施公告, 2026-06.
+- 黄山旅游2025年前三季度利润分配公告, 2025-10.
+- Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026-07-31 11:43:25.
+
+[model decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: company directly operates attractions, cableways, hotels, travel services and food businesses. Resource-use, ticket concession and heritage protection charges are recurring operating settlements. The balance sheet is dominated by cash and operating fixed/CIP assets, with low borrowings, rather than a concession-right/project-debt structure. Cash and private funds are nevertheless discounted for project commitments and exit constraints.
+
+[reported financials CNY]
+revenue=2109325107.63
+cost_of_sales=1120795111.83
+gross_profit=988529995.80
+operating_profit=489364530.85
+net_profit=310789149.99
+parent_net_profit=292480928.60
+operating_cash_flow=666434842.62
+capital_expenditure=525415639.70
+operating_free_cash_flow=141019202.92
+total_assets=6110738966.48
+total_liabilities=1131539631.26
+total_equity=4979199335.22
+parent_equity=4778366895.82
+minority_interest=200832439.40
+
+[formula checks]
+gross_margin=(2109325107.63-1120795111.83)/2109325107.63=0.4686475272
+net_margin=292480928.60/2109325107.63=0.1386609051
+operating_free_cash_flow=666434842.62-525415639.70=141019202.92
+
+[owner earnback assumptions CNY]
+cash: 1738116005.68 * 60% = 1042869603.41
+listed equity: 63460800.00 * 70% = 44422560.00
+private funds/other NFA: 476657869.83 * 30% = 142997360.95
+deduct borrowings/current non-current/lease liabilities: -348009057.06
+discounted_detachable_net_cash=882280467.30
+operating_business_price=8176000000.00-882280467.30=7293719532.70
+discounted_sustainable_cash_profit=220000000.00
+owner_earnback_years=7293719532.70/220000000.00=33.1532706
+market_cap_to_cash_profit=8176000000.00/220000000.00=37.1636364
+
+[dividend]
+2025 interim attributable dividend=51056560.80
+2025 annual dividend=51785940.24
+forecast proxy total=102842501.04
+forecast_yield=102842501.04/8176000000.00=0.0125785838
+
+[known limitations]
+- No project-by-project forward capex schedule was available.
+- Sustainable cash profit is an analytical scenario, not a reported fact.
+- Private fund exit timing/value is unavailable; 30% inclusion is deliberately conservative.
+- Market valuation date differs from financial statement date.
+
+[validation]
+Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Result: status=ok, errors=[]
+Cross-file checks completed: market cap, reported financials, dividend total, discounted net cash, operating business price and both payback multiples agree between result.json, report.md and this trace.

@@ -1,0 +1,56 @@
+stock-research trace
+company: Beijing Enterprises Holdings Limited / 00392.HK
+period: 2025-12-31 annual
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- Checked configured raw filing, annual review, normalized facts, prior stock research, and outputs directories.
+- No reusable 00392.HK/2025-12-31 facts package or prior research output existed at task start.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized with schema stock-research-result-v1.
+
+4. Primary-source retrieval
+- Downloaded HKEX annual report to stock_report/data/raw/filings/00392.HK/2025-12-31/2025-annual-report.pdf
+- Official filing URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042902244.pdf
+- Supporting official pages: https://www.behl.com.hk/en/ir/highlights.php and https://www.behl.com.hk/en/ir/dividend.php
+- Market cap and PE reused exactly from config/input.json (Tencent qt.gtimg.cn snapshot dated 2026-07-31 16:08:47).
+
+5. Model override
+- Input hint said financial_brokerage.
+- Annual report p.105 says the Company acts as an investment holding company.
+- Segment note and business review show gas, water equity holding, environmental/waste-to-energy, and brewery operations; there are no brokerage client funds or securities dealing operating segments.
+- Final model: investment_holding; owner_earnback_applicability: requires_special_model.
+- Ordinary owner earnback fields retained as null per contract.
+
+6. Core extraction (annual report pages)
+- p.94: revenue RMB87,227.795m; cost of sales RMB75,300.441m; gross profit RMB11,927.354m; net profit RMB6,653.310m; parent net profit RMB5,055.839m.
+- pp.96-98: assets RMB214,861.304m; liabilities RMB112,126.490m; total equity RMB102,734.814m; parent equity RMB89,041.916m; NCI RMB13,692.898m; cash RMB31,267.524m; associates RMB60,007.519m.
+- pp.102-104: OCF RMB7,407.674m; dividends received from JVs/associates RMB4,285.491m; financing cash flow -RMB5,589.308m; company dividends paid RMB1,855.173m.
+- pp.149-153 and p.76: segment revenue/profit and company-defined capex RMB6,090.768m.
+- pp.5-6 and p.64: 2025 DPS HK$1.62, payout ratio 37.1%, and 2024-2026 dividend floor policy.
+
+7. Calculations
+- gross_margin = 11,927.354 / 87,227.795 = 0.13674.
+- net_margin = 5,055.839 / 87,227.795 = 0.05796 (parent profit basis, per contract).
+- operating_free_cash_flow = 7,407.674 - 6,090.768 = RMB1,316.906m.
+- forecast_cash_dividend = 5,055.839 * 37.1% = RMB1,875.815086m.
+- forecast_dividend_yield = 1,875.815086 / 34,242.710344 = 0.05478.
+- interest-bearing debt incl. leases = 66,628.791 + 12,317.357 + 680.229 = RMB79,626.377m.
+
+8. Data limitations
+- Forecast dividend uses actual 2025 payout ratio and stated 2024-2026 floor, not formal RMB total guidance; FX can change the RMB amount.
+- Market cap was not independently recomputed.
+- No line-by-line SOTP or listed-associate market-value discount was performed, so no special-model payback number was fabricated.
+
+9. Protocol population and validation
+- outputs/result.json was populated via repeated protocol set/append commands, not authored from scratch.
+- Final validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok; errors: [].

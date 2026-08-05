@@ -1,0 +1,53 @@
+STC stock research trace
+generated_at: 2026-08-05T04:07:15+08:00
+period: 2025-12-31
+
+1. Protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Initialized outputs/result.json using:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields with protocol `set` commands; did not construct result.json from scratch.
+
+2. Local reuse check
+- Checked stock_report/data/analysis/annual_review/STC/2025-12-31 and stock_report/data/raw/filings/STC/2025-12-31.
+- No reusable local annual facts, metadata, or filing artifacts were present, so primary public filings were read.
+
+3. Primary sources
+- SEC 2025 Form 10-K, filed 2026-02-27:
+  https://www.sec.gov/Archives/edgar/data/94344/000009434426000007/stc-20251231.htm
+  Used for company identity, business model, audited statements, title loss ratio, statutory reserve funds, claims reserve, statutory capital/surplus, dividend restrictions, segment economics, acquisitions and risks.
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/94344/000009434426000007/0000094344-26-000007-index.htm
+- Stewart Q2 2026 results, dated 2026-07-22:
+  https://investors.stewart.com/news-and-events/news/news-details/2026/Stewart-Reports-Second-Quarter-2026-Results/default.aspx
+  Used only as a post-period operating cross-check.
+- SEC 8-K dated 2026-06-01 for $0.525 Q2 dividend:
+  https://www.sec.gov/Archives/edgar/data/94344/000110465926068959/tm2615089d1_8k.htm
+- Market cap and PE: config/input.json, Yahoo Finance yfinance snapshot dated 2026-08-03.
+
+4. Model decision
+- Input hint ordinary_operating/applicable was overridden.
+- Confirmed financial_insurance/requires_special_model because title insurance liabilities, statutory reserve assets and regulated capital are integral to operations.
+- Per result contract, discounted net cash, discounted cash profit, operating business price, owner earnback years and market-cap-to-cash-profit remain null.
+- Gross margin remains null because the title insurer income statement does not present a stable, economically comparable cost-of-sales/gross-profit subtotal.
+
+5. Currency and calculations
+- Financial statement source currency: USD; reported statements use USD thousands.
+- Output currency required by contract: CNY absolute yuan.
+- Translation rate used: USD/CNY 6.7352, a public-market reference around 2026-08-03.
+- Total revenue: USD 2,921.636m * 6.7352 = CNY 19,677,802,787.2.
+- Parent net income: USD 115.535m * 6.7352 = CNY 778,151,332.0.
+- Net margin: 115.535 / 2,921.636 = 3.9544625%.
+- OCF: USD 205.688m * 6.7352 = CNY 1,385,349,817.6.
+- Capex proxy: purchases of property/equipment and other long-lived assets, USD 73.409m * 6.7352 = CNY 494,424,296.8.
+- Operating FCF proxy: 205.688m - 73.409m = USD 132.279m; CNY 890,925,520.8. This is not treated as distributable owner cash due to the insurance model.
+- Forecast dividend: USD 2.10 annualized per share * 30,419,415 shares * 6.7352 = CNY 430,249,772.21.
+- Forecast dividend yield: CNY 430,249,772.21 / CNY 13,888,162,531.685303 = 3.0979604%.
+
+6. Quality controls
+- Core audited figures were reconciled to the balance-sheet equation: assets USD 3,252.805m = liabilities USD 1,602.407m + equity USD 1,650.398m.
+- Minority interest: USD 9.314m; parent equity USD 1,641.084m.
+- Ordinary owner-earnback fields were checked to remain null.
+- Final protocol validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

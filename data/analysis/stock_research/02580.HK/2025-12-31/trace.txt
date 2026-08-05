@@ -1,0 +1,62 @@
+stock-research trace
+company: 02580.HK AUX ELECTRIC
+period: 2025-12-31 annual
+generated_at: 2026-08-04T15:48:00+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+- No annual facts package, normalized facts, prior stock-research output, or filing metadata existed for 02580.HK/2025-12-31.
+- Downloaded official 2025 annual report to stock_report/data/raw/filings/02580.HK/2025-12-31/annual-report-2025.pdf.
+
+3. Primary sources
+- HKEX listed-company title search for stock 02580.
+- 2025 Annual Report, published 2026-04-28:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042801933.pdf
+- Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026-08-03 09:48:08.
+
+4. Model verification
+- Input hint said financial_brokerage. Rejected as erroneous.
+- Annual report pp.4-11 and pp.21-23 show design, R&D, manufacture, sale and service of household and central air conditioners.
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+5. Core extraction (annual report, RMB'000 converted to absolute RMB)
+- Revenue 30,048,580; cost of sales 24,388,923; gross profit 5,659,657; parent net profit 2,234,983.
+- Total assets 31,419,286; total liabilities 21,460,899; equity attributable to owners 9,958,387; no NCI.
+- Operating cash flow 2,887,051; company-disclosed capital expenditure 1,350,308; operating FCF 1,536,743.
+- Cash and bank balances 6,879,199; pledged deposits 2,627,671; FVTPL current financial assets 1,400,000; bank borrowings 1,462,846.
+- Contracted capital commitments not provided 2,124,600.
+- Proposed 2025 dividend 1,683,529.312, RMB1.06/share.
+
+6. Calculations
+- gross_margin = 5,659,657 / 30,048,580 = 0.1883502315.
+- net_margin = 2,234,983 / 30,048,580 = 0.0743789890.
+- discounted detachable net cash = 6,879,199 + 1,400,000*0.90 - 1,462,846 - 2,124,600 = 4,551,753 (RMB'000).
+- pledged deposits receive zero detachable value because they secure operating bills/payables.
+- discounted sustainable cash profit = (2,887,051 - 1,350,308)*0.90 = 1,383,068.7 (RMB'000).
+- operating business price = 14,620,041,512.172222 - 4,551,753,000 = 10,068,288,512.172222.
+- owner earnback years = 10,068,288,512.172222 / 1,383,068,700 = 7.2796734625.
+- market cap / cash profit = 14,620,041,512.172222 / 1,383,068,700 = 10.5707269004.
+- forecast dividend yield = 1,683,529,312 / 14,620,041,512.172222 = 0.1151521568.
+
+7. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated all fields using protocol set commands; did not hand-write result JSON.
+- Final protocol validation result recorded below after output validation.
+
+8. Key judgments and limitations
+- 100% of disclosed capital commitments deducted from detachable cash to avoid treating IPO proceeds as both distributable and committed for manufacturing investment.
+- Current FVTPL assets discounted to 90%; cash/bank balances at 100%; pledged deposits at 0%.
+- Single-year operating FCF discounted to 90% because contract liabilities rose RMB1.331bn and post-listing history is short.
+- Company claim of fifth-largest global supplier is not independently verified.
+- Market capitalization and PE are accepted from input and not independently recalculated.
+
+9. Final validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}
+- jq parse check passed; report.md and trace.txt are non-empty.

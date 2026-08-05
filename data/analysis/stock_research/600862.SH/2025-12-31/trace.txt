@@ -1,0 +1,88 @@
+stock-research trace
+company: 中航高科 (600862.SH)
+period: 2025-12-31 annual
+task created_at: 2026-07-31T21:23:48+08:00
+timezone: Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md as explicitly requested.
+3. Read references/data-reuse.md because the skill routes reuse decisions to that file.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields with protocol set/append commands; did not hand-write the result object.
+6. Ran protocol validate after population; status was ok with no errors.
+
+[reuse audit]
+- Expected annual facts, normalized facts, raw filing metadata and prior stock-research outputs were absent from /workspace/stock_report for this company/period.
+- stock_report/data/notes/user_stock_evaluations.md contained no entry for 600862.SH.
+- Therefore fetched/reviewed public annual-report disclosures rather than inheriting prior analysis.
+
+[primary and supporting sources]
+- Annual report PDF (company filing mirrored by CNINFO data cloud):
+  https://dataclouds.cninfo.com.cn/shgonggao/hsomarket/2026/20260313/9d77df0c4f754809a66ee76975f8ee57.PDF
+- Full annual-report text used for searchable cross-check:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=11995236&stockid=600862
+- 2025 profit distribution proposal:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=11995216&stockid=600862
+- 2025 annual distribution implementation announcement found in the company's disclosure stream; implementation inputs were 1,389,154,107 participating shares and CNY 0.223/share.
+- Market cap and PE: config/input.json; Tencent qt.gtimg.cn snapshot at 20260731114322.
+
+[model classification]
+- Confirmed statement_model = ordinary_operating.
+- Reason: 92.86% of audited revenue came from aviation new materials. Assets and liabilities are explainable as manufacturing cash, receivables/notes, inventory, productive long-lived assets, payables and lease obligations. No customer deposits, insurance reserves, regulated presale cash, concession rights or similar special-model items were identified.
+- owner_earnback_applicability = applicable.
+
+[reported figures, CNY]
+revenue = 5,007,841,402.15
+cost_of_sales = 3,124,942,876.27
+operating_profit = 1,210,205,462.54
+net_profit = 1,033,144,845.34
+parent_net_profit = 1,030,822,682.94
+operating_cash_flow = 1,195,232,508.20
+capital_expenditure = 247,850,795.62
+financing_cash_flow = -526,233,718.10
+total_assets = 10,103,632,329.01
+total_liabilities = 2,001,943,366.93
+total_equity = 8,101,688,962.08
+parent_equity = 7,682,642,240.92
+minority_interest = 419,046,721.16
+cash = 1,983,274,737.11
+cash_at_group_finance_company = 1,930,633,329.77
+restricted_cash = 658,754.38
+notes_receivable = 1,353,009,792.27
+accounts_receivable = 2,485,246,214.78
+receivables_financing = 196,073,248.12
+inventory = 1,295,211,320.46
+current_noncurrent_liability = 46,459,787.92
+lease_liability = 61,127,559.69
+
+[derived formulas]
+gross_profit = 5,007,841,402.15 - 3,124,942,876.27 = 1,882,898,525.88
+gross_margin = 1,882,898,525.88 / 5,007,841,402.15 = 0.3759900473
+net_margin = 1,030,822,682.94 / 5,007,841,402.15 = 0.2058417190
+operating_free_cash_flow_2025 = 1,195,232,508.20 - 247,850,795.62 = 947,381,712.58
+operating_free_cash_flow_2024 = 496,108,272.09 - 155,691,735.65 = 340,416,536.44
+minority_interest_ratio = 419,046,721.16 / 8,101,688,962.08 = 0.0517233781
+
+[owner earnback judgments]
+- Cash haircut: 75%. This is a judgment, not a reported fact. Rationale: about 97.35% of cash was deposited at the controlling-group finance company and the business needs working liquidity.
+- Debt deduction: current non-current liabilities plus lease liabilities were deducted at 100%: 46,459,787.92 + 61,127,559.69 = 107,587,347.61.
+- Receivables, notes, inventory, fixed assets, construction in progress, intangible assets and investments received no detachable-cash credit because they are operating or long-term assets.
+- discounted_detachable_net_cash = 1,983,274,737.11 * 0.75 - 107,587,347.61 = 1,379,868,705.2225.
+- discounted_sustainable_cash_profit = 700,000,000. This judgment sits above the two-year FCF average of about 643.90m, but below 2025 parent net profit of 1,030.82m and 2025 FCF of 947.38m. It recognizes stable recent underlying profit while discounting settlement volatility and the unusually strong 2025 cash collection.
+- operating_business_price = 26,175,000,000 - 1,379,868,705.2225 = 24,795,131,294.7775.
+- owner_earnback_years = 24,795,131,294.7775 / 700,000,000 = 35.4216161354.
+- market_cap_to_cash_profit = 26,175,000,000 / 700,000,000 = 37.3928571429.
+
+[dividend]
+- Implemented 2025 annual distribution = 1,389,154,107 * 0.223 = 309,781,365.861.
+- forecast/static yield field = 309,781,365.861 / 26,175,000,000 = 0.0118350092.
+- This uses the actual annual distribution as the most concrete forward/static basis available as of the task date; it is not a forecast of 2026 earnings or payout policy.
+
+[data quality]
+- status = complete under the result contract: identity, market data, model, three statements, asset/liability rows, owner-earnback details, dividend, business narrative and evidence are present.
+- Limitations: market snapshot not independently reconstructed; military-customer/product details and global market share are not publicly quantifiable; the 75% cash haircut and CNY 700m sustainable cash profit are analyst judgments.
+
+[final validation]
+- Run at handoff: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

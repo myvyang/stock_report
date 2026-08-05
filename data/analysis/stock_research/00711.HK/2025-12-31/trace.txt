@@ -1,0 +1,19 @@
+2026-08-03 stock-research trace
+
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Checked configured annual-review, normalized-facts and historical stock-research directories; no reusable facts/results were present.
+4. Identified a model conflict: input hint said financial_brokerage, while official filings identify construction, facility management, property-related and healthcare operations.
+5. Downloaded HKEX 2024/25 audited annual report to stock_report/data/raw/filings/00711.HK/2025-12-31/annual-report-2024-25.pdf and recorded metadata.json.
+6. Extracted and reviewed audited statements and notes: pages 162-173 (three statements), 220-224 (segments/customer concentration), 239 (dividends), 264-272 (cash, payables, bank debt and covenant).
+7. Reviewed HKEX annual results published 2026-06-26 for FY ended 2026-03-31. Used it for current annual income statement, balance sheet, segments and dividend because it predates and is closest to the 2026-07-31 market-cap date.
+8. Period handling: task period is 2025-12-31, but issuer fiscal year ends 31 March. Kept task analysis.period unchanged; disclosed that current figures are FY2026 and audited comparison/cash flow is FY2025.
+9. Currency conversion: multiplied original HKD values by 0.90486 CNY/HKD, PBOC central parity dated 2025-12-26. Ratios were calculated from original HKD values.
+10. Reclassified statement model to construction_project and kept all ordinary owner-earnback fields null, as required by contract for special models.
+11. Populated result.json exclusively through protocol CLI set commands after initialization; did not manually author the result object.
+12. Wrote report.md with operating story, financial interpretation, asset/liability economics, cash conversion, special-model earnback and falsifying facts.
+13. Ran final protocol validation:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Outcome: {"status":"ok","errors":[]}
+14. Parsed result.json with python3 -m json.tool and confirmed special-model owner-earnback sorting fields remain null.

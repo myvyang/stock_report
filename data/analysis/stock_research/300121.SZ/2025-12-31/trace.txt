@@ -1,0 +1,70 @@
+stock-research trace
+company: 300121.SZ 阳谷华泰
+period: 2025-12-31 annual
+generated_at: 2026-08-01 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked the paths supplied in config/input.json.
+- stock_report/data/raw/filings/300121.SZ/2025-12-31, annual_review facts, normalized facts, and prior stock_research outputs were absent from this workspace.
+- Therefore no local annual fact package or prior research conclusion was available to reuse.
+
+3. Public filing retrieval and evidence
+- Located the 2025 annual report disclosed 2026-03-27 (announcement 2026-021). Used the public full-text rendering of the filing to extract the audited statements, notes, business discussion, industry data, risks, capacity and dividend history.
+- Located the official CNINFO PDF for the 2025 profit distribution proposal: https://static.cninfo.com.cn/finalpage/2026-03-31/1225054650.PDF
+- Market cap CNY 4,163,000,000 and PE TTM 21.37 were taken unchanged from config/input.json; snapshot timestamp 2026-07-31 11:42:54, source Tencent qt.gtimg.cn.
+- Audit opinion: standard unmodified opinion, report XYZH/2026JNAA2B0178. Key audit matters include revenue recognition and receivables impairment.
+
+4. Core audited figures (CNY)
+- Revenue 3,443,372,293.57
+- Cost of sales 2,845,631,741.68
+- Gross profit 597,740,551.89; gross margin 17.3592%
+- Parent net profit 197,344,422.42; net margin 5.7311%
+- Deducted non-recurring parent profit 188,919,460.42
+- Operating cash flow 394,262,084.18
+- Capital expenditure 333,999,121.09
+- Operating free cash flow 60,262,963.09
+- Total assets 4,526,470,805.61
+- Total liabilities 884,816,857.53
+- Total equity 3,641,653,948.08
+- Parent equity 3,608,291,208.73
+- Minority interest 33,362,739.35
+
+5. Analysis model
+- Confirmed ordinary_operating / applicable.
+- Reason: manufacturing and direct sale of rubber additives; operating assets are receivables, inventory and chemical plant; liabilities are ordinary operating payables and financing. No financial, property development, construction, concession or holding-company balance-sheet model was identified.
+
+6. Owner earnback calculations
+- Non-restricted cash: (548,683,957.66 - 6,000,000) * 90% = 488,415,561.89.
+- Restricted bill deposit: 6,000,000 * 0% = 0.
+- Structured deposit: 100,364,940 * 80% = 80,291,952.00.
+- Interest-bearing debt deducted at 100%: short borrowing 207,028,096.85 + long borrowing 45,000,000 + bonds payable 263,162,738.48 + current bond portion 1,776,399.46 = 516,967,234.79.
+- Discounted detachable net cash = 51,740,279.10.
+- Sustainable cash profit = deducted non-recurring parent profit 188,919,460.42 * 80% = 151,135,568.34. The 20% haircut covers cyclicality, receivable working capital and continuing reinvestment uncertainty.
+- Operating business price = 4,163,000,000 - 51,740,279.10 = 4,111,259,720.90.
+- Owner earnback years = 4,111,259,720.90 / 151,135,568.34 = 27.2025.
+- Market cap / cash profit = 27.5448.
+- These discounts are analyst assumptions, not reported facts.
+
+7. Dividend forecast
+- Implemented 2025 interim distribution: 30,715,162.31.
+- Proposed 2025 annual distribution: 35,035,831.60, subject to shareholder approval and share-base changes.
+- Forecast combined distribution: 65,750,993.91.
+- Forecast dividend yield: 1.5794% of the supplied market cap.
+
+8. Result construction and validation
+- Populated outputs/result.json via repeated protocol CLI set commands executed by populate_result.py; did not hand-write the initialized result object.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation result: status ok, errors [].
+
+9. Limitations
+- Local raw filing/fact packages listed in the input were absent.
+- Maintenance versus growth capex cannot be precisely separated from the annual report.
+- Cash and profit discounts are explicit research assumptions.
+- Annual dividend remains a proposal as of its cited disclosure.

@@ -1,0 +1,82 @@
+stock-research task trace
+company: 01071.HK / Huadian Power International Corporation Limited
+period: 2025-12-31
+generated_at_input: 2026-08-03T16:32:50+08:00
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Checked reusable data
+   - annual_review facts directory: no existing files
+   - normalized annual facts: no existing file
+   - prior stock_research outputs: no existing file
+   - action: returned to the official annual filing
+
+3. Initialized protocol result
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   result: initialized stock-research-result-v1 skeleton
+
+4. Retrieved and extracted official filing
+   source: Hong Kong Exchanges and Clearing Limited
+   document: Huadian Power International Corporation Limited Annual Report 2025
+   publication date: 2026-04-23
+   url: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042302912.pdf
+   local_pdf: stock_report/data/raw/filings/01071.HK/2025-12-31/annual-report-2025.pdf
+   local_text: stock_report/data/raw/filings/01071.HK/2025-12-31/annual-report-2025.txt
+   extraction: pypdf in temporary virtual environment; 199 PDF pages
+
+5. Reconciled analysis model
+   input hint: financial_brokerage / requires_special_model
+   finding: hint contradicted the annual report and source tags. The company constructs and operates coal-fired, gas-fired and hydropower plants and sells all electricity to local grid companies.
+   final model: utility_concession / requires_special_model
+   reason: generation assets, construction in progress, associated debt, pledged revenue streams and continuing capital expenditure form the operating system; cash is not freely detachable.
+   owner earnback outcome: all ordinary-model ranking fields retained as null.
+
+6. Extracted core facts (annual report amounts originally RMB'000)
+   revenue: RMB126,012,591,000
+   operating cost: RMB111,601,546,000
+   gross profit: RMB14,411,045,000
+   parent net profit: RMB6,070,315,000
+   operating cash flow: RMB27,220,563,000
+   purchases of fixed/intangible/other long-term assets: RMB15,062,722,000
+   mechanical operating free cash flow: RMB12,157,841,000
+   total assets: RMB264,230,768,000
+   total liabilities: RMB162,142,438,000
+   parent equity: RMB69,162,202,000
+   non-controlling interests: RMB32,926,128,000
+   cash and cash equivalents: RMB6,982,918,000
+   controlled installed capacity: 77,924.288 MW
+   coal-fired capacity share: 69.77%
+   power generation: 262.27 million MWh, down 7.15%
+
+7. Calculations
+   gross_margin = 14,411,045,000 / 126,012,591,000 = 0.11436194499008437
+   net_margin = 6,070,315,000 / 126,012,591,000 = 0.04817228938654233
+   operating_free_cash_flow = 27,220,563,000 - 15,062,722,000 = 12,157,841,000
+   minority_interest_ratio = 32,926,128,000 / 102,088,330,000 = 0.32252587538654026
+   dividend baseline = RMB0.23 * 11,611,774,184 shares = RMB2,670,708,062.32
+   forecast_dividend_yield = 2,670,708,062.32 / 41,556,774,510.51593 = 0.06426649069321244
+   note: mechanical free cash flow is not treated as sustainable distributable cash profit because maintenance and expansion capex are not separated.
+
+8. Market inputs reused as supplied
+   market_cap: RMB41,556,774,510.51593
+   market_cap_date: 2026/07/31 16:08:47
+   source: Tencent qt.gtimg.cn
+   pe_ttm: 7.19
+   limitation: historical API snapshot text was not independently available in the workspace.
+
+9. Populated result using protocol CLI
+   method: repeated protocol set operations by section; no hand-written result object
+   outputs: analysis model, metrics, three statements, asset/liability analysis, owner earnback interpretation, dividend, business, risks, evidence and data quality
+
+10. Final validation
+    command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    result: status=ok, errors=[]
+
+Required outputs
+   outputs/result.json
+   outputs/report.md
+   outputs/trace.txt

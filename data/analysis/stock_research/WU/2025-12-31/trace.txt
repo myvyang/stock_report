@@ -1,0 +1,72 @@
+Stock research trace — WU — period 2025-12-31
+Generated for task created_at: 2026-08-04T14:10:55+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill directs reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local-data reuse check
+- Checked the paths supplied in config/input.json.
+- No raw filing, annual review facts package, normalized facts, or prior WU stock-research output existed under stock_report for 2025-12-31.
+- Therefore researched primary public sources rather than fabricating or substituting third-party statement data.
+
+3. Primary sources consulted
+- SEC 2025 Form 10-K, accession 0001193125-26-061340, filed 2026-02-20:
+  https://www.sec.gov/Archives/edgar/data/1365135/000119312526061340/wu-20251231.htm
+- SEC companyfacts API for CIK 0001365135, used to cross-check tagged statement values:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0001365135.json
+- Western Union FY2025 results release, SEC Exhibit 99.1, 2026-02-20:
+  https://www.sec.gov/Archives/edgar/data/1365135/000119312526060322/wu-ex99_1.htm
+- Federal Reserve H.10 China yuan historical exchange-rate series:
+  https://www.federalreserve.gov/RELEASES/H10/hist/dat00_ch.htm
+- Market cap and PE TTM were reused exactly from config/input.json (Yahoo Finance yfinance, date 2026-08-03).
+
+4. Model determination
+- Overrode the default ordinary_operating hint with platform_financial_mixed.
+- Reason: WU is a regulated money-transfer/payment platform and reports USD 3.4491bn of settlement assets matched exactly by USD 3.4491bn of settlement obligations. These are operating settlement balances, not detachable shareholder cash.
+- Kept owner_earnback_applicability=applicable because the matched settlement pair can be excluded and the remaining own cash, borrowings, and fee-business free cash flow support a modified ordinary-company calculation.
+
+5. Currency conversion
+- Applied 1 USD = CNY 6.9931, the Federal Reserve H.10 rate for 2025-12-31, to all USD filing amounts and dividend estimates.
+- Amounts in result.json are absolute CNY yuan as required by the contract.
+
+6. Core statement extraction (USD millions before conversion)
+- Revenue 4,050.7; cost of services 2,550.6; gross profit derived as 1,500.1.
+- Operating income 757.3; net income/parent net income 499.6.
+- Assets 8,305.9; liabilities 7,348.1; total and parent equity 957.8; no noncontrolling interest disclosed.
+- Operating cash flow 543.7.
+- Capital expenditure definition used for this asset-light platform: internal-use software 85.0 + capitalized contract costs 27.3 + property/equipment 38.5 = 150.8.
+- Operating free cash flow: 543.7 - 150.8 = 392.9.
+- Financing cash flow -782.6; dividends 309.0; repurchases 234.6; combined distributions 543.6.
+
+7. Owner earnback assumptions and calculations
+- Settlement assets and obligations: fully excluded as a matched operating pair.
+- Own cash: USD 1,234.4m × 80% haircut.
+- Borrowings: USD 2,877.8m deducted at 100%.
+- Discounted detachable net cash: CNY -13,218,917,068.
+- Sustainable cash profit: 2025 operating FCF CNY 2,747,588,990 × 90% = CNY 2,472,830,091.
+- Operating-business price: market cap CNY 13,384,997,954.860474 - negative discounted net cash = CNY 26,603,915,022.860474.
+- Owner earnback years: 10.7584888746.
+- Market cap / cash profit: 5.4128255732.
+
+8. Dividend forecast
+- Base shares: 315.7m outstanding at 2025-12-31.
+- Annual dividend assumption: USD 0.94/share, equal to each of 2023-2025 declared annual dividends and consistent with the Q1 2026 USD 0.235/share approval.
+- Forecast dividend: 315.7m × USD 0.94 × 6.9931 = CNY 2,075,258,369.8.
+- Forecast dividend yield against supplied market cap: 15.5043607537%.
+- Buybacks excluded from forecast cash dividend.
+
+9. Output construction and validation
+- Populated outputs/result.json through repeated protocol `set` and `append` commands; did not hand-write the initialized JSON object.
+- Wrote outputs/report.md as the human-readable operating story.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed result validation status: ok, errors: [].
+
+10. Limitations explicitly retained
+- A single period-end FX rate is used for comparable CNY presentation, not historical average rates.
+- Market cap and PE were not reconstructed; they are the supplied yfinance snapshot.
+- Dividend and sustainable cash profit are assumptions, not guarantees; acquisition financing, regulation, revenue trends, and capital allocation can alter them.

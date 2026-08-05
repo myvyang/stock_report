@@ -1,0 +1,66 @@
+stock-research trace
+company: 金鹰重工（301048.SZ）
+period: 2025-12-31 annual
+generated for input created_at: 2026-07-31T18:09:43+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because no local annual facts were present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- At task start, stock_report contained only data/notes/user_stock_evaluations.md.
+- No raw filing, annual facts, normalized facts, or prior stock-research outputs existed for 301048.SZ/2025-12-31.
+- Therefore core filing facts had to be reacquired.
+
+3. Filing acquisition and extraction
+- Queried the official CNINFO announcement endpoint for 金鹰重工 and annual-report category.
+- Located announcement 1225192489, title “2025年年度报告”, disclosed 2026-04-27.
+- Source URL: https://static.cninfo.com.cn/finalpage/2026-04-27/1225192489.PDF
+- Saved PDF to stock_report/data/raw/filings/301048.SZ/2025-12-31/2025-annual-report.pdf.
+- PDF: 167 pages, 920285 bytes.
+- System pdftotext was unavailable. Created an isolated /tmp virtual environment, installed pypdf, and extracted text to /tmp/annual.txt for research only.
+
+4. Key filing facts used (all CNY yuan)
+- Revenue 3,199,870,208.64; cost of sales 2,658,395,851.12; gross profit 541,474,357.52.
+- Operating profit 249,592,286.18; net profit 209,332,528.46; parent net profit 201,929,358.37.
+- Total assets 5,735,050,803.83; liabilities 2,856,188,150.42; equity 2,878,862,653.41; parent equity 2,818,080,811.88; minority interest 60,781,841.53.
+- Operating cash flow 286,027,318.48; capex 26,335,030.28; operating FCF 259,692,288.20.
+- Cash equivalents 979,820,083.26. Other monetary funds 2,537,461.18 were guarantees and excluded from cash equivalents.
+- Short-term borrowings 150,096,708.33; current non-current liabilities 8,565,680.30; lease liabilities 26,644,901.21.
+- Accounts receivable 2,014,974,889.84; contract assets 167,165,399.12; inventory 1,138,050,502.69.
+- Accounts payable plus notes payable 2,148,371,393.53; contract liabilities 227,110,698.41.
+- 2025 dividend proposal 57,453,980.52; 2024 dividend paid in 2025 was 33,113,809.40.
+
+5. Model determination
+- Classified as ordinary_operating / applicable.
+- Reason: the company manufactures and repairs railway engineering equipment and recognizes revenue on equipment delivery or over repair service periods. It is not a construction contractor whose contract assets and project financing constitute a special statement model.
+- Caution: equipment contracts use advance payment, acceptance payment and retention. Large receivables, contract assets and inventory constrain detachable cash.
+
+6. Deterministic calculations
+- gross_profit = 3,199,870,208.64 - 2,658,395,851.12 = 541,474,357.52.
+- gross_margin = 541,474,357.52 / 3,199,870,208.64 = 0.1692176002.
+- net_margin = 201,929,358.37 / 3,199,870,208.64 = 0.0631054840.
+- operating_FCF = 286,027,318.48 - 26,335,030.28 = 259,692,288.20.
+- unhaircut_net_cash = 979,820,083.26 - 150,096,708.33 - 8,565,680.30 - 26,644,901.21 = 794,512,793.42.
+- discounted_detachable_net_cash = 794,512,793.42 * 50% = 397,256,396.71.
+- 50% cash haircut judgment: cash must buffer 2.182bn receivables/contract assets, 1.138bn inventory, concentrated customer acceptance/payment cycles, and 138.17m capital commitments.
+- discounted_sustainable_cash_profit = 201,929,358.37 * 90% = 181,736,422.53.
+- 10% profit haircut judgment: customer concentration, negative-margin freight equipment, and working-capital volatility. Parent profit was used instead of the higher one-year FCF.
+- operating_business_price = 4,731,000,000 - 397,256,396.71 = 4,333,743,603.29.
+- owner_earnback_years = 4,333,743,603.29 / 181,736,422.53 = 23.84631293.
+- market_cap_to_cash_profit = 4,731,000,000 / 181,736,422.53 = 26.03220606.
+- forecast_dividend_yield = 57,453,980.52 / 4,731,000,000 = 0.0121441515.
+
+7. Market data boundary
+- Market cap 4,731,000,000, PE TTM 22.1, timestamp 20260731114330 and source Tencent qt.gtimg.cn were supplied in config/input.json.
+- These market fields were reused as instructed and were not independently reconstructed from price and share count.
+
+8. Result construction and validation
+- result.json was not composed from scratch. It was initialized by protocol CLI, then populated with repeated protocol set and append commands.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final protocol validation status: ok, errors: [].
+- Final workspace output validation status: ok, errors: [].

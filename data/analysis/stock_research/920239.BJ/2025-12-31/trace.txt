@@ -1,0 +1,73 @@
+stock-research trace
+company=长虹能源
+code=920239.BJ
+period=2025-12-31
+generated_for_input=2026-08-03T10:42:29+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Read references/data-reuse.md because the skill routes reuse decisions there.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated initialized fields with protocol set commands; did not construct result.json from scratch.
+6. Validated with protocol validate; final status recorded below.
+
+[reuse-check]
+- Requested local raw filing metadata: absent.
+- Requested local annual facts JSON/Markdown: absent.
+- Requested normalized facts: absent.
+- Existing stock research result/report/trace: absent.
+- Sync target /root/aicode/stock_report contained no matching 920239 files.
+- Decision: rebuild from public annual filing and official-company disclosures rather than fabricate a local facts package.
+
+[sources]
+- 2025 annual report, announcement 2026-017, public disclosure PDF:
+  https://dataclouds.cninfo.com.cn/sjother2/bse_onmarket/2026/20260428/cd5cef36420c4edfb5753707ea910c92.pdf
+- Searchable annual-report text used to locate and cross-check tables:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12235870&stockid=920239
+- 2025 annual dividend implementation announcement:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12367606&stockid=920239
+- Market snapshot: config/input.json; Tencent qt.gtimg.cn; as of 2026-07-31 15:37:59.
+
+[model-check]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Annual report identifies battery manufacturing and product sales. Inventory, receivables, production assets, trade payables and borrowings have ordinary manufacturing economic substance; none of the special financial-statement models applies.
+
+[calculations]
+gross_profit=4484937481.90-3742841423.68=742096058.22
+gross_margin=742096058.22/4484937481.90=0.1654640809
+net_margin=249509890.40/4484937481.90=0.0556328581
+operating_free_cash_flow=646599544.18-201996830.85=444602713.33
+forecast_cash_dividend=182074204*0.4=72829681.60
+forecast_dividend_yield=72829681.60/4148000000=0.0175577824
+
+cash_outside_group_finance_company_estimate=549138466.99-281601413.31=267537053.68
+discounted_group_finance_company_cash=281601413.31*0.70=197120989.32
+discounted_cash_total=267537053.68+197120989.32=464658043.00
+financing_related_liabilities=1518803175.43
+discounted_detachable_net_cash=464658043.00-1518803175.43=-1054145132.43
+
+sustainable_profit_start=parent_net_profit-nonrecurring_net=249509890.40-25738578.23=223771312.17
+sustainable_profit_final=200000000.00
+judgment=Apply 23.77m additional buffer for cycle, future reinvestment and possible working-capital reversal. Do not capitalize the unusually strong 2025 FCF directly.
+
+operating_business_price=4148000000-(-1054145132.43)=5202145132.43
+owner_earnback_years=5202145132.43/200000000=26.010726
+market_cap_to_cash_profit=4148000000/200000000=20.74
+
+[fact-inference-judgment]
+- Facts: audited statements, product revenue/margins, cash balances, debt balances, dividend implementation, disclosed proposed fundraising.
+- Inference: payable growth materially supported 2025 cash conversion; annual FCF is not safely repeatable without further evidence.
+- Judgment: 70% recognition for group-finance-company deposits and CNY 200m sustainable distributable cash profit.
+
+[limitations]
+- No local facts package or raw filing cache was available.
+- Market cap and PE were supplied by a non-exchange market snapshot.
+- Detachable-cash haircuts and sustainable cash profit are scenario assumptions, not reported facts.
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

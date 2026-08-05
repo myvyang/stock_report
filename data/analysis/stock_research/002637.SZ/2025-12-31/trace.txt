@@ -1,0 +1,86 @@
+stock-research trace
+company=002637.SZ 赞宇科技
+period=2025-12-31
+generated_for_input_created_at=2026-08-01T00:35:11+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full as requested.
+3. Read references/data-reuse.md because the task required deciding whether existing facts could be reused.
+4. Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields with repeated protocol `set` commands; did not construct result.json manually from scratch.
+6. Ran protocol validate after population; result: {"status":"ok","errors":[]}.
+
+[local reuse check]
+- config/input.json existed.
+- stock_report/data/notes/user_stock_evaluations.md existed.
+- No files existed under the supplied raw filing, annual review, normalized facts, or prior stock research paths for 002637.SZ/2025-12-31.
+- Therefore no annual facts package or prior research result was available to reuse.
+
+[sources]
+1. 赞宇科技集团股份有限公司《2025年年度报告》, 公告编号2026-007, 2026-04-22.
+   Public full-text mirror: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12134135&stockid=002637
+   Used for business mix, financial statements, cash-flow reconciliation, asset/liability notes, dividend proposal, restricted assets and subsidiary information.
+2. 赞宇科技集团股份有限公司《2025年度财务决算报告》, 2026-04-22.
+   https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12134126&stockid=002637
+   Used to cross-check headline statements, margins, turnover, liquidity ratios and cash-flow changes.
+3. 赞宇科技集团股份有限公司《关于2025年度计提资产减值准备的公告》, 公告编号2026-009, 2026-04-22.
+   Official SZSE PDF: https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-22/72c2ca7d-b9db-446b-8ea4-7ce6bd6060c5.PDF
+   Used to cross-check total impairment and its composition.
+4. config/input.json / Tencent qt.gtimg.cn snapshot.
+   Used for market cap CNY 4,544,000,000, timestamp 20260731114254, and PE TTM 22.62.
+
+[model determination]
+- Confirmed statement_model=ordinary_operating.
+- Evidence: more than 98% of revenue comes from manufactured surface-active agents and oleochemical products; revenue is recognized on product delivery; the balance sheet is dominated by inventory, receivables, factories, construction in progress and manufacturing debt.
+- No bank, brokerage, insurance, property-development, construction-contract, concession or investment-holding economics were identified.
+- owner_earnback_applicability=applicable, with manufacturing working capital and operating assets treated as non-detachable.
+
+[key extracted facts, CNY]
+revenue=13133660040.18
+cost_of_sales=12192154615.01
+gross_profit=941505425.17
+parent_net_profit=182376651.71
+operating_cash_flow=934620469.02
+capital_expenditure=452978974.31
+operating_free_cash_flow=481641494.71
+total_assets=8456204491.75
+total_liabilities=4726216238.57
+total_equity=3729988253.18
+parent_equity=3710739327.12
+minority_interest=19248926.06
+cash_and_cash_equivalents=372079232.88
+restricted_cash=115693126.45
+short_term_borrowings=2031665259.51
+current_noncurrent_liabilities=172506107.87
+long_term_borrowings=418879879.81
+lease_liabilities=67928540.51
+
+[formula checks]
+gross_margin=941505425.17/13133660040.18=0.071686447060
+net_margin=182376651.71/13133660040.18=0.013886201649
+operating_free_cash_flow=934620469.02-452978974.31=481641494.71
+forecast_cash_dividend=453152700*0.12=54378324
+forecast_dividend_yield=54378324/4544000000=0.011967060739
+
+[owner earnback assumptions]
+- Detachable cash: 80% of cash and cash equivalents, because a manufacturing group needs operating liquidity.
+- Restricted cash: zero detachable value.
+- Interest-bearing financing liabilities: 100% deduction. Included short-term borrowings, current non-current liabilities, long-term borrowings, and lease liabilities.
+- Long-term equity investments and investment property: zero detachable value because evidence of rapid, unencumbered and lossless disposal was absent.
+discounted_cash=372079232.88*0.8=297663386.304
+interest_bearing_financing_liabilities=2031665259.51+172506107.87+418879879.81+67928540.51=2690979787.70
+discounted_detachable_net_cash=297663386.304-2690979787.70=-2393316401.396
+operating_business_price=4544000000-(-2393316401.396)=6937316401.396
+
+- Sustainable cash profit adopted: CNY 150,000,000.
+- Basis: 2023-2025 parent net profit average was about CNY 135.20m; CNY 150m remains below 2025 parent net profit CNY 182.38m. 2025 FCF was not annualized because operating payables added CNY 572.96m to operating cash flow and project capex increased sharply.
+owner_earnback_years=6937316401.396/150000000=46.248776009307
+market_cap_to_cash_profit=4544000000/150000000=30.293333333333
+
+[quality and limitations]
+- data_quality.status=complete because all protocol-required fields are populated and evidenced.
+- Core annual-report data was read from the published full-text mirror, with the impairment amount cross-checked against an official SZSE PDF. The annual-report PDF itself was not stored locally.
+- Market cap and PE were accepted from the task input and were not independently reconstructed.
+- Sustainable cash profit is an analytical scenario, not a reported company metric or forecast.
+- Industry position lacks independent association ranking; no exact rank was asserted.

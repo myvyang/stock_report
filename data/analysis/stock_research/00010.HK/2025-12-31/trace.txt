@@ -1,0 +1,52 @@
+stock-research trace
+company: HANG LUNG GROUP (00010.HK)
+period: 2025-12-31 annual
+generated_at_input: 2026-08-03T17:27:42+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All structured field changes were made through protocol set/append commands, not by writing JSON directly.
+
+2. Reuse check
+- No raw filing, annual facts, normalized facts, or prior stock-research files existed under the input-declared workspace paths.
+- Therefore fetched and read official 2025 filings.
+
+3. Model verification
+- Input hint said financial_brokerage. This was rejected because the audited report shows property leasing, hotels and property sales, not brokerage activities.
+- Selected investment_holding / requires_special_model.
+- Evidence: property leasing was HKD 9,853m of HKD 10,414m revenue (94.6%); HLG held 65.1% of HLP at year end; RMB 50,875m of RMB 140,065m total equity was non-controlling interests.
+- Consequence: discounted net cash, discounted cash profit, operating business price, owner earnback years and market-cap/cash-profit stay null.
+
+4. Primary sources
+- Audited annual report:
+  https://www.hanglung.com/getmedia/65c8b68d-383b-46b1-9333-2bc694537a64/HLG_2025-AR_E_1.pdf
+- Annual results announcement:
+  https://www.hanglung.com/getmedia/acddb1ca-3dcb-4f5e-bc8c-017d97f1728a/E_HLG_2025_Annual_Results-1.pdf
+- Official annual-results press release:
+  https://www.hanglung.com/en-us/group/media/press-releases/2026/20260130
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, dated 2026/07/31 16:08:41.
+
+5. Currency and calculations
+- Result contract requires CNY absolute yuan. Used the annual report's supplementary RMB columns rather than translating statement items independently.
+- Total assets = RMB 191,558m non-current assets + RMB 21,451m current assets = RMB 213,009m.
+- Total liabilities = RMB 13,832m current liabilities + RMB 59,112m non-current liabilities = RMB 72,944m.
+- Gross/operating contribution = revenue RMB 9,566m - direct costs RMB 3,286m = RMB 6,280m.
+- Gross margin = 6,280 / 9,566 = 65.627%.
+- Net margin = parent net profit RMB 1,265m / revenue RMB 9,566m = 13.224%.
+- Capex proxy = payments for investment properties RMB 146m + investment properties under development RMB 1,793m + property, plant and equipment RMB 280m = RMB 2,219m.
+- Operating FCF = operating cash flow RMB 5,528m - capex proxy RMB 2,219m = RMB 3,309m.
+- Forecast dividend amount uses the RMB cash-flow equivalent of the 2025 HLG dividend: RMB 1,072m.
+- Forecast dividend yield = RMB 1,072m / RMB 16,188,746,952.345371 = 6.622%.
+- This dividend forecast is a flat historical baseline, not company guidance.
+
+6. Data-quality decisions
+- Marked complete because identity, period, market snapshot, special model, core special-model financials, dividend baseline, asset/liability explanations, business story and primary evidence are present.
+- Limitations retained: market snapshot not independently reconstructed; HKD statutory presentation versus RMB supplementary columns; dividend forecast is mechanical; investment-property realizable value and holdco bridge remain valuation-sensitive.
+
+7. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Outcome: {"status":"ok","errors":[]}
+- Confirmed all ordinary owner-earnback sorting fields remain null under requires_special_model.

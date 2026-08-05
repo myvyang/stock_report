@@ -1,0 +1,61 @@
+stock-research trace
+task: 03880.HK / MEDTIDE / annual / 2025-12-31
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read skill and required contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Initialized protocol result
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+result: initialized
+
+3. Reuse audit
+- Expected annual-review facts, normalized facts and raw filing paths in config/input.json did not exist in /workspace.
+- /root/aicode sync targets also did not contain reusable 03880.HK files.
+- Therefore retrieved the official HKEX 2025 annual report.
+
+4. Identity and model correction
+- Input hint said financial_brokerage.
+- HKEX annual report pages 28 and 75 identify Medtide Inc. as a synthetic-peptide CRDMO/API operating company.
+- Overrode hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+5. Primary source
+- HKEX filing title page: https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=1000262701
+- 2025 annual report: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042303035_c.pdf
+- Publication date: 2026-04-23
+- Auditor: Ernst & Young; unmodified opinion as presented in the annual report.
+
+6. Extracted audited figures (RMB yuan)
+- Revenue 570087000; cost of sales 208477000; gross profit 361610000.
+- Profit before FV movement 232282000; net and parent profit 217371000.
+- Assets 1812586000; liabilities 227795000; equity and parent equity 1584791000.
+- CFO 267443000; PPE purchases 128422000; intangible purchases 1274000; capex 129696000; operating FCF 137747000.
+- Cash equivalents 887646000; time deposits 187113000; restricted cash 209000; bank borrowing 30000000.
+- No 2025 dividend declared and no final dividend recommended.
+
+7. Calculations
+- gross_margin = 361610000 / 570087000 = 0.634309868.
+- net_margin = 217371000 / 570087000 = 0.381290909.
+- discounted detachable net cash = 887646000*50% + 187113000*80% - 30000000 = 563513400.
+- discounted sustainable cash profit = 150000000, judgment anchored to operating FCF 137747000 and allowing partial normalization of expansion capex; did not use reported profit directly because of FV liability gain.
+- operating business price = 2752108317.3388243 - 563513400 = 2188594917.3388243.
+- owner earnback years = 2188594917.3388243 / 150000000 = 14.5906327823.
+- market cap / cash profit = 2752108317.3388243 / 150000000 = 18.3473887823.
+- forecast dividend = 0; forecast yield = 0, based on no 2025 dividend and expansion use of funds.
+
+8. Market data
+- Source: Tencent qt.gtimg.cn, supplied in config/input.json.
+- Timestamp: 2026/08/03 09:47:10.
+- Market cap: RMB 2752108317.3388243; PE TTM: 13.29.
+- Limitation: not independently reconstructed from share count and FX.
+
+9. Protocol population and validation
+- Populated outputs/result.json with protocol CLI set commands; did not hand-write the JSON.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- First successful validation: status ok, errors [].
+
+10. Output status
+- data_quality.status=complete.
+- Judgment limitations are recorded in result.json and report.md.

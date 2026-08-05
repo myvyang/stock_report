@@ -1,0 +1,55 @@
+BBDC stock-research trace
+generated_for_period=2025-12-31
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md and references/report-contract.md.
+- Read references/data-reuse.md because no local annual fact package was present.
+- Initialized outputs/result.json with protocol CLI from config/input.json.
+
+2. Source reuse and retrieval
+- No prior BBDC annual facts, normalized facts, or research output existed under stock_report.
+- Retrieved SEC filing accession 0001379785-26-000009, filed 2026-02-19.
+- Saved filing to stock_report/data/raw/filings/BBDC/2025-12-31/bbdc-20251231.htm.
+- Used company FY2025 earnings release for portfolio yield, non-accrual ratio, and Q1 2026 dividend.
+- Retained input market snapshot: CNY 5,829,136,733.7317505 market cap as of 2026-08-03; PE TTM 9.705882; source Yahoo Finance yfinance.
+
+3. Model decision
+- 10-K states BBDC is a BDC, closed-end non-diversified investment company, RIC, and reports under ASC 946.
+- Investment portfolio at fair value and matched borrowings are the operating engine.
+- Overrode input hint ordinary_operating/applicable.
+- Selected statement_model=platform_financial_mixed and owner_earnback_applicability=requires_special_model.
+- Kept all ordinary owner-earnback values null as required by result contract.
+
+4. Currency conversion
+- Presentation FX used: USD/CNY 7.0288 at 2025-12-31.
+- Formula: CNY amount = reported USD amount * 7.0288.
+- Financial statement source amounts are in USD thousands; expanded to absolute USD before conversion.
+
+5. Core calculations
+- Total assets: USD 2,636,383,000 * 7.0288 = CNY 18,530,608,830.40.
+- Total liabilities: USD 1,475,701,000 * 7.0288 = CNY 10,372,407,188.80.
+- Total/parent equity: USD 1,160,682,000 * 7.0288 = CNY 8,158,201,641.60.
+- Total investment income: USD 279,210,000 * 7.0288 = CNY 1,962,511,248.00.
+- Net investment income: USD 117,843,000 * 7.0288 = CNY 828,294,878.40.
+- Net increase in net assets from operations: USD 101,924,000 * 7.0288 = CNY 716,403,411.20.
+- Operating cash flow: USD 160,542,000 * 7.0288 = CNY 1,128,417,609.60.
+- Financing cash flow: USD -185,101,000 * 7.0288 = CNY -1,301,037,908.80.
+- Cash distributions plus repurchases: (USD 125,247,000 + USD 6,349,000) * 7.0288 = CNY 924,960,876.80.
+- Forecast regular dividend: USD 0.26 * 4 * 104,706,884 shares = USD 108,895,159.36.
+- Forecast dividend CNY: USD 108,895,159.36 * 7.0288 = CNY 765,402,296.11.
+- Forecast yield: CNY 765,402,296.11 / CNY 5,829,136,733.7317505 = 0.1313062862.
+- Market cap / FY2025 year-end NAV: CNY 5,829,136,733.7317505 / CNY 8,158,201,641.60 = 0.7145.
+- Regular dividend NII coverage: USD 117,843,000 / (USD 1.04 * 105,200,841 weighted-average shares) = 1.0771x.
+
+6. Special-model interpretation
+- Gross margin and net margin left null: investment companies do not present comparable sales/cost-of-sales gross profit.
+- Capital expenditure and operating free cash flow left null: portfolio purchases and repayments are core operating investment flows, not ordinary capex.
+- Positive operating cash flow was not treated as sustainable free cash flow because it includes portfolio turnover.
+- Forecast excludes the USD 0.15 per-share special dividends paid in 2025.
+
+7. Protocol population and validation
+- Populated initialized result using protocol CLI set commands; did not construct result JSON from scratch.
+- Protocol validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[].

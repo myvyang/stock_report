@@ -1,0 +1,70 @@
+stock-research trace
+company: AUSTAR / 06118.HK
+period: 2025-12-31 annual
+generated_for_task_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read .agents/skills/stock-research/references/result-contract.md completely.
+- Read .agents/skills/stock-research/references/report-contract.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local-source audit
+- Checked configured annual-review, normalized-facts and raw-filing paths.
+- No filing metadata, annual facts, normalized facts, or prior research output existed in the workspace.
+- Retained config/input.json as the supplied source for market cap, timestamp, PE TTM and Tencent attribution.
+
+3. Primary filing retrieved
+- AUSTAR investor-relations annual-report index:
+  https://www.austar.com.hk/index.php?a=annual&c=investor
+- AUSTAR 2025 Annual Report PDF (company website; audited; published 2026-04-23):
+  https://www.austar.com.hk//data/uploads/2026/04/23/1776943248.pdf
+- Auditor: Moore CPA Limited. Auditor report dated 2026-03-26.
+- Financial statements prepared under IFRS Accounting Standards; presentation currency RMB'000.
+
+4. Model-hint override
+- Input hint: financial_brokerage / requires_special_model.
+- Filing evidence: note 1 says subsidiaries provide integrated engineering solutions to pharmaceutical manufacturers and research institutes and manufacture/distribute pharmaceutical equipment and consumables.
+- No brokerage client funds, proprietary trading portfolio, repo financing, or securities customer balances were identified.
+- Final model: ordinary_operating / applicable.
+
+5. Core extracted amounts (RMB; filing values multiplied by 1,000)
+- Revenue 1,530,672,000; cost of sales 1,237,401,000; gross profit 293,271,000.
+- Operating profit 54,151,000; net profit 32,880,000; parent net profit 33,805,000.
+- Total assets 2,128,003,000; liabilities 1,303,918,000; equity 824,085,000; parent equity 822,545,000; NCI 1,540,000.
+- Operating cash flow 132,104,000.
+- Capex definition: PPE cash payment 23,104,000 + land-use-right cash payment 6,158,000 + intangible cash payment 444,000 = 29,706,000.
+- Operating free cash flow: 132,104,000 - 29,706,000 = 102,398,000.
+- Financing cash flow -57,908,000; dividend/buyback cash out 0.
+
+6. Derived metrics
+- Gross margin = 293,271,000 / 1,530,672,000 = 0.19159624008278717.
+- Net margin = 33,805,000 / 1,530,672,000 = 0.022085071132156332.
+- Cash and equivalents 227,394,000; pledged bank deposits 49,388,000; borrowings 321,624,000; lease liabilities 22,051,000.
+- Because cash plus pledged deposits is below borrowings, discounted detachable net cash = 0.
+- Sustainable cash profit judgment = 30,000,000, versus reported parent profit 33,805,000. Rationale: other net gains 14,963,000, equity-method profit 4,628,000 and working-capital release make reported/free-cash-flow measures unsuitable for direct extrapolation; 30m is a conservative round normalized base.
+- Operating business price = 313,088,980.63123226 - 0 = 313,088,980.63123226.
+- Owner earnback years = 313,088,980.63123226 / 30,000,000 = 10.436299354374409.
+- Market cap / cash profit = same 10.436299354374409.
+- Board recommended no 2025 dividend; forecast dividend and yield set to 0 pending a contrary declared policy.
+
+7. Operating evidence used
+- 2025 revenue +2.0%, gross profit -2.6%, order intake +11.4%, net cash from operations +33.7%.
+- Segment revenue: IPS 794,199,000 (+21.2%); CDC 432,470,000 (-16.2%); SIC 304,003,000 (-7.7%).
+- Mainland China 87.2% of revenue; outside Mainland China 12.8%, up 17.4%.
+- Contract assets 628,180,000; trade and notes receivables 351,646,000; inventories 279,653,000.
+- Trade and other payables 653,841,000; contract liabilities 260,343,000.
+- Pledged deposits secure letters of credit, guarantees, borrowings and a lawsuit restriction.
+- Board retained funds for business development and operations and recommended no dividend.
+
+8. Protocol population and validation
+- Populated result fields only through repeated protocol `set` and `append` commands after initialization.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[].
+
+9. Data-quality limitations
+- The task-supplied Tencent market snapshot was not available as a separate raw file and was not independently reconstructed.
+- The 30m sustainable cash-profit estimate is judgmental and based mainly on a single recovery year because no historical fact package existed locally.
+- Capex includes PPE, land-use-right and intangible purchases; an alternative maintenance-capex definition would change free cash flow.

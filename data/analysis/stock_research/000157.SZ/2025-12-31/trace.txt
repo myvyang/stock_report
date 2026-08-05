@@ -1,0 +1,74 @@
+stock-research trace
+company=000157.SZ 中联重科
+period=2025-12-31 annual
+generated_at=2026-08-01T05:11:45+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated the initialized skeleton using protocol set commands; no complex result object was authored from an empty file.
+4. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result={"status":"ok","errors":[]}
+
+[reuse_and_sources]
+- No local annual facts package, normalized facts, prior research result, or filing metadata existed for 000157.SZ/2025-12-31.
+- Downloaded primary filing from CNInfo:
+  https://static.cninfo.com.cn/finalpage/2026-03-31/1225055609.PDF
+  local: stock_report/data/raw/filings/000157.SZ/2025-12-31/annual-report-2025.pdf
+- Extracted 269 PDF pages to a local text working copy using pypdf in a temporary virtual environment.
+- Cross-check: Zoomlion official 2025 performance release dated 2026-03-30.
+- Market cap and PE were reused exactly from config/input.json: CNY 65,988,000,000; PE TTM 15.23; Tencent qt.gtimg.cn; 20260731114315.
+
+[model_review]
+- statement_model=ordinary_operating.
+- Reason: engineering machinery revenue CNY 48,118,195,043.05, 92.34% of revenue; financial services only CNY 447,359,565.93, 0.86%.
+- owner_earnback_applicability=applicable with special handling for credit sales, finance leases, mortgage guarantees, customer receivables, and related financing debt.
+
+[core_financials]
+- revenue=52,107,129,173.91
+- cost_of_sales=37,496,807,305.87
+- gross_profit=14,610,321,868.04
+- gross_margin=14,610,321,868.04 / 52,107,129,173.91 = 0.2803897934
+- parent_net_profit=4,858,487,017.80
+- net_margin=4,858,487,017.80 / 52,107,129,173.91 = 0.0932395036
+- total_assets=133,141,069,402.05
+- total_liabilities=73,268,312,410.01
+- total_equity=59,872,756,992.04
+- parent_equity=57,568,372,991.09
+- minority_interest=2,304,384,000.95
+- operating_cash_flow=4,873,901,652.93
+- capital_expenditure=4,654,893,365.82
+- operating_free_cash_flow=219,008,287.11
+- financing_cash_flow=465,413,961.02
+- dividend_and_buyback_cash_out=3,090,324,865.97. Reconstruction: distributions declared to parent shareholders 4,324,267,618.00 less year-end dividend payable 1,540,391,621.75, plus minority dividends paid 210,327,912.93 and share repurchase cash 96,120,956.79. This is not used in valuation formulas.
+
+[detachable_cash]
+- cash=13,781,732,190.59 at 100%.
+- trading_financial_assets=2,070,512,821.64 at 80%, discounted=1,656,410,257.31.
+- interest_bearing_debt_and_lease_liabilities=33,591,775,791.07 at 100% deduction, sourced from financing-liability movement note.
+- Discounted cash assets do not cover debt; discounted_detachable_net_cash floored at 0. No receivables, long-term receivables, inventories, equity investments, or other operating assets were treated as detachable cash.
+
+[cash_profit]
+- Start with 2025 operating cash flow: 4,873,901,652.93.
+- Estimated maintenance capex: 1,328,000,000, approximating fixed-asset depreciation 1,032,228,623.63 + intangible amortization 281,409,368.29 + long-term prepaid expense amortization 14,294,079.65. Right-of-use depreciation excluded to avoid duplicating lease-liability treatment.
+- Base cash profit about 3.546 billion.
+- Additional working-capital/cycle safety adjustment: -705,901,652.93, about 20% of the base cash profit.
+- discounted_sustainable_cash_profit=2,840,000,000.
+- This is an analyst normalization, not company guidance. Full reported capex was CNY 4.655 billion and reported operating FCF only CNY 0.219 billion.
+
+[owner_earnback]
+- operating_business_price=65,988,000,000 - 0 = 65,988,000,000.
+- owner_earnback_years=65,988,000,000 / 2,840,000,000 = 23.2352112676.
+- market_cap_to_cash_profit=same 23.2352112676 because detachable net cash is zero.
+
+[dividend]
+- Board proposal: CNY 0.20/share on 8,648,535,236 shares = CNY 1,729,707,047.20.
+- forecast_dividend_yield=1,729,707,047.20 / 65,988,000,000 = 0.0262124486.
+- Proposal remains subject to shareholder approval and total amount may change with share count.
+
+[quality]
+- data_quality.status=complete.
+- Primary filing supports all required three-statement fields, business facts, asset/liability explanations, dividend basis, and owner-earnback assumptions.
+- Main limitation: maintenance capex is not separately disclosed and is estimated from depreciation/amortization.

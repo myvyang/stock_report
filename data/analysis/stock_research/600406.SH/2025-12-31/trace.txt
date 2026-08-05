@@ -1,0 +1,86 @@
+stock-research trace
+company: 国电南瑞（600406.SH）
+period: 2025-12-31 annual
+generated_at: 2026-07-31T18:43:33+08:00
+
+1. Read instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse check
+- Expected annual facts directory had no files.
+- Expected prior stock research directory had no files.
+- No local raw filing or normalized facts were available.
+- Therefore retrieved the disclosed annual report from the public filing URL.
+
+3. Primary sources
+- Annual report: https://static.cninfo.com.cn/finalpage/2026-04-30/1225257886.PDF
+  Title: 国电南瑞科技股份有限公司2025年年度报告
+  Published: 2026-04-30
+  Used for: business model, segment revenue/margins, orders, statements, balance-sheet notes, dividends, risks.
+- config/input.json
+  Used for: company identity, report period, market cap CNY 194,288,000,000, quote timestamp 20260731114321, source Tencent qt.gtimg.cn, PE TTM 23.35.
+
+4. Statement model decision
+- Confirmed ordinary_operating/applicable.
+- Reason: annual report describes order-driven design, software/hardware development and manufacturing, systems integration, delivery and lifecycle service. The business has project working-capital intensity but is not a bank, broker, insurer, developer, concession, or investment holding model.
+
+5. Key reported inputs (CNY)
+- revenue: 66,228,963,223.21
+- cost_of_sales: 49,117,323,852.59
+- gross_profit: 17,111,639,370.62
+- operating_profit: 9,809,281,552.09
+- net_profit: 8,858,072,184.03
+- parent_net_profit: 8,278,971,723.32
+- adjusted_parent_net_profit: 7,982,955,643.59
+- operating_cash_flow: 12,768,702,125.04
+- capital_expenditure: 2,110,354,922.10
+- operating_free_cash_flow: 10,658,347,202.94
+- total_assets: 98,585,657,661.02
+- total_liabilities: 42,126,213,104.12
+- total_equity: 56,459,444,556.90
+- parent_equity: 52,646,425,094.68
+- minority_interest: 3,813,019,462.22
+
+6. Derived formulas
+- gross_margin = 17,111,639,370.62 / 66,228,963,223.21 = 0.2583709383
+- net_margin = 8,278,971,723.32 / 66,228,963,223.21 = 0.1250053046
+- operating_free_cash_flow = 12,768,702,125.04 - 2,110,354,922.10 = 10,658,347,202.94
+- forecast_dividend_yield = 4,967,912,638.17 / 194,288,000,000 = 0.0255698378
+
+7. Discounted detachable net cash
+- cash: 7,323,259,338.52 * 50% = 3,661,629,669.26
+- trading financial assets: 17,170,372,185.73 * 80% = 13,736,297,748.584
+- time deposits and large CDs: 2,813,695,459.33 * 90% = 2,532,325,913.397
+- interest-bearing/current lease liabilities: subtract 587,370,367.85
+- result = 19,342,882,963.391
+- Rationale: retain operating liquidity for project delivery and settlement; apply liquidity/availability discounts; subtract identified financing and lease liabilities in full.
+
+8. Sustainable cash profit
+- start parent net profit: 8,278,971,723.32
+- remove disclosed non-recurring profit: -296,016,079.73
+- adjusted parent profit: 7,982,955,643.59
+- prudential buffer for project acceptance, collection, margin and minority distribution uncertainty: -482,955,643.59
+- discounted sustainable distributable cash profit: 7,500,000,000
+- The positive one-year FCF excess was not capitalized as permanent profit.
+
+9. Owner earnback calculations
+- operating_business_price = 194,288,000,000 - 19,342,882,963.391 = 174,945,117,036.609
+- owner_earnback_years = 174,945,117,036.609 / 7,500,000,000 = 23.3260156049
+- market_cap_to_cash_profit = 194,288,000,000 / 7,500,000,000 = 25.9050666667
+- discounted_net_cash_to_market_cap = 19,342,882,963.391 / 194,288,000,000 = 0.0995577852
+
+10. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields using repeated protocol set commands.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: []
+
+11. Known limitations
+- Tencent market quote was supplied by the task and not independently reconciled to an exchange close.
+- Trading financial assets were not penetrated product by product.
+- Dividend forecast mechanically extends the 2025 annual cash distribution baseline.
+- Company-reported industry leadership lacks an independent market-share dataset in this task.

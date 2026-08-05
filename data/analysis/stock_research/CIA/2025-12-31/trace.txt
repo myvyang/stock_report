@@ -1,0 +1,76 @@
+Stock research trace — CIA — period 2025-12-31
+Generated for task created_at 2026-08-04T20:13:50+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked the raw filing, annual review and normalized-facts paths supplied in config/input.json.
+- None of those CIA/2025-12-31 files or directories existed in this workspace.
+- No prior stock-research result existed to reuse.
+
+3. Primary sources used
+- SEC Form 10-K, accession 0000024090-26-000011, filed 2026-03-12:
+  https://www.sec.gov/Archives/edgar/data/24090/000002409026000011/cia-20251231.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/24090/000002409026000011/0000024090-26-000011-index.htm
+- FY2025 earnings release, furnished as Exhibit 99.1:
+  https://www.sec.gov/Archives/edgar/data/24090/000002409026000010/earningsrelease-4q2025.htm
+- Market cap and PE: config/input.json, source labelled Yahoo Finance yfinance.
+
+4. Model decision
+- Input hint was ordinary_operating/applicable.
+- Overrode it based on filing facts: Citizens is predominantly a life insurer; premiums and investment income fund benefits, reserves and policyholder obligations.
+- Selected financial_insurance/requires_special_model.
+- Kept every ordinary owner-earnback amount and ratio null as required by the contract.
+
+5. Core extracted USD values
+- Total assets: $1,754.760m.
+- Total liabilities: $1,519.775m.
+- Total stockholders' equity / parent equity: $234.985m; no noncontrolling interest disclosed.
+- Total investments: $1,442.111m.
+- Cash and equivalents: $22.976m, including $1.554m restricted.
+- Deferred policy acquisition costs: $220.537m.
+- Total policy liabilities: $1,462.138m.
+- Revenue: $255.616m; premiums $176.371m; net investment income $72.039m.
+- Pretax income: $17.525m; net income attributable to Citizens: $14.591m.
+- Operating cash flow: $18.0m per FY2025 earnings release.
+- Direct insurance issued: $1,060.110m; 68,358 policies.
+- Direct insurance in force: $5.43bn.
+- Domestic insurers' statutory capital and surplus: $24.8m (2024: $28.8m).
+- CICA International capital and surplus: $101.470m; 2026 dividend capacity without approval: $0.5m.
+
+6. Currency normalization
+- Contract requires absolute CNY amounts.
+- Input did not specify an FX source/rate.
+- Used an explicit analytical translation of USD 1 = CNY 7.00 for all financial-statement values.
+- Preserved USD source amounts in evidence/report and flagged the translation as a limitation.
+- Did not translate or alter the supplied market cap; it was already given as CNY 1,613,570,673.9582367.
+
+7. Derived observations (not filing facts)
+- 2025 revenue growth: 255.616 / 245.001 - 1 = 4.33%.
+- Premium growth: 176.371 / 173.328 - 1 = 1.76%.
+- Net income growth: 14.591 / 14.912 - 1 = -2.15%.
+- Approximate ROE on average GAAP equity: 14.591 / ((234.985 + 210.355)/2) = 6.55%.
+- Net investment income / average total investments: 72.039 / ((1,442.111 + 1,391.228)/2) = 5.08%.
+- Supplied market cap / translated 2025 equity: 1,613.571 / 1,644.895 = 0.981x.
+- These are analytical calculations, not management-adjusted metrics.
+
+8. Dividend forecast
+- Forecast cash dividend: CNY 0; yield 0%.
+- Basis: the 10-K says Citizens has never paid Class A or B cash dividends and does not expect to do so in the foreseeable future.
+
+9. Data limitations
+- No local annual fact pack or raw filing was available.
+- No aggregate RBC ratio was disclosed; only compliance above minimum requirements.
+- Insurance gross margin, ordinary capex-based FCF and detachable net cash are not economically comparable and remain null.
+- Market snapshot date is later than the financial statement date.
+- Company claims about market leadership were not independently verified.
+
+10. Protocol operations and validation
+- Populated outputs/result.json using protocol `set` commands; did not hand-write a replacement JSON document.
+- First batch wrapper attempt failed before any set operation (`PYTHONPATH=src: command not found`); re-ran using a shell function. No partial mutation resulted from the failed attempt.
+- Validation after population returned: {"status":"ok","errors":[]}.

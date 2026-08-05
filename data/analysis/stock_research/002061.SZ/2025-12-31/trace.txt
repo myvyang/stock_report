@@ -1,0 +1,63 @@
+2026-07-31 stock-research trace — 002061.SZ 浙江交科
+
+1. Read skill and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Initialized protocol result
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reused available sources
+   - stock_report/data/analysis/annual_review/002061.SZ/2025-12-31/facts.json
+   - stock_report/data/analysis/annual_review/002061.SZ/2025-12-31/annual_facts.md
+   - stock_report/data/raw/filings/002061.SZ/2025-12-31/metadata.json
+   - stock_report/data/raw/filings/002061.SZ/2025-12-31/002061_2025_annual_report.txt
+   - config/input.json market snapshot
+
+4. Model determination
+   Confirmed statement_model=construction_project and owner_earnback_applicability=requires_special_model from reported business and balance-sheet substance:
+   - revenue recognized over construction performance
+   - accounts receivable CNY 9,634,436,087.86
+   - contract assets CNY 30,668,830,097.92
+   - accounts payable CNY 38,890,360,223.72
+   - interest-bearing debt (defined in result/report) CNY 13,928,973,649.38
+   Ordinary detachable-net-cash and owner-earnback fields therefore remain null.
+
+5. Source conflict and correction
+   The annual fact pack recorded:
+   - total liabilities CNY 61,898,443,777.89
+   - total equity CNY 22,677,496,491.26
+   - parent equity CNY 19,216,669,990.00
+   These conflict with the primary annual report consolidated balance sheet on page 94. Used primary filing values:
+   - total liabilities CNY 65,299,929,125.93
+   - total equity CNY 19,276,011,143.22
+   - parent equity CNY 15,815,184,651.96
+   - minority interest CNY 3,460,826,491.26
+   Cross-check: liabilities + equity = assets = CNY 84,575,940,269.15.
+
+6. Key calculations
+   - gross margin = 3,483,166,798.25 / 46,409,521,005.41 = 0.0750528365
+   - net margin = 964,326,971.91 / 46,409,521,005.41 = 0.0207786437
+   - operating free cash flow = 1,289,490,561.77 - 391,927,830.57 = CNY 897,562,731.20
+   - forecast dividend yield = 294,172,948.30 / 9,515,000,000 = 0.0309167576
+   - receivables plus contract assets / total assets ≈ 47.7%
+   - new contracts / revenue ≈ 1.60x
+   - remaining performance obligations / revenue ≈ 3.20x
+
+7. Dividend handling
+   Used the board-approved 2025 profit distribution proposal of CNY 294,172,948.30. Annual report states it remained subject to shareholder approval. This is a forecast, not recorded as completed distribution.
+
+8. Result population
+   All result.json mutations were made with protocol CLI set/append commands. Complex JSON was not hand-written from a blank file.
+
+9. Validation
+   Command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result:
+   {"status":"ok","errors":[]}
+
+10. Known limitations
+   - No complete split of unrestricted operating cash, project deposits, overseas cash, and legally distributable cash.
+   - No split of maintenance versus growth capital expenditure.
+   - Aggregate orders do not reveal contract-level margin, owner credit, payment terms, or commencement status.

@@ -1,0 +1,65 @@
+stock-research trace
+task: 00945.HK / Manulife Financial Corporation
+period: 2025-12-31 annual
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Input hint was financial_brokerage; this was treated as a hint only.
+
+3. Reuse check
+- No local raw filing, annual facts, normalized facts, or prior stock-research result existed for 00945.HK/2025-12-31.
+- Public official disclosures were therefore fetched/reviewed.
+
+4. Primary sources reviewed
+- Manulife 2025 audited consolidated financial statements:
+  https://www.manulife.com/content/dam/manulife-com/ca/financial-documents/investors/MFC_CFS_2025_Y1_EN.pdf
+  Key pages: p.10 statement of financial position; p.11 income; pp.13-14 equity/cash flow; pp.104-105 shares and subsequent dividend; pp.121-122 segment results.
+- Manulife FY2025 and Q4 results release:
+  https://www.manulife.com/ca/en/about-us/news/manulife-reports-4q25-net-income-and-core-earnings
+  Key evidence: core earnings, ROE, LICAT, APE/new business CSM/NBV, segment results, Global WAM flows, CSM balance and remittances.
+- Bank of Canada annual average exchange rates:
+  https://www.bankofcanada.ca/rates/exchange/annual-average-exchange-rates/
+- Bank of Canada Valet daily FX series:
+  https://www.bankofcanada.ca/valet/observations/FXCNYCAD/json?start_date=2025-12-31&end_date=2025-12-31
+- Market cap and PE: Tencent qt.gtimg.cn snapshot supplied by config/input.json.
+
+5. Model decision
+- Confirmed statement_model=financial_insurance.
+- Overrode input hint financial_brokerage because the audited statements show insurance contract liabilities, insurance service results, segregated funds, CSM, and insurance/wealth-management segments rather than brokerage customer funds and trading-book financing.
+- owner_earnback_applicability=requires_special_model.
+- Ordinary owner earnback fields kept null because invested assets and cash are required to support policyholder obligations and regulatory capital.
+
+6. Currency conversion
+- Protocol requires CNY absolute yuan.
+- 2025 income statement and 2025 paid dividend: 1 CNY=0.1944 CAD (Bank of Canada 2025 annual average), so 1 CAD=5.1440329218 CNY.
+- 2025-12-31 balance sheet and forecast dividend: 1 CNY=0.1960 CAD (Bank of Canada daily rate), so 1 CAD=5.1020408163 CNY.
+- Original filing amounts are C$ millions unless stated otherwise.
+
+7. Forecast dividend
+- Quarterly common dividend declared 2026-02-11: C$0.485/share.
+- Annualized DPS: C$1.94.
+- Shares used: 1.677 billion at 2025-12-31.
+- Forecast cash dividend: C$3.25338 billion = CNY 16,598,877,551.02.
+- Forecast yield: 16,598,877,551.02 / 498,977,168,503.73267 = 0.03326580573.
+
+8. Protocol population
+- Used repeated protocol set and append commands; result.json was not composed as a complex object from scratch.
+- Populated analysis model, core financials, asset/liability explanations, dividend, business story, risks, evidence, and data quality.
+- Ordinary owner earnback metrics remain null as required for special models.
+
+9. Known limitations
+- Market cap/PE were not independently recomputed.
+- Profit and balance-sheet conversions use different rate conventions appropriate to flow/stock items; both differ from the 2026-07-31 market-cap date.
+- Insurance revenue/margins and consolidated operating cash flow are not used as ordinary-company comparables.
+- Core earnings, core ROE, AUMA and post-tax CSM net of NCI are management non-GAAP measures and were identified as such in interpretation.
+
+10. Validation
+- Protocol validation executed after population.
+- Initial result: status=ok, errors=[]

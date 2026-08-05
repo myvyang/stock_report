@@ -1,0 +1,104 @@
+task=stock_research
+query=CMRE
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-04T18:54:32+08:00
+
+[skill_and_contract]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+
+[reuse_check]
+config_input=config/input.json
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+raw_filing_metadata=missing
+decision=no reusable annual fact package; return to primary filings
+
+[protocol]
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+population=protocol set commands used for analysis, model, metrics, financials, asset analysis, owner earnback, dividend, business, risks, evidence, and data quality
+validation=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[primary_sources]
+sec_filing_index=https://www.sec.gov/Archives/edgar/data/1503584/000114036126007868/0001140361-26-007868-index.htm
+sec_20f=https://www.sec.gov/Archives/edgar/data/1503584/000114036126007868/ef20064083_20f.htm
+sec_fy2025_results=https://www.sec.gov/Archives/edgar/data/1503584/000117184326000875/exh_991.htm
+fx_source=https://english.news.cn/20251231/d55adf458b384452b9c936aff80e901f/c.html
+market_source=config/input.json (Yahoo Finance yfinance snapshot supplied by task)
+
+[identity_and_model]
+company=Costamare Inc.
+ticker=CMRE
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+model_reason=post-spin continuing company earns containership time-charter and controlled maritime lease income; operating cash flow and sustaining capex are separable, but debt, vessel renewal, and cyclicality require special adjustments
+discontinued_operations=Costamare Bulkers dry-bulk business spun off 2025-05-06
+
+[currency]
+source_currency=USD
+output_currency=CNY
+fx_date=2025-12-31
+usd_cny=7.0288
+method=all filing amounts multiplied by 7.0288; market cap retained from CNY input
+
+[financial_extraction_usd_thousands]
+total_assets=3862662
+total_liabilities=1703706
+total_equity=2158956
+parent_equity=2086194
+minority_interest=72762
+total_revenues=877900
+constructed_cost_of_sales=403984
+constructed_gross_profit=473916
+operating_profit=456190
+net_profit=369000
+parent_net_profit=364575
+continuing_operating_cash_flow=536867
+reported_vessel_capex=68971
+reported_operating_free_cash_flow=467896
+continuing_financing_cash_flow=-507588
+dividends_paid_total=79287
+
+[gross_profit_definition]
+formula=total revenue - voyage expenses - related voyage expenses - vessel operating expenses - related management fees - dry-docking amortization - depreciation
+note=company does not report GAAP gross profit; G&A and FX remain below constructed gross profit
+
+[owner_earnback_usd_thousands]
+cash_and_equivalents=519847 discount=0.80
+short_term_investments=19276 discount=1.00
+restricted_cash=50430 discount=0.00
+interest_bearing_debt=1514838 discount=1.00 deduction
+discounted_detachable_net_cash_usd=-1079684.4
+discounted_detachable_net_cash_cny=-7588885710.72
+operating_business_price_cny=20282573184.169952
+
+[sustainable_cash_profit_usd_thousands]
+continuing_ocf=536867
+normalized_replacement_capex=129538 basis=depreciation
+preferred_dividends=20920
+noncontrolling_income=4638
+pre_cycle_haircut_cash_profit=381771
+cycle_discount=0.80
+discounted_sustainable_cash_profit=305416.8
+discounted_sustainable_cash_profit_cny=2146713603.84
+owner_earnback_years=9.448197071043326
+market_cap_to_cash_profit=5.913079160044323
+
+[dividend_forecast]
+quarterly_common_dividend_usd_per_share=0.115
+annualized_common_dividend_usd_per_share=0.46
+shares=120583929
+forecast_cash_dividend_cny=389877747.27139205
+forecast_dividend_yield=0.030714301741464667
+forecast_status=mechanical annualization, not management guidance
+
+[limitations]
+- market cap and PE were supplied in input and not independently refreshed
+- income and cash-flow items use year-end rather than average FX for protocol consistency
+- gross profit is an analyst-constructed shipping operating measure
+- depreciation is a proxy, not a vessel-by-vessel replacement plan
+- earnback is sensitive to charter renewal rates, residual values, environmental capex, and financing

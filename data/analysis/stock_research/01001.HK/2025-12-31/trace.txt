@@ -1,0 +1,55 @@
+stock-research trace
+company=01001.HK HK SH ALLIANCE
+input_period=2025-12-31
+fiscal_period_used=FY2024/25 ended 2025-03-31
+generated_at=2026-08-03T14:11:11+08:00
+
+1. Read protocol instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- Expected annual facts and normalized facts did not exist in workspace.
+- Downloaded official annual results and annual report to:
+  stock_report/data/raw/filings/01001.HK/2025-12-31/annual-results-2025.pdf
+  stock_report/data/raw/filings/01001.HK/2025-12-31/annual-report-2024-25.pdf
+
+3. Primary sources
+- HKEX annual results announcement dated 2025-06-26:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2025/0626/2025062601558.pdf
+- HKEX Annual Report 2024/25 dated 2025-07-17:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2025/0717/2025071700413.pdf
+- Market cap and PE TTM: config/input.json, Tencent qt.gtimg.cn, timestamp 2026/07/31 16:08:47.
+
+4. Model verification
+- Input hint financial_brokerage rejected.
+- Official filing states principal activities are construction-material distribution and processing, sanitary ware/kitchen cabinet trading, property investment and fund management.
+- Selected statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Applied strict cash handling because cash is required for inventory, receivables, trade financing and debt service.
+
+5. Currency and formulas
+- Original financial statements are HKD.
+- Structured amounts converted at research approximation 1 HKD = 0.925 CNY.
+- Gross margin = HKD347.166m / HKD2,111.804m = 16.4393%.
+- Parent net margin = HKD89.617m / HKD2,111.804m = 4.2436%.
+- Operating FCF = operating cash flow HKD227.305m - PPE capex HKD3.061m = HKD224.244m.
+- Detachable net cash = 0 because HKD179.667m cash/pledged deposits is far below HKD1,122.617m borrowings and supports operations.
+- Sustainable cash profit base = CNY74.0m, cross-checked against CNY82.896m parent profit and cash flow before working-capital release.
+- Discounted sustainable cash profit = CNY74.0m * 80% = CNY59.2m.
+- Operating business price = CNY213,560,873.11267856 - 0 = CNY213,560,873.11267856.
+- Owner earnback years = CNY213,560,873.11267856 / CNY59,200,000 = 3.607447181.
+- Forecast dividend = HKD0.033/share * 636,508,315 shares * 0.925 = CNY19,429,625.
+- Forecast dividend yield = CNY19,429,625 / CNY213,560,873.11267856 = 9.0979%.
+
+6. Timing limitations
+- Input research period is 2025-12-31, while company fiscal year ends 31 March; annual numbers use 2025-03-31 filing.
+- Market data is dated 2026-07-31, so PE TTM and market cap are not contemporaneous with FY2024/25 statements.
+- PE TTM retained from input and not used to derive reported earnings.
+
+7. Protocol operations
+- Initialized outputs/result.json using protocol init.
+- Populated scalar/object fields using protocol set.
+- Added asset, liability, risk and evidence rows using protocol append.
+- Protocol validation returned status=ok and errors=[].

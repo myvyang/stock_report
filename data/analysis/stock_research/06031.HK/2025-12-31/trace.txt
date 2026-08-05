@@ -1,0 +1,73 @@
+stock-research trace
+company: 三一重工股份有限公司 (06031.HK / A-share 600031.SH)
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- No files existed under the supplied annual-review, normalized-facts, or raw-filing paths.
+- No prior stock-research result existed for 06031.HK/2025-12-31.
+- Downloaded official HKEX 2025 annual report to:
+  stock_report/data/raw/filings/06031.HK/2025-12-31/annual-report-2025.pdf
+
+3. Model verification
+- Input hint stated financial_brokerage, but source_tags stated equipment_manufacturer.
+- Official annual report says principal activities are R&D, manufacturing, sales and servicing of construction machinery.
+- Five main machinery categories generated RMB72,420.867 million, 80.74% of revenue; financial services generated RMB468.482 million, about 0.52%.
+- Overrode model to ordinary_operating / applicable.
+- Kept finance lease receivables, loans and advances, and restricted deposits outside detachable cash because they support equipment sales or are constrained.
+
+4. Primary financial sources and extracted values
+- HKEX annual report URL:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042906244.pdf
+- Cross-check annual report URL:
+  https://static.cninfo.com.cn/finalpage/2026-03-31/1225061378.PDF
+- Consolidated profit or loss, HKEX pp.109-111, RMB'000:
+  revenue 89,699,505; cost of sales 64,831,182; gross profit 24,868,323;
+  profit before tax 9,907,171; net profit 8,487,650; parent net profit 8,408,057.
+- Consolidated financial position, HKEX pp.112-114, RMB'000:
+  total assets 173,299,138; total liabilities 83,867,741; total equity 89,431,397;
+  parent equity 88,331,244; non-controlling interests 1,100,153.
+- Consolidated cash flow, HKEX pp.118-121, RMB'000:
+  operating cash flow 19,975,261; PPE purchases 2,519,075; ROU additions 59,933;
+  intangible additions 142,843; financing cash flow 1,575,997;
+  dividends paid to equity shareholders 5,643,586; share repurchases 1,413,296.
+- Operating free cash flow calculation:
+  19,975,261 - 2,519,075 - 59,933 - 142,843 = 17,253,410 (RMB'000).
+
+5. Owner earnback assumptions and formulas
+- Cash equivalents: RMB14,904.853m x 100% = RMB14,904.853m.
+- Time deposits: RMB22,039.322m x 95% = RMB20,937.356m.
+- FVPL financial assets: RMB15,736.293m x 70% = RMB11,015.405m.
+- Restricted deposits: RMB1,694.757m x 0% = zero detachable value.
+- Deduct current/non-current borrowings, placements from banks and lease liabilities at 100%:
+  RMB13,588.703m + RMB7,853.367m + RMB3,647.206m + RMB273.718m + RMB771.241m
+  = RMB26,134.235m.
+- Discounted detachable net cash = RMB20,723.379m.
+- Sustainable cash profit = RMB7,500m, anchored to RMB8,408.057m parent profit and haircut for cycle/working-capital reversal.
+- Input market cap = RMB165,486.870109m.
+- Operating business price = market cap - discounted net cash = RMB144,763.491109m.
+- Owner earnback years = operating business price / sustainable cash profit = 19.3018.
+- Market cap / sustainable cash profit = 22.0649.
+
+6. Dividend
+- HKEX annual report p.70 and p.303: proposed 2025 final dividend RMB0.18/share, estimated total RMB1,647m.
+- Forecast dividend yield = RMB1,647m / RMB165,486.870109m = 0.99525%.
+- Proposal remained subject to shareholder approval and actual record-date share count in the cited annual report.
+
+7. Market data
+- Source: config/input.json / Tencent qt.gtimg.cn.
+- Market cap: RMB165,486,870,109.20703 at 2026/08/03 09:47:30.
+- PE TTM: 20.66.
+- Limitation: market-cap construction for the dual-listed A+H issuer was not independently recalculated.
+
+8. Protocol completion
+- Populated result fields using repeated protocol `set` and `append` commands; did not hand-write the initialized JSON object.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].

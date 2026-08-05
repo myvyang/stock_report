@@ -1,0 +1,63 @@
+stock-research execution trace
+generated_for: 03839.HK
+period: 2025-12-31
+report_type: annual
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse audit
+   - No raw filing, annual facts package, normalized facts, or historical stock-research result existed for 03839.HK/2025-12-31.
+   - Existing stock_report content contained only user_stock_evaluations.md.
+
+4. Primary-source retrieval
+   - Downloaded HKEX annual report PDF:
+     https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042902985.pdf
+   - Local copy: stock_report/data/raw/filings/03839.HK/2025-12-31/annual-report-2025.pdf
+   - Extracted text: stock_report/data/raw/filings/03839.HK/2025-12-31/annual-report-2025.txt
+   - Cross-check: https://www.cp-bio.com/investor-relations.html
+
+5. Model override
+   - Input hint: financial_brokerage / requires_special_model.
+   - Filing evidence: all consolidated revenue is from biotech manufacturing/trading; ordinary inventories, receivables, PP&E, trade payables and bank borrowings; no brokerage client funds, proprietary securities portfolio or repo financing.
+   - Final model: ordinary_operating / applicable.
+
+6. Currency normalization
+   - Filing presentation currency: USD thousands.
+   - Result protocol currency: CNY yuan.
+   - Conversion: USD 1 = CNY 6.99, rounded from filing note 25(a): RMB58.041m equivalent to USD8.299m (implied 6.994).
+   - Limitation: income statement converted at this period-end implied rate, not an annual average rate.
+
+7. Key extracted facts
+   - Revenue USD535.914m; gross profit USD77.437m; parent profit USD32.055m.
+   - Assets USD461.664m; liabilities USD153.783m; parent equity USD277.145m.
+   - CFO USD34.331m; PP&E purchases USD6.296m; FCF proxy USD28.035m.
+   - Cash USD39.831m; bank borrowings USD47.150m.
+   - JV and associate carrying values USD105.558m and USD24.059m.
+   - High Orient and related entities revenue USD327.617m; related-company receivables USD97.918m.
+   - 2025 dividend nil; 2024 dividend nil.
+
+8. Research judgments
+   - Detachable net cash includes cash less bank debt only; JV/associate stakes remain in operating/investment purchase price because they are strategic, governed assets rather than freely detachable cash.
+   - Sustainable attributable cash profit set at CNY170m from CNY195.965m consolidated FCF, with CNY25.965m deduction for minority interests and abnormal growth/concentration/margin sustainability.
+   - Forecast dividend set to zero based on two consecutive nil-dividend years and no announced commitment.
+
+9. Formula outputs
+   - discounted detachable net cash: CNY -51,159,810
+   - operating business price: CNY 1,910,827,314.6890974
+   - sustainable cash profit: CNY 170,000,000
+   - owner earnback years: 11.2401606746
+   - market cap / cash profit: 10.9392206158
+
+10. Protocol population
+    - Used protocol CLI set/append commands to populate initialized outputs/result.json.
+
+11. Validation
+    - Initial populated validation: status ok, errors [].
+    - Final validation executed after report and trace creation; see final task execution output.

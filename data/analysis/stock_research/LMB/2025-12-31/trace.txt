@@ -1,0 +1,54 @@
+task=LMB annual stock research
+period=2025-12-31
+generated_at=2026-08-05T05:39:57+08:00
+
+[protocol]
+init: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+population: protocol set commands used for every populated section; result.json was not hand-written
+validate: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[source reuse]
+No annual facts package, normalized facts, raw filing metadata, or prior stock-research result existed under the input paths in this workspace.
+Primary filing was therefore retrieved and read from SEC EDGAR.
+
+[primary sources]
+1. Limbach Holdings, Inc. 2025 Form 10-K
+   SEC accession: 0001628280-26-013285
+   filed: 2026-03-02
+   url: https://www.sec.gov/Archives/edgar/data/1606163/000162828026013285/lmb-20251231.htm
+   used for: identity, business model, segments, statements, notes, debt, cash flow, project estimates, backlog/RPO, dividend policy, risks
+2. Federal Reserve H.10 foreign exchange rates
+   annual USD/CNY 2025: 7.1875 CNY per USD
+   2025-12-31 spot: 6.9931 CNY per USD
+   used for: protocol-required CNY conversion
+3. config/input.json Yahoo Finance yfinance snapshot
+   market_cap=5767788882.941895 CNY
+   market_cap_date=2026-08-03
+   pe_ttm=26.167883
+
+[model decision]
+input_hint=ordinary_operating/applicable
+confirmed_model=construction_project/requires_special_model
+reason=Limbach recognizes revenue on project performance and carries material accounts receivable, contract assets, contract liabilities, retainage, fixed-price estimation risk, and project working-capital swings. ODR service mix reduces but does not eliminate project economics.
+ordinary_owner_earnback_fields=null as required by contract.
+
+[currency conversion]
+balance_sheet: USD thousands * 1000 * 6.9931
+income_statement_and_cash_flow: USD thousands * 1000 * 7.1875
+ratios: calculated from unrounded USD statement values; currency conversion does not alter margins
+cross_statement_CNY_totals_do_not_directly_reconcile_due_to_average_vs_closing_rates=true
+
+[key calculations]
+gross_margin=169314/646804=0.2617701807657343
+net_margin=39064/646804=0.06039542117859506
+operating_free_cash_flow_USD=(45700-3807)*1000=41893000
+operating_free_cash_flow_CNY=41893000*7.1875=301105937.5
+forecast_cash_dividend=0
+forecast_dividend_yield=0/5767788882.941895=0
+
+[interpretive controls]
+2025 free cash flow is disclosed as an observation, not sustainable distributable cash profit.
+Cash is not treated as detachable because cash is below debt and the project business requires working capital.
+The 2025 equity-award tax withholding cash outflow is retained in the protocol's combined dividend_and_buyback_cash_out field but described as withholding, not a broad shareholder repurchase.
+No buy/sell recommendation, ranking label, or target price was produced.

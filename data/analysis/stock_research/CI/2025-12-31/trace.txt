@@ -1,0 +1,52 @@
+Stock research trace — CI — period 2025-12-31
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+   - config/input.json existed.
+   - No annual facts package, normalized facts, raw filing metadata, or prior stock-research result existed for CI/2025-12-31 under the supplied stock_report paths.
+   - Therefore returned to primary public filings.
+
+3. Primary sources retrieved/reviewed
+   - SEC Form 10-K: accession 0001739940-26-000006, filed 2026-02-26, period 2025-12-31.
+     URL: https://www.sec.gov/Archives/edgar/data/1739940/000173994026000006/ci-20251231.htm
+   - SEC Company Facts JSON for CIK 0001739940, used to cross-check core XBRL totals.
+     URL: https://data.sec.gov/api/xbrl/companyfacts/CIK0001739940.json
+   - Company full-year earnings release dated 2026-02-05, used for MCR, net medical costs payable, 2026 outlook and dividend forecast.
+     URL: https://newsroom.thecignagroup.com/2026-02-05-The-Cigna-Group-Reports-Strong-Fourth-Quarter-and-Full-Year-2025-Results%2C-Establishes-2026-Outlook-and-Increases-Dividend
+   - Company investor FAQ, used to confirm quarterly dividend declaration and approval caveat.
+     URL: https://investors.thecignagroup.com/resources/investor-faqs/default.aspx/1000/
+   - Valuation snapshot reused exactly from config/input.json: market cap CNY 497,572,608,219.3281 on 2026-08-03; PE TTM 11.535758; source Yahoo Finance yfinance.
+
+4. Model decision
+   - Input hint ordinary_operating/applicable was rejected after filing review.
+   - Evernorth is a PBM/specialty-pharmacy/health-services platform; Cigna Healthcare includes insured medical risk and ASO services.
+   - The balance sheet includes insurance and contractholder liabilities, matching investments, regulated-subsidiary cash, and legally segregated separate accounts.
+   - Selected statement_model=platform_financial_mixed and owner_earnback_applicability=requires_special_model.
+   - Consequently all ordinary owner-earnback sorting fields remain null as required by the result contract.
+
+5. Currency and calculations
+   - Reporting currency standardized to CNY absolute yuan.
+   - USD filing amounts translated at CNY 6.78 per USD, approximately consistent with the CNY valuation input and contemporaneous Federal Reserve H.10 references.
+   - Parent net margin = USD 5.957bn / USD 274.900bn = 0.0216696981.
+   - Operating free cash flow = USD 9.601bn CFO - USD 1.212bn property/equipment purchases = USD 8.389bn = CNY 56.87742bn.
+   - 2026 forecast dividend = USD 1.600bn × 6.78 = CNY 10.848bn.
+   - Forecast dividend yield = CNY 10.848bn / CNY 497.572608219bn = 0.0218018456.
+   - 2025 dividends plus repurchases = (USD 1.611bn + USD 3.621bn) × 6.78 = CNY 35.47296bn.
+   - Gross margin intentionally null: consolidated expense presentation combines PBM and insurance economics and does not provide a comparable ordinary-company gross profit.
+
+6. Protocol operations
+   - Initialized outputs/result.json with:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Populated scalar and object fields through protocol set/append commands; did not hand-write the initialized complex JSON.
+   - Initial completed validation returned status=ok, errors=[].
+
+7. Output status
+   - outputs/result.json: complete special-model result; ordinary owner-earnback figures null by design.
+   - outputs/report.md: human-readable operating story and limitations.
+   - outputs/trace.txt: source, transformation and protocol audit trail.

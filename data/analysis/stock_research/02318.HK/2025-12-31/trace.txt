@@ -1,0 +1,52 @@
+stock-research trace
+task: 02318.HK / PING AN / annual / 2025-12-31
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Local reuse audit
+- Checked configured raw filing, annual review and normalized facts paths.
+- No local 2025 filing/facts files were present, so research returned to primary public filings.
+
+4. Primary sources used
+- HKEX, Ping An Annual Report 2025, released 2026-04-28:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042803045.pdf
+- Ping An official 2025 annual results release, dated 2026-03-26:
+  https://group.pingan.com/media/news/2026/ar-25.html
+- Tencent qt.gtimg.cn market snapshot supplied in config/input.json, dated 2026-08-03 09:48:07.
+
+5. Key extraction trail (annual report page labels)
+- Five-Year Summary, p. i: parent operating profit, parent net profit, assets, liabilities, equity, solvency, dividend, NBV, CSM, combined ratio, bank metrics.
+- Insurance Funds Investment Portfolio, pp. 56-57: RMB6,489,962m portfolio and asset allocation; 3.7% net and 6.3% comprehensive investment yield.
+- Analysis of Embedded Value, p. 80: operating profit reconciliation and segment operating profit.
+- Liquidity and Capital Resources, p. 86: RMB2.70 DPS, RMB48,891m cash dividend, payout ratios and history.
+- Consolidated Income Statement, p. 200: RMB1,140,324m revenue, RMB158,301m net profit, RMB134,778m parent net profit.
+- Consolidated Statement of Financial Position, pp. 202-203: assets, liabilities, equity and major balance-sheet items.
+- Consolidated Statement of Cash Flows, p. 206: RMB658,632m reported operating cash flow; excluded as ordinary-company cash-profit proxy because it includes insurance and banking flows.
+- Note 19, p. 280: RMB25,833m restricted cash and bank balances.
+
+6. Model decision
+- Input hint financial_brokerage was overridden.
+- Confirmed model: financial_insurance.
+- Applicability: requires_special_model.
+- Reason: insurance investment assets match insurance contract liabilities; the consolidated bank's loans and liquidity assets match customer deposits and regulatory capital. Ordinary detachable-net-cash and free-cash-profit formulas are economically invalid.
+
+7. Calculations
+- Net margin (display-only, non-comparable) = 134,778 / 1,140,324 = 0.11819.
+- Minority interest ratio = 415,569 / 1,415,988 = 0.29349.
+- Flat-dividend forecast yield = 48,891,000,000 / 918,323,368,434.5781 = 0.05324.
+- Forecast dividend is a flat extrapolation of the announced 2025 amount, not company guidance.
+- Ordinary owner earnback metrics remain null per result contract.
+
+8. Protocol write and validation
+- All result fields were populated through repeated protocol `set` commands; no complex JSON result was handwritten from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status before handoff: ok, errors: [].

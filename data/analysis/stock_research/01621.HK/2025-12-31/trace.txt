@@ -1,0 +1,85 @@
+stock-research trace
+company: Vico International Holdings Limited / 01621.HK
+task period: 2025-12-31
+actual annual-report period: year ended 2025-03-31
+generated for input timestamp: 2026-08-04T16:29:13+08:00
+
+1. Protocol initialization
+Command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+Result: initialized stock-research-result-v1 document.
+
+2. Local reuse audit
+Checked paths listed in config/input.json for raw filing metadata, annual facts, normalized facts, extraction trace, and prior stock-research result.
+Result: none existed in /workspace; only config/input.json was present. Public-source retrieval was therefore necessary.
+
+3. Primary filing
+Source: HKEX, Vico International Holdings Limited Annual Report 2024/2025.
+URL: https://www.hkexnews.hk/listedco/listconews/sehk/2025/0716/2025071600383.pdf
+Published: 2025-07-16; audited statements authorized 2025-06-26.
+Downloaded to temporary research storage and extracted locally for review.
+
+Key filing locations reviewed:
+- Business Review and prospects, report pp.6-7.
+- Financial Review, report pp.8-11.
+- Consolidated profit or loss, report p.120.
+- Consolidated financial position, report pp.121-122.
+- Consolidated cash flows, report pp.124-125.
+- Revenue and segments, notes 7-8, report pp.193-198.
+- Dividend, note 14, report p.204.
+- Inventories, note 19, report p.216.
+- Trade and other receivables, note 20, report pp.217-220.
+- Cash/time deposits, note 22, report p.222.
+- Trade and other payables, note 23, report p.223.
+- Bank borrowings and overdrafts, note 24, report p.224 onward.
+
+4. Analysis-model verification
+Input hint: financial_brokerage / requires_special_model.
+Finding: contradicted by audited annual report. The company sells diesel, lubricant oil and other petrochemicals and provides fleet-card services; no brokerage, investment-banking, asset-management or securities-dealing business was reported.
+Override: ordinary_operating / applicable.
+
+5. Currency conversion
+Financial statements are in HKD; result contract requires CNY absolute yuan.
+Rate used: 1 HKD = 0.9323 CNY at 2025-03-31.
+Historical rate source: https://www.exchangerates.org.uk/historical/find-exchange-rate-history-for-31_03_2025
+Methodology cross-reference: HKMA daily exchange-rate series documentation: https://apidocs.hkma.gov.hk/documentation/market-data-and-statistics/monthly-statistical-bulletin/er-ir/er-eeri-daily/
+All HKD statement figures were multiplied by 0.9323. Ratios were calculated from unrounded source figures.
+
+6. Valuation source
+Market cap: CNY 172,060,000.89645386.
+PE TTM: 12.48.
+Timestamp: 2026/08/03 09:20:05.
+Source: Tencent qt.gtimg.cn, supplied in config/input.json.
+Limitation: this market snapshot was not independently replaced with an exchange-calculated market capitalization.
+
+7. Owner earnback assumptions
+Cash and cash equivalents: HKD 62.212m x 90%.
+Time deposit over three months: HKD 20.802m x 95%.
+Bank borrowings and overdrafts: HKD 35.220m x 100% deduction.
+Lease liabilities: HKD 4.823m x 100% deduction.
+Discounted detachable net cash: CNY 33,292,153.31.
+
+Reported parent net profit: HKD 12.346m = CNY 11,510,175.80.
+Sustainability haircut: 10%, reflecting approximately 3% gross margin and sensitivity to oil price, sales mix and fixed costs.
+Discounted sustainable cash profit: CNY 10,359,158.22.
+The reported 2025 operating FCF was not annualized because the HKD 26.937m reduction in trade and other receivables materially boosted operating cash flow.
+
+Formula checks:
+Operating business price = 172,060,000.89645386 - 33,292,153.31 = 138,767,847.58645386 CNY.
+Owner earnback years = 138,767,847.58645386 / 10,359,158.22 = 13.395668319703862.
+Market cap / cash profit = 172,060,000.89645386 / 10,359,158.22 = 16.609457761178383.
+
+8. Dividend forecast
+Annual report note 14 states no ordinary-share dividend was paid or proposed in 2025 and none had been proposed after period end; 2024 comparative was also nil.
+Base forecast: CNY 0; forecast dividend yield: 0.
+
+9. Protocol population and validation
+outputs/result.json was populated only through protocol CLI set commands after initialization; the complex JSON document was not handwritten from scratch.
+Final command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Result: status ok, errors [].
+
+10. Data-quality decision
+Status: complete.
+Reason: identity, model, market data, three statements, asset/liability explanations, owner-earnback assumptions, dividend forecast, business story and primary evidence are present.
+Explicit limitations: input archive period differs from actual reporting date; market and filing dates differ by about 16 months; market cap is from the supplied Tencent snapshot; conversion rate and analytical haircuts introduce estimation uncertainty.

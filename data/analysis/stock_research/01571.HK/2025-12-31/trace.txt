@@ -1,0 +1,83 @@
+stock-research trace
+company=01571.HK Xin Point Holdings Limited / 信邦控股有限公司
+period=2025-12-31
+generated_at=2026-08-04T14:07:22+08:00
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+populate=protocol set commands for each result section
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[reuse-check]
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+historical_stock_research=missing
+decision=fetch and inspect official HKEX disclosure
+
+[primary-sources]
+annual_report_url=https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042904394.pdf
+annual_report_release=2026-04-29 20:08
+annual_results_url=https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032602078.pdf
+annual_results_release=2026-03-26 21:30
+local_annual_report=stock_report/data/raw/filings/01571.HK/2025-12-31/annual-report-2025.pdf
+market_snapshot=config/input.json; Tencent qt.gtimg.cn; 2026/08/03 09:40:22
+
+[model-review]
+input_hint=financial_brokerage / requires_special_model
+verified_business=manufacture and sale of automotive and electronic components
+verified_assets=PPE, ROU assets, inventories, receivables, cash
+verified_liabilities=trade payables, other payables, tax payable, lease liabilities; no year-end bank borrowing
+conclusion=ordinary_operating / applicable
+reason=input hint conflicts with annual-report facts and was overridden
+
+[financial-extraction]
+currency=CNY
+source_unit=RMB thousands
+output_unit=RMB yuan
+revenue=3152791000
+cost_of_sales=2097736000
+gross_profit=1055055000
+net_profit=527170000
+parent_net_profit=529340000
+total_assets=4461684000
+total_liabilities=779733000
+total_equity=3681951000
+parent_equity=3690430000
+cash_and_bank_balances=1074637000
+pledged_bank_deposits=3497000
+lease_liabilities=40218000
+bank_borrowing=0
+operating_cash_flow=1058100000
+capital_expenditure=317300000
+operating_free_cash_flow=1058100000-317300000=740800000
+capital_commitments=166178000
+FY2025_dividend=447477000
+
+[formulas]
+gross_margin=1055055000/3152791000=0.33464159216389544
+net_margin=529340000/3152791000=0.16789568353880735
+discounted_detachable_net_cash=1074637000*0.50-40218000-166178000=330922500
+discounted_sustainable_cash_profit=529340000
+operating_business_price=3399716351.712942-330922500=3068793851.712942
+owner_earnback_years=3068793851.712942/529340000=5.797396478091477
+market_cap_to_cash_profit=3399716351.712942/529340000=6.42255705541418
+forecast_dividend_yield=447477000/3399716351.712942=0.1316218630341144
+
+[judgment-boundaries]
+fact=2025 operating cash flow was RMB1.0581bn; management attributed increase partly to lower dividend withholding tax and higher Mexico VAT refunds
+judgment=do not use cash flow excess to raise sustainable profit; use reported parent net profit
+fact=year-end cash was RMB1.074637bn; capital commitments RMB166.178m; Malaysia expansion ongoing
+judgment=count only 50% of unpledged cash, deduct leases and contracted capex in full
+fact=2025 equipment impairment RMB37.886m tied to a terminated customer co-development project
+judgment=do not add back despite management describing it as non-recurring
+
+[limitations]
+market cap and PE TTM were accepted from input and not independently recomputed
+financing cash flow net amount was not available in the annual-results announcement and remains null
+cash haircut and sustainable-profit selection are analytical judgments, not reported facts

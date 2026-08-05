@@ -1,0 +1,64 @@
+stock-research trace
+task_created_at=2026-08-04T12:46:46+08:00
+company=JCSE / JE Cleantech Holdings Limited
+period=2025-12-31
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full as requested.
+3. Read references/data-reuse.md; searched configured raw filing, annual review, normalized facts and prior stock research paths. No reusable JCSE files existed.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated the initialized result with repeated protocol `set` operations; no complex JSON result was authored from a blank file.
+6. Validated with protocol CLI after population; status=ok, errors=[].
+
+[primary_sources]
+- SEC Form 20-F, accession 0001493152-26-021923, filed 2026-05-08, period 2025-12-31:
+  https://www.sec.gov/Archives/edgar/data/1905511/000149315226021923/form20-f.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/1905511/000149315226021923/0001493152-26-021923-index.htm
+- SEC Form 6-K/A confirming payment of US$0.44 per share dividend:
+  https://www.sec.gov/Archives/edgar/data/1905511/000149315226008010/form6-ka.htm
+- PBOC/CFETS central parity announcement dated 2025-12-26:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- Market snapshot: config/input.json, Yahoo Finance yfinance, market cap date 2026-08-03.
+
+[model_review]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Business operations are equipment manufacturing/sales and centralized dishwashing/general cleaning. Balance sheet consists principally of cash, receivables, inventory, operating fixed assets, bank debt and customer advances. No special financial-statement model applies.
+
+[currency]
+Financial statements are in SGD thousands. All result monetary values were converted to absolute CNY using 1 SGD=5.4655 CNY, the 2025-12-26 PBOC/CFETS central parity cited above. This single-date rate is used consistently for comparability with the CNY market cap; it is not a full GAAP currency translation and is disclosed as a limitation.
+
+[financial_extraction]
+Balance sheet, SGD000: assets=32984; liabilities=13212 (32984-19772); equity=19772; parent_equity=19772; minority_interest=0; cash=9931; receivables_net=7411; prepaid_and_other_current=837; inventory=9202; financial_instruments=764; PPE_net=3735; ROU_assets=983; bank_loans=4022; lease_liabilities_approx=263; AP_accruals_other=2673; warranty=22; tax_payable=205; contract_liabilities=5815.
+Income statement, SGD000: revenue=20296; cost_of_revenue=14521; gross_profit=5775; operating_profit=610; net_income=3236; disposal_gain=4168; other_expense=1585.
+Cash flow, SGD000: CFO=2686; capex=829; operating_FCF=1857; financing_CF=-4839.
+Segments, SGD000: equipment revenue=12510, cost=7855, gross profit=4655; dishwashing/cleaning revenue=7786, cost=6666, gross profit=1120.
+Historic FCF, SGD000: 2023=1375-211=1164; 2024=2053-1253=800; 2025=2686-829=1857.
+
+[formula_checks]
+gross_margin=5775/20296=0.2845398108
+net_margin=3236/20296=0.1594402838
+discounted_detachable_net_cash_SGD000=9931 + 764*0.8 - 4022 - 263 - 3600 = 2657
+discounted_detachable_net_cash_CNY=2657*1000*5.4655=14521833.5
+sustainable_cash_profit_SGD000=1300 (rounded, close to 3-year FCF mean 1273.7)
+sustainable_cash_profit_CNY=1300*1000*5.4655=7105150
+operating_business_price=48195580.13132286-14521833.5=33673746.63132286
+owner_earnback_years=33673746.63132286/7105150=4.739343876
+market_cap_to_cash_profit=48195580.13132286/7105150=6.783191791
+discounted_net_cash_to_market_cap=14521833.5/48195580.13132286=0.3013166941
+forecast_dividend=0; forecast_yield=0/48195580.13132286=0
+
+[judgment_notes]
+- 2025 net income was rejected as sustainable profit because the SGD4.168m disposal gain exceeded operating profit of SGD0.610m.
+- Sustainable cash profit uses SGD1.3m, close to the 3-year operating FCF mean, rather than the strongest single year.
+- Cash reserve of SGD3.6m approximates three months of annual cost of revenue plus operating expenses; this avoids treating operating liquidity as detachable.
+- Financial instruments are discounted to 80% because the disclosed single bond investment is pledged for bank loans.
+- The February 2026 dividend is recorded as history. Forecast is zero because no recurring policy was evidenced and the payment followed a material asset disposal; zero means insufficient basis to extrapolate, not certainty of no future dividend.
+
+[quality]
+data_quality.status=complete
+incomplete_reasons=[]
+Known limitations are stored in outputs/result.json: single-date FX translation, market data sourced from input, unquantified cash upstreaming/loan/tax constraints, and estimated dividend aggregate based on year-end shares.

@@ -1,0 +1,72 @@
+stock-research trace
+company: 倍加洁 603059.SH
+period: 2025-12-31 annual
+generated_at: 2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md in full.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated fields exclusively through protocol `set` operations.
+4. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[source acquisition]
+- No pre-existing annual facts, normalized facts, raw filing, or historical stock-research result was present locally.
+- Downloaded the official SSE-hosted 2025 audited financial report PDF:
+  https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-24/603059_20260424_TFS0.pdf
+- Local source files:
+  stock_report/data/raw/filings/603059.SH/2025-12-31/603059_2025_annual_report.pdf
+  stock_report/data/raw/filings/603059.SH/2025-12-31/603059_2025_annual_report.txt
+- Used the full 2025 annual-report disclosure text to recover the management discussion, primary statements, product/region split and risks. Core numbers were cross-checked to the audited financial-report PDF.
+- Dividend evidence: 2025 profit distribution announcement and SSE 2025 annual dividend implementation announcement dated 2026-07-09.
+- Market-cap evidence: config/input.json snapshot, Tencent qt.gtimg.cn, timestamp 20260731114347.
+
+[model classification]
+- Confirmed ordinary_operating/applicable.
+- Reason: revenue comes from manufacturing and selling oral-care, wipes, and probiotic products. Receivables, inventory, productive fixed assets, supplier payables and borrowings have ordinary operating-company meanings.
+- Long-term equity investments are material but do not turn the consolidated company into an investment-holding model because the operating manufacturing segments remain the revenue and cash-flow engine.
+
+[key financial checks]
+revenue = 1,535,288,602.38
+cost_of_sales = 1,139,930,875.73
+gross_profit = revenue - cost_of_sales = 395,357,726.65
+gross_margin = gross_profit / revenue = 0.2575169653
+parent_net_profit = 114,793,754.13
+net_margin = parent_net_profit / revenue = 0.0747694918
+operating_cash_flow = 213,224,022.00
+capital_expenditure = 89,993,641.48
+operating_free_cash_flow = OCF - capex = 123,230,380.52
+
+[owner earnback]
+discounted liquid funds:
+  unrestricted cash and cash equivalents 100,210,783.41 * 100% = 100,210,783.41
+  current long-term deposit and interest 42,322,666.67 * 90% = 38,090,400.00
+  bank wealth product 2,913,220.75 * 80% = 2,330,576.60
+less:
+  interest-bearing borrowings = 434,374,015.83 + 32,402,780.00 + 68,294,457.24 = 535,071,253.07
+  committed minority-interest acquisition obligation = 158,699,135.62
+raw discounted net cash = 140,631,760.01 - 535,071,253.07 - 158,699,135.62 = -553,138,628.68; detachable net cash is floored at 0.
+
+sustainable cash profit:
+  213,224,022.00 OCF
+  -89,993,641.48 capex
+  =123,230,380.52 operating FCF
+  -23,230,380.52 prudence adjustment for working-capital/capex cycle and recovery-year uncertainty
+  =100,000,000.00 discounted sustainable cash profit
+
+operating_business_price = 2,415,000,000 - 0 = 2,415,000,000
+owner_earnback_years = 2,415,000,000 / 100,000,000 = 24.15
+market_cap_to_cash_profit = 24.15
+
+[dividend]
+2025 full-year cash dividend = 35,157,045.00, including interim 8,035,896.00 and year-end distribution about 27,121,149.00.
+forecast dividend yield = 35,157,045 / 2,415,000,000 = 0.0145577826.
+This is a baseline forecast using the latest full-year distribution, not management guidance for 2026.
+
+[quality and limitations]
+- status=complete under result-contract minimum fields.
+- The sustainable cash-profit figure is a conservative normalization based primarily on one recovery year, not a multi-cycle forecast.
+- Long-term equity investments were not treated as detachable cash because realizability and dividend paths are uncertain.
+- Market cap and PE were accepted from the supplied input snapshot.

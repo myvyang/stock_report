@@ -1,0 +1,60 @@
+Stock research trace — 02558.HK / 2025-12-31 annual
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Read instructions
+- Read /workspace/.agents/skills/stock-research/SKILL.md in full.
+- Read result-contract.md and report-contract.md in full as explicitly requested.
+- Read data-reuse.md because the skill requires reuse assessment.
+
+2. Reuse assessment
+- Checked the configured raw filing, annual review, normalized facts, and prior stock research paths.
+- No local filing, facts package, normalized facts, or prior research existed for 02558.HK / 2025-12-31.
+- Therefore returned to official disclosure sources.
+
+3. Protocol initialization
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- The initializer carried company, period, market-cap snapshot, and analysis-model hint into the protocol object.
+
+4. Official source retrieval and model verification
+- Located HKEX issuer title search for stock code 02558.
+- Downloaded HKEX-filed ANNUAL REPORT 2025, release date 2026-04-28:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042804585.pdf
+- Cross-checked the issuer-hosted annual-report search result:
+  https://www.jshbank.com/data/tosend/resource/upload/20260414/b251799d-ec67-4c28-90ad-80a4507a0a71.pdf
+- Used the HKEX 2026-06-26 AGM poll result and updated dividend announcement to confirm the proposed 2025 final dividend had been approved by the valuation date.
+- Verified statement model financial_bank from the audited balance sheet and business description: customer deposits, loans, financial investments, interbank funding and issued bonds are operating balance-sheet items.
+- Set owner_earnback_applicability to not_applicable; ordinary-company discounted cash, cash profit, business price, earnback years and market-cap/cash-profit fields remain null.
+
+5. Key audited facts extracted
+- Units in annual-report consolidated statements: RMB thousands; converted to absolute RMB yuan for result.json.
+- Total assets RMB393,000,401,000.
+- Total liabilities RMB363,913,490,000.
+- Equity attributable to bank holders RMB29,086,911,000; NCI zero at year-end.
+- Operating income RMB5,444,557,000.
+- Net profit RMB1,663,374,000; attributable net profit RMB1,665,310,000.
+- Net interest income RMB3,866,088,000; NIM 1.07% versus 1.20% in 2024.
+- Gross loans RMB217,626,407,000; net loans RMB210,457,417,000.
+- Customer deposits RMB320,797,012,000; financial investments RMB114,181,886,000.
+- NPL balance RMB4,249,000,000; NPL ratio 1.95%; allowance coverage 191.00%.
+- Real-estate corporate NPL RMB1,255,300,000 and NPL ratio 12.24%.
+- Core tier-one / tier-one / total capital adequacy: 10.46% / 11.24% / 13.96%.
+- ROE 6.06%.
+
+6. Dividend calculation
+- Approved 2025 final cash dividend: RMB5.0 per 100 shares; total approximately RMB291,900,000.
+- Input market cap: RMB5,977,355,828.142762 at 2026-08-03 09:20:05, source Tencent qt.gtimg.cn.
+- Static pre-tax yield = 291,900,000 / 5,977,355,828.142762 = 0.04883598347054566 (about 4.88%).
+- 2025 payout ratio shown in result history = 291,900,000 / 1,665,310,000 = about 17.53%.
+- The dividend is used as the near-term forecast basis because it was approved before the market-cap date; no assumption that future years repeat it.
+
+7. Protocol population and validation
+- Populated result.json using protocol set and append commands, not by hand-writing a complex JSON object.
+- Kept gross margin, net margin, cost of sales, gross profit, ordinary operating cash flow, capex and operating FCF null because these ordinary-company metrics are not economically comparable for a bank.
+- Set data_quality.status=complete: identity, period, valuation snapshot, audited core bank financials, asset/liability explanations, special-model logic, dividend basis, business story, risks and evidence are present; incomplete_reasons is empty.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial validation result: status ok, errors [].
+
+8. Data limitations
+- Market cap and PE TTM are input-provided Tencent historical snapshot data and were not independently reproduced at the exact timestamp.
+- No ordinary owner earnback ranking metrics are produced for this bank.
+- The approved 2025 dividend is not a guarantee of future distributions.

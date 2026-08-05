@@ -1,0 +1,56 @@
+stock-research trace
+generated_at=2026-08-03T15:44:46+08:00
+company=01221.HK SINO HOTELS
+requested_period=2025-12-31
+requested_report_type=annual
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Local reuse check
+- config/input.json found.
+- No reusable annual facts, normalized facts, metadata, or prior research files were present under the input-provided 01221.HK paths.
+
+3. Primary filings used
+- HKEX 2025-2026 Interim Report, released 2026-03-17:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0317/2026031700231.pdf
+- HKEX Annual Report 2025, released 2025-09-25:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2025/0925/2025092501509.pdf
+- PBOC/CFETS 2025-12-26 central parity announcement; 1 HKD = 0.90486 CNY:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- Market snapshot reused from config/input.json: Tencent qt.gtimg.cn, 2026/07/31 16:08:47.
+
+4. Input correction
+- The input model hint financial_brokerage was rejected. Filing segment disclosures identify City Garden Hotel operation, financial-instrument investment holding, hotel operations through associates (Conrad Hong Kong and The Royal Pacific Hotel & Towers), and club/hotel management.
+- statement_model set to investment_holding; owner_earnback_applicability set to requires_special_model.
+- The requested 2025-12-31 annual period does not exist because the company closes its year on 30 June. analysis.report_type corrected to interim; the latest audited FY2025 report was used for annual context.
+
+5. Currency normalization
+- All result.json financial-statement amounts converted from HKD to CNY at 0.90486.
+- Ratios calculated from original HKD values.
+- Market capitalization retained from input because it is already supplied as the protocol currency amount.
+
+6. Key calculations
+- total_assets=(2,733,524+1,587,983)*1000*0.90486=3,910,358,824.02 CNY
+- total_liabilities=46,176*1000*0.90486=41,782,815.36 CNY
+- gross_margin=38,747/64,280=0.6027846919726197
+- net_margin=51,852/64,280=0.8066583696328563; interpretation warns that associate profit and interest income make this unlike an operating hotel margin.
+- operating_free_cash_flow=(13,187-1,639)*1000*0.90486=10,449,323.28 CNY
+- forecast_cash_dividend=0.03 HKD/share*1,188,173,738 shares*0.90486=32,254,639.56 CNY
+- forecast_dividend_yield=32,254,639.56/1,597,499,681.3231707=0.020190701717877187
+
+7. Owner earnback handling
+- Ordinary owner-earnback metrics left null as required for a special model.
+- No ranking label, target price, or buy/sell recommendation produced.
+
+8. Protocol
+- Initialized outputs/result.json with `PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init`.
+- Populated fields with protocol `set`/`append` commands.
+- Final validation result is recorded below after completion.
+
+9. Final validation
+- command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- status: ok
+- errors: []

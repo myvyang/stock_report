@@ -1,0 +1,85 @@
+stock-research trace
+task_created_at=2026-08-03T12:39:03+08:00
+generated_at=2026-08-03T12:39:23+08:00
+query=00104.HK
+input_period=2025-12-31
+effective_annual_period=2025-03-31
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated fields only through protocol set/append commands.
+3. Validated after population; status=ok, errors=[]
+
+[reuse audit]
+- Expected annual facts, normalized facts, raw filing metadata, and prior stock-research outputs were absent under the paths supplied in config/input.json.
+- Local user evaluation file existed but contained no company-specific source found by search.
+- Downloaded the 2024/2025 annual report to stock_report/data/raw/filings/00104.HK/2025-12-31/annual-report-2025.pdf from the company investor-relations site.
+- Company site TLS certificate chain could not be verified in the execution environment; the PDF was fetched read-only with certificate verification disabled. The same document was parsed and cross-checked through the web document reader.
+
+[primary sources]
+- Asia Commercial Holdings Limited Annual Report 2024/2025:
+  https://www.asiacommercialholdings.com/uploadfile/c0104_250719_AR.pdf
+  Audited financial statements dated 2025-06-26; year ended 2025-03-31.
+- Asia Commercial Holdings corporate profile:
+  https://www.asiacommercialholdings.com/en/profile.php
+- Market snapshot: config/input.json, source Tencent qt.gtimg.cn, 2026/07/31 16:08:46.
+
+[model decision]
+- Input hint: financial_brokerage / requires_special_model.
+- Filing evidence: reportable segments are sales of watches and property leasing; no brokerage client money, proprietary securities book, margin finance, or repo funding.
+- Override: ordinary_operating / applicable.
+- Watches revenue HKD698.975m / group revenue HKD709.373m = 98.54%.
+
+[currency normalization]
+- Protocol requires CNY absolute yuan; filing presents HKD thousands.
+- Filing note 21 discloses RMB148.693m = HKD159.166m at 2025-03-31.
+- Applied inferred rate: CNY/HKD = 148.693 / 159.166 = 0.9342007715215562.
+- Limitation: one year-end implied rate was applied to balance-sheet, income-statement, and cash-flow amounts; no separate average-rate translation.
+
+[key filing facts HKD000]
+revenue=709373
+cost_of_sales=476865
+gross_profit=232508
+profit_before_tax=60604
+net_profit=24464
+parent_net_profit=24465
+total_assets=712977
+total_liabilities=271009
+total_equity=441968
+parent_equity=441973
+operating_cash_flow=103307
+ppe_capex=337
+investment_property_construction=8483
+total_capex=8820
+operating_free_cash_flow=94487
+cash_and_bank_balances=179306
+bank_loans=134320
+inventories=100850
+investment_properties=310207
+dividend_proposed=20000
+dividend_paid=26000
+
+[owner earnback]
+- Cash discount: HKD179.306m * 70% = HKD125.5142m.
+- Debt deduction: HKD134.320m * 100%.
+- Discounted cash minus debt is negative; detachable net cash floored at CNY0.
+- Normalized sustainable-profit base: HKD60m. Rationale: near reported parent profit plus major non-cash property valuation loss, below reported FCF, with lease and cycle caution.
+- Sustainability haircut: 30%; discounted cash profit HKD42m = CNY39,236,432.40.
+- Operating business price: CNY154,260,393.8037157.
+- Earnback years and market-cap/cash-profit: 3.9315601433.
+- This is an analytical estimate, not company guidance or a guaranteed return.
+
+[dividend]
+- Forecast basis: static continuation of FY2025 proposed final dividend HKD20m.
+- Converted amount: CNY18,684,015.43.
+- Forecast yield against input market cap: 12.11199775%.
+
+[quality controls]
+- Company identity confirmed.
+- Annual period mismatch explicitly disclosed and corrected to the issuer's fiscal year-end.
+- Balance check: CNY666,063,663.48 assets - CNY253,176,816.89 liabilities = CNY412,886,846.59 equity.
+- Gross margin: 232508 / 709373 = 0.3277655056.
+- Net margin: 24465 / 709373 = 0.0344882030.
+- Capex includes PPE purchases and investment-property construction.
+- No ranking label, buy/sell advice, or target price produced.

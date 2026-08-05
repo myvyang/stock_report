@@ -1,0 +1,56 @@
+stock-research trace
+company=Aflac Incorporated
+code=AFL
+period=2025-12-31
+generated_at=2026-08-04T12:26:48+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read result-contract.md and report-contract.md completely.
+3. Read data-reuse.md; no existing annual facts package or prior research result was available.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields only through protocol set/append commands.
+6. Validated result with protocol validate; status=ok, errors=[].
+
+[primary sources]
+- SEC 2025 Form 10-K, accession 0001628280-26-011402, filed 2026-02-25:
+  https://www.sec.gov/Archives/edgar/data/4977/000162828026011402/afl-20251231.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/4977/000162828026011402/0001628280-26-011402-index.htm
+- Aflac 2025 Q4 earnings release, 2026-02-04:
+  https://investors.aflac.com/press-releases/press-release-details/2026/Aflac-Incorporated-Announces-Fourth-Quarter-Results-Reports-Fourth-Quarter-Net-Earnings-of-1-4-Billion-Reiterates-Increase-in-First-Quarter-Dividend-of-5-2/default.aspx
+- Aflac 2026 Q1 earnings release, 2026-04-29:
+  https://investors.aflac.com/press-releases/press-release-details/2026/Aflac-Incorporated-Announces-First-Quarter-2026-Results/default.aspx
+- SAFE RMB central parity rate data (source data from China Foreign Exchange Trade System):
+  https://www.safe.gov.cn/safe/rmbhlzjj/
+- Market cap and PE: config/input.json, Yahoo Finance yfinance, dated 2026-08-03.
+
+[local source]
+- Downloaded SEC primary filing to stock_report/data/raw/filings/AFL/2025-12-31/afl-20251231.htm
+- Added source metadata at stock_report/data/raw/filings/AFL/2025-12-31/metadata.json
+
+[model decision]
+Input hint ordinary_operating/applicable was rejected after filing review.
+Confirmed model=financial_insurance; owner_earnback_applicability=not_applicable.
+Reason: investments and cash support policy liabilities and regulatory capital; subsidiary distributions are legally constrained. Ordinary detachable-net-cash and free-cash-profit formulas would misstate economic substance.
+
+[currency]
+All filing USD monetary amounts in result.json were converted to CNY using USD/CNY=7.0288 as of 2025-12-31.
+Formula: CNY absolute yuan = USD millions * 1,000,000 * 7.0288.
+Input market cap was already supplied in CNY and was not converted again.
+
+[key calculations]
+net_margin=3,646/17,164=0.2124213470
+forecast_dividend_usd=0.61*4*516,369,452=1,259,941,462.88
+forecast_dividend_cny=1,259,941,462.88*7.0288=8,855,876,554.29
+forecast_dividend_yield=8,855,876,554.29/437,846,657,942.77734=0.0202259773
+
+[null handling]
+gross_margin=null because an insurer has no economically comparable cost-of-sales/gross-profit measure.
+capital_expenditure and operating_free_cash_flow=null because insurance cash flows and investment purchases are not comparable to ordinary-company capex/FCF.
+discounted_net_cash, discounted_cash_profit, operating_business_price, owner_earnback_years, and market_cap_to_cash_profit=null because the ordinary owner earnback model is not applicable.
+
+[quality]
+data_quality.status=complete
+limitations are recorded in outputs/result.json.

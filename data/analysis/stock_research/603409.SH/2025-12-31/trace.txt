@@ -1,0 +1,61 @@
+stock-research trace
+company=603409.SH 汇通控股
+period=2025-12-31 annual
+generated_at=2026-08-03T11:29:33+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- Checked configured raw filing, annual review, normalized facts and prior stock research paths.
+- No local filing metadata, annual facts, normalized facts or prior outputs existed for 603409.SH/2025-12-31.
+- Decision: retrieve and inspect public 2025 annual report; do not fabricate a local annual facts package.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized with stock-research-result-v1 schema and input valuation snapshot.
+
+4. Sources inspected
+- 合肥汇通控股股份有限公司2025年年度报告, disclosed 2026-04-18, 211 pages.
+  URL: https://stockmc.xueqiu.com/202604/603409_20260418_UHRP.pdf
+  Sections used: business discussion pp.14-30; product/customer data pp.18-21; dividend pp.41-42; consolidated statements pp.82-90; cash-flow notes pp.180-182.
+- 上海证券交易所上市交易公告, 2025-03-03.
+  URL: https://www.sse.com.cn/disclosure/announcement/listing/ipo/c/c_20250303_10774546.shtml
+- Input market snapshot: Tencent qt.gtimg.cn, market cap CNY 3,185,000,000, PE TTM 19.91, timestamp 20260731161453.
+
+5. Model decision
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Basis: revenue is ordinary automotive-parts manufacturing and direct sales; balance sheet consists of receivables, inventory, plant/equipment, supplier payables and leases, with no special financial/developer/concession structure.
+- Special caution: 2025 IPO proceeds and wealth-management products are partly earmarked for expansion, so they are not treated as fully detachable.
+
+6. Deterministic calculations
+- gross_profit = 1,235,080,186.52 - 921,005,714.89 = 314,074,471.63
+- gross_margin = 314,074,471.63 / 1,235,080,186.52 = 0.2542948021
+- net_margin = 147,387,161.57 / 1,235,080,186.52 = 0.1193340831
+- operating_free_cash_flow = 151,951,481.15 - 94,139,101.02 = 57,812,380.13
+- discounted_net_cash = 266,132,467.54*50% + 315,100,093.81*25% - 34,978,070.07 = 176,863,187.15
+- standardized pre-discount cash profit = parent net profit 147,387,161.57 + depreciation/amortization 101,721,416.72 - capex 94,139,101.02 = 154,969,477.27
+- discounted_sustainable_cash_profit = 120,000,000.00 after customer concentration, margin pressure and ramp-up discount
+- operating_business_price = 3,185,000,000.00 - 176,863,187.15 = 3,008,136,812.85
+- owner_earnback_years = 3,008,136,812.85 / 120,000,000.00 = 25.0678
+- market_cap_to_cash_profit = 3,185,000,000.00 / 120,000,000.00 = 26.5417
+- forecast_dividend_yield = 37,804,832.40 / 3,185,000,000.00 = 0.0118696491
+
+7. Protocol population
+- Used protocol set/append commands for all structured fields and evidence entries.
+- Complex JSON was not authored from a blank file; it was initialized and mutated through the skill CLI.
+
+8. Output files
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt
+
+9. Known limitations
+- Annual report PDF was accessed from a public mirror of the disclosed filing because no local filing package existed.
+- Market cap and PE were accepted from the task input and not independently recomputed.
+- The 2025 dividend was a proposal at annual-report publication.
+- Detailed IPO fund-account restrictions were not rebuilt project by project; conservative cash discounts address this uncertainty.

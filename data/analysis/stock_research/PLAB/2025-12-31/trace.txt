@@ -1,0 +1,85 @@
+task=stock_research
+query=PLAB
+input=config/input.json
+requested_period=2025-12-31
+actual_fiscal_period=2025-10-31
+model=ordinary_operating
+owner_earnback_applicability=applicable
+
+[protocol]
+initialized=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+populated=protocol set commands used for all completed sections
+validated=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[reuse]
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+prior_stock_research=missing
+action=researched primary filing because no reusable facts package or prior result existed
+
+[primary_sources]
+1=https://www.sec.gov/Archives/edgar/data/810136/000114036125045801/ef20057458_10k.htm
+  use=FY2025 audited statements, business, revenue mix, liquidity, joint ventures, capex outlook, risks
+2=https://www.federalreserve.gov/releases/h10/20251014/
+  use=USD/CNY reference around fiscal year-end
+3=config/input.json
+  use=market cap, market-cap date, PE TTM, company identity
+
+[currency]
+reporting_currency=USD
+output_currency=CNY
+conversion_rate=7.12 CNY/USD
+method=all filing amounts converted with one approximate reference rate for protocol comparability
+limitation=not a formal historical average/period-end dual-rate translation
+
+[financials_usd_thousands]
+total_assets=1804534
+total_liabilities=207227
+total_equity=1597307
+parent_equity=1173589
+minority_interest=423718
+revenue=849294
+cost_of_sales=549464
+gross_profit=299830
+operating_profit=208161
+net_profit=190234
+parent_net_profit=136405
+operating_cash_flow=247798
+capital_expenditure=188137
+operating_free_cash_flow=59661
+financing_cash_flow=-115257
+buyback_cash_out=97422
+
+[owner_earnback]
+cash_and_equivalents_usd_thousands=492256
+jv_cash_usd_thousands=353800
+jv_parent_share_assumption=0.5001
+short_term_investments_usd_thousands=95909
+debt_usd_thousands=24
+attributable_cash_base_usd_thousands=411276.38
+cash_haircut=25%
+discounted_net_cash_cny=2196215869.20
+three_year_average_consolidated_fcf_usd_thousands=120348
+three_year_parent_income_ratio=0.6842723578
+profit_haircut=10%
+discounted_cash_profit_cny=527703988.63
+market_cap_cny=12051998222.161377
+operating_business_price_cny=9855782352.96
+owner_earnback_years=18.67672514399
+market_cap_to_cash_profit=22.83855813471
+
+[judgment_notes]
+fact=FY2025 cash held abroad was USD446.1m; cash in Taiwan/China joint ventures was USD353.8m.
+fact=FY2026 capex guidance was approximately USD330m.
+inference=consolidated cash is not fully detachable for common shareholders.
+inference=three-year average FCF is more representative than accounting profit, but requires parent attribution and safety haircut.
+judgment=25% cash haircut and 10% profit haircut are conservative analytical assumptions, not company guidance.
+dividend_forecast=zero because no ordinary cash dividend was disclosed or announced; repurchases excluded from dividend yield.
+
+[outputs]
+result_json=outputs/result.json
+report_md=outputs/report.md
+trace_txt=outputs/trace.txt
+data_quality=complete

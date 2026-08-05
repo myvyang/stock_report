@@ -1,0 +1,77 @@
+GCMG stock research trace
+generated_for_period=2025-12-31
+research_date=2026-08-05 Asia/Shanghai
+
+[protocol]
+init: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+population: stock_research.protocol set used for all populated result paths
+validation: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[local_reuse]
+Checked configured raw filing, annual review, normalized facts, and prior stock research paths.
+No GCMG 2025 filing/fact/research artifacts existed locally; only stock_report/data/notes/user_stock_evaluations.md existed.
+Decision: return to primary filings and official sources.
+
+[primary_sources]
+1. SEC 2025 Form 10-K, accession 0001819796-26-000010, filed 2026-02-19
+   https://www.sec.gov/Archives/edgar/data/1819796/000181979626000010/gcm-20251231.htm
+   Used for identity, business model, financial statements, AUM/FPAUM, debt, investments, risks, and subsequent events.
+2. SEC 8-K Exhibit 99.2, FY2025 earnings presentation, furnished 2026-02-10
+   https://www.sec.gov/Archives/edgar/data/1819796/000181979626000003/gcmgrosvenorfourthquarte.htm
+   Used for AUM/FPAUM, fundraising, fee-related earnings, adjusted net income, ownership, dividend, cash/investment/debt summary.
+3. Federal Reserve G.5A annual FX release, released 2026-01-05
+   https://www.federalreserve.gov/releases/g5a/current/
+   2025 annual average: 1 USD = 7.1875 CNY.
+4. config/input.json
+   Yahoo Finance yfinance market cap CNY 5,085,170,689.462097 at 2026-08-03; PE TTM 24.96.
+
+[statement_model]
+Confirmed ordinary_operating/applicable, not bank/brokerage/investment-holding.
+Reason: client AUM is not consolidated; GCMG earns fees for managing third-party capital and its corporate cash/debt are separable from client assets.
+Special handling: Up-C structure. At 2025-12-31 public Class A shares=60.7m, management economic interests=141.7m, total=202.4m. Public economic share rounded to 30%. Input market cap treated as Class A market cap, so consolidated owner metrics are first multiplied by 30%.
+
+[currency]
+All USD filing values converted to CNY with 7.1875. Values in result.json are absolute CNY yuan.
+
+[core_financials_usd_millions]
+Assets 813.762; liabilities 686.330; equity 127.432; parent equity 26.992; NCI 100.440.
+Revenue 557.565; operating income 133.454; net income 142.040; parent net income 45.371.
+OCF 183.539; capex 8.497; operating FCF=183.539-8.497=175.042.
+Financing CF -4.861; dividends plus Class A repurchases=25.343+30.657=56.000 (stored 55.999 due filing line aggregation/rounding).
+Gross profit convention: no cost of sales line; gross profit set equal to revenue and gross margin=1.0 solely to match statement presentation. This is not an economic 100% margin assertion.
+Net margin=45.371/557.565=0.0813734722.
+
+[discounted_net_cash]
+Cash: 242.116 * 30% * 80% = 58.10784 USDm.
+Investments attributable to company: (275.313-40.500)=234.813 USDm; *30%*50%=35.22195 USDm.
+Nominal term debt: 431.430 *30%*100%=129.429 USDm deduction.
+Net: 58.10784+35.22195-129.429=-36.09921 USDm. Result uses rounded -36.09 USDm = CNY -259,396,875.
+February 2026 debt prepayment of USD65m uses corporate cash and does not materially change net cash; it is disclosed but not separately post-adjusted.
+
+[discounted_cash_profit]
+Starting company-reported FY2025 adjusted net income, fully exchanged basis: 166.340 USDm.
+Class A attribution: 166.340*30%=49.902 USDm.
+Sustainability haircut: 20%, reflecting performance-fee/carry cyclicality, non-GAAP adjustments, and dilution uncertainty.
+Discounted sustainable Class A cash profit=49.902*80%=39.9216 USDm=CNY286,936,500.
+
+[earnback]
+Market cap=5,085,170,689.462097 CNY.
+Discounted net cash=-259,396,875 CNY.
+Operating business price=market cap-net cash=5,344,567,564.462097 CNY.
+Market cap/cash profit=5,085,170,689.462097/286,936,500=17.7222859046 years.
+Owner earnback=5,344,567,564.462097/286,936,500=18.6263077875 years.
+Discounted net cash/market cap=-0.0510104559.
+
+[dividend]
+Quarterly dividend declared Feb 2026: USD0.12/Class A share.
+Annualized dividend=0.48*60.721681m=29.146407m USD; rounded input to 29.146m.
+CNY forecast cash dividend=209,486,875.
+Forecast yield=209,486,875/5,085,170,689.462097=0.0411956427.
+2025 cash dividends paid=25.343 USDm=CNY182,152,812.5.
+
+[quality_checks]
+Formula validation passed.
+Asset rows and liability rows each populated with category, amount, explanation.
+Evidence includes SEC filing, SEC earnings exhibit, Federal Reserve FX, and supplied market quote.
+data_quality=complete; incomplete_reasons empty.
+Known limitations recorded in result.json and report.md: Up-C market-cap definition, formal gross-margin presentation, and FX/market-date mismatch.

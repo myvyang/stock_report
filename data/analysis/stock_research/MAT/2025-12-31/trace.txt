@@ -1,0 +1,65 @@
+MAT stock research trace
+generated_at: 2026-08-04 Asia/Shanghai
+period: 2025-12-31 annual
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because local-data reuse was relevant.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- Checked configured raw filing, annual review, normalized facts, and prior stock research locations.
+- No MAT filing or annual facts package existed locally; only stock_report/data/notes/user_stock_evaluations.md was present.
+- Therefore fetched primary public sources rather than reusing absent data.
+
+3. Primary sources
+- SEC Form 10-K, accession 0001628280-26-010716, filed 2026-02-23:
+  https://www.sec.gov/Archives/edgar/data/63276/000162828026010716/mat-20251231.htm
+- Mattel FY2025 results release, dated 2026-02-10:
+  https://investors.mattel.com/news/news-details/2026/Mattel-Reports-Fourth-Quarter-and-Full-Year-2025-Financial-Results/default.aspx
+- Federal Reserve H.10 USD/CNY historical rates:
+  https://www.federalreserve.gov/releases/h10/hist/dat00_ch.htm
+- Valuation snapshot was supplied by config/input.json: Yahoo Finance yfinance, date 2026-08-03.
+
+4. Model classification
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: branded toys, consumer products, licensing, inventory, receivables, molds and ordinary corporate debt are the economic structure. No customer deposits, insurance reserves, regulated project cash, concession rights, or other special-statement structure was found.
+
+5. Currency translation
+- Protocol requires CNY absolute yuan.
+- Used 1 USD = 6.9931 CNY, Federal Reserve H.10 rate dated 2025-12-31.
+- Applied one rate to all financial statement values for internal comparability and disclosed this limitation; margins are calculated from original USD values and are exchange-rate invariant.
+- Treated input market cap CNY 29,587,862,303.4375 as already translated. Input does not expose underlying share price, share count, or FX conversion.
+
+6. Core source values (USD)
+- Balance sheet: assets 6,640.382m; liabilities 4,407.334m; equity 2,233.048m; cash 1,242.927m; receivables 1,097.604m; inventory 563.142m; PP&E 590.015m; ROU assets 319.548m; goodwill 1,390.169m; intangibles 337.105m; long-term debt 2,331.675m.
+- Income statement: revenue 5,347.623m; cost of sales 2,741.966m; gross profit 2,605.657m; operating income 546.424m; net income 397.584m.
+- Cash flow: CFO 593.255m; tools/dies/molds capex 71.374m; other PP&E capex 110.618m; financing cash flow -620.566m; share repurchases 600.000m.
+- No noncontrolling interest is presented; parent equity and parent net income were set equal to consolidated values, minority interest set to zero.
+
+7. Calculations
+- gross_margin = 2,605.657 / 5,347.623 = 0.4872551786.
+- net_margin = 397.584 / 5,347.623 = 0.0743477990.
+- capex = (71.374 + 110.618)m USD = 181.992m USD = CNY 1,272,688,255.20.
+- operating FCF = 593.255 - 181.992 = 411.263m USD = CNY 2,876,003,285.30.
+- discounted cash = 1,242.927m USD * 90% * 6.9931 = CNY 7,822,721,523.33.
+- debt deduction = 2,331.675m USD * 100% * 6.9931 = CNY 16,305,636,442.50.
+- discounted detachable net cash = 7,822,721,523.33 - 16,305,636,442.50 = CNY -8,482,914,919.17.
+- discounted sustainable cash profit = operating FCF * 90% = CNY 2,588,402,956.77.
+- operating business price = 29,587,862,303.4375 - (-8,482,914,919.17) = CNY 38,070,777,222.6075.
+- owner earnback years = 38,070,777,222.6075 / 2,588,402,956.77 = 14.7082111474.
+- market cap / cash profit = 29,587,862,303.4375 / 2,588,402,956.77 = 11.4309335902.
+- discounted net cash / market cap = -0.2867025280.
+
+8. Judgment calls
+- Cash haircut: 10% retained for seasonal working capital, global operating needs and possible restrictions/repatriation friction.
+- Debt: deducted at 100%; long maturity does not make it detachable from the acquired business.
+- Cash profit: 2025 operating FCF discounted by 10%; no restructuring add-back and no reliance on adjusted EPS.
+- Dividend forecast: zero, because common dividends were zero in 2023-2025 and announced capital returns focus on buybacks without a board cash-dividend commitment.
+- Data quality: complete. All minimum core fields, asset/liability explanations, owner-earnback breakdowns, dividend basis, business story, evidence and limitations are present.
+
+9. Validation
+- Ran protocol validation after populating result.json.
+- Result: status=ok, errors=[].

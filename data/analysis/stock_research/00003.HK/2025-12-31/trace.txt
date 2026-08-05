@@ -1,0 +1,58 @@
+stock-research trace
+company: 00003.HK / The Hong Kong and China Gas Company Limited
+period: 2025-12-31 annual
+generated_at: 2026-08-03T17:03:25+08:00
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated scalar fields and list rows only through protocol set/append commands.
+3. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+4. Final validation status: ok; errors: []
+
+[local reuse]
+- Checked configured annual-review, normalized-facts, raw-filing and historical stock-research paths.
+- No reusable filing, facts package or prior research existed in /workspace; only config/input.json was present.
+
+[primary sources]
+- HKEX 2025 Annual Results Announcement, released 2026-03-20:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0320/2026032000477.pdf
+  Used for business identity, revenue composition, customer and sales volumes, income statement, balance sheet, borrowings, contract liabilities, operating narrative and dividend per share.
+- HKEX 2025 Annual Report, released 2026-04-28:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042801254.pdf
+  Used for audited cash-flow statement, capital expenditure, dividends paid, associate/JV dividends and commitments.
+- config/input.json / Tencent qt.gtimg.cn supplied snapshot:
+  Used for RMB market cap 112,853,199,654.97911, PE TTM 23.06 and timestamp 2026/07/31 16:08:41.
+
+[model review]
+- Input hint said financial_brokerage. Rejected based on official filing.
+- Official business: gas production, distribution and marketing; water and waste treatment; renewable energy; advanced fuels; minor property activities.
+- Selected statement_model: utility_concession.
+- Selected owner_earnback_applicability: requires_special_model.
+- Reason: infrastructure, project interests, operating cash, borrowings and customer advances are inseparable from continuing utility obligations. Ordinary detachable-net-cash math would misstate the economic model.
+
+[currency conversion]
+- Protocol requires CNY absolute yuan.
+- Original filing currency: HKD.
+- Conversion rate used: 1 HKD = 0.8983 CNY, 2025-12-31 reference rate.
+- Formula: reported HK$ million * 1,000,000 * 0.8983.
+- Market cap remained as supplied because input already states amount in protocol currency.
+
+[key calculations]
+- total liabilities HK$M = total assets 163,555.1 - total equity 71,389.3 = 92,165.8.
+- operating free cash flow HK$M = operating cash flow 10,533.0 - purchase of PP&E 5,096.3 = 5,436.7.
+- parent net margin = 5,688.2 / 54,326.3 = 0.1047043513.
+- forecast dividend CNY = HK$6,531.0M * 0.8983 = CNY5,866,797,300.
+- forecast dividend yield = CNY5,866,797,300 / CNY112,853,199,654.97911 = 0.0519860963.
+- parent dividend / parent profit = 6,531.0 / 5,688.2 = 1.1482.
+- parent dividend / simplified operating FCF = 6,531.0 / 5,436.7 = 1.2013; equivalently FCF coverage is about 0.8324x.
+
+[null fields]
+- gross_profit and gross_margin: null because the issuer reports total operating expenses rather than a uniform cost-of-sales/gross-profit subtotal comparable with ordinary companies.
+- discounted detachable net cash, discounted sustainable cash profit, operating business price, owner earnback years and market-cap/cash-profit: null because the special utility model is required.
+
+[quality]
+- status: complete under the special-model minimum threshold.
+- limitations are recorded in outputs/result.json and report.md.
+- No buy/sell recommendation, target price or ranking label was produced.

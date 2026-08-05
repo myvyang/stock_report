@@ -1,0 +1,68 @@
+stock-research trace
+company=VOYA
+period=2025-12-31
+generated_at=2026-08-04T10:54:43+08:00
+
+[instructions]
+read .agents/skills/stock-research/SKILL.md
+read .agents/skills/stock-research/references/result-contract.md
+read .agents/skills/stock-research/references/report-contract.md
+read .agents/skills/stock-research/references/data-reuse.md
+
+[reuse-check]
+config/input.json present
+annual facts package absent
+raw filing metadata absent
+prior stock-research result absent
+decision: retrieve primary filing and official investor-relations disclosures
+
+[sources]
+1. SEC Form 10-K, accession 0001535929-26-000043, filed 2026-02-20, period 2025-12-31
+   https://www.sec.gov/Archives/edgar/data/1535929/000153592926000043/voya-20251231.htm
+   used: company model, balance sheet, income statement, cash flow, RBC, leverage, dividend restrictions, risks
+2. SEC Company Facts, CIK 0001535929
+   https://data.sec.gov/api/xbrl/companyfacts/CIK0001535929.json
+   used: cross-check core XBRL financial values
+3. Voya Financial full-year 2025 results, published 2026-02-03
+   https://investors.voya.com/news/news-details/2026/Voya-Financial-announces-fourth-quarter-and-full-year-2025-results/default.aspx
+   used: adjusted operating earnings, segment results, client assets/AUM, net inflows, excess capital and shareholder returns
+4. Voya Financial dividend announcement, published 2025-10-30
+   https://investors.voya.com/news/news-details/2025/Voya-Financial-increases-common-dividend-and-declares-preferred-stock-dividend/default.aspx
+   used: quarterly common dividend of USD 0.47
+5. Federal Reserve H.10 historical exchange rate
+   https://www.federalreserve.gov/RELEASES/H10/hist/dat00_ch.htm
+   used: 2025-12-31 exchange rate of CNY 6.9931 per USD
+6. config/input.json
+   used: market cap CNY 60,832,896,970.921875, date 2026-08-03, source Yahoo Finance yfinance, PE TTM 15.019638
+
+[model-decision]
+input_hint=ordinary_operating/applicable
+confirmed_model=financial_insurance/not_applicable
+reason=general-account investments support insurance and retirement liabilities; separate-account assets equal separate-account liabilities; regulated subsidiary capital and upstream dividend restrictions make cash non-detachable
+ordinary_owner_earnback_fields=null by contract, intentionally
+
+[currency]
+protocol_currency=CNY
+conversion_rate=6.9931 CNY/USD
+balance-sheet date rate=2025-12-31
+income and cash-flow values also converted at this rate for protocol consistency; not an accounting translation
+
+[calculations]
+net_margin=USD 613m common-shareholder net income / USD 8,189m revenue = 0.07485651483697643
+forecast_dividend=USD 0.47 * 4 * 93,842,616 shares = USD 176,424,118.08
+forecast_dividend_cny=USD 176,424,118.08 * 6.9931 = CNY 1,233,750,674.40
+forecast_dividend_yield=CNY 1,233,750,674.40 / CNY 60,832,896,970.921875 = 0.020280978480931675
+minority_interest_ratio=USD 1,864m / USD 6,817m = 0.27343112806219745
+dividend_and_buyback_cash_out=USD (178m + 200m) * 6.9931 = CNY 2,643,391,800
+
+[null-fields]
+gross_margin, cost_of_sales, gross_profit: insurance statements lack comparable gross-profit structure
+operating_profit: no directly comparable operating-profit subtotal in consolidated insurance statement
+capital_expenditure, operating_free_cash_flow: conventional capex/FCF does not explain insurance economics and no comparable disclosed capex line was used
+discounted_net_cash, discounted_cash_profit, operating_business_price, owner_earnback_years, market_cap_to_cash_profit: prohibited because ordinary owner-earnback model is not applicable
+
+[protocol]
+initialized outputs/result.json with:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+populated scalar/object fields with protocol set and array entries with protocol append
+validated after population with protocol validate: status=ok, errors=[]

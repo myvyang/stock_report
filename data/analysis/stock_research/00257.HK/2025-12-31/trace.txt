@@ -1,0 +1,60 @@
+stock-research trace
+task: 00257.HK / China Everbright Environment Group Limited
+period: 2025-12-31 annual
+generated_for_input: 2026-08-03T16:39:58+08:00
+
+1. Instructions and protocol
+- Read /workspace/.agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated initialized fields using protocol `set` commands; result.json was not constructed by hand from a blank file.
+
+2. Reuse audit
+- Requested local raw filing, annual facts, normalized facts, and prior stock-research paths did not exist at task start.
+- Downloaded the official 2025 annual report PDF to:
+  stock_report/data/raw/filings/00257.HK/2025-12-31/annual-report-2025.pdf
+- No local annual facts package or prior research result was available; core facts were taken directly from official HKEX disclosures.
+
+3. Primary sources
+- HKEX annual results announcement, published 2026-03-20:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0320/2026032000333.pdf
+- HKEX Annual Report 2025, published 2026-04-23:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042301737.pdf
+- PBOC/CFETS 2025-12-26 RMB central parity announcement: 1 HKD = 0.90486 CNY.
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- Market cap and PE: config/input.json, Tencent qt.gtimg.cn, as of 2026/07/31 16:08:41.
+
+4. Model audit
+- Input hint: financial_brokerage / requires_special_model.
+- Filing evidence: environmental energy, environmental water, and greentech construction and operation; BOT/BOO/TOT service concession assets; project borrowings.
+- Override: utility_concession / requires_special_model.
+- Reason: service concession assets HKD102.211bn, intangible assets HKD30.806bn, and interest-bearing borrowings HKD88.549bn form an integrated project-finance structure. Cash cannot be treated as detachable ordinary net cash.
+- Ordinary owner earnback fields intentionally remain null under the result contract.
+
+5. Currency and calculations
+- Protocol requires absolute CNY. All HKD statement values were multiplied by 0.90486 and by 1,000 because the filing presents HKD'000.
+- The same spot conversion was applied to income statement and cash-flow values for consistency; this is a display conversion, not an audited RMB restatement.
+- Gross margin = HKD11.085458bn / HKD27.520509bn = 0.4028071574.
+- Parent net margin = HKD3.925162bn / HKD27.520509bn = 0.1426267952.
+- Capex proxy = purchase of PPE HKD0.567315bn + additions of intangible assets HKD1.294977bn = HKD1.862292bn.
+- Operating FCF proxy = operating cash flow HKD12.128284bn - capex proxy HKD1.862292bn = HKD10.265992bn = CNY9.289286bn.
+- Forecast dividend = HKD1.658603bn * 0.90486 = CNY1.500804bn.
+- Forecast dividend yield = CNY1.500804bn / CNY26.952485bn = 0.0556833073.
+- This FCF proxy is not used as ordinary discounted cash profit because concession construction cash flows and debt principal are classified across operating/financing sections.
+
+6. Key filing checks
+- Income statement: revenue HKD27.520509bn; gross profit HKD11.085458bn; operating profit HKD8.022364bn; parent profit HKD3.925162bn.
+- Balance sheet: total assets HKD189.143142bn; liabilities HKD116.929565bn; total equity HKD72.213577bn; parent equity HKD52.219815bn.
+- Cash flow: OCF HKD12.128284bn; investing CF HKD-1.675237bn; financing CF HKD-8.267280bn; ordinary shareholder dividends paid HKD1.474314bn.
+- Receivables: net debtors HKD24.152344bn; over 13 months HKD11.631247bn.
+- Dividend: interim HKD0.15/share plus proposed final HKD0.12/share; total HKD0.27/share.
+
+7. Limitations
+- No project-by-project remaining concession terms, tariff ladders, maintenance capex, or debt-amortization schedules were available in the consolidated disclosure.
+- Therefore no special-model project DCF or owner earnback years were fabricated.
+- Tencent market data was accepted from task input and not independently reconciled to an exchange close.
+
+8. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed result validation: status=ok, errors=[]

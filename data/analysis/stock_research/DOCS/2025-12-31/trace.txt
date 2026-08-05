@@ -1,0 +1,90 @@
+[2026-08-04T22:43:33+08:00] 任务初始化
+- 输入：config/input.json
+- 公司：Doximity, Inc. (NYSE: DOCS)
+- 请求期：2025-12-31；报告类型：annual
+- 输出：outputs/result.json, outputs/report.md, outputs/trace.txt
+
+[资料复用检查]
+- 检查 stock_report/data/raw/filings/DOCS/2025-12-31：不存在。
+- 检查 stock_report/data/analysis/annual_review/DOCS/2025-12-31：不存在。
+- 检查 stock_report/data/analysis/stock_research/DOCS/2025-12-31：不存在。
+- 因无原始财报、年度事实包及历史研究结果，转向一手公开披露补齐。
+
+[期间决策]
+- Doximity 财年截至 3 月 31 日；不存在截至 2025-12-31 的年度 10-K。
+- 年度主表选择在请求期之前最近已披露并经审计的 FY2025 10-K（截至 2025-03-31，提交 2025-05-20）。
+- 截至 2025-12-31 的 FY2026 Q3 10-Q 仅作后续动态核对，不拼接为伪年度数据。
+- 市值与 PE 按输入保留，日期 2026-08-03；已在 data_quality 和报告中披露行情/财报时点错配。
+
+[主要来源]
+1. SEC FY2025 Form 10-K:
+   https://www.sec.gov/Archives/edgar/data/1516513/000151651325000056/docs-20250331.htm
+   - Business: lines 192-320, 2084-2100
+   - Risk/customer concentration: lines 474-487, 580; governance lines 1140 onward
+   - Dividend policy: lines 1211-1212
+   - MD&A/revenue/margins/SBC: lines 1400-1492
+   - Balance sheet: lines 1832-1875
+   - Income statement: lines 1884-1913
+   - Cash flow: lines 2008-2063
+   - Securities, earn-out, fixed assets: lines 2520-2606
+   - Repurchase and warrants: lines 2724-2745
+2. SEC FY2026 Q3 Form 10-Q (period ended 2025-12-31):
+   https://www.sec.gov/Archives/edgar/data/1516513/000151651326000006/docs-20251231.htm
+3. 中国人民银行月度汇率表（数据源：中国外汇交易中心）：2025.03 期末 1 USD = 7.1782 CNY。
+4. config/input.json：市值、PE TTM、行情日期及来源 Yahoo Finance yfinance。
+
+[模型判断]
+- statement_model = ordinary_operating
+- owner_earnback_applicability = applicable
+- 理由：数字营销/招聘/工作流订阅经营，资产负债以现金证券、应收和递延收入为主；无客户资金、准备金、项目垫资、监管现金或特许收费权等特殊模型项目。
+
+[币种换算]
+- 财报原币：USD；披露单位：USD thousands。
+- 统一输出：CNY yuan。
+- 换算：USD thousands × 1,000 × 7.1782。
+- 比例字段直接用原币同口径计算，不受汇率影响。
+
+[三张表核心值]
+- Total assets USD 1,264.309m -> CNY 9,075,462,863.80
+- Total liabilities USD 181.684m -> CNY 1,304,164,088.80
+- Total equity/parent equity USD 1,082.625m -> CNY 7,771,298,775.00
+- Revenue USD 570.399m -> CNY 4,094,438,101.80
+- Gross profit USD 514.525m -> CNY 3,693,363,355.00
+- Parent net profit USD 223.185m -> CNY 1,602,066,567.00
+- Operating cash flow USD 273.265m -> CNY 1,961,550,823.00
+- Capital expenditure: internal-use software USD 6.525m -> CNY 46,837,755.00
+- Operating FCF USD 266.740m -> CNY 1,914,713,068.00
+- Gross margin = 514.525 / 570.399 = 0.9020440078
+- Net margin = 223.185 / 570.399 = 0.3912787365
+
+[控股净现金]
+- Cash USD 209.614m × 100%.
+- Marketable securities USD 706.050m × 98%.
+- Less minimum operating cash reserve: 10% of FY2025 revenue = USD 57.040m.
+- Less operating lease liabilities USD 12.396m.
+- Less total AMiON contingent consideration fair value USD 11.493m.
+- Discounted detachable net cash = USD 820.614m × 7.1782 = CNY 5,890,531,414.80.
+- Net cash / market cap = 0.2322458208.
+
+[折后现金利润]
+- Starting operating FCF USD 266.740m.
+- Less SBC economic cost USD 72.386m.
+- Less after-tax cash/securities income: USD 35.774m × (1 - 40.389/263.574) = USD 30.292m.
+- Subtotal USD 164.062m; sustainability discount 90%.
+- Discounted sustainable cash profit = CNY 1,059,901,966.91.
+- Operating business price = 25,363,347,315.79 - 5,890,531,414.80 = CNY 19,472,815,900.99.
+- Owner earnback years = 19,472,815,900.99 / 1,059,901,966.91 = 18.3722801815.
+- Market cap / cash profit = 25,363,347,315.79 / 1,059,901,966.91 = 23.9298992809.
+- 注：上述折扣是研究假设，不是公司指引或审计数字。
+
+[股息]
+- FY2025 10-K 明确表示可预见未来不计划支付股息。
+- forecast_cash_dividend = 0；forecast_dividend_yield = 0。
+- FY2025 回购不计入股息历史，另列为资本配置事实。
+
+[协议操作]
+- 使用 CLI 初始化：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- 使用 CLI set 命令逐个写入 analysis、model、metrics、financials、assets/liabilities、owner_earnback、dividend、business、risks、evidence、data_quality。
+- 未从空文件手写复杂 JSON。
+- 验证命令：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- 验证结果：status=ok, errors=[]。

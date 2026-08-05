@@ -1,0 +1,43 @@
+stock-research trace
+company=COHN Cohen & Company Inc.
+period=2025-12-31
+generated_for_input=2026-08-04T11:15:24+08:00
+
+[protocol]
+Initialized outputs/result.json with:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+Populated fields using repeated protocol `set` commands; no hand-written result object was used.
+Validated with:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[source discovery]
+Expected annual fact pack and normalized fact paths from config/input.json were absent in the workspace.
+Downloaded the primary filing to stock_report/data/raw/filings/COHN/2025-12-31/cohn20251231_10k.htm.
+Primary annual filing: SEC accession 0001437749-26-007157, Form 10-K, filed 2026-03-06.
+Supplementary filing: SEC accession 0001437749-26-014604, Form 10-Q for 2026-03-31, filed 2026-05-04.
+FX source: Federal Reserve H.10 release 2026-01-05; 2025-12-31 USD/CNY=6.9931.
+Market data: reused config/input.json market cap, date, source, and PE TTM.
+
+[model decision]
+Input hint ordinary_operating/applicable was rejected after filing review.
+Selected statement_model=financial_brokerage and owner_earnback_applicability=requires_special_model.
+Reason: regulated broker-dealers conduct sales/trading, underwriting, advisory, and gestation repo; trading securities, reverse repos, shorts, and repos are operating financial positions. Regulated capital and counterparty constraints prevent treating cash and securities as detachable net cash.
+All ordinary owner-earnback fields remain null as required by the contract.
+
+[financial extraction]
+10-K units: USD thousands.
+Conversion used for all statement amounts: USD thousands * 1000 * 6.9931 CNY/USD.
+Balance sheet extracted: total assets 700585; total liabilities 597499; total equity 103086; parent equity 51080; NCI 52006.
+Income statement extracted: revenue 275564; operating profit 59407; net profit 40134; parent net profit 14431.
+Cash flow extracted: OCF 27350; furniture/equipment/leasehold purchases 1254; financing CF -17301; common dividends 2131; share net-settlement cash 343.
+Brokerage gross profit/gross margin left null because no economically comparable cost-of-sales presentation exists.
+Operating FCF shown mechanically as OCF less fixed-asset purchases but explicitly excluded from distributable-cash inference.
+
+[dividend]
+Forecast annual regular dividend: USD 1.00/share * 2,448,559 shares * 6.9931 = CNY 17,123,017.94.
+Forecast yield: CNY 17,123,017.94 / CNY 224,480,173.96621513 = 0.07627853115205203.
+Excluded special dividends from sustainable forecast.
+
+[quality]
+Status=complete under special-model minimum requirements.
+Known limitations are recorded in result.json and report.md.

@@ -1,0 +1,57 @@
+stock-research trace
+generated_at: 2026-08-03 Asia/Shanghai
+company: Xtep International Holdings Limited / 01368.HK
+period: 2025-12-31 annual
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No annual facts package, normalized facts, prior research result, or filing metadata existed in the supplied workspace/sync target.
+- Initialized outputs/result.json with protocol CLI before populating fields.
+
+3. Primary sources acquired
+- Annual Report 2025: https://doc.irasia.com/listco/hk/xtep/annual/2025/ar2025.pdf
+- Company annual-results release: https://www.xtep.com.hk/en/media/news-item.php?item=p260326
+- Local extracted filing: stock_report/data/raw/filings/01368.HK/2025-12-31/ar2025.pdf and ar2025.txt
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, 2026/07/31 16:08:42
+
+4. Model verification
+- Input hint said financial_brokerage.
+- Audited annual report note 1 states the group designs, develops, manufactures and markets footwear, apparel and accessories.
+- Balance sheet contains normal consumer operating assets and liabilities, not brokerage client money/securities financing.
+- Overrode hint with ordinary_operating; normal owner earnback applies.
+
+5. Core audited figures (RMB)
+- Revenue 14,151,086,000; cost 8,088,044,000; gross profit 6,063,042,000.
+- Operating profit 2,018,804,000; parent/net profit 1,371,571,000.
+- Assets 16,898,876,000; liabilities 6,696,353,000; equity/parent equity 10,202,523,000.
+- OCF 952,413,000; PPE purchases 264,120,000; intangible additions 13,028,000; operating FCF 675,265,000.
+- Financing CF -454,736,000; dividends paid in cash flow 609,981,000.
+
+6. Owner earnback calculations
+- Discounted cash = 3,457,110,000*90% + 454,000,000*80% + 227,000,000*80% - 1,096,778,000 - 1,334,361,000 = 1,225,060,000.
+- Discounted cash profit = (952,413,000 - 277,148,000)*90% = 607,738,500.
+- Operating business price = 9,154,512,568.69614 - 1,225,060,000 = 7,929,452,568.69614.
+- Owner earnback years = 7,929,452,568.69614 / 607,738,500 = 13.0474744791.
+- Market cap/cash profit = 9,154,512,568.69614 / 607,738,500 = 15.0632427741.
+
+7. Dividend forecast
+- Forecast amount = 2025 parent profit * 50% = 685,785,500.
+- Forecast yield = 685,785,500 / 9,154,512,568.69614 = 7.4912289961%.
+- Basis is historical policy/payout behavior, not company guidance.
+
+8. Known limitations
+- Market snapshot was supplied by task input and not independently reconstructed.
+- Owner earnback discounts are analyst assumptions.
+- Sustainable cash profit uses only FY2025 rather than a multi-year normalized cycle.
+- Scrip alternatives mean declared dividend and cash-flow dividend paid are not identical.
+
+9. Protocol
+- init used: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- fields populated with repeated protocol set commands.
+- validate used: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- validation result: status=ok, errors=[].

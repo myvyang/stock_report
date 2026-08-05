@@ -1,0 +1,56 @@
+stock-research trace
+company: CIMC Enric Holdings Limited (03899.HK)
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Input hint initialized financial_brokerage/requires_special_model.
+
+3. Reuse check
+- No annual facts, normalized facts, prior research result, or filing metadata existed locally for 03899.HK/2025-12-31.
+- Downloaded official 2025 annual report PDF to stock_report/data/raw/filings/03899.HK/2025-12-31/annual-report-2025.pdf.
+
+4. Primary evidence
+- HKEX annual report: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0422/2026042202028.pdf
+  * pp.123-124: revenue 26,325,942k; cost 22,651,699k; gross profit 3,674,243k; operating profit 1,441,644k; net profit 1,171,591k; parent profit 1,135,214k.
+  * pp.125-127: assets 32,181,887k; liabilities 18,395,277k; equity 13,786,610k; parent equity 12,144,207k; NCI 1,642,403k; detailed assets and liabilities.
+  * pp.129-131: operating cash flow 1,742,844k; PP&E/CIP capex 894,583k; intangible capex 41,077k; financing cash flow -161,045k; shareholder and NCI dividends 655,327k.
+  * p.188: proposed dividend HKD0.31/share, approximately RMB0.27/share.
+  * pp.189-190: business definitions and external segment revenue.
+- AGM result: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0520/2026052001116.pdf
+  * Final dividend approved on 2026-05-20.
+- Market data reused exactly from config/input.json: market cap RMB14,129,162,932.614685; PE TTM 13.07; timestamp 2026-08-03 09:47:36; source Tencent qt.gtimg.cn.
+
+5. Model override
+- Overrode input financial_brokerage hint with ordinary_operating/applicable.
+- Reason: audited segment disclosure shows equipment manufacturing, EPC, processing/distribution and services; no brokerage customer-funds model.
+
+6. Calculations
+- gross_margin = 3,674,243 / 26,325,942 = 0.139572.
+- net_margin = 1,135,214 / 26,325,942 = 0.043116.
+- operating_free_cash_flow = 1,742,844 - 894,583 - 41,077 = RMB807,184,000.
+- interest-bearing and lease debt = bank loans 772,176k + related-party loans 227,740k + notes 2,495,035k + lease liabilities 273,393k = RMB3,768,344,000.
+- discounted net cash = cash 7,751,634k * 80% + term/restricted deposits 1,547,772k * 0% - debt 3,768,344k = RMB2,432,963,200.
+- discounted sustainable cash profit = RMB750,000,000, anchored to RMB807,184,000 2025 FCF and reduced for contract-asset growth, collection volatility and NCI.
+- operating business price = 14,129,162,932.614685 - 2,432,963,200 = RMB11,696,199,732.614685.
+- owner earnback years = 11,696,199,732.614685 / 750,000,000 = 15.594933.
+- market cap / cash profit = 14,129,162,932.614685 / 750,000,000 = 18.838884.
+- forecast dividend = 2,024,677,750 weighted-average shares * RMB0.27 = RMB546,662,993 (rounded).
+- forecast dividend yield = 546,662,993 / 14,129,162,932.614685 = 0.038691.
+
+7. Result construction and validation
+- All result fields were populated using protocol CLI set commands; result.json was not handwritten.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation response: {"status":"ok","errors":[]}
+
+8. Limitations
+- Market snapshot was supplied by input and not independently reconciled for FX/share-count convention.
+- Sustainable cash profit is an analytical scenario, not company guidance.
+- All term/restricted deposits were excluded because free availability was not separately disclosed in the extracted evidence.

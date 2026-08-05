@@ -1,0 +1,40 @@
+2026-08-05 stock-research trace: FTF / period 2025-12-31
+
+1. Read skill instructions and contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Checked configured reuse paths. No annual facts, normalized facts, metadata, or prior stock-research outputs existed for FTF/2025-12-31.
+
+3. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Located and downloaded primary filing:
+   SEC Form N-CSR accession 0001133228-26-002940, filed 2026-03-04, period 2025-12-31.
+   Local copy: stock_report/data/raw/filings/FTF/2025-12-31/annual-report.html
+
+5. Reclassified analysis model after filing review:
+   input hint ordinary_operating/applicable -> investment_holding/not_applicable.
+   Reason: registered closed-end management investment company applying ASC 946; portfolio assets and leverage are the business itself.
+
+6. Extracted primary USD facts from SEC filing:
+   total assets 394,280,636; total liabilities 126,619,928; net assets 267,660,708;
+   investments at value 382,012,081; cash 7,568,292; credit facility 97,500,000;
+   investment income 32,914,426; net expenses 10,053,088; NII 22,861,338;
+   net increase from operations 17,079,365; distributions 29,819,166; tax ROC 8,491,411;
+   reported operating cash flow 43,098,712 (not mapped to ordinary-company OCF because securities trading dominates it).
+
+7. Converted filing amounts to CNY at 7.0288 CNY/USD, the 2025-12-31 central parity authorized by China Foreign Exchange Trade System. Market cap retained from input because contract specifies CNY amounts.
+
+8. Forecast distribution:
+   0.0615 USD/share/month x 12 x 40,405,374 shares x 7.0288 = CNY 209,592,954.07;
+   divided by input market cap CNY 1,556,862,856.04 = 13.4625%.
+   Cross-checked continued 0.0615 USD monthly declaration in Franklin Templeton's 2026-07-14 announcement.
+
+9. Used protocol CLI set commands for all structured result mutations. Ordinary owner-earnback metrics remained null by contract. Set data_quality complete with explicit cross-date, PE, FX, forecast, and cash-flow limitations.
+
+10. Validation:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Result: status ok, errors [].

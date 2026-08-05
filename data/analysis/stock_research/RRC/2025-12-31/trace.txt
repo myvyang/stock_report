@@ -1,0 +1,54 @@
+stock-research trace
+generated_at: 2026-08-05T03:49:10+08:00
+company: Range Resources Corporation (NYSE: RRC)
+period: 2025-12-31 annual
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked input-declared raw filing, annual review, normalized facts, and prior stock research paths.
+- None existed in /workspace; only config/input.json was present, so no local financial fact pack could be reused.
+
+3. Primary sources
+- SEC Form 10-K filed 2026-02-24:
+  https://www.sec.gov/Archives/edgar/data/315852/000119312526067292/rrc-20251231.htm
+- SEC Exhibit 99.1, 2025 results and 2026 guidance, filed 2026-02-24:
+  https://www.sec.gov/Archives/edgar/data/315852/000119312526069413/rrc-ex99_1.htm
+- Federal Reserve H.10 USD/CNY, observation 2025-12-31 = 7.1875 CNY per USD:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Valuation input: Yahoo Finance yfinance as supplied in config/input.json; market cap CNY 63,295,534,817.103516 dated 2026-08-03; PE TTM 11.088398.
+
+4. Model determination
+- Confirmed ordinary_operating / applicable.
+- Rationale: independent upstream natural gas/NGL producer; balance sheet is dominated by operating oil and gas properties rather than customer funds, regulated cash, concession rights, or an investment holding structure.
+- Special economic treatment: reserve decline requires recurring drilling/completion capital; commodity prices and derivatives make one-year earnings unsuitable as sustainable distributable cash.
+
+5. Currency and financial extraction
+- All USD financial statement amounts converted at 7.1875 CNY/USD.
+- 2025 USD millions: assets 7,421.948; liabilities 3,103.267; equity 4,318.681; product plus marketing revenue 2,988.164; analytical cost of sales 1,543.871; analytical gross profit 1,444.293; net income 658.024; CFO 1,171.324; capex 641.515; FCF 529.809.
+- Capex = additions to oil/gas properties 581.489 + field service/other 3.212 + acreage 56.814 = USD 641.515 million.
+- Analytical revenue excludes derivative fair-value income and other income. Analytical cost of sales includes direct operating, transportation/gathering/processing/compression, taxes other than income, and brokered gas/marketing cost. Gross profit is not a reported GAAP subtotal.
+
+6. Owner earnback calculations
+- Historical FCF USD millions: 2023 370.962; 2024 315.934; 2025 529.809.
+- Three-year average FCF = USD 405.5683 million; 80% retained after cycle/estimation haircut = USD 324.4547 million = CNY 2,332,017,916.667.
+- Discounted detachable net cash = cash USD 0.204m + 50% * derivative assets USD 69.397m - debt USD 1,198.334m = USD -1,163.0815m = CNY -8,362,163,906.25.
+- Operating business price = CNY 63,295,534,817.103516 - (-8,362,163,906.25) = CNY 71,657,698,723.35352.
+- Owner earnback = 71,657,698,723.35352 / 2,332,017,916.667 = 30.7278 years.
+- Market cap / cash profit = 27.1420x.
+
+7. Dividend forecast
+- Company expected quarterly dividend increase to USD 0.10/share.
+- Annualized USD 0.40 * 235.381m shares = USD 94.1524m = CNY 676,720,375.
+- Forecast dividend yield = 1.06914% of supplied market cap.
+- This is an expectation, not a full-year declared obligation; repurchases excluded.
+
+8. Result construction and validation
+- Populated result fields through repeated protocol CLI `set` calls; did not construct result.json by hand.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validator result: status=ok, errors=[]

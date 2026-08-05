@@ -1,0 +1,72 @@
+stock-research trace — VLT
+generated_at: 2026-08-05T03:32:56+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked configured annual facts, normalized facts, raw filing metadata, and prior stock research paths.
+- None of the configured VLT filing/fact/research artifacts existed in the workspace; only config/input.json and the user evaluation note were present.
+- No prior conclusion was reused.
+
+3. Company and period verification
+- SEC CIK: 0000846671.
+- SEC submissions index identifies annual N-CSR reports for 2025-02-28 (filed 2025-05-02) and 2026-02-28 (filed 2026-05-07).
+- No annual report exists for input period 2025-12-31 because VLT's audited fiscal year ends in February.
+- Selected the closest subsequent audited annual report, fiscal year ended 2026-02-28, accession 0001193125-26-210663.
+- Result status set to partial because the selected source period does not exactly match the requested period.
+
+4. Model determination
+- SEC N-CSR states VLT is a closed-end management investment company registered under the Investment Company Act of 1940 and follows ASC 946.
+- Overrode input hint ordinary_operating/applicable.
+- Final model: investment_holding / not_applicable.
+- Ordinary owner earnback metrics intentionally remain null. The investment portfolio and secured borrowing are the operating model, not detachable cash and ordinary financing.
+
+5. Primary-source extraction (USD)
+- Total assets: 104,965,186.
+- Total liabilities: 33,166,250.
+- Net assets applicable to common shares: 71,798,936.
+- Investment securities plus affiliated money market fund: 102,446,218.
+- Borrowings: 30,550,000.
+- Total investment income: 7,295,336.
+- Net expenses: 2,477,098.
+- Net investment income: 4,818,238.
+- Net increase in net assets from operations: 4,637,345.
+- Net cash provided by operating activities: 6,576,959.
+- Financing cash flow: -6,607,869.
+- Total FY2026 distributions: 7,425,224; ordinary income 5,048,021; return of capital 2,377,203.
+- Shares outstanding: 6,511,243; NAV/share: 11.03; market price/share: 10.88 at 2026-02-28.
+- Borrowing average balance: 30,550,000; average rate: 5.18%; asset coverage per $1,000 senior debt: $3,350.
+- Portfolio turnover: 139%; expense ratio: 3.41%; expense ratio excluding borrowing costs: 1.22%.
+
+6. Currency conversion
+- Source: PBOC-authorized CFETS central parity announcement for 2026-02-27.
+- Rate used: USD 1 = CNY 6.9228.
+- All filing amounts written to result.json are absolute CNY amounts.
+- Input market capitalization was already supplied in CNY and was not reconverted.
+
+7. Derived values
+- Net investment income / total distribution = 64.89%.
+- Net investment income / ordinary-income distribution = 95.45%.
+- Return of capital / total distribution = 32.00%.
+- Forecast distribution scenario: USD 0.0915/share/month × 12 × 6,511,243 shares × 6.9228 = CNY 49,493,484.28.
+- Forecast distribution yield: CNY 49,493,484.28 / CNY 438,060,573.2182846 = 11.2983%.
+- Forecast is a mechanical annualization of March and April 2026 declarations, not company guidance.
+
+8. Structured result construction
+- Used protocol CLI set commands for scalar/object paths and append commands for asset, liability, risk, and evidence rows.
+- Did not create result.json as a hand-written complex JSON document.
+- Preserved market cap and PE TTM supplied by config/input.json.
+
+9. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status ok; errors [].
+
+10. Source URLs
+- SEC filing: https://www.sec.gov/Archives/edgar/data/846671/000119312526210663/d119614dncsr.htm
+- SEC submissions: https://data.sec.gov/submissions/CIK0000846671.json
+- Invesco overview: https://www.invesco.com/us-rest/contentdetail?contentId=96a066b451c41410VgnVCM100000c2f1bf0aRCRD&dnsName=us
+- FX announcement: https://guangdong.chinatax.gov.cn/gdsw/lvxx/2026-03/02/content_5ac257551c3b402e946be5e524f99b8a.shtml

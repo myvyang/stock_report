@@ -1,0 +1,66 @@
+stock-research trace
+company: 02142.HK / 和铂医药控股有限公司
+period: 2025-12-31 annual
+generated_for_input: config/input.json
+
+1. Protocol initialization
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   outcome: initialized stock-research-result-v1 structure.
+
+2. Local reuse audit
+   checked:
+   - stock_report/data/analysis/annual_review/02142.HK/2025-12-31/facts.json
+   - stock_report/data/analysis/annual_review/02142.HK/2025-12-31/annual_facts.md
+   - stock_report/data/normalized/facts/02142.HK/2025-12-31/annual-facts.json
+   - stock_report/data/analysis/stock_research/02142.HK/2025-12-31/
+   outcome: no reusable annual facts or historical research existed.
+
+3. Primary filing
+   source: HBM Holdings Limited Annual Report 2025
+   issuer: HBM Holdings Limited
+   publication: HKEX, 2026-04-28
+   url: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042804295.pdf
+   local_copy: stock_report/data/raw/filings/02142.HK/2025-12-31/annual-report-2025.pdf
+   key locations:
+   - pp.4-7 financial and business highlights
+   - pp.30-35 management discussion, revenue, costs, liquidity and dividend
+   - pp.41-43 customers, distributable reserves and risks
+   - pp.107-115 audited financial statements
+   - pp.149-152 segment, customer and revenue notes
+   - pp.168-174 receivables, investments, cash, payables, contract liabilities and borrowings
+
+4. Model override
+   input_hint: financial_brokerage / requires_special_model
+   verified_model: ordinary_operating / applicable
+   basis: annual report identifies one operating segment—development of innovative therapeutics in immuno-oncology and immunology—and revenue from molecule licences plus research/technology licences. No brokerage customer funds, proprietary trading book or repo-financing economic structure was present.
+
+5. Currency normalization
+   source: 国家统计局《中华人民共和国2025年国民经济和社会发展统计公报》
+   url: https://www.stats.gov.cn/sj/zxfbhjd/202602/t20260228_1962662.html
+   rate: USD 1 = CNY 7.1429 (2025 annual average)
+   method: all USD statement amounts multiplied by 1,000 and 7.1429. The same average rate was used for balance-sheet values for protocol consistency; this is disclosed as a limitation.
+
+6. Derived formulas
+   gross_margin = 149,244 / 157,975 = 0.9447317614
+   net_margin = 91,333 / 157,975 = 0.5781484412
+   capex = (4,267 + 7,486) thousand USD = 83,950,503.7 CNY
+   operating_free_cash_flow = 580,960,628.6 - 83,950,503.7 = 497,010,124.9 CNY
+   discounted_cash = 2,878,988,702.4 * 90% = 2,591,089,832.16 CNY
+   debt_and_lease_deduction = 524,896,006.5 + 59,171,783.6 = 584,067,790.1 CNY
+   discounted_detachable_net_cash = 2,007,022,042.06 CNY
+   discounted_sustainable_cash_profit = 497,010,124.9 * 50% = 248,505,062.45 CNY
+   operating_business_price = 8,852,358,001.12188 - 2,007,022,042.06 = 6,845,335,959.06188 CNY
+   owner_earnback_years = 6,845,335,959.06188 / 248,505,062.45 = 27.5460624084
+   market_cap_to_cash_profit = 8,852,358,001.12188 / 248,505,062.45 = 35.6224453291
+   forecast_dividend = 0; basis: no 2025 final dividend and no distributable reserves at parent-company level.
+
+7. Market data
+   source: Tencent qt.gtimg.cn, supplied in config/input.json
+   market_cap: CNY 8,852,358,001.12188
+   timestamp: 2026/08/03 09:48:03
+   pe_ttm: 14.48
+
+8. Protocol population and validation
+   method: result fields populated with repeated protocol CLI `set` commands; complex result JSON was not handwritten from scratch.
+   validation_command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   validation_outcome: status=ok, errors=[]

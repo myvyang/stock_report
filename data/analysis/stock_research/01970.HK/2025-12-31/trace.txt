@@ -1,0 +1,68 @@
+stock-research trace
+company: IMAX CHINA (01970.HK)
+period: 2025-12-31 annual
+generated context date: 2026-08-04 Asia/Shanghai
+
+[protocol]
+1. Read stock-research/SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. No local annual facts package, normalized facts, historical research result, or raw filing existed for this period.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields only through protocol `set` commands.
+5. Validated result with protocol `validate`; final status: ok.
+
+[primary filings]
+- IMAX China 2025 Annual Report, HKEX, published 2026-03-09:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0309/2026030900292.pdf
+  Local copy: stock_report/data/raw/filings/01970.HK/2025-12-31/annual-report-2025.pdf
+- IMAX China 2026 Interim Results Announcement, HKEX title search entry dated 2026-07-23:
+  https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=132089
+- National Bureau of Statistics 2025 Statistical Communique, 2025 average USD/CNY 7.1429:
+  https://www.stats.gov.cn/english/PressRelease/202602/t20260228_1962661.html
+- CFETS/PBOC 2025-12-31 USD/CNY central parity 7.0288; cross-checked via official central-parity index and contemporaneous release:
+  https://www.chinamoney.org.cn/english/bmkcpr/index.html?tab=2
+- Market snapshot supplied by config/input.json: Tencent qt.gtimg.cn, market cap CNY 2,429,882,950.6599903, PE TTM 9.63, 2026/08/03 09:20:05.
+
+[model review]
+Input hint classified the company as financial_brokerage. Rejected based on annual-report business and statements.
+The group earns film-remastering/distribution box-office shares, theatre-system sales/rentals, and maintenance fees. It has no brokerage client money, proprietary trading portfolio, repo funding, or bank borrowings. Final model: ordinary_operating; ordinary owner earnback applicable.
+
+[currency conversion]
+- Income statement and cash-flow figures: USD thousands * 1,000 * 7.1429 (2025 average USD/CNY).
+- Balance-sheet figures: USD thousands * 1,000 * 7.0288 (2025 year-end central parity).
+- Market cap was consumed as the CNY-normalized amount supplied by input; no further FX conversion.
+
+[reported financials, USD thousands]
+Revenue 102,343; cost of sales 35,529; gross profit 66,814; operating profit 47,225; attributable profit 37,681.
+Total assets 377,894; total liabilities 61,901; total equity/parent equity 315,993; minority interest 0.
+Operating cash flow 57,858.
+Capital expenditure = joint-revenue-sharing equipment 5,583 + PPE purchases 170 = 5,753.
+Operating free cash flow = 57,858 - 5,753 = 52,105.
+Financing cash flow -3,309; cash buyback 1,454; no dividend.
+
+[owner earnback]
+Discounted detachable net cash, USD thousands:
+129,861 cash - 1,070 lease liabilities - 25,000 operating/strategic reserve = 103,791.
+CNY = 103,791,000 * 7.0288 = 729,526,180.80.
+Reserve is a judgment, not a reported restriction. It approximates one year of SG&A, capex and part of taxes and reflects the board's stated retention plan.
+
+Sustainable cash profit:
+2025 FCF USD 52.105m was treated as a peak-year starting point.
+Normalize to 2024 FCF: USD 30.821m OCF - USD 9.309m joint-revenue-sharing equipment investment - USD 1.453m PPE purchases = USD 20.059m.
+Apply 20% prudence discount: USD 20.059m * 80% = USD 16.0472m.
+CNY result used in JSON: 114,623,544.88.
+Rationale: 2025 IMAX box office rose 85.1%, Ne Zha 2 alone generated USD 144.8m of IMAX box office, commercial theatre count was nearly flat, and 2026H1 attributable profit fell about 66% year-on-year.
+
+Operating business price = 2,429,882,950.6599903 - 729,526,180.8 = 1,700,356,769.8599901.
+Owner earnback years = 1,700,356,769.8599901 / 114,623,544.88 = 14.8343.
+Market cap / cash profit = 2,429,882,950.6599903 / 114,623,544.88 = 21.1988.
+
+[dividend]
+Forecast cash dividend: CNY 0; forecast yield 0.
+Basis: no 2023, 2024, or 2025 final dividend; no 2025 interim dividend; no 2026 interim dividend. Board stated cash is retained for network optimization/expansion, IMAX Enhanced, merchandise and IP initiatives.
+
+[limitations]
+- USD-to-CNY translation is for standardized presentation and is not transaction-level translation.
+- Tencent market cap was accepted as CNY per input; its HKD price/share-count build was not independently reconstructed.
+- Sustainable cash profit and USD 25m cash reserve are analytical judgments, not company guidance.
+- The 2026 interim announcement is used only as subsequent evidence for cyclicality and dividend forecasting; 2025 audited numbers remain the reporting base.

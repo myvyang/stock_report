@@ -1,0 +1,63 @@
+Stock research trace — 06831.HK — period 2025-12-31
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because no local annual fact package was present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All result fields were populated with protocol `set` and `append` commands; the JSON was not constructed manually.
+
+2. Local reuse check
+- Checked configured raw filing, annual review and normalized fact paths.
+- No existing filing metadata, annual facts, normalized facts or prior stock-research result existed for 06831.HK/2025-12-31.
+- Downloaded official HKEX annual report to stock_report/data/raw/filings/06831.HK/2025-12-31/annual-report-2025.pdf.
+- Extracted searchable text to annual-report-2025.txt for evidence review.
+
+3. Primary sources
+- Green Tea Group Limited 2025 Annual Report, released 2026-04-27 on HKEX:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042700702.pdf
+- HKEX issuer title-search page used to confirm annual results, annual report and dividend announcements:
+  https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=1000259261
+- Valuation snapshot reused exactly from config/input.json: Tencent qt.gtimg.cn, 2026/08/03 09:47:31, market cap RMB3,738,691,759.479046, PE TTM 8.07.
+
+4. Model override
+- Input hint classified the issuer as financial_brokerage.
+- Annual report states the group is principally engaged in restaurant operations in Chinese Mainland; revenue consists of restaurant operations, delivery and minor other services.
+- Balance sheet contains ordinary restaurant cash, equipment, right-of-use assets, inventories, receivables, payables and lease liabilities; no broker client funds, repo financing or proprietary securities business was found.
+- Overrode statement_model to ordinary_operating and owner_earnback_applicability to applicable.
+
+5. Core reported facts (RMB'000 in source; converted to absolute RMB in result)
+- Revenue 4,762,967; raw materials and consumables 1,508,430; profit before tax 577,130; net profit 486,399; parent net profit 486,481.
+- Total assets 3,795,399; total liabilities 2,041,974; total equity 1,753,425; parent equity 1,752,016; NCI 1,409.
+- Operating cash flow 1,054,948; PP&E capex 350,901; financing cash flow 244,557; lease principal and interest payment 265,662.
+- Cash and cash equivalents 1,199,327; deposits over three months 20,300; FVPL assets 5,011; no bank loans at year-end.
+- PP&E 848,002; right-of-use assets 1,139,695; inventories 61,269; trade and other receivables 382,438.
+- Lease liabilities 1,274,219; trade and other payables 602,029; contract liabilities 6,106.
+- 2025 special dividend paid 195,744; proposed final dividend 306,721.
+
+6. Derived metrics and judgments
+- Analytical gross profit = revenue - raw materials and consumables = RMB3,254,537,000.
+- Analytical gross margin = 3,254,537 / 4,762,967 = 68.3300%. Source does not report accounting gross profit; limitation recorded.
+- Parent net margin = 486,481 / 4,762,967 = 10.2138%.
+- Operating free cash flow = 1,054,948 - 350,901 = RMB704,047,000.
+- Sustainable cash profit = 704,047 - 265,662 lease cash payment = RMB438,385,000. Lease payment is deducted because IFRS 16 classifies it in financing cash flow although it is an economic occupancy cost.
+- Funds considered for detachable cash = 1,199,327 + 20,300 + 5,011 = RMB1,224,638,000.
+- Applied 50% haircut because IPO proceeds are earmarked for network, supply chain and digital expansion. Discounted detachable cash = RMB612,319,000.
+- Operating business price = 3,738,691,759.479046 - 612,319,000 = RMB3,126,372,759.479046.
+- Owner earnback = 3,126,372,759.479046 / 438,385,000 = 7.131568734 years.
+- Market cap / cash profit = 8.528329572 years.
+- Forecast dividend = 50% × 2025 parent net profit = RMB243,240,500, reflecting stated policy floor rather than guidance.
+- Forecast dividend yield = 243,240,500 / 3,738,691,759.479046 = 6.5060%.
+
+7. Key limitations
+- Nature-of-expense income statement provides no reported cost of sales or gross profit.
+- Full capex was treated as maintenance for conservatism because maintenance/growth split is unavailable.
+- 2025 includes rapid openings and IPO proceeds; cash conversion and detachable cash may not represent a steady state.
+- Market cap and PE were input snapshots and were not independently recalculated.
+- Forecast dividend is a policy-floor scenario, not management guidance.
+
+8. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Outcome: status=ok; errors=[]; exit code 0.

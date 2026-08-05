@@ -1,0 +1,52 @@
+stock-research trace
+generated_at=2026-08-05T02:29:25+08:00
+query=MGNI
+period=2025-12-31
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Data reuse check
+- No existing MGNI annual facts or normalized facts were present under the input-declared paths.
+- Downloaded SEC filing to stock_report/data/raw/filings/MGNI/2025-12-31/mgni-20251231.htm
+- Retrieved SEC companyfacts to a temporary working file for XBRL cross-checking.
+
+4. Primary sources
+- SEC Form 10-K accession 0001595974-26-000007, filed 2026-02-25, period 2025-12-31.
+  https://www.sec.gov/Archives/edgar/data/1595974/000159597426000007/mgni-20251231.htm
+- Magnite FY2025 earnings release, 2026-02-25.
+  https://investor.magnite.com/node/16431
+- PBOC/CFETS USD/CNY central parity announcement, 2025-12-26: 7.0358.
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- Market cap and PE: config/input.json, Yahoo Finance yfinance snapshot dated 2026-08-03.
+
+5. Model decision
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Reason: ad-tech operating platform, not a special financial-statement business. Receivables and seller payables are transaction settlement working capital and were excluded from detachable cash.
+
+6. Key source figures (USD)
+- Revenue 713,953,000; cost of revenue 266,619,000; gross profit 447,334,000.
+- Operating income 97,601,000; net income 144,613,000.
+- CFO 236,168,000; PP&E purchases 70,535,000; capitalized software 13,768,000; operating FCF 151,865,000.
+- Cash 553,362,000; debt 556,112,000; receivables 1,301,955,000; seller payables 1,572,103,000.
+- Assets 3,164,375,000; liabilities 2,242,025,000; equity 922,350,000.
+
+7. Owner earnback calculation
+- FX=7.0358 CNY/USD.
+- Discounted detachable net cash=(553.362m-556.112m)*FX=-19,348,450 CNY.
+- Sustainable cash profit=40m USD*FX=281,432,000 CNY.
+- Basis: GAAP operating income + D&A - PP&E purchases - capitalized software - net interest - normalized cash tax, rounded conservatively; stock compensation remains expensed.
+- Operating business price=18,651,807,533.344482-(-19,348,450)=18,671,155,983.344482 CNY.
+- Owner earnback years=18,671,155,983.344482/281,432,000=66.3434008334.
+
+8. Result population and validation
+- Populated initialized skeleton using protocol set commands; complex JSON was not written from scratch.
+- command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- validation_status=ok

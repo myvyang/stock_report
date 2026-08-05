@@ -1,0 +1,61 @@
+Stock research trace — 01407.HK / 2025-12-31 annual
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Also read references/data-reuse.md to determine whether existing facts could be reused.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- No annual facts, normalized facts, historical stock-research result, or raw filing metadata existed for 01407.HK/2025-12-31.
+- Downloaded the official HKEX 2025 annual report to:
+  stock_report/data/raw/filings/01407.HK/2025-12-31/annual_report_2025.pdf
+- Official disclosure URL:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042302956.pdf
+
+3. Company and model resolution
+- Input hint said financial_brokerage, but its source tags said utility/resource business.
+- Annual report pp.5-7 identifies PNG sales as the principal business, an exclusive Gaomi operating area covering about 70% of the city, a 30-year concession ending August 2039, and 798.5 km of completed mid-pressure pipeline.
+- Overrode the hint with statement_model=utility_concession and owner_earnback_applicability=requires_special_model.
+- Per result contract, left discounted net cash, discounted cash profit, operating business price, owner earnback years, and market-cap-to-cash-profit null.
+
+4. Core financial extraction (RMB'000 in filing; multiplied by 1,000 in result.json)
+- Income statement, annual report pp.63-64:
+  revenue 334,586; cost of sales 270,356; gross profit 64,230; operating profit 43,335;
+  net profit 28,900; parent net profit 28,395.
+- Balance sheet, annual report pp.65-66:
+  total assets 578,067; total liabilities 248,727; total equity 329,340;
+  parent equity 312,356; NCI 16,984.
+- Cash flow, annual report p.69:
+  operating cash flow 16,346; PPE purchases 8,450; financing cash flow 4,988;
+  dividends paid 14,892.
+- Calculations:
+  gross margin = 64,230 / 334,586 = 0.1919682234.
+  parent net margin = 28,395 / 334,586 = 0.0848666711.
+  operating free cash flow = 16,346 - 8,450 = 7,896 (RMB'000).
+  minority interest ratio = 16,984 / 329,340 = 0.0515710208.
+
+5. Business and asset evidence
+- Annual report pp.5-7: PNG volume 82.5m m3, down 5.8%; customer counts; segment revenues and demand drivers.
+- Annual report note 20, pp.120-122: net trade and other receivables RMB93.062m; clean-energy-project receivables RMB72.388m; >3-year gross trade receivables RMB44.860m.
+- Annual report note 23, p.125: cash and bank balances RMB221.396m, including RMB0.150m restricted cash.
+- Annual report notes 26-28, pp.128-131: trade/other payables, borrowings RMB68.290m, average borrowing rate 4.3%, lease liabilities RMB1.931m.
+- Annual report note 31, p.135: contract liabilities fell RMB25.736m and trade/other payables fell RMB14.942m in operating cash-flow reconciliation.
+
+6. Dividend estimate
+- Annual report note 30, p.134: proposed 2025 final dividend HKD0.011/share.
+- Shares: 440,000,000 (annual report note 24 / EPS note).
+- Proposed cash dividend = HKD0.011 × 440,000,000 = HKD4,840,000.
+- Approximate conversion assumption = 1 HKD to 0.856 CNY (late-July 2026 market reference).
+- Forecast dividend = RMB4,143,040.
+- Input market cap = RMB219,548,561.14387512 at 2026/08/03 09:40:36, Tencent qt.gtimg.cn.
+- Forecast dividend yield = 4,143,040 / 219,548,561.14387512 = 0.0188707408.
+- Limitation: exchange rate is an approximation and not a company-reported figure.
+
+7. Result construction and validation
+- All fields were populated through repeated protocol `set` calls after protocol initialization; the result object was not handwritten from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final protocol status: ok; errors: [].

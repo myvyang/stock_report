@@ -1,0 +1,87 @@
+stock-research trace
+generated_at: 2026-08-04T18:53:09+08:00
+query: SENEA
+input_period: 2025-12-31
+report_type: annual
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with the protocol CLI.
+
+2. Reuse audit
+- Searched stock_report/data for files containing SENEA.
+- No raw filing, annual facts, normalized facts, or historical stock-research output existed locally.
+- Public primary-source retrieval was therefore required.
+
+3. Company and period resolution
+- Confirmed issuer: Seneca Foods Corporation, Nasdaq Class A ticker SENEA, CIK 0000088948.
+- Input period 2025-12-31 is not Seneca's fiscal year end.
+- Selected the FY2025 audited annual report for the year ended 2025-03-31, filed on 2025-06-12.
+- Did not combine quarterly filings into a synthetic annual report.
+
+4. Sources used
+- Seneca Foods 2025 Annual Report:
+  https://www.senecafoods.com/sites/default/files/inline-files/2025_SenecaAnnualReport.pdf
+- SEC Form 10-K filing:
+  https://www.sec.gov/Archives/edgar/data/88948/000143774925020197/senea20250331_10k.htm
+- Federal Reserve G.5A annual FX release, 2025 USD/CNY average 7.1875:
+  https://www.federalreserve.gov/releases/g5a/current/
+- Market snapshot supplied by input.json: Yahoo Finance yfinance, 2026-08-03.
+
+5. Statement model decision
+- Annual report says food packaging was 98% of sales.
+- Assets are ordinary operating assets: inventory, receivables, plants and equipment.
+- Liabilities are trade liabilities, leases and borrowings used for seasonal working capital/equipment.
+- Decision: ordinary_operating; owner earnback applicability: applicable.
+
+6. Currency conversion
+- All USD statement amounts multiplied by 7.1875 CNY/USD.
+- Source statements are in USD thousands; multiplied by 1,000 before FX conversion.
+- A single annual average rate was used for consistency. This is research-display conversion, not accounting translation.
+
+7. Core calculations
+- Gross profit USD 150.201m = revenue 1,578.887m - cost of products sold 1,428.686m.
+- Gross margin = 150.201 / 1,578.887 = 0.0951309372.
+- Net margin = 41.224 / 1,578.887 = 0.0261095316.
+- Cash-flow statement capex = USD 37.225m; reported operating FCF = 335.475 - 37.225 = USD 298.250m.
+- FY2025 OCF included USD 234.263m inventory release and is not treated as sustainable.
+
+8. Owner earnback cash bridge
+- Available cash: USD 42.685m, 100% weight.
+- Restricted cash: USD 7.705m, 0% weight.
+- Debt and finance obligations: USD 385.312m = 105.692 + 253.822 + 8.377 + 17.421, 100% deducted.
+- Detachable net cash: USD -342.627m = 42.685 - 385.312.
+- Discounted detachable net cash: CNY -2,462,631,562.50.
+- Operating lease liability excluded from net debt to avoid mixing operating lease treatment with the capital-expenditure cash-profit bridge; disclosed among liabilities.
+
+9. Sustainable cash-profit bridge
+- FY2025: 41.224 + 44.776 - 61.548 = USD 24.452m.
+- FY2024: 63.318 + 43.478 - 43.625 = USD 63.171m.
+- FY2023: 9.231 + 40.941 - 71.805 = USD -21.633m.
+- Three-year mean = USD 21.996667m = CNY 158,101,041.67.
+- 20% sustainability haircut = CNY -31,620,208.33.
+- Discounted sustainable cash profit = CNY 126,480,833.33.
+- Capex uses annual fixed-asset additions disclosed in segment note, not only cash paid in the year, to reduce payment-timing distortion.
+
+10. Valuation formulas
+- Market cap = CNY 7,568,102,633.231689.
+- Operating business price = market cap - discounted net cash
+  = 7,568,102,633.231689 - (-2,462,631,562.50)
+  = CNY 10,030,734,195.73169.
+- Owner earnback years = 10,030,734,195.73169 / 126,480,833.33333336
+  = 79.3063575830.
+- Market cap / cash profit = 7,568,102,633.231689 / 126,480,833.33333336
+  = 59.8359643416.
+- Discounted net cash / market cap = -0.3253961636.
+
+11. Dividend forecast
+- Annual report states no common dividend has been declared or paid in many years.
+- Forecast common cash dividend = 0; forecast yield = 0.
+- Preferred dividends are not attributed to Class A common shareholders.
+
+12. Protocol completion
+- Populated outputs/result.json using protocol CLI set commands after init.
+- Protocol validation result: status=ok, errors=[] (first completed validation).
+- Report and trace created after the successful structured-result validation.

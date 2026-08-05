@@ -1,0 +1,63 @@
+2026-08-04T18:58:59+08:00 INIT
+- Read config/input.json.
+- Initialized outputs/result.json with protocol CLI:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+MODEL REVIEW
+- Input hint said ordinary_operating/applicable.
+- Overrode hint based on SEC issuer identity (SIC 6022 State Commercial Banks), business description, and financial statements.
+- Final model: financial_bank / requires_special_model.
+- Reason: deposits fund loans and short-term investments; cash, deposits, loans, and securities are the operating balance sheet. Ordinary detachable-net-cash and operating-FCF formulas are not economically valid.
+
+LOCAL REUSE CHECK
+- Checked stock_report paths supplied in config.
+- No BSVN raw filing, annual facts, normalized facts, or prior stock research files existed.
+- Reused config/input.json only for market cap, date, source, and PE TTM.
+
+PRIMARY SOURCES OBTAINED
+- SEC 2025 Form 10-K filed 2026-03-17:
+  https://www.sec.gov/Archives/edgar/data/1746129/000114036126009657/ef20060654_10k.htm
+- SEC annual report PDF:
+  https://www.sec.gov/Archives/edgar/data/1746129/000114036126013123/ny20064159x4_ars.pdf
+- Bank7 FY2025 earnings release:
+  https://ir.bank7.com/2026-01-15-Bank7-Corp-Announces-Q4-2025-and-Full-Year-Earnings
+- Bank7 dividend increase release:
+  https://ir.bank7.com/2025-08-21-Bank7-Corp-Announces-a-12-50-Quarterly-Dividend-Increase-Its-Sixth-Consecutive-Annual-Dividend-Increase
+- Bank7 subsequent acquisition release:
+  https://ir.bank7.com/2026-07-02-Bank7-Corp-Announces-Agreement-to-Acquire-Controlling-Interest-in-Century-Financial-Services-Corporation
+- PBOC USD/CNY central parity, 2025-12-26, 7.0358:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+
+RAW MATERIAL
+- Downloaded SEC 10-K HTML to stock_report/data/raw/filings/BSVN/2025-12-31/10-k.html.
+- Downloaded SEC annual report PDF to stock_report/data/raw/filings/BSVN/2025-12-31/annual-report.pdf.
+
+EXTRACTION AND CALCULATIONS
+- USD statement values are in thousands in the annual report.
+- Converted all result.json statement amounts at 7.0358 CNY/USD for protocol consistency.
+- Total assets: 1,963,640,000 USD -> 13,815,778,312 CNY.
+- Total liabilities: 1,712,645,000 USD -> 12,049,827,691 CNY.
+- Equity/parent equity: 250,995,000 USD -> 1,765,950,621 CNY; no minority interest at 2025 year-end.
+- Net income/parent net income: 43,069,000 USD -> 303,024,870.2 CNY.
+- Special bank metrics retained in narrative/evidence: NIM 4.94%; after-tax ROA 2.37%; ROE 18.51%; NPL ratio 0.40%; NPA/assets 0.33%; ACL/loans 1.21%; ACL/nonaccrual loans 300.42%; consolidated total risk-based capital 15.24%, Tier 1 risk-based 14.09%, Tier 1 leverage 12.82%.
+- Static P/B inference: input market cap 3,229,810,100.9978 CNY / parent equity 1,765,950,621 CNY = 1.8289x. P/B is narrative-only because result contract has no P/B field.
+- Forecast dividend: 0.27 USD/share x 4 x 9,462,656 year-end shares x 7.0358 = 71,903,543.49 CNY.
+- Forecast dividend yield: 71,903,543.49 / 3,229,810,100.9978 = 0.0222624678.
+- Ordinary owner earnback fields and gross/net margin remain null by design for financial_bank/requires_special_model.
+
+PROTOCOL CONSTRUCTION
+- Used repeated protocol CLI `set` commands for all scalar and array sections.
+- Used protocol CLI `append` commands for each evidence row.
+- Did not hand-write outputs/result.json as a complex object.
+
+QUALITY NOTES
+- Financial statements received an unqualified audit opinion.
+- ICFR received an adverse opinion due to material weaknesses in deposit operations, related-party transaction controls, and reconciliations.
+- Market cap and PE are inherited from input Yahoo Finance yfinance snapshot and not independently reconstructed from exchange closing price and shares.
+- Forecast dividend is a flat-run-rate scenario, not formal forward guidance.
+- Subsequent Century transaction remained conditional as of the research creation date and is not incorporated into 2025 financials.
+
+VALIDATION
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Outcome: {"status":"ok","errors":[]}
+- Confirmed data_quality.status=complete, evidence rows=11, and all ordinary owner-earnback sorting fields are null under requires_special_model.

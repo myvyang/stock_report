@@ -1,0 +1,53 @@
+stock-research trace — SNT — period 2025-12-31
+generated: 2026-08-04 Asia/Shanghai
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized the result with the protocol CLI
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse audit
+   - No raw filing, annual facts, normalized facts, or prior SNT research files existed under stock_report.
+   - Research therefore returned to primary public filings.
+
+4. Primary sources reviewed
+   - SEC 2025 Form 20-F original filing, filed 2026-05-04:
+     https://www.sec.gov/Archives/edgar/data/1993727/000117891326002328/zk2635101.htm
+   - SEC 2025 Form 20-F/A, filed 2026-05-14; amendment changed auditor report typos only and contains the financial statements:
+     https://www.sec.gov/Archives/edgar/data/1993727/000117891326002698/zk2635316.htm
+   - SEC Q1 2026 results release, filed 2026-05-26:
+     https://www.sec.gov/Archives/edgar/data/1993727/000117891326002952/exhibit_99-1.htm
+   - 2025-12-31 CFETS RMB central parity, USD/CNY 7.0288 (Xinhua republication):
+     https://www1.xinhuanet.com/20251231/fe9f6466f6884589b5287e6ee946baed/c.html
+   - Market cap, date, PE and market source reused exactly from config/input.json.
+
+5. Model decision
+   - Confirmed ordinary_operating / applicable.
+   - SNT sells physical-security hardware and software in one operating segment. Receivables, inventory, facilities, deferred revenue and operating expenses describe an ordinary product business, not a special financial statement model.
+
+6. Currency convention
+   - All USD filing figures multiplied by 7.0288 and stored as absolute CNY yuan.
+   - Limitation recorded: income statement translation uses the period-end rate for protocol comparability, not an annual average rate.
+
+7. Owner earnback judgments
+   - Did not treat 2025 year-end cash of USD 22.468m as detachable because the February 2026 Blickfeld acquisition consumed cash.
+   - Used March 2026 post-acquisition cash and short deposits of USD 10.6m; reserved USD 3.0m operating liquidity; recognized 70% of the remainder: USD 5.32m / CNY 37,393,216.
+   - Normalized cash profit: USD 3.010m operating profit × 75% normalized after-tax + USD 0.676m D&A − USD 0.559m capex = USD 2.3745m; recognized 70% = USD 1.66215m / CNY 11,682,919.92.
+   - Operating business price = CNY 256,630,440.32885742 − CNY 37,393,216 = CNY 219,237,224.32885742.
+   - Owner earnback = 18.765619 years; market cap / cash profit = 21.966293 years.
+   - Dividend forecast set to zero because 2023-2025 statements show no dividend/buyback cash outflow and no announced cash dividend plan was identified; recent cash was allocated to acquisition.
+
+8. Protocol writes
+   - Populated result.json with protocol CLI `set` commands after initialization; did not hand-write the result object.
+   - First batch invocation failed before any set operation because a shell variable included the PYTHONPATH assignment as a command name. Re-ran with exported PYTHONPATH; no data loss occurred.
+
+9. Validation
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   status: ok; errors: []
+
+10. Data-quality caveat
+   - Blickfeld was acquired after the reporting date. Its full post-combination balance sheet and profit contribution are absent from FY2025, so discounted profit is explicitly a conservative pre-acquisition Senstar baseline.

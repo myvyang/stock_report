@@ -1,0 +1,64 @@
+[2026-08-04 Asia/Shanghai] Stock research trace — 02132.HK
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result
+   Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   Result: stock-research-result-v1 skeleton created from task input.
+
+3. Reuse audit
+   Checked the configured raw filing, annual review, normalized facts and historical stock research paths.
+   No reusable 02132.HK/2025-12-31 filing package, facts package or prior research output was present.
+
+4. Company/model verification
+   Official Annual Report 2025 identifies Landrich Holding Limited as a Hong Kong civil engineering contractor undertaking roads and drainage, site formation and building works.
+   Overrode input hint financial_brokerage with construction_project.
+   Set owner_earnback_applicability to requires_special_model because cash, contract assets, receivables, payables and customer advances are tied to project delivery and settlement.
+
+5. Primary filing obtained and reviewed
+   File: stock_report/data/raw/filings/02132.HK/2025-12-31/annual-report-2025.pdf
+   Official company URL: https://www.landrich.com.hk/files/EN/2025/2025073000297.pdf
+   Filing: Annual Report 2025, audited year ended 2025-03-31, published 2025-07-30.
+   Pages reviewed: business/MD&A pp.4-8; directors' report p.12; audited statements pp.70-75; revenue and contract accounting notes; receivables and contract assets notes pp.110-113; financial instruments; litigation note p.135; five-year summary p.136.
+
+6. Core facts transcribed (HK$'000)
+   Revenue 1,281,121; direct costs 1,241,095; gross profit 40,026; profit before tax 18,608; parent profit 13,255.
+   Total assets 670,473; total liabilities 342,078; parent equity 328,395.
+   Bank balances/cash 214,995; trade receivables net 67,592; contract assets net 304,549; FVTPL assets 23,865.
+   Trade/other payables 196,644; contract liabilities 127,054; bank overdraft 9,664; lease liabilities 1,809.
+   Operating cash flow 103,695; PPE purchases 4,847; right-of-use asset payment 3,520; financing cash flow -3,802.
+   Projects on hand 27; outstanding contract value 2,345,100.
+   No dividend for FY2025 or FY2024.
+   Post-reporting-period subcontract claim: 24,700.
+
+7. Currency normalization
+   Protocol requires absolute CNY yuan.
+   Used PBOC/CFTC central parity on 2025-04-01, the next trading day after report date: HKD 1 = CNY 0.92257.
+   Formula: HK$'000 × 1,000 × 0.92257.
+   Ratios are calculated from native-currency figures and therefore unaffected by translation.
+
+8. Analytical decisions
+   Gross margin = 40,026 / 1,281,121 = 0.0312429505.
+   Net margin = 13,255 / 1,281,121 = 0.0103464076.
+   Operating free cash flow = operating cash flow - PPE purchases - right-of-use asset payment = HK$95.328m; treated as reported-period cash flow, not sustainable owner cash profit.
+   Forecast dividend = CNY 0; basis is two consecutive no-dividend years and no disclosed commitment to resume distributions.
+   All ordinary owner-earnback fields left null as required for a special construction-project model.
+
+9. Key limitations recorded
+   - Task period label 2025-12-31 does not match issuer fiscal year-end 2025-03-31.
+   - Market snapshot date 2026-08-03 is about 16 months after the audited balance-sheet date.
+   - Market cap and PE were accepted from task input and not independently reconstructed.
+   - Currency translation uses the next-trading-day official midpoint, not a company-reported CNY translation.
+
+10. Protocol validation
+   Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[] (first validation after structured population).
+
+11. Outputs
+   - outputs/result.json
+   - outputs/report.md
+   - outputs/trace.txt

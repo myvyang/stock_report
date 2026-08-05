@@ -1,0 +1,37 @@
+NECB stock research trace
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read stock-research/SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Checked configured annual-review, normalized-facts, and raw-filing paths. No reusable NECB fact package or filing existed.
+4. Located official SEC filing:
+   issuer CIK: 1847398
+   Form 10-K accession: 0001104659-26-027566
+   period: 2025-12-31
+   filed: 2026-03-13
+   URL: https://www.sec.gov/Archives/edgar/data/1847398/000110465926027566/necb-20251231x10k.htm
+5. Downloaded the 10-K to stock_report/data/raw/filings/NECB/2025-12-31/necb-20251231x10k.htm and extracted text locally for review.
+6. Overrode input analysis_model_hint after filing review:
+   statement_model=financial_bank
+   owner_earnback_applicability=requires_special_model
+   reason: loans, deposits, securities and regulatory capital are the banking business itself.
+7. Extracted key 2025 USD facts (thousands unless ratios):
+   total assets 2,063,508; liabilities 1,711,808; equity 351,700
+   loans 1,860,066; net loans 1,855,603; deposits 1,616,901; borrowings 70,000
+   net interest income 100,735; non-interest income 4,093; net income 44,413
+   construction loans 1,336,329 / 71.84% of loans
+   NIM 5.25%; NPA 0; ACL 4,731; total capital ratio 15.62%; Tier 1 ratio 15.36%
+   dividends declared 13,404; repurchases 1,581; dividends per share 1.00 including 0.20 special dividend
+8. Reviewed official 2026 Q1 Form 10-Q and earnings release for trend context: net income USD 10.0m, net interest income USD 24.1m, dividends declared USD 2.7m.
+9. Currency normalization: financial statement amounts multiplied by 7.00 CNY/USD as an explicit approximate presentation rate. Input market cap retained exactly as supplied.
+10. Dividend forecast: USD 0.20 quarterly regular dividend x 4 x 13,963,432 year-end shares x 7.00 = CNY 78,195,219; no repeat of special dividend. Yield = 3.1513628% on supplied market cap.
+11. Populated result.json only through protocol CLI set commands. Ordinary owner-earnback fields remain null as required for a special banking model.
+12. Wrote outputs/report.md and outputs/trace.txt.
+13. Validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+Data limitations:
+- No pre-existing annual fact package was available.
+- CNY conversion is approximate; USD values in report allow direct filing reconciliation.
+- 2026 dividend is a forecast based on the regular quarterly rate, not a declared full-year obligation.

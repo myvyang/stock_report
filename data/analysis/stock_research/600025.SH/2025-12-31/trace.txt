@@ -1,0 +1,58 @@
+stock-research trace
+company=600025.SH 华能水电
+period=2025-12-31 annual
+generated_at=2026-08-01 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar fields with protocol set and list items with protocol append; no complex result JSON was authored from scratch.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse audit]
+Checked the configured paths under:
+- stock_report/data/raw/filings/600025.SH/2025-12-31
+- stock_report/data/analysis/annual_review/600025.SH/2025-12-31
+- stock_report/data/normalized/facts/600025.SH/2025-12-31
+No source files or reusable fact packs were present. Research therefore returned to the public annual filing.
+
+[sources]
+S1 Official annual filing: 华能澜沧江水电股份有限公司2025年年度报告, disclosed 2026-04-28.
+   https://dataclouds.cninfo.com.cn/shgonggao/hsomarket/2026/20260428/f7636eee276a4804b8c32d9591b4093a.PDF
+   Used for company identity, business model, revenue/cost/product mix, generation, customer concentration, three statements, asset composition, debt, perpetual instruments, minority interests, and cash-flow analysis.
+S2 Official annual-report summary: 华能澜沧江水电股份有限公司2025年年度报告摘要.
+   https://dataclouds.cninfo.com.cn/shgonggao/hsomarket/2026/20260428/453f09e7716045edb0704900288ebe7a.PDF
+   Cross-check for headline financial data.
+S3 2025 annual distribution implementation announcement, disclosed in 2026.
+   Public announcement result: 18,631,094,257 shares; CNY 0.205 per share; total CNY 3,819,374,322.69.
+   Used for forecast baseline/history. It is an implemented historical annual dividend, not a promised future dividend.
+S4 Market snapshot supplied by config/input.json: Tencent qt.gtimg.cn, timestamp 20260731114336, market cap CNY 186,870,000,000, PE TTM 21.88.
+
+[calculations]
+gross_profit = 26,595,330,703.95 - 11,441,243,816.68 = 15,154,086,887.27
+gross_margin = 15,154,086,887.27 / 26,595,330,703.95 = 0.5697951063
+net_margin = 8,504,138,221.82 / 26,595,330,703.95 = 0.3197634801
+operating_free_cash_flow = 19,048,606,224.95 - 16,460,608,570.71 = 2,587,997,654.24
+forecast_dividend_yield = 3,819,374,322.69 / 186,870,000,000 = 0.0204383954
+fixed_assets_plus_construction = 173,495,557,186.43 + 28,618,313,829.35 = 202,113,871,015.78
+fixed_assets_plus_construction / total_assets = 89.15%
+short_borrowings_plus_long_borrowings_plus_bonds = 11,409,248,372.54 + 89,906,968,839.39 + 3,016,945,753.43 = 104,333,162,965.36
+
+[model decision]
+statement_model=utility_concession
+owner_earnback_applicability=requires_special_model
+Reason: power stations and construction in progress are the revenue-producing infrastructure, while cash and financing are tied to project construction and operation. Ordinary detachable-net-cash and cash-profit payback fields remain null as required by the contract.
+Required special model: station/portfolio remaining economic life; hydrology and utilization; settlement tariff; maintenance versus growth capex; debt and perpetual-note service; minority distributions; residual ordinary-shareholder cash flow.
+
+[quality and limitations]
+status=complete under the special-model minimum requirements.
+- No station-by-station remaining-life and long-term volume/price data; no special-model payback or intrinsic value calculated.
+- Reported long-asset purchases combine maintenance and growth capex; operating free cash flow is shown as a conservative mechanical bridge, not normalized distributable cash.
+- Cash-flow line for dividends/profit/interest (CNY 7,498,886,509.17) cannot isolate ordinary dividends, so financials.cash_flow.dividend_and_buyback_cash_out is null.
+- Ordinary owner-earnback ranking fields are intentionally null, not missing.
+
+[validation]
+protocol validate status=ok; errors=[]

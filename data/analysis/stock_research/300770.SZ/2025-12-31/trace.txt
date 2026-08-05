@@ -1,66 +1,40 @@
 新媒股份 300770.SZ stock-research trace
 
-1. 按用户要求读取 stock-research skill：
-   - /workspace/.agents/skills/stock-research/SKILL.md
-   - /workspace/.agents/skills/stock-research/references/result-contract.md
-   - /workspace/.agents/skills/stock-research/references/report-contract.md
-   - 额外读取 data-reuse.md，用于确认复用边界。
+1. 按要求完整读取：
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
 
-2. 使用协议 CLI 初始化结构化结果：
-   - PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. 使用协议 CLI 初始化：
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
 
-3. 复用本地事实与披露文件：
+3. 复用并核对本地资料：
    - stock_report/data/analysis/annual_review/300770.SZ/2025-12-31/facts.json
-   - stock_report/data/analysis/annual_review/300770.SZ/2025-12-31/annual_facts.md
-   - stock_report/data/analysis/annual_review/300770.SZ/2025-12-31/extraction_trace.txt
    - stock_report/data/raw/filings/300770.SZ/2025-12-31/metadata.json
    - stock_report/data/raw/filings/300770.SZ/2025-12-31/300770_2025_annual_report.txt
-
-4. 检查已有 stock_research 历史结果：
    - stock_report/data/analysis/stock_research/300770.SZ/2025-12-31/result.json
    - stock_report/data/analysis/stock_research/300770.SZ/2025-12-31/report.md
-   - 旧 result.json 为历史口径，含 investment_case_type 等不符合新 result-contract 的标签字段，因此没有直接复制为最终 JSON。
-   - 复用其中可核对的回本数字和解释：折后可剥离净现金 2,172,718,981.7775 元，折后现金利润 511,739,452.8265 元，经营业务购买价 5,460,281,018.2225 元，控股回本年 10.6700411470 年。
+   年度事实包三张表、业务拆分、资产负债分类及三年现金转换信息完整，因此未重新下载年报。
 
-5. 年报文本定向核对：
-   - 利润分配：2025 半年度现金分红 227,838,591.00 元，前三季度现金分红 250,622,450.10 元，年度拟派 159,487,013.70 元，全年合计 637,948,054.80 元。
-   - 业务、收入、资产负债、现金流等核心字段复用年度事实包，年度事实包已从年报 PDF/TXT 抽取。
+4. 财报模型复核：
+   公司是 IPTV、互联网视听和版权运营平台。现金及定存可与经营资产区分，合同资产、应收与应付属于普通经营周转；未见特殊报表模型特征，确认 ordinary_operating / applicable。
 
-6. 外部行业和政策信息复核：
-   - 国家广播电视总局《2025年全国广播电视行业统计公报》：2025 年 IPTV 用户超过 4 亿户，OTT 平均月活 2.85 亿户，广播电视机构 IPTV/OTT 收入 266.69 亿元，同比增长 3.14%。
-   - 国家广播电视总局 2025-02-25 电视“套娃”收费治理部署：继续完善互联网电视管理体系、播控评估和 OTT 治理。
-   - 央视网 2025-03-27 对《中国网络视听发展研究报告（2025）》报道：2024 年网络视听用户 10.91 亿人，市场规模 12,226.49 亿元。
+5. 使用协议 CLI 分路径写入 outputs/result.json；没有手写复杂 JSON 骨架。财报数字和折扣拆分复用已核对研究结果，行情字段使用本次 config/input.json。
 
-7. 使用协议 CLI 写入 outputs/result.json：
-   - set analysis.sources_used
-   - set metrics
-   - set financials
-   - set asset_analysis.assets
-   - set asset_analysis.liabilities
-   - set owner_earnback
-   - set dividend
-   - set business
-   - set risks
-   - set evidence
-   - set data_quality
-
-8. 公式与关键口径：
+6. 核心公式：
    - 毛利率 = 773,777,512.71 / 1,626,168,006.66 = 47.58%
    - 净利率 = 660,434,408.67 / 1,626,168,006.66 = 40.61%
    - 经营自由现金流 = 775,735,581.69 - 99,177,058.98 = 676,558,522.71 元
-   - 预测分红率 = 637,948,054.80 / 7,633,000,000.00 = 8.36%
-   - 折后净现金/市值 = 2,172,718,981.7775 / 7,633,000,000.00 = 28.46%
-   - 经营业务购买价 = 7,633,000,000.00 - 2,172,718,981.7775 = 5,460,281,018.2225 元
-   - 控股回本年 = 5,460,281,018.2225 / 511,739,452.8265 = 10.67 年
-   - 市值/现金利润 = 7,633,000,000.00 / 511,739,452.8265 = 14.92 倍
+   - 预测分红率 = 637,948,054.80 / 8,141,000,000 = 7.84%
+   - 折后净现金/市值 = 2,172,718,981.7775 / 8,141,000,000 = 26.69%
+   - 经营业务购买价 = 8,141,000,000 - 2,172,718,981.7775 = 5,968,281,018.2225 元
+   - 控股回本年 = 5,968,281,018.2225 / 511,739,452.8265 = 11.66 年
+   - 市值/现金利润 = 8,141,000,000 / 511,739,452.8265 = 15.91 倍
 
-9. 数据质量限制：
-   - 市值和 PE 来自输入行情快照，不是年报披露数据。
-   - 长期定期存款未披露逐笔期限、利率、银行和提前支取条款。
-   - 合同资产前五名客户匿名披露，公开资料无法核验逐笔期后回款。
-   - 其他资产和其他负债存在倒减项目。
-   - 预测分红率按最近年度分红节奏外推，不代表未来承诺。
+7. 数据限制：
+   市值和 PE 是行情快照；长期定存缺少逐笔条款；合同资产前五名匿名且无法逐笔核验期后回款；分红率是按最近年度分配外推。
 
-10. 最终校验：
-   - PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-   - 校验结果：status ok，errors []。
+8. 最终执行协议 validate：
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   结果：status=ok，errors=[]。

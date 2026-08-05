@@ -1,0 +1,77 @@
+stock-research trace
+company: 能之光 (920056.BJ)
+period: 2025-12-31 annual
+generated_for_input: 2026-08-03T10:36:43+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the task required deciding whether existing annual facts could be reused.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields only through protocol `set` commands.
+
+2. Local reuse check
+- Checked configured paths under stock_report/data/raw/filings/920056.BJ/2025-12-31 and stock_report/data/analysis/annual_review/920056.BJ/2025-12-31.
+- No raw filing, metadata, annual facts, normalized facts, or prior stock research result existed locally.
+- /root/aicode/stock_report also contained no 920056.BJ files available for reuse.
+- Therefore returned to public disclosures rather than inventing a facts package.
+
+3. Sources used
+- Primary filing content: 能之光：2025年年度报告, disclosed 2026-04-20 on the BSE disclosure platform, accessed through the full-text Sina announcement mirror:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12121984&stockid=920056
+- Audit cross-check: 容诚审字[2026]215Z0564号, CNINFO BSE data cloud:
+  https://dataclouds.cninfo.com.cn/sjother2/bse_onmarket/2026/20260420/e2f1c4f4e7cb4d8ab8d1e936ff45be71.pdf
+- Valuation snapshot: config/input.json, amount 1,323,000,000; date 20260731153820; source Tencent qt.gtimg.cn; PE TTM 22.82.
+
+4. Analysis model decision
+- Filing identifies the company as a producer of high-polymer additives and functional polymer materials.
+- Consolidated balance sheet is dominated by cash, receivables, inventory, fixed assets, and ordinary operating liabilities.
+- No customer funds, deposits, insurance reserves, regulated presale cash, project contract assets, concession rights, or holding-company structure was found.
+- Decision: statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+
+5. Core reported facts
+- Revenue: 597,633,165.80
+- Cost of sales: 492,070,059.17
+- Gross profit: 105,563,106.63
+- Operating profit: 62,299,723.61
+- Net profit / parent net profit: 55,029,102.59 / 55,029,102.59
+- Deducted non-recurring parent net profit: 50,741,375.73
+- Total assets: 604,689,357.03
+- Total liabilities: 68,603,186.83
+- Total equity / parent equity: 536,086,170.20 / 536,086,170.20
+- Minority interest: 0
+- Operating cash flow: 74,397,956.51
+- Cash paid to acquire long-term assets (capex proxy): 2,381,027.36
+- Operating free cash flow: 74,397,956.51 - 2,381,027.36 = 72,016,929.15
+- Financing cash flow: 90,660,013.46
+- 2025 cash dividend paid: 0; distribution to owners in equity statement was zero. The 297,620.84 financing cash outflow was dividend/profit or interest, and interest expense was reported; therefore dividend_and_buyback_cash_out was set to zero.
+
+6. Formula checks
+- Gross margin = (597,633,165.80 - 492,070,059.17) / 597,633,165.80 = 0.1766352885.
+- Net margin = 55,029,102.59 / 597,633,165.80 = 0.0920783948.
+- Forecast dividend = 81,691,700 shares * 0.147 yuan/share = 12,008,679.90.
+- Forecast dividend yield = 12,008,679.90 / 1,323,000,000 = 0.0090768556.
+
+7. Owner earnback judgments
+- Reported cash: 207,805,525.80. The filing states that 34,115,400 was term deposits over three months and that the cash increase mainly came from the IPO. The IPO net proceeds were 101,744,531.57 and earmarked for capacity expansion and an R&D center.
+- Judgment: use a 60% cash recognition rate. Discounted cash = 124,683,315.48. This is an analyst haircut, not a filing fact.
+- Financing debt deducted at 100%: short-term borrowings 3,001,734.25 + current lease liabilities 1,531,862.06 + non-current lease liabilities 624,638.15 = 5,158,234.46.
+- Discounted detachable net cash = 124,683,315.48 - 5,158,234.46 = 119,525,081.02.
+- Profit base starts with parent net profit 55,029,102.59, less net non-recurring gains 4,287,726.86 = 50,741,375.73, matching reported deducted non-recurring parent net profit.
+- Judgment: apply a further 10% sustainability haircut for flat/down revenue, raw material and policy sensitivity, and future expansion capex. Discounted sustainable cash profit = 45,667,238.157.
+- Operating business price = 1,323,000,000 - 119,525,081.02 = 1,203,474,918.98.
+- Owner earnback years = 1,203,474,918.98 / 45,667,238.157 = 26.35313559.
+- Market cap to cash profit = 1,323,000,000 / 45,667,238.157 = 28.97044037.
+- Discounted net cash / market cap = 119,525,081.02 / 1,323,000,000 = 0.0903439766.
+
+8. Important boundaries
+- Receivables, notes, inventory, fixed assets, and other operating assets were not treated as detachable cash.
+- Other current liabilities of about 29.964 million were mainly low-credit-bank acceptance notes endorsed but not derecognized, so they were described with the paired note assets rather than added to financing debt.
+- Single-year operating free cash flow of 72.017 million was used as cash-conversion support, not the sustainable profit denominator, because annual capex was unusually low relative to the asset base and IPO expansion plans.
+- Industry position was described using official qualifications and business facts only. No unverified market-share estimate was used.
+
+9. Validation
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final protocol result before report handoff: status=ok, errors=[]

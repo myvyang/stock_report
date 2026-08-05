@@ -1,0 +1,91 @@
+stock-research trace
+company=SYBT
+period=2025-12-31
+generated_for_input=2026-08-05T04:09:24+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md; no existing SYBT annual facts package or prior research output was present.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated scalar/object fields only through protocol set and arrays only through protocol append.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: {"status":"ok","errors":[]}
+
+[company and model verification]
+- SEC CIK: 0000835324.
+- Primary filing: Stock Yards Bancorp 2025 Form 10-K, accession 0001437749-26-005830, filed 2026-02-26.
+- Filing URL: https://www.sec.gov/Archives/edgar/data/835324/000143774926005830/sybt20251231_10k.htm
+- The filing states that Bancorp is a financial holding company, has no significant operations of its own, and conducts banking through wholly owned Stock Yards Bank & Trust Company.
+- Override input hint ordinary_operating/applicable with financial_bank/not_applicable.
+- Economic reason: deposits, loans, cash, securities and wholesale funding form the bank's operating balance sheet; detachable-net-cash and ordinary free-cash-flow formulas are not meaningful.
+
+[2025 primary facts, USD thousands unless stated]
+Balance sheet:
+- total assets 9,536,124
+- total liabilities 8,460,427
+- stockholders' equity / parent equity 1,075,697
+- cash and cash equivalents 886,376
+- AFS securities 722,111; HTM securities 198,946
+- gross loans 7,041,310; allowance for credit losses 91,867; net loans 6,949,443
+- deposits 7,791,137: non-interest-bearing 1,435,846; interest-bearing 6,355,291
+- FHLB advances 300,000; subordinated debentures 26,806; repurchase funding 112,476; federal funds purchased 7,289
+
+Income and specialty metrics:
+- net interest income 300,312; non-interest income 96,948; sum 397,260
+- provision for credit losses 6,700; non-interest expense 212,364
+- net income attributable to stockholders 140,150
+- NIM 3.53%; ROA 1.53%; ROE 14.00%; efficiency ratio 53.41%
+- non-performing loans 13,034 (0.19% of loans)
+- non-performing assets 13,224 (0.14% of assets)
+- ACL / loans 1.30%; ACL / non-performing loans 705%; net charge-offs 626
+- consolidated CET1 11.84%; Tier 1 12.17%; total risk-based capital 13.42%; leverage 10.30%
+- commercial real estate loans 3,037,148, including non-owner occupied 1,915,252
+
+Dividend facts:
+- cash dividends paid: 2025 37,106; 2024 35,835; 2023 34,575
+- dividends per share: 2025 $1.26; 2024 $1.22; 2023 $1.18
+- 2025 payout ratio based on basic EPS: 26.42%
+
+[subsequent-event facts available by analysis date]
+- Field & Main acquisition completed 2026-05-01.
+- 2026 Q2 earnings release filed 2026-07-29: assets $10.37bn, loans $7.88bn, deposits $8.49bn; Q2 NIM 3.84%; merger-related Q2 expense $5.8m, of which $2.3m was one-time.
+- Release URL: https://www.sec.gov/Archives/edgar/data/835324/000117184326004978/exh_991.htm
+- 2026 Q2 Form 10-Q filed 2026-08-04: Q1 and Q2 declared dividends each $0.32/share; common shares outstanding at 2026-07-31 were 31,066,643.
+- 10-Q URL: https://www.sec.gov/Archives/edgar/data/835324/000143774926025620/sybt20260630_10q.htm
+
+[currency conversion]
+- Result contract requires CNY absolute yuan.
+- Federal Reserve H.10 historical annual observation for 2025-12-31: USD/CNY=7.1875.
+- URL: https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Conversion used for all USD filing amounts: CNY yuan = USD thousands * 1,000 * 7.1875.
+- Examples:
+  total assets = 9,536.124m * 7.1875 = CNY 68,540,891,250
+  total liabilities = 8,460.427m * 7.1875 = CNY 60,809,319,062.5
+  parent equity = 1,075.697m * 7.1875 = CNY 7,731,572,187.5
+  parent net income = 140.150m * 7.1875 = CNY 1,007,328,125
+
+[forecast dividend]
+- Latest declared quarterly dividend through 2026 H1: $0.32/share.
+- Mechanical annualization: $0.32 * 4 = $1.28/share.
+- Forecast cash dividend = 31,066,643 shares * $1.28 * 7.1875 = CNY 285,813,115.6.
+- Forecast yield = 285,813,115.6 / input market cap 17,840,948,833.55786 = 0.0160201 (1.60201%).
+- This is a mechanical annualization, not management guidance or a board commitment.
+
+[null-field rationale]
+- gross_margin and net_margin: null because a bank has no economically comparable sales/cost-of-sales/gross-profit structure.
+- revenue in the generic income statement: null; net interest income and non-interest income are explained in report/business/evidence instead.
+- operating cash flow, capex, ordinary operating free cash flow and financing cash flow: null because deposit, loan and securities flows are operating balance-sheet movements for a bank and ordinary-company classification is misleading.
+- discounted_net_cash, discounted_cash_profit, operating_business_price, owner_earnback_years and market_cap_to_cash_profit: null because owner_earnback_applicability is not_applicable.
+
+[market data]
+- Input market cap: CNY 17,840,948,833.55786, date 2026-08-03, source Yahoo Finance yfinance.
+- Input PE TTM: 16.95219.
+- Timing limitation: market cap and TTM PE are post-Field & Main acquisition, while the audited 2025 balance sheet and income statement are pre-acquisition.
+
+[data quality]
+- status=complete under the special-financial-model minimum threshold.
+- Required company identity, period, market data, model, balance sheet, parent profit, asset/liability explanations, dividend forecast, business story, specialty metrics and evidence are present.
+- Generic ordinary-company fields without comparable bank meaning are explicitly null with rationale.

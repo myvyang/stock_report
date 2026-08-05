@@ -1,0 +1,53 @@
+stock-research trace
+company: 02618.HK JD Logistics
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read required skill and contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit:
+   - No 2025 annual facts, normalized facts, raw filing metadata, or prior stock-research output existed under the supplied workspace paths.
+   - No matching files existed under /root/aicode sync targets.
+   - Therefore retrieved the official HKEX 2025 annual report and annual results announcement.
+
+3. Primary sources:
+   - Annual report: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042401322.pdf
+   - Results announcement: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0305/2026030500918.pdf
+   - Market snapshot: config/input.json, Tencent qt.gtimg.cn, 2026/08/03 09:48:10
+
+4. Model audit:
+   - Input hint financial_brokerage rejected.
+   - Annual report Note 1 states the group provides integrated supply chain solutions and logistics services.
+   - Statements show ordinary operating assets/liabilities, not brokerage customer money, trading books, or repo funding.
+   - Final model: ordinary_operating; owner earnback applicable.
+
+5. Key extraction (annual report RMB'000 converted to absolute RMB):
+   - Revenue 217,146,986; gross profit 19,767,969; parent profit 6,646,683.
+   - Assets 124,599,558; liabilities 64,814,829; equity 59,784,729; parent equity 54,680,371.
+   - OCF 18,765,124; PP&E/investment property purchases 6,878,069; intangibles 42,472; ROU asset payments 727,768; lease principal 6,873,804.
+   - Cash 18,117,910; term deposits 3,174,585; amortized-cost treasury investments 1,445,288; wealth products 21,789,392; borrowings 4,407,975.
+
+6. Calculations:
+   - gross_margin = 19,767,969 / 217,146,986 = 0.0910395782.
+   - net_margin = 6,646,683 / 217,146,986 = 0.0306082276.
+   - operating FCF = 18,765,124 - 6,878,069 - 42,472 - 727,768 = 11,116,815 (RMB'000).
+   - post-lease cash = 11,116,815 - 6,873,804 = 4,243,011 (RMB'000).
+   - discounted net cash = cash*100% + term deposits*95% + amortized-cost treasury*90% + wealth products*90% - borrowings = RMB37,635,152,750.
+   - sustainable cash profit judgment = RMB5,000,000,000, between post-lease cash RMB4.243bn and parent profit RMB6.647bn.
+   - operating business price = 87,755,168,650.21527 - 37,635,152,750 = RMB50,120,015,900.21527.
+   - owner earnback years = 50,120,015,900.21527 / 5,000,000,000 = 10.02400318.
+   - market cap / cash profit = 17.55103373.
+
+7. Dividend:
+   - Board did not recommend a 2025 final dividend.
+   - Forecast dividend set to RMB0 and yield 0 pending evidence of a new payout policy.
+
+8. Protocol usage:
+   - Initialized outputs/result.json with protocol CLI.
+   - Populated fields with protocol set/append commands.
+   - Protocol validation: PASS, status=ok, errors=[].
+   - Independent JSON/formula cross-checks: PASS.

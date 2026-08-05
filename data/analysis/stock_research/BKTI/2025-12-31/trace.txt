@@ -1,0 +1,66 @@
+BKTI stock-research trace
+generated_for_period: 2025-12-31
+task_created_at: 2026-08-05T03:17:15+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read result-contract.md, report-contract.md, and data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked stock_report/data/analysis/annual_review/BKTI/2025-12-31 and raw filing directory.
+- No prior BKTI annual facts package, normalized facts, or raw filing was available.
+- Existing user notes contained no reusable BKTI filing facts.
+
+3. Primary-source retrieval
+- Located SEC accession 0001437749-26-007826, Form 10-K filed 2026-03-12 for year ended 2025-12-31.
+- Saved filing to stock_report/data/raw/filings/BKTI/2025-12-31/bkti20251231_10k.htm.
+- Core source: https://www.sec.gov/Archives/edgar/data/2186/000143774926007826/bkti20251231_10k.htm
+- Dividend-policy historical source: https://www.sec.gov/Archives/edgar/data/0000002186/000143774925012869/bkti_ars.pdf
+- FX source: Federal Reserve H.10 release dated 2025-12-29, using 2025-12-26 observation 7.0063 CNY/USD (last available observation before fiscal year-end): https://www.federalreserve.gov/releases/h10/20251229/
+- Market data retained from config/input.json: market cap CNY 2,021,267,891.740265 as of 2026-08-03 and PE TTM 22.346369, source Yahoo Finance yfinance.
+
+4. Filing facts (reported in USD thousands)
+- Balance sheet: cash 22,788; receivables 7,221; inventory 15,862; total assets 63,760; total liabilities 19,062; equity 44,698; debt 0.
+- Income statement: revenue 86,139; cost 44,112; gross profit 42,027; operating income 15,987; net income 13,536.
+- Cash flow: CFO 19,441; PP&E purchases 1,039; capitalized software 2,096; operating FCF 16,306; financing cash flow -595; repurchases 1,193; dividends 0.
+- Business: one reportable LMR Products and Solutions segment; U.S. government agencies were 29% of revenue and 48% of year-end receivables; backlog was USD 14.2m versus USD 21.8m prior year.
+- Supply chain: 15.2% of procurement sourced internationally; 64.4% of that international procurement came from three suppliers.
+
+5. Conversion and formulas
+- All statement amounts converted to CNY absolute yuan at 7.0063 CNY/USD.
+- Gross margin = 42.027 / 86.139 = 0.4878974680.
+- Net margin = 13.536 / 86.139 = 0.1571413645.
+- Operating FCF = (19.441 - 1.039 - 2.096) USD m = 16.306 USD m = CNY 114,244,727.80.
+
+6. Owner earnback judgments
+- Model confirmed ordinary_operating/applicable because operating assets and liabilities are conventional manufacturing/technology items.
+- Cash haircut: 30% retained for seasonal government orders, inventory, and product-development working capital. Included cash = 22.788m USD * 70% * 7.0063 = CNY 111,761,695.08.
+- Sustainable cash profit bridge:
+  base operating FCF CNY 114,244,727.80
+  less stock compensation economic cost CNY 13,494,005.90
+  add working-capital normalization CNY 2,143,927.80
+  less 20% sustainability haircut CNY 20,579,032.30
+  result CNY 82,315,617.44
+- Operating business price = 2,021,267,891.740265 - 111,761,695.08 = CNY 1,909,506,196.660265.
+- Owner earnback = 1,909,506,196.660265 / 82,315,617.44 = 23.1973744 years.
+- Market cap / cash profit = 24.5550960.
+- Forecast cash dividend = 0 because no cash dividend was paid in 2025, prior quarterly program remains indefinitely suspended, and no restoration commitment was identified. Buybacks are recorded separately.
+
+7. Data-quality boundaries
+- SEC filing is the primary source for financial statements and operating facts.
+- Input market snapshot was not independently reconstructed from an official exchange source.
+- Radio and Solutions revenue/profit are not separately disclosed.
+- Cash and profit haircuts are analyst judgments, explicitly identified as such.
+
+8. Output construction
+- outputs/result.json was initialized and populated through the stock-research protocol CLI.
+- outputs/report.md and outputs/trace.txt were written from the sourced facts and disclosed judgments.
+- Final protocol validation is run after output construction; its result is appended below.
+
+9. Final validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[]
+- JSON syntax check passed.
+- No null fields or legacy ranking labels were found in the final outputs.

@@ -1,0 +1,54 @@
+2026-08-04T14:25:11+08:00 INIT
+- Read stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with protocol CLI from config/input.json.
+
+LOCAL_REUSE_CHECK
+- No ACIC files existed under the configured annual-review, normalized-facts, raw-filing, or prior stock-research paths.
+- Existing user_stock_evaluations.md was not used because it contained no identified ACIC research package.
+
+PRIMARY_SOURCE_ACQUISITION
+- Located SEC accession 0001401521-26-000015, Form 10-K for fiscal year 2025, filed 2026-03-09.
+- Downloaded acic-20251231.htm to stock_report/data/raw/filings/ACIC/2025-12-31/acic-20251231.htm.
+- Extracted filing tables locally with a standard-library HTML parser.
+- Used SEC-filed Q4 2025 earnings presentation for management's market-position statement.
+- Used supplied Yahoo Finance yfinance market cap, date, and PE TTM without independent recalculation.
+
+MODEL_DECISION
+- Overrode input hint ordinary_operating/applicable.
+- Confirmed financial_insurance/requires_special_model because ACIC is a P&C insurance holding company.
+- Kept ordinary owner-earnback metrics null: cash and investments support insurance reserves, reinsurance settlements, and regulatory capital.
+
+CORE_USD_FACTS_EXTRACTED (USD thousands unless stated)
+- Total assets 1,072,732; total liabilities 755,167; stockholders' equity 317,565.
+- Total revenue 335,439; net premiums earned 306,852; net income 106,837.
+- Investments 354,890; cash equivalents 198,762; restricted cash 94,092.
+- Unpaid losses/LAE 165,701; unearned premiums 249,616; notes payable 149,353.
+- Operating cash flow 71,025; 2025 cap software/equipment acquisition 155.
+- Gross premiums earned 648,260; ceded premiums earned 341,408.
+- Loss ratio 15.0%; combined ratio 60.1%; underlying combined ratio 61.5%.
+- 2025 catastrophe losses 1,485; no named storms landed in operating footprint.
+- Special dividend declared $0.75/share; paid 2026-01-09.
+
+CONVERSION_AND_DERIVATIONS
+- Protocol requires CNY absolute yuan. Used fixed research FX 1 USD = CNY 7.00 for all filing amounts.
+- Net margin = 106,837 / 335,439 = 31.8505%.
+- Forecast dividend cash = $0.75 * 48,764,802 year-end shares * 7.00 = CNY 256,015,210.50.
+- Forecast dividend yield = converted dividend cash / supplied CNY market cap = approximately 7.37%.
+- Forecast is explicitly the latest declared special distribution, not a normalized recurring dividend.
+
+PROTOCOL_WRITES
+- Populated leaf fields and arrays using repeated protocol CLI set commands; did not hand-write result.json.
+- Set data_quality.status complete because special-model minimum fields, dividend basis, business story, asset/liability explanations, and evidence are present.
+- Ordinary insurance-noncomparable statement and owner-earnback fields remain null as required by contract.
+
+VALIDATION
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status ok, errors [].
+
+LIMITATIONS
+- Fixed FX is a presentation assumption, not spot-rate evidence.
+- Market valuation fields came from task input.
+- Special dividend is discretionary and not a stable run-rate promise.
+- Company market-share rank is management's SEC-furnished statement.

@@ -1,0 +1,29 @@
+2026-08-05 stock-research trace — KBH
+
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full as requested.
+3. Read references/data-reuse.md because the skill routes reuse decisions through it.
+4. Checked configured annual-review, normalized-facts, raw-filing, and prior stock-research paths. No KBH fact package or prior research was present; only the global user evaluation note existed.
+5. Initialized outputs/result.json with the required protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+6. Located official SEC filing accession 0000795266-26-000017, filed 2026-01-23, actual fiscal year end 2025-11-30. Corrected analysis.period from the task archival date 2025-12-31 to the issuer's fiscal year end.
+7. Downloaded the issuer-hosted official 2025 10-K PDF to stock_report/data/raw/filings/KBH/2025-12-31/KBH-2025-10K.pdf. SEC archive direct curl returned HTTP 403; the SEC web-rendered filing and SEC Company Facts API remained available.
+8. Reconciled the statements and operating statistics using the SEC 10-K, issuer full-year release, and SEC XBRL Company Facts (CIK 0000795266).
+9. Overrode analysis_model_hint. KB Home is a real-estate developer: inventory was $5.671bn / 84.9% of assets and cash/debt support land and construction. Set statement_model=real_estate_developer and owner_earnback_applicability=requires_special_model.
+10. Kept all ordinary owner-earnback fields and corresponding metrics null per result contract. Used inventory realization, impairment, debt, backlog conversion, cash-flow cyclicality, and distribution coverage in the report instead.
+11. Converted USD statement values to CNY at 7.1069 CNY/USD, the Federal Reserve G.5 November 2025 monthly average. This is a presentation conversion, not issuer-reported CNY.
+12. Forecast dividends from 63,173,611 shares outstanding at 2025-12-31 and annualized $1.00/share, supported by $0.25 quarterly declarations for the first three quarters of 2026. Forecast CNY amount=448,968,536.02; yield=1.974175% against the supplied market cap.
+13. Populated outputs/result.json exclusively through protocol set/append commands in populate_kbh_result.sh; did not hand-write the complex JSON.
+14. Wrote outputs/report.md following the operating-story and special-model contract.
+15. Protocol validation command and result are recorded after execution below.
+
+Final validation:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Result: {"status":"ok","errors":[]}
+
+Independent consistency checks:
+- analysis.period equals actual issuer fiscal year end 2025-11-30: ok
+- special-model classification and applicability: ok
+- all ordinary owner-earnback fields are null: ok
+- forecast dividend amount / market cap equals forecast dividend yield: ok
+- data_quality.status=complete and incomplete_reasons=[]: ok

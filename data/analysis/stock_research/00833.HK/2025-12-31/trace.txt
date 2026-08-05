@@ -1,0 +1,48 @@
+2026-08-03T12:59:59+08:00 task initialized
+- Read stock-research/SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+- Ran protocol init with config/input.json -> outputs/result.json.
+
+Local reuse check
+- No 2025 annual facts package or prior research output existed under the paths supplied in config/input.json.
+- Fell back to the primary filing as required by data-reuse.md.
+
+Primary evidence
+- HKEX Annual Report 2025: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042300862.pdf
+- Filing downloaded to stock_report/data/raw/filings/00833.HK/2025-12-31/annual-report-2025.pdf.
+- Key pages: 3-6 business/operations; 89 customer concentration; 93 inventory KAM; 97 P&L; 99-100 balance sheet; 103-104 cash flow.
+- Market cap and PE: config/input.json / Tencent qt.gtimg.cn, 2026/07/31 16:08:47.
+- FX: 2025-12-31 CFETS/PBOC midpoint, HKD 1 = CNY 0.90322.
+
+Model override
+- Input hint financial_brokerage rejected.
+- Filing says manufacture and trading of electronic products, plastic moulds and components; revenue is almost entirely electronic-product sales.
+- Final model: ordinary_operating; owner earnback applicable.
+
+Core calculations (HKD '000 filing values converted at 0.90322)
+- Gross margin = 240,770 / 1,141,175 = 0.2109842925.
+- Net margin = 47,171 / 1,141,175 = 0.0413354656.
+- Operating FCF = (106,709 - 15,894) * 1,000 * 0.90322 = CNY 82,025,924.30.
+- Forecast dividend = HKD 0.06 * 473,058,180 * 0.90322 = CNY 25,636,536.56.
+- Forecast yield = 25,636,536.56 / 321,511,317.6751137 = 0.0797375867.
+
+Owner earnback scenario
+- Cash and pledged deposits CNY 402,239,091.58.
+- Less bank debt CNY 150,091,680.28.
+- Less lease liabilities CNY 69,569,617.28.
+- Less HKD 100m operating buffer = CNY 90,322,000.00.
+- Less declared annual dividend CNY 25,636,536.56.
+- Residual CNY 66,619,257.46 * 80% = discounted detachable net cash CNY 53,295,405.97.
+- Normalized parent profit: parent net income plus after-tax HKD 40.663m impairments/FVTPL loss = CNY 73,273,365.73.
+- 80% concentration/recurrence discount = sustainable cash profit CNY 58,618,692.58.
+- Operating business price = market cap - discounted net cash = CNY 268,215,911.71.
+- Owner earnback = 268,215,911.71 / 58,618,692.58 = 4.575603786 years.
+- Market cap / cash profit = 5.484791685 years.
+
+Protocol activity
+- Used protocol set commands to populate the initialized skeleton by section.
+- Protocol validate result: status=ok, errors=[].
+
+Limitations
+- Income statement and cash-flow values use closing FX for protocol comparability, not an annual average FX rate.
+- Market data was accepted from task input and not independently reconstructed from exchange ticks.
+- Cash buffer, adjustment classification and 20% discounts are explicit research judgments.

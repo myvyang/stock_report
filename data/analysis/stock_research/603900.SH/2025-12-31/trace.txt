@@ -1,0 +1,81 @@
+stock-research trace
+company: 603900.SH 莱绅通灵
+period: 2025-12-31 annual
+generated for input timestamp: 2026-07-31T22:46:19+08:00
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+   - config/input.json existed.
+   - The input-declared 2025 annual facts, normalized facts, filing metadata, and prior stock-research files did not exist.
+   - No prior 603900 research facts were found under stock_report.
+
+3. Protocol initialization
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   result: initialized stock-research-result-v1 from the supplied identity and market snapshot.
+
+4. Primary filing acquisition
+   - Located official filing via Shanghai Stock Exchange search result.
+   - Filing: 莱绅通灵珠宝股份有限公司2025年年度报告
+   - disclosure date: 2026-04-17
+   - official URL: https://www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-17/603900_20260417_Y4HO.pdf
+   - saved local copy: stock_report/data/raw/filings/603900.SH/2025-12-31/annual-report-2025.pdf
+   - PDF text extraction used only to read the official filing; all core statement values were checked against the filing tables/notes.
+
+5. Model verification
+   - Products: diamond, gold, jade and other jewelry.
+   - Channels: direct retail, franchise wholesale, online.
+   - Main balance-sheet occupation: inventory, receivables, store leases.
+   - Gold leasing was short-term procurement/risk-management funding and had zero closing balance.
+   - Decision: ordinary_operating; ordinary owner earnback applicable.
+
+6. Core audited figures used (CNY)
+   revenue=1,529,280,167.13
+   cost_of_sales=945,348,636.62
+   gross_profit=583,931,530.51
+   operating_profit=71,520,550.17
+   net_profit=61,036,742.56
+   parent_net_profit=59,744,329.51
+   total_assets=2,206,023,723.17
+   total_liabilities=264,689,400.97
+   total_equity=1,941,334,322.20
+   parent_equity=1,941,334,322.20
+   operating_cash_flow=101,959,863.73
+   capital_expenditure=22,796,857.82
+   operating_free_cash_flow=79,163,005.91
+   inventory=1,628,370,258.82
+   cash=184,050,402.06 (restricted 50,266.29)
+   trading_financial_assets=20,061,150.68 (principal-protected floating-return wealth products)
+   lease_liabilities_current_and_noncurrent=36,802,040.75
+
+7. Formula checks
+   gross_margin=(1,529,280,167.13-945,348,636.62)/1,529,280,167.13=0.38183424009602135
+   net_margin=59,744,329.51/1,529,280,167.13=0.03906696156409468
+   operating_free_cash_flow=101,959,863.73-22,796,857.82=79,163,005.91
+   discounted_cash=184,050,402.06*50% + 20,061,150.68*90% - 36,802,040.75=73,278,195.892
+   discounted_cash_profit=59,744,329.51*85%=50,782,680.0835
+   operating_business_price=1,941,000,000-73,278,195.892=1,867,721,804.108
+   owner_earnback_years=1,867,721,804.108/50,782,680.0835=36.778716700988944
+   market_cap_to_cash_profit=1,941,000,000/50,782,680.0835=38.22169284505049
+   forecast_dividend_yield=34,302,384/1,941,000,000=0.01767253168469861
+
+8. Judgment boundaries
+   - Inventory excluded from detachable cash because it is the core store assortment and carries markdown risk.
+   - Only 50% of cash included because high-value inventory retail requires procurement and operating liquidity.
+   - Sustainable profit uses 85% of 2025 parent profit because 2023 and 2024 were loss years and 2025 is the first turnaround year.
+   - Free cash flow was not substituted for profit because inventory reduction contributed 62,828,087.15 to 2025 operating cash flow.
+   - Forecast dividend repeats the 2025 paid amount as a base case, not a company commitment.
+
+9. Protocol population and validation
+   - outputs/result.json was populated through repeated protocol `set` commands, not manually authored from an empty object.
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: status=ok, errors=[]
+
+10. Output files
+   - outputs/result.json
+   - outputs/report.md
+   - outputs/trace.txt

@@ -1,0 +1,65 @@
+stock-research trace
+task=SPOK
+period=2025-12-31
+generated_for=2026-08-04 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the skill routes reuse decisions there.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated initialized fields using protocol set commands; result.json was not created as a hand-written object.
+
+[reuse audit]
+- Expected annual facts, normalized facts, raw filing, and prior stock-research files were absent under stock_report for SPOK/2025-12-31.
+- Therefore fetched and inspected the primary filing rather than fabricating or relying on secondary summaries.
+
+[primary sources]
+- SEC 2025 Form 10-K, filed 2026-02-26, accession 0001289945-26-000010:
+  https://www.sec.gov/Archives/edgar/data/1289945/000128994526000010/spok-20251231.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/1289945/000128994526000010/0001289945-26-000010-index.htm
+- SEC Companyfacts API, CIK 0001289945, used to cross-check XBRL facts.
+- Federal Reserve H.10/G.5A annual China spot rate: 2025 CNY per USD=7.1875.
+- Market cap, date, PE TTM, and Yahoo Finance attribution were supplied by config/input.json and were not independently recomputed.
+
+[financial extraction: original USD]
+- Revenue 139,708,000; cost of revenue 29,785,000; protocol gross profit 109,923,000.
+- Operating income 19,710,000; net income attributable to parent 15,881,000.
+- Total assets 206,111,000; liabilities 59,732,000; equity attributable to parent 146,379,000; minority interest 0.
+- Operating cash flow 28,949,000; capex 3,753,000; operating free cash flow 25,196,000.
+- Financing cash flow -29,790,000; cash distributions 27,259,000; equity-award tax withholding 2,843,000.
+- Cash 25,280,000; borrowings 0; company states no outstanding borrowings or associated debt-service requirements.
+- All statement amounts converted to CNY at 7.1875; ratios calculated from unrounded values.
+
+[model review]
+- Confirmed ordinary_operating/applicable.
+- Reason: healthcare communications services/software operating business; balance sheet does not represent banking, insurance, brokerage, development projects, concessions, or an investment-holding model.
+- Caution: reported cost of revenue excludes technology operations, so contract gross margin is arithmetically valid but economically incomplete as a contribution-margin measure.
+
+[owner earnback assumptions]
+- Detachable cash: 25.280m USD * 7.1875 * 50%=90.850m CNY.
+- Cash haircut rationale: preserve half for working capital, dividend buffer, network/software transition; AR, goodwill and DTA excluded.
+- Sustainable cash profit: (28.949m-3.753m) USD * 7.1875 * 80%=144.877m CNY.
+- Profit haircut rationale: secular wireless unit decline, software project timing, stock compensation and dividend pressure.
+- Operating business price=1,538,595,857.6916504-90,850,000=1,447,745,857.6916504 CNY.
+- Owner earnback years=1,447,745,857.6916504/144,877,000=9.9929309531.
+- Market cap/cash profit=1,538,595,857.6916504/144,877,000=10.6200146172.
+
+[dividend forecast]
+- Management expectation in 10-K: 0.3125 USD quarterly / 1.25 USD annual in 2026.
+- Shares used: 20,730,353 outstanding on 2026-02-20.
+- Forecast=20,730,353*1.25*7.1875=186,249,265.234375 CNY.
+- Yield=186,249,265.234375/1,538,595,857.6916504=0.1210514537.
+- This is conditional, not a guaranteed dividend.
+
+[quality limitations]
+- One annual average FX rate is used for both flow and stock statement items for protocol comparability.
+- Input market cap/PE retained as supplied; the PE is not reconciled to FY2025 net income.
+- Segment profit is not disclosed, so wireless/software profit attribution remains qualitative.
+- Cash and profit haircuts are explicit analyst assumptions.
+
+[validation]
+- Protocol validate executed after population.
+- Initial final validation status: ok; errors: [].

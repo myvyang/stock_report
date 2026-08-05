@@ -1,0 +1,67 @@
+stock-research trace
+company: 精华制药 (002349.SZ)
+period: 2025-12-31 annual
+generated context date: 2026-07-31 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Read references/data-reuse.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the annual-review, normalized-facts, raw-filing and prior stock-research paths named in config/input.json.
+- No reusable 2025 filing package, annual facts package, normalized facts or prior stock-research output existed in the workspace.
+- Checked stock_report/data/notes/user_stock_evaluations.md; it contained no company-specific reusable evidence for this task.
+
+3. Sources reviewed
+- Primary disclosure identified: 精华制药集团股份有限公司2025年年度报告, disclosed 2026-04-23 through the company's designated disclosure channel (巨潮资讯网); standard unqualified audit opinion dated 2026-04-21, report 信会师报字[2026]第ZH10049号.
+- Searchable full-text mirror used for extraction and line-level checking:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12139529&stockid=002349
+- Annual report summary, announcement 2026-005, used for cross-checking identity, business, headline financials and dividend proposal:
+  https://pdf.dfcfw.com/pdf/H2_AN202604221821444571_1.pdf
+- Valuation snapshot used exactly as supplied in config/input.json: market cap CNY 5,560,000,000; 20260731114312; Tencent qt.gtimg.cn; PE TTM 24.94.
+
+4. Model decision
+- Confirmed statement_model=ordinary_operating.
+- Confirmed owner_earnback_applicability=applicable.
+- Basis: all revenue is pharmaceutical manufacturing; balance sheet consists of production/operating assets, receivables, inventory and proprietary treasury assets; no customer deposits, insurance reserves, regulated presale cash or comparable special-model items.
+
+5. Core extracted facts (CNY)
+- Revenue 1,459,957,149.65; cost of sales 702,399,970.43; gross profit 757,557,179.22.
+- Operating profit 304,285,693.55; net profit 261,835,558.50; parent net profit 219,284,778.83; parent recurring net profit 208,124,771.96.
+- Operating cash flow 340,866,250.03; capex cash out 20,323,490.93; operating FCF 320,542,759.10.
+- Total assets 3,570,339,143.93; liabilities 421,126,363.41; total equity 3,149,212,780.52; parent equity 2,752,711,273.75; minority interest 396,501,506.77.
+- Cash 854,919,296.58, restricted cash 6,110,833.88; wealth-management products 434,740,246.05; long-term certificates/time deposits 497,652,463.61.
+- Short-term borrowing 1,679,219.23; current lease-related liability 415,937.76; lease liability 1,678,158.58; no long-term borrowing.
+- Accounts receivable gross 490,895,500 approximately, loss allowance 168,973,400 approximately, net 321,922,090.82.
+- 2025 dividend proposal 74,670,741.72; 2024 cash dividend 65,134,472.64.
+
+6. Derived calculations
+- Gross margin = 757,557,179.22 / 1,459,957,149.65 = 0.5188900094784368.
+- Parent net margin = 219,284,778.83 / 1,459,957,149.65 = 0.150199462280499.
+- Operating FCF = 340,866,250.03 - 20,323,490.93 = 320,542,759.10.
+- Discounted detachable cash:
+  unrestricted cash 848,808,462.70 * 70% = 594,165,923.89
+  wealth management 434,740,246.05 * 90% = 391,266,221.445
+  long deposits 497,652,463.61 * 90% = 447,887,217.249
+  less financing/lease liabilities 3,773,315.57
+  total = 1,429,546,047.014.
+- Sustainable parent cash profit judgment = 198,000,000, below 2025 recurring parent profit by about 5%, with three-year profit stability and FCF coverage considered.
+- Operating business price = 5,560,000,000 - 1,429,546,047.014 = 4,130,453,952.986.
+- Owner earnback years = 4,130,453,952.986 / 198,000,000 = 20.860878550434343.
+- Market cap / cash profit = 5,560,000,000 / 198,000,000 = 28.08080808080808.
+- Forecast dividend yield = 74,670,741.72 / 5,560,000,000 = 0.01342998951798561.
+
+7. Protocol population and validation
+- Populated outputs/result.json only through protocol CLI set commands after initialization; no complex JSON object was hand-written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].
+
+8. Limitations retained in result and report
+- Financial statement date and market-cap date differ by about seven months.
+- Dividend is a board proposal and may change with share count or implementation.
+- Discounted detachable cash and sustainable cash profit are explicit research judgments, not audited line items.

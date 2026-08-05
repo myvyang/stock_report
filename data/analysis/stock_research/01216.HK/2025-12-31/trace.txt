@@ -1,0 +1,47 @@
+stock-research trace
+company: 01216.HK 中原银行股份有限公司
+period: 2025-12-31 annual
+generated_for_input: 2026-08-03T17:04:47+08:00
+
+1. Read instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- Expected annual facts, normalized facts, metadata, and prior stock-research outputs were absent from /workspace.
+- Downloaded official HKEX annual report PDF to stock_report/data/raw/filings/01216.HK/2025-12-31/2025-annual-report-en.pdf.
+- No annual fact package was fabricated; research fields were traced directly to official disclosure.
+
+3. Sources
+- HKEX, Zhongyuan Bank 2025 Annual Report, published 2026-04-30:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0430/2026043000553.pdf
+- HKEX, Zhongyuan Bank 2025 AGM Circular, published 2026-06-05:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0605/2026060502489_c.pdf
+- config/input.json market snapshot: Tencent qt.gtimg.cn, 2026-07-31 16:08:47.
+
+4. Model decision
+- Confirmed statement_model=financial_bank from reported corporate banking, retail banking, treasury operations, loans, deposits, interbank funding, and regulatory capital disclosures.
+- Confirmed owner_earnback_applicability=not_applicable.
+- All ordinary owner-earnback values remained null by protocol; analysis used NIM, funding cost, NPL ratio, allowance coverage, capital adequacy, ROE, and actual dividend policy.
+
+5. Key extracted facts
+- Total assets RMB1,414,293.381m; liabilities RMB1,314,967.957m; total equity RMB99,325.424m; parent equity RMB96,236.613m.
+- Operating income RMB26,507.022m; net profit RMB3,576.201m; parent net profit RMB3,588.616m.
+- NIM 1.68%; NPL ratio 1.96%; allowance coverage 165.75%; ROE 3.53%.
+- Core tier-1 / tier-1 / total capital adequacy: 8.89% / 11.38% / 13.52%.
+- 2025 profit distribution plan: no cash dividend; retained profit mainly supplements core tier-1 capital.
+
+6. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated the initialized schema using protocol set commands.
+- Validated with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok; errors: [].
+
+7. Limitations
+- Market cap and PE were accepted from task input and not independently reconstructed.
+- Bank operating cash flow and ordinary free cash flow were intentionally left null because they are not comparable measures of distributable cash for a deposit-taking bank.
+- PDF text conversion utility was unavailable locally; evidence was read from the official HKEX indexed PDF and preserved source PDF.

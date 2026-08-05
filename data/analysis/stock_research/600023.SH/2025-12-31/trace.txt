@@ -1,0 +1,58 @@
+stock-research trace
+company: 600023.SH 浙江浙能电力
+period: 2025-12-31 annual
+generated_at: 2026-07-31 Asia/Shanghai
+
+[1] Protocol initialization
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+result: initialized stock-research-result-v1 from task input.
+
+[2] Local reuse check
+checked:
+- stock_report/data/raw/filings/600023.SH/2025-12-31
+- stock_report/data/analysis/annual_review/600023.SH/2025-12-31
+- stock_report/data/normalized/facts/600023.SH/2025-12-31
+- stock_report/data/analysis/stock_research/600023.SH/2025-12-31
+result: no filing, annual facts, normalized facts, or prior research files were present; public disclosure research was required.
+
+[3] Sources
+- Zhejiang Zheneng Electric Power Co., Ltd. 2025 Annual Report, disclosed 2026-04-28; audit report signed by BDO China Shu Lun Pan CPAs on 2026-04-27, unmodified opinion. Public text mirror: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12210353&stockid=600023 ; report states SSE as disclosure venue.
+- 2025 annual profit distribution and 2026 interim distribution authorization announcement, disclosed 2026-04-28: https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12210344&stockid=600023
+- 2025 annual dividend implementation announcement, published July 2026: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12459541&stockid=600023
+- config/input.json market snapshot: market cap CNY 67,044,000,000.00001; 2026-07-31 11:43:23; Tencent qt.gtimg.cn; PE TTM 9.06.
+
+[4] Key extracted facts (CNY absolute yuan in result.json)
+- revenue 79,553,931,304.55
+- cost of sales 69,745,988,894.42
+- gross profit calculated 9,807,942,410.13; gross margin 12.32867094%
+- consolidated net profit 7,639,192,784.78
+- parent net profit 7,528,041,660.90; net margin 9.46281540%
+- operating cash flow 11,453,605,477.23
+- purchases of fixed/intangible/other long-term assets 7,220,147,529.11
+- operating cash flow less disclosed long-term asset purchases 4,233,457,948.12; not treated as sustainable distributable cash because maintenance versus expansion capex is unavailable.
+- total assets 156,337,713,781.70; liabilities 66,466,070,595.43; total equity 89,871,643,186.27; parent equity 76,512,396,209.44; minority interest 13,359,246,976.83.
+- cash 14,681,292,892.22; long-term equity investments 40,545,373,600.41; fixed assets 57,961,436,299.32; construction in progress 2,289,872,459.72; intangible assets 3,029,016,429.59.
+- short-term borrowing 11,738,757,469.92; current portion of non-current liabilities 8,477,278,448.83; long-term borrowing 25,137,149,980.23; lease liabilities 2,828,746,187.63.
+- power/heat revenue 72,870,145,425.91, margin 14.28%; solar manufacturing revenue 2,369,281,843.31, margin -49.92%.
+- power produced 183.2842723 TWh; power sold 173.7198251 TWh.
+- equity-method investment income 3,429,029,332.91.
+- 2025 total cash dividend 4,424,881,807.17, payout ratio 58.78%; implied yield on input market cap 6.59996690%.
+
+[5] Analysis model decision
+input hint was independently checked against business and audited financial statements.
+decision: utility_concession / requires_special_model.
+reason: cash generation depends on physical generation assets, regulated/market power prices, fuel costs, maintenance and growth capex, debt service, and the remaining economic life of each asset group. Long-term equity investments are 25.93% of assets and require a look-through dividend model. Consolidated cash cannot be detached from working capital, security-of-supply duties, capex, and financing.
+ordinary owner earnback fields deliberately remain null under result contract.
+
+[6] Protocol population
+outputs/result.json was populated using repeated protocol CLI `set` commands, not constructed from scratch.
+
+[7] Validation
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+result: status ok; errors [].
+
+[8] Known limitations
+- no per-plant remaining life, utilization, tariff, maintenance capex, project debt, or distributable project cash flow;
+- no reliable split of maintenance and expansion capex;
+- market cap and PE were accepted from the user-provided Tencent snapshot rather than recomputed;
+- consolidated gross margin is distorted by the loss-making solar manufacturing subsidiary and differs from the power/heat segment margin.

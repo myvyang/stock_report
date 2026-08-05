@@ -1,0 +1,77 @@
+Stock research trace: 09885.HK / 药师帮 / FY2025
+Generated at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All structured result updates were made through protocol set commands; the initialized JSON was not replaced by a hand-written object.
+
+2. Reuse check
+- Checked configured annual review, normalized facts, raw filing, and prior stock research paths.
+- No FY2025 facts package, metadata, prior research result, or raw filing was present locally.
+- Downloaded the Chinese 2025 annual report from the company's official investor-relations file host:
+  https://ysbpictencent.ysbang.cn/uploads/pdf/2026/04/23/f80144e7604f457eaedc193910616ac2.pdf
+- Saved source filing at stock_report/data/raw/filings/09885.HK/2025-12-31/annual-report-2025-cn.pdf.
+- Used the HKEX title-search result and company investor-relations page to confirm publication identity and dates.
+
+3. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Annual report note 5 says the group sells pharmaceutical and healthcare products, operates an online marketplace, provides SaaS, and provides primary-care technology/services.
+- No brokerage customer funds, proprietary securities inventory, repo financing, or brokerage revenue structure was found.
+- Override: ordinary_operating / applicable.
+- Important handling: deposits pledged or designated for bank acceptance notes are operating settlement funds, not detachable cash.
+
+4. Core audited facts (RMB thousand in filing; converted to absolute RMB in result.json)
+- Revenue 20,969,650; cost of sales 18,662,668; gross profit 2,306,982.
+- Profit before tax 137,045; net profit 145,982; attributable profit 152,965.
+- Total assets 7,562,543; total liabilities 5,176,350; total equity 2,386,193; parent equity 2,443,318; NCI -57,125.
+- Operating cash flow 637,700.
+- PPE purchases 17,151; intangible purchases 1,085; capex 18,236; operating FCF 619,464.
+- Dividend paid 50,786; repurchases 65,816.
+- Sources: annual report pp.72-77.
+
+5. Cash and working-capital interpretation
+- Bank balances/cash 706,874.
+- Term deposits 738,429, of which 588,429 held in designated accounts for bank acceptance notes.
+- Restricted bank deposits 1,636,628, used for bank acceptance notes.
+- FVTPL financial assets 714,160, including redeemable products but also unlisted equity and an eight-year limited partnership.
+- Amortized-cost long-term note 152,351.
+- Inventory 1,873,196.
+- Trade payables 1,515,914 and notes payable 2,439,232.
+- Operating cash flow contained +929,804 from increased trade/other payables, offset by -413,988 inventory and -167,143 receivables. Therefore reported OCF/FCF was not used as sustainable distributable profit.
+- Sources: annual report pp.73, 76-77, 125-129.
+
+6. Owner earnback assumptions and arithmetic (absolute RMB)
+- Cash 706,874,000 * 80% = 565,499,200.
+- Unpledged/designated-free term deposits 150,000,000 * 95% = 142,500,000.
+- FVTPL assets 714,160,000 * 75% = 535,620,000.
+- Long note 152,351,000 * 60% = 91,410,600.
+- Less bank borrowings 151,653,000.
+- Less lease liabilities 175,800,000.
+- Less contingent consideration 69,575,000.
+- Less additional operating-liquidity reserve 504,499,800.
+- Discounted detachable net cash = 433,502,000.
+- Sustainable cash profit starts with parent profit 152,965,000, adds depreciation/amortization 152,720,000, subtracts capex 18,236,000, and subtracts 87,449,000 normalization for working capital/share compensation/acquisition/cycle = rounded 200,000,000.
+- Market cap 1,868,769,478.7365198 from supplied Tencent snapshot.
+- Operating business price = market cap - discounted net cash = 1,435,267,478.7365198.
+- Owner earnback years = 1,435,267,478.7365198 / 200,000,000 = 7.176337.
+- Market cap / cash profit = 9.343847.
+
+7. Dividend estimate
+- Proposed FY2025 final dividend: RMB0.110/share.
+- FY2025 year-end issued shares: 681,196,858.
+- Estimated cash dividend: 74,931,654.38, stored rounded to 74,931,654.
+- Forecast dividend yield: 74,931,654.38 / 1,868,769,478.7365198 = 0.040096788.
+- Actual total depends on record-date eligible shares and treatment of trust/treasury holdings.
+
+8. Data-quality notes
+- Core FY2025 financial statements are audited and sufficient for complete status.
+- Market cap and PE are from the supplied third-party quote snapshot, not the annual report.
+- Industry-position metrics are company disclosures and were not independently validated.
+- Detachable-cash discounts, liquidity reserve, and sustainable cash-profit normalization are analyst judgments, explicitly exposed in result.json.
+
+9. Validation
+- Final protocol validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

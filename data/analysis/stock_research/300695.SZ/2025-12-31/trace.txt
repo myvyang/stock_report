@@ -1,0 +1,71 @@
+stock-research trace
+company=兆丰股份 (300695.SZ)
+period=2025-12-31
+generated_for=2026-08-01
+
+[skill_and_contract]
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the skill routes reuse decisions through that reference.
+
+[reuse_check]
+- Checked stock_report/data/analysis/annual_review/300695.SZ/2025-12-31, raw filing directory, normalized facts and prior stock-research directory.
+- No reusable local filing, annual facts package or prior research result existed.
+- Initialized outputs/result.json with protocol CLI; did not construct the result object manually.
+
+[sources]
+1. 浙江兆丰机电股份有限公司2025年年度报告，披露日2026-03-27，巨潮资讯网披露；可复核镜像：
+   http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESZ_STOCK/2026/2026-3/2026-03-27/12024053.PDF
+2. 关于2025年度利润分配预案的公告，公告编号2026-015，巨潮资讯网：
+   https://static.cninfo.com.cn/finalpage/2026-03-27/1225037242.PDF
+3. 2025年年度权益分派实施公告（用于确认方案后续实施）。
+4. config/input.json: Tencent qt.gtimg.cn market-cap snapshot, 2026-07-31 11:43:09.
+
+[model]
+- Classified as ordinary_operating.
+- Reason: revenue and operating assets arise from automotive component design/manufacturing/sales; no bank deposits, client funds, insurance reserves, regulated presale cash, concession rights or similar special-model balance-sheet elements.
+- Ordinary owner earnback is applicable.
+
+[core_facts_cny]
+revenue=705451919.07
+cost_of_sales=506784412.06
+gross_profit=198667507.01
+parent_net_profit=350461959.63
+non_recurring_profit=255336580.54
+deducted_parent_net_profit=95125379.09
+operating_cash_flow=129156283.38
+capital_expenditure=89266578.26
+operating_free_cash_flow=39889705.12
+total_assets=3368685631.82
+total_liabilities=464709858.44
+parent_equity=2896453244.75
+
+[owner_earnback]
+- Unrestricted cash: (689123340.42 - 65604236.47) * 100% = 623519103.95.
+- Trading financial assets, mainly structured deposits: 697421583.70 * 95% = 662550504.515.
+- Other non-current financial assets/funds: 717358904.35 * 40% = 286943561.74.
+- Less short-term borrowing and trading financial liability: 5000 + 420086.20 = 425086.20.
+- Less 2025 dividend implemented after year-end but before valuation date: 15141408.60.
+- Discounted detachable net cash = 1557446675.405.
+- Operating business price = 4590000000 - 1557446675.405 = 3032553324.595.
+- Sustainable distributable cash profit = 80000000. This is an analytical estimate below deducted parent profit (95125379.09) and OCF (129156283.38), reflecting maintenance-capex uncertainty and working-capital volatility. It excludes fund fair-value gains.
+- Owner earnback years = 3032553324.595 / 80000000 = 37.9069165574.
+- Market cap / cash profit = 4590000000 / 80000000 = 57.375.
+
+[dividend]
+- Forecast/implemented 2025 cash dividend = 15141408.60.
+- Dividend yield = 15141408.60 / 4590000000 = 0.00329878183.
+
+[quality_limits]
+- Market cap and PE TTM were accepted from task input and not independently reconstructed.
+- Maintenance capital expenditure is not separately disclosed.
+- Fund exit timing, lockups, tax, fees and realizable value are not fully observable; 40% inclusion is intentionally conservative.
+- Valuation date is later than report date; only the known implemented dividend was bridged explicitly.
+
+[protocol]
+- outputs/result.json initialized using:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Fields and list rows populated using protocol set/append commands.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report creation: status=ok, errors=[].

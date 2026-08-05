@@ -1,0 +1,50 @@
+stock-research trace
+company: PRIM / Primoris Services Corporation
+period: 2025-12-31 annual
+generated_for_input: 2026-08-05T01:49:04+08:00
+
+1. Protocol
+- Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields only through protocol `set` commands.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+2. Reuse check
+- No raw filing, annual facts, normalized facts, or prior PRIM stock-research result existed in the supplied stock_report tree.
+- Downloaded SEC filing into stock_report/data/raw/filings/PRIM/2025-12-31/prim-20251231x10k.htm.
+- SEC accession: 0001104659-26-018677; filed 2026-02-24; report date 2025-12-31.
+- Downloaded SEC Companyfacts transiently for XBRL cross-check; filing tables remained the primary source.
+
+3. Model decision
+- Input hint ordinary_operating/applicable was overridden.
+- Selected statement_model=construction_project and owner_earnback_applicability=requires_special_model.
+- Basis: progress-based construction accounting; USD 936.9m contract assets, USD 723.4m receivables, USD 633.6m contract liabilities; receivable sale/pledge facility; project equipment and working-capital dependence.
+- Consequently all ordinary owner-earnback numeric fields remain null as required by the contract.
+
+4. Currency conversion
+- Contract requires CNY absolute yuan.
+- Applied 2025-12-31 CFETS central parity USD 1 = CNY 7.0288 to all USD filing and dividend values.
+- Source: https://english.news.cn/20251231/d55adf458b384452b9c936aff80e901f/c.html
+- Market cap was already supplied in CNY and was not reconverted.
+
+5. Core calculations
+- gross_margin = 813.1 / 7574.9 = 0.10734135104093784
+- net_margin = 274.9 / 7574.9 = 0.0362909081308004
+- operating_free_cash_flow = (470.4 - 129.9) USD m * 7.0288 = CNY 2,393,306,400
+- forecast dividend = 54,045,067 shares * USD 0.32 * 7.0288 = CNY 121,559,029.42
+- forecast dividend yield = 121,559,029.42 / 30,903,541,377.33252 = 0.003933498362962198
+- No buybacks were reported in 2025 financing cash flow, so dividend_and_buyback_cash_out equals cash dividends paid.
+
+6. Primary sources
+- SEC 10-K: https://www.sec.gov/Archives/edgar/data/1361538/000110465926018677/prim-20251231x10k.htm
+- FY2025 release: https://ir.prim.com/news-and-events/news-releases/2026/02-23-2026-211611532
+- 2026-06 business update: https://ir.prim.com/news-and-events/news-releases/2026/06-22-2026-210520328
+- Dividend FAQ: https://ir.prim.com/resources/faqs
+- Market cap and PE: config/input.json, Yahoo Finance yfinance, dated 2026-08-03.
+
+7. Limitations
+- Historical USD dividend cash payments were translated at the common year-end rate for protocol consistency, not at transaction-date rates.
+- Input market cap and PE TTM were not independently reconstructed from exchange data.
+- Full Q2 2026 filing was not incorporated; the June 2026 official update was used only as a material subsequent-event indicator.

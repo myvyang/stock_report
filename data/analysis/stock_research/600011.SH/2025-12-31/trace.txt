@@ -1,0 +1,51 @@
+stock-research trace
+company=600011.SH 华能国际
+period=2025-12-31
+run_date=2026-08-01 Asia/Shanghai
+
+[protocol]
+1. Read stock-research/SKILL.md, result-contract.md, report-contract.md and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated fields only through protocol set/append commands.
+4. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse check]
+- Expected annual facts, normalized facts, prior stock research and raw filing metadata were absent.
+- Downloaded the official 2025 annual report from Shanghai Stock Exchange disclosure URL:
+  https://www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-03-25/600011_20260325_CS0B.pdf
+- Local source copy: stock_report/data/raw/filings/600011.SH/2025-12-31/annual-report-2025.pdf
+- Extracted text for local verification: stock_report/data/raw/filings/600011.SH/2025-12-31/annual-report-2025.txt
+
+[model decision]
+- Input hint: utility_concession / requires_special_model.
+- Confirmed from annual report: large-scale thermal, gas, wind and solar generation operator; fixed assets plus construction in progress RMB 425,074,950,949; 2025 purchases of long-term assets RMB 58,326,323,386; substantial debt, perpetual securities and minority interests.
+- Conclusion: retain utility_concession as the protocol's broad utility special model. Ordinary detachable-net-cash owner earnback is not economically applicable.
+- Required ordinary owner-earnback fields remain null.
+
+[key calculations, CNY]
+gross_profit = 229,288,057,955 - 186,990,711,967 = 42,297,345,988
+gross_margin = 42,297,345,988 / 229,288,057,955 = 0.18447252057192295
+net_margin = 14,409,553,809 / 229,288,057,955 = 0.06284476364585902
+operating_free_cash_flow = 67,212,899,994 - 58,326,323,386 = 8,886,576,608
+minority_interest_ratio = 70,049,433,944 / 212,518,082,134 = 0.3296163471860781
+interest_bearing_and_lease_debt = 61,931,728,636 + 31,980,862,125 + 157,066,581,848 + 49,969,166,392 + 7,939,859,687 = 308,888,198,688
+forecast_dividend_yield = 6,279,237,344 / 112,555,000,000 = 0.055788168841899514
+
+[source map]
+- Annual report pp. 6-7: three-year headline financial data.
+- Annual report pp. 10-12: business, installed capacity, power volume, tariff, fuel cost and industry context.
+- Annual report pp. 14-16: revenue/cost movements and profit by generation type.
+- Annual report pp. 27-29: capital expenditure by category and market-traded electricity.
+- Annual report p. 52: 2025 dividend plan and ordinary-shareholder profit basis.
+- Annual report pp. 130-131: consolidated balance sheet.
+- Annual report pp. 134-135: consolidated income statement.
+- Annual report pp. 137-138: consolidated cash-flow statement.
+- config/input.json: market capitalization RMB 112,555,000,000 at 20260731114330 and PE TTM 8.09, source Tencent qt.gtimg.cn.
+
+[limitations]
+- Annual report does not provide a complete project-by-project split of remaining operating life, maintenance versus growth capex, debt service and ordinary-shareholder cash attribution. No special-model payback years were fabricated.
+- Operating free cash flow subtracts all purchases of long-term assets and therefore includes growth capex.
+- Market data was accepted from the supplied input snapshot and not reconstructed from exchange ticks.
+

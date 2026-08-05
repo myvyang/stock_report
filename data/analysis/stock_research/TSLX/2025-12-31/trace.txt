@@ -1,0 +1,68 @@
+stock-research trace
+task: TSLX annual research, period 2025-12-31
+generated_at: 2026-08-05T02:58:01+08:00
+
+1. Read instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- config/input.json found.
+- No local annual facts, normalized facts, raw filing, or prior stock-research package was present for TSLX/2025-12-31.
+- Research therefore returned to primary public filings.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initialized schema: stock-research-result-v1.
+
+4. Primary sources consulted
+- SEC Form 10-K, accession 0001193125-26-048664, filed 2026-02-12, period 2025-12-31:
+  https://www.sec.gov/Archives/edgar/data/1508655/000119312526048664/tslx-20251231.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/1508655/000119312526048664/0001193125-26-048664-index.htm
+- SEC Companyfacts API for CIK 0001508655 (downloaded to /tmp only; not an output artifact):
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0001508655.json
+- FY2025 earnings release, SEC Exhibit 99.1:
+  https://www.sec.gov/Archives/edgar/data/1508655/000119312526048683/tslx-ex99_1.htm
+- PBOC/CFETS 2025-12-26 USD/CNY central parity announcement:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- Market capitalization and PE reused from config/input.json; source recorded there as Yahoo Finance yfinance.
+
+5. Model decision
+- Input hint ordinary_operating/applicable was overridden.
+- TSLX is an externally managed business development company and regulated investment company. Loans, equity investments, cash, and financing debt form the operating balance sheet.
+- Selected statement_model: investment_holding.
+- Selected owner_earnback_applicability: requires_special_model.
+- Ordinary owner-earnback metrics remain null by contract.
+
+6. Core USD facts and conversion
+- Conversion rate used for all financial-statement CNY display amounts: USD/CNY 7.0358 (PBOC/CFETS, 2025-12-26).
+- Total assets: USD 3,421,655,000 -> CNY 24,074,080,249.
+- Total liabilities: USD 1,813,934,000 -> CNY 12,762,476,837.2.
+- Net assets/parent equity: USD 1,607,721,000 -> CNY 11,311,603,411.8.
+- Investments at fair value: USD 3,347,317,000 -> CNY 23,551,052,948.6.
+- Debt carrying amount: USD 1,763,915,000 -> CNY 12,410,553,157.
+- Investment income: USD 449,055,000 -> CNY 3,159,461,169.
+- Net investment income: USD 215,314,000 -> CNY 1,514,906,241.2.
+- Net income: USD 170,517,000 -> CNY 1,199,723,508.6.
+- Operating cash flow: USD 401,577,000 -> CNY 2,825,415,456.6; retained only as a reported statement value, not treated as ordinary-company free cash flow.
+- 2025 distribution: USD 192,867,000; NII/distribution coverage = 1.1164x.
+- Forecast base dividend: USD 0.46 per quarter x 4 x 94,705,150 shares x 7.0358 = CNY 1,226,040,749.64.
+- Forecast dividend yield = CNY 1,226,040,749.64 / input market cap CNY 11,002,859,323.720093 = 11.1429%.
+- Reference market cap / period-end translated NAV = 0.9727x; dates differ and this is not stored as a sortable contract metric.
+
+7. Result population
+- Used protocol `set` commands for all populated scalar, array, and object paths.
+- Did not hand-write outputs/result.json.
+
+8. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status ok; errors [].
+
+9. Known limitations
+- A directly verifiable 2025-12-31 PBOC central parity page was not obtained; the nearby 2025-12-26 official rate is used consistently.
+- Market cap and PE were supplied by the task and not independently exchange-verified.
+- Forecast includes only the declared base dividend run-rate and excludes supplemental dividends.
+- Gross margin, capex, ordinary free cash flow, detachable cash, and owner-earnback years are null because they lack comparable meaning for this BDC model.

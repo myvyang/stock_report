@@ -1,0 +1,127 @@
+stock-research trace
+company: 青岛食品（001219.SZ）
+period: 2025-12-31 annual
+generated_at: 2026-07-31T16:49:12+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Read references/data-reuse.md because the skill requires reuse-boundary handling.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated initialized fields with protocol set commands; no complex result object was handwritten from scratch.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: {"status":"ok","errors":[]}
+
+[reuse audit]
+Checked configured long-term paths under:
+- stock_report/data/raw/filings/001219.SZ/2025-12-31
+- stock_report/data/analysis/annual_review/001219.SZ/2025-12-31
+- stock_report/data/normalized/facts/001219.SZ/2025-12-31
+- stock_report/data/analysis/stock_research/001219.SZ/2025-12-31
+No filing, annual facts, normalized facts, or prior stock-research files were present in the workspace. Core facts were therefore rebuilt from the public 2025 annual report.
+
+[sources]
+S1 青岛食品股份有限公司2025年年度报告, disclosed 2026-04-17.
+   Web text: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12103406&stockid=001219
+   The report identifies Shenzhen Stock Exchange and CNINFO as designated disclosure venues.
+S2 青岛食品股份有限公司2025年度利润分配预案公告, CNINFO, disclosed 2026-04-17.
+   PDF: https://static.cninfo.com.cn/finalpage/2026-04-17/1225113966.PDF
+S3 Input market snapshot: Tencent qt.gtimg.cn; market cap CNY 2,398,000,000; timestamp 20260731114321; PE TTM 21.29.
+
+[model classification]
+statement_model = ordinary_operating
+owner_earnback_applicability = applicable
+Reason: annual report says the group researches, produces and sells biscuits, condiments/peanut butter and chocolate products. Inventory, receivables and fixed assets are ordinary manufacturing operating assets. Deposits and structured deposits are idle-fund management, not a financial operating model.
+
+[financial facts from S1]
+total_assets = 1,328,566,317.43
+total_liabilities = 266,622,327.57
+total_equity = 1,061,943,989.86
+parent_equity = 1,060,419,407.90
+minority_interest = 1,524,581.96
+revenue = 545,143,326.86
+cost_of_sales = 329,082,347.34
+gross_profit = 216,060,979.52
+operating_profit = 146,615,819.38
+net_profit = 110,925,547.76
+parent_net_profit = 110,870,965.80
+deducted_parent_net_profit = 97,373,839.07
+operating_cash_flow = 104,386,584.04
+capital_expenditure = 6,679,367.12
+operating_free_cash_flow = 97,707,216.92
+financing_cash_flow = 13,639,377.50
+dividend_and_interest_cash_out = 76,303,383.70
+
+[operating calculations]
+gross_margin = (545,143,326.86 - 329,082,347.34) / 545,143,326.86
+             = 0.3963434667
+net_margin = 110,870,965.80 / 545,143,326.86
+           = 0.2033767350
+operating_free_cash_flow = 104,386,584.04 - 6,679,367.12
+                         = 97,707,216.92
+
+[business mix from S1]
+biscuits revenue = 458,747,163.94; share 84.15%; gross margin 44.37%
+peanut butter revenue = 42,327,560.90; share 7.76%; gross margin 10.89%
+domestic distribution = 346,336,043.67; share 63.53%; YoY -1.37%
+domestic direct = 115,795,191.00; share 21.24%; YoY +10.51%
+online direct = 27,099,992.39; share 4.97%; YoY +86.54%
+foreign = 36,137,406.73; share 6.63%; YoY -14.18%
+
+[cash facts and discounts]
+cash and cash equivalents = 274,009,239.66
+  cross-check: cash 330,020,748.71 - restricted cash 56,011,509.05 = 274,009,239.66
+structured deposits = 430,553,217.79; discount 95%; discounted = 409,025,556.9005
+one-year certificate of deposit = 101,540,821.89; discount 95%; discounted = 96,463,780.7955
+long-term certificates of deposit = 333,322,095.17; discount 90%; discounted = 299,989,885.653
+short-term borrowing = 49,000,000.00; deducted at 100%
+notes payable = 106,035,880.40; deducted at 100%
+financial derivative due within one year = 13,264,410.15; included at zero because the public text did not sufficiently explain its economic substance.
+
+discounted_detachable_net_cash =
+  274,009,239.66
+  + 409,025,556.9005
+  + 96,463,780.7955
+  + 299,989,885.653
+  - 49,000,000.00
+  - 106,035,880.40
+  = 924,452,582.609
+
+[sustainable cash profit]
+parent_net_profit = 110,870,965.80
+less non-recurring gains = 13,497,126.73
+normalized profit = 97,373,839.07
+prudence discount = 5%
+discounted_sustainable_cash_profit = 97,373,839.07 * 0.95
+                                    = 92,505,147.1165
+Cross-check: 2025 operating free cash flow 97,707,216.92 is close to normalized profit, but S1 says OCF improvement was mainly due to switching some supplier payments from wire transfers to bank acceptance notes. The 5% discount addresses this single-year working-capital help and ordinary variability.
+
+[owner earnback]
+market_cap = 2,398,000,000
+operating_business_price = 2,398,000,000 - 924,452,582.609
+                         = 1,473,547,417.391
+owner_earnback_years = 1,473,547,417.391 / 92,505,147.1165
+                     = 15.9293559691
+market_cap_to_cash_profit = 2,398,000,000 / 92,505,147.1165
+                          = 25.9228818585
+discounted_net_cash_to_market_cap = 924,452,582.609 / 2,398,000,000
+                                  = 0.3855098343
+
+[dividend]
+S2 proposed cash dividend = 68,244,312.50
+forecast_dividend_yield = 68,244,312.50 / 2,398,000,000
+                        = 0.0284588459
+S2 historical/proposed totals:
+2023 = 44,996,250.00
+2024 = 58,495,125.00
+2025 = 68,244,312.50 (proposal; payout ratio 61.55%)
+
+[quality]
+status = complete
+Limitations:
+- No pre-existing annual facts package was available in the workspace.
+- Market cap and PE were accepted from the supplied Tencent snapshot and were not independently reconstructed from price and shares.
+- Cash discounts and sustainable-profit discount are analyst estimates, not audited facts or company guidance.
+- Early-transfer pricing of long-term certificates of deposit and the minimum operating cash actually required need additional due diligence.

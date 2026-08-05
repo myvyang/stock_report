@@ -1,0 +1,63 @@
+stock-research trace
+company: 四川成渝（601107.SH）
+period: 2025-12-31 annual
+generated_for_input: 2026-08-01T02:48:23+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the selected skill routes reuse decisions through it.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields only through protocol set commands.
+6. Ran protocol validate; final status recorded below.
+
+[reuse audit]
+- No raw filing, annual facts package, normalized facts, or prior stock-research output for 601107.SH/2025-12-31 existed in the workspace.
+- Therefore fetched the official 2025 annual report from the company's investor-relations site and extracted its PDF text locally.
+- Reused the market-cap/PE snapshot exactly as supplied in config/input.json.
+
+[primary sources]
+- 四川成渝2025年度报告, company investor-relations page, published 2026-03-31:
+  https://www.cygs.com/details.aspx?mid=292&sid=198880
+- Annual report PDF resolved from that page:
+  https://www.cygs.com/upload/file/2026-03-31/6391056406414352374230997.pdf
+- 四川成渝关于2025年利润分配及股息派发方案的公告, published 2026-03-31:
+  https://www.cygs.com/details.aspx?mid=292&sid=198900
+- Market data: config/input.json; Tencent qt.gtimg.cn snapshot at 20260731114344.
+
+[filing locations used]
+- Annual report pp. 19-24: business model, roads, traffic and toll revenue.
+- Annual report p. 29: revenue/cost/margin by industry.
+- Annual report p. 36: restricted cash and pledged concession rights.
+- Annual report pp. 43-44: policy and concession-expiry risks.
+- Annual report pp. 76-77 and 280: dividend history and 2025 proposal.
+- Annual report pp. 125-135: consolidated balance sheet, income statement and cash-flow statement.
+- Annual report pp. 157-159 and 206: concession terms, amortization and carrying values.
+- Annual report p. 282: segment revenue, profit, assets and liabilities.
+
+[model decision]
+- Input hint ordinary_operating/applicable was overridden.
+- Confirmed model: utility_concession.
+- Ordinary owner earnback applicability: requires_special_model.
+- Reason: the economic asset is a portfolio of finite-life, regulated toll concessions; most concession assets are pledged and financed with project debt. Cash cannot be treated as detachable and current profit cannot be capitalized as perpetual cash profit.
+- Required ordinary owner-earnback numeric fields were retained as null.
+
+[formula checks]
+- gross_profit = 8,757,989,737.49 - 5,706,653,576.66 = 3,051,336,160.83
+- gross_margin = 3,051,336,160.83 / 8,757,989,737.49 = 0.3484059986697928
+- net_margin = 1,513,154,962.20 / 8,757,989,737.49 = 0.17277423330638242
+- operating_free_cash_flow = 3,318,926,426.39 - 2,439,306,815.26 = 879,619,611.13
+- forecast_dividend_yield = 908,243,820 / 18,195,000,000 = 0.04991722011541632
+- minority_interest_ratio = 1,097,019,187.22 / 21,248,477,775.98 = 0.051628130672970264
+- financing debt reference = 10,007,944.44 + 1,373,203,322.17 + 36,399,349,128.64 + 2,000,000,000 = 39,782,620,395.25
+
+[limitations]
+- No road-by-road discounted cash-flow model was produced. The report therefore does not claim a concession-specific earnback period or intrinsic value.
+- 2025 dividend was a board proposal at annual-report date and required shareholder approval.
+- Cash-flow-statement capex includes both maintenance and growth/expansion investment; reported operating FCF is not steady-state distributable cash.
+
+[validation]
+- Final protocol validation: status ok, errors [].
+- Cross-checks passed: special-model ordinary earnback fields are all null; assets = liabilities + equity; revenue = cost of sales + gross profit.
+- Required outputs present: outputs/result.json, outputs/report.md, outputs/trace.txt.

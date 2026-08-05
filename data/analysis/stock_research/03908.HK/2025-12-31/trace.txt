@@ -1,0 +1,60 @@
+Stock research trace — 03908.HK — period 2025-12-31
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely as requested.
+- Read references/data-reuse.md because the skill identifies it as the reuse boundary.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked paths under stock_report/data/raw/filings/03908.HK/2025-12-31,
+  stock_report/data/analysis/annual_review/03908.HK/2025-12-31,
+  stock_report/data/normalized/facts/03908.HK/2025-12-31, and
+  stock_report/data/analysis/stock_research/03908.HK/2025-12-31.
+- None of the referenced filing, metadata, annual facts, normalized facts, or prior stock-research files existed in this workspace.
+- Result: no prior fact pack was reusable; primary public disclosure was required.
+
+3. Primary sources used
+- CICC 2025 Annual Report, HKEX, published 2026-04-16:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0416/2026041600446.pdf
+- HKEX issuer title-search page for 03908, used to confirm annual-report publication and the 2026-06-26 AGM/final-dividend announcements:
+  https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&market=SEHK&stockId=132638
+- Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026/08/03 09:48:10.
+
+4. Key extraction and calculations
+- Total revenue: RMB40,517.9m; total revenue and other income: RMB40,769.6m.
+- Parent net profit: RMB9,790.5m; total net profit: RMB9,800.4m; weighted average ROE: 9.4%.
+- Total assets: RMB782,826.2m; total liabilities: RMB658,437.7m; parent equity: RMB122,057.7m.
+- Total equity derived as assets minus liabilities: RMB124,388.5m.
+- Minority interest derived as total equity minus parent equity: RMB2,330.8m; ratio to total equity = 0.0187380666.
+- Operating cash flow: RMB41,646.6m; financing cash flow: RMB-8,441.1m.
+- 2025 interim dividend: RMB434,453,118.12; final dividend: RMB1,110,269,079.64.
+- Total 2025 declared dividend = RMB1,544,722,197.76.
+- Forecast/display dividend yield = 1,544,722,197.76 / 89,370,175,436.62967 = 0.0172845380 (about 1.73%).
+- Implied 2025 payout ratio = 1,544,722,197.76 / 9,790,500,000 = about 15.8%.
+
+5. Model determination
+- Confirmed financial_brokerage from the annual report's six operating segments and balance-sheet composition.
+- Set owner_earnback_applicability to requires_special_model.
+- Left discounted net cash, discounted cash profit, operating business price, owner earnback years, and market-cap-to-cash-profit null.
+- Reason: client cash/payables, trading and derivative assets/liabilities, repos, margin financing and debt funding are operating components constrained by regulatory capital and liquidity requirements.
+- Alternative model documented through ROE, adjusted gearing, operating leverage, net capital, risk coverage, liquidity coverage, stable funding, earnings mix and dividends.
+
+6. Null-field decisions
+- Gross profit and gross margin: null because a brokerage's fee, interest and investment-income structure has no comparable cost-of-sales gross margin.
+- Net margin metric: null because the contract permits non-comparable special-model fields to remain null and revenue includes brokerage-specific investment/interest flows.
+- Capital expenditure and operating free cash flow: null because brokerage operating cash flow is dominated by trading assets, repos, client money and settlements; ordinary FCF would be misleading.
+- Owner earnback fields: null as required by result-contract.md when applicability is not applicable.
+
+7. Protocol usage and validation
+- Populated scalar, array and object fields using repeated protocol CLI `set` commands; result.json was not hand-written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validator response: {"status":"ok","errors":[]}.
+
+8. Limitations
+- Dividend yield is pre-tax and uses the RMB market cap supplied in the task. It does not model H-share dividend FX conversion or investor-specific tax.
+- The proposed share-exchange mergers with Dongxing Securities and Cinda Securities may alter share count, capital structure, earnings mix and dividend capacity after the reporting date.
+- Findings labelled as interpretation are analytical inferences, not company guidance or investment advice.

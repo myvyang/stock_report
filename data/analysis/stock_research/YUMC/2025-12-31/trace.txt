@@ -1,0 +1,65 @@
+stock-research trace
+company=YUMC
+period=2025-12-31
+generated_at=2026-08-05T03:26:42+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- Checked configured annual facts, normalized facts, raw filing, and prior research paths.
+- No reusable YUMC 2025 fact package or prior research output was present in /workspace.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized with schema stock-research-result-v1.
+
+4. Primary evidence acquired
+- SEC 2025 Form 10-K filed 2026-02-27, accession 0001193125-26-082824.
+- Filing URL: https://www.sec.gov/Archives/edgar/data/1673358/000119312526082824/yumc-20251231.htm
+- Yum China dividend history: https://ir.yumchina.com/dividend-history
+- PBOC/CFETS USD/CNY series for conversion assumptions.
+- Input market snapshot: Yahoo Finance yfinance, market cap date 2026-08-03.
+
+5. Statement-model decision
+- Confirmed ordinary_operating/applicable.
+- The company operates and franchises restaurants; customer deposits, insurance reserves, development inventory, concession rights, or other special-statement-model balances are absent.
+- Operating lease liabilities are matched to restaurant right-of-use assets and are not treated as ordinary financial debt in detachable-cash analysis.
+
+6. Source financials (USD millions)
+- Revenue 11,797; direct operating cost definition 9,890; structured gross profit 1,907.
+- Operating profit 1,290; consolidated net income 1,004; parent net income 929.
+- Total assets 10,783; total liabilities 4,684; total equity 6,099; parent equity 5,379; NCI 720.
+- Operating cash flow 1,466; capital spending 626; operating FCF 840.
+- Financing cash flow -1,689; common dividends 353; share repurchase cash flow 1,144; NCI dividends 75.
+
+7. Currency conversion
+- Income statement and cash flow: USD/CNY 7.1429 average-rate assumption.
+- Balance sheet and detachable-cash balances: USD/CNY 7.0288 year-end-rate assumption.
+- Output monetary fields are CNY absolute yuan.
+
+8. Owner earnback methodology
+- Discounted cash: cash 50%; short-term investments 90%; long-term deposits/notes 80%; equity investments 50%.
+- Deducted short-term borrowings and non-current finance lease liabilities at 100%.
+- Discounted detachable net cash: CNY 11,935,605,280.
+- Sustainable cash profit: (OCF 1,466 - capex 626 - NCI dividends 75) * 90% = USD 688.5m = CNY 4,917,886,650.
+- Operating business price: market cap - discounted detachable net cash = CNY 99,471,514,773.37402.
+- Owner earnback years: 20.2264756902.
+- Market cap / cash profit: 22.6534542136.
+
+9. Dividend forecast
+- Annualized declared run-rate: USD 0.29 * 4 * 353,096,444 shares.
+- Converted forecast cash dividend: CNY 2,878,939,371.281152.
+- Forecast dividend yield: 2.584161%.
+
+10. Protocol population
+- Used repeated protocol `set` commands to populate initialized result fields and arrays.
+- Complex result JSON was not handwritten from scratch.
+
+11. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}
+- Independent checks: JSON parse passed; gross margin, net margin, operating business price, owner earnback years, market-cap-to-cash-profit, and forecast dividend yield all recomputed exactly to stored values.

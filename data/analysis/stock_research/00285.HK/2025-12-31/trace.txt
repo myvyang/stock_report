@@ -1,0 +1,68 @@
+stock-research task trace
+company: BYD Electronic (International) Company Limited / 00285.HK
+period: 2025-12-31 annual
+generated context date: 2026-08-03 Asia/Shanghai
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Protocol initialization
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   result: initialized stock-research-result-v1 skeleton.
+
+3. Reuse check
+   - No annual facts, normalized facts, prior research result, or raw filing metadata existed under the input-provided paths.
+   - Downloaded HKEX annual report PDF to stock_report/data/raw/filings/00285.HK/2025-12-31/annual-report-2025.pdf.
+
+4. Primary evidence
+   - HKEX Annual Report 2025, published 2026-04-22:
+     https://www.hkexnews.hk/listedco/listconews/sehk/2026/0422/2026042200748.pdf
+   - Input market snapshot: Tencent qt.gtimg.cn, market cap CNY 45,514,378,209.13553, PE TTM 13.6, timestamp 2026/07/31 16:08:44.
+
+5. Model review
+   - Input hint said financial_brokerage. Rejected as inconsistent with audited business and statements.
+   - Annual report identifies product sales/manufacturing across smartphones, computers, NEVs, AI infrastructure and related fields.
+   - Balance sheet contains manufacturing inventory, trade receivables, PPE and supplier payables; no brokerage client-money model.
+   - Final model: ordinary_operating; owner earnback applicability: applicable.
+
+6. Main extracted figures (annual report amounts converted from RMB'000 to absolute CNY)
+   - Revenue 179,477,404,000
+   - Cost of sales 168,720,739,000
+   - Gross profit 10,756,665,000
+   - Parent net profit 3,514,572,000
+   - Total assets 83,612,174,000
+   - Total liabilities 49,170,224,000
+   - Total/parent equity 34,441,950,000; minority interest 0
+   - Operating cash flow 18,768,443,000
+   - Capital expenditure 4,088,160,000 (PPE 4,082,575,000 + leasehold land 4,493,000 + intangibles 1,092,000)
+   - Operating free cash flow 14,680,283,000
+   - Financing cash flow -5,994,173,000
+   - Dividends plus repurchases paid 1,487,825,000
+   - Proposed 2025 final dividend 351,499,902
+
+7. Owner-earnback assumptions
+   - Cash equivalents: 80% of 13,552,178,000
+   - FVTPL financial products: 80% of 2,155,183,000
+   - Restricted deposits: 0% of 2,809,749,000
+   - Interest-bearing loans: deduct 100% of 7,183,992,000
+   - Lease liabilities: deduct 100% of 1,706,539,000
+   - Discounted detachable net cash: 3,675,357,800
+   - Sustainable cash profit: 85% of 2025 parent net profit = 2,987,386,200
+   - Reason for not using reported FCF: trade receivables fell 17,468,611,000 and non-recourse receivables factoring totaled 7,980,691,000, making 2025 cash conversion non-normal.
+   - Operating business price: 41,839,020,409.13553
+   - Owner earnback years: 14.005226511769898
+   - Market cap / cash profit: 15.235518664823292
+
+8. Protocol population
+   - Used repeated protocol `set` commands to populate initialized branches; result was not authored as a complex JSON object from scratch.
+
+9. Validation
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: status ok, errors [].
+
+10. Known limitations
+   - Tencent market snapshot was supplied by the task and not independently verified against exchange pricing.
+   - Sustainable cash profit is an analyst scenario, not company guidance.
+   - Annual report does not disclose profit by Device/Car/Cloud, limiting profit-source attribution.

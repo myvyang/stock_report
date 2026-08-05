@@ -1,0 +1,73 @@
+stock-research trace
+company: 01853.HK / Jilin Province Chuncheng Heating Company Limited
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated initialized fields through protocol set commands; did not construct result.json manually.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   validation result: status=ok, errors=[]
+
+[model verification]
+Input hint classified the company as financial_brokerage. This was rejected because the 2025 annual report identifies the group as a centralized heat supplier in Changchun, with 97.65% of 2025 revenue from heat supply. No brokerage client funds, securities dealing inventory or repurchase-financing business was found. Final model: ordinary_operating; owner earnback applicability: applicable, with seasonal cash handling.
+
+[primary sources]
+- Annual Report 2025, Jilin Province Chuncheng Heating Company Limited, published 2026-04-16. Local copy: stock_report/data/raw/filings/01853.HK/2025-12-31/annual-report-2025.pdf
+- HKEX Annual Results Announcement for year ended 2025-12-31, released 2026-03-27: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0327/2026032702812.pdf
+- HKEX Final Dividend announcement, released 2026-03-27: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0327/2026032702832.pdf
+- Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026/08/03 09:20:05.
+
+[annual report locations]
+- pp.2, 5-6: business, service area, users, heat procurement and transmission.
+- pp.10-12: revenue movement, gross profit and gross margin.
+- pp.22, 196: RMB0.030/share proposed final dividend, approximately RMB14.00m.
+- pp.62-66: consolidated balance sheet.
+- pp.67-69: consolidated income statement.
+- pp.70-72: consolidated cash flow statement.
+- pp.154-155: restricted monetary funds, borrowings and payables.
+- p.160: lease liabilities.
+- pp.174-176: EPS, cash-flow reconciliation, depreciation.
+
+[key extracted facts, CNY]
+revenue=1,704,750,642.57
+cost_of_sales=1,479,759,822.61
+gross_profit=224,990,819.96
+parent_net_profit=81,707,199.57
+total_assets=3,493,924,286.59
+total_liabilities=2,397,399,042.11
+parent_equity=1,096,525,244.48
+monetary_funds=1,043,630,142.74
+restricted_monetary_funds=6,600,000.00
+contract_liabilities=1,420,552,518.20
+external_loan_asset=300,000,000.00
+operating_cash_flow=329,011,851.80
+capital_expenditure=238,377,727.92
+fixed_asset_depreciation=144,562,069.72
+forecast_dividend=14,000,000.00
+
+[calculations]
+gross_margin = 224,990,819.96 / 1,704,750,642.57 = 0.13198
+net_margin = 81,707,199.57 / 1,704,750,642.57 = 0.04793
+operating_free_cash_flow = 329,011,851.80 - 238,377,727.92 = 90,634,123.88
+forecast_dividend_yield = 14,000,000 / 542,032,017.8240538 = 0.02583
+discounted_detachable_net_cash = 0
+discounted_sustainable_cash_profit = 60,000,000
+operating_business_price = 542,032,017.8240538 - 0 = 542,032,017.8240538
+owner_earnback_years = 542,032,017.8240538 / 60,000,000 = 9.0339
+market_cap_to_cash_profit = 9.0339
+
+[judgment trail]
+- Monetary funds discounted to zero detachable value: year-end contract liabilities exceed cash and represent future heating obligations; cash is seasonal operating liquidity, not surplus cash.
+- RMB300m external loan asset discounted to zero: counterparty, maturity, security and distribution availability were not sufficiently established for detachable-cash treatment.
+- Sustainable cash profit begins with RMB81.707m parent profit, removes estimated after-tax non-core investment income of RMB12.216m, then applies RMB9.491m buffer for maintenance capex uncertainty, impairments and declining margins; rounded result RMB60m.
+- Reported 2025 operating cash flow is not extrapolated because heating prepayments and collections cause large working-capital seasonality; 2024 operating cash flow was only RMB36.020m.
+
+[limitations]
+- Maintenance capital expenditure is not separately disclosed.
+- The RMB300m external loan requires deeper counterparty and recoverability verification.
+- Market value and PE use the supplied snapshot and were not independently reconstructed from share classes.

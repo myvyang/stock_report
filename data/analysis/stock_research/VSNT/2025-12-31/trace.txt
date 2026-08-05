@@ -1,0 +1,90 @@
+task=stock_research
+query=VSNT
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-04T15:03:14+08:00
+
+[protocol]
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+mutation=all result fields populated through protocol set/append commands; result.json was not hand-written from scratch
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse_check]
+stock_report/data/raw/filings/VSNT/2025-12-31/metadata.json=missing at task start
+stock_report/data/analysis/annual_review/VSNT/2025-12-31/facts.json=missing
+stock_report/data/analysis/annual_review/VSNT/2025-12-31/annual_facts.md=missing
+stock_report/data/normalized/facts/VSNT/2025-12-31/annual-facts.json=missing
+stock_report/data/analysis/stock_research/VSNT/2025-12-31/result.json=missing
+action=no reusable fact package; downloaded official SEC 10-K to stock_report/data/raw/filings/VSNT/2025-12-31/vsnt-20251231.htm
+
+[sources]
+1=https://www.sec.gov/Archives/edgar/data/2067876/000206787626000010/vsnt-20251231.htm
+  type=primary SEC Form 10-K
+  supports=business model, revenue mix, three statements, separation, debt, Comcast payment, dividend, shares, commitments, risks
+2=https://www.sec.gov/Archives/edgar/data/2067876/000206787626000007/versantmediagroupincex991.htm
+  type=primary company earnings release furnished to SEC
+  supports=FY2025 headline results and Standalone Adjusted EBITDA
+3=https://www.federalreserve.gov/releases/g5a/current/
+  type=official exchange-rate source
+  supports=2025 annual average USD/CNY 7.1875
+4=config/input.json
+  type=task input / third-party market data
+  supports=market cap CNY 34,364,283,806.61914 on 2026-08-03; PE TTM 5.9983335; source Yahoo Finance yfinance
+
+[model_classification]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Versant earns operating revenue from network distribution, advertising, platforms and licensing. Its balance sheet is not itself a financial, real-estate, construction, concession or holding-company business. Historical statements are carve-out statements, so post-separation debt/cash and standalone costs require adjustment.
+
+[currency]
+result_currency=CNY
+result_unit=yuan
+fx_rate=7.1875 CNY per USD
+fx_method=Federal Reserve 2025 annual average applied consistently to both flow and stock values for protocol comparability
+limitation=balance-sheet values were not translated at a separate 2025-12-31 closing rate
+
+[core_financials_usd_millions]
+revenue=6688
+cost_of_revenue_ex_DA=2937
+gross_profit_protocol=3751
+operating_income=1272
+net_income=931
+parent_net_income=930
+operating_cash_flow=2022
+capital_expenditure=167
+operating_free_cash_flow=1855
+total_assets=12333
+total_liabilities=1931
+total_equity=10402
+parent_equity=10292
+minority_interest=110
+
+[owner_earnback]
+post_separation_cash_usd_millions=55+1034+2000-2250=839
+post_separation_debt_usd_millions=3000
+detachable_net_cash_usd_millions=839-3000=-2161
+detachable_net_cash_cny=-15532187500
+reported_fcf_usd_millions=2022-167=1855
+effective_tax_rate=297/1228
+standalone_cost_adjustment_usd_millions_after_tax=247*(1-297/1228)=187.262
+incremental_interest_adjustment_usd_millions_after_tax=(3000*6.6%-13)*(1-297/1228)=140.256
+base_adjusted_cash_profit_usd_millions=1527.482
+sustainability_haircut=15%
+discounted_sustainable_cash_profit_usd_millions=1298.360
+discounted_sustainable_cash_profit_cny=9331960861.156351
+operating_business_price_cny=34364283806.61914-(-15532187500)=49896471306.61914
+owner_earnback_years=49896471306.61914/9331960861.156351=5.3468367526
+market_cap_to_cash_profit=34364283806.61914/9331960861.156351=3.6824290541
+judgment=15% sustainability haircut is analyst judgment, motivated by 2025 revenue -5.3%, linear distribution -5.4%, advertising -8.9%, and Adjusted EBITDA -14.5%; it is not company guidance
+
+[dividend]
+declared_quarterly_dividend_usd_per_share=0.375
+shares=143790841 Class A + 377775 Class B = 144168616
+annualized_dividend_usd=144168616*0.375*4=216252924
+forecast_dividend_cny=1554317891.25
+forecast_dividend_yield=0.0452306208
+limitation=annualization of first declared quarterly dividend; no commitment to maintain four equal quarterly payments
+
+[quality]
+status=complete
+known_limitations=2025 carve-out comparability; Comcast centralized cash management; 2026 working-capital prefunding reversal amount not disclosed; market data is yfinance; FX uses annual average for all values

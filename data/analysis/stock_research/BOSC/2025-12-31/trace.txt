@@ -1,0 +1,108 @@
+stock-research trace
+query=BOSC
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-04T15:05:53+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because local data reuse was evaluated.
+4. Checked configured annual facts, normalized facts and raw filing paths; no BOSC 2025 local fact package or filing existed.
+5. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+6. Populated result fields only through protocol set commands.
+7. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result={"status":"ok","errors":[]}
+
+[primary sources]
+SEC 2025 Form 20-F filed 2026-03-31:
+https://www.sec.gov/Archives/edgar/data/1005516/000121390026037333/ea0283859-20f_bosbetter.htm
+- Business and segments: Item 4, lines 747-773 and 875-940 in web extraction.
+- Supplier/customer/geographic risks: lines 358-435 and 875-940.
+- Results and liquidity: lines 1032-1233.
+- Balance sheet: F-4/F-5, lines 2897-2985.
+- Income statement: F-6, lines 3009-3045.
+- Cash flow statement: F-8/F-9, lines 3116-3203.
+- Goodwill impairment and dividend policy: lines 3711-3730.
+
+PBOC/CFETS exchange-rate notice, 2025-12-26:
+https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- USD/CNY central parity used: 7.0358.
+
+Market data supplied by config/input.json:
+- market_cap_cny=214074528.3106842
+- market_cap_date=2026-08-03
+- pe_ttm=9.782609
+- source=Yahoo Finance yfinance
+
+[model determination]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: revenue comes from component distribution, RFID equipment/software/services and custom automation. Balance-sheet cash, receivables, inventory, fixed assets, borrowings, leases and operating liabilities have ordinary operating-company meanings. No bank deposits, customer brokerage funds, insurance reserves, regulated presale funds, project concessions or underlying holding-company stakes were found.
+
+[reported USD facts]
+All amounts below are absolute USD unless marked otherwise.
+total_assets=44644000
+total_liabilities=15940000
+total_equity=28704000
+parent_equity=28704000
+minority_interest=0
+revenue=50569000
+cost_of_sales=38494000
+gross_profit=12075000
+operating_profit=2908000
+net_profit=3611000
+parent_net_profit=3611000
+operating_cash_flow_2025=5046000
+capital_expenditure_2025=452000
+operating_free_cash_flow_2025=4594000
+financing_cash_flow_2025=3776000
+cash_and_equivalents=11825000
+restricted_cash=98000
+short_and_current_debt=775000
+long_term_debt=972000
+lease_liabilities=1019000
+
+[calculations]
+gross_margin=12075000/50569000=0.2387826534
+net_margin=3611000/50569000=0.0714073840
+
+fcf_2023=1829000-341000=1488000 USD
+fcf_2024=1294000-519000=775000 USD
+fcf_2025=5046000-452000=4594000 USD
+sustainable_cash_profit_usd=(1488000+775000+4594000)/3=2285666.67 USD
+Rounded protocol amount uses 2286000 USD because reported statements are in USD thousands.
+discounted_sustainable_cash_profit_cny=2286000*7.0358=16083838.80
+
+eligible_cash_usd=11825000
+restricted_cash_usd=98000 excluded before calculation
+debt_usd=775000+972000=1747000
+lease_liabilities_usd=251000+768000=1019000
+net_cash_before_haircut_usd=11825000-1747000-1019000=9059000
+cash_haircut=20%
+discounted_detachable_net_cash_usd=9059000*80%=7247200
+discounted_detachable_net_cash_cny=7247200*7.0358=50989849.76
+
+operating_business_price_cny=214074528.3106842-50989849.76=163084678.5506842
+owner_earnback_years=163084678.5506842/16083838.8=10.1396613444
+market_cap_to_cash_profit=214074528.3106842/16083838.8=13.3099150627
+discounted_net_cash_to_market_cap=50989849.76/214074528.3106842=0.2381873741
+forecast_cash_dividend=0
+forecast_dividend_yield=0
+
+[judgment boundaries]
+- Fact: 2025 FCF was USD 4.594m. Judgment: this single-year number is not sustainable by itself because working-capital movements were large.
+- Fact: 2023-2025 FCF values were USD 1.488m, 0.775m and 4.594m. Judgment: their simple average is a conservative smoothing convention, not a forecast.
+- Fact: cash was USD 11.825m and borrowings/leases totaled USD 2.766m. Judgment: applying a further 20% haircut reflects operating liquidity and capital-allocation constraints.
+- Fact: the company historically paid no dividends and disclosed no foreseeable dividend plan. Forecast: base-case dividend is zero, not a claim that dividends are legally impossible.
+- Inference: Supply Chain Solutions is the main economic profit engine based on revenue share, growth, disclosed robotics gross profit and RFID impairment; complete segment profit was not disclosed.
+
+[data quality]
+status=complete
+limitations:
+- Financial statements converted at 2025-12-26 FX while market cap is dated 2026-08-03.
+- PE TTM reused from supplied yfinance input and was not reconstructed.
+- Sustainable cash profit depends on a three-year averaging convention.
+- Complete segment operating profit was unavailable.

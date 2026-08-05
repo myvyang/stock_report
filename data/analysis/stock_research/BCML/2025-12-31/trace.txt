@@ -1,0 +1,79 @@
+BCML stock research trace
+generated_at=2026-08-04T22:02:53+08:00
+period=2025-12-31
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+- No BCML annual facts, normalized facts, raw filing metadata, or prior stock-research output existed under stock_report.
+- Initialized outputs/result.json with protocol CLI from config/input.json.
+
+3. Primary sources retrieved
+- SEC 2025 Form 10-K, filed 2026-03-16, accession 0001730984-26-000016:
+  https://www.sec.gov/Archives/edgar/data/1730984/000173098426000016/bcml-20251231x10k.htm
+- SEC Companyfacts API for CIK 0001730984:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0001730984.json
+- BayCom official news page for 2026 dividend declarations:
+  https://baycomcorp.q4ir.com/news-market-information/news/default.aspx
+- Market-cap snapshot and PE were taken unchanged from config/input.json.
+
+4. Model decision
+- Input hint ordinary_operating/applicable was rejected.
+- Filing identifies BayCom as the holding company of United Business Bank; deposits fund loans and investments.
+- Selected financial_bank/requires_special_model.
+- All ordinary owner-earnback metrics remain null as required by contract.
+
+5. Currency conversion
+- Reporting currency in filing: USD.
+- Result contract requires absolute CNY amounts.
+- Research translation rate: 1 USD = 7.20 CNY, applied consistently to filing amounts.
+- This is an analytical presentation conversion, not an audited accounting translation.
+
+6. Core extracted USD facts
+- total assets: 2,593,677,000
+- total liabilities: 2,255,123,000
+- parent equity: 338,554,000
+- parent net income: 23,931,000
+- cash and cash equivalents: 206,514,000
+- net loans: 2,045,126,000
+- deposits: 2,213,640,000
+- AFS securities fair value: 179,708,000
+- equity securities fair value: 12,554,000
+- goodwill: 38,838,000
+- finite-lived intangibles: 1,745,000
+- 2025 declared common dividends: 9,859,000; $0.90/share
+- 2025 common dividends paid plus repurchases: 6,600,000 + 6,909,000 = 13,509,000
+
+7. Bank-specific operating facts
+- net interest margin: 3.82% (2024: 3.74%)
+- efficiency ratio: 63.51% (2024: 65.77%)
+- nonperforming assets / total assets: 0.52%
+- nonperforming loans / total loans: 0.65%
+- CET1 ratio: 14.32%
+- total risk-based capital ratio: 15.78%
+- CRE and construction loans / total loans: 86.0%
+- CRE loans / total regulatory capital: 411.1%
+- union deposits / total deposits: 26.7%
+- ten largest nonbrokered depositors / total deposits: 11.7%
+
+8. Dividend forecast
+- First two 2026 quarterly declarations: $0.30/share each.
+- Annualized scenario: $1.20/share.
+- Shares outstanding at 2026-03-10: 10,909,317.
+- Forecast cash dividend: 10,909,317 * 1.20 * 7.20 = CNY 94,256,499 (rounded).
+- Forecast yield: 94,256,499 / 2,221,733,161.326599 = 4.2425%.
+- This is a run-rate extrapolation, not management guidance.
+
+9. Valuation consistency check
+- Input market cap: CNY 2,221,733,161.326599 at 2026-08-03.
+- Input PE TTM: 25.15.
+- Market cap / translated FY2025 net income = approximately 12.9x, not 25.15x.
+- Supplier TTM methodology could not be reconciled; retained input PE but flagged limitation.
+
+10. Protocol operations
+- All complex JSON content was populated through protocol CLI set commands.
+- Final protocol validate status: ok; errors: [].

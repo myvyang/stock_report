@@ -1,0 +1,55 @@
+stock-research trace
+task: 00987.HK, annual, period 2025-12-31
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Read protocol and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Checked reusable data
+- No existing annual facts package, normalized facts, or prior stock-research result was present for 00987.HK/2025-12-31.
+
+3. Initialized result through protocol CLI
+- PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Primary filing obtained and inspected
+- HKEX URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042800583_c.pdf
+- Local PDF: stock_report/data/raw/filings/00987.HK/2025-12-31/annual-report-2025.pdf
+- Extracted text: stock_report/data/raw/filings/00987.HK/2025-12-31/annual-report-2025.txt
+- Filing: China Renewable Energy Investment Limited Annual Report 2025, published 2026-04-28.
+- Key pages inspected: chairman statement and MD&A pp.4-15; comprehensive income pp.104-105; financial position pp.106-107; cash flows p.109; revenue note pp.143-144; associates pp.159-161; dividends pp.150-151; cash-flow reconciliation pp.172-173.
+
+5. Model review
+- Input hint financial_brokerage rejected.
+- Filing evidence: single renewable-energy segment; eight wind farms plus one distributed solar project; revenue from electricity sales; project loans secured by wind equipment, right-of-use assets, and receivables.
+- Selected statement_model=utility_concession and owner_earnback_applicability=requires_special_model.
+- Ordinary owner-earnback fields intentionally left null.
+
+6. Currency normalization
+- Filing presentation currency: HKD.
+- Result contract currency: CNY absolute yuan.
+- Approximate conversion: 1 HKD = 0.89874 CNY, inferred from annual-report disclosure RMB442.9m = HKD492.8m for charged assets.
+- Same approximate rate used for income statement, balance sheet, cash flow, and dividend. Ratios use original consistent-currency values.
+
+7. Key calculations
+- gross_margin = 45,782 / 172,216 = 0.2658405723.
+- net_margin = 19,491 / 172,216 = 0.1131776374.
+- operating_free_cash_flow = (161,353 - 4,616 - 58) HKD thousand = 156,679 HKD thousand; converted to CNY 140,813,684.46.
+- proposed 2025 dividend = (12,531 + 75,185) HKD thousand = 87,716 HKD thousand; converted to CNY 78,833,877.84.
+- forecast_dividend_yield = 78,833,877.84 / 439,836,980.29160494 = 0.1792343104.
+- Dividend yield is an announced/proposed one-period figure dominated by a special dividend, not a sustainable forecast.
+
+8. Result population
+- All result.json updates after init were made using protocol CLI set commands.
+- No complex JSON result object was hand-written from scratch.
+
+9. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Status: ok; errors: [].
+
+10. Data limitations
+- Average and closing FX rates were not separately available; one filing-implied approximate closing rate was used.
+- Project-by-project remaining operating lives, maintenance capex schedules, debt amortization, and tariff scenarios were not fully disclosed.
+- Tencent market snapshot was supplied in config/input.json; raw API response was not available locally.

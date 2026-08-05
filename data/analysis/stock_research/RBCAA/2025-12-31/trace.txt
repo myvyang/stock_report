@@ -1,0 +1,72 @@
+stock-research trace
+task: RBCAA, annual period ended 2025-12-31
+generated_at: 2026-08-05T02:47:41+08:00
+
+1. Read skill and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+   - Expected annual facts, normalized facts, and raw filing metadata were absent under the paths supplied in config/input.json.
+   - No prior RBCAA research artifact was available for reuse.
+
+3. Protocol initialization
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   outcome: stock-research-result-v1 skeleton created.
+
+4. Model override
+   - Input hint ordinary_operating/applicable rejected after reviewing the filing.
+   - Confirmed financial_bank/requires_special_model because the registrant is a financial holding company and loans, deposits, securities, and wholesale funding constitute its operating balance sheet.
+   - Ordinary owner-earnback fields intentionally left null.
+
+5. Primary evidence retrieved
+   - SEC 2025 Form 10-K, accession 0001104659-26-024523, filed 2026-03-06.
+   - SEC Companyfacts API for CIK 0000921557.
+   - SEC-filed 2025 Q4 earnings release/financial supplement.
+   - Republic Bancorp investor-relations dividend history.
+   - PBOC/CFETS 2025-12-31 USD/CNY central parity as reproduced by Xinhua: 7.0288.
+   - Market capitalization and PE TTM reused from config/input.json.
+
+6. Key source values in USD
+   - Total assets: 7,042,061,000
+   - Total liabilities: 5,939,768,000
+   - Parent stockholders' equity: 1,102,293,000
+   - Net loans: 5,360,977,000
+   - Deposits: 5,203,147,000
+   - FHLB advances: 506,000,000
+   - Net interest income: 334,670,000
+   - Noninterest income: 82,825,000
+   - Provision for credit losses: 31,597,000
+   - Noninterest expense: 220,189,000
+   - Parent net income: 131,317,000
+   - Cash dividends paid: 33,852,000
+
+7. Bank-specific operating indicators
+   - NIM: 5.05%; ROA: 1.84%; ROE: 12.31%.
+   - CET1: 16.54%; total risk-based capital: 17.79%; Tier 1 leverage: 15.11%.
+   - Core Bank NPL/loans: 0.45%; delinquent/loans: 0.26%; net charge-offs/average loans: 0.03%.
+   - Company NPL/loans: 0.44%.
+   - RCS delinquent/loans: 7.87%.
+
+8. Calculations
+   - All statement amounts converted at 7.0288 CNY/USD for result-contract consistency.
+   - Market cap / FY2025 net income = 13,177,149,185.46753 / (131,317,000 * 7.0288) = 14.2764x.
+   - Market cap / FY2025 equity = 13,177,149,185.46753 / (1,102,293,000 * 7.0288) = 1.7008x.
+   - Dividend scenario uses 17,461,076 Class A shares * USD 1.98 plus 2,148,269 Class B shares * USD 1.80, then converts at 7.0288 = CNY 270,185,769.42.
+   - Forecast dividend yield = 270,185,769.42 / 13,177,149,185.47 = 2.0504%.
+
+9. Result construction
+   - All result.json mutations made with protocol set/append commands after protocol initialization.
+   - Human-readable report and this trace written separately.
+
+10. Validation
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   output: {"status":"ok","errors":[]}
+   exit_status: 0
+
+11. Artifact checks
+   - outputs/result.json: present, protocol-valid
+   - outputs/report.md: present
+   - outputs/trace.txt: present

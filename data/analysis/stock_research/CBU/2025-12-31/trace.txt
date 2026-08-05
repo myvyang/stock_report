@@ -1,0 +1,65 @@
+CBU stock research trace
+generated_at_input=2026-08-05T01:21:16+08:00
+period=2025-12-31
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- Checked stock_report/data/analysis/annual_review/CBU/2025-12-31, normalized facts, raw filing directory, historical research directory, and configured /root/aicode mirror.
+- No reusable CBU 2025 annual fact package, raw filing, or historical result existed.
+
+3. Primary research sources
+- SEC 2025 Form 10-K, accession 0001104659-26-021651, filed 2026-02-27:
+  https://www.sec.gov/Archives/edgar/data/723188/000110465926021651/cbu-20251231x10k.htm
+- Federal Reserve/FRED AEXCHUS annual USD/CNY series, 2025=7.1875:
+  https://fred.stlouisfed.org/series/AEXCHUS
+- Valuation data supplied by config/input.json: market cap CNY 23,003,097,685.56958 on 2026-08-03; PE TTM 15.037123; source Yahoo Finance yfinance.
+
+4. Model determination
+- Input hint ordinary_operating/applicable was rejected.
+- Filing identifies registrant as a financial holding company whose core subsidiary Community Bank, N.A. accepts deposits and originates loans.
+- Selected statement_model=financial_bank and owner_earnback_applicability=not_applicable.
+- All ordinary owner earnback sorting fields retained as null.
+
+5. Core source amounts (USD, filing units expanded)
+- Total assets 17,303,296,000
+- Total liabilities 15,297,262,000
+- Total shareholders equity 2,006,034,000
+- Gross loans 10,949,757,000; allowance 87,921,000
+- Deposits 14,387,085,000
+- Investment securities 4,406,759,000
+- Net interest income 506,550,000
+- Noninterest revenue 311,457,000
+- Income before tax 275,394,000
+- Net income 210,455,000
+- 2025 declared cash dividends 98,100,000; DPS 1.86; payout 46.6%
+
+6. Bank-specific facts
+- NIM 3.29%; ROA 1.26%; ROE 11.29%
+- NPL ratio 0.52%; ACL/NPL 156%; net charge-off ratio 0.12%
+- Company CET1 14.04%; total risk-based capital 14.85%; tier 1 leverage 9.21%
+- Equity/assets 11.59%; tangible equity/assets 6.75%
+- AOCI loss 418,990,000 USD
+
+7. Conversions and calculations
+- All filing USD amounts multiplied by 7.1875 for result.json CNY fields.
+- Protocol revenue = net interest income + noninterest revenue = USD 818,007,000.
+- Protocol net_margin = 210,455,000 / 818,007,000 = 0.2572777495; marked non-comparable to industrial-company margins.
+- Forecast dividend = 0.47 USD x 4 x 52,723,931 shares x 7.1875 = CNY 712,432,117.64.
+- Forecast yield = 712,432,117.64 / 23,003,097,685.56958 = 0.0309711382.
+- Auxiliary P/B = CNY market cap / CNY year-end equity = approximately 1.5954x; explanatory only, not a protocol owner-earnback sorting field.
+
+8. Protocol operations
+- Initialized outputs/result.json using protocol init.
+- Populated sections using protocol set commands; did not construct result.json manually.
+- Final validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+
+9. Limitations
+- Balance-sheet CNY conversion uses the 2025 annual average rather than a 2025-12-31 spot rate for consistent protocol presentation.
+- Bank operating cash flow, capex and ordinary free cash flow kept null because those measures are not economically comparable to ordinary operating companies.
+- Dividend forecast is a mechanical annualization of the declared Q1 2026 dividend, not guidance.

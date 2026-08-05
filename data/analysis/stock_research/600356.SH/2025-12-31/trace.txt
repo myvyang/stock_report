@@ -1,0 +1,88 @@
+stock-research trace
+company: 牡丹江恒丰纸业股份有限公司 (600356.SH)
+period: 2025-12-31 annual
+research date: 2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields with protocol `set`; no complex JSON was hand-written from scratch.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[local reuse audit]
+- config/input.json: present and used.
+- stock_report/data/analysis/annual_review/600356.SH/2025-12-31: absent.
+- stock_report/data/raw/filings/600356.SH/2025-12-31: absent.
+- stock_report/data/analysis/stock_research/600356.SH/2025-12-31: absent.
+- Conclusion: no annual fact pack, raw filing or prior research result could be reused; public filing research was required.
+
+[sources]
+S1 牡丹江恒丰纸业股份有限公司2025年年度报告全文（公开公告全文镜像；公告ID 12086971；报告披露日2026-04-15）
+   https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12086971&stockid=600356
+   Used for business, product mix, customer concentration, audited financial statements, cash flow, asset notes and risks.
+   Audit: 天健审〔2026〕7-231号，标准无保留意见，审计报告日2026-04-13.
+
+S2 牡丹江恒丰纸业股份有限公司2025年年度报告摘要及同日公告（上海证券报，上交所公告内容）
+   https://paper.cnstock.com/html/2026-04/15/content_2199754.htm
+   Used to cross-check company identity, audit opinion, parent net profit and 2025 dividend proposal.
+
+S3 牡丹江恒丰纸业股份有限公司2025年度利润分配方案公告（公告全文镜像；公告ID 12086957）
+   https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12086957&stockid=600356
+   Used for dividend amount, per-share dividend and payout ratio.
+
+S4 牡丹江恒丰纸业股份有限公司发行股份购买资产暨关联交易报告书（草案）（上交所静态文件，2025-06-27）
+   https://static.sse.com.cn/stock/disclosure/announcement/c/202506/600356_20250627_46FQ.pdf
+   Used only as evidence that the Jin Feng acquisition is a material forward uncertainty. No forecast profit from this document was included.
+
+S5 Market snapshot supplied in config/input.json
+   provider: Tencent qt.gtimg.cn
+   timestamp: 20260731114334
+   market cap: 2,692,000,000 yuan
+   PE TTM: 11.88
+   The quote was not independently recomputed.
+
+[key reported facts]
+- Revenue: 2,822,466,355.40
+- Cost of sales: 2,272,697,888.11
+- Parent net profit: 197,723,106.35
+- Deducted parent net profit: 169,934,863.03
+- Operating cash flow: 266,261,825.63
+- Capital expenditure (cash paid to acquire long-term assets): 140,962,308.98
+- Total assets: 3,809,764,413.23
+- Total liabilities: 998,683,753.62
+- Total equity: 2,811,080,659.61
+- Parent equity: 2,735,087,239.27
+- Minority interest: 75,993,420.34
+- Cash and cash equivalents: 613,621,944.99
+- Interest-bearing debt: short-term borrowing 380,288,077.78 + current maturities 70,796,428.37 + long-term borrowing 189,604,501.04 = 640,689,007.19
+- Proposed/implemented 2025 cash dividend: 62,611,935.76
+
+[calculations]
+- Gross profit = 2,822,466,355.40 - 2,272,697,888.11 = 549,768,467.29
+- Gross margin = 549,768,467.29 / 2,822,466,355.40 = 0.1947830011
+- Net margin = 197,723,106.35 / 2,822,466,355.40 = 0.0700533085
+- Operating free cash flow = 266,261,825.63 - 140,962,308.98 = 125,299,516.65
+- Discounted sustainable cash profit = 125,299,516.65 * 0.90 = 112,769,564.985
+- Discounted detachable net cash = 613,621,944.99 * 0.80 - 640,689,007.19 = -149,791,451.198
+- Operating business price = 2,692,000,000 - (-149,791,451.198) = 2,841,791,451.198
+- Owner earnback years = 2,841,791,451.198 / 112,769,564.985 = 25.19998593
+- Market cap / cash profit = 2,692,000,000 / 112,769,564.985 = 23.87168914
+- Discounted net cash / market cap = -149,791,451.198 / 2,692,000,000 = -0.0556431840
+- Forecast dividend yield = 62,611,935.76 / 2,692,000,000 = 0.0232585200
+
+[judgment log]
+- statement_model = ordinary_operating: annual report confirms paper manufacturing and direct sales; no special financial-statement model applies.
+- Cash discount = 80%: judgment, not reported fact. It retains 20% for pulp purchasing, inventory, receivables and safety liquidity.
+- Debt discount = 100%: all identified interest-bearing debt is deducted.
+- Cash-profit discount = 10%: judgment reflecting pulp-price cyclicality, inventory growth, customer concentration and unknown split between maintenance and growth capex.
+- No acquisition forecast or target-company synergy was included in sustainable cash profit.
+
+[quality]
+result status: complete
+known limitations:
+- No local raw filing/fact pack was supplied; public annual-report mirror was used and material headline data were cross-checked with the annual-report summary.
+- Maintenance capex is not separately disclosed.
+- Market cap and PE were accepted from the task input.

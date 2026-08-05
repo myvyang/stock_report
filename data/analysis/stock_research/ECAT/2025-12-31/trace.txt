@@ -1,0 +1,68 @@
+ECAT stock-research trace
+generated_at_input=2026-08-04T15:28:55+08:00
+period=2025-12-31
+
+1. Instructions and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Applied AGENTS.md special-model rule: investment assets/liabilities are the business itself.
+
+2. Local reuse audit
+- Checked configured annual facts, normalized facts, raw filing metadata, and annual review paths.
+- No local ECAT filing, facts.json, annual_facts.md, normalized facts, or metadata existed.
+- Reuse was therefore impossible; official public sources were retrieved.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized from config/input.json; no complex JSON was hand-written from scratch.
+
+4. Official source retrieval
+- SEC filing: https://www.sec.gov/Archives/edgar/data/1864843/000119312526093555/d34699dncsr.htm
+- Filing identity: BlackRock ESG Capital Allocation Term Trust, N-CSR, fiscal year/reporting period ended 2025-12-31.
+- Filing downloaded for extraction to /tmp/ecat2025.htm; it was not treated as a required deliverable.
+- BlackRock official product page: https://www.blackrock.com/us/individual/products/320060/blackrock-esg-capital-allocation-trust
+- Federal Reserve H.10: USD/CNY=7.1875 on 2025-12-31.
+- Market cap and PE were reused exactly from config/input.json (Yahoo Finance yfinance).
+
+5. Model determination
+- Input hint ordinary_operating/applicable was rejected.
+- Confirmed model: investment_holding.
+- Applicability: requires_special_model.
+- Reason: substantially all assets are investment securities and related settlement/derivative positions; investment fair-value changes dominate reported earnings. These are not detachable cash plus a residual operating business.
+- All ordinary owner-earnback sorting fields remain null as required.
+
+6. Key extracted USD facts
+- Total assets: 1,791,056,568
+- Total liabilities: 182,332,385
+- Net assets / parent equity: 1,608,724,183
+- Shares outstanding: 99,468,307
+- NAV/share: 16.17; market price/share: 15.38 at 2025-12-31
+- Total investment income: 46,709,752
+- Net investment income: 23,505,462
+- Net realized gain: 34,341,629
+- Net unrealized appreciation: 155,521,622
+- Net increase from operations: 213,368,713
+- Total distributions: 351,538,753
+- Distribution from net investment income: 24,208,068
+- Return of capital: 327,330,685 (93.1137% of distributions)
+- Net cash from operating activities: 344,620,896
+- Cash dividends paid: 347,607,626
+- Expense ratio: 1.41%; portfolio turnover: 226% (137% excluding MDRs)
+
+7. Currency and formulas
+- All structured monetary values converted to CNY absolute yuan at 7.1875 CNY/USD.
+- Forecast distribution scenario = 351,538,753 * 7.1875 = 2,526,684,787.19 CNY.
+- Forecast distribution yield = 2,526,684,787.19 / 10,054,757,745.593262 = 0.2512924579.
+- This is a mechanical run-rate scenario, not an earnings forecast.
+- 2025 year-end same-day discount = 15.38 / 16.17 - 1 = -4.8856%.
+- Input market cap / translated 2025 year-end NAV = 86.9585%; dates differ, so this is explicitly not reported as a current discount.
+
+8. Protocol population and validation
+- Populated initialized fields through repeated protocol `set` commands.
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: {"status":"ok","errors":[]}
+
+9. Quality decision
+- status=complete because the special-model minimum fields, dividend scenario, business story, asset/liability explanations, and primary-source evidence are present.
+- Limitations retained in result.json: period-end FX used for flow translation; market cap/NAV date mismatch; PE has weak meaning for an investment company; distribution forecast is policy-dependent.

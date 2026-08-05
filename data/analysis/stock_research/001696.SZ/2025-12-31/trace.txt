@@ -1,0 +1,61 @@
+stock-research trace
+company: 001696.SZ 宗申动力
+period: 2025-12-31 annual
+generated_at: 2026-07-31T21:34:29+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md as requested.
+3. Read references/data-reuse.md because the skill routes reuse decisions through it.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields only through protocol set/append commands in outputs/populate_result.sh.
+6. Final validation command and result are recorded below after execution.
+
+[reuse audit]
+- config/input.json existed.
+- No raw filing metadata, annual facts, normalized facts, or prior stock-research result was present in the task workspace paths supplied by the input.
+- Therefore the research returned to the publicly available 2025 annual report.
+
+[sources]
+- 重庆宗申动力机械股份有限公司2025年年度报告, disclosed 2026-04-23, public full-text page:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12145714&stockid=001696
+  The page reproduces the company's annual report and identifies SZSE/CNINFO as designated disclosure venues.
+- Market snapshot from config/input.json: Tencent qt.gtimg.cn, 2026-07-31 11:43:36, market cap CNY 16,328,000,000, PE TTM 26.73.
+
+[key annual-report locations checked]
+- Important notice and dividend proposal: annual report opening section.
+- Main financial indicators: revenue, parent net profit, deducted parent net profit, OCF, total assets, parent equity.
+- Management discussion: product/region/channel mix, segment gross margins, R&D, cash-flow changes, asset composition.
+- Consolidated balance sheet: cash, trading financial assets, receivables, inventory, loans and advances, long-term equity investments, fixed assets, goodwill, debt, payables, total liabilities/equity.
+- Consolidated income statement: cost of sales, operating profit, net profit, parent net profit, investment income, impairment.
+- Consolidated cash-flow statement: operating cash flow, capex cash outflow, financing cash flow and dividend/interest cash outflow.
+
+[calculations]
+- gross_profit = 12,309,542,333.37 - 10,636,707,479.64 = 1,672,834,853.73
+- gross_margin = 1,672,834,853.73 / 12,309,542,333.37 = 0.1358974045
+- net_margin = 665,514,760.18 / 12,309,542,333.37 = 0.0540649475
+- operating_free_cash_flow = 1,215,185,066.10 - 329,920,059.30 = 885,265,006.80
+- discounted_cash_assets = 1,629,324,579.17 * 0.90 + 393,000,772.96 * 0.80 = 1,780,792,739.621
+- financing_constraints = 300,562,271.76 + 875,900,032.10 + 1,719,183,839.34 + 89,212,156.34 + 231,007,530.74 = 3,215,865,830.28
+- discounted_detachable_net_cash = 1,780,792,739.621 - 3,215,865,830.28 = -1,435,073,090.659
+- operating_business_price = 16,328,000,000 - (-1,435,073,090.659) = 17,763,073,090.659
+- discounted_sustainable_cash_profit = CNY 500,000,000, judgment based on CNY 629,175,559.59 deducted parent profit, lower 2024 cash conversion, 2025 Q4 loss, working-capital volatility, and finance-subsidiary capital use.
+- owner_earnback_years = 17,763,073,090.659 / 500,000,000 = 35.5261461813
+- market_cap_to_cash_profit = 16,328,000,000 / 500,000,000 = 32.656
+- forecast_dividend_yield = 229,005,384 / 16,328,000,000 = 0.0140253175
+
+[model decision]
+- statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- Reason: 97.16% of revenue comes from mechanical manufacturing and operating assets are conventional receivables, inventory and plant. Loans/advances from consolidated small-loan, factoring and leasing subsidiaries are treated as operating financial assets and excluded from detachable cash.
+
+[judgment boundaries]
+- Facts: annual-report amounts, product mix, quarterly profit, and disclosed dividend proposal.
+- Derived facts: margins, FCF, ratios, discounted cash arithmetic.
+- Judgment: cash haircuts and CNY 500m sustainable cash profit. These are not management guidance or forecasts.
+
+[validation]
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+result: {"status":"ok","errors":[]}
+additional checks: jq parsed outputs/result.json successfully; report/result/trace scan found no buy/sell recommendation, target price, or prohibited ranking labels.

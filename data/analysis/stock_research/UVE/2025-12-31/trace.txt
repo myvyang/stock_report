@@ -1,0 +1,61 @@
+stock-research trace
+task: UVE annual research, period 2025-12-31
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result
+- command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- result: initialized stock-research-result-v1 skeleton
+
+3. Reuse audit
+- Expected local annual facts, normalized facts and raw filing paths were absent.
+- No prior UVE research result was available to reuse.
+- Public official-source supplementation was required.
+
+4. Primary evidence reviewed
+- SEC Form 10-K, accession 0000891166-26-000010, filed 2026-02-27, period 2025-12-31.
+- SEC Q1 2026 10-Q and February/April/July 2026 dividend disclosures.
+- SEC 8-K dated 2026-06-16 for $100m 7.75% senior unsecured notes due 2031.
+- Federal Reserve H.10: 2025-12-31 CNY per USD = 7.1875.
+- Task input market snapshot: market cap CNY 8,208,705,294.544922; PE TTM 5.743758; date 2026-08-03; Yahoo Finance yfinance.
+
+5. Model decision
+- Overrode input hint ordinary_operating/applicable.
+- Final model: financial_insurance/requires_special_model.
+- Reason: cash and invested assets support policy liabilities, claims, reinsurance settlements and statutory capital; insurance subsidiary distributions are regulated.
+- Per contract, all ordinary owner-earnback sortable fields remain null.
+
+6. Currency and calculations
+- SEC financial statements are USD thousands.
+- CNY amount = USD thousands * 1,000 * 7.1875.
+- Net margin = USD 182.951m / USD 1,603.915m = 0.1140652715.
+- Forecast dividend = USD 0.16 * 4 * 28,008,189 shares * 7.1875 = CNY 128,837,669.4.
+- Forecast dividend yield = CNY 128,837,669.4 / CNY 8,208,705,294.544922 = 0.0156952485.
+- Mechanical operating FCF = operating cash flow USD 381.493m - property/equipment purchases USD 4.438m = USD 377.055m; explicitly not treated as sustainable distributable cash profit for an insurer.
+
+7. Protocol population
+- Used protocol set for scalar/object paths.
+- Used protocol append for asset rows, liability rows, dividend history, risks and evidence.
+- Did not hand-write result.json from scratch.
+
+8. Key judgment safeguards
+- Gross margin left null because it lacks comparable meaning for a property insurer.
+- Cost of sales and gross profit left null for the same reason.
+- Owner earnback figures left null because special insurance model is required.
+- 2025 earnings characterized as favorable-cycle, not normalized, because no significant hurricane made landfall and combined ratio improved to 94.1% from 104.1%.
+- Dividend forecast excludes special dividends and notes inability of insurance entities to pay ordinary dividends during 2026 without regulatory approval.
+
+9. Outputs
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt
+
+10. Validation
+- command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- result: {"status":"ok","errors":[]}
+- python3 -m json.tool outputs/result.json also completed successfully.

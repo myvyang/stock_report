@@ -1,0 +1,76 @@
+stock-research trace
+generated_at_input: 2026-08-04T14:22:37+08:00
+company: 02510.HK / TS LINES
+period: 2025-12-31 annual
+
+1. Protocol initialization
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   Result skeleton created successfully.
+
+2. Local-data reuse check
+   Checked stock_report/data/raw/filings/02510.HK/2025-12-31,
+   stock_report/data/analysis/annual_review/02510.HK/2025-12-31,
+   stock_report/data/normalized/facts/02510.HK/2025-12-31, and
+   stock_report/data/analysis/stock_research/02510.HK/2025-12-31.
+   No prior filing, annual facts, normalized facts, or stock-research result existed.
+
+3. Primary-source acquisition
+   Downloaded HKEX 2025 annual report to:
+   stock_report/data/raw/filings/02510.HK/2025-12-31/2025-annual-report-zh.pdf
+   Source URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0408/2026040800799_c.pdf
+   Extracted a local text working copy with pypdf for page-level review.
+   Cross-check: https://ir.tslines.com/ financial highlights and filings index.
+
+4. Model verification
+   Input hint financial_brokerage was rejected.
+   Annual report evidence: container shipping and vessel-chartering revenue; operating assets are vessels,
+   containers, and right-of-use assets; no brokerage client money, proprietary trading book, or repo funding.
+   Final model: ordinary_operating; owner earnback applicability: applicable.
+
+5. Statement extraction (annual report presentation currency: USD; figures below USD'000)
+   Income statement, annual report p.64:
+     revenue 1,284,763; cost of sales 1,031,069; gross profit 253,694;
+     operating profit 330,960; net profit 328,887; parent net profit 328,901.
+   Balance sheet, annual report pp.66-67:
+     total assets 2,459,091; total liabilities 338,259; total equity 2,120,832;
+     parent equity 2,120,667; NCI 165; cash 485,686; lease liabilities 149,672.
+   Cash flow, annual report pp.69-70 and note 15:
+     operating cash flow 502,145; PPE purchases 200,661; financing cash flow -254,776;
+     lease principal payment 53,243; dividends and NCI distributions 198,387.
+   Operating data, annual report management discussion and note 3:
+     volume 1,654,197 TEU; average freight 718 USD/TEU vs 769 in 2024;
+     container shipping revenue 1,187,175; other services 97,588;
+     41 operated vessels, 109,342 TEU, 46 routes.
+   Commitments, annual report p.127 and management discussion:
+     vessel capital commitments 837,212; 13 vessels / approximately 93,600 TEU.
+   Dividend, annual report note 20(c):
+     proposed 0.10 USD/share; 1,665,031,000 shares; total 166,503 (USD'000).
+
+6. Currency translation
+   Income statement and cash flow: 2025 average USD/CNY 7.1429, National Bureau of Statistics.
+   Balance sheet and 2025 dividend: 2025-12-31 USD/CNY 7.0288, CFETS/PBOC announcement.
+   All result.json monetary amounts are absolute CNY yuan.
+
+7. Owner-earnback calculations
+   unrestricted cash = (485,686 - 8,144) * 1,000 * 7.0288 = CNY 3,356,547,209.60
+   discounted cash = unrestricted cash * 80% = CNY 2,685,237,767.68
+   lease liabilities = 149,672 * 1,000 * 7.0288 = CNY 1,052,014,553.60
+   discounted detachable net cash = CNY 1,633,223,214.08
+   pre-discount cash profit = (502,145 - 200,661 - 53,243) * 1,000 * 7.1429
+                            = CNY 1,773,160,638.90
+   discounted sustainable cash profit = pre-discount cash profit * 80%
+                                       = CNY 1,418,528,511.12
+   operating business price = 12,734,272,505.347134 - 1,633,223,214.08
+                            = CNY 11,101,049,291.267134
+   owner earnback years = 11,101,049,291.267134 / 1,418,528,511.12 = 7.82575
+   market cap / cash profit = 12,734,272,505.347134 / 1,418,528,511.12 = 8.97710
+   These are scenario figures, not a forecast or investment recommendation.
+
+8. Result construction
+   Used protocol `set` commands for all populated paths; the initialized JSON was not replaced by a
+   hand-written object. Added evidence, asset/liability explanations, dividend basis, risks, and limitations.
+
+9. Validation
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Final result status: ok; errors: none.
+   JSON parse and cross-file placeholder scan also passed.

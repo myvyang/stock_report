@@ -1,0 +1,69 @@
+ACFN stock-research trace
+generated_at=2026-08-05T04:17:45+08:00
+period=2025-12-31
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No files existed under stock_report/data paths for ACFN/2025-12-31.
+- No pre-existing annual facts package or stock-research result was available.
+- Returned to primary public disclosures.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized with stock-research-result-v1 schema.
+
+4. Primary sources reviewed
+- SEC 2025 Form 10-K, filed 2026-03-05:
+  https://www.sec.gov/Archives/edgar/data/880984/000149315226008937/form10-k.htm
+  Reviewed business model, segments, competition, risk factors, audited balance sheet, statements of operations and cash flows, revenue mix, margins, liquidity, customer concentration, inventory, deferred revenue, tax assets and dividend expectation.
+- SEC Exhibit 99.1 / company 2025 results release, dated 2026-03-05:
+  https://www.sec.gov/Archives/edgar/data/880984/000149315226008939/ex99-1.htm
+  Used as cross-check for annual revenue mix and margins.
+- National Bureau of Statistics of China 2025 statistical communiqué:
+  https://www.stats.gov.cn/english/PressRelease/202602/t20260228_1962661.html
+  Used annual average exchange rate USD/CNY=7.1429.
+- config/input.json
+  Used market cap CNY 319049927.52573395, date 2026-08-03, Yahoo Finance yfinance source, PE TTM 24.48052.
+
+5. Statement-model conclusion
+- ordinary_operating / applicable.
+- Reason: hardware sales plus annual monitoring subscriptions through 99%-owned OmniMetrix; ordinary cash, receivables, inventory, PPE, deferred revenue and lease liabilities; no financial-institution, real-estate, concession or investment-holding balance-sheet structure.
+
+6. Currency conversion
+- Protocol requires CNY absolute yuan.
+- All USD filing amounts converted at 7.1429 CNY/USD.
+- Limitation: average rate was used for both flow and balance-sheet fields for consistency; balance-sheet CNY values are analytical conversions, not accounting translations at the closing rate.
+
+7. Core calculations
+- gross_margin = 8.815 / 11.478 = 0.7679909391880119
+- net_margin = 2.510 / 11.478 = 0.21867921240634255
+- operating_free_cash_flow = (2.090 - 0.033) million USD = 2.057 million USD = CNY 14692945.3
+- discounted_sustainable_cash_profit = CNY 14692945.3 * 80% = CNY 11754356.24
+- cash = 4.454 million USD = CNY 31814476.6
+- discounted_detachable_net_cash = CNY 31814476.6 * 80% = CNY 25451581.28
+- operating_business_price = CNY 319049927.52573395 - CNY 25451581.28 = CNY 293598346.245734
+- owner_earnback_years = CNY 293598346.245734 / CNY 11754356.24 = 24.9778329200727
+- market_cap_to_cash_profit = CNY 319049927.52573395 / CNY 11754356.24 = 27.143122176271046
+- discounted_net_cash_to_market_cap = 0.07977303576709675
+- forecast_cash_dividend = 0; forecast_yield = 0, based on no common cash dividend in comparative cash-flow statement and explicit 10-K expectation of no dividends.
+
+8. Judgment calls
+- Cash haircut: 20% retained for working capital, lease obligations and micro-cap liquidity buffer; no interest-bearing debt deducted.
+- Cash-profit haircut: 20% applied to 2025 operating FCF to reflect customer concentration, working-capital volatility, new-product inventory and expected expense growth.
+- Deferred tax benefit of USD 0.464m was not added to cash profit because it was non-cash.
+- Deferred tax asset was excluded from detachable cash because realization depends on future taxable income and tax-law limitations.
+
+9. Protocol population and validation
+- Populated result fields with protocol CLI set commands; did not construct result.json manually.
+- First validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- First validation result: status=ok, errors=[]
+
+10. Outputs
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

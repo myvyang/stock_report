@@ -1,0 +1,60 @@
+2026-08-04 stock research trace — 01846.HK EUROEYES
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- references/result-contract.md
+- references/report-contract.md
+- references/data-reuse.md
+
+2. Initialized result through protocol CLI
+- PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse audit
+- No local raw filing, annual facts, normalized facts, or prior stock-research output existed for 01846.HK/2025-12-31.
+- Public filing retrieval was therefore required.
+
+4. Primary sources reviewed
+- 2025 Annual Report, HKEX release 2026-04-29:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042901332.pdf
+  Relevant pages: 4-11 business/operations; 120-126 statements; 130 credit risk/customer settlement; 163 cash; 169 leases; 181-182 net cash/dividends.
+- FYEO acquisition circular, HKEX release 2026-06-30:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0630/2026063002559.pdf
+  Relevant pages: 14-15 funding; 174-190 enlarged-group unaudited pro forma financial information.
+- FYEO completion announcement, HKEX release 2026-07-23:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0723/2026072300025.pdf
+  Relevant pages: 1-2 completion date and final consideration; 5-7 use of proceeds.
+- PBOC/CFETS 2025-12-26 central parity: HKD 1 = CNY 0.90486.
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- Market cap/PE: config/input.json, Tencent qt.gtimg.cn snapshot supplied by task.
+
+5. Model decision
+- Overrode input hint financial_brokerage.
+- Confirmed ordinary_operating: revenue is almost entirely patient vision-correction services; no brokerage/client-money business.
+- Ordinary earnback remains applicable, but valuation-date analysis incorporates the completed July 2026 FYEO acquisition.
+
+6. Currency convention
+- Protocol requires absolute CNY.
+- Converted all HKD statement/pro-forma figures using HKD/CNY 0.90486.
+- Limitation recorded: no separate annual-average conversion for income/cash flow.
+
+7. Owner earnback calculation (CNY)
+- Enlarged-group pro forma OCF: HKD259.792m.
+- Add back non-recurring transaction costs included in OCF: HKD18.642m.
+- Less PP&E purchases HKD80.188m and intangible purchases HKD4.830m.
+- Less lease principal payments HKD93.364m because these are recurring clinic occupancy cash costs despite financing classification.
+- Base distributable cash: approximately HKD100.052m / CNY90.53m.
+- Apply 80% sustainability factor: CNY72.43m.
+- Pro forma cash is below borrowings, leases, contingent consideration and redemption liabilities; detachable net cash = 0.
+- Operating business price = CNY669.06m.
+- Earnback = 669.063916m / 72.426442m = 9.23784 years.
+
+8. Dividend convention
+- 2025 interim HKD10.102m + proposed/approved final HKD4.041m = HKD14.143m.
+- Converted CNY12.797m; divided by supplied market cap = 1.9127%.
+- Used as latest verifiable run-rate basis, not a 2026 promise.
+
+9. Protocol writes and validation
+- Populated result using protocol set commands; did not hand-create result.json.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok; errors: [].

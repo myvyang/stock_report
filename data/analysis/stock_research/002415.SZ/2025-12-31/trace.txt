@@ -1,0 +1,56 @@
+stock-research trace
+company=002415.SZ 海康威视
+period=2025-12-31 annual
+generated_for_input=2026-07-31T18:58:01+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated initialized fields using protocol set commands; result.json was not composed from scratch.
+5. Validated with protocol validate; final status: ok, errors: [].
+
+[reuse audit]
+- No annual facts package, normalized facts, raw filing, or prior stock-research result existed for 002415.SZ/2025-12-31.
+- stock_report/data/notes/user_stock_evaluations.md existed but contained no reusable company fact used here.
+- Therefore fetched the official annual report and extracted its text locally.
+
+[primary sources]
+- Annual report PDF:
+  https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-18/982c4407-83a0-4334-b5c2-b079590ff1ad.PDF
+  local: stock_report/data/raw/filings/002415.SZ/2025-12-31/2025-annual-report.pdf
+- Extracted annual report text:
+  local: stock_report/data/raw/filings/002415.SZ/2025-12-31/2025-annual-report.txt
+- Shareholder meeting resolution approving 2025 profit distribution:
+  https://static.cninfo.com.cn/finalpage/2026-05-09/1225285783.PDF
+- Market snapshot: config/input.json; Tencent qt.gtimg.cn; 20260731114315.
+
+[key annual-report locations]
+- Business and revenue mix: annual report printed pages 86-90.
+- R&D and cash flow discussion: printed pages 91-93.
+- Dividend plan: printed pages 113-115.
+- Consolidated balance sheet: printed pages 146-147.
+- Consolidated income statement: printed page 150.
+- Consolidated cash flow statement: printed page 152.
+- Restricted cash and cash-equivalent reconciliation: financial statement notes.
+
+[derived calculations]
+- gross_profit = 92,507,796,069.94 - 50,067,436,550.36 = 42,440,359,519.58.
+- gross_margin = 42,440,359,519.58 / 92,507,796,069.94 = 45.8776%.
+- parent_net_margin = 14,195,371,894.42 / 92,507,796,069.94 = 15.3451%.
+- operating_free_cash_flow = 25,339,411,083.10 - 3,622,046,664.67 = 21,717,364,418.43.
+- financing_and_lease_debt = short-term borrowings + current long-term borrowings + long-term borrowings + current lease liabilities + lease liabilities = 7,963,016,354.55.
+- discounted_detachable_net_cash = 46,204,338,694.43 * 90% - 7,963,016,354.55 = 33,620,888,470.44.
+- sustainable_cash_profit = 14,000,000,000.00, judgmental: close to 2025 parent net profit and below unusually high 2025 FCF; avoids capitalizing the roughly RMB8.10bn accounts-receivable reduction.
+- operating_business_price = 337,542,000,000.00 - 33,620,888,470.44 = 303,921,111,529.56.
+- owner_earnback_years = 303,921,111,529.56 / 14,000,000,000.00 = 21.7087.
+- market_cap_to_cash_profit = 337,542,000,000.00 / 14,000,000,000.00 = 24.1101.
+- forecast dividend = 2025 interim estimated RMB3,665,948,620.00 + annual plan RMB6,873,653,662.50 = RMB10,539,602,282.50.
+- forecast dividend yield = 10,539,602,282.50 / 337,542,000,000.00 = 3.1225%.
+
+[judgment and limitations]
+- Confirmed ordinary_operating model from actual products/services and ordinary working-capital structure.
+- Did not treat receivables, inventory, equity investments, or operating liabilities as detachable cash.
+- Did not assert an absolute global market rank because the annual report did not provide independently reproducible market-share evidence.
+- No buy/sell recommendation or target price produced.

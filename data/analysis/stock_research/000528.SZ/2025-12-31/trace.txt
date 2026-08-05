@@ -1,0 +1,66 @@
+stock-research trace
+company: 000528.SZ 广西柳工机械股份有限公司
+period: 2025-12-31 annual
+generated_at: 2026-08-01 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill linked it for reuse boundaries.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked annual_review, normalized facts, raw filing and prior stock_research paths for 000528.SZ/2025-12-31.
+- No existing annual fact pack, normalized fact file, raw annual report or prior stock-research result was present.
+- Therefore returned to public filing sources, per the reuse protocol.
+
+3. Sources obtained and reviewed
+- Full 2025 annual report PDF, disclosed 2026-04-25; local path:
+  stock_report/data/raw/filings/000528.SZ/2025-12-31/annual-report-2025.pdf
+- Extracted text, 274 pages; local path:
+  stock_report/data/raw/filings/000528.SZ/2025-12-31/annual-report-2025.txt
+- Discovery/cross-check pages:
+  https://pdf.dfcfw.com/pdf/H2_AN202604241821559833_1.pdf
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12191400&stockid=000528
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12191369&stockid=000528
+- Market data was not re-estimated. Used the supplied Tencent qt.gtimg.cn snapshot: market cap CNY 17,831,000,000; PE TTM 11.44; timestamp 20260731114342.
+
+4. Filing anchors
+- Annual report pp. 7-9: revenue, parent net profit, operating cash flow and quarterly data.
+- pp. 12-17: business model, sales modes, financing lease exposure, guarantees and business network.
+- pp. 24-25: revenue and gross margin by industry, product and geography.
+- pp. 31-33: material assets, liabilities and restricted assets.
+- p. 70: 2025 dividend proposal.
+- pp. 125-127: consolidated balance sheet.
+- pp. 131-132: consolidated income statement.
+- pp. 135-136: consolidated cash-flow statement.
+- pp. 178 onward: note detail for cash, receivables, inventory and debt.
+- pp. 229-230: operating cash-flow reconciliation and cash/equivalent restrictions.
+
+5. Deterministic calculations
+- Gross profit = 33,143,878,244.37 - 25,716,308,585.34 = 7,427,569,659.03.
+- Gross margin = 7,427,569,659.03 / 33,143,878,244.37 = 0.2241008009.
+- Parent net margin = 1,609,225,714.30 / 33,143,878,244.37 = 0.0485527283.
+- Operating free cash flow = 1,005,334,550.87 - 715,058,347.74 = 290,276,203.13.
+- Forecast dividend yield = 644,024,913.03 / 17,831,000,000 = 0.0361182723.
+- Operating business price = 17,831,000,000 - 0 discounted detachable net cash = 17,831,000,000.
+- Owner earnback = 17,831,000,000 / 500,000,000 = 35.662 years.
+
+6. Judgment calls, explicitly not filing facts
+- Statement model retained as ordinary_operating because manufacturing is 90.7% of revenue. Financing lease and credit support are ancillary to equipment sales, not a bank-like statement model.
+- Discounted detachable net cash set to zero. Unrestricted cash was haircut to 50%, wealth products to 80%, restricted cash to zero, and interest-bearing/quasi-interest-bearing debt deducted at 100%; discounted funds did not cover debt.
+- Sustainable distributable cash profit set at CNY 500,000,000. This is near the 2024-2025 average free cash flow of about CNY 474 million, modestly normalizing growth working-capital absorption, while remaining far below 2025 accounting profit and operating cash flow.
+- Financing-sale guarantees of CNY 6.0651482 billion are treated as a risk exposure, not booked as if all were current liabilities.
+- Dividend forecast directly uses the board's 2025 proposal. It remains subject to approval/implementation and share-base changes.
+
+7. Protocol updates and validation
+- All result sections were populated through repeated protocol `set` commands after protocol initialization; the complex JSON file was not authored from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report/trace finalization: status=ok, errors=[]
+
+8. Known limitations
+- Tencent market snapshot was supplied by the task and not independently reconstructed from exchange tick data.
+- No pre-existing annual fact pack was available; this run directly extracted the annual filing.
+- Cash-profit normalization and cash haircuts are analytical judgments and may change materially with receivable collection, credit losses, maintenance capex and guarantee realization.

@@ -1,0 +1,55 @@
+stock-research trace
+company=600028.SH 中国石化
+period=2025-12-31 annual
+generated_for_input=2026-08-01T00:15:30+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read result-contract.md, report-contract.md, and data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields only through protocol set/append commands.
+5. Validated with protocol validate after writing all outputs.
+
+[local reuse audit]
+No existing filing, annual facts package, normalized facts, or prior 2025 stock-research result for 600028.SH was present under stock_report at task start.
+Therefore the research returned to the official annual report.
+
+[primary source]
+Title: China Petroleum & Chemical Corporation Annual Report 2025
+Disclosure date: 2026-03-22 (HKEX search metadata); financial statements approved 2026-03-20.
+URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0322/2026032200057.pdf
+Local copy: stock_report/data/raw/filings/600028.SH/2025-12-31/annual-report-2025.pdf
+Scope used: principal financial data; business review; MD&A; PRC consolidated balance sheet, income statement and cash flow statement; notes 5, 23, 30, 32, 33, 34, 35, 57 and 58; dividend and repurchase disclosures.
+
+[market source]
+Source: config/input.json / Tencent qt.gtimg.cn
+market_cap=634859000000
+market_cap_date=20260731114336
+pe_ttm=17.86
+
+[formula audit]
+gross_profit=2783583000000-2341383000000=442200000000
+gross_margin=442200000000/2783583000000=0.15886000165973135
+net_margin=31809000000/2783583000000=0.011427358192660324
+operating_free_cash_flow=162496000000-133625000000=28871000000
+recognized_cash=152318000000*0.50=76159000000
+financing_debt=29455000000+79150000000+11651000000+182968000000+52296000000=355520000000
+discounted_detachable_net_cash=76159000000-355520000000=-279361000000
+discounted_sustainable_cash_profit=28871000000*0.85=24540350000
+operating_business_price=634859000000-(-279361000000)=914220000000
+owner_earnback_years=914220000000/24540350000=37.25374739969072
+market_cap_to_cash_profit=634859000000/24540350000=25.87000592901079
+forecast_dividend_yield=24206000000/634859000000=0.0381281512902865
+
+[judgment audit]
+statement_model=ordinary_operating: supported by integrated E&P, refining, marketing/distribution and chemicals operations; assets and liabilities are ordinary operating, financing, and investment items rather than customer funds or regulated project balances of a special statement model.
+cash haircut=50%: judgment reflecting very large procurement/tax/working-capital needs and RMB1.445bn restricted deposits. This is not a reported fact.
+debt deduction=100%: short/current/long borrowings and debentures deducted. Lease liabilities excluded from this net-cash deduction because they match right-of-use operating assets and are serviced through continuing operations; their existence is separately disclosed.
+cash-profit haircut=15%: judgment applied to one-year free cash flow for oil-price, margin and capex cyclicality. This is not a reported fact.
+long-term equity investments excluded from detachable cash due to operating linkage, governance constraints and insufficient evidence of near-term distribution/realization.
+
+[limitations]
+Market cap and PE were accepted from the supplied snapshot and not independently reconstructed.
+Only one complete annual free-cash-flow observation was directly used; cyclicality is addressed with a haircut rather than a full-cycle average.
+The owner-earnback result is sensitive to the detachable-cash rate, maintenance-capex split and commodity/margin cycle.

@@ -1,0 +1,56 @@
+task=stock_research
+company=301608.SZ 博实结
+period=2025-12-31
+report_type=annual
+generated_at=2026-07-31T17:34:11+08:00
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+[local_reuse]
+annual_facts_json=missing
+annual_facts_md=missing
+raw_filing_metadata=missing
+prior_stock_research=missing
+decision=本地无可复用事实包，转向公开年报全文与摘要。
+
+[sources]
+1. 博实结：2025年年度报告，公告日期2026-04-21，公开可检索全文转载：https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12117498&stockid=301608
+2. 博实结：2025年年度报告摘要，公告日期2026-04-21：https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12117496&stockid=301608
+3. config/input.json：市值5879000000元，日期20260731114327，来源Tencent qt.gtimg.cn，PE TTM 23.56。
+
+[model_check]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=物联网智能硬件研发、生产与销售，报表为普通制造经营结构；无特殊行业资产负债模型。
+special_treatment=尚未使用募集资金及其现金管理合计666108267.87元，仍绑定募投用途，按0%计入可剥离现金。
+
+[key_calculations]
+gross_profit=1711517711.87-1296790629.73=414727082.14
+gross_margin=414727082.14/1711517711.87=0.24231539017312892
+net_margin=234722619.86/1711517711.87=0.13714296862493036
+operating_free_cash_flow=316054323.51-95310884.04=220743439.47
+cash_and_wealth_products=983209649.75+805141018.02=1788350667.77
+unrestricted_cashlike=1788350667.77-666108267.87=1122242399.90
+discounted_detachable_net_cash=1122242399.90*0.85-584233.09=953321806.825
+discounted_cash_profit=扣非归母净利润=210701087.74
+operating_business_price=5879000000-953321806.825=4925678193.175
+owner_earnback_years=4925678193.175/210701087.74=23.377564140784916
+market_cap_to_cash_profit=5879000000/210701087.74=27.90208661501806
+forecast_cash_dividend=45000463.20+40000115.10=85000578.30
+forecast_dividend_yield=85000578.30/5879000000=0.014458339564551795
+
+[judgment_boundaries]
+fact=三张表、业务构成、毛利率、募集资金、分红来自公司年报披露。
+inference=智能车载终端是主要利润支柱，依据其收入占比与分产品毛利率。
+judgment=非募集资金现金理财按85%折价；扣非归母净利润作为可持续现金利润。
+limitation=本地无官方PDF；采用完整年报转载文本并以年报摘要交叉核对。行情直接复用输入快照。
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

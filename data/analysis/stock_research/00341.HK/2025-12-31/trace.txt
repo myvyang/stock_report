@@ -1,0 +1,99 @@
+stock-research trace
+generated_at=2026-08-03T16:16:45+08:00
+query=00341.HK
+requested_period=2025-12-31
+report_type=annual
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated every field through protocol set commands; no complex result JSON was hand-written.
+3. Final validation command and outcome recorded below.
+
+[identity_and_model]
+- Identified issuer as Café de Coral Holdings Limited / 大家樂集團有限公司, HKEX stock code 341.
+- Rejected input analysis_model_hint=financial_brokerage.
+- Evidence: audited annual report note 5 says the group operates quick service restaurants, casual dining chains, institutional catering, food processing and distribution.
+- Final model: ordinary_operating; owner earnback applicability: applicable.
+
+[period_handling]
+- Issuer fiscal year ends 31 March, so there is no annual report ended 2025-12-31.
+- Core audited financial statements: FY2024/25 ended 2025-03-31, published 2025-07-07.
+- Trend/dividend overlay: FY2025/26 annual results ended 2026-03-31, published 2026-06-15.
+- Market valuation: input dated 2026-07-31.
+
+[primary_sources]
+- HKEX annual report 2024/25:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2025/0707/2025070700698.pdf
+  Key pages: 99-105 statements; 154-160 segment note; 181-185 working capital and cash; 203-204 borrowings; 209-210 expenses.
+- HKEX FY2025/26 annual results:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0615/2026061500255.pdf
+  Key pages: 1 and 4-10 for revenue, margins, profit, dividend, store network, cash/debt and capex.
+- Tencent qt.gtimg.cn market data supplied in config/input.json.
+
+[currency]
+- Protocol requires CNY absolute yuan.
+- Applied analytical conversion HKD/CNY=0.925 to all filing figures.
+- This is disclosed as an analysis assumption, not a company-reported FX rate.
+
+[audited_fy2024_25_hkd_thousand]
+revenue=8568317
+cost_of_sales=7675662
+gross_profit=892655
+operating_profit=324886
+net_profit=235111
+parent_net_profit=232744
+total_assets=5980230
+total_liabilities=3235494
+total_equity=2744736
+parent_equity=2732286
+minority_interest=12450
+operating_cash_flow=1510999
+capex_purchase_ppe=305069
+financing_cash_flow=-1460236
+dividends_paid=327600
+buybacks=46049
+cash=1053633
+bank_borrowings=305000
+lease_liabilities=1829310
+lease_liability_payments=956340
+
+[calculations]
+gross_margin=892655/8568317=0.1041844026
+net_margin=232744/8568317=0.0271633101
+reported_operating_fcf_cny=(1510999-305069)*1000*0.925=1115485250
+lease_adjusted_cash_check_cny=(1510999-305069-956340)*1000*0.925=230685750
+
+detachable_cash_start_cny=1053633*1000*0.925=974610525
+less_bank_debt_cny=305000*1000*0.925=282125000
+less_working_cash_reserve_cny=300000*1000*0.925=277500000
+remaining_cny=414985525
+discount=0.80
+discounted_detachable_net_cash_rounded=332000000
+
+sustainable_cash_profit_assumption_hkd=180000000
+discounted_sustainable_cash_profit_cny=180000000*0.925=166500000
+operating_business_price=2769322920.428514-332000000=2437322920.428514
+owner_earnback_years=2437322920.428514/166500000=14.6386
+market_cap_to_cash_profit=2769322920.428514/166500000=16.6326
+discounted_net_cash_to_market_cap=332000000/2769322920.428514=0.119885
+
+forecast_dividend_per_share_hkd=0.40
+estimated_shares=581700000
+forecast_cash_dividend_cny=0.40*581700000*0.925=215229000, rounded_to=215200000
+forecast_dividend_yield=215200000/2769322920.428514=0.0777
+
+[judgment_separation]
+- Fact: FY2025/26 revenue HK$8,183.1m, attributable profit HK$164.1m, full-year DPS HK$0.40 and payout ratio 141.4%.
+- Inference: second-half recovery supports a sustainable-profit assumption modestly above FY2025/26 reported profit.
+- Judgment: HK$300m operating cash reserve, 20% haircut on residual cash, and HK$180m sustainable cash profit are conservative analytical assumptions, not reported facts.
+
+[limitations]
+- Requested period mismatch with issuer fiscal year is explicitly disclosed.
+- FX assumption can shift all CNY filing figures and owner-earnback output.
+- Forecast dividend cash amount uses estimated shares and can change with buybacks and AGM approval.
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

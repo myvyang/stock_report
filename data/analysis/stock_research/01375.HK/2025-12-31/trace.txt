@@ -1,0 +1,44 @@
+stock-research trace
+company: 01375.HK / 中原证券股份有限公司（香港业务名称：中州证券）
+period: 2025-12-31 annual
+generated_at: 2026-08-03T17:23:47+08:00
+
+[protocol]
+1. Read stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because no existing annual facts package was present.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated initialized paths with protocol set commands; no complex JSON was created from a blank file.
+6. Validated with protocol validate after report completion.
+
+[source discovery]
+- Existing paths stock_report/data/analysis/annual_review/01375.HK/2025-12-31 and normalized facts contained no reusable facts.
+- Located official HKEX Annual Report 2025, released 2026-04-17:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0417/2026041700698.pdf
+- Saved the official PDF to:
+  stock_report/data/raw/filings/01375.HK/2025-12-31/annual-report-2025.pdf
+- Market valuation reused from config/input.json as instructed; source Tencent qt.gtimg.cn, timestamp 2026/07/31 16:08:45.
+
+[key extraction]
+- Annual report pp.27-28: operating income, parent net profit, total assets, liabilities, parent equity, ROE and net capital indicators.
+- Annual report pp.35, 56-57: segment income and year-on-year changes.
+- Annual report pp.58-61: cash-flow explanation and asset/liability composition.
+- Annual report pp.117-118: 2025 cash dividend and payout ratio.
+- Financial statement notes pp.162, 225-226, 255, 279, 301, 324-326: client deposits, cash equivalents, margin assets, impairment, trading assets and financing liabilities.
+
+[model decision]
+- Confirmed financial_brokerage from audited business description and balance-sheet structure.
+- owner_earnback_applicability = requires_special_model.
+- Ordinary discounted net cash, sustainable cash profit, operating business price and payback ratios kept null.
+- Special model uses price-to-parent-equity (calculated in report only), ROE, net capital, regulatory liquidity/risk ratios, segment quality and dividends.
+
+[calculations]
+- forecast dividend yield = 139,286,541 / 6,910,093,093.002439 = 0.020156970264416502.
+- market cap / 2025 parent equity = 6,910,093,093.002439 / 14,384,324,225.18 = 0.48039052685604827.
+- No ordinary free cash flow calculated: broker operating cash flow contains client cash and trading/financing position changes.
+
+[limitations]
+- Market data was not independently reconstructed; input valuation was retained.
+- Annual report figures are RMB absolute yuan; rounded figures in report.md are presentation only.
+- The dividend forecast is a baseline using the declared 2025 dividend, not 2026 guidance.

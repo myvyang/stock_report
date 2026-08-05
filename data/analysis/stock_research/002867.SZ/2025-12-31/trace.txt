@@ -1,0 +1,103 @@
+stock-research trace
+company=周大生
+code=002867.SZ
+period=2025-12-31
+run_date=2026-08-01 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md as requested.
+3. Read references/data-reuse.md because source reuse rules were applicable.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated scalar fields with protocol `set` and list fields with protocol `append`; result was not hand-written from scratch.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[local source audit]
+Expected paths from config/input.json were checked:
+- stock_report/data/raw/filings/002867.SZ/2025-12-31/metadata.json: missing
+- stock_report/data/analysis/annual_review/002867.SZ/2025-12-31/facts.json: missing
+- stock_report/data/analysis/annual_review/002867.SZ/2025-12-31/annual_facts.md: missing
+- stock_report/data/normalized/facts/002867.SZ/2025-12-31/annual-facts.json: missing
+Only stock_report/data/notes/user_stock_evaluations.md existed under stock_report. Therefore no annual fact package or raw filing could be reused locally.
+
+[public evidence used]
+Primary financial source:
+- 周大生：2025年年度报告, disclosed 2026-04-29, audited by Ernst & Young Hua Ming with standard unqualified opinion.
+- Reproducible text URL: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12251477&stockid=002867
+- Official exchange materials were also located in search results; public report text was used for line-level extraction.
+
+Dividend source:
+- 周大生：2025年年度报告摘要, disclosed 2026-04-29.
+- URL: https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12251453&stockid=002867
+
+Market source:
+- config/input.json market snapshot: market cap CNY 13,916,000,000; timestamp 20260731114318; source Tencent qt.gtimg.cn; PE TTM 12.16.
+
+[core extraction]
+Balance sheet (CNY):
+- total_assets=8,311,518,922.15
+- total_liabilities=1,835,265,954.41
+- total_equity=6,476,252,967.74
+- parent_equity=6,482,304,533.00
+- minority_interest=-6,051,565.26
+- cash=807,602,463.14
+- inventory=5,000,206,205.46
+- accounts_receivable=265,515,132.36
+- short_term_borrowings=550,358,258.93
+- trading_financial_liabilities=366,667,247.06 (mainly gold leasing)
+
+Income statement (CNY):
+- revenue=8,815,068,487.36
+- cost_of_sales=6,051,231,760.69
+- gross_profit=2,763,836,726.67
+- operating_profit=1,347,206,031.15
+- net_profit=1,102,054,004.52
+- parent_net_profit=1,103,224,980.77
+
+Cash flow (CNY):
+- operating_cash_flow=464,011,855.04
+- capex=109,862,802.86
+- operating_free_cash_flow=354,149,052.18
+- financing_cash_flow=-543,236,249.62
+- actual distribution to shareholders shown in equity statement=976,926,503.70
+
+[formula checks]
+gross_profit = revenue - cost_of_sales = 2,763,836,726.67
+gross_margin = gross_profit / revenue = 0.31353547968834156
+net_margin = parent_net_profit / revenue = 0.12515217350289715
+operating_free_cash_flow = operating_cash_flow - capex = 354,149,052.18
+forecast_cash_dividend = 1,085,473,893 / 10 * 6.5 = 705,558,030.45
+forecast_dividend_yield = 705,558,030.45 / 13,916,000,000 = 0.05070120943158954
+
+[analysis model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: jewelry revenue is the dominant operating activity and inventory/store/channel assets are the economic core. Small-loan activity and gold leasing are subordinate. Gold leasing liabilities match gold inventory/risk management and remain within the operating business rather than being treated as detachable cash.
+
+[owner earnback judgments]
+Facts and judgments were kept separate.
+Cash breakdown (CNY):
+- cash at book value: +807,602,463.14
+- short-term borrowings: -550,358,258.93
+- required operating cash reserve (judgment): -200,000,000.00
+- discounted detachable net cash: 57,244,204.21
+
+Profit breakdown (CNY):
+- 2025 parent net profit: 1,103,224,980.77
+- working-capital/sustainability haircut (judgment): -303,224,980.77
+- discounted sustainable distributable cash profit: 800,000,000.00
+Rationale: 2025 FCF was only CNY 354.15m and inventory increased about CNY 729.97m, but 2024 FCF was about CNY 1.661bn and the 2025 annual dividend proposal is CNY 705.56m. CNY 800m avoids using either the unusually weak single-year FCF or accounting profit without adjustment.
+
+operating_business_price = 13,916,000,000 - 57,244,204.21 = 13,858,755,795.79
+owner_earnback_years = 13,858,755,795.79 / 800,000,000 = 17.3234447447375
+market_cap_to_cash_profit = 13,916,000,000 / 800,000,000 = 17.395
+discounted_net_cash_to_market_cap = 57,244,204.21 / 13,916,000,000 = 0.00411383818051164
+
+[quality]
+status=complete
+limitations:
+- Configured local annual fact/raw filing paths were absent.
+- Sustainable cash profit and required operating cash are analyst judgments, not company guidance.
+- Market cap and PE TTM were inherited from the input snapshot and not independently recalculated.

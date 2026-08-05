@@ -1,0 +1,84 @@
+[2026-07-31 Asia/Shanghai] stock-research trace
+
+1. Input
+- Read config/input.json.
+- Company: 北京神州泰岳软件股份有限公司 / 300002.SZ.
+- Period: 2025-12-31 annual.
+- Market snapshot supplied by input: CNY 17,036,000,000.000002; PE TTM 23.21; timestamp 20260731114330; source Tencent qt.gtimg.cn.
+
+2. Required protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read .agents/skills/stock-research/references/result-contract.md in full.
+- Read .agents/skills/stock-research/references/report-contract.md in full.
+
+3. Local reuse check
+- Checked all paths named in config/input.json.
+- Missing locally: raw filing metadata and filings, annual facts JSON/Markdown, extraction trace, normalized facts, prior stock-research result/report/trace.
+- /root/aicode sync targets also contained no 300002.SZ source files.
+- Therefore no prior fact package or research conclusion was reused.
+
+4. Public-source recovery
+- Located the company's 2025 annual report, disclosed 2026-04-28.
+- Primary accounting source: 北京神州泰岳软件股份有限公司2025年年度报告; audit report 信会师报字[2026]第ZA12746号; standard unqualified opinion.
+- Public readable copy used for detailed extraction:
+  https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12231260&stockid=300002
+- Official announcement located through CNINFO/SZSE search; board resolution:
+  https://static.cninfo.com.cn/finalpage/2026-04-28/1225217188.PDF
+- Dividend announcement facts were cross-checked against the annual report and the 2025 annual profit distribution announcement.
+
+5. Statement model decision
+- Confirmed statement_model=ordinary_operating.
+- Confirmed owner_earnback_applicability=applicable.
+- Reason: revenue is generated from games, cloud/software projects, communications/IoT and services. Cash, bank wealth-management products and deposits are separable from low financing debt. No bank deposits, brokerage customer funds, insurance reserves, property presale restrictions or concession liabilities exist that would make ordinary net-cash treatment economically invalid.
+
+6. Extracted audited facts (CNY)
+- Total assets: 8,744,963,445.98.
+- Total liabilities: 1,106,213,423.87.
+- Total equity: 7,638,750,022.11.
+- Parent equity: 7,647,067,650.19.
+- Revenue: 5,820,801,820.30.
+- Cost of sales: 2,461,530,373.73.
+- Gross profit: 3,359,271,446.57.
+- Operating profit: 1,020,832,274.40.
+- Net profit: 786,166,036.09.
+- Parent net profit: 801,508,494.94.
+- Operating cash flow: 1,141,532,247.20.
+- Capex cash paid: 79,849,775.46.
+- Operating free cash flow: 1,061,682,471.74.
+- Financing cash flow: -279,891,109.91.
+- Dividend/profit/interest cash paid: 198,795,153.47.
+- Cash: 2,155,815,155.84.
+- Trading financial assets (bank wealth management and structured deposits): 792,651,354.32.
+- Bank time deposits in other current assets: 1,463,313,837.91.
+- Short-term borrowings + current non-current liabilities + lease liabilities: 62,444,354.19.
+
+7. Formula calculations
+- Gross margin = 3,359,271,446.57 / 5,820,801,820.30 = 0.5771148976167798.
+- Net margin = 801,508,494.94 / 5,820,801,820.30 = 0.1376972657177136.
+- Forecast dividend yield = 118,030,431.96 / 17,036,000,000.000002 = 0.006928294902559285.
+- Discounted detachable net cash:
+  cash * 90% + trading financial assets * 95% + bank time deposits * 95%
+  - financing and lease liabilities - CNY 1,000,000,000 operating cash reserve
+  = 3,020,956,218.6845.
+- Discounted sustainable cash profit: CNY 750,000,000.
+- Operating business price = 17,036,000,000.000002 - 3,020,956,218.6845 = 14,015,043,781.315502.
+- Owner earnback years = 14,015,043,781.315502 / 750,000,000 = 18.686725041754002.
+- Market cap / cash profit = 17,036,000,000.000002 / 750,000,000 = 22.71466666666667.
+
+8. Judgment boundaries
+- CNY 1.0bn operating cash reserve is an analyst assumption, retained for game marketing, R&D, payroll and enterprise-project working capital.
+- Cash haircuts of 90%/95% are analyst assumptions reflecting foreign-currency exposure, access/timing and valuation conservatism.
+- Sustainable cash profit of CNY 750m is an analyst estimate. It is below 2025 parent net profit (CNY 801.5m), below adjusted net profit (CNY 819.9m), and below operating FCF (CNY 1,061.7m), to allow for mature-game decline, new-game uncertainty, FX and capitalized development spending.
+- No recommendation or target price was produced.
+
+9. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated the initialized skeleton using repeated protocol `set` commands. The JSON was not handwritten from an empty file.
+- Initial population attempt failed before mutation because a shell variable incorrectly included an environment assignment. Corrected by exporting PYTHONPATH and rerunning protocol commands.
+- First completed-result validation: status ok, errors [].
+
+10. Output set
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

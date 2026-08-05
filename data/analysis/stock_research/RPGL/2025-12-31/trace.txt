@@ -1,0 +1,66 @@
+RPGL stock-research trace
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   outcome: initialized stock-research-result-v1 template.
+
+3. Checked reusable local data
+   expected annual-review and raw-filing paths did not exist in /workspace/stock_report.
+   No prior RPGL facts package or stock-research output was available for reuse.
+
+4. Identified authoritative filings
+   - SEC 20-F accession 0001213900-25-121345, filed 2025-12-15, fiscal year ended 2025-06-30.
+   - SEC 6-K accession 0001213900-26-077070, filed 2026-07-10, unaudited six months ended 2025-12-31.
+   Key scope finding: RPGL fiscal year ends June 30. The requested 2025-12-31 annual period does not exist; 2025-12-31 is an unaudited interim date.
+
+5. Model determination
+   statement_model: ordinary_operating
+   owner_earnback_applicability: applicable
+   basis: operating subsidiary sells customized ERP/software services and hardware; no special financial-statement model applies.
+   reporting-quality override: partial because the input requests an annual report for an interim date.
+
+6. Currency conversion
+   Company 6-K provides SGD primary figures and USD convenience translations at USD1 = SGD1.2859.
+   Result uses those disclosed USD values multiplied by Federal Reserve H.10 2025-12-31 rate USD1 = CNY7.1875.
+   All result amounts are absolute CNY yuan. Minor rounding differences are expected.
+
+7. Key extracted interim figures (source currency)
+   total assets: USD 8,341,067
+   total liabilities: USD 1,772,630
+   shareholders' equity: USD 6,568,437
+   six-month revenue: USD 1,685,151
+   gross profit: USD 435,481
+   operating loss: USD 690,017
+   net loss: USD 763,254
+   operating cash outflow: USD 203,757
+   additions to intangible assets: USD 3,164,954
+   financing cash inflow: USD 3,373,248
+   cash: USD 4,644
+
+8. Owner-earnback treatment
+   - Cash receives 100% detachable weight.
+   - Supplier deposits, prepayments, related-party acquisition deposit and work-in-progress software receive 0% detachable-cash weight.
+   - Sustainable distributable cash profit set to zero floor because net income, operating cash flow and operating free cash flow are negative.
+   - owner_earnback_years and market_cap_to_cash_profit remain null because the denominator is not positive.
+   - Forecast cash dividend and yield set to zero based on losses, negative cash generation and negligible period-end cash.
+
+9. Market-data limitation
+   Market cap and PE TTM were retained from config/input.json (Yahoo Finance yfinance, 2026-08-03).
+   PE was not used as an analytical conclusion because it was not reconciled to reverse splits, later offerings, current share count and a comparable TTM earnings period.
+
+10. Protocol construction and validation
+   outputs/result.json was initialized and updated through protocol CLI set commands; it was not authored as a standalone complex JSON document.
+   validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   validation outcome before report creation: {"status":"ok","errors":[]}
+
+11. Final output policy
+   data_quality.status: partial
+   reason: annual/interim period mismatch and unreconciled PE/share-count input.
+   The result must not enter formal annual ranking.

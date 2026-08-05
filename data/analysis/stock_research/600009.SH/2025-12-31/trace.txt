@@ -1,0 +1,80 @@
+task=stock_research
+company=上海机场
+code=600009.SH
+period=2025-12-31
+report_type=annual
+generated_from_input=config/input.json
+
+[protocol]
+skill=.agents/skills/stock-research/SKILL.md
+contracts_read=.agents/skills/stock-research/references/result-contract.md,.agents/skills/stock-research/references/report-contract.md
+additional_reference=.agents/skills/stock-research/references/data-reuse.md
+init_command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+mutation_method=protocol set commands only; result.json was initialized by protocol and not hand-written
+validate_command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[reuse_check]
+annual_facts_json=missing:stock_report/data/analysis/annual_review/600009.SH/2025-12-31/facts.json
+annual_facts_md=missing:stock_report/data/analysis/annual_review/600009.SH/2025-12-31/annual_facts.md
+normalized_facts_json=missing:stock_report/data/normalized/facts/600009.SH/2025-12-31/annual-facts.json
+prior_stock_research=missing:stock_report/data/analysis/stock_research/600009.SH/2025-12-31/
+decision=no reusable annual fact pack; return to official filing
+
+[primary_source]
+title=上海国际机场股份有限公司2025年年度报告
+publisher=上海证券交易所披露系统
+publication_date=2026-04-30
+url=https://star.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-30/600009_20260430_BK10.pdf
+pages_used=2,6,9-14,17-23,67-75,147
+
+[market_source]
+source=config/input.json / Tencent qt.gtimg.cn
+market_cap=61038000000
+market_cap_timestamp=20260731114326
+pe_ttm=28.06
+independent_market_verification=not_performed
+
+[model_review]
+input_hint=utility_concession/requires_special_model
+confirmed_statement_model=utility_concession
+confirmed_applicability=requires_special_model
+reason=Company operates Pudong and Hongqiao airports; fixed assets, construction in progress, right-of-use assets and matching lease obligations are the operating system itself. Cash must support operation, expansion and lease service, so it is not mechanically detachable.
+ordinary_owner_earnback_fields=all null as required by result contract
+special_model=two-airport project cash flow using traffic, regulated aviation charges, non-aviation monetization, maintenance/expansion capex, lease debt service, remaining contract terms and distributable cash
+
+[extracted_financials_cny]
+revenue=13346192164.12
+cost_of_sales=9674078511.84
+gross_profit=3672113652.28
+operating_profit=3012515261.21
+net_profit=2410579187.36
+parent_net_profit=2116775136.25
+operating_cash_flow=5981731896.44
+capital_expenditure_cash=1306646770.05
+operating_free_cash_flow_simple=4675085126.39
+financing_cash_flow=-4172103176.24
+total_assets=71678547661.74
+total_liabilities=27139427653.70
+total_equity=44539120008.04
+parent_equity=42539846961.27
+minority_interest=1999273046.77
+
+[calculated_metrics]
+gross_margin=gross_profit/revenue=0.27514317245874353
+net_margin=parent_net_profit/revenue=0.15860517443625258
+simple_operating_fcf=operating_cash_flow-capital_expenditure_cash=4675085126.39
+forecast_dividend_yield=1169474626.83/61038000000=0.019159779593531896
+note=simple operating FCF is an observation, not sustainable distributable cash profit
+
+[dividend]
+interim_paid=522550767.69
+final_proposed=646923859.14
+full_year_scheme=1169474626.83
+payout_ratio=0.5525
+status=final dividend proposed in annual report; implementation amount can change with distribution share base
+
+[quality]
+status=complete
+meaning=Meets result contract minimum for a special financial model; does not express investment quality or recommendation.
+limitations=No local fact pack; market snapshot not independently verified; no full project cash-flow model; final dividend remains proposal/implementation basis.

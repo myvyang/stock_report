@@ -1,0 +1,62 @@
+stock-research trace
+company: 01110.HK / 金活医药集团有限公司
+period: 2025-12-31 annual
+generated_for_task_at: 2026-08-03 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md in full.
+- Read references/report-contract.md in full.
+- Read references/data-reuse.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the configured annual-review, normalized-facts, raw-filing and prior stock-research paths.
+- No 01110.HK annual facts, normalized facts, raw filing, or prior research output existed locally.
+- Existing stock_report content was limited to data/notes/user_stock_evaluations.md.
+- Therefore fetched the primary annual report from HKEX rather than fabricating missing facts.
+
+3. Primary sources
+- HKEX Annual Report 2025, released 2026-04-21:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0421/2026042101368.pdf
+  Local copy: stock_report/data/raw/filings/01110.HK/2025-12-31/annual-report-2025.pdf
+  Extracted text: stock_report/data/raw/filings/01110.HK/2025-12-31/annual-report-2025.txt
+- HKEX Annual Results Announcement, released 2026-03-31:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0331/2026033102643.pdf
+- Valuation snapshot: config/input.json; Tencent qt.gtimg.cn, timestamp 2026/07/31 16:08:47.
+
+4. Model override
+- Input hint said financial_brokerage/requires_special_model.
+- Annual report says the group distributes branded imported pharmaceutical and healthcare products and manufactures/sells electrotherapeutic, physiotherapeutic and general medical examination devices.
+- Balance sheet has ordinary inventory, trade receivables, PPE, investment properties and bank loans; no brokerage customer money or repo-financing structure.
+- Overrode to ordinary_operating/applicable.
+
+5. Key extracted facts (RMB)
+- Revenue 917,341,000; cost of sales 669,436,000; gross profit 247,905,000.
+- Operating profit 63,163,000; net profit 38,892,000; parent net profit 11,282,000.
+- Total assets 1,442,388,000; total liabilities 753,537,000; total equity 688,851,000; parent equity 617,701,000; NCI 71,150,000.
+- CFO 84,559,000; management-disclosed capex 48,836,000; operating FCF 35,723,000; financing cash flow -30,815,000.
+- Cash 264,410,000; bank loans 414,386,000; lease liabilities 19,480,000.
+- Dong Di Xin ownership 55%; net profit 64,362,000; CFO 92,301,000; NCI dividend 22,500,000.
+- 2025 final dividend: nil. Forecast cash dividend set to 0 based on the announced board resolution.
+
+6. Calculations and judgments
+- Gross margin = 247,905,000 / 917,341,000 = 0.2702430175910594.
+- Parent net margin = 11,282,000 / 917,341,000 = 0.012298589074291894.
+- Operating FCF = 84,559,000 - 48,836,000 = 35,723,000.
+- Cash less bank and lease debt = 264,410,000 - 414,386,000 - 19,480,000 = -169,456,000.
+- Discounted detachable net cash floored at 0; operating business price equals market cap 219,574,370.14400956.
+- Discounted sustainable distributable cash profit set to 0 because parent profit is below group capex and consolidated CFO is dominated by a 55%-owned subsidiary. This is a conservative evidence-quality judgment, not a claim that future cash generation is impossible.
+- With non-positive cash-profit denominator, owner earnback years and market-cap-to-cash-profit remain null per contract.
+
+7. Protocol mutation and validation
+- All result fields were populated through repeated protocol `set` commands after protocol initialization; the complex result was not hand-written from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report/trace completion: status ok, errors [].
+
+8. Limitations
+- Market cap and PE are supplied market data, not audited filing data.
+- Capex uses management's wider RMB48.836m disclosure; cash-flow-statement PPE purchases were RMB29.643m.
+- No separate parent-company cash-flow statement was disclosed, so parent-distributable cash requires conservative inference from ownership and consolidated disclosures.

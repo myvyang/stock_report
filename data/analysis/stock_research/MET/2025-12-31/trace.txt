@@ -1,0 +1,109 @@
+stock-research trace: MET / MetLife, Inc.
+task period: 2025-12-31 annual
+generated in Asia/Shanghai on 2026-08-04
+
+[1] Required instructions read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- workspace AGENTS.md
+
+[2] Protocol initialization
+Command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+Result: initialized stock-research-result-v1 skeleton.
+
+[3] Reuse check
+Checked the paths declared in config/input.json.
+No raw filing, filing metadata, annual facts, normalized facts, or historical MET stock-research result was present in the workspace.
+Therefore official public sources were fetched for this task.
+
+[4] Primary sources used
+- SEC Form 10-K, accession 0001099219-26-000013, filed 2026-02-19, period 2025-12-31:
+  https://www.sec.gov/Archives/edgar/data/1099219/000109921926000013/met-20251231.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/1099219/000109921926000013/0001099219-26-000013-index.htm
+- SEC Companyfacts API, CIK 0001099219:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0001099219.json
+- MetLife FY2025 and 4Q25 results, 2026-02-04:
+  https://www.metlife.com/about-us/newsroom/2026/february/metlife-announces-full-year-and-4q-2025-results/
+- MetLife 4Q25 earnings presentation, SEC Exhibit 99.4:
+  https://www.sec.gov/Archives/edgar/data/1099219/000109921926000008/ex994q425earningscallpre.htm
+- MetLife common dividend increase, 2026-04-28:
+  https://investor.metlife.com/news/news-details/2026/MetLife-Increases-Common-Stock-Dividend-by-4-4/default.aspx
+- Market cap and PE: task input, Yahoo Finance yfinance, dated 2026-08-03.
+
+[5] Statement-model decision
+Input hint: ordinary_operating / applicable.
+Observed facts: MetLife provides insurance, annuities, employee benefits, pension risk transfer and asset management. Investments are held to support policyholder accounts, future policy benefits and other insurance obligations. Separate-account assets are paired with separate-account liabilities.
+Decision: financial_insurance / requires_special_model.
+Reason: investments, cash, policy liabilities and regulatory capital are the operating structure itself. They cannot be recast as ordinary detachable net cash.
+Protocol consequence: all ordinary owner-earnback values remain null.
+
+[6] Extracted FY2025 facts in USD
+- Total assets: 745,166,000,000
+- Total liabilities: 716,245,000,000
+- Total equity including NCI: 28,680,000,000
+- Equity attributable to parent: 28,398,000,000
+- Noncontrolling interest: 282,000,000
+- Revenue: 77,084,000,000
+- Operating income: 6,137,000,000
+- Net income including NCI: 3,403,000,000
+- Net income available to common shareholders: 3,173,000,000
+- Premiums: 49,779,000,000
+- Net investment income: 22,559,000,000
+- Policyholder benefits and claims: 49,718,000,000
+- Investment assets other than related parties: 472,178,000,000
+- Separate account assets: 151,933,000,000
+- Cash and cash equivalents: 22,032,000,000
+- Premiums and other receivables: 49,059,000,000
+- Policyholder account balances: 236,857,000,000
+- Future policy benefits: 208,855,000,000
+- Long-term debt and lease obligations: 14,467,000,000
+- Other liabilities: 57,582,000,000
+- Common dividends paid: 1,509,000,000
+- Common share repurchases: 2,883,000,000
+- 2025 dividend per share paid: USD 2.248
+
+[7] Currency conversion
+The result contract requires CNY absolute yuan.
+Applied one explicit protocol conversion rate to all USD statement and dividend amounts:
+  1 USD = 7.20 CNY
+This is a presentation normalization, not a claim that MetLife reports in CNY and not a mix of average/closing FX rates.
+Examples:
+  total assets = 745,166,000,000 * 7.20 = 5,365,195,200,000 CNY
+  parent equity = 28,398,000,000 * 7.20 = 204,465,600,000 CNY
+  common net income = 3,173,000,000 * 7.20 = 22,845,600,000 CNY
+
+[8] Dividend forecast
+Approximate share base inferred from FY2025 cash dividend and dividend per share:
+  1,509,000,000 / 2.248 = approximately 671.26 million weighted shares.
+2026 scenario:
+  Q1 declared/paid per share = USD 0.5675
+  Q2 declared per share = USD 0.5925
+  Q3 assumption = USD 0.5925
+  Q4 assumption = USD 0.5925
+  annual scenario DPS = USD 2.345
+  forecast cash dividend = 671.26m * 2.345 = approximately USD 1.57444bn
+  converted forecast = CNY 11,333,610,320 (rounded protocol value)
+  forecast yield = 11,333,610,320 / 417,387,948,019.76953 = approximately 0.027154
+Limitations: actual diluted/share count changes with repurchases; Q3 and Q4 dividends were assumptions at the task date.
+
+[9] Special-model indicators
+- FY2025 combined U.S. insurance-company RBC ratio: above management's 360% target (company presentation).
+- Expected total U.S. statutory adjusted capital: approximately USD 17.2bn at 2025-12-31.
+- Holding-company cash and liquid assets: USD 3.6bn at 2025-12-31, within USD 3-4bn target buffer.
+- Dividends and returns of capital upstreamed from operating subsidiaries: USD 3.4bn in 2025; USD 0.458bn from other MetLife holding companies.
+These indicators replace an ordinary FCF/earnback calculation; they do not create an insurance-sector payback number.
+
+[10] Result construction
+outputs/result.json was initialized by protocol CLI and populated using repeated protocol CLI set commands. It was not handwritten from an empty object.
+
+[11] Validation
+Command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Validation after population: status ok, errors [].
+
+[12] Data-quality decision
+status: complete
+Rationale: identity, period, market data, insurance model decision, required special-model balance-sheet and profit fields, explained asset/liability rows, dividend forecast, business narrative, evidence and limitations are present. Ordinary margins, cash flow and owner earnback remain null because they lack comparable meaning for this insurance model, as permitted by the result contract.

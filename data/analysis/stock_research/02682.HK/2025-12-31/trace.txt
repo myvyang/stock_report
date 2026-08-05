@@ -1,0 +1,52 @@
+stock-research trace
+company=02682.HK YUN LEE MARINE / 润利海事集团控股有限公司
+requested_period=2025-12-31
+company_fiscal_year_end=03-31
+primary_filing_period=2025-03-31
+supplemental_results_period=2026-03-31
+
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Checked configured annual-review, normalized-facts, raw-filing, and prior stock-research paths. No reusable files existed.
+4. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Retrieved primary official filing:
+   Yun Lee Marine Annual Report 2025, HKEX release 2025-07-10
+   https://www.hkexnews.hk/listedco/listconews/sehk/2025/0710/2025071000269.pdf
+6. Retrieved supplemental official disclosure:
+   Yun Lee Marine Annual Results for year ended 2026-03-31, HKEX release 2026-06-26
+   https://www.hkexnews.hk/listedco/listconews/sehk/2026/0626/2026062601811.pdf
+7. Rejected input analysis_model_hint=financial_brokerage. Filing business and statements show an ordinary maritime-services and marine-construction company; set ordinary_operating/applicable.
+8. Currency conversion used for all filing amounts:
+   1 HKD = 0.92283 CNY, PBOC central parity, 2025-03-31
+   https://wzdt.pbc.gov.cn/huilv/llChart4.jsp
+9. Primary reported HKD figures (FY2025 / 2025-03-31):
+   revenue=373187000; cost_of_revenue=274623000; gross_profit=98564000
+   net_profit=32505000; parent_net_profit=19807000
+   total_assets=440505000; total_liabilities=132677000; total_equity=307828000
+   parent_equity=274779000; NCI=33049000
+   operating_cash_flow=25605000; capex=4564000; operating_FCF=21041000
+   cash=73572000; time_deposits=51538000
+   bank_and_other_borrowings=7385000; lease_liabilities=8707000
+   amounts_due_to_NCI_shareholders=42961000; tax_payables=4847000
+10. Formula checks:
+   gross_margin=98564000/373187000=0.2641142376
+   parent_net_margin=19807000/373187000=0.0530752679
+   parent_share_of_net_profit=19807000/32505000=0.6093524073
+   sustainable_parent_cash_profit_CNY=(25605000-4564000)*0.6093524073*0.80*0.92283=9465566.24
+   discounted_detachable_net_cash_CNY=((73572000+51538000)*0.90-7385000-8707000-42961000-4847000)*0.92283=44940898.17
+   operating_business_price=108397800.56476593-44940898.17=63456902.39476593
+   owner_earnback_years=63456902.39476593/9465566.239192989=6.7039732005
+   market_cap_to_cash_profit=108397800.56476593/9465566.239192989=11.4518030750
+   forecast_dividend_CNY=10000000*0.92283=9228300
+   forecast_dividend_yield=9228300/108397800.56476593=0.0851336462
+11. Populated result fields through repeated protocol CLI set commands; did not replace the initialized result with a hand-written JSON document.
+12. Protocol validation passed before report/trace creation:
+   {"status":"ok","errors":[]}
+
+Key judgment notes:
+- Cash and time deposits receive a 10% operating-liquidity haircut.
+- Bank/other borrowings, lease liabilities, amounts due to subsidiary NCI shareholders, and tax payables are deducted at 100%.
+- Trade receivables, contract assets, vessels, and the YLTK profit-guarantee financial asset are excluded from detachable cash.
+- Consolidated FCF is first allocated by the FY2025 parent-net-profit share, then receives a 20% sustainability haircut for project, collection, and customer-concentration risk.
+- The FY2026 proposed dividend remained subject to shareholder approval at the research date.

@@ -1,0 +1,102 @@
+stock-research trace
+task: APA / annual / 2025-12-31
+generated_at_input: 2026-08-04T19:18:28+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because SKILL.md identifies it as the reuse boundary.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the configured raw filing, annual review, normalized facts and prior stock research directories.
+- No APA 2025 filing cache, annual facts package or prior research outputs were present under stock_report.
+- Therefore returned to primary public sources rather than fabricating missing facts.
+
+3. Primary sources consulted
+- SEC 2025 Form 10-K, accession 0001841666-26-000015, filed 2026-02-26:
+  https://www.sec.gov/Archives/edgar/data/1841666/000184166626000015/apa-20251231.htm
+- SEC extracted XBRL instance for deterministic tag cross-check:
+  https://www.sec.gov/Archives/edgar/data/1841666/000184166626000015/apa-20251231_htm.xml
+- APA FY2025 results release, dated 2026-02-25:
+  https://investor.apacorp.com/news-releases/news-release-details/apa-corporation-announces-fourth-quarter-and-full-year-2025/
+- APA dividend history through the 2026-05-20 declaration:
+  https://investor.apacorp.com/stock-information/dividend-history/
+- APA 2Q26 supplemental release, dated 2026-07-08, used only for current share-count context and Waha curtailment evidence:
+  https://investor.apacorp.com/news-releases/news-release-details/apa-corporation-provides-second-quarter-2026-supplemental/
+- Federal Reserve H.10 daily Chinese yuan per U.S. dollar, latest official observation found before valuation date: 6.7719 on 2026-07-24:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?preview=H10%2FH10%2FRXI_N.B.CH&rel=H10
+- Valuation input was accepted from config/input.json: CNY 89,016,304,590.2373 as of 2026-08-03, Yahoo Finance yfinance, PE TTM 8.699301.
+
+4. Model classification
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: APA earns revenue by producing and selling oil, gas and NGL; it has no bank/insurance/developer balance-sheet structure.
+- Special handling retained: reserves and production assets are operating assets; sustaining capex is essential; Egypt includes a one-third NCI; ARO and decommissioning obligations are real senior cash claims.
+
+5. Currency normalization
+- Result contract requires CNY absolute yuan.
+- All 2025 USD filing amounts were multiplied by 6.7719 CNY/USD.
+- This is a comparison translation, not APA's accounting translation.
+- Market cap was already provided by input in CNY and was not translated again.
+
+6. Statement extraction (USD millions -> CNY yuan)
+- Total assets 17,761 -> 120,275,715,900.
+- Total liabilities derived as assets 17,761 - total equity 7,003 = 10,758 -> 72,852,100,200.
+- Total equity 7,003 -> 47,423,615,700.
+- Parent equity 6,093 -> 41,261,186,700.
+- NCI 910 -> 6,162,429,000; NCI/total equity=0.1299448276.
+- Revenue 8,920 -> 60,405,348,000.
+- Parent net income 1,434 -> 9,710,904,600; net margin=1,434/8,920=0.1607623318.
+- Consolidated net income 1,692 -> 11,458,054,800.
+- Operating cash flow 4,545 -> 30,778,285,500.
+- Capex defined as additions to oil and gas property 2,740 + leasehold/property acquisitions 26 = 2,766 -> 18,731,075,400.
+- Operating FCF 4,545 - 2,766 = 1,779 -> 12,047,210,100.
+- Financing cash flow -2,501 -> -16,936,521,900.
+- Dividends 360 + treasury stock activity 280 = 640 -> 4,334,016,000.
+
+7. Analytical gross profit
+- APA does not report conventional GAAP gross profit.
+- Analytical direct cost = lease operating expense 1,504 + gathering/processing/transmission 424 + purchased oil and gas cost 1,070 + taxes other than income 229 = USD 3,227 million.
+- Analytical gross profit = total revenue 8,920 - direct cost 3,227 = USD 5,693 million = CNY 38,552,426,700.
+- Analytical gross margin = 5,693 / 8,920 = 0.6382286996.
+- DD&A, exploration, G&A, transaction costs, ARO accretion, impairments and financing costs remain below this analytical gross-profit line; this is disclosed as a limitation.
+
+8. Detachable net cash
+- Cash USD 516m -> CNY 3,494,300,400.
+- Cash haircut 50% because cyclical upstream operations and debt require liquidity -> discounted cash CNY 1,747,150,200.
+- Total debt USD 4,493m (current 213 + long-term 4,280) -> CNY 30,426,146,700, deducted at 100%.
+- Discounted detachable net cash = 1,747,150,200 - 30,426,146,700 = -28,678,996,500.
+- Discounted net cash / market cap = -0.3221768937.
+
+9. Sustainable distributable cash profit
+- Starting point: company-reported FY2025 FCF approximately USD 1,000m = CNY 6,771,900,000.
+- Deduct NCI distributions USD 430m = CNY 2,911,917,000, leaving parent-view cash USD 570m = CNY 3,859,983,000.
+- Apply 20% haircut for commodity cyclicality, sustaining drilling, reserve decline and working-capital volatility.
+- Discounted sustainable cash profit = USD 456m = CNY 3,087,986,400.
+- This is an analyst assumption, not company guidance.
+
+10. Owner earnback formulas
+- Operating business price = market cap - discounted detachable net cash
+  = 89,016,304,590.2373 - (-28,678,996,500)
+  = CNY 117,695,301,090.2373.
+- Owner earnback years = 117,695,301,090.2373 / 3,087,986,400 = 38.1139311657.
+- Market cap / cash profit = 89,016,304,590.2373 / 3,087,986,400 = 28.8266504640.
+
+11. Dividend forecast
+- Annualized dividend assumed USD 1.00/share because quarterly declarations remained USD 0.25/share through May 2026.
+- Share base: estimated 2Q26 weighted-average basic shares 353m from APA's 2026-07-08 supplemental release.
+- Forecast cash dividend = USD 353m * 6.7719 = CNY 2,390,480,700.
+- Forecast dividend yield = 2,390,480,700 / 89,016,304,590.2373 = 0.0268544140.
+- Board declares dividends quarterly; forecast is not guaranteed.
+
+12. Structured result construction
+- Populated the initialized skeleton exclusively with protocol CLI `set` operations.
+- Did not hand-write outputs/result.json from scratch.
+- Final protocol validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation response: {"status":"ok","errors":[]}.
+
+13. Data quality decision
+- status=complete because identity, valuation, model, three statements, asset/liability explanations, owner-earnback decomposition, dividend forecast, business story and evidence are present.
+- Limitations explicitly retain the analytical gross-margin definition, FX translation convention, non-GAAP/analytical cash-profit judgment, absence of pre-existing facts package, and lack of a complete 2Q26 filing as of input creation time.

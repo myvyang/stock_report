@@ -1,0 +1,110 @@
+stock-research trace
+company: 金房能源 001210.SZ
+period: 2025-12-31 annual
+generated_for_input: 2026-07-31T19:34:27+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated initialized paths using protocol set commands; no complex JSON was written from scratch.
+4. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   validation status: ok
+
+[reuse check]
+- No filing metadata, raw filing, annual facts, normalized facts, or prior stock-research result existed for 001210.SZ/2025-12-31.
+- Existing stock_report content was limited to stock_report/data/notes/user_stock_evaluations.md and did not contain company facts.
+- Therefore fetched the official CNINFO filing PDF and parsed it in a temporary directory.
+
+[primary sources]
+- CNINFO annual report full text:
+  https://static.cninfo.com.cn/finalpage/2026-03-17/1225011702.PDF
+  title: 金房能源集团股份有限公司2025年年度报告全文
+  pages: 174
+  audit report date: 2026-03-16
+- CNINFO annual report summary:
+  https://static.cninfo.com.cn/finalpage/2026-03-17/1225011701.PDF
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, 20260731114345.
+
+[model classification]
+- Annual report business mix: heat-supply industry revenue 1,115,135,946.26 / total revenue 1,199,174,166.64 = 92.99%.
+- Heat-operation sales model revenue: 1,082,013,244.86 / total revenue = 90.23%.
+- Company uses EMC/BOT/BOO/GOT/EOT operating modes. One Tianjin energy-station project has a 30-year operating right and end-of-term transfer obligation.
+- Judgment: ordinary_operating / applicable at consolidated-company level, with special handling for project concession obligations and contract liabilities.
+
+[financial statement extraction]
+Balance sheet, annual report pp.68-70:
+- total assets: 2,500,611,689.20
+- total liabilities: 1,074,173,520.64
+- total equity: 1,426,438,168.56
+- parent equity: 1,341,618,028.56
+- minority interest: 84,820,140.00
+- minority interest ratio = 84,820,140.00 / 1,426,438,168.56 = 5.9466%
+
+Income statement, annual report pp.72-74:
+- revenue: 1,199,174,166.64
+- cost of sales: 890,599,418.45
+- gross profit = 1,199,174,166.64 - 890,599,418.45 = 308,574,748.19
+- gross margin = 308,574,748.19 / 1,199,174,166.64 = 25.7323%
+- operating profit: 154,455,959.32
+- net profit: 124,747,749.87
+- parent net profit: 134,413,221.62
+- parent net margin = 134,413,221.62 / 1,199,174,166.64 = 11.2088%
+
+Cash flow statement, annual report pp.76-77:
+- operating cash flow: 341,275,899.04
+- capex (cash paid to acquire fixed/intangible/other long-term assets): 187,946,718.16
+- operating free cash flow = 341,275,899.04 - 187,946,718.16 = 153,329,180.88
+- financing cash flow: 7,579,279.23
+- dividends/profit/interest cash paid: 47,061,689.28
+- 2024 operating free cash flow = 233,383,024.43 - 205,292,297.99 = 28,090,726.44
+
+[asset and liability interpretation]
+- Cash and equivalents: 909,280,088.79 (annual report cash-flow reconciliation).
+- Restricted cash: 5,219,202.24, comprising performance guarantee and frozen cash.
+- Trading financial assets: 22,473,173.20; notes identify wealth-management products 20,031,520.44 and performance compensation 2,441,652.76.
+- Receivables: accounts receivable carrying value 348,365,526.82; contract assets 12,947,492.62. Audit key matter states gross accounts receivable 506,875,681.54. Credit impairment loss was 61,676,634.51.
+- Contract liabilities: 522,753,067.70, mainly prepaid residential heat 334,516,546.46, non-residential heat 69,632,843.14, and energy-saving renovation projects 101,199,423.22.
+- Interest-bearing and lease debt:
+  short-term borrowing 7,716,140.44
+  current portion of long-term borrowing 2,729,750.79
+  long-term borrowing 40,845,319.02
+  current lease liability 2,100,294.11
+  long-term lease liability 5,687,223.74
+  total = 59,078,728.10
+
+[owner earnback calculation]
+Cash breakdown:
+- cash equivalents: 909,280,088.79 * 85% = 772,888,075.47
+- trading financial assets: 22,473,173.20 * 80% = 17,978,538.56
+- less all borrowing and lease debt: -59,078,728.10
+- long-term equity/instrument investments: 60,552,976.02 * 0% = 0
+- discounted detachable net cash = 731,787,885.93
+- net cash / market cap = 731,787,885.93 / 3,822,000,000 = 19.1467%
+
+Cash-profit normalization:
+- reference 1: 2025 parent net profit 134,413,221.62
+- reference 2: 2025 operating FCF 153,329,180.88
+- reference 3: 2024 operating FCF 28,090,726.44
+- normalized pre-haircut cash profit judgment: 110,000,000
+- uncertainty haircut for receivable impairment, seasonality, expansion capex, and cash-flow volatility: -10,000,000
+- discounted sustainable distributable cash profit: 100,000,000
+
+Formula outputs:
+- operating business price = 3,822,000,000 - 731,787,885.93 = 3,090,212,114.07
+- owner earnback years = 3,090,212,114.07 / 100,000,000 = 30.9021
+- market-cap-to-cash-profit = 3,822,000,000 / 100,000,000 = 38.22
+
+[dividend]
+- 2025 interim dividend implemented: 31,362,535.20
+- 2025 year-end proposal: 39,203,169.00
+- full-year total: 70,565,704.20
+- disclosed payout ratio: 52.50% of 2025 parent net profit
+- baseline forecast dividend yield = 70,565,704.20 / 3,822,000,000 = 1.8463%
+- This is a baseline extrapolation of the latest complete year's distribution, not 2026 company guidance.
+
+[quality limitations]
+- Market cap and PE TTM were accepted from the task input and not independently refreshed.
+- Sustainable cash profit and forward dividend are analytical estimates, clearly separated from reported facts.
+- No verifiable nationwide market-share statistic was found in the annual report; no nationwide leadership claim was made.

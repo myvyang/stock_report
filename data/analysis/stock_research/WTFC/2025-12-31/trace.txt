@@ -1,0 +1,62 @@
+WTFC stock research trace
+generated_at=2026-08-05T02:52:52+08:00
+period=2025-12-31
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- Expected annual facts, normalized facts, filing metadata, and prior research paths did not exist in /workspace/stock_report.
+- Returned to the primary filing as required by the data-reuse policy.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized from supplied company and market data.
+
+4. Primary sources reviewed
+- Wintrust Financial Corporation 2025 Form 10-K, SEC accession 0001015328-26-000007, filed 2026-02-26.
+  URL: https://www.sec.gov/Archives/edgar/data/1015328/000101532826000007/wtfc-20251231.htm
+- Wintrust Q4/FY2025 earnings release, SEC Exhibit 99.1, dated 2026-01-20.
+  URL: https://www.sec.gov/Archives/edgar/data/1015328/000101532826000004/q4-2025exhibit991.htm
+- Federal Reserve H.10 release dated 2025-12-29; USD/CNY observation 7.0063 for 2025-12-26.
+  URL: https://www.federalreserve.gov/releases/h10/20251229/
+- config/input.json market cap and PE, sourced there to Yahoo Finance yfinance.
+
+5. Model decision
+- Input hint ordinary_operating/applicable rejected.
+- Filing identifies Wintrust as a financial holding company and bank operator.
+- Set statement_model=financial_bank and owner_earnback_applicability=requires_special_model.
+- All ordinary owner earnback values and ratios intentionally retained as null.
+
+6. Currency convention
+- Contract requires absolute CNY yuan.
+- Filing USD values multiplied by 7.0063 CNY/USD.
+- Ratios remain based on original USD figures.
+
+7. Key extracted facts (USD)
+- Total assets 71,142.046m; liabilities 63,883.331m; equity 7,258.715m.
+- Net loans 52,725.818m; deposits 57,717.191m; AFS+HTM securities 9,580.168m.
+- Net income 823.844m; net income applicable to common shares 774.154m.
+- Net interest income 2,224.052m; non-interest income 501.940m; provision 95.553m.
+- NIM 3.52%; ROA 1.23%; ROCE 12.13%; ROTCE 14.43%; efficiency ratio 55.64%.
+- NPL 185.808m and 0.35% of loans; allowance for loan losses 379.283m; net charge-offs 72.3m.
+- CET1 10.3%; Tier 1 capital 11.0%; total capital 12.4%; leverage 9.6%.
+- 2025 common dividend $2.00/share; January 2026 quarterly declaration $0.55/share.
+
+8. Dividend forecast
+- Annualized announced dividend: $0.55 x 4 x 66.975m shares = $147.345m.
+- Converted forecast dividend: CNY 1,032,343,273.50.
+- Forecast dividend yield: 1,032,343,273.50 / 72,620,874,558.93164 = 0.014215516953906365.
+
+9. Protocol population
+- Used protocol set and append commands to populate result fields and evidence.
+- Did not construct result.json manually.
+
+10. Validation
+- Final protocol validation command and outcome recorded after file generation.
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Outcome: status=ok, errors=[]
+- jq syntax check: passed.

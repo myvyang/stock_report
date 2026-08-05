@@ -1,0 +1,93 @@
+task=stock_research
+company=横店东磁
+code=002056.SZ
+period=2025-12-31
+generated_for_input=2026-07-31T15:37:18+08:00
+
+[protocol]
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+population=all top-level research sections were written through protocol set commands; result.json was not authored from a blank object
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validate_status=ok
+validate_errors=[]
+
+[source_1]
+type=official_filing
+name=横店集团东磁股份有限公司2025年年度报告
+publisher=巨潮资讯网
+url=https://static.cninfo.com.cn/finalpage/2026-03-28/1225044458.PDF
+local_path=stock_report/data/raw/filings/002056.SZ/2025-12-31/annual-report.pdf
+sha256=8076c0e60cacd697a818c20f77249c938cd2075b9d2602a115869c1fe00506d5
+used_for=company identity; business model; segment revenue and cost; three statements; asset restrictions; dividend proposal; risks
+
+[source_2]
+type=reused_official_filing_review
+name=2025年度ROIC核对结果
+local_path=stock_report/data/analysis/annual_review/002056.SZ/2025-12-31/result.json
+used_for=official filing verification; financing debt components; cash-equivalent and restricted-fund interpretation; operating FCF cross-check
+
+[source_3]
+type=market_snapshot
+name=Tencent qt.gtimg.cn
+local_path=config/input.json
+snapshot_time=20260731114312
+market_cap=34421000000
+pe_ttm=19.35
+limitation=provided snapshot was used as instructed and was not independently reconciled to an exchange closing price
+
+[financial_formulas]
+revenue=22586366921.57
+cost_of_sales=18562434994.47
+gross_profit=revenue-cost_of_sales=4023931927.10
+gross_margin=gross_profit/revenue=0.1781575558863847
+parent_net_profit=1851179463.16
+net_margin=parent_net_profit/revenue=0.08196003675970225
+operating_cash_flow=3258111466.45
+capital_expenditure=1428766763.70
+operating_free_cash_flow=operating_cash_flow-capital_expenditure=1829344702.75
+
+[analysis_model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Revenue comes from manufacturing and selling photovoltaic, magnetic-material/device and lithium-battery products. Inventory, receivables, fixed assets and supplier credit form the operating cycle. There are no customer deposits, insurance reserves or similar balance-sheet items that make the balance sheet itself the product.
+
+[detachable_cash]
+cash_and_cash_equivalents=3314909637.30
+necessary_cash_basis=25% of annual operating cash outflows
+necessary_cash=5172731896.8425
+excess_cash=max(cash_and_cash_equivalents-necessary_cash,0)=0
+non_cce_monetary_funds=5971272473.09
+non_cce_treatment=0 discounted value because deposits, pledged deposits, guarantees and frozen funds lack sufficient evidence of immediate detachability
+financing_and_lease_debt=2633707770.67
+discounted_detachable_net_cash=0-2633707770.67=-2633707770.67
+
+[cash_profit]
+starting_operating_fcf=1829344702.75
+inventory_cash_effect=-2219327225.23
+operating_receivable_cash_effect=-543386421.69
+operating_payable_cash_effect=2975418647.78
+net_working_capital_release=212705000.86
+cash_profit_before_safety_discount=1829344702.75-212705000.86=1616639701.89
+safety_discount=10%
+discounted_sustainable_cash_profit=1454975731.701
+limitation=maintenance capex is not separately disclosed; all long-asset purchase cash outflow was deducted
+
+[owner_earnback]
+market_cap=34421000000
+discounted_detachable_net_cash=-2633707770.67
+operating_business_price=market_cap-discounted_detachable_net_cash=37054707770.67
+owner_earnback_years=operating_business_price/discounted_sustainable_cash_profit=25.4675778869
+market_cap_to_cash_profit=market_cap/discounted_sustainable_cash_profit=23.6574392617
+
+[dividend]
+forecast_cash_dividend=960801897.60
+basis=2025 annual distribution proposal, CNY 6.00 per 10 shares on 1601336496 eligible shares
+forecast_dividend_yield=forecast_cash_dividend/market_cap=0.027913247656953605
+status=board-approved proposal disclosed in annual report; implementation amount may change with eligible share count and approvals
+
+[quality]
+status=complete
+core_financial_source=official annual report
+sorting_fields=complete
+evidence_count=6
+known_limitations=market snapshot not independently verified; working-capital adjustment uses aggregate cash-flow reconciliation; maintenance and growth capex cannot be separated; annual dividend is a proposal

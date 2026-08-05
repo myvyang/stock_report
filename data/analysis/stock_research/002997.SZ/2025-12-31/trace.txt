@@ -1,0 +1,98 @@
+stock-research trace
+company=瑞鹄汽车模具股份有限公司
+code=002997.SZ
+period=2025-12-31
+generated_at=2026-07-31T15:36:10+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar fields with protocol set and array fields with protocol append through outputs/build_result.sh.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: {"status":"ok","errors":[]}
+
+[reuse audit]
+- Expected annual facts:
+  stock_report/data/analysis/annual_review/002997.SZ/2025-12-31/facts.json
+  Not present.
+- Expected normalized facts:
+  stock_report/data/normalized/facts/002997.SZ/2025-12-31/annual-facts.json
+  Not present.
+- Expected previous stock research result:
+  stock_report/data/analysis/stock_research/002997.SZ/2025-12-31/result.json
+  Not present.
+- Only stock_report/data/notes/user_stock_evaluations.md existed locally; it did not contain a reusable company fact pack.
+
+[primary source]
+深圳证券交易所：
+《瑞鹄汽车模具股份有限公司向不特定对象发行可转换公司债券募集说明书》
+published=2026-06
+url=https://reportdocs.static.szse.cn/UpFiles/rasinfodisc1/202606/RAS_202606_0916459453CCC512BC4ECF922D00A917FE9BB5.pdf
+local research copy=/tmp/rayhoo/prospectus.pdf
+extracted text=/tmp/rayhoo/prospectus.txt
+
+The prospectus states that its 2025 financial data are taken from audited financial
+statements and identifies the 2025 audit report as 容诚审字[2026]241Z0004号 with
+a standard unqualified opinion.
+
+[source locations]
+- PDF pages 5-7: 2023-2025 dividends and 2025 distribution proposal.
+- PDF pages 8-10: business description, related-party sales, customer concentration and risks.
+- PDF pages 91-96: industry barriers, upstream/downstream economics and industry context.
+- PDF pages 159-163: audited consolidated balance sheet, income statement and cash flow statement.
+- PDF pages 169-195: cash, financial assets, receivables, inventory, fixed assets, contract liabilities and debt analysis.
+- PDF pages 196-200: segment revenue, cost, gross profit and margin.
+- PDF pages 208-209: cash-flow analysis and capital expenditure.
+
+[market source]
+market_cap=5507000000
+market_cap_date=20260731114309
+market_cap_source=Tencent qt.gtimg.cn
+pe_ttm=13.73
+source=config/input.json
+
+[calculations]
+gross_profit=3292241789.86-2496754536.10=795487253.76
+gross_margin=795487253.76/3292241789.86=0.2416247969
+net_margin=391820868.38/3292241789.86=0.1190133937
+operating_free_cash_flow=518894493.29-194401047.83=324493445.46
+
+minority allocation proxy:
+parent_share=391820868.38/455355654.97=0.8604721696
+parent_attributed_fcf=324493445.46*0.8604721696=279217022.82
+sustainability_discount=10%
+discounted_sustainable_cash_profit=279217022.82*0.90=251295821.14
+
+discounted detachable cash:
+cash_equivalents=789216303.33*30%=236764891.00
+trading_financial_assets=90421313.54*80%=72337050.83
+debt_investments=(353781011.08+75813232.88)*80%=343675395.17
+interest_and_lease_debt=
+  82947624.39+44544548.52+217979371.20+6062357.96
+  =351533902.07
+discounted_net_cash=
+  236764891.00+72337050.83+343675395.17-351533902.07
+  =301243434.93
+
+operating_business_price=5507000000-301243434.93=5205756565.07
+owner_earnback_years=5205756565.07/251295821.14=20.7157
+market_cap_to_cash_profit=5507000000/251295821.14=21.9144
+discounted_net_cash_to_market_cap=301243434.93/5507000000=0.0547019
+
+forecast_cash_dividend=94194596.25
+forecast_dividend_yield=94194596.25/5507000000=0.0171045
+
+[judgment boundaries]
+- statement_model=ordinary_operating because the company manufactures and sells
+  automotive production equipment and components. It is not a financial institution,
+  property developer, construction contractor, concession operator or investment holding
+  platform.
+- Ordinary owner earnback is applicable, but cash receives a severe discount because
+  customer advances and long-cycle work in progress are integral to operations.
+- Cash-equivalent discount (30%), financial-asset discount (80%), minority allocation
+  proxy and 10% sustainability discount are analyst judgments, explicitly separated from
+  reported facts in result.json and report.md.
+- No buy/sell recommendation, target price or ranking label is produced.

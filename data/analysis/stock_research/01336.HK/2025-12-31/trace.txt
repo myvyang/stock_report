@@ -1,0 +1,72 @@
+stock-research trace
+company: 01336.HK / New China Life Insurance Company Ltd. (NCI, 新华保险)
+period: 2025-12-31
+generated_at: 2026-08-03T12:39:22+08:00
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because no annual facts were present and reuse boundaries were relevant.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated scalar fields with protocol `set` and array records with protocol `append`; did not hand-write the JSON object.
+
+2. Local reuse audit
+- Checked stock_report/data/analysis/annual_review/01336.HK/2025-12-31 and stock_report/data/raw/filings/01336.HK/2025-12-31.
+- No annual facts, normalized facts, metadata, filing, or prior stock-research output was available locally or at the supplied sync target.
+- Therefore retrieved official public disclosure rather than fabricating or extrapolating a facts pack.
+
+3. Source hierarchy
+- Primary filing: NCI Annual Report 2025, HKEX, published 2026-04-09:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0409/2026040900722.pdf
+- Primary results disclosure: NCI audited results for year ended 2025-12-31, company/HKEX, published 2026-03-27:
+  https://static-cdn.newchinalife.com/ncl/pdf/20260327/e9dc5449-3de7-4e2c-936c-05c0bd47464e.pdf
+- Valuation input: config/input.json; Tencent qt.gtimg.cn snapshot dated 2026/07/31 16:08:45.
+- Search engines and third-party filing pages were used only to locate official documents, not as the source of core financial figures.
+
+4. Model determination
+- Input hint said financial_brokerage, but source tags and the annual report identify a nationwide life insurer.
+- Overrode statement_model to financial_insurance.
+- owner_earnback_applicability remains requires_special_model.
+- Rationale: financial investments, deposits and cash support insurance contract liabilities and regulatory capital. They are not detachable cash. Ordinary discounted-net-cash, cash-profit, operating-business-price and payback fields remain null.
+
+5. Key extracted facts (annual report amounts converted from RMB million to absolute RMB)
+- Total assets: 1,899,484m -> 1,899,484,000,000.
+- Total liabilities: 1,787,906m -> 1,787,906,000,000.
+- Total equity: 111,578m -> 111,578,000,000.
+- Parent equity: 111,544m -> 111,544,000,000.
+- Non-controlling interests: 34m -> 34,000,000.
+- Total revenue: 155,551m -> 155,551,000,000.
+- Net profit: 36,289m -> 36,289,000,000.
+- Parent net profit: 36,284m -> 36,284,000,000.
+- Operating cash flow: 110,916m -> 110,916,000,000.
+- Purchases of PPE, intangible and other assets: 1,482m -> 1,482,000,000.
+- Financing cash flow: 3,739m -> 3,739,000,000.
+- Dividends paid in cash-flow/equity statement: 8,298m -> 8,298,000,000.
+- GWP: 195,871m; NBV: 9,842m; embedded value: 287,840m.
+- Insurance contract liabilities: 1,532,638m; CSM: 181,723m.
+- Total/net/comprehensive investment yields: 6.6% / 2.8% / 5.0%.
+- Core/comprehensive solvency ratios: 135.11% / 210.47%.
+
+6. Derived fields
+- net_margin = parent net profit / total revenue
+  = 36,284,000,000 / 155,551,000,000
+  = 0.23326111693271018.
+- forecast dividend basis = disclosed total 2025 cash dividends of 8,516,000,000, including interim dividend and proposed final dividend.
+- forecast_dividend_yield = 8,516,000,000 / 129,785,951,257.20084
+  = 0.06561573049708269.
+- minority_interest_ratio = 34,000,000 / 111,578,000,000
+  = 0.0003047195683736937.
+- Gross margin is null: IFRS 17 insurer reporting has no ordinary comparable cost-of-sales/gross-profit measure.
+- Operating free cash flow is null: premium inflows and insurance liability growth make ordinary OCF-minus-capex economically misleading.
+
+7. Data-quality judgments
+- status set to complete because identity, period, valuation, special model, core balance-sheet/profit figures, dividend basis, asset/liability explanations, operating story and primary evidence are present.
+- Market-cap and PE snapshot were supplied by the task and not independently exchange-verified.
+- 2025 disclosed dividend is used as the latest verifiable distribution baseline, not a guaranteed 2026 dividend.
+- No official, directly comparable market-share series was obtained; no quantitative industry ranking was asserted.
+
+8. Validation
+- Command run after population:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}.

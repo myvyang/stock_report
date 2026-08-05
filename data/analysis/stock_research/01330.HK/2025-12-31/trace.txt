@@ -1,0 +1,54 @@
+task=stock_research
+company=01330.HK DYNAGREEN ENV / 绿色动力环保集团股份有限公司
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-03T16:30:15+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated the initialized skeleton through protocol set commands; no complex JSON was written from scratch.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse_check]
+Checked the input-declared local annual facts, normalized facts, raw filing metadata, and prior stock-research paths.
+No 01330.HK files existed in /workspace/stock_report or /root/aicode/stock_report, so no prior facts could be reused.
+
+[official_sources]
+Primary filing: Dynagreen Environmental Protection Group Co., Ltd. Annual Report 2025, published on HKEX 2026-04-13.
+URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0413/2026041300390.pdf
+Pages used:
+- p.13: principal business, BOT concession model, 25-30 year period, transfer at expiry, 37 operating projects, 40,300 t/day, 857MW.
+- p.21: 2025 operating volumes and year-on-year changes.
+- pp.38-40: asset changes, receivable settlement, pledged assets.
+- p.92: 2025 interim and proposed final dividends.
+- pp.165-166: consolidated balance sheet.
+- pp.169-172: consolidated income and cash-flow statements.
+- p.228: receivable composition and impairment allowance.
+- pp.262-264: dividend history and revenue breakdown.
+- pp.267-268: credit and asset impairment losses.
+Market snapshot: config/input.json, Tencent qt.gtimg.cn, timestamp 2026/07/31 16:08:42.
+
+[model_review]
+Input hint financial_brokerage was rejected after filing review.
+Confirmed statement_model=utility_concession.
+Confirmed owner_earnback_applicability=requires_special_model because concession rights, project receivables, pledged assets, and project financing are economically linked.
+All ordinary owner-earnback sortable fields remain null per result contract.
+
+[calculations]
+gross_profit = 3,533,559,874.91 - 1,884,532,911.03 = 1,649,026,963.88
+gross_margin = 1,649,026,963.88 / 3,533,559,874.91 = 0.4666758233
+net_margin = 617,500,625.79 / 3,533,559,874.91 = 0.1747531237
+operating_free_cash_flow = 1,845,911,667.47 - 261,284,433.20 = 1,584,627,234.27
+forecast_cash_dividend = 454,073,970.00 (company-disclosed annual total; component estimates of 139,345,400.00 and 314,728,600.00 differ by RMB30 because each used its applicable registration-date share base/rounding)
+forecast_dividend_yield = 454,073,970.00 / 6,855,180,143.716335 = 0.0662380799
+interest-bearing debt proxy = 293,188,903.61 + 883,247,351.44 + 7,246,754,307.83 + 2,915,661,242.30 = 11,338,851,805.18
+
+[quality]
+status=complete under the special-model minimum threshold.
+Limitation: project-level remaining concession lives, maintenance capex, debt amortization, and upstreamable cash were unavailable; no special-model payback number was fabricated.
+Limitation: market snapshot was supplied by the task and not independently reverified.
+Limitation: proposed final dividend was pending shareholder approval at filing date.

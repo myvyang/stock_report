@@ -1,0 +1,68 @@
+Stock research trace — KT Corporation — FY2025
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked configured raw filing, annual review, and normalized facts paths.
+- No KT filing/facts package existed in the workspace; only config/input.json and the user notes file existed.
+- Downloaded the official SEC FY2025 20-F to stock_report/data/raw/filings/KT/2025-12-31/kt-20251231.htm and generated a plain-text extraction alongside it for local searching.
+
+3. Primary sources
+- SEC Form 20-F, accession 0001628280-26-028096, filed 2026-04-29, period 2025-12-31:
+  https://www.sec.gov/Archives/edgar/data/892450/000162828026028096/kt-20251231.htm
+  Used for company identity, business model, market shares, risks, all three statements, Notes 7/16/32/35, shares outstanding, and capex outlook.
+- KT 44th AGM results, 2026-03-31:
+  https://corp.kt.com/eng/html/intro/gov/meeting.html
+  Used for FY2025 DPS KRW 2,400 and total cash dividend KRW 580,955 million.
+- KT 1Q26 earnings presentation, 2026-05-12:
+  https://corp.kt.com/attach/record/2026/KT%201Q26%20PT_SCRIPT_F.pdf
+  Used for FY2026 minimum DPS KRW 2,400 and KRW 250 billion buyback/cancellation plan.
+- Industrial Bank of Korea historical exchange-rate page, 2025-12-31:
+  https://global.ibk.co.kr/en/services/ExchangeRate/CNY?dt=2025.12.31
+  Used transaction standard rate: CNY 1 = KRW 207.30.
+- config/input.json supplied valuation snapshot: CNY 58,138,133,102.21777 market cap, 2026-08-03, Yahoo Finance yfinance, PE TTM 8.260274.
+
+4. Financial extraction and conversion
+- All filing amounts were extracted in KRW millions and converted using:
+  CNY amount = KRW millions * 1,000,000 / 207.30.
+- Balance sheet: assets KRW 43,050,118m; liabilities 23,633,307m; equity 19,416,811m; parent equity 17,614,441m; NCI 1,802,370m.
+- Income statement: revenue KRW 28,253,193m; operating profit 2,528,658m; net profit 1,824,546m; parent net profit 1,718,814m.
+- Cash flow: OCF KRW 4,941,733m; PPE/investment property purchases 3,596,545m; intangible purchases 444,214m; operating FCF 900,974m; financing CF -631,456m.
+- Gross profit and cost of sales were not fabricated. KT presents operating expenses by nature and does not disclose a consolidated cost-of-sales/gross-profit subtotal under the cited IFRS statements.
+
+5. Analysis-model decision
+- Confirmed ordinary_operating/applicable because the dominant business is integrated telecommunications and ICT services supported by network assets.
+- Added special handling because consolidated results include BC Card finance operations and real-estate development. Their cash, receivables, payables, and investments cannot all be treated as detachable cash.
+
+6. Owner earnback calculations
+- Discounted detachable net cash (KRW millions):
+  cash 3,506,971 * 80%
+  + current other financial assets 1,626,982 * 50%
+  + listed FVOCI equities 2,044,789 * 50%
+  - total borrowings 10,785,572 * 100%
+  = KRW -6,144,510m = CNY -29,638,734,684.03.
+- Operating FCF in KRW millions:
+  2023 = 5,503,289 - 3,692,972 - 478,685 = 1,331,632
+  2024 = 5,065,796 - 2,909,481 - 438,653 = 1,717,662
+  2025 = 4,941,733 - 3,596,545 - 444,214 = 900,974
+  Three-year mean = 1,316,756.
+- Discounted sustainable cash profit:
+  KRW 1,316,756m * 80% sustainability factor * (17,614,441 / 19,416,811 parent-equity share)
+  = CNY 4,609,851,684.89.
+- Operating business price = market cap - discounted net cash
+  = CNY 87,776,867,786.25.
+- Owner earnback years = operating business price / discounted cash profit = 19.0411.
+- Market cap / cash profit = 12.6117.
+- Forecast dividend = KRW 2,400 * 241,095,063 shares / 207.30 = CNY 2,791,259,774.24; yield = 4.8011%.
+
+7. Protocol population and validation
+- Populated result fields exclusively through repeated protocol CLI `set` and `append` commands; the complex JSON result was not hand-written.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[].
+- data_quality.status remains partial solely because official consolidated cost of sales/gross profit is unavailable, so the ordinary-company `complete` minimum threshold cannot be met without inventing a metric.

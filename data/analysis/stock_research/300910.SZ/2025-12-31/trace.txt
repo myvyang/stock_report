@@ -1,0 +1,84 @@
+[2026-07-31 20:42:12+08:00] protocol init
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+result: initialized stock-research-result-v1 skeleton
+
+[2026-07-31] local reuse audit
+checked paths from config/input.json:
+- stock_report/data/raw/filings/300910.SZ/2025-12-31
+- stock_report/data/analysis/annual_review/300910.SZ/2025-12-31/facts.json
+- stock_report/data/normalized/facts/300910.SZ/2025-12-31/annual-facts.json
+- stock_report/data/analysis/stock_research/300910.SZ/2025-12-31/result.json
+result: no filing, annual facts, normalized facts, or prior research files found; only stock_report/data/notes/user_stock_evaluations.md existed
+
+[2026-07-31] source acquisition
+primary source: 新乡市瑞丰新材料股份有限公司2025年年度报告，公告编号2026-007
+publisher/platform: 巨潮资讯网
+published: 2026-03-21
+url: https://static.cninfo.com.cn/finalpage/2026-03-21/1225022739.PDF
+local temporary copy: /tmp/rf_research/annual.pdf
+extraction: pypdf installed in isolated /tmp/rf_research/venv; extracted 216 pages to /tmp/rf_research/annual.txt
+market source: config/input.json, Tencent qt.gtimg.cn snapshot, 2026-07-31 11:43:12, market cap CNY 11,484,000,000, PE TTM 16.85
+
+[2026-07-31] model classification
+statement_model: ordinary_operating
+owner_earnback_applicability: applicable
+reason: lubricating-oil additive manufacturing; assets and liabilities are ordinary cash/investments, working capital, production assets, operating payables, and bank debt. No bank deposits, brokerage client funds, insurance reserves, regulated presale funds, concession rights, or holding-company structure identified.
+
+[2026-07-31] audited financial extraction (CNY)
+total_assets=5,096,284,297.68
+total_liabilities=1,247,231,783.38
+total_equity=3,849,052,514.30
+parent_equity=3,821,231,317.74
+minority_interest=27,821,196.56
+revenue=3,508,343,875.06
+cost_of_sales=2,294,404,675.07
+gross_profit=1,213,939,199.99
+operating_profit=855,210,928.05
+net_profit=741,630,379.78
+parent_net_profit=736,393,118.44
+operating_cash_flow=746,801,854.96
+capital_expenditure=318,864,630.46
+operating_free_cash_flow=427,937,224.50
+financing_cash_flow=30,508,699.11
+2024 ordinary dividend paid in 2025=348,427,998.00
+
+[2026-07-31] derived ratios
+gross_margin=(3,508,343,875.06-2,294,404,675.07)/3,508,343,875.06=0.3460148843
+net_margin=736,393,118.44/3,508,343,875.06=0.2098976453
+forecast_dividend_yield=435,534,997.50/11,484,000,000=0.0379253742
+
+[2026-07-31] discounted detachable net cash
+cash_and_cash_equivalents=834,210,931.80; rate=0.95; discounted=792,500,385.21
+trading_financial_assets=906,206,500.60; rate=0.80; discounted=724,965,200.48
+interest_bearing_debt_and_leases=701,151,904.12; rate=1.00; discounted=-701,151,904.12
+discounted_detachable_net_cash=816,313,681.57
+excluded from detachable cash: restricted deposits, receivables, inventory, long-term equity investments, other non-current financial assets, fixed assets, and construction in progress
+
+[2026-07-31] sustainable cash profit judgment
+parent_net_profit=736,393,118.44
+less non_recurring_profit=68,074,888.37
+recurring_parent_profit=668,318,230.07
+2025 operating_free_cash_flow=427,937,224.50
+2024 operating_free_cash_flow=435,696,631.88-465,871,506.28=-30,174,874.40
+selected discounted_sustainable_cash_profit=500,000,000.00
+rationale: triangulated between recurring profit and current-year free cash flow, with an added discount for ongoing expansion, weak prior-year FCF, margin pressure, and required maintenance/operating capex
+
+[2026-07-31] owner earnback calculation
+operating_business_price=11,484,000,000-816,313,681.57=10,667,686,318.43
+owner_earnback_years=10,667,686,318.43/500,000,000=21.3353726369
+market_cap_to_cash_profit=11,484,000,000/500,000,000=22.968
+
+[2026-07-31] dividend forecast
+basis: 2025 annual profit distribution plan, 290,356,665 eligible shares, CNY 15 per 10 shares
+forecast_cash_dividend=435,534,997.50
+status at annual-report date: subject to annual shareholders meeting approval
+
+[2026-07-31] result population
+method: initialized protocol skeleton populated by deterministic jq transformation; result was not handwritten from a blank JSON object
+
+[2026-07-31] protocol validation
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+result: {"status":"ok","errors":[]}
+
+[2026-07-31] final consistency check
+result: protocol validation passed; gross profit, free cash flow, operating business price, and earnback formulas reconciled within rounding tolerance; all three required output files are non-empty

@@ -1,0 +1,66 @@
+stock-research trace
+company: Tencent Holdings Limited / 00700.HK
+period: 2025-12-31 annual
+generated_for_input: 2026-08-03T15:44:22+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read result-contract.md, report-contract.md and data-reuse.md completely.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields only through protocol set commands.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[reuse audit]
+- No pre-existing raw filing, annual facts, normalized facts or prior stock-research result existed for 00700.HK/2025-12-31.
+- Downloaded official Tencent 2025 Annual Report to stock_report/data/raw/filings/00700.HK/2025-12-31/annual-report-2025.pdf.
+- Local pdftotext was unavailable; document evidence was read from the official Tencent-hosted PDF through indexed PDF extraction.
+
+[primary sources]
+- Tencent Holdings Limited Annual Report 2025:
+  https://static.www.tencent.com/uploads/2026/04/09/62d786fcf3d3c8cb7e54791ee95439ac.pdf
+- Tencent investor announcements/results pages used to confirm publication identity and date:
+  https://www.tencent.com/en-us/investors/announcements.html
+  https://www.tencent.com/investors/results/
+- Market value, PE and timestamp: config/input.json, source labelled Tencent qt.gtimg.cn.
+
+[model verification]
+- Input hint said financial_brokerage/requires_special_model.
+- Overridden to ordinary_operating/applicable.
+- Reason: annual-report revenue segments are VAS, Marketing Services, and FinTech and Business Services. Consolidated liabilities are ordinary borrowings, notes, payables, deferred revenue, tax and lease obligations; no brokerage customer-fund/repo-financing balance-sheet model dominates the group.
+
+[core extracted facts; RMB million]
+- Revenue 751,766; cost of revenue 329,173; gross profit 422,593; operating profit 241,562; parent net profit 224,842.
+- Total assets 2,038,986; total liabilities 797,921; total equity 1,241,065; parent equity 1,154,152; NCI 86,913.
+- Operating cash flow 303,052; management-defined capex 79,198; financing cash flow -87,155.
+- Share repurchases 73,312; dividends paid to company shareholders 37,535.
+- Net cash 107,145; investment portfolio 957,219; FVOCI listed equity 323,116.
+- Share-based compensation 31,859; proposed final dividend HKD5.30/share.
+
+[calculations]
+- gross_margin = 422,593 / 751,766 = 0.5621336958574875.
+- net_margin = 224,842 / 751,766 = 0.29908508764695396.
+- operating_free_cash_flow = 303,052 - 79,198 = 223,854 million.
+- discounted_cash_profit = 223,854 - 31,859 share compensation = 191,995 million.
+- discounted_detachable_net_cash:
+  net cash 107,145 at 100%
+  + FVOCI listed equity 323,116 at 70% = 226,181.2
+  + remaining investment portfolio 634,103 at 30% = 190,230.9
+  = 523,557.1 million.
+- operating_business_price = 3,717,153,064,888.8267 - 523,557,100,000 = 3,193,595,964,888.8267 yuan.
+- owner_earnback_years = 3,193,595,964,888.8267 / 191,995,000,000 = 16.63374548758471.
+- market_cap_to_cash_profit = 19.360676397243818.
+- forecast dividend: HKD5.30 x approximately 9.14bn shares x implied HKD/CNY 0.916 ~= CNY44.4bn; yield = 0.011944625153962532.
+
+[judgment boundaries]
+- Investment haircuts are analyst assumptions, not issuer facts or liquidation quotes.
+- All management-defined capex was deducted; maintenance versus growth/AI capex cannot be reliably split.
+- Share compensation was deducted from operating FCF because cash flow adds it back but shareholders bear dilution or repurchase cost.
+- Input market cap was treated as CNY as required by the result protocol. The source's FX/share-count calculation was not independently available.
+- Dividend RMB total is estimated because the issuer proposed HKD/share rather than a CNY total.
+
+[quality]
+- data_quality.status=complete because company identity, model, three statements, asset/liability explanations, dividend estimate, owner-earnback components, business story and primary evidence are present.
+- Limitations are retained in outputs/result.json and report.md; no buy/sell advice or target price is provided.

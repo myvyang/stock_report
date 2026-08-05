@@ -1,0 +1,83 @@
+stock-research trace
+company=Tong Ren Tang Technologies Co. Ltd. / 北京同仁堂科技发展股份有限公司
+code=01666.HK
+period=2025-12-31
+generated_at=2026-08-04T13:03:04+08:00
+
+[protocol]
+init: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+result: ok
+populate: all fields were written with protocol set/append commands; result.json was not composed by hand from a blank object
+validate: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validate_result: {"status":"ok","errors":[]}
+
+[model_check]
+input_hint=financial_brokerage / requires_special_model
+resolved_model=ordinary_operating / applicable
+reason=Annual report note 1 identifies the principal business as manufacturing and sale of Chinese medicine. Balance sheet contains ordinary production assets, inventory, receivables, deposits and borrowings; no brokerage client money or securities-dealer balance-sheet structure.
+
+[primary_sources]
+1. HKEX Annual Report 2025, published 2026-04-27
+   url=https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042700900.pdf
+   used_pages=2,8,13-20,25-26,129-138,150,159-160,166,171-174,191-198,207-209,217-218
+   local_copy=stock_report/data/raw/filings/01666.HK/2025-12-31/annual-report-2025.pdf
+2. HKEX updated final dividend announcement, published 2026-06-12
+   url=https://www.hkexnews.hk/listedco/listconews/sehk/2026/0612/2026061200934.pdf
+3. HKEX issuer title search / post-balance-sheet disclosure index
+   url=https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=49339
+   note=Shows 2026-07-14 inside-information announcement concerning an application to dissolve a subsidiary; financial effect was not quantified in this research.
+4. Tencent qt.gtimg.cn market snapshot supplied in config/input.json
+   timestamp=2026/08/03 09:46:00
+   market_cap_cny=3856501242.092848
+   pe_ttm=10.22
+
+[reported_facts_cny]
+revenue=6483875000
+cost_of_sales=4018368000
+gross_profit=2465507000
+operating_profit=802140000
+net_profit=660634000
+parent_net_profit=396277000
+total_assets=13710811000
+total_liabilities=3446100000
+total_equity=10264711000
+parent_equity=7340263000
+minority_interest=2924448000
+cash_and_cash_equivalents=4704271000
+term_deposits=56407000
+borrowings=1844728000
+lease_liabilities=159617000
+inventory=4547245000
+trade_and_bills_receivables=671307000
+operating_cash_flow=1562433000
+capital_expenditure=129000000
+dividend_total=230541000
+dividend_per_share=0.18
+
+[calculations]
+gross_margin=2465507000/6483875000=0.3802520869
+net_margin=396277000/6483875000=0.0611173103
+operating_free_cash_flow=1562433000-129000000=1433433000
+forecast_dividend_yield=230541000/3856501242.092848=0.0597798329
+
+TRTCM_stake=0.3805
+TRTCM_cash=2012326000
+equity_adjusted_cash=(4704271000+56407000-2012326000)+(2012326000*0.3805)=3514042043
+discounted_cash=3514042043*0.70=2459828430.10
+discounted_detachable_net_cash=2459828430.10-1844728000-159617000=455484430.10
+
+sustainable_cash_profit_start=396277000
+prudential_adjustment=-66277000
+discounted_sustainable_cash_profit=330000000
+reason=Revenue fell 10.69%, parent profit fell 24.06%, consolidated OCF included large working-capital release and is not wholly attributable to parent shareholders.
+
+operating_business_price=3856501242.092848-455484430.10=3401016811.992848
+owner_earnback_years=3401016811.992848/330000000=10.3061115515
+market_cap_to_cash_profit=3856501242.092848/330000000=11.6863674003
+discounted_net_cash_to_market_cap=455484430.10/3856501242.092848=0.1181082026
+
+[limitations]
+- Market capitalisation is an input market-data snapshot, not a filing value.
+- TRTCM term deposits and debt were not separately identified. The calculation adjusts known TRTCM cash by the 38.05% economic stake, then deducts all consolidated borrowings and lease liabilities, which is deliberately conservative.
+- Sustainable cash profit is an analyst scenario, not company guidance.
+- The potential effect of the July 2026 subsidiary dissolution application is unquantified.

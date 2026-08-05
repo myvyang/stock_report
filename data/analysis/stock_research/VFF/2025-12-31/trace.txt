@@ -1,0 +1,68 @@
+stock-research trace
+task: VFF annual research, period 2025-12-31
+generated_at: 2026-08-04T14:53:07+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar and structured fields with repeated protocol set commands; the result was not authored as a complex JSON object from scratch.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[reuse check]
+- Checked configured annual review, normalized facts, raw filing metadata and prior stock-research paths.
+- No reusable VFF 2025 facts package, raw filing or prior result was present in the workspace; only config/input.json was available.
+
+[primary sources]
+1. SEC Form 10-K, accession 0001193125-26-104189, filed 2026-03-12, period 2025-12-31.
+   URL: https://www.sec.gov/Archives/edgar/data/1584549/000119312526104189/vff-20251231.htm
+   Used for company identity, business model, three statements, debt, discontinued operations, assets, cash flow and risks.
+2. SEC company facts API, CIK 0001584549.
+   URL: https://data.sec.gov/api/xbrl/companyfacts/CIK0001584549.json
+   Used to cross-check XBRL values and statement periods.
+3. Village Farms FY2025 results release, 2026-03-12.
+   URL: https://news.villagefarms.com/news-releases/news-release-details/village-farms-delivers-record-full-year-2025-profitability
+   Used for segment performance, expansion status and company-described market position.
+4. State Administration of Foreign Exchange RMB central parity query, date 2026-08-03.
+   URL: https://www.safe.gov.cn/AppStructured/hlw/RMBQuery.do?startDate=2026-08-03&endDate=2026-08-03
+   USD column: 678.98 per USD 100; conversion used: USD 1 = CNY 6.7898.
+5. Market cap and PE: config/input.json, sourced there to Yahoo Finance yfinance, date 2026-08-03.
+
+[key USD facts from 10-K]
+- Continuing revenue: 215,937,000
+- Cost of sales: 128,255,000
+- Gross profit: 87,682,000
+- Parent net income, total: 32,441,000
+- Parent income from continuing operations: 20,988,000
+- Discontinued operations income: 11,117,000
+- Continuing operating cash flow: 58,112,000
+- Capital expenditure: 18,219,000
+- Cash and equivalents: 81,189,000
+- Restricted cash: 5,063,000
+- Long-term debt including current portion: 33,654,000
+- Total assets: 423,096,000
+- Total liabilities: 113,034,000
+- Shareholders' equity: 299,898,000
+- Redeemable noncontrolling/mezzanine equity: 10,164,000
+
+[analytical calculations]
+- Gross margin = 87.682 / 215.937 = 40.6054%.
+- Net margin displayed = total parent net income 32.441 / revenue 215.937 = 15.0234%; report explicitly notes the discontinued-operation distortion.
+- Discounted detachable net cash USD = 81.189 * 90% + 5.063 * 0% - 33.654 = 39.4161 million.
+- Sustainable cash profit USD = continuing parent income 20.988 + D&A 16.379 - all capex 18.219 = 19.148 million.
+- Converted discounted net cash = CNY 267,627,435.78.
+- Converted sustainable cash profit = CNY 130,011,090.40.
+- Operating business price = market cap 1,578,204,459.18 - discounted net cash 267,627,435.78 = CNY 1,310,577,023.40.
+- Owner earnback = 1,310,577,023.40 / 130,011,090.40 = 10.0805 years.
+- Market cap / cash profit = 12.1390 times.
+- Dividend forecast = zero because no cash dividends were paid and no declared/stable dividend policy was identified; buybacks are described separately.
+
+[judgment boundaries]
+- analysis_model_hint was confirmed as ordinary_operating from the filing; no bank/insurance/real-estate-style operating liabilities exist.
+- 2025 discontinued produce operations were excluded from sustainable cash profit.
+- Reported free cash flow was not used as sustainable profit because working-capital movements and disposal-year effects reduce repeatability.
+- All capex was deducted because maintenance/growth capex was not precisely split; this is conservative but does not remove expansion execution risk.
+- Company market-position claims are labeled as company/third-party estimates, not regulatory facts.

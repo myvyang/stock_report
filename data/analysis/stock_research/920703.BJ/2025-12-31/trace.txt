@@ -1,0 +1,102 @@
+stock-research trace
+company: 广厦环能
+code: 920703.BJ (旧代码 873703)
+period: 2025-12-31
+generated_for: 2026-08-03 task
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md in full.
+- Read references/report-contract.md in full.
+- Read references/data-reuse.md because the skill references it for source reuse boundaries.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local source reuse check
+- Checked configured raw filing, annual review, normalized facts, and prior stock-research paths under /workspace/stock_report and /root/aicode/stock_report.
+- No company-period files for 920703.BJ/2025-12-31 were present.
+- Existing stock_report/data/notes/user_stock_evaluations.md did not supply a company fact package.
+- Conclusion: no reusable annual facts or prior result; public filing retrieval was required.
+
+3. Sources retrieved or checked
+- Company 2025 annual report, disclosed 2026-04-24, Sina disclosure mirror:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12197978&stockid=920703
+- Direct PDF exposed by the disclosure mirror:
+  http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSEBJ_STOCK/2026/2026-4/2026-04-24/12197978.PDF
+- Beijing Stock Exchange old/new code mapping:
+  https://www.bse.cn/service/code_mapping.html
+- Beijing Stock Exchange listing/company description:
+  https://www.bse.cn/issue_report_meeting/200019879.html
+- Market snapshot supplied in config/input.json:
+  Tencent qt.gtimg.cn, 2026-07-31 15:38:20, market cap CNY 1,454,000,000, PE TTM 18.72.
+
+4. Filing extraction
+- Downloaded the 139-page annual-report PDF for source retention during the run.
+- Local environment lacked pdftotext/PDF text libraries, so the full HTML filing mirror was decoded from GB18030 and converted into line-oriented text for searching.
+- Verified annual report identity: Beijing Groundsun Technology Co.Ltd., report period 2025-01-01 to 2025-12-31, Tianjian standard unqualified audit opinion.
+- Verified BSE code mapping: legacy code 873703 maps to current code 920703.
+
+5. Core extracted facts (CNY)
+- Revenue: 368,361,306.70; 2024: 540,975,730.52; YoY -31.91%.
+- Cost of sales: 211,579,654.00.
+- Gross profit: 156,781,652.70; gross margin 42.56%.
+- Operating profit: 102,809,648.71.
+- Net profit / parent net profit: 90,620,264.70; YoY -41.22%.
+- Parent net profit excluding non-recurring items: 78,526,221.12.
+- Total assets: 1,404,909,549.78.
+- Total liabilities: 275,819,409.87.
+- Total/parent equity: 1,129,090,139.91; minority interest zero.
+- Operating cash flow: 94,077,560.45.
+- Capital expenditure (cash paid to acquire long-term assets): 61,000,808.63.
+- Financing cash flow: -42,602,759.92.
+- Dividend/profit/interest cash out: 43,064,000.00.
+- Cash and cash equivalents: 105,977,309.19.
+- Term deposits: 465,000,000 in monetary funds plus 260,000,000 in other non-current assets.
+- Bill and guarantee deposits: 77,708,576.96.
+- Interest-bearing and lease liabilities used in earnback: 2,401,600 + 1,634,365.56 + 3,021,189.75.
+- Accounts receivable: gross 227,563,356.31, allowance 45,539,947.76, net 182,023,408.55.
+- Top five customers: 67.24% of revenue; Sinopec group 40.21%.
+- 2025 annual distribution proposal: CNY 0 per 10 shares.
+
+6. Formula calculations
+- Gross profit = 368,361,306.70 - 211,579,654.00 = 156,781,652.70.
+- Gross margin = 156,781,652.70 / 368,361,306.70 = 0.4256192218.
+- Net margin = 90,620,264.70 / 368,361,306.70 = 0.2460091846.
+- Operating free cash flow = 94,077,560.45 - 61,000,808.63 = 33,076,751.82.
+
+7. Analysis model decision
+- Confirmed ordinary_operating / applicable.
+- Reason: custom industrial equipment manufacturing with conventional receivables, inventory, plant, cash, payables, contract liabilities and very low financing debt. No customer deposits, insurance reserves, regulated presale cash, concession rights, or balance-sheet-as-business structure.
+
+8. Owner earnback assumptions and calculations
+- Cash equivalents: 105,977,309.19 x 100% = 105,977,309.19.
+- Term deposits: 725,000,000 x 85% = 616,250,000.00.
+  Rationale: low bank credit risk, but maturity, restricted/raised-fund usage and future capex reduce immediate detachability.
+- Bill and guarantee deposits: 77,708,576.96 x 0% = 0.
+  Rationale: operating collateral, not detachable.
+- Financing and lease liabilities: 7,057,155.31 x -100% = -7,057,155.31.
+- Discounted detachable net cash = 715,170,153.88.
+- Discounted net cash / market cap = 0.4918639298.
+- Operating business price = 1,454,000,000 - 715,170,153.88 = 738,829,846.12.
+- Sustainable profit start = parent net profit excluding non-recurring items = 78,526,221.12.
+- Sustainability haircut = 10%, because revenue fell 31.91%, customer concentration is high, and order delivery is lumpy.
+- Discounted sustainable cash profit = 78,526,221.12 x 90% = 70,673,599.008.
+- Owner earnback years = 738,829,846.12 / 70,673,599.008 = 10.4541137920.
+- Market cap / cash profit = 1,454,000,000 / 70,673,599.008 = 20.5734534594.
+
+9. Dividend forecast
+- Forecast cash dividend = 0.
+- Forecast dividend yield = 0 / 1,454,000,000 = 0.
+- Basis: the disclosed 2025 annual distribution proposal is CNY 0 per 10 shares. Historical dividend was not extrapolated over an explicit current proposal.
+
+10. Result population and validation
+- Populated leaf fields and list rows through protocol CLI set/append commands; did not hand-write result.json from scratch.
+- First completed validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- First completed validation result: status ok, errors [].
+
+11. Limitations
+- No local filing/facts package existed; the annual report was extracted from a public filing mirror and identity was cross-checked with official BSE pages.
+- The split of self-owned versus raised-fund term deposits and each deposit maturity was not fully reconstructed; 85% is an analytical haircut.
+- Sustainable cash profit uses one-year adjusted profit and a judgmental 10% haircut. Project timing makes one-year normalization uncertain.
+- The supplied market-cap snapshot was used as instructed and was not independently reconstructed from price times shares.

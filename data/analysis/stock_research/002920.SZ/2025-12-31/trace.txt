@@ -1,0 +1,50 @@
+stock-research trace
+company: 002920.SZ 德赛西威
+period: 2025-12-31 annual
+generated_for_input: 2026-08-01T01:29:12+08:00
+
+1. Read protocol and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No annual facts, normalized facts, raw filing metadata, or prior stock-research output existed in the paths supplied by config/input.json.
+- Research therefore returned to public annual-report disclosure.
+
+3. Initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result JSON was initialized from the supplied company, period, market-cap, and model-hint fields.
+
+4. Sources consulted
+- Shenzhen Stock Exchange 2025 annual report summary, announcement 2026-005:
+  https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-03-06/71f46a45-d981-420e-b12d-3ece08a37047.PDF
+- Desay SV 2025 annual report full text, announcement 2026-006, company disclosure mirrored as searchable text:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=11983521&stockid=002920
+- Company investor-relations page confirming the 2025 annual report:
+  https://www.desaysv.com/investor.html
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, 2026-07-31 11:43:39.
+
+5. Core calculations
+- gross_profit = 32,557,178,348.37 - 26,348,976,573.64 = 6,208,201,774.73
+- gross_margin = 6,208,201,774.73 / 32,557,178,348.37 = 0.1906861125
+- net_margin = 2,453,584,767.75 / 32,557,178,348.37 = 0.0753623284
+- operating_free_cash_flow = 2,883,761,178.73 - 1,802,783,345.93 = 1,080,977,832.80
+- discounted_sustainable_cash_profit = 900,000,000.00, using 2025 FCF as anchor and a 180,977,832.80 haircut for two-year volatility and continued expansion.
+- discounted_detachable_net_cash = 0.00. Cash and financial assets were not deducted because debt, operating liquidity, restrictions, and designated-use private-placement proceeds prevent evidence of freely detachable cash.
+- operating_business_price = 55,020,000,000.00 - 0 = 55,020,000,000.00
+- owner_earnback_years = 55,020,000,000.00 / 900,000,000.00 = 61.1333333333
+- forecast dividend = (596,842,634 - 2,858,773) * 1.25 = 742,479,826.25
+- forecast dividend yield = 742,479,826.25 / 55,020,000,000.00 = 0.0134947260
+
+6. Judgment boundaries
+- Facts: audited statements, product mix, margins, cash flows, balance-sheet amounts, and board dividend proposal.
+- Inference: year-end trading financial assets largely reflect private-placement proceeds because both increased alongside CNY 4.398bn financing inflow.
+- Judgment: no detachable net cash and CNY 0.9bn sustainable cash profit. Both are conservative owner-perspective assumptions, not company guidance.
+- Limitation: dividend_and_buyback_cash_out uses the statement line for dividends/profit distribution/interest and therefore includes interest.
+
+7. Protocol updates
+- All complex structures were populated through `stock_analysis.stock_research.protocol set`; result.json was not authored from a blank JSON object.
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation outcome: status=ok, errors=[]

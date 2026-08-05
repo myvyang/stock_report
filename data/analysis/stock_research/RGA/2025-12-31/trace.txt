@@ -1,0 +1,66 @@
+Stock research trace — RGA — period 2025-12-31
+Generated for task created_at: 2026-08-04T12:55:52+08:00
+
+1. Protocol and contract
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the selected skill directly routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- Searched the paths named by config/input.json.
+- No RGA raw filing, annual facts, normalized facts, or prior stock-research artifact existed under stock_report; only config/input.json was present.
+- Therefore obtained the primary filing and official company disclosures rather than inventing missing facts.
+
+3. Primary sources reviewed
+- SEC Form 10-K for year ended 2025-12-31, filed 2026-02-20:
+  https://www.sec.gov/Archives/edgar/data/898174/000089817426000006/rga-20251231.htm
+  Reviewed business model, competition/customer concentration, ratings, consolidated balance sheets, income statements, cash flows, segment note, statutory capital/dividend restrictions, and risk disclosures.
+- SEC company facts JSON was downloaded as a cross-check aid:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0000898174.json
+- RGA fourth-quarter and full-year 2025 earnings release dated 2026-02-05:
+  https://investor.rgare.com/news-releases/news-release-details/reinsurance-group-america-reports-fourth-quarter-results-16
+  Used for adjusted operating income, adjusted ROE, deployed capital, deployable capital, and current quarterly dividend declaration.
+- RGA dividend history:
+  https://investor.rgare.com/stock-information/dividend-history
+  Used to verify 2025 quarterly dividends and the two 2026 declarations at USD 0.93/share.
+- Federal Reserve H.10 release dated 2025-12-29:
+  https://www.federalreserve.gov/releases/h10/20251229/
+  Used 2025-12-26 observation of 7.0063 CNY per USD as the common display conversion rate.
+- Market capitalization, date, source and PE TTM were reused exactly from config/input.json: Yahoo Finance yfinance, 2026-08-03.
+
+4. Model determination
+- Input hint was ordinary_operating/applicable, explicitly marked as a default requiring verification.
+- Filing facts show RGA is a life and health reinsurer with asset-intensive reinsurance and investment-type products.
+- 2025 investments were USD 130.481bn versus USD 121.765bn of future policy benefits, interest-sensitive contract liabilities, market-risk benefits and other policy claims/benefits.
+- Investments and insurance liabilities are the operating system, not detachable cash and ordinary debt.
+- Overrode model to financial_insurance / requires_special_model.
+- Kept every ordinary owner-earnback field null: discounted detachable net cash, discounted sustainable cash profit, operating business price, both payback ratios, and their metrics mirrors.
+
+5. Financial extraction and conversion
+- Filing amounts are in USD millions. Every reported monetary field was multiplied by 1,000,000 and by 7.0063 to comply with the result contract's CNY absolute-yuan requirement.
+- Balance sheet: assets USD 156,590m; liabilities USD 143,039m; equity USD 13,551m; parent equity USD 13,461m; NCI USD 90m.
+- Income: revenue USD 23,698m; net income USD 1,189m; parent net income USD 1,182m.
+- Cash flow: CFO USD 4,091m; financing cash flow USD 8,798m. Capital expenditure and ordinary operating FCF kept null because investments and contract flows are integral to the insurance model; a manufacturing-style capex subtraction has no comparable meaning.
+- Gross profit and gross margin kept null because policy benefits, interest credited and insurance acquisition costs do not form a comparable sales-cost/gross-profit layer.
+- Net margin retained as parent net income / total revenue = 0.0498776268039497, with limited interpretive weight noted in report.md.
+- Balance-sheet asset and liability analysis rows reconcile to the reported totals before conversion.
+
+6. Dividend calculation
+- Forecast rate: USD 0.93 quarterly dividend x 4 = USD 3.72 per share.
+- Shares: 65,463,664 outstanding at 2025-12-31.
+- Forecast cash dividend: 3.72 x 65,463,664 x 7.0063 = CNY 1,706,208,016.99.
+- Forecast dividend yield: CNY 1,706,208,016.99 / CNY 104,707,320,279.62695 = 0.016295021326426625.
+- Historical cash dividend values use the cash-flow statement's actual USD payments: USD 240m (2025), USD 229m (2024), USD 219m (2023), converted at the common display rate.
+
+7. Data-quality judgments
+- Status set to complete because the special-model minimum fields, asset/liability explanations, business story, dividend forecast and primary evidence are present.
+- Limitations recorded: one common period-end display FX rate; market inputs reused from yfinance; no consolidated comparable RBC percentage in the public 10-K; annualized dividend is not a board commitment.
+- Facts, inferences and judgments are separated in report.md. No recommendation, target price, ranking label or unsupported certainty was added.
+
+8. Protocol operations and validation
+- outputs/result.json was populated exclusively through protocol set operations after protocol init; it was not hand-written as a complex JSON object.
+- Initial set batch failed before modifying the file because a shell variable containing an environment assignment was invoked as a command. Re-ran with a shell function; all protocol set operations then succeeded.
+- Protocol validation after population returned:
+  {"status":"ok","errors":[]}

@@ -1,0 +1,60 @@
+stock-research trace
+company=600720.SH 中交设计
+period=2025-12-31 annual
+generated_at=2026-08-01T01:53:23+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated the initialized skeleton through protocol set commands in populate_result.sh; did not construct result.json from scratch.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse audit]
+- No files existed under stock_report/data/analysis/annual_review/600720.SH/2025-12-31.
+- No prior stock research result existed under stock_report/data/analysis/stock_research/600720.SH/2025-12-31.
+- No filing metadata or normalized facts existed for this company/period.
+- Therefore primary annual-report research was required.
+
+[source acquisition]
+- Saved annual-report PDF to stock_report/data/raw/filings/600720.SH/2025-12-31/2025-annual-report.pdf.
+- Source URL: https://cniis.aastocks.com/CNSESH_STOCK/2026/2026-3/2026-03-31/12048741.pdf
+- Cross-checked searchable announcement text carrying the same announcement ID at:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12048741&stockid=600720
+- Extracted PDF text to stock_report/data/raw/filings/600720.SH/2025-12-31/2025-annual-report.txt using pypdf in an isolated temporary virtual environment because system PDF text tools were unavailable.
+- Market cap, timestamp, source, and PE were reused from config/input.json as instructed.
+
+[model decision]
+- Input hint: construction_project / requires_special_model.
+- Verified nuance: the company is predominantly engineering design, not a conventional construction contractor; 2025 design revenue was 8.434bn yuan, 77.11% of main-business revenue.
+- Revenue is recognized over time by external project milestones or cost progress.
+- Project receivable and contract-related assets (net AR + contract assets + current portion of non-current assets + long-term receivables) totaled 14.259bn yuan, 46.36% of total assets.
+- 2025 credit impairment loss was 556.48m yuan.
+- Decision: retain the closest protocol model construction_project, explain it as project-based engineering design consulting, and set ordinary owner earnback fields to null.
+
+[calculations]
+- gross_profit = 11,060,024,199.46 - 7,733,242,024.55 = 3,326,782,174.91
+- gross_margin = 3,326,782,174.91 / 11,060,024,199.46 = 0.3007933902
+- net_margin = 1,455,068,881.42 / 11,060,024,199.46 = 0.1315610938
+- operating_free_cash_flow = 352,909,958.68 - 252,220,975.16 = 100,688,983.52
+- operating_cash_flow / parent_net_profit = 0.2425383177
+- project receivable and contract-related assets = 10,825,165,052.88 + 1,351,137,799.06 + 263,619,780.32 + 1,818,583,245.68 = 14,258,505,877.94
+- project receivable and contract-related assets / total_assets = 0.4635852786
+- forecast_dividend_yield = 290,954,717.64 / 12,093,000,000 = 0.0240597633
+- 2024 dividend cash amount is an inference: 2,294,595,565 shares * 0.229 yuan/share = 525,462,384.39 yuan.
+
+[key annual-report locations]
+- Business and operating review: annual report pp. 10, 22-24.
+- Industry position: annual report pp. 19-21.
+- Dividend proposal: annual report pp. 48-50.
+- Consolidated statements: annual report pp. 90-100.
+- Accounts receivable and contract assets: annual report pp. 150-154.
+- Long-term receivables: annual report pp. 163-165.
+- Credit and asset impairment: annual report p. 198.
+
+[quality]
+- status=complete under the special-model minimum threshold.
+- Ordinary owner earnback sortable fields remain null by contract.
+- Limitations recorded in result.json: market snapshot not independently reconstructed; dividend was a proposal at report date; no unified ending backlog or customer payment-cycle dataset; special project metrics live in explanations rather than dedicated schema fields.

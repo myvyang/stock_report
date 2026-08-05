@@ -1,0 +1,72 @@
+stock-research trace
+company=603515.SH 欧普照明
+period=2025-12-31
+generated_for_input=2026-07-31T19:45:48+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields only through protocol set/append commands.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[sources reused]
+- stock_report/data/raw/filings/603515.SH/2025-12-31/annual-report.pdf
+  sha256=eee5e25ff50f3e761779fd748b5ce799e85c4377a25d9296b6cd704baf603f17
+  official_url=https://static.cninfo.com.cn/finalpage/2026-04-24/1225168937.PDF
+- stock_report/data/raw/filings/603515.SH/2025-12-31/metadata.json
+- stock_report/data/analysis/annual_review/603515.SH/2025-12-31/result.json
+- stock_report/data/analysis/annual_review/603515.SH/2025-12-31/report.md
+- config/input.json market-cap snapshot
+
+[local extraction]
+- No pdftotext/mutool parser was installed.
+- Created work/pdfenv and installed pypdf in that temporary virtual environment.
+- Extracted the local 218-page annual report to work/annual.txt for targeted read-only searches.
+- No new filing was downloaded.
+
+[key annual-report pages]
+- p7: revenue, parent net profit, operating cash flow, parent equity, total assets.
+- p10: main business and operating model.
+- p18-19: expenses, segment revenue, domestic/foreign revenue, volume.
+- p69-72: consolidated balance sheet.
+- p76-77: consolidated income statement.
+- p81-82: consolidated cash flow statement and capex.
+- p121: trading financial assets classified as investment wealth-management products.
+- p135-136: inventory composition and impairment.
+- p155: accounts payable and contract liabilities.
+- p166: revenue/cost breakdown.
+- p174-175: working-capital bridge and cash-equivalent composition.
+- p202: 2025 dividend proposal.
+
+[model decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=The company manufactures and sells lighting products and solutions; operating working capital and long-lived assets are separable from cash-management products and small financing debt. No special financial-statement model applies.
+
+[owner earnback calculations]
+required_operating_cash = 6,832,558,179.48 * 25% = 1,708,139,544.87
+excess_cash = 1,715,158,948.15 - 1,708,139,544.87 = 7,019,403.28
+discounted_wealth_management = 3,642,802,853.79 * 95% = 3,460,662,711.1005
+discounted_detachable_net_cash = 7,019,403.28 + 3,460,662,711.1005 - 27,670,999.59 = 3,440,011,114.7905
+normalized_working_capital_addback = 127,871,420.93 + 226,373,511.04 = 354,244,931.97
+pre_haircut_cash_profit = 689,874,479.51 + 354,244,931.97 - 361,984,891.21 = 682,134,520.27
+discounted_sustainable_cash_profit = 682,134,520.27 * 90% = 613,921,068.243
+operating_business_price = 12,663,000,000 - 3,440,011,114.7905 = 9,222,988,885.2095
+owner_earnback_years = 9,222,988,885.2095 / 613,921,068.243 = 15.0230858042
+market_cap_to_cash_profit = 12,663,000,000 / 613,921,068.243 = 20.6264300983
+forecast_dividend_yield = 628,986,174.75 / 12,663,000,000 = 0.04967118177
+
+[judgment boundaries]
+- 25% of annual operating cash outflow retained as required operating cash follows the reused annual ROIC fact-pack convention.
+- 95% wealth-management recovery and 90% normalized cash-profit haircut are analyst assumptions, not filing facts.
+- Working-capital normalization assumes the 2025 receivable increase and payable decrease do not recur indefinitely.
+- All 2025 capex is deducted; no expansion capex is added back.
+- Long-term equity investments, other financial assets and investment property are excluded from detachable net cash due to insufficient realization detail.
+- Dividend forecast is the board proposal, not a completed distribution.
+
+[data quality]
+status=complete
+limitations=single-year normalized cash-profit bridge; market quote from input snapshot; wealth-management redemption detail unavailable; dividend proposal pending shareholder approval.

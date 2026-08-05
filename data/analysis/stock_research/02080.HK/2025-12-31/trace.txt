@@ -1,0 +1,60 @@
+Stock research trace: 02080.HK / AUX International Holdings Limited
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md and references/data-reuse.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- Checked configured annual filing, annual review, normalized facts and prior stock-research paths.
+- No filing metadata, annual facts package, normalized facts or prior research existed for this company/period.
+- Only stock_report/data/notes/user_stock_evaluations.md existed; it did not supply the required company facts.
+
+3. Official-source retrieval
+- Located the issuer's FY2025 annual report via the issuer financial-reports page and HKEXnews title search.
+- Downloaded https://www.auxint.com/documents/2025073000715.pdf to:
+  stock_report/data/raw/filings/02080.HK/2025-12-31/annual-report-2025.pdf
+- Extracted text locally to annual-report-2025.txt for evidence checking.
+- Used PBOC 2025-04-01 central parity (1 HKD = 0.92257 CNY), nearest business-day proxy to the 2025-03-31 balance-sheet date.
+
+4. Model verification
+- Rejected input hint financial_brokerage.
+- Audited report identifies continuing segments as mainland China property management and property-management-related value-added services.
+- Classified as ordinary_operating; owner earnback applicability = applicable.
+- Treated restricted repair funds and contract liabilities according to their operating substance rather than as free cash/debt.
+
+5. Core audited facts (HK$'000 unless stated)
+- Revenue 330,625; constructed operating contribution 43,621; operating profit 43,602.
+- Continuing profit 26,470; total/parent profit 24,004.
+- Total assets 523,409; liabilities 272,690; equity attributable to parent 250,719; no NCI.
+- Operating cash flow 22,052; capex 922; operating FCF 21,130; financing cash flow -16,089.
+- Deposits and cash 376,158; restricted deposits 9,930; unrestricted deposits/cash 366,228.
+- Funding liabilities used in net-cash analysis 95,201 (related-party interest-bearing amount, shareholder loans and leases).
+- FY2025/FY2024 final dividends: nil/nil.
+- Projects 57 versus 69; contracted GFA 9.6m sqm versus 9.2m sqm.
+
+6. Currency and calculations
+- All statement amounts multiplied by 0.92257 and 1,000 to produce absolute CNY yuan.
+- Constructed gross/operating contribution = revenue minus inventory, cleaning, staff, rent, utilities, repairs and other operating expenses.
+- Gross margin = 43,621 / 330,625 = 13.1935%.
+- Net margin = 24,004 / 330,625 = 7.2602%.
+- Discounted detachable net cash = (366,228 * 70% - 95,201) * 1,000 * 0.92257 = CNY 148,680,089.60.
+- Discounted cash profit = (26,470 + 8,609 - 922 - 8,465 * 75%) * 80% * 1,000 * 0.92257 = CNY 20,524,045.76.
+- Operating business price = CNY 122,997,091.64 - CNY 148,680,089.60 = CNY -25,682,997.96.
+- Owner earnback years = -25,682,997.96 / 20,524,045.76 = -1.25136.
+- Market cap / discounted cash profit = 122,997,091.64 / 20,524,045.76 = 5.99283.
+- Forecast dividend and yield set to zero based on two consecutive nil final dividends and no established payout basis.
+
+7. Result construction and validation
+- Populated the initialized skeleton using protocol CLI set commands; did not hand-write result.json from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+
+8. Important limitations
+- Requested period is 2025-12-31, while issuer year-end is 31 March; used FY2025 ended 2025-03-31, the latest complete annual period ending before the requested cutoff.
+- Closing-rate proxy used for both balance-sheet and income/cash-flow translation; flow amounts are approximate in CNY.
+- Issuer presents expenses by nature and no statutory gross profit; reported gross margin is an explicitly constructed operating-contribution margin.
+- Market cap and PE TTM came from the supplied Tencent snapshot and were not independently reconstructed.

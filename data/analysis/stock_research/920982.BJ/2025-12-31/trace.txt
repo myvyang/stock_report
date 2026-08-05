@@ -1,0 +1,81 @@
+stock-research trace
+company=920982.BJ 锦波生物
+period=2025-12-31
+generated_for_task=2026-08-03 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because SKILL.md directly routes reuse decisions there.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated scalar/object fields with protocol `set` and list rows with protocol `append`; result.json was not authored from a blank object.
+6. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[sources inspected]
+- config/input.json
+- stock_report/data/raw/filings/920982.BJ/2025-12-31/metadata.json
+- stock_report/data/raw/filings/920982.BJ/2025-12-31/annual-report.pdf
+  official_url=https://static.cninfo.com.cn/finalpage/2026-04-29/1225267792.PDF
+  sha256=ee0581ce33133eb610e068636d8917f6f664f11819678ef435e774d8eea30888
+- stock_report/data/analysis/annual_review/920982.BJ/2025-12-31/result.json
+- stock_report/data/analysis/annual_review/920982.BJ/2025-12-31/report.md
+
+[extraction]
+- Existing annual_review files supplied detailed ROIC, cash, restricted cash, financing debt, capex and source-page checks.
+- The package did not contain the input-advertised facts.json/annual_facts.md paths, so missing stock-research fields were extracted from the same official annual-report PDF.
+- System pdftotext was unavailable. A temporary venv under /tmp/stock_research_920982 was used with pypdf to extract the 182-page PDF to temporary text. No source filing was modified.
+
+[model decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Revenue and profit arise from R&D, manufacture and sale of medical devices, skincare and raw materials. Cash, receivables, inventory, production/R&D assets and borrowings have ordinary operating-company meanings; no bank, brokerage, insurance, property-development, construction, concession or holding-company balance-sheet model was found.
+
+[key facts]
+revenue=1595372919.28
+cost_of_sales=172119657.78
+gross_profit=1423253261.50
+parent_net_profit=652128968.10
+adjusted_parent_net_profit=635506016.42
+operating_cash_flow=630002189.99
+capital_expenditure=370322228.53
+operating_free_cash_flow=259679961.46
+total_assets=2583855317.33
+total_liabilities=690125814.23
+total_equity=1893729503.10
+parent_equity=1895253856.52
+
+[owner earnback calculation]
+cash=992146971.14
+less_restricted_project_cash=126000000.00
+less_required_operating_cash=288461851.01 (25% of 2025 operating cash outflow 1153847404.03)
+add_fund_investment_after_50pct_haircut=15000000.00
+less_interest_bearing_and_lease_debt=304351634.57
+discounted_detachable_net_cash=288333485.56
+market_cap=15304000000.00
+operating_business_price=15015666514.44
+
+cash_profit_start=635506016.42 (2025 adjusted parent net profit)
+sustainability_haircut=20%
+discounted_sustainable_cash_profit=508404813.136
+owner_earnback_years=29.53486301952704
+market_cap_to_cash_profit=30.10199668567286
+
+[dividend]
+2025_annual_plan=RMB 0.50 per share
+shares=115065340
+forecast_cash_dividend=57532670.00
+forecast_dividend_yield=0.003759322399372713
+note=Plan basis, not a promise of recurring distribution.
+
+[quality and limitations]
+status=complete
+- Core financial statement facts are from the official audited annual report.
+- Market cap and PE TTM are reused from the task input's Tencent quote snapshot and were not independently re-queried.
+- Sustainable cash profit is an analyst research convention, not management guidance. The 20% haircut covers working-capital growth, uncertain maintenance capex and product/channel volatility.
+- Independent comparable market-share evidence was unavailable; company industry-position claims were qualified.
+
+[validation]
+status=ok
+errors=[]

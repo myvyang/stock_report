@@ -1,0 +1,86 @@
+stock-research execution trace
+company=LOPE / Grand Canyon Education, Inc.
+period=2025-12-31
+generated_for=2026-08-04 Asia/Shanghai
+
+1. Protocol initialization
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+result: initialized stock-research-result-v1 skeleton from task input.
+
+2. Required contracts read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+3. Reuse check
+- Checked stock_report/data/analysis/annual_review/LOPE/2025-12-31
+- Checked stock_report/data/raw/filings/LOPE/2025-12-31
+- Checked stock_report/data/normalized/facts/LOPE/2025-12-31
+- Checked stock_report/data/analysis/stock_research/LOPE/2025-12-31
+result: no LOPE filing, annual fact pack, normalized facts, or prior research output was present. Research therefore returned to primary public disclosure.
+
+4. Primary sources used
+- SEC 2025 Form 10-K, accession 0001104659-26-017047, filed 2026-02-18:
+  https://www.sec.gov/Archives/edgar/data/1434588/000110465926017047/lope-20251231x10k.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/1434588/000110465926017047/0001104659-26-017047-index.htm
+- Grand Canyon Education FY2025 results release:
+  https://investors.gce.com/news-releases/news-release-details/grand-canyon-education-inc-reports-fourth-quarter-2025-results/
+- Federal Reserve H.10 DEXCHUS via FRED:
+  https://fred.stlouisfed.org/data/DEXCHUS
+- Market cap, market date and PE TTM: config/input.json, source field Yahoo Finance yfinance.
+
+5. Model classification
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+rationale: GCE is an education services operator. Cash and marketable securities are corporate funds, not customer balances or regulated reserves. Balance sheet reports no financing debt. Operating leases match required classrooms/labs and offices and remain operating obligations rather than detachable cash offsets.
+
+6. Currency conversion
+source currency=USD
+output currency=CNY
+rate=6.9931 CNY per USD
+rate date=2025-12-31
+source=Federal Reserve Board H.10 DEXCHUS daily series via FRED
+limitation=the same period-end rate was applied to balance sheet and annual flow items for deterministic comparability.
+
+7. Key source figures (USD millions unless stated)
+2025 revenue=1,106.070
+2025 total operating costs and expenses=840.160
+2025 operating income=265.910
+2025 net income=216.170
+2025 operating cash flow=273.491
+2025 capex=34.843
+2025 operating free cash flow=238.648
+2024 operating free cash flow=252.710
+2023 operating free cash flow=199.125
+2025 total assets=992.305
+2025 total liabilities=245.372
+2025 stockholders equity=746.933
+2025 cash=111.762
+2025 investments=188.317
+2025 financing cash flow=-264.758
+2025 repurchases plus tax withholding purchases=264.758
+2025 reported cash dividends=0
+
+8. Derived metrics
+gross_margin=1.0 only as reported-presentation mapping because the issuer reports no cost-of-sales/gross-profit subtotal; this is not an economic comparable margin.
+net_margin=216.170 / 1,106.070 = 0.19543970996410714
+operating_margin=265.910 / 1,106.070 = 0.24040973898577853 (report narrative only)
+discounted cash=111.762m USD * 90%
+discounted investments=188.317m USD * 95%
+qui tam settlement reserve=35.000m USD * 100% deduction
+discounted detachable net cash=(111.762*0.90 + 188.317*0.95 - 35.000)*6.9931m CNY = 1,709,721,690.045 CNY
+three-year average FCF=(238.648+252.710+199.125)/3=230.161m USD
+discounted sustainable cash profit=230.161*90%*6.9931m CNY=1,448,585,000.19 CNY
+operating business price=25,563,397,340.441162-1,709,721,690.045=23,853,675,650.396164 CNY
+owner earnback years=23,853,675,650.396164/1,448,585,000.19=16.466880194995433
+market cap to cash profit=25,563,397,340.441162/1,448,585,000.19=17.64715038267565
+forecast cash dividend=0; forecast dividend yield=0 because issuer states it does not expect to pay cash dividends in the foreseeable future.
+
+9. Protocol population
+All result.json sections were populated using repeated protocol CLI `set` calls after initialization; the JSON was not created as a handwritten object.
+
+10. Final validation
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+initial completed-result validation: status=ok, errors=[]
+final validation is rerun after report and trace creation.

@@ -1,0 +1,64 @@
+stock-research trace
+company=00728.HK CHINA TELECOM
+period=2025-12-31
+generated_at=2026-08-03T14:25:23+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse check
+- config/input.json found.
+- Expected annual facts, normalized facts, raw filing metadata and prior stock-research outputs were absent.
+- No sufficient historical research result was available for reuse.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initial hint was financial_brokerage / requires_special_model.
+
+4. Official source acquisition
+- Downloaded official 2025 H-share annual report from:
+  https://www.chinatelecom-h.com/en/ir/report/annual2025.pdf
+- Local copy:
+  stock_report/data/raw/filings/00728.HK/2025-12-31/annual2025.pdf
+- Company official supporting pages:
+  https://www.chinatelecom-h.com/sc/ir/finhigh_keyfindata_fullyear.php
+  https://www.chinatelecom-h.com/sc/ir/faq.php
+- PDF text was extracted locally for table verification; the temporary extraction was not treated as a separate source.
+
+5. Model override
+- Financial statements and revenue note show a telecom operator: mobile, wireline/Smart Family and Industrial Digitalisation services.
+- Balance sheet is dominated by network PPE, construction in progress and right-of-use assets.
+- No brokerage client funds, proprietary securities inventory or repo financing structure was found.
+- Overrode input hint to ordinary_operating / applicable.
+
+6. Core audited facts (RMB million)
+- Revenue 529,559; operating profit 39,674; attributable profit 33,185.
+- Assets 870,644; liabilities 402,384; equity 468,260; parent equity 460,828.
+- Operating cash flow 125,069; cash-flow-statement capex 73,115; cash FCF 51,954.
+- Management disclosed capex 80,400 and FCF 44,700; used this more conservative FCF basis.
+- Cash 61,394; short-term deposits and restricted cash 38,413; current FVTPL assets 11,709.
+- Interest-bearing debt 10,023; lease liabilities 39,290.
+
+7. Key calculations (RMB yuan)
+- Proxy gross profit = 529,559m - merchandise cost of goods sold 36,719m = 492,840m.
+- Proxy gross margin = 492,840 / 529,559 = 0.9306611727871682.
+- Net margin = 33,185 / 529,559 = 0.06266534984770347.
+- Discounted detachable net cash = 50%*(61,394+38,413+11,709)m - (10,023+39,290)m = 6,445m.
+- Sustainable cash profit = 44,700m * 90% = 40,230m.
+- Operating business price = 373,149,827,496.1567 - 6,445,000,000 = 366,704,827,496.1567.
+- Owner earnback = 366,704,827,496.1567 / 40,230,000,000 = 9.11520824002378 years.
+- Market cap / cash profit = 9.275412068012843.
+- Dividend = RMB0.2720/share * 91,507m shares = 24,889,904,000.
+- Dividend yield = 24,889,904,000 / 373,149,827,496.1567 = 0.06670217206587442.
+
+8. Protocol population and validation
+- Populated result sections using protocol `set` commands; result was not handwritten from scratch.
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: none.
+
+9. Limitations
+- Gross margin is a protocol proxy because the issuer presents expenses by nature and does not report a conventional all-business cost of sales.
+- Market cap and PE TTM are the supplied Tencent snapshot and were not independently reconstructed.
+- Haircuts and sustainable cash profit are research judgments, explicitly separated from audited facts.

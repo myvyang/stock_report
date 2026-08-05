@@ -1,0 +1,68 @@
+stock-research trace v1
+company=01617.HK 南方通信控股有限公司
+period=2025-12-31
+generated_at=2026-08-04T13:18:38+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md as requested.
+3. Read references/data-reuse.md because the local reuse hierarchy was relevant.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields with repeated protocol `set` commands; the complex JSON object was not authored from a blank file.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: {"status":"ok","errors":[]}
+
+[reuse-check]
+The configured annual facts, normalized facts, filing metadata, prior research result and report did not exist in the workspace. Only config/input.json and the user evaluation note were present. Public filing retrieval was therefore required.
+
+[primary-source]
+Title: Nanfang Communication Holdings Limited Annual Report 2025
+Issuer: Nanfang Communication Holdings Limited (stock code 1617)
+Published: 2026-04-29
+URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042903081.pdf
+Local copy: stock_report/data/raw/filings/01617.HK/2025-12-31/annual-report-2025.pdf
+Use: company identity, business, audited statements, notes, dividend and risks.
+
+[market-source]
+Source: Tencent qt.gtimg.cn, supplied in config/input.json
+Timestamp: 2026/08/03 09:46:02
+Market cap: CNY 342,769,330.78587055
+PE TTM: 11.84
+No independent market-data reconciliation was performed.
+
+[model-resolution]
+Input hint: financial_brokerage / requires_special_model.
+Annual-report evidence: revenue is from manufacturing and sales of optical fibre cables, optical distribution network devices and prepainted steel sheet; balance sheet contains factories, receivables, inventory, trade payables and bank borrowings, not brokerage client money or securities financing.
+Resolved model: ordinary_operating / applicable.
+
+[key-extraction]
+Annual report p54: revenue 464,168,000; cost of sales 360,336,000; gross profit 103,832,000; parent net profit 30,390,000.
+Annual report pp55-56: total assets 1,328,498,000; total liabilities 480,124,000; parent equity 848,374,000.
+Annual report pp58-59: operating cash flow 69,305,000; purchases of PPE and ROU assets 11,956,000; financing cash flow -188,646,000.
+Annual report pp83-85: product revenue and customer concentration.
+Annual report pp100-103: receivables, deposits and bank borrowings.
+Annual report p92 note 13: no 2025 final dividend.
+
+[calculations]
+gross_margin=103832000/464168000=0.2237
+net_margin=30390000/464168000=0.06547
+operating_free_cash_flow=69305000-11956000=57349000
+three_year_average_parent_profit=(5198000+39936000+30390000)/3=25174666.67
+discounted_cash=261462000*0.70+112489000*0.80+50152000*0.70+47794000*0.00-179205000=128915200
+operating_business_price=342769330.78587055-128915200=213854130.78587055
+owner_earnback_years=213854130.78587055/25174666.67=8.4949
+market_cap_to_cash_profit=342769330.78587055/25174666.67=13.6158
+forecast_cash_dividend=0; forecast_dividend_yield=0
+
+[judgment-boundaries]
+Fact: audited financial statement amounts, product mix, customer concentration, dividend resolution.
+Inference: ordinary-operating model applicability and importance of customer bargaining power.
+Judgment: cash discounts, use of three-year average profit as sustainable cash-profit anchor, and zero forward dividend forecast.
+
+[limitations]
+- Market cap and PE were inherited from the supplied snapshot.
+- No verifiable market share was disclosed.
+- Cash discounts and normalized profit are analytical assumptions, not issuer guidance.
+- 2025 cash flow benefited materially from receivable and working-capital recovery and was not extrapolated directly.

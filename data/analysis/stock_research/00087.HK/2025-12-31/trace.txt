@@ -1,0 +1,69 @@
+task: stock research 00087.HK, period 2025-12-31
+generated_at: 2026-08-03T17:21:19+08:00
+
+protocol:
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because local fact reuse rules applied.
+4. Ran protocol init with config/input.json to create outputs/result.json.
+5. Populated fields only through protocol set/append commands.
+6. Ran protocol validate; result: {"status":"ok","errors":[]}.
+
+local reuse audit:
+- config/input.json existed.
+- stock_report/data/raw/filings/00087.HK/2025-12-31 had no filing or metadata.
+- stock_report/data/analysis/annual_review/00087.HK/2025-12-31 had no facts package.
+- no prior stock-research output was available for reuse.
+- therefore official public disclosures were retrieved.
+
+identity and model check:
+- Official filing identifies Swire Pacific Limited, stock codes 00019 and 00087.
+- Official business description identifies a Hong Kong-based international conglomerate focused on Property, Beverages and Aviation, not a brokerage.
+- Overrode input hint financial_brokerage with investment_holding.
+- owner_earnback_applicability remains requires_special_model, but for investment-holding reasons.
+- Ordinary owner earnback fields left null as required by the result contract.
+
+primary sources:
+- Swire Pacific 2025 Annual Results, published 2026-03-12:
+  https://www.swirepacific.com/storage/fm/PressRelease/pdf/en/swirepacific-annual-2025.pdf
+- Swire Pacific Key Financials:
+  https://www.swirepacific.com/en/investor-relations/our-financial-performance/key-financials
+- PBOC/CFETS 2025-12-26 central parity announcement:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026/07/31 16:08:47.
+
+source figures in HK$ million:
+- revenue 90,467; cost of sales 56,728; gross profit 33,739.
+- operating profit 4,454; net profit 3,495; parent net profit 2,938.
+- underlying parent profit 11,373; recurring underlying parent profit 9,754.
+- total assets 476,413; total liabilities 160,178; total equity 316,235; parent equity 259,577; NCI 56,658.
+- operating cash flow 14,551.
+- capex definition used: PPE and ROU purchases 5,595 + investment property additions 1,958 + intangible purchases 109 = 7,662.
+- operating free cash flow: 14,551 - 7,662 = 6,889.
+- financing cash flow -12,952.
+- dividends to company shareholders 4,602 + share repurchases 1,851 = dividend_and_buyback_cash_out 6,453.
+- year-end bank balances and short-term deposits 23,172.
+- borrowings and bonds 17,166 current + 71,270 non-current = 88,436.
+- net debt disclosed by company 65,264; gearing excluding lease liabilities 20.6%.
+
+currency conversion:
+- Result contract requires CNY absolute yuan.
+- Applied HKD/CNY 0.90486 to all financial-statement amounts for consistent display.
+- This is a simplifying period-end translation; income and cash flow were not translated at an annual average rate.
+
+derived metrics:
+- gross_margin = 33,739 / 90,467 = 0.3729426199608697.
+- net_margin = 2,938 / 90,467 = 0.032475930449777264.
+- NCI ratio = 56,658 / 316,235 = 0.17916422913339763.
+- forecast B-share dividend cash = HK$0.76 * 2,853,521,185 weighted-average B shares * 0.90486 = CNY1,962,348,256.39.
+- forecast dividend yield = CNY1,962,348,256.39 / CNY36,715,031,894.29 = 0.05344808802124758.
+
+important scope control:
+- Market cap supplied is for listed B-share class 00087, while consolidated profit/equity belongs jointly to A and B classes.
+- Did not divide B-class market cap by group profit or compare it with whole-group net assets.
+- Dividend yield is class-matched using B-share dividend and disclosed B-share weighted-average count; 2026 repurchase effects are not incorporated.
+
+final files:
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

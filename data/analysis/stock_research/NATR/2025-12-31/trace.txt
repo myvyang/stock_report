@@ -1,0 +1,59 @@
+stock-research trace — NATR — period 2025-12-31
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill requires checking reusable annual facts first.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked the configured annual-review, normalized-facts and raw-filing paths.
+- No local NATR annual facts, extraction trace, normalized facts, filing metadata or prior stock-research output existed; only config/input.json was present.
+- Therefore retrieved the official 2025 Form 10-K and company earnings release.
+
+3. Primary sources
+- SEC 2025 Form 10-K, filed 2026-03-10:
+  https://www.sec.gov/Archives/edgar/data/275053/000162828026016540/natr-20251231.htm
+- Company FY2025 results release, dated 2026-03-10:
+  https://ir.naturessunshine.com/news-events/press-releases/detail/267/natures-sunshine-reports-strong-fourth-quarter-and-full
+- Market snapshot: config/input.json; Yahoo Finance yfinance, market-cap date 2026-08-03.
+
+4. Model classification
+- Confirmed ordinary_operating/applicable.
+- Basis: product manufacturing and direct selling; ordinary inventory, receivables, PP&E, trade/channel liabilities; revolving credit balance was zero at 2025 year-end.
+- Cash is not the operating product, unlike a financial institution; no special statement model required.
+
+5. Currency normalization
+- Result contract requires CNY absolute yuan.
+- Form 10-K reports USD thousands.
+- Used 7.0 CNY/USD, the 2025-12-31 spot rate disclosed by the company for RMB translation, for all statement amounts for consistent comparison with supplied CNY market cap.
+- This is a presentation conversion, not a historical-rate restatement.
+
+6. Key reported USD figures (thousands)
+- Assets 261,146; liabilities 99,593; equity/parent equity 161,553; NCI 0.
+- Revenue 480,144; cost of sales 132,420; gross profit 347,724; operating income 24,743; net income 20,451; parent net income 19,521.
+- CFO 35,321; capex 6,480; FCF 28,841; financing cash flow -23,773; buybacks 16,309.
+- Cash 93,891; foreign-held cash 87,485; inventory 68,312; receivables 8,602; PP&E 32,915.
+
+7. Derived metrics
+- Gross margin = 347,724 / 480,144 = 0.7242077377.
+- Net margin = 19,521 / 480,144 = 0.0406565530.
+- Discounted detachable cash:
+  domestic/non-foreign cash USD 6.406m × 100% + foreign cash USD 87.485m × 60%
+  = USD 58.897m × 7.0 = CNY 412,279,000.
+- 2025 FCF = (35.321 - 6.480)m USD = 28.841m USD = CNY 201,887,000.
+- 2024 FCF = (25.298 - 10.971)m USD = 14.327m USD = CNY 100,289,000.
+- Sustainable cash profit = two-year average CNY 151,088,000 × 90% = CNY 135,979,200.
+- Operating business price = 2,391,053,765.027893 - 412,279,000 = CNY 1,978,774,765.027893.
+- Owner earnback years = 1,978,774,765.027893 / 135,979,200 = 14.5520400549.
+- Market cap / cash profit = 2,391,053,765.027893 / 135,979,200 = 17.5839669966.
+- Forecast cash dividend and yield = 0 because no regular dividend was paid/announced; buybacks kept separate.
+
+8. Output construction and validation
+- Populated outputs/result.json through protocol CLI set commands, not by hand-writing a JSON object from scratch.
+- Wrote outputs/report.md from the validated facts and explicit inference/assumption boundaries.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].

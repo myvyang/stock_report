@@ -1,0 +1,73 @@
+stock-research trace
+company: 01314.HK / Tsui Wah Holdings Limited
+task period: 2025-12-31
+audited fiscal period used: year ended 2025-03-31
+
+1. Read protocol and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- annual facts JSON/Markdown, normalized facts and raw metadata were absent.
+- downloaded official 2025 annual report PDF to:
+  stock_report/data/raw/filings/01314.HK/2025-12-31/tw_annual_2025_eng.pdf
+- official report URL:
+  https://www.tsuiwah.com/images/report/eng_report/annual/tw_annual_2025_eng.pdf
+- HKEX annual-results announcement:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2025/0627/2025062703436.pdf
+
+3. Model verification
+- input hint: financial_brokerage / requires_special_model.
+- annual report pages 33 and 59: subsidiaries principally conduct restaurant operations, food sales and catering services.
+- balance sheet pages 54-55: major items are PPE, right-of-use assets, investment properties, JV investments, cash, lease liabilities and operating payables.
+- no brokerage customer funds, proprietary securities portfolio or repo financing found.
+- conclusion: override hint with ordinary_operating / applicable.
+
+4. Core audited facts (HKD'000)
+- revenue 906,040; cost of inventories sold 234,162; company-defined gross profit 671,878.
+- profit before tax 14,690; net profit 11,379; parent net profit 12,342.
+- share of JV profits 28,392.
+- total assets 827,913; total liabilities 387,198; total equity 440,715; parent equity 464,270; NCI -23,555.
+- cash 146,578; restricted cash 2,500; lease liabilities 248,249.
+- operating cash flow 105,659; PPE capex 38,517; intangible capex 2,002.
+- lease principal paid 101,950; lease interest paid 10,386.
+- dividends received from JVs 17,650; dividends paid to shareholders 47,235; share-award purchases 10,167.
+- FY2025 attributable dividend 14,112, equal to HKD 0.01/share.
+
+5. Currency conversion
+- result contract requires CNY absolute yuan.
+- PBOC 2025-03-31 central parity: HKD 1 = CNY 0.92283.
+- audited HKD figures multiplied by 1,000 and 0.92283.
+- input market capitalization treated as already normalized CNY and not converted again.
+
+6. Calculations
+- gross margin = 671,878 / 906,040 = 74.1554%.
+- net margin = 12,342 / 906,040 = 1.3622%.
+- operating profit proxy excluding financing and equity-accounted JV profit = 14,690 + 10,471 - 28,392 = -3,231 HKD'000.
+- accounting operating FCF = CFO - PPE capex - intangible capex = 65,140 HKD'000; not used as sustainable distributable profit because IFRS 16 lease principal is in financing cash flow.
+- detachable cash base = cash 146,578 - trade payables 28,937 - other payables 83,036 - current tax payable 12,526 = 22,079 HKD'000.
+- discounted detachable cash = 22,079 * 70% * 1,000 * 0.92283 = CNY 14,262,614.499.
+- normalized cash profit before haircut (HKD'000) = parent profit 12,342 + PPE/ROU impairment 15,158 + PPE write-off 299 - early lease termination gain 5,790 - lease modification gain 262 - JV share profit 28,392 + JV dividend received 17,650 + PPE depreciation 36,430 + investment-property depreciation 3,101 + intangible amortization 599 - PPE capex 38,517 - intangible capex 2,002 = 10,739.
+- discounted sustainable cash profit = 10,739 * 80% * 1,000 * 0.92283 = CNY 7,928,217.096.
+- operating business price = CNY 228,246,194.18919083 - CNY 14,262,614.499 = CNY 213,983,579.69019082.
+- owner earnback = 213,983,579.69019082 / 7,928,217.096 = 26.99 years.
+- market cap / cash profit = 28.79 times.
+- forecast dividend uses FY2025 HKD 14,112,000 continuation case: CNY 13,022,976.96 / market cap = 5.7057%.
+
+7. Protocol commands
+- initialized with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- populated fields using protocol set commands only; complex JSON was not hand-written as a replacement file.
+- validation executed after population.
+
+8. Validation
+- command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- status: ok
+- errors: []
+
+9. Limitations
+- task period is 2025-12-31, while audited annual figures end 2025-03-31.
+- owner-earnback cash retention, JV cash substitution and profit haircut are analyst assumptions, not issuer guidance.
+- dividend forecast is a flat continuation scenario, not a company forecast.

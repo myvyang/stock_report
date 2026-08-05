@@ -1,0 +1,60 @@
+stock-research trace
+company: 603889.SH 新澳股份
+period: 2025-12-31 annual
+generated_at: 2026-08-01 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked paths supplied in config/input.json.
+- No raw filing metadata, annual facts, normalized facts, annual review, or historical stock-research result existed in the workspace for 603889.SH/2025-12-31.
+- Therefore fetched the 2025 annual report PDF disclosed on 2026-04-10 and saved it as:
+  stock_report/data/raw/filings/603889.SH/2025-12-31/2025-annual-report.pdf
+- Source discovery page: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12071691&stockid=603889
+- PDF mirror URL embedded by the disclosure page: http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESH_STOCK/2026/2026-4/2026-04-10/12071691.PDF
+- PDF properties: 215 pages; annual report identifies the Shanghai Stock Exchange filing, company code 603889, audit report 天健审〔2026〕4922号, standard unmodified opinion.
+
+3. Extraction and checks
+- Environment had no pdftotext; created temporary virtual environment /tmp/stock-pdf-env and installed pypdf for read-only extraction.
+- Identity and main figures: annual report pp. 7, 83-92.
+- Business model and industry: pp. 10-17, 24-27.
+- Assets, liabilities, restrictions: pp. 32-34, 127, 140-143, 156-164.
+- Dividend: pp. 53-54 and note on retained earnings p. 170.
+- Subsidiaries/minority interests and financial risks: pp. 187-193.
+- Cross-checks performed:
+  assets 6,383,126,555.78 = liabilities 2,332,541,469.83 + equity 4,050,585,085.95.
+  gross profit 1,008,408,670.53 = revenue 5,052,209,374.95 - cost 4,043,800,704.42.
+  operating FCF 161,044,205.10 = CFO 419,555,049.02 - capex 258,510,843.92.
+  proposed dividend yield 4.6104% = 255,555,105.05 / 5,543,000,000.
+
+4. Analysis model
+- Confirmed ordinary_operating and owner_earnback applicable.
+- Reason: wool/cashmere yarn manufacturer; inventory, receivables, plant, equipment, supplier liabilities and bank debt are ordinary operating-company items. No customer deposits, insurance reserves, regulated project cash, concession rights, or underlying investment holdings.
+
+5. Owner earnback assumptions
+- Non-restricted cash: 729,448,680.42 at 100%.
+- Large certificates of deposit: 520,438,160.14 at 95%; includes current debt investments, debt investments, and >1-year deposits in other non-current assets.
+- Restricted cash: 20,218,877.48 at 0%.
+- Bank loans plus lease liabilities: 1,598,182,428.69 deducted at 100%.
+- Discounted detachable net cash: -374,317,496.14.
+- Operating business price: market cap 5,543,000,000 - (-374,317,496.14) = 5,917,317,496.14.
+- Sustainable distributable cash profit: 360,000,000. This is an inference, not company guidance. Starting point was parent net profit 480,116,363.25; deductions reflect CFO below earnings, inventory build, and a maintenance-capex safety margin. It is above single-year reported FCF because part of working-capital build and capex is judged expansion-related, but below accounting profit.
+- Owner earnback years: 5,917,317,496.14 / 360,000,000 = 16.437.
+- Market cap / cash profit: 5,543,000,000 / 360,000,000 = 15.397.
+
+6. Protocol population and validation
+- Populated outputs/result.json exclusively through repeated protocol set commands after protocol initialization; did not hand-write the JSON skeleton.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation result: {"status":"ok","errors":[]}
+
+7. Known limitations
+- Market-cap date is 2026-07-31, seven months after the balance-sheet date.
+- No 2026 interim report was included in the supplied workspace or task inputs.
+- Sustainable cash profit is sensitive to inventory normalization, post-expansion maintenance capex, and overseas cash mobility.
+- The 2025 dividend is the annual-report proposal, not a perpetual commitment.

@@ -1,0 +1,57 @@
+stock-research trace
+company: EVA Precision Industrial Holdings Limited (00838.HK)
+period: 2025-12-31 annual
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Read skill protocol and contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Local reuse check:
+   No pre-existing 00838.HK/2025-12-31 annual facts, normalized facts, or raw filing were present.
+
+4. Official filing acquired:
+   HKEX Annual Report 2025, published 2026-04-22
+   URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0422/2026042201782.pdf
+   Saved as: stock_report/data/raw/filings/00838.HK/2025-12-31/annual-report-2025.pdf
+   Extracted text saved beside PDF as annual-report-2025.txt.
+
+5. Model verification:
+   Input hint financial_brokerage rejected. Annual report identifies sales of moulds and components across OA equipment, automotive components, and ICT. Selected ordinary_operating / applicable.
+
+6. Financial extraction (reported HK$'000):
+   Total assets 7,699,725; total liabilities 4,364,952; equity attributable to owners 3,334,773.
+   Revenue 6,027,820; cost of sales 4,681,242; gross profit 1,346,578; operating profit 363,762; parent profit 244,627.
+   Net operating cash flow 598,623; PPE purchases 507,121; operating free cash flow 91,502; financing cash flow -234,996.
+   Cash 1,597,431; restricted deposits 96,348; bank borrowings 2,163,812; lease liabilities 100,247.
+   Source: Annual Report 2025 pp.166-173 and notes.
+
+7. Currency normalization:
+   Protocol requires CNY absolute yuan. Used 1 HKD = 0.866 CNY, rounded from the 2026-07-31 historical rate shown by ValutaFX. Converted both the supplied HKD market capitalization and filing amounts using the same factor for internal comparability. This is an analytical conversion, not accounting restatement.
+
+8. Owner earnback assumptions:
+   Cash: 85% haircut; restricted deposits: 0%; FVOCI asset: 50%; bank and lease debt: deducted at 100%.
+   Discounted detachable net cash = CNY -780,809,544.90.
+   2024 operating FCF = (713,778 - 330,107) HK$'000; 2025 operating FCF = (598,623 - 507,121) HK$'000.
+   Sustainable cash profit = two-year average converted to CNY, then 25% risk haircut = CNY 154,312,431.75.
+   Operating business price = market cap - discounted net cash = CNY 1,812,177,710.40.
+   Owner earnback years = 11.7436; market cap/cash profit = 6.6836.
+
+9. Dividend:
+   2025 interim HK$40.319m plus proposed final HK$33.051m = HK$73.370m; converted forecast CNY 63.538m; yield 6.1606% on converted market cap. Proposed final dividend remained subject to approval at annual report date.
+
+10. Result population:
+    All material result fields were populated using protocol CLI set commands; JSON was not authored from scratch.
+
+11. Validation:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Initial completed result validation: status ok, errors [].
+
+12. Limitations:
+    Market cap and PE are from the supplied Tencent snapshot and were not independently reconstructed from exchange trading data.
+    Maintenance versus growth capex is not separately disclosed, so sustainable cash profit is judgmental and sensitivity is discussed in report.md.

@@ -1,0 +1,65 @@
+stock-research trace
+company: 00868.HK XINYI GLASS
+period: 2025-12-31 annual
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Instructions and contracts read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+- No existing files were found in the configured annual_review, normalized facts, or raw filing paths.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Sources acquired and used
+- Official audited annual report downloaded from:
+  https://www.xinyiglass.com/uploadfiles/2026/05/ANNUAL%20REPORT%202025.pdf
+- Local raw copy:
+  stock_report/data/raw/filings/00868.HK/2025-12-31/annual-report-2025.pdf
+- Text extraction copy:
+  stock_report/data/raw/filings/00868.HK/2025-12-31/annual-report-2025.txt
+- Market capitalization, market date/source and PE TTM reused from config/input.json.
+- Company website About Us used only for company-claimed global capacity/share context:
+  https://www.xinyiglass.com/en/company/index.aspx
+
+4. Model verification
+- Input hint financial_brokerage rejected.
+- Annual report page 69 states the group produces and sells float, automobile and architectural glass.
+- Balance sheet and segment notes show ordinary manufacturing assets and liabilities, not brokerage client funds or trading-book funding.
+- Final model: ordinary_operating; owner_earnback_applicability: applicable.
+
+5. Core audited facts (annual report, RMB'000 converted to absolute RMB)
+- Revenue 20,829,014,000; cost of sales 14,347,222,000; gross profit 6,481,792,000.
+- Operating profit 2,851,748,000; net profit 2,737,434,000; parent net profit 2,729,004,000.
+- Total assets 47,623,628,000; total liabilities 10,765,644,000; total equity 36,857,984,000; parent equity 36,808,874,000.
+- Operating cash flow 5,321,500,000; management-disclosed capex 1,431,300,000; operating FCF 3,890,200,000.
+- Cash and equivalents 2,626,042,000; long-term fixed deposits 212,000,000; pledged deposits 79,628,000.
+- Bank borrowings 4,804,172,000; lease liabilities 3,007,000.
+- FY2025 dividend 1,357,391,000 (interim 501,802,000 plus proposed final 855,589,000).
+
+6. Formula and judgment trace
+- Gross margin = 6,481,792,000 / 20,829,014,000 = 0.3111905345.
+- Net margin = 2,729,004,000 / 20,829,014,000 = 0.1310193560.
+- Operating FCF = 5,321,500,000 - 1,431,300,000 = 3,890,200,000.
+- Discounted detachable net cash = cash equivalents 2,626,042,000 * 100% + fixed deposits 212,000,000 * 95% + pledged deposits 79,628,000 * 0% - bank borrowings 4,804,172,000 - lease liabilities 3,007,000 = -1,979,737,000.
+- Discounted sustainable cash profit = 3,890,200,000 * 70% = 2,723,140,000.
+- 70% is a judgmental cyclicality/capex discount: float glass pricing weakened, 2025 capex fell from 5,124,000,000 in 2024, and year-end contracted capex commitments were 886,600,000.
+- Operating business price = market cap 35,499,075,264.95457 - (-1,979,737,000) = 37,478,812,264.95457.
+- Owner earnback years = 37,478,812,264.95457 / 2,723,140,000 = 13.7630868281.
+- Market cap / cash profit = 35,499,075,264.95457 / 2,723,140,000 = 13.0360816061.
+- Forecast dividend yield baseline = 1,357,391,000 / 35,499,075,264.95457 = 0.0382373622.
+
+7. Protocol usage
+- All structured fields were populated using repeated protocol `set` and `append` commands; the complex JSON result was not handwritten from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial validation result: status ok, errors [].
+
+8. Data limitations
+- Market snapshot was supplied by the input and not independently reconciled.
+- Sustainable cash profit is based on one year with a judgmental 70% discount, not a full-cycle average.
+- Maintenance and expansion capex were not separately quantified.
+- Company-claimed market shares were not independently verified.

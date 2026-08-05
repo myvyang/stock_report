@@ -1,55 +1,131 @@
-Run: 2026-07-27T00:54:17+08:00 stock research
-Timezone: Asia/Shanghai
-Company: 新华文轩 / 00811.HK / HK
-Period: 2025-12-31 annual
+Stock research trace — 00811.HK XINHUA WINSHARE — period 2025-12-31
+Generated: 2026-08-03 Asia/Shanghai
 
-Required instructions read:
-- /workspace/.agents/skills/stock-research/SKILL.md
-- /workspace/.agents/skills/stock-research/references/result-contract.md
-- /workspace/.agents/skills/stock-research/references/report-contract.md
-- /workspace/.agents/skills/stock-research/references/data-reuse.md
+1. Instructions and contracts read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+- /workspace/AGENTS.md instructions supplied in task context
 
-Protocol CLI usage:
-- Initialized outputs/result.json with:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- Populated outputs/result.json with repeated protocol set commands through a deterministic Python driver that called:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol set --result outputs/result.json --path <path> --json <json>
-- Validated outputs/result.json with:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-
-Local sources reused:
+2. Inputs and reused evidence
 - config/input.json
-- stock_report/data/normalized/facts/00811.HK/2025-12-31/annual-facts.json
 - stock_report/data/analysis/annual_review/00811.HK/2025-12-31/facts.json
 - stock_report/data/analysis/annual_review/00811.HK/2025-12-31/annual_facts.md
 - stock_report/data/analysis/annual_review/00811.HK/2025-12-31/extraction_trace.txt
-- stock_report/data/analysis/stock_research/00811.HK/2025-12-31/result.json
-- stock_report/data/analysis/stock_research/00811.HK/2025-12-31/report.md
-- stock_report/data/analysis/stock_research/00811.HK/2025-12-31/trace.txt
 - stock_report/data/raw/filings/00811.HK/2025-12-31/imported_from_agent_runs/357ab2a76bdc-xinhua_winshare_2025_annual_report_hkex_en.txt
+- stock_report/data/raw/filings/00811.HK/2025-12-31/imported_from_agent_runs/80a6f8b84951-xinhua_winshare_2025_annual_report_hkex_en.pdf
+- 2024 annual report files already present in the same raw filing package for comparison data
 
-Market data:
-- Market cap RMB9,903,000,000 and PE TTM 6.31 were taken from config/input.json.
-- Market cap date: 2026-07-24.
-- Market cap source: AH Note published stock payload, based on prior screening snapshot; normalized to CNY, as-of 2026-07-24 for this batch input.
+No new filing was downloaded. The annual fact pack was sufficiently detailed for the three statements, asset/liability decomposition, and three-year cash conversion. The raw 2025 annual report text was searched only to supplement and verify net profit, dividends, share capital, and investment disclosures.
 
-Core calculations:
-- Gross margin = RMB4,176,498,997.95 / RMB11,731,677,466.92 = 0.3560018598982576.
-- Net margin = RMB1,568,450,497.66 / RMB11,731,677,466.92 = 0.13369362583335462.
-- Operating free cash flow = RMB1,508,458,892.06 - RMB178,961,810.43 = RMB1,329,497,081.63.
-- Discounted detachable net cash reused from prior stock_research/owner_earnback trace: RMB6,591,729,332.937.
-- Discounted sustainable distributable cash profit reused from prior stock_research/owner_earnback trace: RMB977,500,000.
-- Operating business price = RMB9,903,000,000 - RMB6,591,729,332.937 = RMB3,311,270,667.063.
-- Owner earnback years = RMB3,311,270,667.063 / RMB977,500,000 = 3.387489173465984.
-- Market cap to cash profit = RMB9,903,000,000 / RMB977,500,000 = 10.130946291560102.
-- Forecast dividend yield = RMB789,862,434.94 / RMB9,903,000,000 = 0.07975991466626275.
+3. Protocol initialization
+Command executed successfully:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
 
-Report generation:
-- outputs/report.md was created from the existing 2025 stock_research report because it already follows the report contract, explains the operating story, and cites the same source chain.
-- Removed no substantive report content; the result JSON was updated to the current result-contract shape and does not carry the legacy investment_case_type ranking label.
+The initializer inherited analysis_model_hint=financial_brokerage. This was treated only as a hint and explicitly re-audited.
 
-Unresolved limitations:
-- This workspace does not contain a separate stock_report/data/analysis/owner_earnback/00811.HK/2025-12-31 directory. Owner-earnback figures are therefore reused from the previous stock_research result and trace, which state they reused owner_earnback output.
-- Public annual-report material does not disclose cash ownership split among listed parent, Hong Kong/offshore entities and PRC operating subsidiaries. This affects confidence in discounted detachable net cash.
-- Local filing metadata did not include an HKEX original URL; annual-report evidence uses local imported filing text/PDF paths and normalized annual facts.
-- Forecast dividend yield is based on observed 2025 cash paid to shareholders as a proxy, not a future dividend commitment.
+4. Analysis model audit
+Input hint: financial_brokerage / requires_special_model.
+Finding: contradicted by annual-report business and balance-sheet facts.
+
+Evidence used:
+- The company publishes and distributes textbooks, supplementary materials, general books, and education-related products/services.
+- 2025 publication segment sales revenue was approximately RMB2,895 million; distribution segment sales revenue was approximately RMB10,212 million.
+- The balance sheet has ordinary publishing/distribution working capital, deposits, equity investments, small borrowings, leases, and supplier/customer operating liabilities.
+- No brokerage client money, margin finance, proprietary securities funding structure, or repurchase financing was identified.
+
+Final model:
+- statement_model = ordinary_operating
+- owner_earnback_applicability = applicable
+
+5. Core financial extraction reused
+2025 balance sheet (RMB):
+- Total assets: 23,444,441,325.05
+- Total liabilities: 7,793,582,360.02
+- Total equity: 15,650,858,965.03
+- Parent equity: 15,260,687,340.27
+- Minority interest: 390,171,624.76
+
+2025 income statement (RMB):
+- Revenue: 11,731,677,466.92
+- Cost of sales: 7,555,178,468.97
+- Gross profit: 4,176,498,997.95
+- Operating profit: 1,669,913,553.73
+- Net profit: 1,607,706,527.97
+- Parent net profit: 1,568,450,497.66
+
+2025 cash flow (RMB):
+- Operating cash flow: 1,508,458,892.06
+- Acquisition/construction of long-term assets: 178,961,810.43
+- Operating free cash flow: 1,329,497,081.63
+- Financing cash flow: -897,122,129.30
+- Cash paid for dividends/profit distributions/interest: 790,182,397.07
+
+Calculated ratios:
+- Gross margin = 4,176,498,997.95 / 11,731,677,466.92 = 0.3560018599
+- Parent net margin = 1,568,450,497.66 / 11,731,677,466.92 = 0.1336936258
+
+6. Owner earnback assumptions and calculations
+Market capitalization: RMB10,582,885,872.138142 at 2026/07/31 16:08:47.
+
+Discounted detachable cash calculation:
+- Cash and cash equivalents RMB7,279,621,670.33 × 70% = RMB5,095,735,169.231
+- Time deposits over three months RMB1,500,890,654.94 × 85% = RMB1,275,757,056.699
+- Non-current term deposits and large CDs RMB3,062,939,775.54 × 75% = RMB2,297,204,831.655
+- Restricted cash RMB32,782,671.64 × 0% = RMB0
+- Less short-term borrowing and installment asset payable RMB20,584,681.60
+- Discounted detachable net cash = RMB8,648,112,375.985
+
+Lease liabilities were not deducted from detachable cash because they match ongoing store/warehouse operations and lease expense is already borne by the operating cash-profit stream. Equity investments and investment property totaling approximately RMB3.520 billion were excluded from detachable cash rather than assigned an exit value.
+
+Sustainable cash-profit calculation:
+- 2023 OCF less capex = RMB2,172,537,081.81
+- 2024 OCF less capex = RMB1,621,281,994.16
+- 2025 OCF less capex = RMB1,329,497,081.63
+- Selected sustainable cash profit = the lowest year, 2025 = RMB1,329,497,081.63
+
+The selection is below the three-year median of RMB1,621,281,994.16 and reflects declining 2025 revenue and the absence of a maintenance/growth capex split. Interest income, investment income, fair-value gains, and disposal gains were not added to the cash-flow base, preventing double counting with detachable funds/investment assets.
+
+Formula results:
+- Operating business price = 10,582,885,872.138142 - 8,648,112,375.985 = RMB1,934,773,496.153143
+- Owner earnback years = 1,934,773,496.153143 / 1,329,497,081.63 = 1.4552672006
+- Market cap / cash profit = 10,582,885,872.138142 / 1,329,497,081.63 = 7.9600670196
+- Discounted net cash / market cap = 0.8171790266
+
+7. Dividend calculation
+- Issued shares: 1,233,841,000
+- 2025 interim dividend: RMB0.19/share (paid)
+- Proposed 2025 final dividend: RMB0.42/share at annual-report date
+- Full-year basis: RMB0.61/share
+- Forecast/full-year cash dividend = 1,233,841,000 × 0.61 = RMB752,643,010
+- Tax-before dividend yield = 752,643,010 / 10,582,885,872.138142 = 0.0711188819
+
+Limitations: the final dividend was still subject to shareholder approval at the annual-report date; H-share cash receipt is affected by RMB/HKD conversion and applicable withholding tax.
+
+8. Protocol writes and validation
+outputs/result.json was populated from the initialized skeleton using repeated protocol `set` commands. It was not constructed as a complex JSON object from scratch.
+
+Validation command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+Validation response after structured-result completion:
+{
+  "status": "ok",
+  "errors": []
+}
+
+9. Data-quality judgment
+status = complete
+
+Reasons:
+- Identity, period, market cap, timestamp, PE, and market source are present.
+- Analysis model was verified against annual-report facts and the incorrect input hint was overridden.
+- Three statements, asset/liability explanations, owner-earnback calculation, dividend forecast, business story, risks, and evidence are present.
+- Known gaps are explicit limitations rather than missing core fields.
+
+Principal limitations retained in result.json and report.md:
+- No original HKEX URL in local raw-file metadata.
+- No legal-entity cash ownership/upstreaming split.
+- No exact maintenance/growth capex split.
+- Dividend yield is pre-tax and H-share receipts have FX/tax effects.

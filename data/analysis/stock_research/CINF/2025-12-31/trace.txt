@@ -1,0 +1,63 @@
+2026-08-04 stock-research trace — CINF / FY2025
+
+1. Read required instructions:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit:
+   - config/input.json existed.
+   - No local raw filing, metadata, annual facts package, normalized facts, or historical CINF research existed at the paths supplied in the input.
+   - Public primary-source retrieval was therefore required.
+
+3. Protocol initialization:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Sources retrieved and used:
+   - SEC 2025 Form 10-K filed 2026-02-23:
+     https://www.sec.gov/Archives/edgar/data/20286/000002028626000008/cinf-20251231.htm
+   - Company FY2025 results release dated 2026-02-09:
+     https://investors.cinfin.com/2026-02-09-Cincinnati-Financial-Reports-Fourth-Quarter-and-Full-Year-2025-Results
+   - Company dividend history:
+     https://investors.cinfin.com/dividends
+   - Federal Reserve H.10, 2025-12-31 USD/CNY = 6.9931:
+     https://www.federalreserve.gov/releases/h10/20260105/
+   - Market cap, market date and PE TTM: task input, source Yahoo Finance yfinance.
+
+5. Model determination:
+   - Input hint: ordinary_operating / applicable.
+   - Filing facts: insurance underwriting is the main business; investments support loss reserves, life/investment contract reserves, unearned premiums and regulatory capital.
+   - Final model: financial_insurance / requires_special_model.
+   - Consequence: all ordinary owner-earnback amounts and ratios remain null. Analysis uses underwriting, investment return, reserve/capital and parent dividend capacity.
+
+6. Currency conversion:
+   - All reported USD financial statement amounts converted to absolute CNY at 6.9931 CNY/USD, the Federal Reserve H.10 rate for 2025-12-31.
+   - Example: total assets USD 41,002m × 6.9931 = CNY 286,731,086,200.
+   - Market cap was already supplied in CNY and was not reconverted.
+
+7. Key extracted facts (USD millions unless stated):
+   - Assets 41,002; liabilities 25,091; equity 15,911.
+   - Investments 31,783; cash 1,431.
+   - Loss/loss-expense reserves 11,507; life/investment-contract reserves 2,992; unearned premiums 5,254.
+   - Revenue 12,631; net income 2,393; pretax income 2,980.
+   - P&C net written premiums 10,082; combined ratio 94.9%; underwriting profit 501.
+   - Net investment income 1,165; net investment gains 1,442; unrealized gains on equities still held 1,448.
+   - Operating cash flow 3,112; capex 20; dividends paid 525; share repurchases 205.
+   - Parent dividends received from subsidiaries 740.
+   - 2026 quarterly dividend declared to date: USD 0.94 twice. Forecast assumes USD 3.76 annualized on 155.4m year-end shares.
+
+8. Result construction:
+   - Used protocol `set` commands for all result.json mutations; no complex JSON file was handwritten from scratch.
+   - Forecast dividend: 0.94 × 4 × 155.4m × 6.9931 = CNY 4,086,096,302.40.
+   - Forecast dividend yield: CNY 4,086,096,302.40 / CNY 184,017,816,252.79102 = 2.2204895%.
+
+9. Validation:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Initial completed result validation status: ok; errors: [].
+
+10. Known limitations recorded in result and report:
+   - Filing and market-cap dates differ; FX timing is not identical to the market snapshot conversion basis.
+   - Dividend forecast is an annualization, not formal company guidance.
+   - PE is affected by equity-security fair-value changes.
+   - Detailed statutory capital/RBC ratios were not obtained in this run.

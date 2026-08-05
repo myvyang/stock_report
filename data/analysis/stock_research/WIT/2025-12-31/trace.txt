@@ -1,0 +1,63 @@
+2026-08-04 stock-research trace — WIT / Wipro Limited
+
+1. Read instructions
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+
+2. Input and reuse audit
+- Read config/input.json.
+- Checked configured annual-review, normalized-facts, raw-filing, and prior stock-research paths.
+- No WIT filing or annual facts files existed locally, so no prior financial package could be reused.
+
+3. Primary sources located
+- SEC Form 20-F, fiscal year ended 2025-03-31, accession 0000950170-25-076303:
+  https://www.sec.gov/Archives/edgar/data/1123799/000095017025076303/wit-20250331.htm
+- SEC companyfacts API, CIK 0001123799. Used audited IFRS tags and accession filtering.
+- Wipro Integrated Annual Report 2024-25 / investor annual-report page.
+- Market cap and PE were taken unchanged from config/input.json (Yahoo Finance yfinance; 2026-08-03).
+
+4. Period decision
+- config period 2025-12-31 is a research anchor, not Wipro's fiscal year end.
+- Used FY2025 annual statements ending 2025-03-31, the latest complete annual filing available at the anchor.
+- Explicitly recorded the mismatch between FY2025 statements and the later 2026-08-03 valuation snapshot.
+
+5. Currency conversion
+- Form 20-F convenience rate: INR/USD = 85.43 at 2025-03-31.
+- USD/CNY used for cross conversion: 7.2567.
+- Derived 1 INR = 7.2567 / 85.43 = 0.08494322837410745 CNY.
+- All result.json monetary fields are absolute CNY yuan.
+
+6. Core FY2025 inputs (INR)
+- Assets 1,286,520m; liabilities 456,073m; equity 830,447m; parent equity 828,309m.
+- Revenue 890,884m; cost of sales 617,802m; gross profit 273,082m.
+- Operating profit 151,271m; net profit 132,180m; parent net profit 131,354m.
+- Operating cash flow 169,426m; capex 14,737m; operating FCF 154,689m.
+- Financing cash flow -63,963m; dividends paid 62,750m; buybacks zero.
+- Company gross cash 533,448m; borrowings/total debt 161,817m; lease liabilities 30,218m.
+
+7. Model and calculations
+- Confirmed ordinary_operating / applicable: IT services and consulting are the core business.
+- Gross margin = 273,082 / 890,884 = 30.6529%.
+- Net margin = 131,354 / 890,884 = 14.7442%.
+- Discounted detachable net cash = 90% × gross cash - borrowings - lease liabilities
+  = CNY 24,469,442,899.92.
+- Sustainable cash profit = 90% × parent net profit (FCF was higher, so net profit used as cap)
+  = CNY 10,041,869,537.87.
+- Operating business price = market cap - discounted net cash
+  = CNY 107,702,656,885.54.
+- Owner earnback = operating business price / sustainable cash profit = 10.7254 years.
+- Market cap / sustainable cash profit = 13.1621 years.
+- Forecast dividend = FY2025 paid dividend translated to CNY = 5,330,187,580.48; yield = 4.0328%.
+
+8. Protocol operations and validation
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated sections only through protocol `set` calls; did not construct result.json from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].
+
+9. Output files
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

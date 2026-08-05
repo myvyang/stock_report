@@ -1,0 +1,77 @@
+stock-research trace
+task: 01876.HK / BUD APAC / annual / 2025-12-31
+generated timezone: Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill directs reuse of existing fact packages.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked stock_report/data/analysis/annual_review/01876.HK/2025-12-31 and normalized/raw paths.
+- No annual facts package, normalized facts, prior stock research result, or stored filing existed.
+- Therefore returned to the official annual report and company investor-relations materials.
+
+3. Company/model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Annual Report 2025, Note 1.1: group is principally engaged in brewing and distributing beer in Asia Pacific.
+- Financial statements show ordinary operating assets and liabilities, not brokerage client money or trading-book financing.
+- Overrode hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+4. Primary sources
+- Budweiser Brewing Company APAC Limited Annual Report 2025:
+  https://www.budweiserapac.com/uploadfiles/2026/03/20260323065743420.pdf
+  Key pages used: 60-69 (operations, liquidity, cash flow), 221-227 (audited statements), 249 (cash net of debt), 262-272 (PPE, receivables, cash, equity).
+- Bud APAC investor calendar/official results event page confirmed FY2025 results publication on 2026-02-12:
+  https://www.budweiserapac.com/Upcoming/index.html
+- 2025-12-31 USD/CNY central parity 7.0288, China Foreign Exchange Trade System announcement reproduced by China Economic Net:
+  https://www.ce.cn/xwzx/gnsz/gdxw/202512/t20251231_2676993.shtml
+- Market capitalization, timestamp, source, and PE TTM were supplied in config/input.json from Tencent qt.gtimg.cn.
+
+5. Currency and statement calculations
+- Protocol requires absolute CNY yuan. Applied USD/CNY 7.0288 to all annual-report USD amounts.
+- Revenue: USD 5,764m * 7.0288 = CNY 40,514,003,200.
+- Gross profit: USD 2,887m * 7.0288 = CNY 20,292,145,600.
+- Parent net profit: USD 489m * 7.0288 = CNY 3,437,083,200.
+- Gross margin: 2,887 / 5,764 = 0.5008674532.
+- Parent net margin: 489 / 5,764 = 0.0848369188.
+- Total assets: USD 14,773m * 7.0288 = CNY 103,836,462,400.
+- Total liabilities: USD 4,445m * 7.0288 = CNY 31,243,016,000.
+- Total equity: USD 10,328m * 7.0288 = CNY 72,593,446,400.
+- Operating cash flow: USD 951m * 7.0288 = CNY 6,684,388,800.
+- Capex: USD 307m * 7.0288 = CNY 2,157,841,600.
+- Operating free cash flow: (951 - 307)m * 7.0288 = CNY 4,526,547,200.
+
+6. Owner earnback judgments and formulas
+- Cash and equivalents USD 2,828m: 80% inclusion because unrestricted but distributed across operating entities and needed for working capital.
+- AB InBev cash-pool deposit USD 71m: 50% inclusion because of related-party transfer/governance constraints.
+- Interest-bearing debt USD 277m: 100% deduction.
+- Discounted detachable net cash:
+  (2,828 * 80% + 71 * 50% - 277)m USD * 7.0288
+  = CNY 14,204,501,920.
+- Sustainable distributable cash profit:
+  USD 644m FCF * 85% * 7.0288 = CNY 3,847,565,120.
+  The 15% haircut reflects continuing China contraction, working-capital variability, and proposed dividend above FY2025 FCF.
+- Operating business price:
+  CNY 76,050,236,497.23112 - CNY 14,204,501,920
+  = CNY 61,845,734,577.231125.
+- Owner earnback years:
+  61,845,734,577.231125 / 3,847,565,120 = 16.07399294.
+- Market cap / cash profit:
+  76,050,236,497.23112 / 3,847,565,120 = 19.76580880.
+
+7. Dividend
+- FY2025 proposed final dividend: USD 750m * 7.0288 = CNY 5,271,600,000.
+- Forecast dividend yield: 5,271,600,000 / 76,050,236,497.23112 = 0.0693173387.
+- The amount is a board recommendation, not an unconditional future payment.
+
+8. Protocol population and validation
+- Populated result fields only with protocol CLI `set` and `append` commands; did not hand-write the result object.
+- First completed validation result:
+  {"status":"ok","errors":[]}
+- Final validation after all three outputs were created:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+  {"status":"ok","errors":[]}
+- Non-empty output check passed for outputs/result.json, outputs/report.md, and outputs/trace.txt.

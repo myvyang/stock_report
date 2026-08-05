@@ -1,0 +1,80 @@
+AMG stock research trace
+generated_at=2026-08-04T23:27:40+08:00
+period=2025-12-31
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because local source reuse was evaluated.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields only through protocol set/append commands.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: {"status":"ok","errors":[]}
+
+[local reuse]
+- Checked stock_report/data/analysis/annual_review/AMG/2025-12-31 and stock_report/data/raw/filings/AMG/2025-12-31.
+- No reusable 2025 annual facts package or raw filing was present at task start.
+
+[primary source retrieval]
+- SEC filing: Affiliated Managers Group, Inc. 2025 Form 10-K, filed 2026-02-17, accession 0001628280-26-008665.
+  URL: https://www.sec.gov/Archives/edgar/data/1004434/000162828026008665/amg-20251231.htm
+- SEC extracted XBRL instance downloaded to /tmp/amg.xml for deterministic fact extraction.
+  URL: https://www.sec.gov/Archives/edgar/data/1004434/000162828026008665/amg-20251231_htm.xml
+- SEC Companyfacts JSON downloaded to /tmp/companyfacts.json; facts filtered to accession 0001628280-26-008665 and FY2025.
+- AMG 2026-05-01 Form 8-K used for the latest declared quarterly dividend of USD 0.01/share.
+  URL: https://www.sec.gov/Archives/edgar/data/1004434/000162828026029094/amg-20260501.htm
+- Input market cap and PE source: config/input.json / Yahoo Finance yfinance.
+
+[currency conversion]
+- Result contract requires absolute CNY yuan.
+- Used USD/CNY=7.0288, the 2025-12-31 central parity rate authorized by China Foreign Exchange Trade System.
+- Balance sheet and flow items both use this single rate for internal consistency. This is a research presentation conversion, not AMG's accounting translation.
+
+[key source facts in USD]
+Assets=9,207,400,000
+Liabilities=4,785,300,000
+Total equity=4,175,300,000
+Parent equity=3,238,400,000
+Noncontrolling interest=936,900,000
+Revenue=2,074,400,000
+Operating expenses=1,805,400,000
+Derived operating profit=269,000,000
+Consolidated net income=904,000,000
+Parent net income=716,600,000
+Operating cash flow=973,200,000
+Capital expenditure=6,100,000
+Derived operating free cash flow=967,100,000
+Financing cash flow=-1,148,700,000
+Common share repurchases=706,300,000
+Common dividends paid=1,000,000
+Cash=586,000,000
+Long-term debt=2,691,300,000
+Equity-method Affiliate investments=2,870,400,000
+Goodwill=2,531,200,000
+Other intangible assets=1,639,300,000
+Investments=711,600,000
+Unfunded investment commitments=283,000,000
+Gain on sale of business=371,300,000
+Year-end AUM approximately=813,000,000,000
+2025 AUM increase=105,400,000,000 (15%)
+
+[model decision]
+- Input hint ordinary_operating/applicable was overridden.
+- Selected statement_model=investment_holding and owner_earnback_applicability=requires_special_model.
+- Reason: equity-method Affiliate stakes, goodwill and customer-related intangibles are the operating fee rights themselves; consolidated cash flow and equity also include noncontrolling Affiliate interests.
+- Ordinary discounted net cash, cash profit, operating business price and payback metrics were left null as required by contract.
+
+[derived figures]
+- operating_profit = revenue - operating_expenses = USD 269,000,000.
+- operating_free_cash_flow = operating_cash_flow - capex = USD 967,100,000.
+- forecast dividend = USD 0.01 * 4 * 26,684,730 shares * 7.0288 = CNY 7,502,465 (rounded).
+- forecast dividend yield = CNY 7,502,465 / CNY 65,361,831,627.95508 = 0.00011478358.
+- gross margin left null because AMG does not present an economically comparable cost-of-sales/gross-profit subtotal.
+
+[limitations]
+- Market cap and PE TTM were accepted from task input and were not independently reconstructed from official exchange share/price data.
+- Latest dividend is annualized mechanically; future board declarations can differ.
+- Current-year flows translated at year-end FX rather than an average FX rate.
+- No buy/sell recommendation, target price, ranking label, or unsupported certainty was produced.

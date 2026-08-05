@@ -1,0 +1,56 @@
+stock-research trace
+generated_at=2026-08-04T20:03:27+08:00
+query=MRBK
+period=2025-12-31
+
+1. Read required instructions:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check:
+   - config/input.json exists.
+   - No raw filing, annual facts package, normalized facts, or prior stock-research output existed under the paths provided for MRBK/2025-12-31.
+   - Result: obtained the missing annual filing from the SEC rather than fabricating facts.
+
+3. Primary filing:
+   - Meridian Corporation Form 10-K for year ended 2025-12-31.
+   - SEC accession 0001750735-26-000009, filed 2026-03-13.
+   - URL: https://www.sec.gov/Archives/edgar/data/1750735/000175073526000009/mrbk-20251231.htm
+   - Audited consolidated statements and MD&A used for business, statements, asset quality, capital, and dividends.
+
+4. Model decision:
+   - Overrode input hint ordinary_operating/applicable.
+   - Confirmed financial_bank/not_applicable because Meridian Corporation owns Meridian Bank; loans and securities are operating assets and deposits are operating funding obligations.
+   - Ordinary owner-earnback values were intentionally left null.
+
+5. Currency conversion:
+   - Filing values are USD; result protocol requires CNY absolute yuan.
+   - Applied 2025-12-31 USD/CNY central parity 7.0288 to filing amounts.
+   - Market cap and PE were retained exactly from config/input.json.
+
+6. Key extracted USD facts:
+   - Assets 2,561,995,000; liabilities 2,362,279,000; equity 199,716,000.
+   - Net loans 2,149,027,000; deposits 2,158,128,000.
+   - Net interest income 87,678,000; provision 15,152,000; noninterest income 39,180,000; net income 21,836,000.
+   - ROA 0.87%; ROE 12.00%; NIM 3.64%.
+   - NPA/assets 2.38%; NPL/loans 2.50%; net charge-offs/average loans 0.55%.
+   - CBLR 9.50%; CET1 risk-based 10.66%; total risk-based capital 11.65%.
+   - 2025 dividends 5,673,000 and $0.50/share.
+
+7. Dividend forecast:
+   - Mechanical annualization of 2026 quarterly dividend $0.14 to $0.56/share.
+   - Used 11,875,178 shares outstanding as of 2026-03-09 from the 10-K.
+   - Forecast CNY dividend 46,742,220.63; yield 2.9662% on input market cap.
+
+8. Protocol usage:
+   - Initialized outputs/result.json with protocol CLI init.
+   - Populated scalar fields with protocol CLI set.
+   - Populated arrays with protocol CLI append.
+   - Final validation performed with protocol CLI validate.
+
+9. Data limitations:
+   - Market valuation date and financial statement FX date differ.
+   - Yahoo Finance market cap and PE were supplied inputs and not reconstructed.
+   - Ordinary-company OCF, capex, FCF, gross margin, net margin, and owner-earnback fields are null because they are not economically comparable for a bank.

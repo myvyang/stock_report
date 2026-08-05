@@ -1,0 +1,55 @@
+stock-research trace
+company=AUPH
+period=2025-12-31
+generated_at=2026-08-04T18:55:57+08:00
+
+1. Read instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- No local raw filing metadata, annual facts package, normalized facts, or prior stock-research result existed for AUPH/2025-12-31.
+- Public-source supplementation was therefore required.
+
+3. Primary evidence
+- SEC Form 10-K accession 0001600620-26-000017, filed 2026-02-26, period 2025-12-31:
+  https://www.sec.gov/Archives/edgar/data/1600620/000160062026000017/auph-20251231.htm
+- Company FY2025 results release, 2026-02-26:
+  https://www.auriniapharma.com/press-releases/aurinia-pharmaceuticals-reports-financial-results-for-the-three-and-twelve-months-ended-december-31-2025-and-provides-update-on-recent-business-progress
+- USD/CNY midpoint for 2025-12-31: 7.0288, CFETS announcement carried by Xinhua:
+  https://www1.xinhuanet.com/20251231/fe9f6466f6884589b5287e6ee946baed/c.html
+- Market cap, date and PE TTM reused exactly from config/input.json.
+
+4. Model decision
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Reason: pharmaceutical product sales and licensing are ordinary operating activities; no special-model customer funds, reserves, regulated project cash, or similar balance-sheet-as-business structure.
+
+5. Currency and formulas
+- All filing amounts converted from USD to CNY at 7.0288 CNY/USD.
+- gross_margin=(283.055-32.665)/283.055=0.8845983996
+- net_margin=287.202/283.055=1.0146508629; flagged as distorted by USD 173.045m tax benefit.
+- discounted net cash=(397.997m*90%-68.845m finance leases-5.967m operating leases)*7.0288=1,991,858,596.64 CNY.
+- pre-haircut cash profit=(135.658m CFO-0.252m capex-13.136m finance lease principal-14.678m SBC)=107.592m USD.
+- discounted cash profit=107.592m*80%*7.0288=604,994,119.68 CNY.
+- operating business price=12,912,924,707.72754-1,991,858,596.64=10,921,066,111.08754 CNY.
+- owner earnback years=10,921,066,111.08754/604,994,119.68=18.0515243964.
+- market cap/cash profit=21.3438846555.
+
+6. Judgment calls
+- 90% liquidity factor reflects restricted cash, retained operating liquidity, and modest security-price/transaction uncertainty.
+- Lease liabilities deducted because they are contractual obligations tied to operating capacity.
+- SBC deducted as an economic owner cost even though non-cash in the period.
+- 20% cash-profit haircut reflects single-product exposure, Paragraph IV patent litigation, channel concentration, sole-source API supply, and expected R&D growth.
+- Deferred tax assets excluded from detachable cash.
+- Forecast cash dividend set to zero because the 10-K says the company has never paid dividends and has no plans to do so.
+
+7. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated sections using repeated protocol set commands; result.json was not manually authored from scratch.
+- Validated with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status before report/trace final audit: ok, errors=[]

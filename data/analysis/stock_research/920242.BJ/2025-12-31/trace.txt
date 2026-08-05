@@ -1,0 +1,62 @@
+stock-research trace
+company: 建邦科技 (920242.BJ)
+period: 2025-12-31 annual
+generated_at: 2026-08-03T10:20:22+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because local-data reuse was evaluated.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- config/input.json existed.
+- No raw filing, annual facts, normalized facts, or prior stock-research output existed at the input-declared local paths.
+- Therefore core facts were re-extracted from public disclosures.
+
+3. Sources inspected
+- Company IR periodic-report index: https://www.qi-auto.com/index.php?a=lists&c=index&catid=31&m=content
+- 2025 annual report web transcription: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12101772&stockid=920242
+- 2025 annual dividend implementation announcement: https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12388181&stockid=920242
+- Valuation snapshot: config/input.json; source recorded there as Tencent qt.gtimg.cn, timestamp 20260731153820.
+
+4. Statement-model conclusion
+- ordinary_operating / applicable.
+- Evidence: automotive aftermarket parts development, design, sourcing, sales, and partial manufacturing; conventional inventory, receivables, fixed assets, payables, and lease liabilities; no bank borrowings.
+- The company is not a bank, broker, insurer, property developer, construction contractor, concession utility, or investment holding platform.
+
+5. Core calculations (CNY)
+- gross_profit = 780124843.74 - 551839647.93 = 228285195.81
+- gross_margin = 228285195.81 / 780124843.74 = 0.2926226552
+- net_margin = 85594581.05 / 780124843.74 = 0.1097165243
+- operating_free_cash_flow = 134579059.88 - 72555933.48 = 62023126.40
+- forecast_cash_dividend = 67295500 shares * 0.50/share = 33647750
+- forecast_dividend_yield = 33647750 / 1298000000 = 0.0259227658
+
+6. Owner-earnback calculations
+- discounted cash = 302605236.67 * 60% = 181563142.00
+- lease-related debt = 3769435.60 + 588765.42 = 4358201.02
+- discounted detachable net cash = 181563142.00 - 4358201.02 = 177204940.98
+- normalized profit bridge:
+  85594581.05 reported parent profit
+  +11580000 estimated after-tax add-back for specifically impaired CARDONE receivable
+  -1670000 estimated after-tax non-core investment/disposal/government income
+  -15504581.05 safety haircut for customer/overseas/capex volatility
+  =80000000 discounted sustainable cash profit
+- operating_business_price = 1298000000 - 177204940.98 = 1120795059.02
+- owner_earnback_years = 1120795059.02 / 80000000 = 14.0099382378
+- market_cap_to_cash_profit = 1298000000 / 80000000 = 16.225
+
+7. Protocol usage and validation
+- All scalar fields were set with protocol `set`.
+- Asset, liability, cash-breakdown, profit-adjustment, dividend-history, risk, and evidence rows were added with protocol `append`.
+- No complex result JSON was handwritten from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: []
+
+8. Limitations
+- No local original PDF or annual-facts package was supplied; annual-report web transcription was cross-checked across audited statements, operating tables, cash-flow reconciliation, and notes.
+- Profit normalization, the 60% cash recognition rate, and maintenance-capex interpretation are analytical judgments, not management guidance.
+- Market cap and PE TTM were accepted from the task input and were not independently re-priced.

@@ -1,0 +1,65 @@
+stock-research trace
+company=000531.SZ 穗恒运Ａ
+period=2025-12-31
+generated_for_input=2026-08-01T04:50:49+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Also read references/data-reuse.md because the skill defines reuse boundaries.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields with repeated protocol `set` commands. The JSON object was not authored from a blank file.
+6. Validated result with protocol validate; final status=ok, errors=[].
+
+[reuse audit]
+- config/input.json existed.
+- No raw filing metadata, annual facts package, normalized annual facts, or historical stock-research result existed in the workspace for 000531.SZ/2025-12-31.
+- Therefore an official filing was required.
+
+[official filing retrieval]
+- Company announcement index identified itemid=8625, title “广州恒运企业集团股份有限公司 2025年年度报告”, disclosure date 2026-04-13.
+- Detail page: https://www.hengyun.com.cn/CompanyAnnouncement/info.aspx?itemid=8625
+- Official DOCX: https://www.hengyun.com.cn/uploadfiles/2026/04/20260413105245945.docx
+- DOCX text was extracted to a temporary file for analysis; no unofficial financial database replaced the filing.
+- Filing states audit report date 2026-04-09 and standard unmodified opinion by BDO China Shu Lun Pan CPAs (立信会计师事务所).
+
+[model decision]
+- Input hint: ordinary_operating/applicable.
+- Filing evidence contradicts a pure ordinary-operating treatment:
+  * long-term equity investments=6,184,205,851.89, 34.51% of total assets;
+  * investment income=474,626,153.59, 151.51% of profit before tax;
+  * major investees include Yuexiu Capital, Guangdong Power Grid Energy Development, Guangzhou Asset Management, and Baiyun Hengyun Energy;
+  * operating assets are capital-intensive power/heat projects, and disclosed project loans are secured by project receivables, tariff rights, equipment, or land.
+- Final model=platform_financial_mixed; ordinary owner earnback applicability=requires_special_model.
+- As required by the result contract, discounted net cash, discounted cash profit, operating business price, owner earnback years, and market-cap/cash-profit fields remain null.
+
+[core calculations]
+gross_profit=4,141,471,201.25-3,485,696,128.73=655,775,072.52
+gross_margin=655,775,072.52/4,141,471,201.25=0.1583435066
+net_margin=302,496,618.58/4,141,471,201.25=0.0730408601
+minority_interest_ratio=774,998,487.72/7,520,930,891.40=0.1030455537
+operating_free_cash_flow=847,182,125.04-819,903,680.21=27,278,444.83
+forecast_dividend=61,908,259.92+51,590,216.60=113,498,476.52
+forecast_dividend_yield=113,498,476.52/6,082,000,000=0.0186613740
+
+[financial statement anchors]
+total_assets=17,918,447,268.01
+total_liabilities=10,397,516,376.61
+total_equity=7,520,930,891.40
+parent_equity=6,745,932,403.68
+revenue=4,141,471,201.25
+cost_of_sales=3,485,696,128.73
+operating_profit=535,536,538.17
+net_profit=253,849,791.45
+parent_net_profit=302,496,618.58
+operating_cash_flow=847,182,125.04
+capital_expenditure=819,903,680.21
+financing_cash_flow=-1,138,039,961.65
+
+[quality and limitations]
+- Complete under the special-model threshold: identity, valuation snapshot, core balance-sheet/profit figures, dividend baseline, business story, asset/liability rows, evidence, and model rationale are present.
+- No project-level split between maintenance and growth capex was available.
+- No 2026-07-31 mark-to-market sum-of-parts valuation was performed for investees.
+- Forecast dividend is a baseline extrapolation from 2025 total declared/paid distribution, not company guidance.
+- Market cap and PE are accepted from config/input.json; core filing facts come from the official company annual report.

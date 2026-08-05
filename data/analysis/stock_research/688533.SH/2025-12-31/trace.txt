@@ -1,0 +1,57 @@
+[2026-08-01 Asia/Shanghai] task initialized
+- Input: config/input.json; company 688533.SH 上声电子; period 2025-12-31; annual.
+- Required contracts read: result-contract.md and report-contract.md.
+- Stock-research skill protocol used to initialize outputs/result.json.
+
+[local reuse audit]
+- Missing: stock_report/data/raw/filings/688533.SH/2025-12-31/metadata.json and filing files.
+- Missing: stock_report/data/analysis/annual_review/688533.SH/2025-12-31/facts.json and annual_facts.md.
+- Missing: stock_report/data/normalized/facts/688533.SH/2025-12-31/annual-facts.json.
+- Missing: prior stock research result/report/trace for this company-period.
+- Present but not used as a factual source: stock_report/data/notes/user_stock_evaluations.md.
+- Decision: re-extract from public annual filing because no reusable fact pack or prior result exists.
+
+[source acquisition]
+- SSE announcement query endpoint returned the official 2025 annual report record, disclosure date 2026-04-29, URL path /disclosure/listedinfo/announcement/c/new/2026-04-29/688533_20260429_FOXU.pdf.
+- Direct SSE PDF download was blocked by an anti-bot HTML response; a byte-identical-content public annual-report mirror was downloaded temporarily and parsed with pypdf. The official SSE URL remains recorded in evidence.
+- Annual report summary cross-check: https://dataclouds.cninfo.com.cn/shgonggao/hsomarket/2026/20260428/3b62c5424f1e4841a743bd7f10126ea2.PDF.
+- Dividend implementation cross-check: 2025 annual equity distribution implementation announcement, disclosed 2026-05-29.
+- Market data: task input, Tencent qt.gtimg.cn, market cap CNY 3,511,000,000, PE TTM 19.55, timestamp 20260731114332.
+
+[model classification]
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Basis: revenue comes from manufactured automotive acoustic products sold directly to OEM/Tier-1/audio-brand customers; assets are receivables, inventory, plant/equipment and ordinary investments; liabilities are trade liabilities, bank debt, convertible bond and leases. No special-model customer funds, reserves, regulated presale cash, concession right or underlying-holding structure was identified.
+
+[financial extraction: CNY]
+- Revenue 3,022,653,609.57; cost of sales 2,395,244,021.31; gross profit 627,409,588.26; gross margin 20.7569%.
+- Operating profit 218,154,190.42; net profit 178,528,167.46; parent net profit 182,605,806.63; parent net margin 6.0412%.
+- Total assets 3,588,662,667.38; total liabilities 1,853,928,680.24; total equity 1,734,733,987.14; parent equity 1,729,704,598.99; minority interest 5,029,388.15.
+- Operating cash flow 285,499,749.98; capex 265,526,298.07; operating FCF 19,973,451.91; financing cash flow -63,972,779.22.
+- Fixed-asset depreciation 114,976,154.10.
+- Cash 488,824,412.64; trading financial assets 29,440,426.08.
+- Interest-bearing debt and lease obligations 1,040,013,487.71 = short-term borrowings 457,260,291.25 + current long-term borrowings 8,000,000 + current lease liabilities 12,129,243.60 + long-term borrowings 64,600,000 + bonds payable 460,764,354.11 + lease liabilities 37,259,598.75.
+
+[owner earnback assumptions and formulas]
+- Discounted cash assets = (488,824,412.64 + 29,440,426.08) * 80% = 414,611,870.976.
+- Discounted detachable net cash = 414,611,870.976 - 1,040,013,487.71 = -625,401,616.734.
+- Maintenance capex proxy = fixed-asset depreciation 114,976,154.10 because maintenance capex is not separately disclosed.
+- Pre-haircut cash profit = OCF 285,499,749.98 - maintenance proxy 114,976,154.10 = 170,523,595.88.
+- Business uncertainty haircut = 10% for declining margin, customer concentration, and new-plant ramp-up.
+- Discounted sustainable cash profit = 170,523,595.88 * 90% = 153,471,236.292.
+- Operating business price = 3,511,000,000 - (-625,401,616.734) = 4,136,401,616.734.
+- Owner earnback years = 4,136,401,616.734 / 153,471,236.292 = 26.9523 years.
+- Market cap / cash profit = 3,511,000,000 / 153,471,236.292 = 22.8773.
+- Sensitivity limitation: if actual recurring maintenance capex is close to total reported capex rather than depreciation, sustainable distributable cash is materially lower.
+
+[dividend]
+- Annual-report proposal: CNY 0.35/share; forecast cash dividend 57,000,179.25; payout ratio 31.21%.
+- Forecast dividend yield = 57,000,179.25 / 3,511,000,000 = 1.6235%.
+- Implementation total rose to 57,745,464.35 because share count increased; per-share dividend remained CNY 0.35.
+
+[protocol operations]
+- outputs/result.json was initialized and populated exclusively through stock_analysis.stock_research.protocol init/set commands.
+- Complex result JSON was not hand-written from scratch.
+- Final validation: `PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json`.
+- Validation outcome: status=ok, errors=[].
+- JSON syntax check: `jq empty outputs/result.json` passed.
+- Final content scan found no null placeholders, legacy ranking labels, buy/sell recommendation, or target price language.

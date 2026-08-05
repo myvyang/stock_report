@@ -1,0 +1,78 @@
+stock-research trace
+company: 01731.HK Prosperous Industrial (Holdings) Limited / 其利工业集团有限公司
+period: 2025-12-31 annual
+generated_at_context: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the skill routes reuse decisions through that reference.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- config/input.json existed.
+- No annual facts package, normalized facts, prior stock-research result, or filing metadata existed for 01731.HK/2025-12-31.
+- Therefore returned to the primary annual filing.
+
+3. Primary filing retrieval
+- HKEX title search identified “2025 ANNUAL REPORT”, released 2026-04-29.
+- Source URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042903543.pdf
+- Saved local copy: stock_report/data/raw/filings/01731.HK/2025-12-31/2025-annual-report.pdf
+- pdftotext was unavailable; extraction and page/line verification used the web PDF parser.
+
+4. Model verification
+- Input hint said financial_brokerage/requires_special_model.
+- Annual report note 4 states the only operating segment is manufacturing and sale of sport bags, handbags and luggage bags.
+- Balance sheet contains ordinary manufacturing assets/liabilities, with no brokerage customer money, repo funding, or material proprietary financial portfolio.
+- Overrode hint to ordinary_operating/applicable.
+
+5. Financial facts (annual report presentation: US$'000)
+- Revenue 238,751; cost of sales 180,640; gross profit 58,111.
+- Profit before tax 29,567; finance cost 262; inferred operating profit/EBIT 29,829.
+- Profit and parent profit 24,545; no NCI.
+- Total assets 243,689; total equity/parent equity 190,003; liabilities inferred as 53,686.
+- Operating cash flow 24,665.
+- Capex 7,696 = PPE 1,691 + intangibles 57 + investment property 5,948.
+- Operating free cash flow 16,969.
+- Financing cash flow -11,469; dividends paid 9,988.
+- Cash and time deposits 85,744; lease liabilities 7,216; no external borrowing.
+
+6. Business and risk facts
+- 22.888m pieces sold at US$10.4 average selling price.
+- Outdoor and sporting bags: 84.6% of revenue.
+- Vietnam and Cambodia: about 85% of production capacity.
+- Largest customer 37.1%; five largest customers 92.9%; six customers 87% of receivables.
+- Industrial park contractual commitment: US$30.023m.
+- Proposed 2025 final dividend: HK8.5 cents/share, US$12.234m total.
+
+7. Currency conversion
+- Contract requires absolute CNY yuan.
+- Used official 2025 annual average USD/CNY 7.1429 from National Bureau of Statistics for every statement amount to keep ratios internally consistent.
+- Limitation: balance-sheet amounts were not translated at a 2025-12-31 closing rate, so converted CNY amounts are analytical, not statutory translations.
+
+8. Owner earnback assumptions
+- Discounted detachable net cash = cash/time deposits * 50% - lease liabilities * 100%.
+- US$ amount = 85.744m * 0.50 - 7.216m = 35.656m; CNY = 254,687,242.40.
+- 50% cash haircut reserves funds for working capital, US$30.023m industrial park commitment, and transfer constraints.
+- Reported operating FCF = OCF 24.665m - total capex 7.696m = US$16.969m.
+- Discounted sustainable cash profit = reported FCF * 80% = CNY 96,966,296.08.
+- 20% haircut reflects customer concentration and 2025 revenue/margin/profit decline.
+- Operating business price = 741,922,723.865509 - 254,687,242.40 = 487,235,481.465509 CNY.
+- Owner earnback years = 487,235,481.465509 / 96,966,296.08 = 5.0247921305.
+- Market cap / cash profit = 7.6513464354.
+
+9. Dividend calculation
+- Proposed dividend CNY = US$12.234m * 7.1429 = 87,386,238.60.
+- Forecast dividend yield = 87,386,238.60 / 741,922,723.865509 = 0.1177834777.
+
+10. Result construction and validation
+- outputs/result.json was populated through protocol CLI set commands; no complex JSON file was written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report/trace finalization: status=ok, errors=[].
+
+11. Core sources
+- HKEX 2025 Annual Report (primary filing): pages 8-13, 43, 48-53, 80-90, 93-105, 114-121.
+- National Bureau of Statistics: 2025 average exchange rate of USD1=CNY7.1429.
+- Task input/Tencent qt.gtimg.cn: market cap, date, and PE TTM.

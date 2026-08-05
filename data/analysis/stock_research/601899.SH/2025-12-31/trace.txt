@@ -1,0 +1,58 @@
+task: stock research 601899.SH 紫金矿业
+period: 2025-12-31 annual
+generated_context_date: 2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md as requested.
+3. Read references/data-reuse.md because local data reuse rules applied.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields only through protocol set/append commands.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[local_reuse_check]
+- config/input.json present.
+- No pre-existing filing, annual facts package, normalized facts, or stock-research result existed for 601899.SH/2025-12-31.
+- Downloaded official HKEX 2025 annual report PDF to:
+  stock_report/data/raw/filings/601899.SH/2025-12-31/2025-annual-report-en.pdf
+- Local PDF text utilities were unavailable; cited and inspected the exchange-hosted parsed document.
+
+[primary_sources]
+- Zijin Mining Group Co., Ltd. Annual Report 2025, HKEX official disclosure, released 2026-04-27:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042700802.pdf
+- Market snapshot from config/input.json: Tencent qt.gtimg.cn, 2026-07-31 11:43:34, market cap CNY873,239,000,000, PE TTM 14.16.
+
+[key_extractions]
+- Balance sheet, annual report pp.175-177: assets 512,005,142,450; liabilities 263,982,621,036; equity 248,022,521,414; parent equity 185,541,965,085; NCI 62,480,556,329.
+- Income statement, p.178: revenue 349,079,082,852; cost 252,288,843,039; operating profit 82,110,135,522; net profit 63,822,189,587; parent profit 51,777,327,785.
+- Cash flow, pp.182-183: OCF 75,429,516,296; capex 30,982,297,763; financing CF 5,532,343,919.
+- Interest-bearing liabilities, p.103: 165,261,000,000.
+- Dividend plan, pp.88-89: interim 5,847,059,534.80; proposed final 10,104,098,593; buyback treated as distribution 999,887,625.01.
+
+[calculations]
+- gross_profit = revenue - cost = 96,790,239,813.
+- gross_margin = 96,790,239,813 / 349,079,082,852 = 0.2772731010.
+- net_margin = 51,777,327,785 / 349,079,082,852 = 0.1483254951.
+- consolidated_operating_FCF = 75,429,516,296 - 30,982,297,763 = 44,447,218,533.
+- parent attribution factor = 51,777,327,785 / 63,822,189,587 = 0.8112747012.
+- attributed_FCF = 44,447,218,533 * 0.8112747012 = 36,058,903,933.05.
+- discounted_cash_profit = attributed_FCF * 0.80 cycle haircut = 28,847,123,146.44.
+- discounted_cash = 65,576,737,700 * 0.80 = 52,461,390,160.
+- discounted_detachable_net_cash = 52,461,390,160 - 165,261,000,000 = -112,799,609,840.
+- operating_business_price = 873,239,000,000 - (-112,799,609,840) = 986,038,609,840.
+- owner_earnback_years = 986,038,609,840 / 28,847,123,146.44 = 34.1815.
+- market_cap_to_cash_profit = 873,239,000,000 / 28,847,123,146.44 = 30.2713.
+- forecast_cash_dividend = 5,847,059,534.80 + 10,104,098,593 = 15,951,158,127.80.
+- forecast_dividend_yield = 15,951,158,127.80 / 873,239,000,000 = 0.0182666593.
+
+[judgment_notes]
+- Confirmed ordinary_operating model; mining is an asset-heavy operating business, not a special financial-statement model.
+- Cash receives a 20% haircut because of restrictions, working liquidity, expansion, debt service, and rehabilitation needs.
+- Trading financial assets receive zero detachable value because composition includes securities/derivatives and operational or strategic uses.
+- All disclosed interest-bearing debt is deducted at 100%.
+- All capex is deducted because maintenance versus growth capex is not separately disclosed.
+- Consolidated FCF is allocated to parent by parent-profit/net-profit ratio as an approximation, then receives a 20% commodity-cycle haircut.
+- Data quality marked complete under the result contract, with limitations explicitly retained.

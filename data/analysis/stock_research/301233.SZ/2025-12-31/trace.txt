@@ -1,0 +1,92 @@
+stock-research trace
+company: 成都盛帮密封件股份有限公司 (301233.SZ)
+period: 2025-12-31 annual
+generated_for_input: 2026-08-01T01:20:11+08:00
+
+[1] protocol initialization
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+result: initialized stock-research-result-v1 skeleton; market cap, PE and company identity inherited from input.
+
+[2] required contracts read
+files:
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+[3] local reuse check
+checked paths supplied by config/input.json under /workspace/stock_report and /root/aicode/stock_report.
+result: no existing annual facts, normalized facts, filing metadata, or prior stock research files for 301233.SZ/2025-12-31 were present. Public official filing retrieval was therefore required.
+
+[4] official filing acquired
+source: Shenzhen Stock Exchange official disclosure PDF
+url: https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-24/5b235032-2ee2-4e2b-8128-1e5bacb40da7.PDF
+local copy: stock_report/data/raw/filings/301233.SZ/2025-12-31/annual-report-2025.pdf
+filing date: 2026-04-24
+report: 成都盛帮密封件股份有限公司2025年年度报告
+
+[5] model classification
+fact: company manufactures rubber sealing/insulating products for automotive, electrical and aviation customers; balance sheet contains ordinary manufacturing assets and liabilities; no short-term or long-term bank borrowings.
+conclusion: statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+special treatment: designated IPO proceeds are not treated as freely detachable cash.
+
+[6] core reported facts extracted
+all amounts CNY yuan.
+revenue=440822135.15
+cost_of_sales=276289507.75
+gross_profit=164532627.40
+operating_profit=101062050.83
+net_profit=87135503.62
+parent_net_profit=87135503.62
+deducted_parent_net_profit=79352755.85
+operating_cash_flow=86481881.93
+capital_expenditure=44927607.90
+operating_free_cash_flow=41554274.03
+financing_cash_flow=-26404294.00
+dividend_and_buyback_cash_out=26182872.00
+total_assets=1085149782.41
+total_liabilities=99978537.92
+total_equity=985171244.49
+parent_equity=985171244.49
+minority_interest=0
+
+[7] formulas
+gross_margin=(440822135.15-276289507.75)/440822135.15=0.37324039398342357
+net_margin=87135503.62/440822135.15=0.19766589894663553
+operating_free_cash_flow=86481881.93-44927607.90=41554274.03
+
+[8] discounted detachable net cash
+non-designated cash: (260838619.67-169691242.21)*70%=63803164.222
+designated IPO proceeds cash: 169691242.21*0%=0
+trading financial assets: 247493452.01*85%=210369434.2085
+other non-current financial assets: 11203036.75*50%=5601518.375
+less current lease-related liability and lease liability: -(869425.92+210878.10)=-1080304.02
+discounted_detachable_net_cash=278693812.7855
+limitation: trading financial assets may contain temporarily idle IPO proceeds; the annual report does not provide a complete source-by-product split. The 15% haircut is judgment, not a reported fact.
+
+[9] discounted sustainable cash profit
+reported parent net profit=87135503.62
+less non-recurring profit=7782747.77
+deducted parent net profit=79352755.85
+additional prudential haircut=14352755.85
+discounted_sustainable_cash_profit=65000000
+rationale: 2025 OCF improved but one-year FCF was 41554274.03; new factory was commissioned and IPO projects continue through 2027. A further 18.1% haircut to deducted profit allows for maintenance capex and working-capital volatility. This is an inference, not company guidance.
+
+[10] owner earnback formulas
+market_cap=2195000000 from input Tencent snapshot dated 20260731114306
+operating_business_price=2195000000-278693812.7855=1916306187.2145
+owner_earnback_years=1916306187.2145/65000000=29.481633649453844
+market_cap_to_cash_profit=2195000000/65000000=33.76923076923077
+discounted_net_cash_to_market_cap=278693812.7855/2195000000=0.12696756846719817
+
+[11] dividend forecast
+board proposal: eligible shares=50742000; cash dividend per share=0.606
+forecast_cash_dividend=50742000*0.606=30749652
+forecast_dividend_yield=30749652/2195000000=0.014008953075170843
+status: board-approved annual distribution proposal stated in annual report; actual implementation may differ.
+
+[12] result construction
+outputs/result.json was initialized and populated using protocol CLI init/set/append commands. It was not authored as a complex JSON document from scratch.
+
+[13] validation
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+result: status=ok, errors=[]

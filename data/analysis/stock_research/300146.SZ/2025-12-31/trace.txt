@@ -1,0 +1,72 @@
+stock-research trace
+company=汤臣倍健
+code=300146.SZ
+period=2025-12-31
+generated_context_date=2026-07-31
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Read references/data-reuse.md to apply reuse boundaries.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated scalar fields and appended list entries through protocol set/append commands.
+6. Validated result.json with the protocol validator.
+
+[reuse_check]
+- stock_report/data/analysis/annual_review/300146.SZ/2025-12-31: not present.
+- stock_report/data/normalized/facts/300146.SZ/2025-12-31: not present.
+- stock_report/data/analysis/stock_research/300146.SZ/2025-12-31: not present.
+- /root/aicode/stock_report matching 300146.SZ/2025-12-31 files: not present.
+- Therefore no existing annual facts or historical stock-research result could be reused.
+
+[sources]
+- 汤臣倍健股份有限公司2025年年度报告（2026-03-21披露），公开年报全文：
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12009396&stockid=300146
+- 汤臣倍健股份有限公司2025年年度报告摘要：
+  https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12009367
+- Company investor relations page identifying the 2025 annual report:
+  https://www.by-health.com/about-services/
+- Market cap and PE TTM: config/input.json, source recorded as Tencent qt.gtimg.cn, snapshot 20260731114306.
+
+[core_facts]
+- revenue=6265470820.50
+- cost_of_sales=2011472652.29
+- gross_profit=4253998168.21
+- parent_net_profit=782150543.66
+- operating_cash_flow=1213699380.10
+- capital_expenditure=133377559.13
+- operating_free_cash_flow=1080321820.97
+- total_assets=13980068650.70
+- total_liabilities=2789652670.89
+- parent_equity=11109138425.11
+- cash=2449398453.00
+- trading_financial_assets=3607888853.06 (annual report note: wealth-management products)
+- interest_bearing_debt=1032344549.78
+- forecast_cash_dividend=753821479.80
+
+[formula_checks]
+gross_margin=(6265470820.50-2011472652.29)/6265470820.50=0.6789590583187044
+net_margin=782150543.66/6265470820.50=0.1248350788101799
+operating_free_cash_flow=1213699380.10-133377559.13=1080321820.97
+discounted_net_cash=2449398453.00+3607888853.06*0.90-1032344549.78=4664153870.974
+discounted_net_cash_to_market_cap=4664153870.974/17610000000=0.2648582550240772
+discounted_sustainable_cash_profit=750000000.00
+operating_business_price=17610000000-4664153870.974=12945846129.026
+owner_earnback_years=12945846129.026/750000000=17.261128172034667
+market_cap_to_cash_profit=17610000000/750000000=23.48
+forecast_dividend=1675158844*0.45=753821479.80
+forecast_dividend_yield=753821479.80/17610000000=0.04280644405451448
+
+[judgment_boundaries]
+- statement_model=ordinary_operating; confirmed from the annual report's VDS manufacturing and sales business.
+- Cash includes unrestricted monetary funds at 100%.
+- Trading financial assets are wealth-management products and receive a 10% haircut.
+- Interest-bearing debt is deducted at 100%.
+- Long-term equity investments, other equity instruments, non-current financial assets, goodwill, inventory, receivables and operating fixed assets are excluded from detachable cash.
+- Sustainable cash profit is set to CNY 750m versus parent net profit of CNY 782.15m and operating FCF of CNY 1,080.32m, reflecting revenue decline and non-recurring positive items.
+- Dividend forecast is a board-approved proposal, not yet treated as an irrevocably completed payment.
+
+[final_validation]
+protocol_status=ok
+protocol_errors=[]

@@ -1,0 +1,96 @@
+stock-research trace
+company=000729.SZ 燕京啤酒
+period=2025-12-31
+generated_for_input=2026-07-31T18:43:05+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated initialized paths using protocol set commands; result was not handwritten from an empty object.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Initial populated validation status: ok, errors: [].
+
+[reuse audit]
+- Expected annual fact pack, normalized facts, raw filing metadata, and historical stock-research outputs were absent in the workspace.
+- No prior research conclusion was reused.
+- Downloaded official annual report PDF to stock_report/data/raw/filings/000729.SZ/2025-12-31/annual-report-2025.pdf.
+- Extracted a local text copy to stock_report/data/raw/filings/000729.SZ/2025-12-31/annual-report-2025.txt for deterministic searching.
+
+[primary sources]
+- Shenzhen Stock Exchange annual report PDF:
+  https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-15/71e46585-5d8e-49b0-9edc-51b2845bf27e.PDF
+  Disclosure date: 2026-04-15.
+- Market snapshot: config/input.json; Tencent qt.gtimg.cn; timestamp 20260731114339.
+
+[model classification]
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Evidence: beer revenue was CNY 13,568,016,949.57, 88.49% of revenue. The company manufactures and sells physical consumer products through production bases and distribution channels. Cash, deposits, borrowings, and contract liabilities support but do not constitute a financial business model.
+
+[financial extraction]
+- Balance sheet: annual report pp.84-85.
+  total_assets=23,746,974,374.74
+  total_liabilities=6,998,459,020.82
+  total_equity=16,748,515,353.92
+  parent_equity=15,480,762,312.76
+  minority_interest=1,267,753,041.16
+- Income statement: annual report pp.88-89.
+  revenue=15,332,979,766.40
+  cost_of_sales=8,653,866,068.65
+  gross_profit=6,679,113,697.75
+  operating_profit=2,364,369,770.06
+  net_profit=2,007,686,284.05
+  parent_net_profit=1,679,117,088.59
+- Cash flow statement: annual report pp.91-92.
+  operating_cash_flow=2,721,833,054.44
+  capital_expenditure=1,271,821,622.82
+  operating_free_cash_flow=1,450,011,431.62
+  financing_cash_flow=-1,282,652,883.53
+  dividends/profit/interest cash out=978,199,104.73
+
+[derived metrics]
+- gross_margin=(15,332,979,766.40-8,653,866,068.65)/15,332,979,766.40=0.4356044161
+- net_margin=1,679,117,088.59/15,332,979,766.40=0.1095101614
+- minority_interest_ratio=1,267,753,041.16/16,748,515,353.92=0.0756934579
+
+[discounted detachable net cash]
+Source notes: annual report note V.1, V.2, V.9, V.20, financing-liability roll-forward, and related finance-company disclosure.
+- cash and cash equivalents 1,595,805,093.33 at 100%=1,595,805,093.33
+- term deposits/accrued interest inside monetary funds 4,890,565,176.53 at 85%=4,156,980,400.05
+- current term deposits 448,600,767.10 at 90%=403,740,690.39
+- long-term deposits 2,220,282,007.96 at 75%=1,665,211,505.97
+- structured deposits 90,326,711.68 at 80%=72,261,369.34
+- deduct financing liabilities 575,023,312.55 in full, plus an additional minority-interest/finance-company concentration buffer 318,976,746.53; total deduction 894,000,059.08, so final discounted detachable net cash=7,000,000,000.00
+Judgment note: this is a conservative analytical value, not a reported subtotal. Related finance-company deposits were CNY 603,638,721.19 at year-end.
+
+[sustainable cash profit]
+- Starting parent net profit=1,679,117,088.59.
+- Non-recurring gain after tax/minority=156,707,812.35; main item was land resumption/non-current asset disposal.
+- Consolidated operating FCF=2,721,833,054.44-1,271,821,622.82=1,450,011,431.62.
+- Parent share proxy=1,679,117,088.59/2,007,686,284.05=0.8363443542.
+- Attributable FCF proxy about CNY 1.213 billion; rounded down to discounted_sustainable_cash_profit=1,200,000,000.00.
+- This is below attributable recurring earnings and treats all capex as a deduction because maintenance/growth capex was not separately disclosed.
+
+[earnback formulas]
+- market_cap=36,021,000,000.00
+- discounted_net_cash=7,000,000,000.00
+- operating_business_price=36,021,000,000-7,000,000,000=29,021,000,000.00
+- owner_earnback_years=29,021,000,000/1,200,000,000=24.1841666667
+- market_cap_to_cash_profit=36,021,000,000/1,200,000,000=30.0175
+- discounted_net_cash_to_market_cap=7,000,000,000/36,021,000,000=0.1943310846
+
+[dividend]
+- 2025 first-three-quarter dividend paid: CNY 281,853,934.10, CNY 1.0 per 10 shares.
+- 2025 year-end proposed dividend: CNY 563,707,868.20, CNY 2.0 per 10 shares.
+- Full-year baseline forecast=845,561,802.30.
+- forecast_dividend_yield=845,561,802.30/36,021,000,000=0.0234741346.
+- Limitation: year-end component was a board proposal in the annual report.
+
+[data quality]
+- status=complete
+- Core audited financials, business facts, cash/deposit details, dividend basis, model classification, and valuation snapshot are present.
+- Analytical judgment remains in net-cash haircuts and sustainable cash profit; both are explicitly traced.
+- Market snapshot was accepted from task input and was not independently reconciled to exchange tick data.

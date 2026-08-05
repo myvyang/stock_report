@@ -1,0 +1,86 @@
+stock-research trace
+company=002991.SZ 甘源食品
+period=2025-12-31 annual
+generated_at=2026-07-31T20:59:46+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, data-reuse.md.
+2. Ran protocol init with config/input.json -> outputs/result.json.
+3. Local annual facts/raw filing/research outputs were absent; no prior facts were reused.
+4. Populated initialized paths with protocol set commands.
+5. Ran protocol validate; status=ok, errors=[].
+
+[primary filing]
+CNINFO query endpoint returned:
+- secCode=002991
+- orgId=9900039782
+- announcementId=1225136087
+- title=2025年年度报告
+- date=2026-04-22
+- official_url=https://static.cninfo.com.cn/finalpage/2026-04-22/1225136087.PDF
+Downloaded PDF: 1,523,823 bytes, 165 pages.
+Text extraction used pypdf in temporary venv because pdftotext was unavailable. Temporary extraction was used only for research, not as an output source.
+
+[financial facts: annual report]
+revenue=2095869356.91
+cost_of_sales=1367534658.06
+gross_profit=728334698.85 (calculated revenue-cost)
+gross_margin=0.34750958901551227 (calculated)
+operating_profit=243451990.60
+net_profit=207706840.89
+parent_net_profit=208434887.25
+parent_net_margin=0.09945032430709398 (calculated)
+deducted_parent_net_profit=190215181.21
+operating_cash_flow=258749120.74
+capex=124149091.48
+operating_free_cash_flow=134600029.26 (calculated OCF-capex)
+financing_cash_flow=-265408457.19
+dividend_and_interest_cash_out=216761009.73
+total_assets=2166564481.01
+total_liabilities=453654222.80
+total_equity=1712910258.21
+parent_equity=1713156813.90
+minority_interest=-246555.69
+
+[business facts]
+distribution revenue=1584965218.06, gross margin=32.79%, YoY=-17.74%
+e-commerce revenue=324665750.18, gross margin=43.37%, YoY=+35.77%
+direct/other revenue=163402381.14, gross margin=31.69%, YoY=+101.94%
+distributors at year end=3578, YoY=-4.13%
+product gross margins: green peas 43.92%, broad beans 41.96%, sunflower kernels 40.73%, mixed nuts/beans 25.09%
+
+[cash model: facts then judgments]
+Fact: cash=478259222.28
+Fact: trading financial assets=173094637.63, mainly bank wealth-management products
+Judgment: apply 95% to trading financial assets => 164439905.7485
+Fact: restricted/frozen cash=6764498.00; deduct 100%
+Fact: fundraising cash whose use remains restricted=156176250.00; deduct 100%
+Judgment: operating cash reserve=150000000.00; deduct 100%. This equals about 0.86 month of 2025 operating cash outflows and is not a company-disclosed minimum.
+Fact: current non-current liabilities=5795742.74 and lease liabilities=634763.35; annual report indicates no year-end bank borrowings. Deduct total 6430506.09.
+Formula: 478259222.28 + 173094637.63*0.95 - 6764498 - 156176250 - 150000000 - 6430506.09 = 323327873.9385 discounted detachable net cash.
+
+[cash-profit model]
+Fact starting point: deducted parent net profit=190215181.21.
+Judgment cash-conversion discount=0.94 because reported FCF 134600029.26 was below deducted profit, while recognizing part of capex is growth capex.
+Judgment sustainability discount=0.90 because revenue fell 7.15%, distribution revenue fell 17.74%, and parent profit fell 44.59%.
+Formula: 190215181.21*0.94*0.90=160922043.30366 discounted sustainable cash profit.
+
+[owner earnback]
+Market fact from input: market_cap=4034000000.00; timestamp=20260731114315; source=Tencent qt.gtimg.cn; pe_ttm=18.17.
+operating_business_price=4034000000-323327873.9385=3710672126.0615
+owner_earnback_years=3710672126.0615/160922043.30366=23.0588181077
+market_cap_to_cash_profit=4034000000/160922043.30366=25.0680386427
+discounted_net_cash_to_market_cap=323327873.9385/4034000000=0.08015068764
+
+[dividend]
+Fact: 2025 interim dividend=53133776.22.
+Fact: 2025 annual dividend=92800888.47.
+Fact: total dividends attributable to FY2025=145934664.69, disclosed payout ratio=70.01%.
+Forecast judgment: use FY2025 total as a next-12-month capacity baseline, not a 2026 promise.
+forecast_dividend_yield=145934664.69/4034000000=0.03617616874.
+
+[limitations]
+- Market snapshot was supplied by the task and not independently reconciled to exchange tick data.
+- Cash reserve and all discounts are analytical judgments; changing them changes the earnback result.
+- No verifiable market share was disclosed, so no industry ranking assertion was made.
+- 2026 dividend is unknown; forecast uses the prior-year distribution capacity only.

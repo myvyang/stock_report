@@ -1,0 +1,64 @@
+stock-research trace
+company=PGR
+period=2025-12-31
+generated_at=2026-08-04T17:20:57+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+- Checked configured raw filing, annual review, normalized facts, and prior stock-research paths.
+- No PGR 2025 local filing or annual facts package was present; fetched primary public sources.
+
+3. Primary sources used
+- SEC Form 10-K filed 2026-03-02, accession 0000080661-26-000086:
+  https://www.sec.gov/Archives/edgar/data/80661/000008066126000086/pgr-20251231.htm
+- SEC Exhibit 13, 2025 Annual Report to Shareholders:
+  https://www.sec.gov/Archives/edgar/data/80661/000008066126000086/pgr-20251231_d2.htm
+- Federal Reserve G.5A annual FX table, released 2026-01-05:
+  https://www.federalreserve.gov/releases/g5a/current/
+- Market cap and PE: config/input.json, Yahoo Finance yfinance, dated 2026-08-03.
+
+4. Model decision
+- Input hint ordinary_operating/applicable was overridden.
+- Confirmed statement_model=financial_insurance.
+- Confirmed owner_earnback_applicability=requires_special_model.
+- Reason: investments support policy liabilities, claims reserves, liquidity, and regulatory capital; they are not detachable net cash. Insurance operating cash flow is distorted by premium timing, reserve movements, and investment allocation.
+- Ordinary discounted net cash, discounted cash profit, operating business price, earnback years, and market-cap-to-cash-profit fields were kept null.
+
+5. Currency conversion
+- Financial statement USD amounts converted to CNY at 2025 Federal Reserve annual average USD/CNY=7.1875.
+- 2024 dividend history converted at 2024 annual average USD/CNY=7.1957.
+- This convention is consistent within the result but differs from period-end translation for balance-sheet items.
+
+6. Key extracted USD facts (millions unless noted)
+- Revenue 87,671; net premiums earned 81,661; net income 11,308.
+- Total assets 123,039; total liabilities 92,716; shareholders' equity 30,323.
+- Investments 97,373; premiums receivable 15,362; reinsurance recoverables 4,083.
+- Unearned premiums 25,219; loss and LAE reserves 43,310; debt 6,897.
+- Operating cash flow 17,548; property/equipment purchases 348; financing cash flow -3,037.
+- Underwriting profit 10,249; underwriting margin 12.6%; combined ratio 87.4%.
+- Statutory surplus 28,370; net premiums written/statutory surplus 2.9x.
+- 2025 common dividends declared $13.90/share, including $13.50 annual-variable dividend.
+
+7. Dividend forecast
+- Base forecast includes regular quarterly dividend only: $0.10 x 4 x 586.1 million shares.
+- Converted forecast CNY cash dividend=1,685,037,500.
+- Forecast yield=0.0020314840005007297 against input market cap.
+- Annual-variable dividend excluded because it is discretionary and historically volatile.
+
+8. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields with protocol set commands; complex JSON was not hand-written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validator status: ok; errors: [].
+
+9. Output status
+- outputs/result.json: complete under special-model minimum requirements.
+- outputs/report.md: completed.
+- outputs/trace.txt: completed.

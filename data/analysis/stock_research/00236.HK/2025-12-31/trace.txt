@@ -1,0 +1,43 @@
+task: stock research 00236.HK, annual period 2025-12-31
+generated_at: 2026-08-03 Asia/Shanghai
+
+protocol:
+- initialized outputs/result.json with: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- populated scalar/object fields using protocol set
+- populated asset_analysis and evidence arrays using protocol append
+- validated with protocol validate; status=ok, errors=[]
+
+source reuse:
+- reused stock_report/data/analysis/annual_review/00236.HK/2025-12-31/facts.json
+- reused annual_facts.md and extraction_trace.txt
+- checked raw annual-report text for model identity, segment results, dividends, financial statements and concentration
+- primary filing: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0331/2026033101438_c.pdf
+
+model decision:
+- input hint financial_brokerage rejected
+- annual report note 3(a) says all revenue derives from manufacture/distribution of bottled, canned and draught beer
+- confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable
+
+currency conversion:
+- source: PBOC/CFETS 2025-12-26 RMB central parity announcement
+- rate used uniformly: HKD 1 = CNY 0.90486
+- limitation: period-end rate used for all statements; no separate annual-average rate
+
+owner earnback assumptions:
+- non-Mainland cash HKD232.258m x 80%
+- Mainland cash HKD53.455m x 50%
+- related-company interest-bearing loan HKD3.592m deducted 100%
+- lease liabilities tracked but not mechanically deducted because they support continuing operations
+- investment properties excluded from detachable cash to avoid double counting rental income and asset value
+- sustainable cash profit base: median 2023-2025 FCF after PPE capex = HKD64.203m
+- additional business-quality haircut: 15%
+- discounted net cash CNY189.063m
+- discounted sustainable cash profit CNY49.381m
+- operating business price CNY148.390m
+- owner earnback 3.005 years; market cap/cash profit 6.834x
+
+key limitations:
+- cash not disclosed by parent versus subsidiaries/legal entities
+- Mainland remittance regulation exists; no separate restricted-cash line found
+- maintenance versus growth capex not disclosed
+- market snapshot supplied by input not independently reconstructed

@@ -1,0 +1,27 @@
+Stock research trace — ARR — period 2025-12-31
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Read stock-research SKILL.md and both required contracts in full.
+2. Checked configured raw-filing, annual-review and normalized-facts paths. No local ARR filing or facts package existed.
+3. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Retrieved and reviewed primary disclosures:
+   - SEC 2025 Form 10-K: https://www.sec.gov/Archives/edgar/data/1428205/000142820526000029/arr-20251231.htm
+   - SEC filing index: https://www.sec.gov/Archives/edgar/data/1428205/000142820526000029/0001428205-26-000029-index.htm
+   - Q1 2026 Form 10-Q/earnings release: https://www.sec.gov/Archives/edgar/data/1428205/000142820526000058/arrq12026pressrelease.htm
+   - July 2026 dividend filing: https://www.sec.gov/Archives/edgar/data/1428205/000142820526000076/arr-20260701.htm
+5. Model override:
+   Input hint ordinary_operating/applicable rejected. Filing facts show an Agency mortgage REIT whose MBS, repo funding and derivatives are its operating system. Classified platform_financial_mixed/requires_special_model. Ordinary owner earnback values left null.
+6. Financial extraction (USD thousands in filing):
+   Assets 21,005,159; liabilities 18,744,106; equity 2,261,053; net income 322,687.
+   Agency MBS 19,417,640; repo 17,941,796; debt/equity 7.94x.
+   Interest income 800,424; interest expense 642,085; NII 158,339.
+   Common dividends 271,474; preferred dividends 12,038; estimated REIT taxable income 229,732.
+7. Currency conversion:
+   Contract requires absolute CNY amounts. Used explicit analytical assumption USD/CNY 7.20 for all filing and dividend amounts. Market cap was retained unchanged from input. This is disclosed as a limitation.
+8. Dividend forecast:
+   Annualized $0.24 monthly rate confirmed through July 2026. Approximate share count derived from April 2026 declared aggregate common dividend $29.847m / $0.24 = 124.3625m shares. Forecast $358.164m = CNY 2,578,780,800; yield 16.392% versus supplied market cap. Board discretion and ATM issuance caveats disclosed.
+9. Populated result fields using protocol CLI set commands, not by constructing result.json manually.
+10. Protocol validation:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Result: {"status":"ok","errors":[]}

@@ -1,0 +1,121 @@
+stock-research trace
+company: 深圳市同为数码科技股份有限公司 (002835.SZ)
+period: 2025-12-31 annual
+generated context date: 2026-08-01 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields only through protocol `set`; did not construct the result JSON from scratch.
+
+[local reuse check]
+Checked the input-declared paths under stock_report/data/raw/filings, annual_review, normalized/facts and stock_research.
+Finding: the 002835.SZ/2025-12-31 filing, facts, normalized facts and prior research files were absent from /workspace. Only stock_report/data/notes/user_stock_evaluations.md existed.
+Consequence: no annual fact pack was available to reuse. Research reverted to the official filing.
+
+[official sources]
+Primary annual report:
+https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-24/c9ab381d-e291-4281-bd5d-2835a0cfd7ec.PDF
+Title: 深圳市同为数码科技股份有限公司2025年年度报告全文
+Published: 2026-04-24, Shenzhen Stock Exchange static disclosure host.
+Local temporary copy: /tmp/tvt2025/annual.pdf (not an output dependency).
+PDF extraction: pypdf installed into /tmp/tvt2025/pylib because pdftotext was unavailable; extracted text to /tmp/tvt2025/annual.txt for verification.
+
+Dividend announcement:
+https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-24/e54ca31c-1990-45b1-b9ce-dc02b3124ead.PDF
+The annual report itself also states the proposal: 218,666,131 eligible shares, CNY 2.8 per 10 shares.
+
+Market data:
+config/input.json, sourced there to Tencent qt.gtimg.cn.
+market_cap = 2,597,000,000 CNY
+market_cap timestamp = 2026-07-31 11:43:42
+pe_ttm = 22.57
+
+[financial statement extraction]
+Revenue = 1,114,202,998.15
+Cost of sales = 636,144,651.25
+Gross profit = 478,058,346.90
+Operating profit = 140,495,821.53
+Parent/net profit = 139,353,451.97 (no minority interest)
+Operating cash flow = 114,011,616.58
+Capex (cash paid to acquire fixed, intangible and other long-term assets) = 73,428,497.68
+Operating free cash flow = 40,583,118.90
+Financing cash flow = -48,241,749.28
+Dividend/profit/interest cash out = 70,794,760.43
+
+Total assets = 1,645,428,554.18
+Total liabilities = 394,671,431.25
+Total/parent equity = 1,250,757,122.93
+Minority interest = 0
+
+Cross-checks:
+assets = liabilities + equity = 394,671,431.25 + 1,250,757,122.93 = 1,645,428,554.18
+gross profit = revenue - cost = 478,058,346.90
+gross margin = 478,058,346.90 / 1,114,202,998.15 = 0.4290550423
+net margin = 139,353,451.97 / 1,114,202,998.15 = 0.1250682774
+
+[analysis model]
+Confirmed statement_model = ordinary_operating and owner_earnback_applicability = applicable.
+Reason: revenue comes from R&D, manufacture and distribution of video surveillance products. Assets are ordinary cash, wealth-management products, receivables, inventory and productive fixed assets. Liabilities are ordinary trade payables, contract liabilities, employee/tax obligations and small borrowings. No customer deposits, insurance reserves, regulated presale funds, concession rights or underlying investment-holding structure were identified.
+
+[discounted detachable net cash]
+Cash: 499,955,456.50 × 80% = 399,964,365.20.
+Rationale: only 170,334.02 was restricted, but operating cash must fund R&D, purchases, overseas operations and FX volatility; 20% haircut reserves for those needs.
+
+Trading financial assets: 130,524,729.00 × 90% = 117,472,256.10.
+Rationale: mainly 130,000,000 bank wealth-management products plus 524,729 fair value of forward FX; high liquidity but not treated at par.
+
+Debt deduction at 100%:
+long-term borrowing 40,617,016.11
+current portion of non-current liabilities 6,640,831.93
+lease liabilities 5,125,113.47
+total = 52,382,961.51
+
+Discounted detachable net cash = 399,964,365.20 + 117,472,256.10 - 52,382,961.51 = 465,053,659.79.
+Discounted net cash / market cap = 0.1790734154.
+
+[discounted sustainable cash profit]
+Reported CFO = 114,011,616.58.
+Cash-flow reconciliation working-capital components:
+inventory change = -79,579,602.25
+operating receivables change = -27,527,237.65
+operating payables change = +46,970,035.89
+net working-capital cash drag = -60,136,804.01.
+
+Normalization assumption: treat the 2025 net working-capital cash drag as non-recurring for the base case.
+Normalized CFO = 114,011,616.58 + 60,136,804.01 = 174,148,420.59.
+Less capex = 73,428,497.68.
+Normalized free cash flow = 100,719,922.91.
+Sustainability haircut = 10,071,992.291 (10%) to cover shrinking revenue, elevated inventory, overseas concentration and FX uncertainty.
+Discounted sustainable cash profit = 90,647,930.619.
+
+This is an inference, not a reported fact. If inventory growth is structural or obsolete rather than temporary, normalized cash profit is overstated. The unadjusted 2025 free cash flow was only 40,583,118.90.
+
+[owner earnback formulas]
+Operating business price = 2,597,000,000 - 465,053,659.79 = 2,131,946,340.21.
+Owner earnback years = 2,131,946,340.21 / 90,647,930.619 = 23.518976452.
+Market cap / cash profit = 2,597,000,000 / 90,647,930.619 = 28.649287219.
+
+[dividend]
+Forecast/reference dividend = 218,666,131 eligible shares × CNY 0.28/share = 61,226,516.68.
+Forecast dividend yield = 61,226,516.68 / 2,597,000,000 = 0.0235758632.
+The annual report unappropriated-profit note reports prior ordinary dividend of 70,033,208.99 for 2024.
+
+[business and risk evidence]
+2025 revenue mix: front-end products 788,188,274.91 (70.74%); back-end 256,801,960.77 (23.05%); overseas 1,081,270,557.12 (97.04%); all sales classified as distribution.
+R&D = 218,134,646.59, 19.58% of revenue, up 10.17%; R&D staff = 507, 34.35% of employees.
+Receivables: balance 312,163,700 approx.; allowance 16,801,100 approx.; carrying amount 295,362,597.41; top five represent 44.01% of receivables and contract assets.
+Inventory carrying value = 261,402,924.64; allowance = 17,284,904.27.
+Overseas revenue concentration, inventory build, receivable concentration and rising R&D were retained because each directly affects revenue, margin, cash conversion or distributable cash.
+
+[quality]
+status = complete because the official annual report supports company identity, model classification, all three statement cores, asset/liability explanations, dividend, business story and owner-earnback components.
+Limitations are explicitly recorded in outputs/result.json: missing local fact packs, market-data reuse from task input, and analytical assumptions in net-cash/cash-profit discounts.
+
+[validation]
+Final command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Result: {"status":"ok","errors":[]}
+Also parsed outputs/result.json with python3 -m json.tool successfully and confirmed all three required output files are non-empty.

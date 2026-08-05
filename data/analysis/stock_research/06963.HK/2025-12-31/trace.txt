@@ -1,0 +1,59 @@
+stock-research trace
+company: 阳光保险集团股份有限公司 (06963.HK)
+period: 2025-12-31 annual
+generated_at: 2026-08-04T10:49:37+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill defines reuse boundaries.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked configured raw filing, annual review, normalized facts, prior stock research, and outputs paths.
+- No reusable files existed in the workspace for 06963.HK/2025-12-31.
+- Therefore retrieved and inspected the official HKEX annual results announcement.
+
+3. Primary filing
+- Title: Annual Results Announcement for the year ended December 31, 2025
+- Issuer: Sunshine Insurance Group Company Limited
+- Publication date: 2026-03-16
+- HKEX URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0316/2026031601496.pdf
+- Document states figures are RMB unless otherwise specified; consolidated financial statements are audited and figures were agreed by the auditor.
+
+4. Model override
+- Input hint: financial_brokerage.
+- Verified business: life insurance, property and casualty insurance, and insurance asset management.
+- Final model: financial_insurance; owner_earnback_applicability=requires_special_model.
+- Reason: RMB640.195bn investment assets match RMB537.054bn insurance contract liabilities and regulatory capital needs. They are not detachable cash.
+- All ordinary owner-earnback values and ratios were left null as required by the contract.
+
+5. Key extracted facts (RMB million in filing; multiplied by 1,000,000 in result.json)
+- Total assets 673,339; total liabilities 608,602; total equity 64,737; parent equity 58,201; NCI 6,536.
+- Total revenue 94,811; net profit 6,570; parent net profit 6,307.
+- Operating cash inflow 64,316; purchases of PPE/intangibles/other assets 635; financing cash inflow 6,396; dividends paid 1,993.
+- Insurance contract liabilities 537,054; bonds payable 19,522; repo liabilities 27,661.
+- Investment assets 640,195: fixed income 461,991 (72.1%); equity 136,431 (21.4%).
+- Net/total/comprehensive investment yields 3.7%/4.8%/6.1%.
+- Group embedded value 120,780; life VNB 7,638; life CSM 57,620.
+- P&C combined ratio 102.1%; ex-guarantee 98.9%; guarantee insurance 129.0% and RMB1,513m underwriting loss.
+- Group core/comprehensive solvency 136%/196%; life 110%/170%; P&C 172%/237%.
+- Proposed 2025 final dividend RMB0.19/share, RMB2,185m total, subject to AGM approval.
+
+6. Market data and derived values
+- Market cap: RMB36,660,084,533.00357 at 2026/08/03 09:48:02, Tencent qt.gtimg.cn, from config/input.json.
+- PE TTM: 6.1 from the same input snapshot.
+- Forecast dividend yield = 2,185,000,000 / 36,660,084,533.00357 = 0.05960160831250244.
+- Descriptive report ratios, not ranking fields: market cap / parent equity ~= 0.63; market cap / embedded value ~= 0.30; proposed dividend / parent net profit ~= 34.6%.
+
+7. Protocol population and checks
+- Used protocol `set` and `append` commands for result fields and list rows; did not hand-write the result JSON.
+- Protocol validation after population returned status=ok and no errors.
+- Final workspace output validation executed after report and trace creation; see final command output in task transcript.
+
+8. Limitations
+- Core filing used was the audited annual results announcement, not the later full annual report; some granular notes are unavailable.
+- Market data was supplied by the task and not independently reconstructed from share classes, FX, or live price.
+- Insurance operating cash flow was retained as a reported fact but explicitly not treated as ordinary free cash flow.
+- Proposed dividend was pending AGM approval at announcement date.

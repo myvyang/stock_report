@@ -1,0 +1,65 @@
+stock-research execution trace
+company: 600004.SH 白云机场
+period: 2025-12-31 annual
+generated context date: 2026-07-31 Asia/Shanghai
+
+1. Read instructions
+   - /workspace/AGENTS.md (provided in task context)
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Initialized protocol result
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reused primary annual-report extraction
+   - stock_report/data/analysis/annual_review/600004.SH/2025-12-31/facts.json
+   - stock_report/data/analysis/annual_review/600004.SH/2025-12-31/annual_facts.md
+   - stock_report/data/analysis/annual_review/600004.SH/2025-12-31/extraction_trace.txt
+   - stock_report/data/raw/filings/600004.SH/2025-12-31/metadata.json
+   - primary filing: https://big5.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-30/600004_20260430_ZSRN.pdf
+
+4. Supplementary verification
+   - Verified 2025 dividend plan/implementation from public announcement search:
+     2,577,244,598 shares; CNY 0.285 per share; total CNY 734,514,710.43;
+     payout ratio 50.02%; implemented in July 2026.
+   - Market capitalization and PE TTM retained from config/input.json:
+     CNY 20,257,000,000; PE TTM 15.12; timestamp 20260731114343;
+     source Tencent qt.gtimg.cn.
+
+5. Analysis-model decision
+   - Input hint reviewed rather than accepted mechanically.
+   - Confirmed statement_model=utility_concession and
+     owner_earnback_applicability=requires_special_model.
+   - Reason: airport infrastructure and rights-of-use are operating capacity;
+     aviation charges are policy constrained; construction payables, lease
+     obligations and continuing capex bind cash; phase-three expansion entered
+     operation only on 2025-10-30, so full-year costs are absent.
+   - Ordinary discounted net cash, cash profit, operating business price,
+     owner earnback years and market-cap/cash-profit fields left null per contract.
+
+6. Key calculations
+   - gross margin = 2,014,229,328.70 / 7,955,002,081.35 = 25.3203%
+   - parent net margin = 1,468,348,737.38 / 7,955,002,081.35 = 18.4582%
+   - mechanical operating FCF = 3,074,788,371.68 - 737,422,743.94
+     = CNY 2,337,365,627.74
+   - forecast/implemented dividend yield = 734,514,710.43 / 20,257,000,000
+     = 3.6260%
+   - 2025 non-recurring items = CNY 509,648,099.50
+   - 2025 recurring-profit reference: parent net profit excluding non-recurring
+     items = CNY 958,700,637.88
+   - mechanical FCF not treated as distributable cash because maintenance capex
+     is undisclosed and CNY 477 million lease cash outflow is classified in financing.
+
+7. Protocol population
+   - Used repeated protocol `set` commands for all top-level research sections.
+   - Complex result JSON was not hand-written from scratch.
+
+8. Validation
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: status=ok, errors=[]
+
+9. Output files
+   - outputs/result.json
+   - outputs/report.md
+   - outputs/trace.txt

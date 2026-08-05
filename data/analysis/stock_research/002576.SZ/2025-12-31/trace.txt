@@ -1,0 +1,70 @@
+stock-research trace
+company: 002576.SZ 通达动力
+period: 2025-12-31 annual
+generated_at: 2026-08-01T02:30:55+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the paths supplied in config/input.json.
+- stock_report/data/raw/filings/002576.SZ/2025-12-31/metadata.json was absent.
+- stock_report/data/analysis/annual_review/002576.SZ/2025-12-31/facts.json was absent.
+- annual_facts.md, extraction_trace.txt and normalized annual facts were also absent.
+- Therefore no local annual fact pack or prior research result could support this task.
+
+3. Source retrieval and model check
+- Located the 2025 annual report announced 2026-03-31. The report identifies 巨潮资讯网 as the designated disclosure site; the accessible full-text mirror used for line-level verification was:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12041099&stockid=002576
+- Business facts show order-based customized production and direct sales of motor stator/rotor laminations, cores and processed assemblies.
+- Balance sheet consists of ordinary manufacturing cash, receivables, inventory, plant/equipment, payables, notes and short-term borrowing.
+- Confirmed analysis_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+4. Core reported facts (CNY)
+- Revenue: 1,760,583,930.12
+- Cost of sales: 1,517,658,789.63
+- Gross profit: 242,925,140.49
+- Operating profit: 92,947,955.93
+- Net profit: 81,010,566.99
+- Parent net profit: 82,379,104.78
+- Deducted parent net profit: 76,946,014.69
+- Operating cash flow: 81,153,485.54
+- Capital expenditure (cash paid for PP&E/intangibles/other long-term assets): 44,208,695.75
+- Operating free cash flow: 81,153,485.54 - 44,208,695.75 = 36,944,789.79
+- Total assets: 2,061,459,810.17
+- Total liabilities: 747,684,323.48
+- Total equity: 1,313,775,486.69
+- Parent equity: 1,326,159,903.76
+- Minority interest: -12,384,417.07
+- Cash and cash equivalents: 346,639,361.62
+- Reported cash: 438,799,683.92
+- Reported cash less cash equivalents: 92,160,322.30; excluded from detachable cash because it is not cash-equivalent and is associated mainly with note deposits/restrictions.
+- Trading financial assets: 40,091,440.56
+- Short-term borrowing: 110,345,506.94
+
+5. Calculations
+- Gross margin = 242,925,140.49 / 1,760,583,930.12 = 0.1379798693.
+- Net margin = 82,379,104.78 / 1,760,583,930.12 = 0.0467907854.
+- Discounted detachable net cash = 346,639,361.62 + 40,091,440.56 * 0.90 - 110,345,506.94 = 272,376,151.184.
+- Discounted net cash / market cap = 272,376,151.184 / 2,323,000,000 = 0.1172518946.
+- 2025 FCF was only 36.94m and 2024 FCF was about 12.55m, versus 2025 deducted parent profit of 76.95m. To avoid using either accounting profit or a single-year working-capital low mechanically, discounted sustainable cash profit was set to 50,000,000. This is an analyst estimate, not reported guidance.
+- Operating business price = 2,323,000,000 - 272,376,151.184 = 2,050,623,848.816.
+- Owner earnback years = 2,050,623,848.816 / 50,000,000 = 41.0124769763.
+- Market cap / cash profit = 2,323,000,000 / 50,000,000 = 46.46.
+- Proposed dividend base = 165,100,000 - 18,800 shares.
+- Forecast cash dividend = 165,081,200 * 0.08 = 13,206,496.
+- Forecast dividend yield = 13,206,496 / 2,323,000,000 = 0.0056851037.
+
+6. Output construction
+- Populated outputs/result.json through repeated protocol CLI `set` operations; did not hand-write the JSON object.
+- Wrote outputs/report.md as the human-readable operating story required by report-contract.md.
+- Set data_quality.status=complete because company identity, valuation, three statements, asset/liability explanations, owner earnback bridge, dividend forecast, business story and evidence are populated.
+- Recorded limitations: no local primary filing package, sustainable cash profit is an estimate, dividend remains a proposal, and market-cap date differs from report date.
+
+7. Validation
+- Ran protocol validation after population; initial result: status=ok, errors=[].
+- Final validation rerun after exact ratio corrections is recorded below by the task runner.

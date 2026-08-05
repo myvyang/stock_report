@@ -1,0 +1,59 @@
+stock-research trace
+task: 00807.HK / FY2025 annual
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read .agents/skills/stock-research/references/result-contract.md in full.
+- Read .agents/skills/stock-research/references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked the annual-review, normalized-facts, raw-filing and prior stock-research paths supplied in config/input.json.
+- No reusable files were present in the workspace; only config/input.json existed.
+
+3. Primary-source retrieval
+- Located and downloaded the official SIIC Environment Holdings Ltd. Annual Report 2025 from HKEX:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0327/2026032701980.pdf
+- Publication date: 2026-03-27.
+- Extracted the PDF locally for review; core references used:
+  * pp. 24-30: financial highlights and management discussion
+  * pp. 63, 94: dividend proposal and payment information
+  * pp. 100-111: consolidated income statement, balance sheet and cash flow statement
+  * Notes 12-13: cash and receivables
+  * Note 17, pp. 147-148 onward: service concession model, terms and project counts
+  * Note 36: historical dividends and RMB equivalents
+  * Note 41, pp. 187-188: segment revenue, profit, assets, liabilities and capex
+  * Note 42: net debt, leverage, interest-rate sensitivity and financial risks
+
+4. Model review
+- Rejected input analysis_model_hint=financial_brokerage as a company-master-data error.
+- Confirmed statement_model=utility_concession.
+- Confirmed owner_earnback_applicability=requires_special_model because concession financial assets, intangible operating rights, project borrowings and transfer obligations are integral to the business.
+- Kept all ordinary owner-earnback sorting fields null as required by the result contract.
+
+5. Calculations
+- gross_margin = 2,463,026,000 / 7,072,781,000 = 0.3482372713.
+- net_margin = 610,436,000 / 7,072,781,000 = 0.0863091951.
+- minority_interest_ratio = 5,631,557,000 / 16,661,429,000 = 0.3379948408.
+- operating_free_cash_flow = 1,694,367,000 - 929,407,000 = 764,960,000.
+- forecast dividend: S$0.011 x 2,575,665,726 shares = S$28.332m. RMB estimate uses the annual report's prior-year actual RMB equivalent for the same S$0.011/share: approximately RMB157.5m.
+- forecast_dividend_yield = 157,500,000 / 2,193,687,584.4293833 = 0.0717978234.
+- net debt quoted from annual report Note 42: RMB18,263,541,000.
+
+6. Market data
+- Used config/input.json market snapshot without alteration:
+  market cap RMB2,193,687,584.4293833; timestamp 2026/07/31 16:08:47; PE TTM 3.77; source Tencent qt.gtimg.cn.
+- Limitation: market snapshot was not independently reconstructed from share price and issued shares.
+
+7. Protocol population and validation
+- Populated outputs/result.json through repeated protocol `set` commands; no complex result object was hand-written from scratch.
+- First completed validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[].
+
+8. Output consistency checks
+- outputs/report.md reports the same core numbers, model classification and limitations as outputs/result.json.
+- Ordinary owner-earnback values remain null in both metrics and owner_earnback.
+- All amounts in outputs/result.json are absolute RMB yuan; ratios are decimals.

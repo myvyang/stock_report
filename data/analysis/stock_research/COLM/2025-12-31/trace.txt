@@ -1,0 +1,93 @@
+stock-research trace — COLM — period 2025-12-31
+generated for task created_at: 2026-08-04T22:19:54+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md in full.
+- Read references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked configured annual-review, normalized-facts and raw-filing paths.
+- No pre-existing COLM 2025 annual facts or filing metadata were present in the workspace.
+- Downloaded the official 2025 Form 10-K HTML to stock_report/data/raw/filings/COLM/2025-12-31/colm-20251231.htm for reproducible local inspection.
+
+3. Primary sources
+- SEC Form 10-K, accession 0001050797-26-000028, filed 2026-02-25:
+  https://www.sec.gov/Archives/edgar/data/1050797/000105079726000028/colm-20251231.htm
+- Company full-year 2025 results and 2026 outlook, dated 2026-02-03:
+  https://investor.columbia.com/news-events/press-releases/detail/383/columbia-sportswear-company-reports-fourth-quarter-and-full
+- USD/CNY central parity on 2025-12-31: 7.0288, CFETS-authorized release reproduced by China Economic Net:
+  https://www.ce.cn/xwzx/gnsz/gdxw/202512/t20251231_2676993.shtml
+- Market cap, date, source and PE were taken exactly from config/input.json.
+
+4. Statement model audit
+- Confirmed ordinary_operating.
+- Business consists of branded apparel, accessories, equipment and footwear sold through wholesale and DTC.
+- Balance sheet contains ordinary cash, short-term investments, receivables, inventory, PP&E, lease assets and operating liabilities.
+- No year-end bank borrowings; no customer deposits, insurance reserves, project escrow, concession rights or other special-model balance-sheet structure.
+- owner_earnback_applicability therefore remains applicable.
+
+5. Currency normalization
+- Filing values are USD thousands.
+- Conversion formula for every financial statement amount: USD thousands × 1,000 × 7.0288 CNY/USD.
+- This period-end rate is a display normalization, not an assertion about average realized FX.
+
+6. Extracted audited facts (USD thousands)
+- Total assets 2,928,493; total liabilities 1,218,350; shareholders' equity 1,710,143; no minority interest disclosed.
+- Revenue 3,397,351; cost of sales 1,680,629; gross profit 1,716,722; operating income 207,039; net income 177,224.
+- Operating cash flow 282,903; capex 66,166; operating FCF 216,737; financing cash flow -267,115.
+- Dividends paid 65,530; repurchases 201,096; combined cash distribution 266,626.
+- Cash 442,028; short-term investments 348,766; receivables 403,168; inventory 689,456.
+- PP&E 279,131; operating lease ROU assets 425,492.
+- Accounts payable 385,599; accrued liabilities 278,421; lease liabilities 477,689; borrowings zero.
+
+7. Formula checks
+- Gross margin = 1,716,722 / 3,397,351 = 0.5053119327.
+- Net margin = 177,224 / 3,397,351 = 0.0521653488.
+- Operating FCF = 282,903 - 66,166 = USD 216,737 thousand = CNY 1,523,401,025.60.
+
+8. Detachable cash judgment
+- Cash: CNY 3,106,926,406.40 × 50% = CNY 1,553,463,203.20.
+  Reason: preserve substantial liquidity for seasonal purchasing, inventory and ongoing operations.
+- Short-term investments: CNY 2,451,406,460.80 × 95% = CNY 2,328,836,137.76.
+  Reason: mainly short-maturity U.S. Treasury instruments; small realization/liquidity haircut retained.
+- Bank borrowings: zero.
+- Discounted detachable net cash = CNY 3,882,299,340.96.
+- Lease liabilities are treated as operating commitments matched by ROU assets; they are not added to detachable cash or separately deducted as bank debt because lease costs are already reflected in sustainable earnings/cash flow.
+
+9. Sustainable cash-profit judgment
+- 2025 FCF USD 216.737m is used as an upper reference, not blindly capitalized.
+- 2025 net income USD 177.224m includes USD 29m goodwill/intangible impairment.
+- 2026 company outlook: EPS USD 3.20–3.65, gross margin 49.8%–50.0%, with roughly 300 bps pre-mitigation incremental tariff pressure.
+- Adopted discounted sustainable cash profit: USD 170m = CNY 1,194,896,000.
+- This sits near the low end of outlook-implied profit using year-end shares and allows for tariffs, brand execution and working-capital variability.
+
+10. Owner earnback formulas
+- Market cap = CNY 20,491,924,335.497314 (input).
+- Operating business price = market cap - discounted net cash
+  = 20,491,924,335.497314 - 3,882,299,340.96
+  = CNY 16,609,624,994.537315.
+- Owner earnback years = 16,609,624,994.537315 / 1,194,896,000
+  = 13.9004775265 years.
+- Market cap / cash profit = 20,491,924,335.497314 / 1,194,896,000
+  = 17.1495463501 years.
+- Discounted net cash / market cap = 0.1894550886.
+
+11. Dividend forecast
+- Latest board action continues quarterly dividend at USD 0.30/share.
+- Forecast assumes USD 1.20 annualized × 53.495m year-end shares = USD 64.194m.
+- Converted forecast = CNY 451,206,787.20.
+- Forecast dividend yield = 451,206,787.20 / 20,491,924,335.497314 = 0.0220187611.
+- No dividend growth or special dividend assumed.
+
+12. Protocol population and validation
+- Populated initialized skeleton only through protocol CLI set commands; did not hand-write result.json from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation response: {"status":"ok","errors":[]}
+
+13. Data-quality boundary
+- Marked complete because identity, model, valuation, three statements, asset/liability explanations, cash haircuts, profit adjustments, dividend forecast, business story and evidence meet the result contract.
+- Main limitations: one period-end FX rate; supplied market snapshot not independently reconstructed; detachable cash and sustainable cash profit are explicit analyst judgments.

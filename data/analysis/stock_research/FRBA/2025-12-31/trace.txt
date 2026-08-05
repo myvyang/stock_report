@@ -1,0 +1,68 @@
+stock-research trace
+task_created_at=2026-08-04T23:57:10+08:00
+company=FRBA | First Bank | US
+period=2025-12-31
+
+1. Instructions loaded
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md in full.
+- Read references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes research reuse decisions through it.
+
+2. Reuse check
+- Checked stock_report/data/analysis/annual_review/FRBA/2025-12-31, normalized facts, and raw filing paths.
+- No reusable annual facts package or raw filing was present in the workspace.
+
+3. Protocol initialization
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- The initialized input hint was ordinary_operating/applicable.
+
+4. Model verification
+- Official annual-report facts identify First Bank as a deposit-taking commercial bank whose primary assets are loans and whose primary funding is customer deposits.
+- Overrode input hint to financial_bank/requires_special_model.
+- Kept all ordinary owner-earnback fields null as required by the result contract.
+
+5. Primary evidence retrieved
+- First Bank 2025 Annual Report (official IR PDF): https://s206.q4cdn.com/450111087/files/doc_financials/2025/ar/first_bank_annual_report_2025_single_page.pdf
+- First Bank FY2025 earnings release (official IR): https://frba.q4ir.com/news/news-details/2026/First-Bank-Announces-Fourth-Quarter-2025-Net-Income-of-12-3Million-and-Full-Year-Net-Income-of-43-7Million/default.aspx
+- First Bank Q2 2026 earnings release (official IR): https://frba.q4ir.com/news/news-details/2026/First-Bank-Announces-Second-Quarter-2026-Net-Income-of-10-9-Million/default.aspx
+- Market cap and PE source: config/input.json / Yahoo Finance yfinance.
+
+6. Key source facts (USD unless ratio)
+- Total assets: 3,958,036,000
+- Net loans: 3,293,225,000
+- Deposits: 3,202,308,000
+- Borrowings: 236,672,000
+- Subordinated debentures: 34,384,000
+- Stockholders' equity: 443,502,000
+- Net interest income: 137,822,000
+- Credit loss expense: 11,889,000
+- Non-interest income: 9,377,000
+- Net income: 43,659,000
+- NIM: 3.69%; ROA: 1.11%; ROE: 10.26%
+- NPL/loans: 0.56%; allowance/NPL: 246.91%; net charge-offs/average loans: 0.13%
+- CET1: 10.67%; total risk-based capital: 12.87%
+- 2025 dividend/share: 0.24; latest declared quarterly dividend/share: 0.09
+
+7. Currency and derived values
+- Protocol requires CNY absolute yuan. Used explicit translation assumption USD/CNY=7.1884.
+- Total liabilities derived as assets minus equity: USD 3,514,534,000.
+- Bank total net revenue reference = net interest income + non-interest income = USD 147,199,000.
+- Net margin reference = 43,659,000 / 147,199,000 = 0.2965984823; not comparable to industrial-company sales margin.
+- Forecast dividend = USD 0.09 x 4 x 24,800,244 shares x 7.1884 = CNY 64,178,666.63.
+- Forecast dividend yield = CNY 64,178,666.63 / CNY 3,134,057,382.524872 = 0.02047782117.
+- Implied market cap / 2025 year-end book equity = 0.9831x.
+
+8. Protocol population
+- Used repeated protocol `set` commands for model, metrics, financial statements, asset/liability rows, owner-earnback interpretation, dividend, business, risks, evidence, and data quality.
+- Did not hand-write result.json from scratch.
+
+9. Validation
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validator response: status=ok, errors=[]
+
+10. Limitations
+- Official 2025 annual-report summary was available; a local complete 10-K facts package was not.
+- Market cap and PE were accepted from task input without independent reconstruction.
+- Peer outperformance is management's selected-peer statement and was labeled as such.
+- Dividend forecast annualizes one declared quarter and remains subject to future board declarations.

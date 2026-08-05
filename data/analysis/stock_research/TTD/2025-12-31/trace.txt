@@ -1,0 +1,124 @@
+TTD stock research trace
+generated_for_period=2025-12-31
+task_date=2026-08-05 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md, references/report-contract.md, and referenced data-reuse.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated initialized fields through repeated protocol `set` commands; result.json was not created as a hand-written object.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Initial validation result after population: {"status":"ok","errors":[]}
+
+[reuse_check]
+Expected local paths checked:
+- stock_report/data/raw/filings/TTD/2025-12-31
+- stock_report/data/analysis/annual_review/TTD/2025-12-31
+- stock_report/data/normalized/facts/TTD/2025-12-31/annual-facts.json
+No TTD filing or annual fact package was present. Research therefore returned to primary public sources.
+
+[primary_sources]
+1. SEC Form 10-K, fiscal year ended 2025-12-31, filed 2026-02-27
+   Issuer: The Trade Desk, Inc.
+   Accession: 0001671933-26-000014
+   URL: https://www.sec.gov/Archives/edgar/data/1671933/000167193326000014/ttd-20251231.htm
+   Used for business model, retention, risks, audited statements, cash flow, capex, stock compensation, repurchases, and dividend policy.
+2. Company investor relations FY2025 results, published 2026-02-25
+   URL: https://investors.thetradedesk.com/news-and-events/news/news-details/2026/The-Trade-Desk-Reports-Fourth-Quarter-and-Fiscal-Year-2025-Financial-Results/
+   Used to cross-check revenue, net income, year-over-year growth, and management's platform framing.
+3. Federal Reserve H.10 China historical exchange rate
+   URL: https://www.federalreserve.gov/releases/h10/Hist/dat00_ch.htm
+   Observation: 2025-12-31, 6.9931 CNY per USD.
+4. Market data supplied by config/input.json
+   Source: Yahoo Finance yfinance
+   Market cap: CNY 57,228,137,318.95752
+   Date: 2026-08-03
+   PE TTM: 20.500002
+
+[source_facts_usd_thousands]
+revenue=2896284
+platform_operations=619067
+operating_income=589321
+net_income=443304
+total_assets=6153220
+total_liabilities=3668829
+total_stockholders_equity=2484391
+cash_and_cash_equivalents=658175
+short_term_investments=644882
+accounts_receivable=3770194
+property_and_equipment_net=396819
+operating_lease_assets=342042
+accounts_payable=3007651
+operating_lease_liabilities_current=76355
+operating_lease_liabilities_noncurrent=359975
+operating_cash_flow=992721
+purchases_property_equipment=197011
+capitalized_software=12752
+financing_cash_flow=-1411377
+stock_based_compensation=490627
+depreciation_and_amortization=115784
+net_interest_income=68717
+effective_tax_rate=0.33
+class_a_repurchase_amount_excluding_presentation_difference=1388465
+restricted_stock_tax_withholding_cash=97654
+
+[classification]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: TTD operates an ad-buying software/platform business. Receivables and payables represent media settlement working capital. The balance sheet contains no customer deposits, insurance reserves, regulated project cash, development inventory, concession rights, or similar items requiring a special financial-statement model.
+
+[calculation_policy]
+All filing values converted from USD to CNY at 6.9931 CNY/USD. This single period-end rate is used for protocol consistency and is disclosed as a limitation.
+
+Analytical gross profit = revenue - platform operations
+= (2,896,284 - 619,067) * 1,000 * 6.9931
+= CNY 15,924,806,202.7
+gross_margin=0.7862547319254604
+Note: issuer does not present gross profit; platform operations is listed as an operating expense.
+
+net_margin = 443,304 / 2,896,284 = 0.1530595756493493
+
+capital_expenditure = (197,011 + 12,752) * 1,000 * 6.9931
+= CNY 1,466,893,635.3
+operating_free_cash_flow = (992,721 - 197,011 - 12,752) * 1,000 * 6.9931
+= CNY 5,475,303,589.8
+
+Discounted detachable net cash:
+- cash: CNY 4,602,683,592.5 * 80% = CNY 3,682,146,874.0
+- short-term investments: CNY 4,509,724,314.2 * 95% = CNY 4,284,238,098.49
+- operating lease liabilities: CNY 3,051,299,323.0 * 100% deducted
+- result: CNY 4,915,085,649.49
+Judgment: cash haircut preserves operating/seasonal settlement buffer; investments receive liquidity/tax/friction haircut; lease obligations are fully deducted.
+
+Sustainable cash profit:
+- GAAP net income: CNY 3,100,069,202.4
+- add D&A: CNY 809,689,090.4
+- subtract property/equipment and capitalized software capex: CNY 1,466,893,635.3
+- subtract after-tax interest income: 68,717 * (1 - 0.33) * 1,000 * 6.9931 = CNY 321,965,051.3
+- base owner cash profit: CNY 2,120,899,606.191
+- apply 90% sustainability factor: CNY 1,908,809,645.5719001
+Judgment: GAAP net income retains stock-based compensation as an owner cost. This avoids treating the USD 490.627m noncash add-back in operating cash flow as freely distributable profit.
+
+operating_business_price = 57,228,137,318.95752 - 4,915,085,649.49
+= CNY 52,313,051,669.46752
+owner_earnback_years = 52,313,051,669.46752 / 1,908,809,645.5719001
+= 27.4061123857083
+market_cap_to_cash_profit = 57,228,137,318.95752 / 1,908,809,645.5719001
+= 29.981060422508158
+discounted_net_cash_to_market_cap=0.08588582259974792
+
+[dividend]
+forecast_cash_dividend=0
+forecast_dividend_yield=0
+Basis: 2025 10-K states no historical common cash dividends and none anticipated in the foreseeable future; retained earnings are intended for operations, expansion, or Class A repurchases. Repurchases are not classified as dividends.
+
+[data_quality]
+status=complete
+incomplete_reasons=[]
+limitations:
+- Market cap and PE are supplied market data, not SEC-filed figures, and post-date the reporting period.
+- A single period-end FX rate is used for both balance-sheet and flow figures.
+- Gross profit is an analytical reclassification because the issuer does not report it.
+- Haircuts and sustainability adjustments are analyst judgments, not issuer guidance.

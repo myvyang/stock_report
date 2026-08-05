@@ -1,0 +1,51 @@
+2026-08-05 Asia/Shanghai
+Task: 02581.HK / BENQ HOLDING / FY2025 annual research
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse check
+- Checked stock_report/data/analysis/annual_review/02581.HK/2025-12-31 and raw filing directory.
+- No annual facts, annual_facts.md, metadata, or raw filing was available in the workspace.
+
+3. Primary-source retrieval
+- HKEX issuer search identified BenQ BM Holding Cayman Corp., stock code 02581.
+- Downloaded HKEX 2025 Annual Report: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042702510.pdf
+- Extracted the 157-page PDF locally for review.
+- Core pages reviewed: financial summary pp.7-8; MD&A pp.27-32; consolidated statements pp.89-94; notes on revenue, fixed assets, receivables, cash, borrowings, dividends and financial risks.
+
+4. Identity/model resolution
+- Input hint said financial_brokerage, while source tags said medical_service.
+- Annual report confirms the group operates Nanjing BenQ Hospital and Suzhou BenQ Hospital and earns hospital healthcare revenue.
+- No brokerage customer funds, proprietary trading assets, repo financing, or securities operations found.
+- Overrode hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+5. Core calculations (RMB absolute yuan)
+- Total assets = 2,751,955,000 non-current + 1,099,206,000 current = 3,851,161,000.
+- Total liabilities = 1,394,046,000 current + 204,981,000 non-current = 1,599,027,000.
+- Gross margin = 424,066,000 / 2,718,346,000 = 0.1560023301.
+- Net margin = 94,936,000 / 2,718,346,000 = 0.0349241715.
+- Operating FCF = 349,501,000 operating cash flow - 306,661,000 PP&E/intangible purchases = 42,840,000.
+- Cash plus time deposits = 649,800,000 + 703,000 = 650,503,000.
+- Cash less bank loans = 650,503,000 - 671,075,000 = -20,572,000.
+- Discounted detachable net cash = 0 because net cash is negative and IPO proceeds have specified uses.
+- Discounted sustainable cash profit = 80,000,000 judgmental scenario, starting from 94,936,000 parent profit, subtracting 14,936,000 for litigation compensation/non-core effects and a heavy-asset safety margin.
+- Operating business price = 711,166,998.705268 - 0 = 711,166,998.705268.
+- Owner earnback years = 711,166,998.705268 / 80,000,000 = 8.8895874838.
+- Forecast dividend = 0; forecast yield = 0, based on no 2024/2025 dividend, no 2025 final dividend recommendation, no company-level distributable reserves at year-end, and ongoing use of IPO proceeds.
+
+6. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields only through protocol set commands.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+
+7. Limitations
+- Market cap and PE TTM use the supplied Tencent snapshot and were not independently reconciled to an exchange close.
+- Maintenance versus growth capital expenditure is not disclosed; sustainable cash profit is therefore a conservative analytical estimate, not company guidance.
+- Short listing and dividend history limits confidence in forward dividend behavior.
+- Industry position relies on third-party industry material quoted in the prospectus.

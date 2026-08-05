@@ -1,0 +1,75 @@
+stock-research trace
+query=00623.HK
+period=2025-12-31
+generated_at=2026-08-03T12:29:20+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because the skill routed reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- No files were present in stock_report/data/analysis/annual_review/00623.HK/2025-12-31.
+- No files were present in stock_report/data/raw/filings/00623.HK/2025-12-31.
+- Therefore no annual facts pack or prior stock-research result could be reused.
+
+3. Official-source retrieval
+- Located HKEX annual report:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042802085.pdf
+- Document: SinoMedia Holding Limited Annual Report 2025, published 2026-04-28.
+- Located HKEX proposed name-change announcement, published 2026-04-10:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0410/2026041000670.pdf
+- Extracted annual-report text page by page locally for evidence review.
+
+4. Identity and model reconciliation
+- Input company/display name GOLDENBRIDGE GP is consistent with a post-report-period rename.
+- Annual-report issuer at 2025-12-31 was SinoMedia Holding Limited, stock code 00623.
+- Input hint financial_brokerage was rejected: audited accounts show advertising, content and rental revenue; there are no brokerage client funds, margin receivables, repo financing or interest-bearing debt.
+- Selected statement_model=platform_financial_mixed because ordinary media/rental operations coexist with material cash, securities and investment property.
+- Selected owner_earnback_applicability=applicable because the asset pools and liabilities can be separately identified; conservative category-specific discounts were used.
+
+5. Audited facts extracted (RMB thousand in source; converted to absolute RMB in JSON)
+- Revenue 382,288; cost of services 245,916; gross profit 136,372.
+- Operating profit 67,745; profit attributable to shareholders 80,043.
+- Total assets 1,996,427; liabilities 107,210; total equity 1,889,217; parent equity 1,898,757; NCI -9,540.
+- Operating cash flow 39,424; PPE purchases 7,129; financing cash flow -136,592.
+- Cash 316,191; bank deposits 338,840; securities 585,758; investment property 492,851.
+- Proposed final dividend 45,545 (HKD0.11/share equivalent).
+
+6. Calculations
+- gross_margin = 136,372,000 / 382,288,000 = 0.3567258193.
+- net_margin = 80,043,000 / 382,288,000 = 0.2093787930.
+- operating_free_cash_flow = 39,424,000 - 7,129,000 = 32,295,000.
+- discounted detachable assets:
+  cash 316,191,000 * 90% = 284,571,900
+  bank deposits 338,840,000 * 90% = 304,956,000
+  current listed securities 72,798,000 * 70% = 50,958,600
+  non-current FVPL listed securities 129,280,000 * 60% = 77,568,000
+  FVOCI listed strategic securities 323,653,000 * 50% = 161,826,500
+  unlisted equity 60,027,000 * 20% = 12,005,400
+  investment property 492,851,000 * 50% = 246,425,500
+  less all liabilities 107,210,000
+  less potential withholding tax 38,306,000
+  total = 992,795,900.
+- operating_business_price = 738,326,669.8467731 - 992,795,900 = -254,469,230.1532269.
+- owner_earnback_years = -254,469,230.1532269 / 32,295,000 = -7.8795240797.
+- market_cap_to_cash_profit = 738,326,669.8467731 / 32,295,000 = 22.8619498327.
+- forecast_dividend_yield = 45,545,000 / 738,326,669.8467731 = 0.0616867870.
+- Negative owner earnback is retained as the formula result and explicitly interpreted as discounted asset coverage, not immediate arbitrage.
+
+7. Output construction
+- outputs/result.json was populated field by field using protocol CLI set/append commands; no complex JSON object was handwritten from scratch.
+- outputs/report.md was written under the report contract's operating-story sequence.
+- Source currency is RMB and all JSON monetary fields are absolute yuan.
+
+8. Validation
+- Command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[]
+
+9. Limitations retained in result
+- Market cap and PE are from the provided Tencent snapshot and were not independently recomputed.
+- The 2026 rename and post-period strategic changes create a timing mismatch with the 2025 audited balance sheet.
+- Discounts and sustainable cash profit are scenario judgments, not quoted liquidation values.

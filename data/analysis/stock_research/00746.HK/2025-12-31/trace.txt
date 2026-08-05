@@ -1,0 +1,48 @@
+stock-research trace
+task: 00746.HK, annual, period 2025-12-31
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Read SKILL.md, result-contract.md, report-contract.md and data-reuse.md in full.
+2. Checked configured long-term paths. No raw filing, annual facts, normalized facts, or prior stock-research outputs were present in the workspace.
+3. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Located official 2025 annual results and annual report through HKEX title search. Downloaded the annual report PDF to /tmp for text extraction; no temporary research artifact was copied into outputs.
+5. Rejected input analysis_model_hint after filing review. Segment note shows chemical revenue HKD3,751.514m of consolidated HKD3,754.768m; property revenue only HKD3.254m. Classified as ordinary_operating / applicable.
+6. Extracted audited statements and notes:
+   - income statement: annual results pp.1-2
+   - balance sheet: annual results pp.3-4
+   - cash flow: annual report pp.117-118
+   - segments: annual report pp.144-145
+   - inventories/receivables/dividends: annual results pp.12-13
+   - borrowings, lease liabilities, payables: annual report notes 28-31
+7. Currency normalization:
+   - Filing presentation currency is HKD; protocol requires CNY.
+   - Converted 2025 statement amounts at 0.90486 CNY/HKD, the CFETS/PBOC central parity published 2025-12-26 (last directly verified official rate near year end).
+   - Kept input market cap amount unchanged as protocol-denominated CNY; input does not expose Tencent's FX conversion method.
+   - Forecast dividend converted at 0.86669 CNY/HKD (2026-07-20 parity, nearest verified rate available before valuation snapshot).
+8. Owner earnback calculations:
+   discounted net cash = 50% * cash - 100% * bank borrowings - 100% * lease liabilities
+                       = CNY -638,610,374.16
+   adjusted pre-discount cash profit = parent net profit + PP&E depreciation + ROU depreciation + intangible amortization - PP&E purchases
+                                    = CNY 296,433,945.72
+   discounted sustainable cash profit = adjusted cash profit * 90%
+                                      = CNY 266,790,551.15
+   operating business price = market cap - discounted net cash
+                            = CNY 3,988,618,591.61
+   owner earnback years = operating business price / discounted sustainable cash profit
+                        = 14.9504 years
+   market cap / cash profit = 12.5567 years
+9. Dividend scenario:
+   2025 DPS HKD0.335 * 825m shares * 0.86669 = CNY239,531,448.75
+   forecast yield = 7.1502%. This is a flat-DPS scenario, not company guidance.
+10. Populated result.json only through protocol set/append commands after CLI initialization.
+11. Validation command:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    result: {"status":"ok","errors":[]}
+
+Primary sources:
+- https://www.hkexnews.hk/listedco/listconews/sehk/2026/0310/2026031000161.pdf
+- https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0324/2026032400324.pdf
+- https://www.leemanchemical.com/en/page/tzz/index.php
+- https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- config/input.json (Tencent qt.gtimg.cn valuation snapshot)

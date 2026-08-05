@@ -1,0 +1,41 @@
+[2026-08-04 18:02 Asia/Shanghai] Read config/input.json task payload.
+[2026-08-04] Read .agents/skills/stock-research/SKILL.md completely.
+[2026-08-04] Read result-contract.md, report-contract.md and data-reuse.md completely.
+[2026-08-04] Inspected reusable paths. No existing FOX raw filing, annual facts, normalized facts, or prior stock-research output was present under /workspace/stock_report; only config/input.json and user evaluation notes existed.
+[2026-08-04] Initialized outputs/result.json via protocol CLI:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+[2026-08-04] Identified period mismatch from official filing facts: FOX fiscal year ends June 30. SEC filing fox-20250630 is the FY2025 Form 10-K filed 2025-08-06; fox-20251231 is an unaudited FY2026 six-month Form 10-Q. Kept task analysis.period=2025-12-31, used FY2025 audited annual statements for annual metrics, and documented the mismatch.
+[2026-08-04] Downloaded official SEC filing documents to stock_report/data/raw/filings/FOX/2025-12-31/:
+  - fox-20250630.htm (SEC accession 0001628280-25-038077)
+  - fox-20250630_htm.xml (extracted XBRL instance)
+  - fox-20251231.htm (SEC accession 0001628280-26-005285)
+[2026-08-04] Extracted FY2025 audited facts from inline XBRL contexts c-1 (FY duration) and c-10 (2025-06-30 instant). Source units USD millions:
+  revenue 16,300; operating costs 10,518; derived gross profit 5,782; SG&A 2,168; D&A 385; other operating item 350; derived operating profit 2,879; net income 2,293; parent net income 2,263.
+  operating cash flow 3,324; capex 331; derived operating FCF 2,993; financing cash flow -1,755; dividends 277; repurchases 1,000.
+  assets 23,195; total equity 12,067; derived liabilities 11,128; parent equity 11,962; NCI 105; cash/cash equivalents/restricted cash 5,351; long-term debt 6,602; long-term investments 1,621.
+[2026-08-04] Extracted segment facts from FY2025 10-K: Cable Network Programming revenue 6,930 and segment EBITDA 3,030; Television revenue 9,325 and segment EBITDA 945 (USD millions). Business overview states revenue mix approximately 47% affiliate fees, 42% advertising, 11% other.
+[2026-08-04] Applied uniform presentation conversion assumption USD/CNY=7.163 to all filing amounts. This is an analysis/display assumption and not claimed as a filing fact. Market capitalization and PE were retained from input without modification.
+[2026-08-04] Confirmed analysis model ordinary_operating/applicable. FOX assets and liabilities are separable ordinary media operating items; no customer deposits, insurance reserves, regulated project cash, or holding-company look-through model was found.
+[2026-08-04] Owner earnback cash calculation (USD millions):
+  5,351 cash x 90% + 1,621 long-term investments x 50% - 6,602 debt x 100% = -975.6 discounted detachable net cash.
+  Converted result: CNY -6,988,222,800.
+[2026-08-04] Sustainable cash profit calculation (USD millions):
+  2,993 FY2025 operating FCF - 521 programming inventory/payable working-capital release - 95 receivables release - 89 payables release - 49 other working-capital release = 2,239; x 90% sustainability discount = 2,015.1.
+  Converted result: CNY 14,434,161,300.
+[2026-08-04] Owner earnback formulas:
+  operating business price = CNY 147,171,449,994.64453 - (-6,988,222,800) = 154,159,672,794.64453.
+  owner earnback years = 154,159,672,794.64453 / 14,434,161,300 = 10.6801960703.
+  market cap / cash profit = 147,171,449,994.64453 / 14,434,161,300 = 10.1960513629.
+[2026-08-04] Dividend forecast assumption: hold latest normal semiannual rate at USD 0.27/share, annualize to USD 0.54/share, multiply by approximately 445.536 million combined Class A and B shares. Forecast USD 240.589 million = CNY 1,723,342,000.13; yield on input market cap 1.1709758%. This is an estimate, not company guidance.
+[2026-08-04] Populated outputs/result.json using protocol CLI set commands from outputs/populate_result.sh; did not hand-write the complex JSON result.
+[2026-08-04] Created outputs/report.md and outputs/trace.txt using the report contract.
+[2026-08-04] Protocol validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+  Result: status=ok, errors=[]
+
+Primary sources:
+  https://www.sec.gov/Archives/edgar/data/1754301/000162828025038077/fox-20250630.htm
+  https://www.sec.gov/Archives/edgar/data/1754301/000162828026005285/fox-20251231.htm
+  https://investor.foxcorporation.com/stock-information/dividend-history/
+
+Data quality decision: complete. All ordinary-company minimum financial fields, business story fields, asset/liability rows, owner-earnback breakdowns, dividend estimate, evidence, model confirmation and limitations are populated. The period mismatch and valuation/filing date mismatch are disclosed as limitations rather than concealed.

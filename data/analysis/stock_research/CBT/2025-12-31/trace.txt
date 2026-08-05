@@ -1,0 +1,64 @@
+Stock research trace — CBT / Cabot Corporation
+Generated for task created_at: 2026-08-05T00:16:14+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because local-fact reuse was evaluated.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields through protocol `set` commands; result.json was not authored from a blank JSON object.
+
+2. Reuse check
+- Checked the configured annual_review, raw filing, and normalized facts paths.
+- No CBT files were present in those configured local directories, so public primary sources were required.
+
+3. Primary sources
+- Cabot Corporation Form 10-K for fiscal year ended 2025-09-30, filed 2025-11-24, accession 0001193125-25-292412:
+  https://www.sec.gov/Archives/edgar/data/16040/000119312525292412/cbt-20250930.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/16040/000119312525292412/0001193125-25-292412-index.html
+- Federal Reserve H.10 China spot exchange rate, monthly series; 2025-09 average = 7.1235 CNY/USD:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.M.CH&rel=H10
+- Market snapshot was supplied by config/input.json: CNY 30,661,002,056.922363 on 2026-08-03; PE TTM 16.607546; source label Yahoo Finance yfinance.
+
+4. Period resolution
+- Input storage/report key: 2025-12-31.
+- Actual Cabot annual filing period: fiscal year ended 2025-09-30.
+- The protocol period was retained from the input, while the actual fiscal cutoff is disclosed in analysis_model.special_handling, data_quality.limitations, report.md, and evidence.
+
+5. Financial extraction (USD millions; 2025 Form 10-K)
+- Revenue 3,713; cost of sales 2,773; gross profit 940; operating profit 621; consolidated net income 376; parent net income 331.
+- Assets 3,815; liabilities 2,110; total equity 1,705; parent equity 1,550; noncontrolling interests 155.
+- Cash 258; receivables 671; inventory 504; net PP&E 1,711.
+- Interest-bearing debt: short-term borrowings 14 + current long-term debt 260 + long-term debt 856 = 1,130.
+- CFO 665; capex 274; financing cash flow -336; common dividends 96; buybacks 168; NCI dividends 57.
+- Segments: Reinforcement Materials sales 2,341 / EBIT 508; Performance Chemicals sales 1,250 / EBIT 194.
+
+6. Currency conversion
+- All statement amounts use 7.1235 CNY/USD, expressed as absolute CNY yuan in result.json.
+- Conversion formula for a USD-million field: USD millions × 1,000,000 × 7.1235.
+- Ratios use source-currency values because currency conversion cancels out.
+
+7. Formula checks
+- Gross margin = 940 / 3,713 = 0.2531645569620253.
+- Net margin = 331 / 3,713 = 0.089146242930244.
+- Operating FCF = (665 - 274) USDm = 391 USDm = CNY 2,785,288,500.
+- Conservative sustainable distributable cash profit = CFO 665 - capex 274 - working-capital release 56 - NCI dividends 57 = 278 USDm = CNY 1,980,333,000.
+- Discounted detachable net cash = cash 258 × 70% - debt 1,130 = -949.4 USDm = CNY -6,763,050,900.
+- Operating business price = market cap - discounted net cash = CNY 37,424,052,956.92236.
+- Owner earnback years = 37,424,052,956.92236 / 1,980,333,000 = 18.89785838075021.
+- Market cap / cash profit = 30,661,002,056.922363 / 1,980,333,000 = 15.482750665753435.
+- Forecast dividend = FY2025 common cash dividends 96 USDm × 7.1235 = CNY 683,856,000.
+- Forecast dividend yield = 683,856,000 / 30,661,002,056.922363 = 0.02230213487517572.
+
+8. Judgment boundaries
+- Ordinary operating model confirmed: manufacturing assets and liabilities are economically comparable to a normal operating company; no special financial/real-estate/concession model applies.
+- Cash haircut of 30% reflects overseas location, possible repatriation taxes, and Argentina controls; this is an analyst assumption, not a reported fair value.
+- All debt is deducted at 100%.
+- Sustainable cash profit removes the disclosed working-capital release and NCI dividends. It is a conservative scenario, not management guidance.
+- Dividend forecast assumes FY2025 cash dividends remain flat; no growth assumption.
+
+9. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Expected final status: ok, errors: [].

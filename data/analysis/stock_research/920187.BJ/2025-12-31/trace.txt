@@ -1,0 +1,50 @@
+通领科技 920187.BJ 2025 年度 stock-research trace
+
+1. 输入与协议
+- 读取 config/input.json：报告期 2025-12-31，annual，市值 1,834,000,000 元，行情时间 20260731153759，PE TTM 14.47。
+- 完整读取 stock-research/SKILL.md、result-contract.md、report-contract.md，并按 data-reuse.md 优先复用年度事实包。
+- 使用协议 CLI init 初始化 outputs/result.json；全部结构化字段通过协议 CLI set/append 写入，未手写 JSON 骨架。
+
+2. 复用资料
+- stock_report/data/analysis/annual_review/920187.BJ/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/920187.BJ/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/920187.BJ/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/920187.BJ/2025-12-31/metadata.json
+- stock_report/data/raw/filings/920187.BJ/2025-12-31/12168984.txt
+- 原始年报 PDF：http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSEBJ_STOCK/2026/2026-4/2026-04-23/12168984.PDF
+
+3. 财报模型复核
+- 主业为汽车内饰件研发、生产和销售，直销、同步开发、以销定产。
+- 资产主要为现金、应收、票据、预付款、存货、厂房设备；负债主要为供应商款、合同负债和普通短期银行借款。
+- 未发现客户资金、监管资金、项目垫资主导结构、收费权或投资控股结构。
+- 结论：statement_model=ordinary_operating；owner_earnback_applicability=applicable。
+
+4. 核心财务事实
+- 总资产 1,222,548,425.20；总负债 383,289,064.88；归母权益 839,259,360.32。
+- 营收 971,329,967.15；毛利 313,358,736.19；归母净利润 147,981,402.24；扣非归母净利润 143,773,861.65。
+- 经营现金流 199,630,737.28；资本开支 32,696,728.32；经营自由现金流 166,934,008.96。
+- 现金及现金等价物 224,868,105.61；受限货币资金 205,294.98；短期借款 70,044,166.66；一年内到期租赁负债 12,329.64。
+
+5. 计算
+- gross_margin = 313,358,736.19 / 971,329,967.15 = 0.3226079157。
+- net_margin = 147,981,402.24 / 971,329,967.15 = 0.1523492605。
+- discounted_net_cash = 224,868,105.61 * 0.80 - 70,044,166.66 - 12,329.64 = 109,837,988.188。
+- discounted_cash_profit = (147,981,402.24 - 4,207,540.59) * 0.90 = 129,396,475.485。
+- operating_business_price = 1,834,000,000 - 109,837,988.188 = 1,724,162,011.812。
+- owner_earnback_years = 1,724,162,011.812 / 129,396,475.485 = 13.3246443178。
+- market_cap_to_cash_profit = 1,834,000,000 / 129,396,475.485 = 14.1734926946。
+
+6. 分红
+- 年报披露 2025 年度预案：每 10 股派现 5 元（含税）、转增 4.5 股；披露总股本 46,800,000 股。
+- forecast_cash_dividend = 46,800,000 * 0.50 = 23,400,000 元。
+- forecast_dividend_yield = 23,400,000 / 1,834,000,000 = 0.0127589967。
+- 年报披露时方案尚需股东会审议；2024 年现金分红金额未从现有事实包确认，保持 null。
+
+7. 数据限制
+- 2023 年资本开支未在现有三年摘要中直接披露。
+- 外币货币资金折人民币约 192,025,586.87 元，但逐账户期限及集团内调拨约束未披露。
+- 市值和 PE TTM 直接复用输入行情快照，未按最新股本和价格另行复算。
+
+8. 验证
+- 执行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- 协议结果：status=ok，errors=[]。

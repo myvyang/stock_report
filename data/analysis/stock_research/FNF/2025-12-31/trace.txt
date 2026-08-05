@@ -1,0 +1,118 @@
+task=stock_research
+query=FNF
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-04T11:00:43+08:00
+
+[protocol]
+skill=.agents/skills/stock-research/SKILL.md
+contracts_read=.agents/skills/stock-research/references/result-contract.md,.agents/skills/stock-research/references/report-contract.md
+reuse_rules_read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+update_method=stock_analysis.stock_research.protocol set (11 section-level updates; JSON not written from scratch)
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validate_status=ok
+
+[reuse_check]
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+raw_filing_metadata=missing
+decision=no reusable annual fact pack or raw filing existed; retrieved the official SEC filing.
+
+[primary_sources]
+1=https://www.sec.gov/Archives/edgar/data/1331875/000133187526000026/fnf-20251231.htm
+  type=audited Form 10-K
+  accession=0001331875-26-000026
+  filed=2026-02-26
+  used_for=business,segments,balance_sheet,income_statement,cash_flow,dividends,statutory_capital,RBC,reinsurance,risks
+2=https://www.sec.gov/Archives/edgar/data/1331875/000133187526000026/0001331875-26-000026-index.htm
+  type=SEC filing index
+  used_for=identity,filing_date,period,accession
+3=https://www.investor.fnf.com/news-releases/news-release-details/fnf-reports-fourth-quarter-and-full-year-2025-financial-results/
+  type=company investor relations release
+  used_for=full-year cross-check
+4=https://www.investor.fnf.com/ir-resources/investor-faqs/
+  type=company dividend history
+  used_for=dividend cross-check
+5=https://www.safe.gov.cn/safe/2025/1231/26980.html
+  type=SAFE official exchange-rate table landing page
+  used_for=official 2025-12-31 rate source
+6=https://www.ce.cn/xwzx/gnsz/gdxw/202512/t20251231_2676993.shtml
+  type=PBOC-authorized CFETS announcement republication
+  used_for=exact USD/CNY central parity 7.0288
+7=config/input.json
+  type=task input
+  used_for=company identity,market cap 93701632194.2461 CNY on 2026-08-03,PE TTM 18.35943,Yahoo Finance yfinance attribution
+
+[filing_extraction]
+downloaded_to=/tmp/fnf-20251231.htm
+method=SEC inline XBRL HTML table parsing plus SEC companyfacts cross-check
+companyfacts=https://data.sec.gov/api/xbrl/companyfacts/CIK0001331875.json
+units_in_filing=USD millions unless otherwise stated
+fx_rate=7.0288 CNY per USD
+fx_date=2025-12-31
+
+[model_decision]
+input_hint.statement_model=ordinary_operating
+final.statement_model=platform_financial_mixed
+final.owner_earnback_applicability=requires_special_model
+reason=FNF combines title insurance/transaction services with a 70%-owned annuity and life insurer. USD 73.195bn investments are economically paired with USD 62.726bn contractholder funds, USD 10.755bn future policy benefits, USD 14.191bn funds-withheld reinsurance liabilities, and other insurance obligations. Consolidated cash and operating cash flow are not detachable cash/free cash flow.
+ordinary_owner_earnback_fields=all null as required by contract
+special_model=Title underwriting/fees/statutory capital + F&G spread/asset quality/RBC/reinsurance + regulated upstream dividends
+
+[core_facts_usd_millions]
+total_assets=109014
+total_liabilities=100042
+total_equity=8972
+parent_equity=7424
+noncontrolling_interest=1548
+revenue=14445
+pretax_before_equity_method=1397
+net_income=679
+parent_net_income=602
+operating_cash_flow=5828
+capex_and_capitalized_software=147
+cash=2636
+investments=73195
+reinsurance_recoverable=17551
+contractholder_funds=62726
+future_policy_benefits=10755
+funds_withheld_reinsurance_liabilities=14191
+notes_payable=4400
+title_claim_reserve=1700
+title_revenue=8490
+title_pretax_before_equity_method=1227
+fg_revenue=5731
+fg_pretax_before_equity_method=323
+dividends_paid=546
+share_repurchases=251
+
+[key_special_metrics]
+title_market_share=approximately 32% through Q3 2025, company disclosure citing ALTA
+title_statutory_capital_and_surplus_usd_millions=1273
+title_statutory_earnings_usd_millions=488
+FGL_estimated_US_RBC=over 410%
+FGL_RBC_target=400%
+FNF_ownership_of_FG_after_2025_distribution=approximately 70%
+
+[dividend_forecast]
+latest_declared_quarterly_dividend_usd_per_share=0.52
+annualized_dividend_usd_per_share=2.08
+shares_outstanding_2026_01_31=271137574
+forecast_cash_dividend_usd=563966153.92
+forecast_cash_dividend_cny=3964005302.672896
+forecast_dividend_yield=0.0423045491295
+basis=mechanical annualization only; not a board commitment
+
+[quality_and_limits]
+status=complete
+market_financial_time_mismatch=market cap dated 2026-08-03 versus fiscal statements dated 2025-12-31
+translation_limit=single period-end central parity used for all balance-sheet and flow amounts for consistent CNY presentation
+gross_margin=null because insurance benefits/reserves and investment income do not form a manufacturing-style gross profit measure
+cash_flow_limit=reported operating cash flow includes insurance and reinsurance liability movements; not treated as distributable free cash flow
+forecast_limit=dividend forecast is latest quarterly rate annualized
+
+[final_validation]
+result_protocol_validation=ok
+required_outputs=outputs/result.json,outputs/report.md,outputs/trace.txt

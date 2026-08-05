@@ -1,0 +1,74 @@
+stock-research trace
+company: 00200.HK / MELCO INT'L DEV
+period: 2025-12-31 annual
+generated_at: 2026-08-03T17:40:39+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the selected skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Searched the configured raw filing, annual review, normalized facts and prior stock research paths.
+- No existing 00200.HK filing, facts package or prior research files were present in the workspace.
+- Public filing retrieval was therefore required.
+
+3. Source retrieval
+- Located the official company 2025 Annual Report page and PDF:
+  https://www.melco-group.com/en/Reports.html
+  https://www.melco-group.com/doc/MI-2025AR-en.pdf
+- Cross-checked publication/existence against HKEX title search for stock code 00200; annual results dated 2026-03-31 and annual report dated 2026-04-28.
+- Downloaded the official PDF to a temporary directory and extracted text locally. System pdftotext was unavailable, so pypdf was installed under /tmp/pdfmods and used only for local extraction.
+- Market capitalization, timestamp, source and PE TTM were reused exactly from config/input.json.
+- HKD amounts were translated into CNY at 0.90322 CNY/HKD, the 2025-12-31 CFETS central parity reported in the PBOC-authorized announcement. Publicly accessible copy used for traceability:
+  https://finance.sina.com.cn/jjxw/2025-12-31/doc-inhervyw3857837.shtml
+
+4. Identity and model override
+- Input hint financial_brokerage was rejected as factually inconsistent.
+- Annual report note 1 identifies the Company as an investment holding company and the Group as a developer, owner and operator of integrated resorts.
+- Operations run through majority-owned, separately listed Melco Resorts & Entertainment.
+- Annual report note 36/44 shows ownership in Melco Resorts of 58.65% at 2025-12-31; non-controlling ownership was 41.35%.
+- Chosen statement_model: investment_holding.
+- Chosen owner_earnback_applicability: requires_special_model.
+- Reason: consolidated cash/debt/FCF largely sits in a partially owned operating subsidiary, debt covenants restrict upstreaming, and assets include license-linked resorts. Ordinary detachable net cash and parent cash profit cannot be isolated reliably from consolidated statements.
+
+5. Core extracted facts (annual report, HK$'000 unless stated)
+- Net revenues: 40,240,892 (p.118).
+- Operating income: 5,507,353 (p.118).
+- Profit for year: 1,537,474 (p.119).
+- Profit attributable to owners: 1,058,309 (p.119).
+- Adjusted EBITDA: 10,619,969 (p.155).
+- Total assets: 82,698,786 (pp.120-121).
+- Total liabilities: 72,987,076 (pp.120-121).
+- Total equity: 9,711,710; parent equity 1,905,104; NCI 7,806,606 (p.121).
+- Cash and bank balances: 8,119,084 (p.120 / note 27).
+- Restricted cash: 1,085,932, including 970,874 pledged for Macau concession guarantee (p.120 / note 26).
+- Interest-bearing borrowings: 57,136,789 (note 30).
+- Lease liabilities: 2,317,320 (pp.120-121).
+- Operating cash flow: 10,246,938 (p.125).
+- Segment capital expenditure: 2,713,493 (p.158).
+- Operating FCF used: 10,246,938 - 2,713,493 = 7,533,445 HK$'000.
+- Financing cash flow: (8,602,596) (p.126).
+- Dividends: no dividend recommended for 2025 or 2024 (note 15, p.168).
+
+6. Metric treatments
+- Net margin = parent net profit / revenue = 1,058,309 / 40,240,892 = 0.02629934247.
+- Gross profit and gross margin left null because the casino presentation separates gaming tax/license fees, employee costs and other operating expenses rather than reporting a comparable cost of sales/gross profit.
+- Forecast dividend amount = CNY 0; forecast yield = 0. Basis is two consecutive nil recommendations and continuing suspension, pending any future resumption announcement.
+- All ordinary owner earnback fields left null in accordance with result-contract.md for requires_special_model.
+- Dividend and subsidiary share repurchase cash out combines HK$1,291.095m subsidiary repurchases and HK$31.675m NCI dividends, translated at 0.90322.
+
+7. Structured output process
+- Used protocol set commands to populate result fields; result.json was not hand-authored from scratch.
+- A batched set command stopped at owner_earnback.interpretation due to shell argument parsing. Existing JSON remained valid; remaining fields were written with individual protocol set calls.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].
+
+8. Limitations
+- Market quote was not independently replaced; it is the input-specified Tencent snapshot.
+- Period-end FX was used for all structured CNY amounts for protocol consistency; it is not an average-rate accounting translation.
+- No complete parent-only cash flow and tier-by-tier distributable cash schedule was available, so a special-model numerical NAV/earnback was not fabricated.
+- No buy/sell advice or target price was produced.

@@ -1,0 +1,68 @@
+stock-research trace
+company: 02628.HK / China Life Insurance Company Limited
+period: 2025-12-31
+generated_at_input: 2026-08-04T13:47:00+08:00
+
+[1] Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read .agents/skills/stock-research/references/result-contract.md in full.
+- Read .agents/skills/stock-research/references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All result population used protocol `set`; no complex JSON was handwritten directly into result.json.
+
+[2] Local reuse check
+- Checked the paths supplied in config/input.json.
+- No raw filing, annual facts, normalized facts, annual review, or prior stock-research output existed under the supplied local stock_report paths.
+- Repository-wide search found no reusable facts for 02628.HK beyond config/input.json.
+
+[3] Primary source acquired
+- Official issuer PDF: China Life Insurance Company Limited, Summary of 2025 Annual Report, dated 2026-03-25.
+- URL: https://www.e-chinalife.com/upload/resources/file/2026/03/25/2025%E5%B9%B4%E5%B9%B4%E5%BA%A6%E6%8A%A5%E5%91%8A%E6%91%98%E8%A6%81.pdf
+- The PDF states that the PRC GAAP and IFRS financial statements were audited with standard unqualified opinions.
+- PDF was downloaded to a temporary directory for extraction; no source filing was fabricated into the absent stock_report tree.
+
+[4] Model determination
+- Input hint said financial_brokerage, but input tags said insurance and the issuer filing confirms life, annuity, health and accident insurance.
+- Overrode statement_model to financial_insurance.
+- owner_earnback_applicability remains requires_special_model.
+- Reason: RMB 7.423705tn of investment assets supports RMB 6.376114tn of insurance contract liabilities and regulated liquidity/capital needs. These are the operating model, not detachable cash and ordinary debt.
+
+[5] Core extracted facts (official annual report summary; RMB million in source)
+- Revenue 615,678; operating profit 181,998; parent net profit 154,078; operating cash flow 459,925.
+- Total assets 7,591,004; total liabilities 6,982,611; parent equity 595,205.
+- Investment assets 7,423,705; fixed-maturity assets 5,234,179; equity financial assets 1,676,327.
+- Insurance contract liabilities 6,376,114; contractual service margin 768,369.
+- Total premium 729,887; one-year new business value 45,752; embedded value 1,467,876.
+- Total investment income 387,694; net investment income 193,795; total investment yield 6.09%; three-year average total investment yield 4.76%.
+- Core solvency ratio 128.77%; comprehensive solvency ratio 174.01%.
+- 2025 dividend RMB 0.856/share and RMB 24,195m aggregate, comprising paid interim dividend and proposed final dividend.
+
+[6] Calculations and transformations
+- Converted all RMB million source amounts to absolute RMB by multiplying by 1,000,000.
+- Total equity = total assets - total liabilities = RMB 608,393,000,000.
+- Minority interest = total equity - parent equity = RMB 13,188,000,000.
+- Minority interest ratio = 13,188 / 608,393 = 0.0216767825.
+- Protocol net margin = parent net profit / revenue = 154,078 / 615,678 = 0.2502565854. Report cautions against cross-industry use.
+- Static forecast dividend yield = 24,195,000,000 / 713,435,128,049.0851 = 0.0339148046.
+- Market cap / embedded value = 713,435,128,049.0851 / 1,467,876,000,000 = approximately 0.486.
+- Insurance contract liabilities / total liabilities = 6,376,114 / 6,982,611 = approximately 91.31%.
+- All ordinary owner-earnback sorting fields kept null as required by the contract for a non-applicable ordinary model.
+
+[7] Market data
+- Market cap: RMB 713,435,128,049.0851.
+- PE TTM: 4.86.
+- Snapshot time: 2026/08/03 09:48:12.
+- Source: Tencent qt.gtimg.cn, supplied by config/input.json; not independently recomputed.
+
+[8] Data-quality boundaries
+- Official audited annual-report summary was sufficient for the special-model minimum fields and operational story.
+- Full annual report notes were not locally supplied; granular asset-quality and embedded-value sensitivity details were not inferred.
+- Gross profit/margin, capex and ordinary free cash flow were left null because they lack comparable meaning or were unavailable in the summary.
+- 2024 dividend is an approximate trend comparator inferred from the disclosed 31.7% increase and is explicitly labeled as such.
+
+[9] Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final status: ok
+- Final errors: []
+- JSON parsing check: python3 -m json.tool outputs/result.json (passed).

@@ -1,0 +1,62 @@
+stock-research trace
+company: 001368.SZ 通达创智
+period: 2025-12-31 annual
+generated_for_input: 2026-08-01T03:28:13+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Read references/data-reuse.md because the skill requires reuse-first research.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated scalar and list fields with protocol `set` and `append` commands; result.json was not authored from a blank object.
+
+[reuse audit]
+- config/input.json exists.
+- stock_report annual filing, annual facts, normalized facts, and prior stock-research outputs for 001368.SZ/2025-12-31 were absent.
+- Therefore official/public filing research was required.
+
+[sources]
+- Full annual report: 通达创智（厦门）股份有限公司2025年年度报告全文, disclosed 2026-03-27.
+  Retrieval URL used for extraction: https://pdf.dfcfw.com/pdf/H2_AN202603261820776434_1.pdf
+  Search/extraction was cross-checked against Shenzhen Stock Exchange hosted annual-report summary and profit-distribution announcement.
+- Official profit distribution announcement: Shenzhen Stock Exchange static disclosure PDF, announcement 2026-006:
+  https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-03-27/ebe20408-a8ff-427e-831b-e46be55d009b.PDF
+- Market cap and PE: config/input.json; Tencent qt.gtimg.cn snapshot at 20260731114330.
+
+[key extracted facts]
+- Revenue 1,056,001,791.21; cost of sales 797,431,470.16; gross profit 258,570,321.05.
+- Operating profit 107,272,064.14; net profit and parent net profit 98,244,381.99.
+- Total assets 1,735,570,112.39; liabilities 351,267,068.01; total/parent equity 1,384,303,044.38; no minority interest.
+- Operating cash flow 155,301,449.75; capex 133,757,021.64; operating FCF 21,544,428.11.
+- Financing cash flow -92,318,198.23; dividend/interest cash paid 85,568,643.69.
+- Cash equivalents 122,596,499.75 after excluding 23,410,000 restricted/in-transit funds.
+- Trading financial assets 269,942,267.70; large CDs and interest 163,230,594.05.
+- Lease obligations 18,972,004.56; no short-term or long-term bank borrowing.
+- 2025 revenue mix: home living 56.23%, sports/outdoor 37.88%, health care 2.98%; overseas 80.40%.
+- Top-five customers 88.38%; top two 40.68% and 27.06%.
+- 2025 cumulative dividend 85,377,708.00, payout ratio 86.90%.
+
+[model and estimates]
+- statement_model confirmed ordinary_operating: this is a design/manufacturing company, and financial assets are treasury assets rather than customer/regulatory funds.
+- Discounted detachable net cash:
+  122,596,499.75 cash equivalents at 100%
+  + 269,942,267.70 trading financial assets at 95%
+  + 163,230,594.05 CDs at 98%
+  - 18,972,004.56 lease obligations at 100%
+  = 520,035,631.674.
+- Sustainable cash profit: 80,000,000. Starting from parent net profit, reduce to recurring parent profit 88,620,343.48, then apply an additional 8,620,343.48 prudence adjustment because maintenance capex is not disclosed separately and overseas expansion is ongoing.
+- Operating business price: 2,276,000,000 - 520,035,631.674 = 1,755,964,368.326.
+- Owner earnback: 1,755,964,368.326 / 80,000,000 = 21.949554604075 years.
+- Market cap / cash profit: 2,276,000,000 / 80,000,000 = 28.45.
+- Forecast dividend yield scenario: 85,377,708 / 2,276,000,000 = 0.03751217398945519.
+
+[judgment boundaries]
+- Facts are attributed to filings or input snapshot.
+- Haircuts, sustainable cash profit, and forecast dividend are analyst estimates/scenarios, explicitly labeled as such.
+- No buy/sell recommendation, target price, ranking label, or deterministic future claim is included.
+
+[validation]
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}
+- JSON syntax check: passed via python3 -m json.tool.

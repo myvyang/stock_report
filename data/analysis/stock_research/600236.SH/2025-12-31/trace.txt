@@ -1,0 +1,68 @@
+stock-research trace
+company: 广西桂冠电力股份有限公司 (600236.SH)
+period: 2025-12-31 annual
+generated_at: 2026-08-01 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely as explicitly requested.
+- Read references/data-reuse.md because SKILL.md links it and the task required deciding whether existing facts could be reused.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All structured result changes were made with protocol `set` and `append` commands; the complex JSON was not handwritten from an empty file.
+
+2. Reuse audit
+- Expected local paths under stock_report/data/analysis/annual_review/600236.SH/2025-12-31 and stock_report/data/raw/filings/600236.SH/2025-12-31 did not exist.
+- Therefore no annual facts package, extraction trace, normalized facts, or prior stock-research output was available for reuse.
+
+3. Sources obtained
+- Primary filing: 广西桂冠电力股份有限公司2025年年度报告, disclosed 2026-03-31, 293 pages, standard unqualified audit opinion.
+  Official disclosure index mirror: https://www.chinamoney.com.cn/chinese/cwbg/20260331/3307961.html
+  Full-text disclosure mirror: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12048342&stockid=600236
+  Retrieved PDF for local temporary extraction only: /tmp/stock-research-600236/annual.pdf
+- Dividend implementation announcement: 广西桂冠电力股份有限公司2025年年度权益分派实施公告, disclosed 2026-06-09.
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12379298&stockid=600236
+- Market data: config/input.json, Tencent qt.gtimg.cn, market cap CNY 84,893,000,000, PE TTM 22.05, timestamp 20260731114337.
+
+4. Key extraction anchors from annual report
+- pp. 6-7: revenue 10,392,934,752.84; parent net profit 3,279,598,444.12; operating cash flow 6,957,390,577.01; parent equity 20,767,388,763.42; total assets 52,567,354,531.62.
+- pp. 11-17: total generation 46.142 TWh (461.42 亿千瓦时); hydro generation +35.92%; segment revenue, cost, margin and profit; generation business 99.64% of revenue.
+- pp. 23, 101-103, 181: cash, receivables, fixed assets, construction in progress, borrowings, bonds, lease liabilities, restricted assets, total liabilities and equity.
+- pp. 25-27: installed capacity 15.0304 GW; 2025 capital spending disclosure CNY 4.388bn; market-traded electricity 6.839bn kWh and 15.00% share.
+- pp. 53-54 and 2026-06-09 implementation announcement: 2025 total dividend CNY 2,309,536,695.99, CNY 0.293/share, payout 70.42%; annual CNY 0.243/share paid 2026-06-16.
+- pp. 109-110: cash purchase of fixed/intangible/other long-term assets CNY 4,060,890,274.91; financing cash flow -2,045,681,783.08.
+
+5. Calculations
+- Gross profit = revenue - cost of sales
+  = 10,392,934,752.84 - 4,782,990,068.94
+  = 5,609,944,683.90.
+- Gross margin = 5,609,944,683.90 / 10,392,934,752.84
+  = 0.5397844610.
+- Net margin = parent net profit / revenue
+  = 3,279,598,444.12 / 10,392,934,752.84
+  = 0.3155603804.
+- Operating free cash flow (simple cash statement proxy) = operating cash flow - cash paid to acquire long-term assets
+  = 6,957,390,577.01 - 4,060,890,274.91
+  = 2,896,500,302.10.
+- Flat-dividend scenario yield = 2,309,536,695.99 / 84,893,000,000
+  = 0.0272052666.
+- Minority interest ratio = 3,299,314,824.22 / 24,066,703,587.64
+  = 0.1370904334.
+
+6. Model decision
+- Confirmed statement_model = utility_concession.
+- Confirmed owner_earnback_applicability = requires_special_model.
+- Evidence: generation is 99.64% of revenue; fixed assets plus construction in progress are CNY 41.816bn; cash, project assets, pledged tariff receivables, debt, lease liabilities and perpetual securities are economically interdependent.
+- All ordinary owner-earnback fields remain null, as required by result-contract.md.
+- No project cash-flow payback number was produced because the filing does not centrally disclose plant-by-plant remaining operating/licence life, maintenance versus growth capex, long-run price/volume assumptions and project debt amortization.
+
+7. Data-quality judgments
+- Status set to complete because the special-model minimum fields, business story, asset/liability explanations, dividend scenario and evidence are present.
+- Limitation retained: annual-report capex CNY 4.388bn and cash-flow cash acquisition CNY 4.061bn differ by accounting/payment timing and scope. Free cash flow uses the cash-flow amount.
+- Limitation retained: maintenance capex cannot be reliably separated from growth capex.
+- Dividend forecast is explicitly a flat 2025 implemented-dividend scenario, not management guidance.
+
+8. Validation
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final status: ok; errors: [].

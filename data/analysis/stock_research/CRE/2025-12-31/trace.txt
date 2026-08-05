@@ -1,0 +1,75 @@
+stock-research trace
+task: CRE / annual / 2025-12-31
+generated_at: 2026-08-04T12:57:35+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local data reuse audit
+- config/input.json exists.
+- The referenced raw filing metadata, annual facts, normalized facts and prior stock-research outputs did not exist under /workspace at research time.
+- Therefore no local fact package or historical conclusion was reused.
+
+3. Primary filing
+- SEC issuer: Cre8 Enterprise Limited, CIK 2003977.
+- Filing: Form 20-F for fiscal year ended 2025-12-31.
+- Accession/document: 0001213900-26-047573 / ea0285864-20f_cre8.htm.
+- Filed/auditor report date: 2026-04-24.
+- Auditor: WWC, P.C.; unmodified opinion.
+- URL: https://www.sec.gov/Archives/edgar/data/2003977/000121390026047573/ea0285864-20f_cre8.htm
+
+4. Statement-model decision
+- One reportable segment: integrated financial printing services.
+- All revenue generated in Hong Kong.
+- Balance sheet contains ordinary service-business cash, receivables, prepayments, supplier payables, customer prepayments, bank borrowing and operating leases.
+- Classified ordinary_operating; ordinary owner earnback model applicable.
+- Overrode the misleading manufacturing/source-company tags in the input rationale with filing facts.
+
+5. Currency normalization
+- Filing reporting currency: HKD; filing convenience translation for FY2025: USD 1 = HKD 7.7833.
+- CNY conversion: USD 1 = CNY 7.0288, 2025-12-31 central parity announced by CFETS under PBOC authorization.
+- Result amounts use filing USD convenience figures multiplied by 7.0288.
+- Yahoo Finance market-cap input for a US-listed security was interpreted as USD 32,888,700.018505096 and converted to CNY 231,168,094.69.
+- Limitation: input market-cap field had no explicit currency attribute.
+
+6. Core reported figures (FY2025; filing USD convenience column -> result CNY)
+- Total assets: USD 14,906,429 -> CNY 104,774,308.16.
+- Total liabilities: USD 8,297,686 -> CNY 58,322,775.36.
+- Equity/parent equity: USD 6,608,743 -> CNY 46,451,532.80; no NCI.
+- Revenue: USD 16,822,196 -> CNY 118,239,851.24.
+- Cost of revenue: USD 9,771,065 -> CNY 68,678,861.67.
+- Gross profit: USD 7,051,131 -> CNY 49,560,989.57.
+- Operating income: USD 753,531 -> CNY 5,296,418.69.
+- Net/parent net income: USD 678,036 -> CNY 4,765,779.44.
+- Operating cash flow: USD 1,482,193 -> CNY 10,418,038.16.
+- Capex: USD 92,164 -> CNY 647,802.32.
+- Operating FCF: CNY 9,770,227.96.
+- Financing cash flow: USD 3,867,884 -> CNY 27,186,583.06.
+
+7. Ratios and owner earnback
+- Gross margin = 54,881,062 / 130,932,196 = 41.916%.
+- Net margin = 5,277,360 / 130,932,196 = 4.031%.
+- Discounted detachable net cash = cash CNY 49,405,723.38 x 80% - bank debt CNY 7,297,841.38 = CNY 32,226,737.33.
+- 2023/2024/2025 FCF translated consistently: CNY 4,773,728.55 / 6,182,446.08 / 9,770,227.96.
+- Three-year mean FCF: CNY 6,908,800.86.
+- Sustainable cash profit: mean FCF x 85% = CNY 5,872,480.73.
+- Operating business price: CNY 231,168,094.69 - 32,226,737.33 = CNY 198,941,357.36.
+- Owner earnback: 198,941,357.36 / 5,872,480.73 = 33.88 years.
+- Market cap / cash profit = 39.36x.
+- Forecast dividend: zero; 20-F states no dividends by company or subsidiaries in FY2023-FY2025 and no explicit future policy.
+
+8. Market-data inconsistency
+- Input PE TTM: 6.914286, retained as supplied.
+- Converted market cap / FY2025 net income = approximately 48.50x.
+- The discrepancy was not silently reconciled; it is disclosed in result limitations, risks and report.
+
+9. Result construction and validation
+- outputs/result.json was initialized with protocol init.
+- Populated using repeated protocol set commands; complex JSON was not authored from a blank file.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report finalization: {"status":"ok","errors":[]}.

@@ -1,0 +1,59 @@
+2026-08-04T16:00:09+08:00 INIT
+- Read config/input.json.
+- Read stock-research SKILL.md, result-contract.md, report-contract.md, and data-reuse.md in full.
+- Initialized outputs/result.json with protocol CLI:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+LOCAL REUSE CHECK
+- Checked the configured raw filing, annual review, normalized facts, and prior stock research paths.
+- No IGIC 2025 filing, annual facts package, normalized facts, or historical stock-research output was present.
+- Existing stock_report/data/notes/user_stock_evaluations.md was not relevant to the requested core facts and was not modified.
+
+PRIMARY SOURCE ACQUISITION
+- Located IGIC 2025 Form 20-F on SEC EDGAR, accession 0001794338-26-000012, filed 2026-04-21:
+  https://www.sec.gov/Archives/edgar/data/1794338/000179433826000012/igic-20251231.htm
+- Downloaded the filing to:
+  stock_report/data/raw/filings/IGIC/2025-12-31/igic-20251231.htm
+- Located IGI Group 2025 Financial Condition Report on the company website:
+  https://www.iginsure.com/media/2679/igi-group-2025-ye-financial-condition-report.pdf
+- Located the 2025-12-31 USD/CNY central parity announcement (1 USD = 7.0288 CNY), authorized by CFETS and reproduced by China Economic Net:
+  https://www.ce.cn/xwzx/gnsz/gdxw/202512/t20251231_2676993.shtml
+- Market capitalization, date, PE TTM, and market source were reused exactly from config/input.json.
+
+MODEL DECISION
+- Overrode input hint ordinary_operating/applicable.
+- Confirmed statement_model = financial_insurance.
+- Confirmed owner_earnback_applicability = requires_special_model.
+- Reason: cash and investments support claims reserves, unearned premiums, liquidity, and regulatory capital. They are not detachable cash. Ordinary discounted-net-cash and cash-profit payback fields remain null.
+
+CORE EXTRACTION (USD, unless noted)
+- Total assets 2,100.789m; total liabilities 1,390.641m; shareholders' equity 710.148m.
+- Total revenue 516.879m; net income 127.150m.
+- Gross written premiums 666.709m; net earned premiums 453.806m.
+- Net loss and LAE 215.782m; acquisition expense 76.870m; underwriting income 161.154m.
+- Operating cash flow 108.138m; capex 0.944m; dividends paid 46.197m; buybacks 61.922m.
+- Investments 1,134.485m; cash 186.183m; net premiums receivable 274.312m.
+- Reinsurance recoverables 233.650m; prepaid reinsurance premiums 114.169m.
+- Claims reserve 798.339m; unearned premiums 469.897m.
+- IGI Bermuda draft 2025 BSCR ratio 245%; UK and Europe draft capital surplus over requirements 68% and 83%.
+- Ordinary quarterly dividend approved May 2026: USD 0.075/share. Special USD 1.15/share excluded from forecast.
+
+TRANSFORMATION
+- Converted filing amounts at 7.0288 CNY/USD, using absolute CNY yuan as required by the result contract.
+- Calculated net margin = 127.150 / 516.879 = 24.6000%.
+- Calculated consolidated acquisition-only combined ratio = 47.6% loss ratio + 16.9% acquisition expense ratio = approximately 64.5%; disclosed in evidence/report, not inserted as an unsupported schema field.
+- Forecast ordinary annual dividend = 42,842,216 shares * USD 0.075 * 4 * 7.0288 = CNY 90,338,810.35.
+- Forecast dividend yield = CNY 90,338,810.35 / CNY 8,033,350,575.13 = 1.12454709%.
+- Gross margin kept null because the insurer does not have economically comparable sales/cost-of-sales gross profit.
+
+RESULT CONSTRUCTION
+- Used protocol CLI set commands to populate outputs/result.json after initialization; did not hand-write the JSON object from scratch.
+- Added explained asset and liability rows, business story, insurance-specific owner earnback interpretation, dividend history/forecast, risks, evidence, and limitations.
+- Set data_quality.status = complete and incomplete_reasons = [].
+
+VALIDATION
+- First protocol validation result: status=ok, errors=[].
+- Corrected dividend history to the cash-flow-statement amounts actually paid in 2023-2025, rather than approximating declared per-share dividends with period-end shares.
+- Final protocol validation result: status=ok, errors=[].
+- Confirmed all ordinary owner-earnback fields remain null under requires_special_model.
+- Confirmed outputs/result.json parses as JSON and outputs/result.json, outputs/report.md, and outputs/trace.txt all exist and are non-empty.

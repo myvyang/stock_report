@@ -1,0 +1,19 @@
+任务：GAB，年度报告期 2025-12-31；生成日 2026-08-04（Asia/Shanghai）。
+
+1. 按 stock-research 技能读取 result-contract.md、report-contract.md 与 data-reuse.md。
+2. 检查指定 stock_report 目录：未发现 GAB 的原始财报、年度事实包或历史研究结果，故补充公开来源。
+3. 使用协议 CLI init 从 config/input.json 初始化 outputs/result.json。
+4. 核心财报来源：SEC N-CSR，CIK 0000794685，accession 0001829126-26-002087，2026-03-09提交，报告期2025-12-31：
+   https://www.sec.gov/Archives/edgar/data/794685/000182912626002087/gab_ncsr.htm
+5. 模型覆盖：原 hint=ordinary_operating/applicable；根据注册投资公司身份、证券组合占资产主体以及优先股杠杆，改为 investment_holding/requires_special_model。普通 owner_earnback 排序字段保持 null。
+6. 财报美元金额以 Federal Reserve H.10 的 2025-12-31 汇率 7.1875 CNY/USD 换算为人民币绝对元：
+   https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+7. 2026年分配政策来源：Gabelli 2026-05-13公告，每股季度分配0.15美元，最低年度分配为四个前季末平均NAV的10%，且分配可含资本返还：
+   https://gabelli.com/wp-content/uploads/2026/05/06-26-div_GAB.pdf
+8. 2026年股数调整来源：Gabelli 2026-04-22配股结果，预计新增31,119,670股，募资约1.55亿美元：
+   https://gabelli.com/wp-content/uploads/2026/04/Press-Release-Rights-Results-GAB-2026.04.22.pdf
+9. 预测分配：估算股数=311,196,702+31,119,670=342,316,372；每股全年0.60美元；按约6.776 CNY/USD折算，金额=1,391,721,442元；除以输入市值11,780,749,778.0625元，预测分配率=11.8135%。这是分配率，不是盈利收益率。
+10. 用协议 CLI set/append 逐字段写入，不直接手写复杂 result JSON。
+11. 协议 CLI validate 首次完成校验：status=ok，errors=[]。
+
+数据限制：输入PE对封闭式基金解释力有限；估值日实时NAV未提供；预测股数未考虑配股后分配再投资等进一步变化；预测分配汇率为接近估值日的近似值。

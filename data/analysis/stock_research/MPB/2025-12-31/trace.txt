@@ -1,0 +1,56 @@
+Stock research trace — MPB — period 2025-12-31
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the local annual fact package was absent.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- Checked stock_report/data/raw/filings/MPB/2025-12-31 and stock_report/data/analysis/annual_review/MPB/2025-12-31.
+- No filing, metadata, annual facts, normalized facts, or prior stock-research result existed locally.
+- Therefore returned to primary public filings rather than inventing missing facts.
+
+3. Primary sources used
+- SEC audited 2025 Form 10-K, filed 2026-03-12, accession 0000879635-26-000026:
+  https://www.sec.gov/Archives/edgar/data/879635/000087963526000026/mpb-20251231.htm
+- SEC XBRL company facts for CIK 0000879635, used to cross-check audited totals:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0000879635.json
+- Mid Penn FY2025 earnings release, dated 2026-01-21, used for detailed balance-sheet, operating, asset-quality and non-GAAP ratio tables:
+  https://investors.midpennbank.com/news-events/press-releases/news-details/2026/Mid-Penn-Bancorp-Inc--Reports-Fourth-Quarter-and-Full-Year-Earnings-Declares-61st-Consecutive-Quarterly-Dividend-and-Special-Dividend/default.aspx
+- Federal Reserve H.10 week of 2025-12-29, latest quoted year-end business-day USD/CNY rate 7.0063:
+  https://www.federalreserve.gov/releases/h10/20251229/
+- Valuation source was supplied, not independently rewritten: config/input.json, Yahoo Finance yfinance, market cap CNY 6,550,925,718.453003 on 2026-08-03, PE TTM 17.427273.
+
+4. Model decision
+- Overrode input hint ordinary_operating/applicable with financial_bank/not_applicable.
+- Evidence: Mid Penn is a financial holding company whose consolidated operations consist almost entirely of Mid Penn Bank; the core activity is deposit gathering and lending.
+- Deposits, loans, cash and securities are operating balance-sheet items. The ordinary detachable-net-cash and cash-profit earnback formula would misstate economic substance.
+- All ordinary owner-earnback sorting fields remain null, as required by result-contract.md.
+
+5. Currency and calculations
+- Financial statement USD amounts were multiplied by 7.0063 and recorded as absolute CNY yuan.
+- Total assets: USD 6,133,896,000 -> CNY 42,975,855,948.8.
+- Total liabilities: USD 5,319,838,000 -> CNY 37,271,600,179.4.
+- Equity: USD 814,058,000 -> CNY 5,704,255,769.4.
+- Net income attributable/common: USD 56,248,000 -> CNY 394,090,382.4.
+- 2025 dividend cash out plus repurchases: [USD 18,160,000 + (79,169 shares x USD 28.50 disclosed average price)] x 7.0063 = CNY 143,042,838.3.
+- Forecast regular dividend: USD 0.22 x 4 x 25,339,110 record-date shares x 7.0063 = CNY 156,307,674.7.
+- Forecast dividend yield: CNY 156,307,674.7 / CNY 6,550,925,718.453003 = 0.02386.
+- Special dividend USD 0.05 was excluded from forecast.
+- Approximate P/B: market cap / 2025-12-31 equity = 1.1485x.
+- Approximate P/TBV: market cap / [(USD 814.058m - USD 136.620m goodwill - USD 14.657m other intangibles) x 7.0063] = 1.410x.
+
+6. Material limitations preserved
+- The input did not provide the USD market-cap value or the share count used by yfinance.
+- The 2026-08-03 valuation postdates the Cumberland Advisors and 1st Colonial acquisitions; 2025-12-31 financials are pre-acquisition for both.
+- Bank revenue/gross margin/operating cash flow/capex do not have ordinary-company comparability and remain null under the special-model contract.
+- The dividend forecast is a mechanical annualization, not company guidance.
+
+7. Protocol completion
+- Populated outputs/result.json exclusively through protocol set commands after protocol initialization.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: {"status":"ok","errors":[]}

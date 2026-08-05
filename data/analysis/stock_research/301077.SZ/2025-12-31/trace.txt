@@ -1,0 +1,50 @@
+stock-research trace — 301077.SZ — period 2025-12-31
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md, report-contract.md, and data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse and source audit
+- No annual facts package, normalized facts, raw filing, or historical stock-research output existed under the input-declared /workspace stock_report paths.
+- Used the official Shenzhen Stock Exchange 2025 annual report as the primary filing:
+  https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-11/557f456f-0556-457f-a273-e4dd44d8b0aa.PDF
+- Used the official 2025 profit-distribution proposal:
+  https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-11/b43ebae1-f1a4-44be-bf73-e1d467060bfe.PDF
+- Used the company acquisition filing for the Dongwang transaction:
+  https://pdf.dfcfw.com/pdf/H2_AN202512231806670343_1.pdf
+- Used the company's 2026 Q1 report for post-period closing and cash-flow confirmation:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12190320&stockid=301077
+- Used market cap CNY 3,264,000,000 and PE TTM 25.5 from config/input.json (Tencent qt.gtimg.cn, timestamp 20260731114251).
+
+3. Statement model
+- Confirmed ordinary_operating: operating assets are receivables, inventory, factories/equipment and land; liabilities are bank debt and operating payables. No special financial-statement model applies.
+- Owner earnback is applicable, but the January 2026 Dongwang acquisition is treated as a post-balance-sheet cash commitment because the valuation date follows closing.
+
+4. Core calculations (CNY)
+- Gross profit = 769,440,041.47 - 509,816,080.04 = 259,623,961.43.
+- Gross margin = 259,623,961.43 / 769,440,041.47 = 0.337409.
+- Net margin = 129,727,153.84 / 769,440,041.47 = 0.168596.
+- 2025 operating FCF = 177,766,714.87 - 49,480,278.13 = 128,286,436.74.
+- 2024 operating FCF = 192,051,973.15 - 58,132,209.78 = 133,919,763.37.
+- Non-restricted cash = 895,881,445.16 - 6,044,000.00 = 889,837,445.16.
+- Debt and leases = 307,958,568.88 + 43,890,000.00 + 2,132,222.38 + 1,037,076.27 = 355,017,867.53.
+- Discounted net cash before post-period acquisition = 889,837,445.16*85% + 82,112,657.15*90% - 355,017,867.53 = 475,245,352.291.
+- Discounted detachable net cash after CNY 140,000,000 Dongwang commitment = 335,245,352.291.
+- Two-year average FCF = (128,286,436.74 + 133,919,763.37)/2 = 131,103,100.055.
+- Sustainable base = min(two-year FCF average, 2025 recurring parent profit about 124,253,800) = 124,253,800.
+- Discounted cash profit = 124,253,800*90% = 111,828,420.
+- Operating business price = 3,264,000,000 - 335,245,352.291 = 2,928,754,647.709.
+- Owner earnback years = 2,928,754,647.709 / 111,828,420 = 26.18971678.
+- Market cap / cash profit = 3,264,000,000 / 111,828,420 = 29.18757146.
+- Forecast dividend yield = 102,047,364.60 / 3,264,000,000 = 0.0312645.
+
+5. Protocol mutation and validation
+- Populated result fields exclusively through repeated protocol `set` commands in outputs/populate_result.sh; did not hand-write result.json.
+- Final protocol validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation result: {"status":"ok","errors":[]}
+- Cross-checked report figures against JSON metrics and confirmed balance-sheet equation:
+  1,712,076,919.41 - 545,487,673.69 = 1,166,589,245.72.
+- Removed the temporary population script after successful validation; the required deliverables are result.json, report.md and trace.txt.

@@ -1,0 +1,101 @@
+RAVE stock-research trace
+generated_at_input: 2026-08-04T20:06:30+08:00
+research_period_input: 2025-12-31
+actual_fiscal_year_end: 2025-06-29
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields with protocol `set`; no complex JSON was authored as a replacement for the initialized result.
+5. Validated with protocol `validate`; status: ok, errors: [].
+
+[reuse audit]
+No RAVE raw filing, annual facts package, normalized facts, or prior stock-research result existed under stock_report at task start. Research therefore returned to the official SEC filing.
+
+[primary sources]
+- SEC FY2025 Form 10-K, accession 0001140361-25-036080, filed 2025-09-25:
+  https://www.sec.gov/Archives/edgar/data/718332/000114036125036080/ef20050393_10q.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/718332/000114036125036080/0001140361-25-036080-index.htm
+- FY2025 earnings release, Exhibit 99.1:
+  https://www.sec.gov/Archives/edgar/data/718332/000114036125036081/ef20055903_ex99-1.htm
+- Federal Reserve H.10 release dated 2025-06-30:
+  https://www.federalreserve.gov/releases/h10/20250630/
+- Market value and PE TTM: config/input.json, source marked Yahoo Finance yfinance, as of 2026-08-03.
+
+[identity and model]
+- Issuer: Rave Restaurant Group, Inc.; ticker RAVE; Nasdaq Capital Market.
+- FY2025 10-K year end: 2025-06-29. Input 2025-12-31 is treated as research directory period, not fiscal year end.
+- Business is franchising/licensing Pizza Inn, Pie Five, and PIE kiosks plus supply-chain facilitation.
+- statement_model: ordinary_operating.
+- owner_earnback_applicability: applicable.
+- Reason: no customer deposits, insurance reserves, regulated project cash, development inventory, concession asset, or holding-company look-through structure; operating assets and liabilities are those of a capital-light franchisor.
+
+[currency]
+Reporting currency in result: CNY, absolute yuan.
+Source filing currency: USD.
+FX: 7.1721 CNY/USD, Federal Reserve H.10 observation for 2025-06-27 (last business day before FY end).
+All FY2025 filing amounts were multiplied by 7.1721. No false precision is implied in report prose.
+
+[financial statement extraction, source USD]
+Balance sheet, USD thousands:
+- cash 2,859; short-term investments 7,024; accounts receivable 1,171; current notes receivable 45; long-term notes receivable 75.
+- property/equipment 137; operating lease ROU assets 489; definite-lived intangibles 182; deferred tax asset 3,995.
+- total assets 16,557; total liabilities 2,403; total shareholders' equity 14,154.
+- trade payables 207; accrued expenses 855; lease liabilities 576; deferred revenues 765.
+- no minority interest and no interest-bearing borrowings reported.
+
+Income statement, USD thousands:
+- revenue 12,039; G&A 5,215; franchise expenses 3,397; credit-loss recovery 21; interest income 354; D&A 182; pretax income 3,620; tax 918; net income 2,702.
+- analytical gross profit proxy = revenue 12,039 - franchise expense 3,397 = 8,642.
+- analytical operating profit = revenue - G&A - franchise expense + credit-loss recovery - D&A = 3,266.
+- gross margin proxy = 8,642 / 12,039 = 0.7178337071.
+- net margin = 2,702 / 12,039 = 0.2244372456.
+
+Cash flow, USD thousands:
+- CFO 3,395.
+- capex = property/equipment purchase 56 + definite-lived intangible purchase 11 = 67.
+- operating FCF = 3,395 - 67 = 3,328.
+- financing cash flow = -1,386.
+- treasury stock repurchase = 1,204; restricted-stock tax withholding = 182.
+
+[business facts]
+- Units at FY end: 117 franchised Pizza Inn restaurants, 17 franchised Pie Five units, 1 licensed PIE unit.
+- Pizza Inn segment revenue 10,790 thousand USD and pretax income 7,793 thousand USD.
+- Pie Five segment revenue 1,196 thousand USD and pretax income 796 thousand USD.
+- Revenue composition, USD thousands: royalties 4,620; supplier/distributor incentives 4,940; franchise fees 153; area/master fees 13; advertising fund 2,031; convention funds 217; rent 53; other 12.
+- Company states Pie Five unit count is expected to decrease modestly.
+- Company states it historically has not paid common cash dividends and currently does not anticipate doing so in the foreseeable future.
+
+[owner earnback]
+Market cap = 302,083,916.61727524 CNY from task input.
+
+Discounted detachable net cash:
+- cash: USD 2,859,000 * 7.1721 * 50% = CNY 10,252,516.95.
+- U.S. Treasury bills: USD 7,024,000 * 7.1721 * 95% = CNY 47,858,488.88.
+- interest-bearing debt: zero.
+- total = CNY 58,110,505.83.
+
+Sustainable cash profit:
+- start net income: USD 2,702,000.
+- effective tax rate = 918 / 3,620 = 25.3591%.
+- subtract after-tax interest income: USD 354,000 * (1 - 918/3,620).
+- add D&A: USD 182,000.
+- subtract capex: USD 67,000.
+- base sustainable cash profit = CNY 18,308,730.83071823.
+- apply 90% sustainability factor = CNY 16,477,857.74764641.
+
+Formula results:
+- operating business price = 302,083,916.61727524 - 58,110,505.83 = 243,973,410.78727522 CNY.
+- owner earnback years = 243,973,410.78727522 / 16,477,857.74764641 = 14.8061364847.
+- market cap / cash profit = 302,083,916.61727524 / 16,477,857.74764641 = 18.3327178353.
+- discounted net cash / market cap = 0.19236544097.
+- forecast dividend and yield = 0, based on explicit company policy statement and absence of declared cash dividend evidence.
+
+[limitations]
+- Market valuation date is about 13 months after the FY2025 balance sheet date.
+- Gross profit is an analytical proxy because the issuer does not report GAAP gross profit or cost of sales.
+- Income statement and balance sheet were translated at one FY-end spot rate, not period-average and closing rates separately.
+- No local annual facts package existed; extracted facts were checked directly against the SEC 10-K.

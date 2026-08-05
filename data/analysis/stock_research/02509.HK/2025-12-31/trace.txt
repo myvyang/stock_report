@@ -1,0 +1,52 @@
+stock-research trace
+company=02509.HK Qyuns Therapeutics Co., Ltd. / 荃信生物
+period=2025-12-31
+generated_for_input=2026-08-04T16:36:23+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No annual facts, normalized facts, raw filing metadata, or prior stock-research output existed for 02509.HK/2025-12-31.
+- Downloaded the official 2025 annual report from HKEX:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042701473.pdf
+- Local evidence copy:
+  stock_report/data/raw/filings/02509.HK/2025-12-31/annual-report-2025.pdf
+- Extracted text used for targeted review:
+  stock_report/data/raw/filings/02509.HK/2025-12-31/annual-report-2025.txt
+
+3. Model verification
+- Input hint financial_brokerage rejected.
+- Annual report note 4 identifies R&D, manufacturing and commercialization of biologic therapies for autoimmune and allergic diseases.
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+4. Core audited figures (RMB)
+- Revenue 806,961,000; gross profit 714,412,000; parent net profit 314,450,000.
+- Total assets 1,600,326,000; total liabilities 921,230,000; parent equity 694,029,000.
+- Operating cash flow 399,848,000; capex 7,622,000; operating FCF 392,226,000.
+- Cash and cash equivalents plus time deposits 1,041,968,000; borrowings 577,398,000.
+- Sources: annual report consolidated statements pp.153-159 and notes 4, 19, 22, 26, 27.
+
+5. Owner earnback judgments
+- Licensing revenue 723,442,000, 89.65% of revenue; top two customers 87.04% of revenue.
+- Discounted detachable net cash = 1,041,968,000 - 577,398,000 - 44,527,000 - 352,985,000 = 67,058,000.
+- 352,985,000 operating reserve equals one year of 2025 R&D plus administrative expense.
+- Discounted sustainable cash profit set to 0 because 2025 licensing-led profit lacks multi-year recurrence evidence and 2024 was loss-making.
+- Owner earnback years and market-cap-to-cash-profit therefore null under result contract.
+- Forecast dividend=0 because no 2025 dividend was paid/declared, no final dividend was recommended, and company distributable reserves were nil.
+
+6. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields via protocol set/append commands in populate_result.sh; the result object was not handwritten from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok, errors=[]
+
+7. Limitations
+- Market cap and PE TTM were inherited from the Tencent input snapshot and not independently verified.
+- Sustainable cash profit=0 is a conservative evidence-quality treatment, not a forecast that future profit will always be zero.
+- No buy/sell advice or target price produced.

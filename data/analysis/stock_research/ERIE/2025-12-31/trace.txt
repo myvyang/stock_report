@@ -1,0 +1,82 @@
+task=stock_research
+query=ERIE
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-05T05:36:04+08:00
+
+[protocol]
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+update=all result fields were populated with protocol set commands; result.json was not authored from scratch
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validate_status=ok
+
+[reuse_check]
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+prior_stock_research_result=missing
+decision=no reusable fact package; returned to primary filings
+
+[primary_sources]
+1=https://www.sec.gov/Archives/edgar/data/922621/000162828026010666/erie-20251231.htm
+  type=SEC Form 10-K
+  used_for=business model, statement model, income statement, balance sheet, cash flow, Exchange operating data, liquidity, risks
+2=https://www.sec.gov/Archives/edgar/data/922621/000162828026010640/erie-20260219.htm
+  type=SEC Form 8-K
+  used_for=2026 dividend forecast
+3=https://www.irs.gov/individuals/international-taxpayers/yearly-average-currency-exchange-rates
+  type=US government exchange-rate reference
+  used_for=2025 average USD/CNY 7.129 for income statement and cash-flow translation
+4=https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+  type=Federal Reserve H.10
+  used_for=2025-12-31 USD/CNY 7.1875 for balance-sheet translation
+5=config/input.json
+  type=task input
+  used_for=market cap CNY 85404306763.39746, date 2026-08-03, PE TTM 21.963701, Yahoo Finance yfinance attribution
+
+[model_review]
+input_hint=ordinary_operating/applicable
+confirmed_statement_model=ordinary_operating
+confirmed_owner_earnback_applicability=applicable
+reason=ERIE is an attorney-in-fact and management-services company with one management operations segment; it does not underwrite policies or carry insurance reserves on its own consolidated balance sheet
+special_attention=sole customer Exchange; related-party governance; annual management fee rate capped at 25%; Class A non-voting
+
+[currency_translation]
+income_statement_and_cash_flow=USD amounts * 7.129 CNY/USD
+balance_sheet=USD amounts * 7.1875 CNY/USD
+market_cap=used as supplied in CNY; no additional conversion
+
+[financial_calculations]
+gross_profit_proxy_usd_thousand=4067258-3350074=717184
+gross_margin_proxy=717184/4067258=0.17633108103788842
+net_margin=559335/4067258=0.13752139647890543
+operating_fcf_usd_thousand=686657-115692=570965
+normalized_fcf_usd_thousand=570965+100000=670965
+discounted_sustainable_cash_profit_usd_thousand=670965*0.90=603868.5
+discounted_sustainable_cash_profit_cny=603868500*7.129=4304978536.5
+
+[detachable_cash_calculation]
+unrestricted_unpledged_cash_cny=315000000*7.1875=2264062500
+unrestricted_unpledged_investments_discounted_cny=1100000000*7.1875*0.85=6720312500
+agent_loans_discounted_cny=93953000*7.1875*0.50=337643593.75
+dividend_payable_deduction_cny=68109000*7.1875=489533437.5
+discounted_detachable_net_cash_cny=8832485156.25
+discounted_net_cash_to_market_cap=0.10341966922955485
+
+[owner_earnback_calculation]
+operating_business_price_cny=85404306763.39746-8832485156.25=76571821607.14746
+owner_earnback_years=76571821607.14746/4304978536.5=17.78680682329285
+market_cap_to_cash_profit=85404306763.39746/4304978536.5=19.83849769268123
+
+[dividend_forecast]
+class_a_annual_usd=46189068*1.4625*4
+class_b_annual_usd=2542*219.375*4
+forecast_cash_dividend_cny=(class_a_annual_usd+class_b_annual_usd)*7.129=1942200897.81
+forecast_dividend_yield=1942200897.81/85404306763.39746=0.02274125241941062
+
+[judgment_notes]
+gross_margin=company reports no gross profit; operating revenue minus total operating expense is used as a service-business gross-profit proxy and equals operating income
+charitable_contribution=USD 100m cash contribution treated as non-recurring and added back before applying a 10% sustainability haircut
+investment_discount=85% applied to company-disclosed unrestricted and unpledged investment portfolio for market, tax, and liquidity friction
+agent_loan_discount=50% because loans have recovery value but are tied to the distribution channel and carry credit risk
+data_quality=complete under result contract; limitations preserved in result.json and report.md

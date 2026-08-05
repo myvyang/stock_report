@@ -1,0 +1,64 @@
+MNDO stock research trace
+generated_at=2026-08-04T13:06:39+08:00
+period=2025-12-31
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json using:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Searched stock_report/data for MNDO annual facts, normalized facts, raw filings and prior stock-research outputs.
+- No MNDO local facts package or prior research existed at the start of the task.
+- Downloaded the primary SEC filing to stock_report/data/raw/filings/MNDO/2025-12-31/2025-20f.html.
+
+3. Primary sources
+- MIND C.T.I. Ltd. Form 20-F, fiscal year ended 2025-12-31, filed 2026-03-18.
+  SEC accession: 0001178913-26-001091
+  URL: https://www.sec.gov/Archives/edgar/data/1119083/000117891326001091/zk2634570.htm
+- SAFE historical RMB central parity data, sourced from CFETS.
+  URL: https://www.safe.gov.cn/safe/2020/1218/17833.html
+  Conversion used: USD/CNY 7.0288 on 2025-12-31.
+- Market snapshot was supplied in config/input.json: market cap CNY 130,679,395.51121521 on 2026-08-03; PE TTM 6.396; source Yahoo Finance yfinance.
+
+4. Model classification
+- Confirmed ordinary_operating / applicable.
+- Evidence: business is telecom billing/customer-care software, enterprise messaging and communications analytics; balance sheet contains proprietary cash/deposits, receivables, goodwill/intangibles and operating deferred revenue.
+- No customer deposits, insurance reserves, regulated project cash, concession assets or similar special-model balance sheet items were identified.
+
+5. Extracted audited USD amounts (thousands)
+- Total assets 30,166; liabilities 7,117; equity 23,049; minority interest 0.
+- Revenue 19,457; cost of revenue 9,536; gross profit 9,921; operating income 2,086; net income 2,604.
+- Operating cash flow 3,986; capex 27; operating FCF 3,959.
+- Cash 8,116; short-term deposits 5,237; marketable securities 200; lease liabilities 929.
+- Dividends paid 4,502; share repurchases 130.
+- All output monetary amounts converted to absolute CNY yuan at 7.0288.
+
+6. Owner earnback calculations
+- Discounted detachable net cash USD thousands:
+  8,116 cash * 100% + 5,237 deposits * 100% + 200 securities * 90% - 929 lease liabilities * 100% = 12,604.
+- Converted discounted net cash: CNY 88,590,995.20.
+- Operating business price: 130,679,395.51121521 - 88,590,995.20 = CNY 42,088,400.31121521.
+- Sustainable cash profit normalization starts with 2025 OCF, subtracts capex, approximately USD 1.0m working-capital release and financial income attributable to cash already deducted from market cap, then rounds conservatively to USD 2.3m = CNY 16,166,240.
+- Owner earnback years: 42,088,400.31121521 / 16,166,240 = 2.6034749151.
+- Market cap / cash profit: 130,679,395.51121521 / 16,166,240 = 8.0834749151.
+- Gross margin: 9,921 / 19,457 = 0.5098936116.
+- Net margin: 2,604 / 19,457 = 0.1338335817.
+
+7. Dividend treatment
+- 20-F states the board decided in 2025 to discontinue dividend distributions and shift capital return to share repurchases.
+- Forecast cash dividend set to CNY 0 and forecast dividend yield to 0.0.
+- Repurchases are not classified as cash dividends.
+
+8. Protocol population and validation
+- Populated initialized JSON using protocol set commands by section/path; the complex result object was not written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[].
+
+9. Known limitations
+- Market snapshot was not independently verified and post-dates the reporting period by about seven months.
+- A single period-end FX rate was used for balance sheet, income statement and cash flow amounts to comply with the unified CNY protocol.
+- Sustainable cash profit contains analyst normalization estimates, not company guidance.

@@ -1,0 +1,58 @@
+stock-research trace
+company: 301203.SZ 国泰环保
+period: 2025-12-31 annual
+generated_for_input: 2026-07-31T20:42:25+08:00
+
+1. Protocol
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md, references/report-contract.md and references/data-reuse.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields only through protocol `set` commands.
+
+2. Reuse audit
+- Expected annual facts, raw filing metadata, normalized facts and prior stock-research outputs under stock_report/.../301203.SZ/2025-12-31 were not present.
+- /root/aicode/stock_report also contained no matching 301203.SZ files accessible during the audit.
+- Therefore no historical conclusion was reused; research was rebuilt from the public 2025 annual report and summary.
+
+3. Sources
+- Annual report full text (210 pages): https://pdf.dfcfw.com/pdf/H2_AN202604271821645339_1.PDF
+  Identity: 杭州国泰环保科技股份有限公司2025年年度报告全文; signed/audited 2026-04-27; report states disclosure via SZSE and cninfo.
+- Annual report summary: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12235572&stockid=301203
+  Announcement date 2026-04-28; used to cross-check company identity, main figures and zero-dividend proposal.
+- Valuation: config/input.json, Tencent qt.gtimg.cn snapshot 20260731114324; market cap CNY 2,490,000,000; PE TTM 23.52. Not independently refreshed.
+
+4. Extracted financial facts (CNY)
+- Revenue 300,229,771.34; cost 133,218,283.49; gross profit 167,011,487.85.
+- Operating profit 136,241,036.44; net profit 115,935,417.39; parent net profit 113,879,915.71.
+- Total assets 1,509,275,199.20; liabilities 51,387,733.40; equity 1,457,887,465.80; parent equity 1,441,015,491.83; minority interest 16,871,973.97.
+- OCF 84,207,863.47; capex 18,294,136.04; operating FCF 65,913,727.43; financing CF -121,788,308.29.
+- Cash 839,842,587.74; trading financial assets 63,043,969.95; current lease-like liability 2,525,847.77; lease liability 2,295,312.09.
+
+5. Model determination
+- Confirmed ordinary_operating/applicable.
+- Reason: fee-based environmental operating service company; no customer deposits, regulated presale cash, bank/broker/insurance balances, project-financing debt, or concession-right liability structure requiring a special model.
+- Caveat: CNY 225,648,980.97 construction in progress and early-stage expansion constrain cash detachability.
+
+6. Formula audit
+- Gross margin = 167,011,487.85 / 300,229,771.34 = 0.5562789030.
+- Net margin = 113,879,915.71 / 300,229,771.34 = 0.3793092044.
+- FCF = 84,207,863.47 - 18,294,136.04 = 65,913,727.43.
+- Discounted cash = 839,842,587.74 * 75% = 629,881,940.805.
+- Discounted trading assets = 63,043,969.95 * 85% = 53,587,374.4575.
+- Lease-like liabilities deducted = 2,525,847.77 + 2,295,312.09 = 4,821,159.86.
+- Discounted detachable net cash = 678,648,155.4025.
+- Discounted sustainable cash profit = 65,913,727.43 * 90% = 59,322,354.687.
+- Operating business price = 2,490,000,000 - 678,648,155.4025 = 1,811,351,844.5975.
+- Owner earnback = 1,811,351,844.5975 / 59,322,354.687 = 30.53405169 years.
+- Market cap / cash profit = 2,490,000,000 / 59,322,354.687 = 41.97405874.
+- Forecast dividend = 0 based on announced 2025 proposal; yield = 0 / 2,490,000,000 = 0.
+
+7. Judgment separation
+- Fact: audited statements, disclosed operating data, customer concentration and dividend proposal.
+- Inference: company remains economically dependent on mature sludge projects despite three stated growth areas.
+- Subjective scenario assumptions: 75% cash recognition, 85% trading-asset recognition, exclusion of long-term investments, and 90% FCF sustainability factor.
+
+8. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result before report handoff: status=ok, errors=[]

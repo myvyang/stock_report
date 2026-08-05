@@ -1,0 +1,86 @@
+task=stock-research
+company=天士力
+code=600535.SH
+period=2025-12-31
+generated_at=2026-07-31T18:51:32+08:00
+
+[protocol]
+initialized=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+populated=protocol set/append commands only; skeleton was not replaced by a hand-written JSON object
+validated=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[reuse_check]
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+prior_stock_research_result=missing
+prior_stock_research_report=missing
+raw_filing_initially=missing
+decision=download and inspect the official company-hosted 2025 annual report because no reusable filing/fact pack/research existed
+
+[sources]
+source_1=天士力医药集团股份有限公司2025年年度报告
+source_1_url=https://www.taslypharma.com/u/cms/www/202603/23113120bxm6.pdf
+source_1_local=stock_report/data/raw/filings/600535.SH/2025-12-31/annual-report-2025.pdf
+source_1_published=2026-03-20
+source_1_auditor=毕马威华振会计师事务所（特殊普通合伙）
+source_1_audit_opinion=标准无保留意见
+source_2=config/input.json
+source_2_fact=market_cap 23784000000; date 20260731114331; source Tencent qt.gtimg.cn; pe_ttm 19.45
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=主营药品研发、生产和销售；现金、借款和营运资产是普通制造销售公司的资金与经营项目，不存在银行存款、保险准备金、预售监管资金、特许经营权等特殊模型配对。开发支出、应收、存货和长期投资均未伪装为可剥离现金。
+
+[financial_extraction]
+annual_report_page_7=revenue 8236477437.80; parent_net_profit 1104961925.73; recurring_parent_net_profit 791345927.46; operating_cash_flow 1424751577.01
+annual_report_pages_109_112=total_assets 15339719707.15; total_liabilities 2791999159.26; total_equity 12547720547.89; parent_equity 12404228392.95; minority_interest 143492154.94
+annual_report_pages_114_115=cost_of_sales 2729994133.76; operating_profit 1354968270.84; net_profit 1061330248.76
+annual_report_page_118=capex_cash_out 381263506.27; financing_cash_flow -370110309.21; dividend_profit_interest_cash_out 635849601.92
+annual_report_pages_29_30=industrial_revenue 7381624148.65; industrial_gross_margin 0.7037; cardiovascular_metabolic_revenue 4066745616.69; cardiovascular_metabolic_gross_margin 0.7754
+annual_report_pages_81_82=2025_total_cash_dividend 463124501.55; payout_ratio 0.4191; proposed_final_dividend 149395000.50
+
+[formulas]
+gross_profit=8236477437.80-2729994133.76=5506483304.04
+gross_margin=5506483304.04/8236477437.80=0.668548338245774
+net_margin=1104961925.73/8236477437.80=0.1341546715904245
+operating_free_cash_flow=1424751577.01-381263506.27=1043488070.74
+minority_interest_ratio=143492154.94/12547720547.89=0.011435714908723351
+dividend_and_buyback_cash_out=635849601.92-32495515.91=603354086.01; note cash-flow line includes interest, so reported interest expense was removed
+
+[cash_discount]
+cash_and_cash_equivalents=1415081061.58*1.00=1415081061.58; restricted cash excluded by using cash-equivalent amount
+large_certificates_of_deposit_and_interest=1404035342.41*0.95=1333833575.2895
+wealth_management_products=1290941764.55*0.90=1161847598.095
+listed_stock=103139809.07*0.60=61883885.442
+interest_bearing_debt=(1115672563.89+4002383.33+216868059.10)*-1=-1336543006.32
+discounted_detachable_net_cash=2636103104.0865
+excluded_from_detachable_cash=receivables; notes receivable; inventory; prepayments; long-term equity investments; non-current private equity; fixed assets; construction in progress; intangibles; development expenditure
+
+[cash_profit]
+starting_point=2025 operating_free_cash_flow 1043488070.74
+adjustment=-143488070.74
+adjustment_reason=revenue -3.08%; recurring parent net profit -23.59%; receivables increased; centralized procurement pricing pressure continues; retain operating/R&D/working-capital buffer
+discounted_sustainable_cash_profit=900000000
+judgment_boundary=analysis estimate, not company guidance
+
+[owner_earnback]
+market_cap=23784000000
+operating_business_price=23784000000-2636103104.0865=21147896895.9135
+owner_earnback_years=21147896895.9135/900000000=23.497663217681666
+market_cap_to_cash_profit=23784000000/900000000=26.426666666666666
+discounted_net_cash_to_market_cap=2636103104.0865/23784000000=0.11083514564776742
+
+[dividend_forecast]
+forecast_cash_dividend=149395000.5
+forecast_basis=board-proposed 2025 final dividend of CNY 1 per 10 shares; excludes already-paid 2025 interim dividend to avoid treating past cash as future cash
+forecast_dividend_yield=149395000.5/23784000000=0.0062813235998990915
+approval_status=subject to shareholder approval at annual-report date
+
+[limitations]
+1=No reproducible official market-share figure was found in the annual report; industry position is qualitative.
+2=The CNY 900m sustainable cash profit is an analytical estimate with an explicit safety discount.
+3=Market cap and PE were accepted from the supplied Tencent snapshot and not independently re-queried.
+4=The final dividend proposal was pending shareholder approval at the annual-report date.

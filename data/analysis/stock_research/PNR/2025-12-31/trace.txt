@@ -1,0 +1,56 @@
+PNR stock-research trace
+generated_at: 2026-08-05 Asia/Shanghai
+period: 2025-12-31 annual
+
+1. Protocol
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated sections using protocol `set`; no complex result JSON was created from scratch.
+- Final validation command recorded below after execution.
+
+2. Reuse check
+- No prior PNR raw filing, annual facts package, normalized facts, or stock-research result existed in the workspace.
+- Downloaded SEC filing to stock_report/data/raw/filings/PNR/2025-12-31/pnr-20251231.htm.
+- SEC accession: 0000077360-26-000007; filed 2026-02-24.
+
+3. Primary sources
+- SEC 2025 Form 10-K: https://www.sec.gov/Archives/edgar/data/77360/000007736026000007/pnr-20251231.htm
+- SEC filing index: https://www.sec.gov/Archives/edgar/data/77360/000007736026000007/0000077360-26-000007-index.htm
+- Pentair dividends: https://investors.pentair.com/stock-information/dividends
+- IRS average FX: https://www.irs.gov/individuals/international-taxpayers/yearly-average-currency-exchange-rates
+- Federal Reserve H.10: https://www.federalreserve.gov/releases/h10/hist/dat00_ch.htm
+- Market cap and PE: config/input.json, Yahoo Finance yfinance, dated 2026-08-03.
+
+4. Currency conversion
+- Income statement and cash flow: USD x 7.129 CNY/USD (IRS 2025 yearly average).
+- Balance sheet: USD x 6.9931 CNY/USD (Federal Reserve H.10, 2025-12-31).
+- This produces display-comparable CNY values; it does not alter reported USD statements.
+
+5. Core reported facts (USD millions)
+- Revenue 4,176.0; cost of sales 2,485.7; gross profit 1,690.3; operating income 857.5; net income 653.8.
+- Assets 6,868.8; liabilities 2,999.6; equity 3,869.2; cash 101.6; long-term debt 1,638.6.
+- Operating cash flow 814.8; capex 68.8; financing cash flow -402.5; dividends 164.3; repurchases 225.0.
+- Segment sales: Flow 1,553.6; Water Solutions 1,062.1; Pool 1,558.8.
+- Segment income/margin: Flow 362.1/23.3%; Water Solutions 253.9/23.9%; Pool 527.1/33.8%.
+
+6. Calculations
+- gross_margin = 1,690.3 / 4,176.0 = 0.4047653.
+- net_margin = 653.8 / 4,176.0 = 0.1565613.
+- 2023 operating FCF = (619.2 - 76.0) x 7.129 = CNY 3.8727bn.
+- 2024 operating FCF = (766.7 - 74.4) x 7.129 = CNY 4.9350bn.
+- 2025 operating FCF = (814.8 - 68.8) x 7.129 = CNY 5.3182bn.
+- Three-year average = CNY 4.7087bn; sustainability discount 90%; discounted cash profit = CNY 4.2378bn.
+- Discounted detachable net cash = (101.6 - 1,638.6) x 6.9931 = CNY -10.7484bn.
+- Operating business price = CNY 70.4776bn - (-10.7484bn) = CNY 81.2260bn.
+- Owner earnback = 81.2260 / 4.2378 = 19.1669 years.
+- Market cap/cash profit = 70.4776 / 4.2378 = 16.6306.
+- Forecast dividend = USD 0.27 x 4 x 163,235,706 shares x 7.129 = CNY 1.2568bn.
+- Forecast dividend yield = 1.2568 / 70.4776 = 1.7833%.
+
+7. Judgment boundaries
+- statement_model ordinary_operating: products, working capital, plants and financing debt have ordinary manufacturing economics.
+- Cash is counted at 100%; long-term debt is deducted at 100%. Receivables, inventory, PP&E, goodwill and intangibles are not treated as detachable cash.
+- Sustainable cash profit uses three-year average operating FCF and a 10% haircut. The haircut is analyst judgment, not a reported fact.
+- Forecast dividend annualizes announced quarterly dividend; it is not management guidance.
+- Input market cap and PE were not independently recomputed; possible provider/unit mismatch remains a limitation.
+- Validation: PASS (`stock_analysis.stock_research.protocol validate`).

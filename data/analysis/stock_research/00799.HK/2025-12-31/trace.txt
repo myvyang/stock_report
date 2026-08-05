@@ -1,0 +1,67 @@
+IGG 00799.HK stock research trace
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Inputs and protocol
+- Read config/input.json.
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md, report-contract.md, and data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reused local primary-material extraction
+- Annual fact pack: stock_report/data/analysis/annual_review/00799.HK/2025-12-31/facts.json
+- Human-readable fact pack: stock_report/data/analysis/annual_review/00799.HK/2025-12-31/annual_facts.md
+- Extraction trace: stock_report/data/analysis/annual_review/00799.HK/2025-12-31/extraction_trace.txt
+- Raw annual report text: stock_report/data/raw/filings/00799.HK/2025-12-31/igg-2025-annual-report.txt
+- Raw annual report PDF metadata: stock_report/data/raw/filings/00799.HK/2025-12-31/metadata.json
+- Primary filing URL: https://iis.quamnet.com/media/IRAnnouncement/799/EN_US/12118244-0.PDF
+
+3. Analysis-model correction
+- Input hint: financial_brokerage / requires_special_model.
+- Filing evidence: revenue is from mobile games and APP operations; balance sheet has no brokerage client money, proprietary trading financing, margin lending, or repo liabilities.
+- Overrode model to ordinary_operating / applicable.
+
+4. Currency normalization
+- Filing presentation: HKD, HK$'000.
+- Required output: CNY absolute yuan.
+- Applied HKD/CNY 0.90486 to all filing amounts.
+- FX source: PBOC/CFETS central parity announcement dated 2025-12-26, the nearest sourced official rate located for period end.
+- URL: https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+
+5. Core filing facts used
+- Revenue HK$5,497.009m; gross profit HK$4,560.438m; operating profit HK$719.900m; profit for year HK$585.755m; parent profit HK$580.493m.
+- Assets HK$4,654.043m; liabilities HK$1,177.591m; equity HK$3,476.452m; parent equity HK$3,456.344m.
+- Operating cash flow HK$682.763m; capex HK$156.320m; operating FCF HK$526.443m.
+- Cash HK$2,414.275m; >3-month deposits HK$27.163m; restricted deposits HK$8.779m.
+- No bank loans/other borrowings except HK$59.892m lease liabilities.
+- Filing locations are recorded in annual fact pack and outputs/result.json evidence.
+
+6. Owner-earnback judgments and formulas
+- Reported cash plus >3-month deposits in CNY: RMB2,209,159,588.68.
+- Detachable haircut: 60%, reflecting operating reserve, product-acquisition spending, entity/VIE and cross-border distribution uncertainty.
+- Discounted detachable net cash: RMB1,325,495,753.208.
+- 2023/2024/2025 operating FCF in HKD: -5.349m / 986.982m / 526.443m.
+- Three-year median is 2025 FCF, converted to RMB476,357,212.98.
+- Sustainable-profit haircut: 80%.
+- Discounted sustainable cash profit: RMB381,085,770.384.
+- Market cap: RMB3,290,518,472.1440077 from input.
+- Operating business price = market cap - discounted net cash = RMB1,965,022,718.9360077.
+- Owner earnback years = operating business price / discounted cash profit = 5.1563791452.
+- Market cap / discounted cash profit = 8.6345876122.
+
+7. Dividend forecast treatment
+- After reporting date, board declared second interim dividend HK6.7 cents/share plus special dividend HK47.7 cents/share, aggregate approximately HK$624m.
+- Converted forecast cash dividend: RMB564,632,640.
+- Forecast yield = RMB564,632,640 / input market cap = 17.15938217%.
+- Treated as declared/static forecast only; not assumed sustainable because most is special dividend.
+
+8. Market-data caveat
+- Market cap RMB3,290,518,472.1440077, date 2026/07/31 16:08:42, PE TTM 6.59.
+- Source accepted from config input: Tencent qt.gtimg.cn.
+- Market cap was not independently recomputed from share count and price in this run.
+
+9. Result construction and validation
+- outputs/result.json was initialized and populated exclusively through stock-research protocol init/set commands; it was not hand-written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation result: {"status":"ok","errors":[]}

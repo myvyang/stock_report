@@ -1,0 +1,68 @@
+stock-research trace
+company: TVB / 00511.HK
+period: 2025-12-31 annual
+generated_at_input: 2026-08-03T17:16:18+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md in full.
+- Read references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- No annual facts package or prior 2025 stock-research output for 00511.HK was present in the supplied stock_report paths.
+- Downloaded the official 2025 Annual Report to:
+  stock_report/data/raw/filings/00511.HK/2025-12-31/2025-annual-report.pdf
+- Official annual report URL:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042300360.pdf
+- Official annual-results announcement URL:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0325/2026032500377.pdf
+
+3. Model verification
+- Input hint said financial_brokerage/requires_special_model.
+- Annual report pp. 50-56 and annual-results announcement pp. 6-8 identify TV Broadcasting, Digital Media, Chinese Mainland Operations and International Operations.
+- No broker customer funds, proprietary trading book, margin finance or repo financing exists in the operating description or statements.
+- Overrode hint with ordinary_operating/applicable.
+
+4. Core extraction (reported currency HKD'000)
+- Annual report p.119: revenue 3,192,434; cost of sales 1,824,331; gross profit 1,368,103; net profit 17,659; parent profit 59,289.
+- Operating profit proxy 141,062 = EBITDA 365,313 less depreciation and amortisation 224,251. This is used only as a descriptive financial field; owner cash profit is calculated separately.
+- Annual report pp.117-118: total assets 5,459,179; total liabilities 3,227,031; total equity 2,232,148; parent equity 2,334,355; NCI -102,207.
+- Annual report p.123: operating cash flow 291,607; PPE purchases 43,864; intangible additions 28,174; financing cash flow -355,786.
+- Operating free cash flow 219,569 = 291,607 - 43,864 - 28,174.
+- Annual report pp.117-118 and p.196: cash 794,070; borrowings 1,995,935; convertible bonds 114,414; lease liabilities 20,638; reported net debt 1,336,917.
+- Annual report p.195: no dividend for 2025 and 2024.
+
+5. Currency conversion
+- Protocol requires absolute CNY yuan.
+- Conversion rate used: 1 HKD = CNY 0.90486, the PBOC/CFETS central parity published on 2025-12-26, the nearest cited official working-day rate used in this report.
+- PBOC source:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- All statement values in result.json are HKD'000 * 1,000 * 0.90486.
+- Limitation: one closing-date proxy rate is used for all statements; no separate annual average rate was applied to income/cash-flow items.
+
+6. Owner earnback assumptions and formulas
+- Market cap: CNY 960,129,217.0023918 from supplied Tencent snapshot at 2026/07/31 16:08:44.
+- Cash haircut: 50%, because annual-results announcement p.9 states about 59% of unrestricted cash was held in Mainland and overseas subsidiaries for daily operations, and media production requires working liquidity.
+- Financing liabilities haircut: 100% for borrowings, convertible bonds and lease liabilities.
+- Discounted detachable net cash:
+  794,070m HKD * 0.90486 * 50% - 2,130,987m HKD * 0.90486
+  = CNY -1,568,983,806.72.
+- Operating business price:
+  960,129,217.00 - (-1,568,983,806.72) = CNY 2,529,113,023.72.
+- Sustainable cash profit scenario: CNY 108,583,200, equivalent to HKD 120m. This is below 2025 reported operating FCF of CNY 198,679,205.34 to reflect receivable growth, programme-rights release, cyclicality and a newly restored profit base.
+- Owner earnback years:
+  2,529,113,023.72 / 108,583,200 = 23.2919 years.
+- Market cap/cash profit:
+  960,129,217.00 / 108,583,200 = 8.8423.
+- Dividend forecast: CNY 0, based on two consecutive nil-dividend years, net debt and debt service priority.
+
+7. Data quality and validation
+- Market-cap/PE fields are reused from input and were not independently reconstructed.
+- Sustainable cash profit and dividend forecast are explicitly scenario judgments, not company guidance.
+- data_quality.status set to complete because company identity, model, valuation, three statements, asset/liability explanation, dividend basis, business story and evidence are present.
+- Final protocol validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final expected validation status: ok, errors: [].

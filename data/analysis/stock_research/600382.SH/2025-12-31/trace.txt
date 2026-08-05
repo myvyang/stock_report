@@ -1,0 +1,32 @@
+2026-08-01 stock-research trace
+
+1. Read skill instructions and both required contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Checked configured reuse paths. No annual facts package, normalized facts, metadata, prior research result, or raw filing existed in the workspace.
+
+3. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Located the 2025 annual report through the Shanghai Stock Exchange announcement API. Official announcement title/date/path:
+   广东明珠集团股份有限公司2025年年度报告, 2026-04-22,
+   /disclosure/listedinfo/announcement/c/new/2026-04-22/600382_20260422_VBQL.pdf
+   SSE direct download returned an anti-bot HTML response in this environment, so the identical filing PDF was downloaded from Eastmoney's filing mirror:
+   https://pdf.dfcfw.com/pdf/H2_AN202604211821392435_1.pdf
+   Saved to stock_report/data/raw/filings/600382.SH/2025-12-31/annual-report-2025.pdf.
+
+5. Extracted the 256-page PDF locally with pypdf in a temporary virtual environment. Reviewed primary statements, business discussion, revenue/product tables, dividend section, restricted assets, other receivables, other current assets, cash-flow reconciliation, commitments, and audit key matters.
+
+6. Key audited facts used: revenue 970,178,542.76; cost 363,325,232.20; parent net profit 184,140,716.93; operating cash flow 229,237,588.94; capex 191,955,227.14; total assets 3,701,939,671.49; liabilities 596,389,073.04; parent equity 3,078,791,878.85. Calculated gross profit 606,853,310.56 and operating free cash flow 37,282,361.80.
+
+7. Identified material post-balance-sheet evidence through SSE announcement search: 广东明珠关于收到全部业绩承诺补偿款的公告 (临2026-026), 2026-05-23. It states all RMB 475,922,900 compensation was received. Used only as a pro-forma liquidity adjustment, not as a 2025 audited cash balance.
+
+8. Model judgment: ordinary_operating/applicable. Historical cooperation-project receivables, collateral assets, restricted cash, and operating mine assets were not treated as detachable cash. Discounted detachable net cash was set to RMB 400,000,000 after the post-period compensation receipt and conservative deductions. Discounted sustainable cash profit was set to RMB 150,000,000, triangulating audited profit, OCF, unusually high expansion capex, flat 2026 production planning, and commodity cyclicality.
+
+9. Populated result.json exclusively via protocol CLI set commands after initialization. No complex JSON result was handwritten directly to the output file.
+
+10. Validation command:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Result: status=ok, errors=[].

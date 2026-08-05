@@ -1,0 +1,79 @@
+GBLI stock-research trace
+generated_at: 2026-08-04 Asia/Shanghai
+period: 2025-12-31 annual
+
+1. Protocol initialization
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   outcome: initialized stock-research-result-v1 skeleton.
+
+2. Required contract review
+   read: .agents/skills/stock-research/SKILL.md
+   read: .agents/skills/stock-research/references/result-contract.md
+   read: .agents/skills/stock-research/references/report-contract.md
+
+3. Reuse audit
+   expected annual facts paths from config/input.json were absent in /workspace.
+   absent: stock_report/data/analysis/annual_review/GBLI/2025-12-31/facts.json
+   absent: stock_report/data/analysis/annual_review/GBLI/2025-12-31/annual_facts.md
+   absent: raw filing cache and normalized facts for GBLI/2025-12-31
+   decision: fetch and read primary filing rather than fabricate or reuse unavailable facts.
+
+4. Primary sources
+   SEC 2025 Form 10-K: https://www.sec.gov/Archives/edgar/data/1494904/000119312526100467/gbli-20251231.htm
+   filing date: 2026-03-10
+   company results page: https://investors.gbli.com/financials/quarterly-results/default.aspx
+   FX: Federal Reserve H.10, https://www.federalreserve.gov/releases/H10/hist/dat00_ch.htm
+   market snapshot: config/input.json, Yahoo Finance yfinance, dated 2026-08-03
+
+5. Model determination
+   input hint: ordinary_operating / applicable
+   filing fact: GBLI owns five statutory property-casualty insurers; investment assets support insurance liabilities and regulatory capital.
+   override: financial_insurance / requires_special_model
+   consequence: all ordinary discounted cash, cash-profit, business-price and earnback fields remain null.
+
+6. Currency normalization
+   reporting contract requires CNY absolute yuan.
+   selected FX: 6.7509 CNY/USD, Federal Reserve H.10 rate for 2026-07-31, latest available observation before 2026-08-03 market-cap date.
+   all USD filing values multiplied by 6.7509.
+   limitation: this is a uniform presentation rate, not period-average or each historical balance-sheet-date rate.
+
+7. Key extracted filing facts (USD thousands unless noted)
+   total assets: 1,720,762
+   total liabilities: 1,014,172
+   shareholders' equity: 706,590
+   total investments: 1,376,272
+   cash and cash equivalents: 65,542
+   unpaid losses and LAE: 750,191
+   unearned premiums: 182,728
+   total revenues: 450,098
+   net earned premiums: 388,772
+   net investment income: 62,664
+   net income: 25,333
+   net income available to common shareholders: 24,893
+   operating cash flow: 9,065
+   common distributions paid: 20,004
+   2025 calendar-year combined ratio: 98.6%
+   2025 current-accident-year combined ratio: 96.2%
+   current-accident-year combined ratio excluding California wildfires: 92.2%
+   California wildfire net losses: 15,740
+   2026 distributions available without regulatory approval: 44,319 total across five insurers
+
+8. Dividend forecast
+   basis: annualized 2026 Q1 declared common distribution of USD 0.35/share.
+   annualized rate: USD 1.40/share.
+   shares outstanding at 2026-03-10: 14,350,839.
+   forecast USD cash dividend: 20,091,174.60.
+   forecast CNY cash dividend: 135,633,510.6071.
+   input market cap CNY: 2,711,015,860.221222.
+   forecast yield: 0.050030511660699814.
+
+9. Protocol population and validation
+   result fields were populated with repeated protocol `set` commands; result.json was not handwritten from scratch.
+   validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   validation result before report completion: {"status":"ok","errors":[]}
+
+10. Known limitations
+   No workspace annual facts package was available.
+   Consolidated RBC percentage was not disclosed; only the statement that each insurer exceeded company-action-level requirements was available.
+   PE TTM is retained from input and not recomputed from 2025 annual income.
+   Capital expenditure and ordinary free cash flow are null because securities reinvestment and claim timing are integral to insurance operations and the ordinary operating-company measure is not economically comparable.

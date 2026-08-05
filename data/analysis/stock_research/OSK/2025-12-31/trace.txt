@@ -1,0 +1,73 @@
+stock-research trace
+company: OSK / Oshkosh Corporation
+period: 2025-12-31
+generated_at: 2026-08-04T23:39:03+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse audit
+- config/input.json existed.
+- No local OSK raw filing, annual facts package, normalized facts, or prior research output existed under the supplied stock_report paths.
+- Decision: return to the primary filing rather than inventing missing annual facts.
+
+3. Primary sources retrieved and checked
+- SEC 2025 Form 10-K, accession 0001193125-26-054061, filed 2026-02-17:
+  https://www.sec.gov/Archives/edgar/data/775158/000119312526054061/osk-20251231.htm
+- SEC company facts API for CIK 0000775158, used to cross-check XBRL amounts.
+- Oshkosh investor relations dividend history and 2026 quarterly releases, used for the $0.57 quarterly dividend.
+- SAFE RMB central parity table, latest captured official USD/CNY value 6.7910 dated 2026-07-15.
+- Market cap and PE were used exactly as supplied in config/input.json (Yahoo Finance yfinance snapshot, 2026-08-03).
+
+4. Analysis model decision
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Basis: assets and liabilities are identifiable manufacturing working capital, operating assets, customer advances, and financing debt. They are not customer deposits, insurance reserves, project regulatory cash, concession assets, or an investment-holding balance sheet.
+
+5. Key USD filing facts
+- Revenue 10,422.3m; cost of sales 8,603.3m; gross profit 1,819.0m.
+- Operating profit 939.5m; net income attributable to parent 647.0m.
+- Total assets 10,072.4m; total liabilities 5,541.9m; parent equity 4,530.5m; no NCI.
+- Operating cash flow 783.4m.
+- PP&E additions 165.4m and rental equipment additions 46.4m; operating FCF defined here as 571.6m.
+- Cash 479.8m; current debt 0.6m; long-term debt 1,100.3m.
+- Customer advances 1,959.8m; accounts payable 1,074.2m.
+- Dividends paid 130.4m; share repurchases 278.0m.
+- Segment operating profit: Access 502.0m, Vocational 547.1m, Transport 77.8m.
+- Backlog 14.2bn; approximately 53% not expected to be filled in 2026.
+
+6. Currency conversion
+- Protocol requires CNY absolute yuan.
+- Conversion factor: 6.7910 CNY per USD.
+- All filing-derived monetary amounts in result.json were converted using this one factor for internal consistency.
+- Market cap was already supplied in CNY and was not reconverted.
+
+7. Owner earnback judgment
+- Detachable net cash = cash 479.8m - interest-bearing debt 1,100.9m = -621.1m USD = -4,217,890,100 CNY.
+- 2025 operating FCF = OCF 783.4m - PP&E 165.4m - rental equipment 46.4m = 571.6m USD.
+- 2025 OCF included customer advances increase of 155.9m USD and approximately 90m USD lower tax payments from accelerated deductions; receivables and inventory moved the other way.
+- Sustainable distributable cash profit was conservatively normalized to 500m USD = 3,395,500,000 CNY. This is analyst judgment, not company guidance.
+- Operating business price = market cap - discounted net cash = 63,548,722,402.75098 CNY.
+- Owner earnback years = 63,548,722,402.75098 / 3,395,500,000 = 18.7155713.
+- Market cap / cash profit = 17.4733713.
+
+8. Dividend forecast
+- Annualized dividend per share: 0.57 USD x 4 = 2.28 USD.
+- Forecast share count: 63m, from company 2026 outlook.
+- Forecast cash dividend: 143.64m USD = 975,459,240 CNY.
+- Forecast yield on supplied market cap: 1.6441017%.
+
+9. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated scalar fields and appended arrays using protocol set/append commands.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].
+
+10. Data-quality limitations
+- Official FX date and market-cap date differ; minor CNY translation mismatch is unavoidable from captured sources.
+- Normalized sustainable cash profit cannot precisely separate all timing effects and remains a disclosed analytical estimate.
+- Input legal name includes a quote-vendor suffix; SEC-confirmed legal name is Oshkosh Corporation.

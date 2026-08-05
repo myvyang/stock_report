@@ -1,0 +1,62 @@
+stock-research trace
+company: 上海环境 (601200.SH)
+period: 2025-12-31 annual
+generated_at: 2026-07-31T23:20:13+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized result through protocol CLI
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse audit
+- No annual facts package, normalized facts, filing metadata, or prior stock-research output existed at the requested paths.
+- Located the official 2025 annual report on the Shanghai Stock Exchange.
+- Source URL: https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-02/601200_20260402_2VHX.pdf
+- Saved as stock_report/data/raw/filings/601200.SH/2025-12-31/annual-report-2025.pdf
+- PDF has 230 pages; text extracted locally for research. Core evidence came from the annual report rather than media or third-party financial databases.
+
+4. Model decision
+- Input hint: ordinary_operating / applicable.
+- Overridden after filing review: utility_concession / requires_special_model.
+- Evidence: BOT/TOT concessions; revenue from waste-disposal fees, electricity sales and wastewater-treatment fees; CNY 8,359,307,972.14 concession-right carrying value; CNY 12,583,005,506.16 long-term receivables; CNY 5,860,492,697.02 restricted intangible assets; project borrowing secured by concession/charging rights or land.
+- Consequence required by result contract: discounted net cash, discounted cash profit, operating-business price, ordinary owner earnback years and market-cap/cash-profit metrics remain null.
+
+5. Key filing facts entered via protocol set commands
+- Revenue: 6,258,331,644.45
+- Cost of sales: 4,588,119,451.40
+- Gross profit: 1,670,212,193.05
+- Parent net profit: 603,141,346.67
+- Operating cash flow: 1,642,784,840.74
+- Purchases of fixed/intangible/other long-lived assets: 552,232,015.40
+- Operating cash flow less disclosed long-lived-asset purchases: 1,090,552,825.34
+- Total assets: 31,086,188,248.57
+- Total liabilities: 17,489,650,963.74
+- Total equity: 13,596,537,284.83
+- Parent equity: 11,667,260,032.23
+- Minority interest: 1,929,277,252.60
+- Cash: 1,119,459,469.48
+- Accounts receivable: 3,717,816,438.50
+- Long-term receivables: 12,583,005,506.16
+- Concession rights: 8,359,307,972.14
+- Interest-bearing borrowings used in report: short-term borrowings 1,073,375,435.05 + current portion of long-term borrowings 1,201,700,641.08 + long-term borrowings 8,047,352,528.81 = 10,323,428,604.94
+- Proposed 2025 cash dividend: 181,741,083.89; CNY 0.135 per share; subject to shareholder approval at annual-report date.
+
+6. Derived formulas
+- gross_margin = (6,258,331,644.45 - 4,588,119,451.40) / 6,258,331,644.45 = 0.2668781854236143
+- net_margin = 603,141,346.67 / 6,258,331,644.45 = 0.09637414265267909
+- forecast_dividend_yield = 181,741,083.89 / 9,545,000,000 = 0.019040448809848086
+- operating_free_cash_flow field = 1,642,784,840.74 - 552,232,015.40 = 1,090,552,825.34. This is a mechanical annual cash-flow subtraction, not sustainable distributable cash profit; ordinary earnback metrics were not populated.
+
+7. Limitations
+- Market cap and PE were reused from config/input.json and not independently refreshed.
+- The annual report does not provide a complete project-by-project schedule of remaining concession life, debt amortization and maintenance capex, so no special-model earnback year was estimated.
+- The company's first-tier industry position is management disclosure and was not independently verified with market-share data.
+- Dividend is the annual-report proposal and was pending shareholder approval as disclosed.
+
+8. Validation
+- All structured fields were populated through the protocol CLI, not by hand-writing a complex JSON result.
+- Protocol validation was run after population and again after report/trace creation.

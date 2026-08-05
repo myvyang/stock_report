@@ -1,0 +1,62 @@
+stock-research trace
+company=First Solar, Inc. (NASDAQ: FSLR)
+period=2025-12-31
+generated_at=2026-08-05T00:26:00+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md; also read directly linked data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar fields with protocol set and list rows with protocol append; JSON was not authored from scratch.
+
+[local-reuse]
+- Checked configured annual-review, normalized-facts, raw-filing, and prior stock-research paths.
+- No FSLR annual facts, raw filing, or prior research artifacts existed locally; only config/input.json and the user evaluation notes file were present.
+
+[primary-sources]
+- SEC 2025 Form 10-K, accession 0001274494-26-000021, filed 2026-02-24:
+  https://www.sec.gov/Archives/edgar/data/1274494/000127449426000021/fslr-20251231.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/1274494/000127449426000021/0001274494-26-000021-index.html
+- SEC Companyfacts API, CIK 0001274494, used to cross-check statement facts.
+- 2025-12-31 RMB central parity: USD 1 = CNY 7.0288, announced by CFETS under PBOC authorization; Xinhua reproduction:
+  https://www1.xinhuanet.com/20251231/fe9f6466f6884589b5287e6ee946baed/c.html
+- Market cap, date, PE TTM, and quote source were taken unchanged from config/input.json (Yahoo Finance yfinance snapshot).
+
+[model-review]
+- Confirmed ordinary_operating. First Solar reports one operating segment designing, manufacturing, and selling CdTe solar modules.
+- Ordinary owner earnback is applicable because cash, receivables, inventory, PP&E, accounts payable, debt, and customer advances have normal manufacturing meanings.
+- Special caution: Section 45X credits materially affect gross profit, tax rate, and operating cash flow; ongoing capacity expansion makes one-year free cash flow non-stationary.
+
+[currency]
+- All USD filing amounts were multiplied by 7.0288 and stored as absolute CNY yuan.
+- Ratios are decimals. Market cap remains the CNY amount supplied by the task.
+
+[key-formulas]
+- gross_margin = 2,120,339 / 5,219,376 = 0.4062437732.
+- net_margin = 1,528,229 / 5,219,376 = 0.2927991775.
+- operating_free_cash_flow = (2,057,105 - 869,875) million USD * 7.0288 = CNY 8,344,802,224.
+- discounted_detachable_net_cash = cash * 75% + unrestricted marketable securities * 90% - current and long-term debt
+  = CNY 11,602,634,154.88.
+- discounted_sustainable_cash_profit = 2025 operating FCF * 70% = CNY 5,841,361,556.80.
+- operating_business_price = CNY 153,040,252,013.06836 - CNY 11,602,634,154.88
+  = CNY 141,437,617,858.18835.
+- owner_earnback_years = operating_business_price / discounted_sustainable_cash_profit
+  = 24.2131250536.
+- market_cap_to_cash_profit = market_cap / discounted_sustainable_cash_profit
+  = 26.1994143874.
+- forecast dividend = 0 because the 10-K states the company has never paid dividends and does not expect to pay them for the foreseeable future.
+
+[judgment-notes]
+- Cash haircut of 25% preserves funds for capacity expansion, working capital, and foreign cash access constraints.
+- Unrestricted securities haircut of 10% reflects liquidity/valuation conservatism.
+- Debt is deducted at 100%.
+- Sustainable cash profit uses a 30% aggregate haircut to observed FCF because 2025 cash generation included 45X proceeds and inventory release, while capex remains high. This is an explicit scenario, not a forecast or management guidance.
+- Restricted recycling securities are excluded from detachable cash because they fund module collection/recycling obligations.
+- Customer deferred revenue is treated as a delivery obligation, not detachable cash.
+
+[validation]
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[].
+- Also parsed outputs/result.json with python3 -m json.tool successfully.

@@ -1,0 +1,98 @@
+PRDO stock-research trace
+generated_at=2026-08-04T17:20:06+08:00
+period=2025-12-31
+
+1. Protocol initialization
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+result: initialized stock-research-result-v1 skeleton; valuation fields inherited from input.
+
+2. Local reuse check
+checked:
+- stock_report/data/analysis/annual_review/PRDO/2025-12-31/
+- stock_report/data/raw/filings/PRDO/2025-12-31/
+- stock_report/data/normalized/facts/PRDO/2025-12-31/
+- stock_report/data/analysis/stock_research/PRDO/2025-12-31/
+result: no reusable PRDO 2025 annual fact package or prior research output was present.
+
+3. Primary filing
+source: https://www.sec.gov/Archives/edgar/data/1046568/000119312526059331/prdo-20251231.htm
+filing: Perdoceo Education Corporation Form 10-K for year ended 2025-12-31
+accession: 0001193125-26-059331
+filed: 2026-02-19
+used for: business description, enrollment, Title IV dependence, audited statements, asset/liability detail, dividends, buybacks, USAHS acquisition effects, risks.
+
+4. Latest official operating/dividend cross-check
+source: https://www.sec.gov/Archives/edgar/data/1046568/000119312526211824/prdo-ex99_1.htm
+document: Exhibit 99.1 to Form 8-K filed 2026-05-07
+used for: quarterly dividend $0.15/share; Q1 2026 revenue, operating income, cash and investments; 2026 outlook.
+
+5. XBRL cross-check
+source: https://data.sec.gov/api/xbrl/companyfacts/CIK0001046568.json
+used for: Assets, StockholdersEquity, RevenueFromContractWithCustomerExcludingAssessedTax, OperatingIncomeLoss, NetIncomeLoss, NetCashProvidedByUsedInOperatingActivities and buybacks for accession 0001193125-26-059331.
+
+6. Currency conversion
+source: Federal Reserve H.10 Data Download Program, H10/H10/RXI_N.M.CH
+observation: 2025-12 monthly average = 7.0432 CNY per USD
+method: all USD filing amounts multiplied by 7.0432; input market capitalization retained as supplied in CNY.
+limitation: statement conversion date and 2026-08-03 market-cap date are not matched FX dates.
+
+7. Key reported USD values
+total_assets=1247717000
+total_liabilities=275305000
+stockholders_equity=972412000
+revenue=846096000
+educational_services_and_facilities=197540000
+gross_profit_proxy=648556000
+operating_income=196000000
+net_income=159914000
+operating_cash_flow=225240000
+capital_expenditure=8576000
+operating_free_cash_flow=216664000
+cash_unrestricted=110970000
+restricted_cash=21310000
+short_term_investments=511211000
+finance_lease_liabilities=11555000
+sale_leaseback_financing=56992000
+dividends_paid=36855000
+share_repurchases=120793000
+
+8. Derived metrics
+gross_profit_proxy = revenue - educational_services_and_facilities = 648556000 USD
+gross_margin_proxy = 648556000 / 846096000 = 0.7665276753
+net_margin = 159914000 / 846096000 = 0.1890021936
+operating_free_cash_flow = 225240000 - 8576000 = 216664000 USD
+
+discounted_detachable_net_cash_usd =
+  110970000 * 100%
+  + 511211000 * 95%
+  + 21310000 * 90%
+  - 11555000
+  - 56992000
+  - 100000000 operating/regulatory reserve
+  = 447252450 USD
+discounted_detachable_net_cash_cny = 3150088455.84
+
+discounted_sustainable_cash_profit_usd =
+  (159914000 net income + 41627000 D&A - 8576000 capex) * 90%
+  = 173668500 USD
+discounted_sustainable_cash_profit_cny = 1223181979.20
+
+operating_business_price = 13459470827.884277 - 3150088455.84 = 10309382372.044277 CNY
+owner_earnback_years = 10309382372.044277 / 1223181979.20 = 8.4283308186
+market_cap_to_cash_profit = 13459470827.884277 / 1223181979.20 = 11.0036536319
+discounted_net_cash_to_market_cap = 3150088455.84 / 13459470827.884277 = 0.2340425189
+
+forecast_dividend = $0.15 * 4 * 62478373 year-end shares * 7.0432 = 264028606.03 CNY
+forecast_dividend_yield = 264028606.03 / 13459470827.884277 = 0.0196165666
+
+9. Judgment boundaries
+- ordinary_operating model confirmed: education service operator; no customer deposits, insurance reserves, project settlement assets or concession structure.
+- gross profit is an analytical proxy, not a company-reported GAAP subtotal.
+- net cash discounts, $100m reserve and 10% sustainable-profit haircut are analyst judgments, disclosed in result and report.
+- no investment recommendation or target price produced.
+
+10. Protocol population and validation
+population: fields were set on the initialized skeleton using `python3 -m stock_analysis.stock_research.protocol set`; the result was not constructed from a blank handwritten JSON object.
+validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+final validation result: status=ok, errors=[]
+independent formula checks: ok

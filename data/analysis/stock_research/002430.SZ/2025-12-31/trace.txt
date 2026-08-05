@@ -1,0 +1,38 @@
+[2026-08-01 02:25 Asia/Shanghai] 读取 config/input.json。
+[2026-08-01] 完整读取 stock-research/SKILL.md、result-contract.md、report-contract.md、data-reuse.md。
+[2026-08-01] 检查长期目录：未发现 002430.SZ/2025-12-31 的年度事实包、标准化事实或历史股票研究结果，决定回查公开披露。
+[2026-08-01] 协议初始化：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json。
+[2026-08-01] 取得巨潮资讯 2025 年年度财务报告：https://static.cninfo.com.cn/finalpage/2026-04-11/1225092148.PDF；保存至 stock_report/data/raw/filings/002430.SZ/2025-12-31/2025-annual-financial-report.pdf。
+[2026-08-01] 因环境无 pdftotext/PDF Python 库，使用新浪财经转载的财务报告 HTML 进行表格抽取，并以巨潮资讯 PDF 搜索结果交叉核对标题、日期和审计信息。核心财报数字仍归因于巨潮资讯原始财务报告。
+[2026-08-01] 模型复核：收入来自工业气体和装备销售，固定资产与债务虽重但无金融/地产等特殊报表负债，statement_model=ordinary_operating，owner_earnback_applicability=applicable。
+
+核心算式：
+gross_profit = 15,082,533,819.09 - 11,914,675,491.24 = 3,167,858,327.85
+gross_margin = 3,167,858,327.85 / 15,082,533,819.09 = 0.2100361772
+net_margin = 948,853,670.52 / 15,082,533,819.09 = 0.0629114274
+operating_free_cash_flow = 2,220,370,021.42 - 1,695,695,846.06 = 524,674,175.36
+discounted_cash_profit = 524,674,175.36 * 0.90 = 472,206,757.82
+
+折后资金：
+cash_equivalents = 2,172,998,971.37 * 0.90 = 1,955,699,074.23
+current_noncurrent_asset = 500,000,000.00 * 0.80 = 400,000,000.00
+investments = 163,139,740.05 * 0.30 = 48,941,922.02
+interest_bearing_debt = -7,336,183,691.49
+discounted_net_cash = 1,955,699,074.23 + 400,000,000.00 + 48,941,922.02 - 7,336,183,691.49 = -4,931,542,695.24
+
+交叉核对发现初次录入的折后净现金存在加总误差；已用协议 CLI 将 JSON 修正为逐项精确合计 -4,931,542,695.24，并同步更新经营业务购买价 27,766,542,695.24、回本年 58.8016631。
+
+分红：
+forecast_cash_dividend = 978,354,407 * 0.40 = 391,341,762.80
+forecast_dividend_yield = 391,341,762.80 / 22,835,000,000 = 0.0171378044
+
+证据：
+- 2025 年年度财务报告（巨潮资讯，2026-04-11）：三张表、附注、受限资产、债务变动表、应收账款减值。
+- 2025 年年度报告：业务模式、分部收入、经营回顾和风险。
+- 关于 2025 年度利润分配预案的公告：年度每 10 股派 3 元。
+- 2025 年半年度报告：中期每 10 股派 1 元。
+- 杭氧集团官网：公司业务定位；仅作公司自述，不作为独立市场份额证明。
+- Tencent qt.gtimg.cn：任务输入市值、日期、PE TTM；本次未独立复核。
+
+[2026-08-01] 所有 result.json 字段均通过协议 CLI set/append 写入，没有手写复杂 JSON。
+[2026-08-01] 最终协议 validate 返回 status=ok、errors=[]；资产负债恒等式、毛利、自由现金流、现金折扣加总、经营业务购买价、回本年和分红率均已程序化复算通过。

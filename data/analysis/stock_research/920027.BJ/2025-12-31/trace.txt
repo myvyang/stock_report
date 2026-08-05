@@ -1,0 +1,78 @@
+stock-research trace
+company: 920027.BJ 交大铁发
+period: 2025-12-31 annual
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Expected annual facts, normalized facts and raw filing paths from config/input.json were absent under stock_report/.
+- No prior stock research outputs were available for reuse.
+- Therefore returned to public filing sources rather than inventing missing facts.
+
+3. Sources inspected
+- 交大铁发《2025年年度报告》, disclosed 2026-04-29, full report text mirrored from the Beijing Stock Exchange filing; original announcement PDF identified as Sina announcement id 12284961. Audit opinion: standard unqualified, auditor: 容诚会计师事务所（特殊普通合伙）.
+- 交大铁发《2025年年度权益分派实施公告》, disclosed 2026-05-27: cash dividend CNY 11,880,525 and capitalization of CNY 23,761,050 shares.
+- config/input.json market snapshot: market cap CNY 1,163,000,000, PE TTM 23.13, Tencent qt.gtimg.cn, timestamp 2026-07-31 15:38:20.
+- 2025 annual performance bulletin was viewed only as a cross-check; audited annual-report figures were used in outputs.
+
+4. Model decision
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: products and technical services are sold by direct sales/tender, produced to order and recognized on delivery/acceptance. Receivables, inventory and trade payables are operating working capital. The company is not a bank, insurer, broker, developer, construction general contractor, concession utility or investment holding platform.
+- Special handling retained inside ordinary model: IPO proceeds and deposit products are earmarked for production, R&D, sales network and working capital, so they are discounted instead of treated as fully detachable.
+
+5. Audited financial extraction (CNY)
+- total_assets 889,169,442.58
+- total_liabilities 421,938,671.19
+- total_equity 467,230,771.39
+- parent_equity 457,561,536.30
+- minority_interest 9,669,235.09
+- revenue 363,907,116.26
+- cost_of_sales 230,216,745.57
+- gross_profit 133,690,370.69
+- operating_profit 52,198,372.91
+- net_profit 44,763,178.24
+- parent_net_profit 44,241,944.95
+- operating_cash_flow 95,951,506.90
+- capital_expenditure 22,123,851.21
+- operating_free_cash_flow 73,827,655.69
+- financing_cash_flow 115,266,834.77
+
+6. Derived operating metrics
+- gross_margin = (363,907,116.26 - 230,216,745.57) / 363,907,116.26 = 0.3673749831110269
+- net_margin = 44,241,944.95 / 363,907,116.26 = 0.12157482767770485
+- Free cash flow was not used as sustainable cash profit because accounts payable increased CNY 76.73m and inventory increased CNY 45.14m, materially affecting the single-year cash result.
+
+7. Owner earnback assumptions and arithmetic
+- unrestricted_cash = 172,385,508.01 - 1,633,748.61 performance-guarantee deposit - 4,328,059.00 bill deposit = 166,423,700.40
+- discounted_unrestricted_cash = 166,423,700.40 * 50% = 83,211,850.20
+- discounted_trading_financial_assets = 70,024,273.97 * 50% = 35,012,136.985
+- discounted_large_certificate_of_deposit = 30,130,082.20 * 50% = 15,065,041.10
+- financing_and_lease_debt = 10,009,013.89 + 21,608,045.76 + 577,114.76 = 32,194,174.41, deducted at 100%
+- discounted_detachable_net_cash = 83,211,850.20 + 35,012,136.985 + 15,065,041.10 - 32,194,174.41 = 101,094,853.875
+- discounted_sustainable_cash_profit = 44,241,944.95 * 80% = 35,393,555.96
+- operating_business_price = 1,163,000,000 - 101,094,853.875 = 1,061,905,146.125
+- owner_earnback_years = 1,061,905,146.125 / 35,393,555.96 = 30.002782069287168
+- market_cap_to_cash_profit = 1,163,000,000 / 35,393,555.96 = 32.85908884979976
+- discounted_net_cash_to_market_cap = 101,094,853.875 / 1,163,000,000 = 0.08692592766552018
+- The 50% cash discounts and 20% profit haircut are analyst assumptions, not reported facts.
+
+8. Dividend
+- forecast_cash_dividend uses the known 2025 annual distribution implemented in 2026: CNY 11,880,525.
+- forecast_dividend_yield = 11,880,525 / 1,163,000,000 = 0.010215412725709373.
+- Share capitalization is excluded from cash return.
+
+9. Protocol construction and validation
+- All complex JSON content was created from the protocol-generated skeleton using repeated protocol set commands; result.json was not hand-written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation result: status=ok, errors=[]
+
+10. Data-quality judgment
+- status=complete because audited three-statement data, model decision, asset/liability explanations, owner-earnback breakdown, dividend basis, business story and evidence are all present.
+- Limitations are recorded in result.json: absent local fact pack, estimate sensitivity, and reliance on the supplied market snapshot.

@@ -1,0 +1,75 @@
+stock-research trace
+generated_at: 2026-08-04T21:24:35+08:00
+company: Coastal Financial Corporation (NASDAQ: CCB)
+period: 2025-12-31 annual
+
+1. Instructions and contracts read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- Checked the configured annual-review, raw-filing, normalized-facts, and prior stock-research paths.
+- No reusable CCB 2025 filing/facts package was present in the workspace.
+
+3. Identity and model decision
+- Input identity: US ticker CCB, Coastal Financial Corporation.
+- Input model hint cited source_company_id HK.00939 and included construction-contractor tags. Those attributes belong to a different issuer and were rejected.
+- SEC CIK 1437958 filing confirms Coastal Financial is a bank holding company operating Coastal Community Bank, with community bank, CCBX, and treasury/administration segments.
+- Final statement_model: financial_bank.
+- Final owner_earnback_applicability: not_applicable.
+- Rationale: loans, interest-bearing deposits, and customer deposits are the bank's operating balance sheet; they cannot be reduced to detachable net cash.
+
+4. Primary sources
+- SEC 2025 Form 10-K, filed 2026-02-27:
+  https://www.sec.gov/Archives/edgar/data/1437958/000143795826000013/ck1437958-20251231.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/1437958/000143795826000013/0001437958-26-000013-index.html
+- Coastal Financial Q4/full-year 2025 release, dated 2026-01-29:
+  https://ir.coastalbank.com/news/press-releases/news-details/2026/Coastal-Financial-Corporation-Announces-Fourth-Quarter-2025-Results/default.aspx
+- Federal Reserve G.5A 2025 annual FX rate (CNY 7.1875/USD):
+  https://www.federalreserve.gov/releases/g5a/current/
+- Federal Reserve H.10 release dated 2025-12-29; closest available year-end business-day CNY rate was 7.0063/USD on 2025-12-26:
+  https://www.federalreserve.gov/releases/h10/20251229/
+- Market data: supplied input snapshot, Yahoo Finance yfinance, market cap date 2026-08-03.
+
+5. Extracted USD facts
+- Total assets: $4,741.437m
+- Total liabilities: $4,250.478m
+- Total shareholders' equity / parent equity: $490.959m
+- Deposits: $4,144.199m
+- Loans receivable: $3,749.531m; allowance: $169.530m; net loans: $3,580.001m
+- CCBX credit enhancement asset: $177.657m
+- Net interest income: $310.065m
+- Net income attributable to common structure: $46.993m (no minority interest disclosed)
+- Net interest margin: 7.14%; ROA: 1.05%; ROE: 10.17%
+- Nonperforming loans / loans: 1.71%; allowance / loans: 4.52%
+- Consolidated CET1: 12.43%; total capital: 14.95%
+- CCBX loans: $1,807.552m, 48.1% of total loans
+- Common dividend history and near-term intent: no dividends; retain earnings for growth
+
+6. Currency conversion
+- Balance-sheet amounts converted at 7.0063 CNY/USD (period-end proxy).
+- Income-statement amounts converted at 7.1875 CNY/USD (2025 annual average).
+- Market capitalization was already supplied under the contract's CNY convention and was not reconverted.
+- Different FX rates for stock and flow amounts create expected CNY translation differences.
+
+7. Protocol operations
+- Initialized with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated initialized paths using repeated protocol set commands; no complex result object was hand-written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report handoff: status=ok, errors=[]
+
+8. Null and zero decisions
+- gross_margin and net_margin: null; banking revenue/cost structure is not comparable to ordinary operating companies.
+- operating cash flow, capex, and operating free cash flow: null; deposit and loan movements dominate bank cash-flow statements and do not represent ordinary distributable FCF.
+- discounted net cash, discounted cash profit, operating business price, owner earnback years, and market cap/cash profit: null because ordinary owner earnback is not applicable.
+- forecast dividend and forecast dividend yield: zero, not null, because management explicitly states no historical common dividends and no near-term intent to pay.
+
+9. Data quality
+- status: complete
+- incomplete_reasons: []
+- limitations recorded in outputs/result.json cover FX translation, supplied market snapshot, and non-comparable bank cash-flow/margin fields.

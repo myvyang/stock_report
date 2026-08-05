@@ -1,0 +1,47 @@
+2026-08-04T16:28:03+08:00 INIT
+- Read stock-research/SKILL.md in full.
+- Read result-contract.md and report-contract.md in full.
+- Read data-reuse.md because the selected skill directly references reuse boundaries.
+- Ran protocol CLI init with config/input.json -> outputs/result.json.
+
+SOURCE REUSE CHECK
+- Searched configured annual-review, normalized-facts, raw-filing and prior stock-research paths.
+- No reusable FSCO filing package or annual facts were present in /workspace/stock_report.
+- Returned to primary public disclosures.
+
+PRIMARY SOURCES
+1. SEC Form N-CSR, FS Credit Opportunities Corp., year ended 2025-12-31, filed 2026-03-05:
+   https://www.sec.gov/Archives/edgar/data/1568194/000162828026013171/fsco123125n-csr.htm
+   Used for company/fund identity, business model, portfolio mix, financial statements, distribution coverage, fair-value hierarchy, financing, fees and risks.
+2. Federal Reserve H.10 historical USD/CNY:
+   https://www.federalreserve.gov/releases/h10/Hist/dat00_ch.htm
+   2025-12-31 spot: 6.9931 CNY/USD; 2025 annual average: 7.1875 CNY/USD.
+3. FS Investments official FSCO distributions page and June 2025 announcement, used as cross-check:
+   https://fsinvestments.com/investments/fs-credit-opportunities-corp/
+   https://fsinvestments.com/fs-credit-opportunities-corp-fsco-declares-increased-distribution-for-june-2025/
+4. config/input.json supplied market snapshot: market cap CNY 6,756,331,819.761475 on 2026-08-03 and PE TTM 6.513158, sourced there to Yahoo Finance yfinance.
+
+MODEL DECISION
+- Overrode input hint ordinary_operating/applicable.
+- Selected investment_holding/requires_special_model.
+- Reason: registered closed-end investment company; loans, bonds, cash deployment, credit facilities and term preferred stock collectively constitute the business and leverage structure.
+- Consequence: all ordinary owner-earnback sorting fields remain null. Analysis uses NAV discount, NII/distribution coverage, credit quality, valuation hierarchy and leverage/asset coverage.
+
+CONVERSION AND CALCULATIONS
+- Balance-sheet USD amounts x 6.9931 spot rate.
+- 2025 income/cash-flow USD amounts x 7.1875 annual-average rate.
+- Forecast distribution = USD 0.0678/share/month x 12 x 202,269,645 shares x 6.9931 = CNY 1,150,830,572.78.
+- Forecast distribution yield = CNY 1,150,830,572.78 / CNY 6,756,331,819.76 = 17.0334%.
+- Cross-period indicative NAV discount = 1 - input market cap / (2025-12-31 shares x USD 7.11 NAV x 6.9931) = 32.8199%; not stored as a sortable protocol metric because dates do not match.
+- Level 3 share = USD 1,291.407m / USD 1,709.285m = 75.55%.
+
+DATA INTERPRETATION
+- Revenue mapped to total investment income for structured consumption, while gross profit/margin remain null because the ordinary sales-cost model is not meaningful.
+- Operating profit mapped to net investment income; net profit mapped to increase in net assets resulting from operations.
+- Operating cash flow, capex and operating FCF remain null because fund cash flows include purchases/sales/repayments of investments and are not comparable to ordinary operating-company cash conversion.
+- 2025 accounting NII (USD 133.756m) is below distributions (USD 159.399m), while the filing states tax-basis NII fully covered distributions and none was return of capital. Both facts are retained without forcing reconciliation beyond disclosed evidence.
+
+PROTOCOL OPERATIONS
+- Used protocol CLI set/append for all result.json population; did not hand-write the JSON object.
+- Wrote report.md and trace.txt as human-readable outputs.
+- Final protocol validation follows after file construction.

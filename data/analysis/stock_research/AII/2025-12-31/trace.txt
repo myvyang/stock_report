@@ -1,0 +1,63 @@
+stock-research trace
+generated_at=2026-08-04T12:10:33+08:00
+query=AII
+period=2025-12-31
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No annual facts, normalized facts, raw filing metadata, or prior stock-research files were present for AII in the paths declared by config/input.json.
+- Research therefore returned to the official filing.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized successfully.
+
+4. Primary sources used
+- SEC Form 10-K, accession 0002007587-26-000016, filed 2026-02-27, period 2025-12-31.
+  URL: https://www.sec.gov/Archives/edgar/data/2007587/000200758726000016/aii-20251231.htm
+- SEC Form 8-K, accession 0002007587-26-000007, filed 2026-02-24, special dividend.
+  URL: https://www.sec.gov/Archives/edgar/data/2007587/000200758726000007/aii-20260224.htm
+- Federal Reserve H.10 release dated 2025-12-29; 2025-12-26 CNY rate 7.0063 per USD.
+  URL: https://www.federalreserve.gov/releases/h10/20251229/
+- Market snapshot supplied by config/input.json: Yahoo Finance yfinance, dated 2026-08-03.
+
+5. Model decision
+- Input hint ordinary_operating/applicable was overridden.
+- Confirmed statement_model=financial_insurance.
+- Confirmed owner_earnback_applicability=requires_special_model.
+- Reason: invested assets, cash, unearned premium, claim reserves, reinsurance balances, and regulatory capital are integral to insurance operations. They cannot be converted into detachable net cash without misrepresenting the business.
+- All ordinary owner earnback sorting metrics remain null as required by the result contract.
+
+6. Currency conversion
+- All filing amounts were reported in USD and converted to CNY at 7.0063 CNY/USD.
+- Formula: USD absolute amount * 7.0063.
+- Market capitalization was already supplied in protocol-required CNY and was not reconverted.
+
+7. Key extracted facts (USD)
+- Total assets 1,225.074m; liabilities 888.052m; equity 337.022m.
+- Total revenue 276.485m; net premiums earned 242.923m; net income 99.621m.
+- Operating cash flow 138.192m; property/equipment purchases 5.017m.
+- Cash 203.902m; investments 348.610m; restricted cash 40.217m.
+- Unearned premiums 481.557m; unpaid losses/LAE 266.591m; reinsurance payable 78.526m.
+- Combined ratio 63.7%; loss ratio 38.7%; expense ratio 25.0%.
+- AIIC statutory surplus 193.080m; statutory net income 42.028m.
+- Special dividend approximately 20.000m, or USD 1.02 per share.
+
+8. Research judgments
+- 2025 underwriting was strong, but the filing attributes part of the improvement to no significant Florida storm activity and Citizens take-out economics.
+- Operating cash flow is not treated as sustainable distributable cash profit because changes in reinsurance recoverables and claim reserves are integral insurance working balances.
+- The declared special dividend is included as forecast cash dividend, while forecast_basis explicitly states it is non-recurring.
+
+9. Output construction
+- outputs/result.json was initialized and populated with protocol CLI set/append commands; it was not handwritten from scratch.
+- outputs/report.md and outputs/trace.txt were created from the verified result and sources.
+
+10. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[].
+- JSON syntax check passed; ordinary owner-earnback metrics were confirmed null.

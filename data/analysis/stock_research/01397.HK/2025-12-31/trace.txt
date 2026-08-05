@@ -1,0 +1,59 @@
+Task: 01397.HK BAGUIO GREEN
+Period: 2025-12-31 annual
+Run timestamp: 2026-08-03 Asia/Shanghai
+
+Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Read references/data-reuse.md completely because the skill routes reuse decisions there.
+- Initialized outputs/result.json with protocol CLI:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+Reused sources
+- stock_report/data/analysis/annual_review/01397.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/01397.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/01397.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/01397.HK/2025-12-31/imported_from_agent_runs/812a9768cde2-baguio_2025_annual_report.txt
+- stock_report/data/raw/filings/01397.HK/2025-12-31/imported_from_agent_runs/ae8176f829ae-baguio_2025_annual_report.pdf
+
+Public-source checks
+- HKEX 2025 annual report: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042301879.pdf
+- Company financial-report page: https://www.baguio.com.hk/en/investor/financial/
+- PBOC 2025-12-26 central parity announcement: https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- FX used for all HKD filing amounts: HKD 1 = CNY 0.90486. This is a uniform presentation conversion; it is not a claim that annual-average and period-end rates were identical.
+- Market cap and PE reused from config/input.json: CNY 324,892,296.692729; PE TTM 3.88; timestamp 2026/07/31 16:08:47; source Tencent qt.gtimg.cn.
+
+Model review
+- Input hint said financial_brokerage / requires_special_model.
+- Filing shows environmental service contracting, no brokerage client money, proprietary securities portfolio, repo financing, investment banking, or asset management.
+- Overrode hint with ordinary_operating / applicable.
+
+Owner earnback assumptions
+- Cash and cash equivalents HKD 244.293m: 50% included due payroll, service working capital, and missing parent/subsidiary split.
+- Pledged bank deposits HKD 7.449m: 0% included.
+- Key-management life insurance HKD 16.259m: 50% included due unquoted surrender-value basis and no fixed maturity.
+- Bank borrowings HKD 50.699m and lease liabilities HKD 35.279m: deducted in full.
+- Discounted detachable net cash: HKD 44.298m = CNY 40.083488m.
+- 2025 parent profit HKD 97.279m less disposal gain HKD 14.963m, life-insurance fair-value gain HKD 1.078m, and grants HKD 0.960m = HKD 80.278m adjusted profit.
+- Sustainable midpoint set at HKD 70m after comparison with 2024 profit HKD 53.856m, lower contract backlog, and two-year cash conversion.
+- 15% distributability haircut for concentration, capital expenditure, payroll working capital, and upstreaming friction.
+- Discounted sustainable cash profit: HKD 59.5m = CNY 53.839170m.
+- Operating business price: CNY 284.808808m.
+- Owner earnback: 5.28999 years. Market cap / cash profit: 6.03450.
+
+Dividend
+- 2025 proposed final dividend: HKD 0.07/share, HKD 29.05m total = CNY 26.286183m.
+- Forecast dividend yield: 8.09074% against input market cap.
+
+Known limitations
+- Filing does not separate listed-parent cash from operating-subsidiary cash.
+- Maintenance versus growth capex is not disclosed.
+- Precise tax/remittance/upstreaming leakage is not disclosed.
+- A single official FX point is used for all statements for protocol comparability.
+- Market snapshot was not cross-checked against a second same-time quote.
+
+Result construction
+- outputs/result.json was initialized and populated through the stock-research protocol CLI; it was not hand-written as a complex JSON object.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

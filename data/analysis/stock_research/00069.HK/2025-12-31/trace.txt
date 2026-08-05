@@ -1,0 +1,64 @@
+stock-research trace
+company=00069.HK SHANGRI-LA ASIA
+period=2025-12-31
+generated_at=2026-08-03T17:50:39+08:00
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because no reusable annual facts were present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated initialized fields using protocol set commands; did not construct result.json from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+
+2. Reuse check
+- config/input.json existed.
+- No annual facts, normalized facts, raw filing metadata, prior research result, or report existed at the declared paths.
+- Therefore retrieved and read the original 2025 annual report.
+
+3. Primary sources
+- Shangri-La Asia Limited Annual Report 2025, HKEX release 2026-04-23:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042301259.pdf
+- PBOC/CFETS RMB central parity announcement, 2025-12-26:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- Market snapshot from config/input.json: Tencent qt.gtimg.cn, 2026/07/31 16:08:41.
+
+4. Model decision
+- Rejected input hint financial_brokerage.
+- Annual report says the group owns/leases/operates hotels, provides management services, owns rental property, and sells limited property inventory.
+- Selected statement_model=ordinary_operating and owner_earnback_applicability=applicable, with heavy-asset hotel adjustments.
+
+5. Currency translation
+- Annual report currency: USD.
+- Protocol currency: CNY absolute yuan.
+- Applied USD/CNY=7.0358 to all financial statement amounts for consistency.
+- Applied HKD/CNY=0.90486 to forecast per-share dividend.
+- Limitation: income/cash-flow values were not translated at a full-year average rate.
+
+6. Key source values (USD)
+- Revenue 2,234.072m; gross profit 1,245.184m; parent profit 112.293m.
+- Total assets 14,426.534m; liabilities 8,826.439m; parent equity 5,324.429m.
+- Operating cash flow 159.452m.
+- Capex = PPE 47.468m + development 15.825m + investment property 0.982m + intangibles 3.375m = 67.650m.
+- Operating FCF = 159.452m - 67.650m = 91.802m.
+- Operating-item PATMI disclosed by company = 122.8m.
+- Cash/bank/short fund placements 2,530.187m.
+- Bank loans 5,173.092m; fixed-rate bonds 1,683.047m; lease liabilities 753.251m.
+- 2025 dividend 68.903m; HKD0.15 per share.
+
+7. Owner earnback judgment
+- Detachable net cash=0 because bank loans and bonds materially exceed cash; lease and operating liquidity are additional constraints.
+- Sustainable cash profit baseline=USD122.8m operating-item PATMI.
+- Judgmental haircut=20% for hotel cyclicality, potentially normalized maintenance capex, and associate cash-remittance timing.
+- Discounted cash profit=USD98.24m x 7.0358=CNY691,196,992.
+- Operating business price=CNY12,790,269,432.638884.
+- Earnback=18.504521259 years.
+
+8. Dividend forecast
+- Scenario assumes HKD0.15 per share is maintained.
+- Shares=3,585,525,056 at 2026-03-26.
+- Forecast cash dividend=CNY486,659,730.33; yield=3.8049%.
+- This is not company guidance.

@@ -1,0 +1,70 @@
+stock-research trace
+company: 00467.HK / 联合能源集团有限公司
+period: 2025-12-31 annual
+generated_for_input: 2026-08-03T15:01:04+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields only through protocol set/append commands.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   validation result: status=ok, errors=[]
+
+[source discovery and reuse]
+- No pre-existing 2025 annual facts, normalized facts, raw filing, or prior stock-research output existed under the paths in config/input.json.
+- Downloaded company-hosted 2025 annual report PDF:
+  https://www.ueg.com/api/uploads/invest_service_file_img/826fbfea7fd8cbb5d645d8bcfd108ebac40bc1e1.pdf
+- Local source: stock_report/data/raw/filings/00467.HK/2025-12-31/annual-report-2025.pdf
+- Extracted text locally to annual-report-2025.txt for page-level searching.
+- Cross-checked filing identity and release date against HKEX title-search result for stock 00467.
+
+[model override]
+- Input hint: financial_brokerage / requires_special_model.
+- Filing facts: principal activities are upstream oil and gas exploration, development, production and sale, plus energy trading and clean energy.
+- No brokerage client money, proprietary securities portfolio, repo financing, or margin-financing balance-sheet structure was found.
+- Final model: ordinary_operating / applicable.
+
+[financial source locations]
+- Annual report pp. 3-4: financial summary, production and reserve summary.
+- Annual report pp. 8-20: business review, realized price, capex, cash flow discussion, 2026 outlook.
+- Annual report pp. 55-61: audited income statement, balance sheet and cash flow statement.
+- Note 8: revenue by product and geography.
+- Note 11: segment revenue, profit, assets and liabilities.
+- Notes 17, 25, 27, 28, 30, 31: dividend, receivables, cash restrictions, payables, borrowing and lease details.
+
+[currency conversion]
+- Protocol requires CNY absolute yuan; filing is in HKD thousands.
+- Used 0.9163905335445636 CNY/HKD, inferred from the input market cap, 25,694,872,192 weighted-average shares and HKD0.34 market price represented by the snapshot.
+- Formula for statement values: reported HKD'000 * 1,000 * 0.9163905335445636.
+- Limitation: a single conversion rate was used for both flow and stock measures.
+
+[owner earnback calculation]
+- Reported bank and cash: HKD3,685.528m.
+- Explicitly pledged/restricted cash: HKD1,564.015m for borrowings, HKD91.685m for equipment settlement, HKD21.577m for exploration commitments.
+- Residual cash: HKD2,008.251m; haircut: 70% retained.
+- Listed securities: HKD5.202m; haircut: 80% retained.
+- Bank borrowing: HKD3,537.181m; deducted 100%.
+- Lease liabilities: HKD294.614m; deducted 100%.
+- Discounted detachable net cash: CNY -2,219,367,469.87.
+- Market cap: CNY 8,005,822,796.71.
+- Operating business price: CNY 10,225,190,266.58.
+- Operating cash flow: HKD6,162.796m.
+- PP&E purchases: HKD5,262.550m.
+- Operating free cash flow: HKD900.246m / CNY824,976,912.26.
+- Commodity/working-capital haircut: 20%.
+- Discounted sustainable cash profit: CNY659,981,529.81.
+- Owner earnback years: 15.4931.
+- Market cap / cash profit: 12.1304.
+
+[dividend]
+- 2025 cash paid: HKD1,292.480m, relating to 2024 final dividend of HKD0.05/share.
+- Board recommendation for year ended 2025: no final dividend.
+- Forecast confirmed cash dividend used in result: CNY0; yield 0.
+
+[quality]
+- data_quality.status: complete.
+- The result meets protocol minimum fields and formula checks.
+- Analytical limitations are recorded in result.json and report.md.

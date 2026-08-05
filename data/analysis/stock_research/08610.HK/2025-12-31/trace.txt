@@ -1,0 +1,56 @@
+stock-research trace
+company: BBSB International Limited (08610.HK)
+period: 2025-12-31 annual
+generated_for_task: 2026-08-04 Asia/Shanghai
+
+1. Read instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No existing annual facts package or prior research result was found under the supplied 08610.HK paths.
+- Downloaded official HKEX Annual Report 2025 to stock_report/data/raw/filings/08610.HK/2025-12-31/annual-report-2025.pdf.
+
+3. Protocol
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields using protocol `set` and `append`; did not construct result.json manually.
+
+4. Model verification
+- Input hint financial_brokerage rejected.
+- Annual report pp.5 and 91 identifies the group as a Malaysian civil engineering contractor.
+- Selected statement_model=construction_project and owner_earnback_applicability=requires_special_model.
+- Ordinary owner earnback sorting values remain null because contract assets, receivables, payables, pledged cash and performance guarantees are integral to project operations.
+
+5. Primary financial sources
+- HKEX Annual Report 2025 pp.85-90: income statement, balance sheet and cash flow.
+- pp.100, 125-134: revenue mechanics, receivables, contract assets/liabilities, cash, payables and borrowings.
+- pp.14, 107, 146: customer and credit concentration.
+- pp.13, 115: dividends.
+- p.149: performance guarantees and post-period IPO.
+
+6. Currency conversion
+- Reporting currency MYR converted to protocol currency CNY at 1 MYR=1.7241 CNY, the 2025-12-31 closing historical rate from exchangerates.org.uk.
+- All financial statement amounts: RM'000 × 1,000 × 1.7241.
+- Limitation: income/cash-flow items use closing rather than annual-average FX.
+
+7. Derived metrics
+- gross_margin = 29,769 / 147,229 = 0.2021952197.
+- net_margin = 6,289 / 147,229 = 0.0427157693.
+- capex = PPE purchases RM0.284m + cash payments for ROU additions RM0.086m = RM0.370m.
+- operating_free_cash_flow = operating cash flow RM-4.984m - capex RM0.370m = RM-5.354m.
+- 2025 top two customer share = (RM51.866m + RM83.400m) / RM147.229m ≈ 91.9%.
+
+8. Dividend forecast
+- Forecast cash dividend set to CNY 0 and yield 0% as a conservative next-12-month base case.
+- Basis: RM5m 2025 interim dividend was paid before listing, no final dividend recommended, no post-list stable policy is established, and 2025 operating FCF was negative.
+- This is an analytical scenario, not company guidance.
+
+9. Market data
+- Market cap CNY245,185,501.27744675, PE TTM 23.63, timestamp 2026/08/03 09:20:05, source Tencent qt.gtimg.cn, carried from config/input.json.
+- Period mismatch disclosed: financial year ended before the 13 Jan 2026 listing and before the market snapshot.
+
+10. Validation
+- Protocol validation run after all outputs were populated; see terminal result in task execution.

@@ -1,0 +1,82 @@
+stock-research trace
+company=02457.HK BUYANG INTL
+period=2025-12-31
+generated_for=2026-08-04 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely as requested.
+3. Read references/data-reuse.md because the skill requires reuse of adequate existing facts before reacquiring filings.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields only through protocol `set` commands; result.json was not authored as a complex object from scratch.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   First populated validation result: status=ok, errors=[]
+
+[reuse audit]
+Expected annual fact and filing paths from config/input.json were absent at task start.
+No reusable annual facts, normalized facts, or prior stock-research result existed for 02457.HK/2025-12-31.
+Fallback per data-reuse.md: obtain and inspect the original official filing.
+
+[official sources]
+HKEX title search for stock 02457 identified:
+- Annual Report 2025, released 2026-04-23
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042302266.pdf
+- Annual results announcement, released 2026-03-27
+The annual report PDF was saved to:
+stock_report/data/raw/filings/02457.HK/2025-12-31/annual_report_2025.pdf
+The environment lacked pdftotext/Python PDF libraries, so the official HKEX indexed PDF text and page/line locations were used for extraction; no third-party financial database replaced core figures.
+
+[model verification]
+Input hint: financial_brokerage / requires_special_model.
+Official annual report pages 8-9: aluminum-alloy automobile wheel R&D, design, production and sales to aftermarket wholesalers and retailers.
+Official statements pages 82-87: manufacturing income statement and balance sheet; no brokerage client money, proprietary securities, margin finance or repo liabilities.
+Conclusion: input hint is a stock-master misclassification. Overridden to ordinary_operating / applicable.
+
+[core extraction; annual report pages]
+p8-10: business model, product mix, overseas mix, revenue drivers, cost and margin narrative.
+p23: no 2025 final dividend; no fixed prescribed payout ratio.
+p24: largest customer 13.3%; top five customers 42.2%.
+p82: revenue 404,827k; cost 360,274k; gross profit 44,553k; operating profit 8,062k; net/parent profit 11,064k.
+p83-84: total assets 506,827k; liabilities 95,722k (85,789k current + 9,933k non-current); equity/parent equity 411,105k; no NCI.
+p87: OCF 30,943k; PPE/intangible purchases 21,842k; financing CF -857k; dividends paid 0.
+p112-113: inventory 94,041k; trade/other receivables 72,008k and their composition.
+p114: cash at bank and hand 123,935k less pledged deposits 17,877k = cash equivalents 106,058k.
+p117-118: contract liabilities 5,211k; lease liabilities 6,148k total.
+p132: related-party loan to Topsun 14,596k, annual interest rate 6%.
+
+[calculations]
+gross_margin = 44,553,000 / 404,827,000 = 0.1100596082
+net_margin = 11,064,000 / 404,827,000 = 0.0273301914
+operating_free_cash_flow = 30,943,000 - 21,842,000 = 9,101,000
+
+discounted detachable net cash:
+cash equivalents: 106,058,000 * 80% = 84,846,400
+time deposits: 120,968,000 * 80% = 96,774,400
+pledged deposits: 17,877,000 * 0% = 0
+related-party loan: 14,596,000 * 0% = 0
+lease liabilities: -6,148,000
+total = 175,472,800
+
+operating_business_price = 283,899,001.47914886 - 175,472,800 = 108,426,201.47914886
+discounted sustainable cash profit judgment = 8,000,000
+Reason: below 2025 parent profit 11,064,000 and FCF 9,101,000 due to 4,145,000 net finance income, falling gross margin, and capex uncertainty.
+owner_earnback_years = 108,426,201.47914886 / 8,000,000 = 13.5532751849
+market_cap_to_cash_profit = 283,899,001.47914886 / 8,000,000 = 35.4873751849
+discounted_net_cash_to_market_cap = 175,472,800 / 283,899,001.47914886 = 0.6180810741
+forecast dividend = 0 based on latest formal board decision; yield = 0 / market cap = 0.
+
+[market data]
+market_cap=283899001.47914886 CNY
+market_cap_date=2026/08/03 09:20:05
+market_cap_source=Tencent qt.gtimg.cn (task input snapshot)
+pe_ttm=26.94
+Limitation: not cross-checked against a second quote source.
+
+[quality decision]
+status=complete
+Reason: company identity, official audited annual statements, ordinary model verification, three statements, asset/liability explanations, dividend forecast, owner earnback assumptions/calculations, business story and evidence are present. Remaining uncertainties are judgment limitations, not missing required fields.
+
+[final validation]
+Protocol validation after report/trace creation: status=ok, errors=[] (see final task execution output).

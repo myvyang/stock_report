@@ -1,0 +1,63 @@
+stock-research trace
+company=00917.HK QUNABOX GROUP
+period=2025-12-31
+generated_for_input=2026-08-03T12:33:54+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Reused primary-source extraction
+- stock_report/data/raw/filings/00917.HK/2025-12-31/metadata.json
+- stock_report/data/raw/filings/00917.HK/2025-12-31/2025-annual-report.txt
+- stock_report/data/analysis/annual_review/00917.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/00917.HK/2025-12-31/annual_facts.md
+- stock_report/data/normalized/facts/00917.HK/2025-12-31/annual-facts.json
+- Primary filing: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042300342.pdf
+
+3. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Filing facts: revenue is marketing services, vending merchandise and IT/software services; balance sheet has no brokerage customer funds, repo financing or brokerage operating accounts.
+- Decision: override hint with ordinary_operating / applicable.
+
+4. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All result fields were populated through protocol `set`; result.json was not authored from a blank object.
+
+5. Key reported figures (RMB absolute yuan)
+- Revenue 1,663,244,000; gross profit 953,266,000; parent net profit 285,738,000.
+- Total assets 2,727,428,000; liabilities 711,153,000; parent equity 2,015,658,000.
+- Operating cash flow 368,947,000; cash capex 10,840,000; operating FCF 358,107,000.
+- Cash 1,506,112,000; listed FVTPL equities 307,883,000; unlisted equity 4,000,000.
+- Bank borrowing 534,940,000; lease liabilities 5,822,000.
+
+6. Owner earnback calculations
+- Discounted cash = 1,506,112,000 * 75% = 1,129,584,000.
+- Discounted listed equities = 307,883,000 * 50% = 153,941,500.
+- Unlisted equity included at zero.
+- Discounted detachable net cash = 1,129,584,000 + 153,941,500 - 534,940,000 - 5,822,000 = 742,763,500.
+- Non-core pretax income = 53,102,000 + 19,406,000 + 8,168,000 + 3,301,000 = 83,977,000.
+- Estimated after-tax removal at 25% tax = 62,982,750.
+- Adjusted core earnings = 285,738,000 - 62,982,750 = 222,755,250.
+- Sustainability haircut = 80%, reflecting two-year cash-flow history and receivable/ECL uncertainty.
+- Discounted sustainable cash profit = 222,755,250 * 80% = 178,204,200.
+- Market cap = 1,909,736,964.9499655.
+- Operating business price = 1,166,973,464.9499655.
+- Owner earnback years = 1,166,973,464.9499655 / 178,204,200 = 6.5485183006.
+- Market cap / cash profit = 1,909,736,964.9499655 / 178,204,200 = 10.7165654061.
+
+7. Dividend forecast
+- 2025 final dividend: nil; 2024 comparative: nil (Annual Report p.35).
+- No declared dividend or payout guidance supplied; forecast cash dividend = 0 and yield = 0.
+
+8. Known limitations
+- Cash location and upstream distribution constraints are not split by entity.
+- Restricted cash is not separately disclosed; no asset pledge was reported.
+- Only 2024 and 2025 full cash-flow years are in the reusable fact pack.
+- Maintenance versus growth capex is not explicitly split.
+- Independent market share evidence is absent.
+
+9. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Status: ok; errors: [].

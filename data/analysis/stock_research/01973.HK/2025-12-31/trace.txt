@@ -1,0 +1,49 @@
+[2026-08-04 Asia/Shanghai] stock-research trace for 01973.HK / FY2025
+
+1. Read protocol and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse check
+- config/input.json present.
+- Expected annual facts, normalized facts, raw filing metadata and prior research paths under stock_report/ were absent in this workspace.
+- Initialized outputs/result.json using:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Primary filing retrieved and reviewed
+- HKEX 2025 Annual Report, released 2026-04-29:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042901968.pdf
+- Identity/business/model: annual report pp. 4, 8-11, 72, 101.
+- Income statement: p. 66.
+- Balance sheet: pp. 67-68; financial summary p. 173.
+- Cash flow: pp. 70-71.
+- Investments: pp. 118-129.
+- Bond payables: pp. 130-131.
+- FVTPL liabilities / third-party LP interests: p. 132.
+- Dividends/distributable reserves: pp. 56, 110.
+- Capital commitments and structured entities: pp. 142-143.
+
+4. Model decision
+- Input hint financial_brokerage rejected.
+- Filing says the sole reportable segment is Private Equity Investment and the group provides PE investment management through own fund investments.
+- Selected statement_model=investment_holding and owner_earnback_applicability=requires_special_model.
+- Ordinary owner earnback metrics kept null because cash, investment assets and third-party LP FVTPL liabilities are integral to the business.
+
+5. Unit conversion and calculations
+- Filing values in RMB'000 multiplied by 1,000 for result.json.
+- Minority ratio = 21,867,000 / 6,563,689,000 = 0.0033315.
+- Mechanical operating FCF = 625,853,000 - 822,000 = 625,031,000; explicitly limited because investing transactions sit in operating cash flow.
+- Market cap / parent equity = 1,192,427,424.2126942 / 6,541,822,000 = 0.18228; report describes 18.2% of book value / 81.8% discount.
+- Forecast dividend = 0 based on no proposed FY2025 dividend and no parent-company distributable reserve.
+
+6. Market data
+- Reused exactly from config/input.json: market cap RMB1,192,427,424.2126942, timestamp 2026/08/03 09:20:05, PE TTM 6.39, source Tencent qt.gtimg.cn.
+- Limitation: no raw quote snapshot was supplied.
+
+7. Protocol writes and validation
+- Scalar/object fields populated with protocol `set`; arrays populated with protocol `append`.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation output: {"status":"ok","errors":[]}
+- Cross-check: 5 asset rows, 4 liability rows, 7 evidence rows; data_quality.status=complete; all ordinary owner-earnback ranking fields remain null.

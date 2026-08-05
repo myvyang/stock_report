@@ -1,0 +1,53 @@
+2026-08-04T18:58:27+08:00 INIT
+- 按 stock-research protocol CLI 由 config/input.json 初始化 outputs/result.json。
+
+MODEL REVIEW
+- 输入 hint=financial_brokerage，与 company tags（汽车/整车）矛盾。
+- 港交所年报第8页：公司设计、研发、制造和销售乘用车；第48页：主要从事乘用车及零部件制造销售。
+- 结论：statement_model=ordinary_operating；owner_earnback_applicability=applicable。
+
+PRIMARY SOURCE
+- HKEX title search: stock 09973, release 2026-04-02 22:28, 2025 Annual Report.
+- Annual report URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0402/2026040203392.pdf
+- 本地保存：stock_report/data/raw/filings/09973.HK/2025-12-31/2025-annual-report.pdf
+- 审计意见：Ernst & Young；财务报表报告期截至2025-12-31。
+
+EXTRACTED FINANCIALS (RMB million; converted to absolute yuan in result.json)
+- AR p69: revenue 300,287; cost of sales 258,844; gross profit 41,443; profit 19,507; parent profit 19,019.
+- AR pp71-72: total assets 259,347; liabilities 208,549; equity 50,798; parent equity 50,757; NCI 41.
+- AR pp75-77: CFO 20,130; PPE purchases 11,061; intangible purchases 3,593; financing CF -5,939; dividends paid 3,993.
+- FCF calculation: 20,130 - 11,061 - 3,593 = 5,476.
+- AR p119: proposed final dividend RMB0.86/share, total 5,000.
+
+BUSINESS FACTS
+- AR pp4-15: 2025 sales 2.631m vehicles; NEV 0.827m; exports 1.294m.
+- Revenue mix: passenger vehicles 272,352 (90.7%), components 21,725 (7.2%), other 6,210 (2.1%).
+- Gross margin: total 13.8%; ICE 15.0%; NEV 8.8%; components 21.3%.
+- Trade receivables increased 17,423 to 33,882; AR says +94.5%.
+
+OWNER EARNBACK CALCULATION (RMB million)
+- Cash 46,955 at 100% = 46,955.
+- Time deposits 12,040 at 100% = 12,040.
+- FVTPL financial assets 32,529 at 70% = 22,770.3.
+- FVOCI financial assets 2,327 at 80% = 1,861.6.
+- Restricted deposits 12,750 at 0% = 0.
+- Less borrowings 15,924 and lease liabilities 4,135.
+- Discounted detachable net cash = 63,567.9.
+- Sustainable cash profit = parent profit 19,019 - (capex 14,654 - D&A 4,422) = 8,787.
+- Market cap = 135,122.736305 million (input).
+- Operating business price = 71,554.836305 million.
+- Owner earnback = 71,554.836305 / 8,787 = 8.1433 years.
+- Market cap / cash profit = 15.3776.
+- Proposed final dividend yield = 5,000 / 135,122.736305 = 3.7003%.
+
+JUDGMENT FLAGS
+- 70% and 80% financial-asset discounts are analyst judgments due to incomplete look-through data.
+- Restricted deposits excluded entirely.
+- All capex above D&A is deducted; this conservatively treats expansion capex as recurring because maintenance/expansion split is unavailable.
+- Supplier payables and contract liabilities are treated as operating liabilities, not detachable financial debt.
+- Market cap and PE are reused from task input; not independently reconstructed.
+
+OUTPUT
+- outputs/result.json populated only through protocol init/set/append commands.
+- outputs/report.md written from the same facts and formulas.
+- protocol validation after completion returned: {"status":"ok","errors":[]}.

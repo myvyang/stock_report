@@ -1,0 +1,64 @@
+stock-research trace
+company=002823.SZ 凯中精密
+period=2025-12-31
+generated_for=2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the skill referenced it for reuse boundaries.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated scalar fields with protocol set and list fields with protocol append; no complex JSON object was handwritten from scratch.
+6. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[local-reuse-audit]
+- config/input.json: present and used.
+- stock_report/data/analysis/annual_review/002823.SZ/2025-12-31: absent at start.
+- stock_report/data/normalized/facts/002823.SZ/2025-12-31/annual-facts.json: absent at start.
+- prior stock_research result/report/trace for this period: absent at start.
+- Conclusion: no annual facts package or prior research result could support the task; original filing retrieval was required.
+
+[primary-sources]
+- Shenzhen Stock Exchange, 2025 annual report, disclosed 2026-04-16:
+  https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-16/316221be-eb66-4537-80ad-340fe5d6ffc9.PDF
+  Local copy: stock_report/data/raw/filings/002823.SZ/2025-12-31/annual_report.pdf
+- CNINFO investor interaction, company reply dated 2026-05-11 concerning changed 2025 distribution and intended 2026 interim dividend:
+  https://irm.cninfo.com.cn/interview/interview/activityInfo?activityId=1441903783762620416
+- Market-cap/PE snapshot: config/input.json, Tencent qt.gtimg.cn, timestamp 20260731114251.
+
+[model-check]
+- Confirmed statement_model=ordinary_operating.
+- Evidence: the company designs, manufactures and directly sells precision components; its cash, receivables, inventory, plant/equipment, payables and bank debt have ordinary manufacturing meanings.
+- It is not a bank, broker, insurer, property developer, construction contractor, concession utility or investment holding platform.
+- owner_earnback_applicability=applicable, with capital-intensive and net-debt caveats.
+
+[calculation-checks]
+gross_profit = 2,928,353,785.81 - 2,316,448,882.44 = 611,904,903.37
+gross_margin = 611,904,903.37 / 2,928,353,785.81 = 0.20895866692580778
+net_margin = 233,598,490.52 / 2,928,353,785.81 = 0.07977126659079047
+2025 operating_free_cash_flow = 468,387,028.11 - 163,122,833.30 = 305,264,194.81
+2024 operating_free_cash_flow = 386,248,715.45 - 131,835,488.69 = 254,413,226.76
+two_year_average_fcf = (305,264,194.81 + 254,413,226.76) / 2 = 279,838,710.785
+cash_profit_base = min(225,835,760.65 adjusted parent profit, 279,838,710.785 average FCF) = 225,835,760.65
+discounted_sustainable_cash_profit = 225,835,760.65 * 0.80 = 180,668,608.52
+interest_bearing_debt = 675,159,595.87 + 137,019,028.70 + 197,476,885.55 + 9,969,823.62 = 1,019,625,333.74
+discounted_detachable_net_cash = 196,370,904.99 * 0.90 - 1,019,625,333.74 = -842,891,519.249
+
+NOTE: During first population, outputs/result.json contained an arithmetic transcription mismatch. The final reconciliation pass recomputed the debt sum, margins, dividend yield and every dependent field directly from source values.
+
+operating_business_price = 4,239,000,000 - (-842,891,519.249) = 5,081,891,519.249
+owner_earnback_years = 5,081,891,519.249 / 180,668,608.52 = 28.1282485147
+market_cap_to_cash_profit = 4,239,000,000 / 180,668,608.52 = 23.4628474461
+discounted_net_cash_to_market_cap = -842,891,519.249 / 4,239,000,000 = -0.198842066348
+forecast_cash_dividend = 233,598,490.52 * 0.30 = 70,079,547.156
+forecast_dividend_yield = 70,079,547.156 / 4,239,000,000 = 0.0165320941628
+
+[judgment-boundaries]
+- Cash discount of 10% is an analytical assumption for operability/working-capital uncertainty.
+- All identified interest-bearing debt is deducted at face value.
+- Sustainable cash profit uses the lower of adjusted earnings and two-year FCF average, then an explicit 20% conservatism discount.
+- The forecast dividend is the company's stated minimum intent, not a declared dividend; governance approval remains outstanding.
+- No target price, buy/sell recommendation, ranking label or unsupported market-share claim is included.

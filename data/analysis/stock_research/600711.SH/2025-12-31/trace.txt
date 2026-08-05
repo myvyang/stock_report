@@ -1,0 +1,63 @@
+stock-research trace
+company: 盛屯矿业 600711.SH
+period: 2025-12-31 annual
+generated_at: 2026-08-01 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: initialized stock-research-result-v1 skeleton from task input.
+
+3. Local reuse audit
+- No annual facts, normalized facts, raw filing, or prior stock-research result existed for 600711.SH/2025-12-31.
+- Existing user note file was not used because it contained no task-specific sourced facts.
+
+4. Primary filing acquisition
+- Downloaded company-official PDF: https://www.600711.com/uploads/pdfs/177492497780028.pdf
+- Saved: stock_report/data/raw/filings/600711.SH/2025-12-31/annual_report_2025.pdf
+- Extracted text: stock_report/data/raw/filings/600711.SH/2025-12-31/annual_report_2025.txt
+- Filing: 盛屯矿业集团股份有限公司2025年年度报告, disclosed 2026-03-20, 228 pages.
+- Auditor: 信永中和会计师事务所（特殊普通合伙）, standard unqualified opinion.
+
+5. Model determination
+- Confirmed ordinary_operating.
+- Reason: revenue derives from mining, smelting, manufacturing and trading; balance sheet contains inventory, plant, construction in progress, mining/intangible rights and ordinary financing. No banking deposits, insurance reserves, real-estate presale structure, concession right model, or investment-holding economics dominates.
+- Ordinary owner earnback is applicable with heavy-asset/cyclical special handling.
+
+6. Core facts extracted
+- Revenue 30,002,676,485.18; cost of sales 24,264,965,997.83; gross profit 5,737,710,487.35.
+- Parent net profit 1,961,420,763.20; adjusted parent net profit 2,528,556,887.00.
+- Total assets 43,113,912,217.70; liabilities 25,368,146,281.50; equity 17,745,765,936.20; parent equity 16,480,546,024.23.
+- OCF 2,591,717,457.14; capex cash out 2,162,791,751.97; operating FCF 428,925,705.17.
+- Cash and cash equivalents 3,771,894,614.66. Restricted/non-cash-equivalent monetary funds 4,290,070,251.53.
+- Inventory 10,215,495,146.05; fixed assets 11,915,770,591.78; construction in progress 2,143,953,682.57; intangible assets 3,535,159,653.16.
+- Financing burden included short borrowings, current non-current liabilities, long borrowings, leases and long-term payables = 16,170,958,839.06.
+
+7. Formula checks
+- gross_margin = 5,737,710,487.35 / 30,002,676,485.18 = 0.1912399545.
+- net_margin = 1,961,420,763.20 / 30,002,676,485.18 = 0.0653748596.
+- operating_FCF = 2,591,717,457.14 - 2,162,791,751.97 = 428,925,705.17.
+- discounted liquid assets = 3,771,894,614.66 + 70% * (412,169,670.96 + 5,775,655.00) + 50% * 371,502,937.39 = 4,250,207,811.527.
+- discounted detachable net cash = 4,250,207,811.527 - 16,170,958,839.06 = -11,920,751,027.533.
+- sustainable cash profit selected = 1,800,000,000.00, starting from adjusted parent profit 2,528,556,887 and applying 728,556,887 discount for cycle, working capital, maintenance capex and overseas/minority constraints.
+- operating business price = 32,513,000,000 - (-11,920,751,027.533) = 44,433,751,027.533.
+- owner earnback = 44,433,751,027.533 / 1,800,000,000 = 24.6854172375 years.
+- market cap / cash profit = 18.0627777778.
+- forecast dividend yield = 303,198,855.10 / 32,513,000,000 = 0.0093254654.
+
+8. Judgment notes
+- Restricted monetary funds were excluded rather than treated as detachable cash.
+- Financing liabilities were deducted at 100%; long-term payables were conservatively treated as financing.
+- Repurchase cash 556,058,783.54 was not added to forecast cash dividend because repurchased shares were treasury shares and not cancelled in the reporting period.
+- Sustainable cash profit is an explicit scenario, not a reported fact. Main limitation is lack of project-level maintenance versus growth capex disclosure.
+
+9. Result construction
+- Used protocol CLI set/append operations after initialization; did not create result JSON from a blank handwritten object.
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation outcome: {"status":"ok","errors":[]}
+- JSON syntax also passed python3 -m json.tool.

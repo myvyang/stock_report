@@ -1,0 +1,58 @@
+KSPI stock research trace
+generated_at: 2026-08-04 Asia/Shanghai
+period: 2025-12-31 annual
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because the skill directs reuse decisions.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked configured raw filing, annual review, normalized facts and output locations.
+- No KSPI 2025 filing metadata, facts.json, annual_facts.md, normalized facts or historical research result existed locally.
+- Therefore used the primary filing rather than inventing or reusing absent facts.
+
+3. Primary sources
+- SEC Form 20-F filed 2026-03-16 for year ended 2025-12-31:
+  https://www.sec.gov/Archives/edgar/data/1985487/000198548726000008/kspi-20251231.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/1985487/000198548726000008/0001985487-26-000008-index.htm
+- SAFE 2025-12-31 currency conversion material:
+  https://www.safe.gov.cn/safe/2025/1231/26980.html
+- Market cap, date and PE TTM were preserved from config/input.json (Yahoo Finance yfinance snapshot).
+
+4. Model decision
+- Overrode input hint ordinary_operating/applicable.
+- Selected platform_financial_mixed/requires_special_model.
+- Evidence: loans to customers were 65% of assets; customer accounts were 96% of primary funding; Fintech generated about 33% of net income; deposit-funded lending is a core business.
+- Consequence: all ordinary detachable-net-cash, cash-profit and owner-earnback sorting fields remain null.
+
+5. Currency conversion
+- Form 20-F reporting-date rate: KZT/USD = 505.53.
+- SAFE/CFETS 2025-12-31 USD/CNY = 7.0288.
+- Cross rate used: CNY per KZT = 7.0288 / 505.53 = 0.013903823709769945.
+- All KZT million statement amounts were multiplied by 1,000,000 and this factor.
+- Limitation: the income statement is also converted at the period-end rate for unified display, not an accounting average exchange rate.
+
+6. Key extracted KZT million facts
+- Revenue 4,046,074; net income 1,067,707; parent net income 1,073,177.
+- Total assets 11,081,748; total liabilities 8,480,171; total equity 2,601,577; parent equity 2,491,843; NCI 109,734.
+- Cash and equivalents 903,143; mandatory NBRK balances 305,126; investment securities and derivatives 1,179,819; loans 7,172,162.
+- Customer accounts 7,531,286; debt securities 331,992; due to banks 16,183; trade liabilities 346,401; other liabilities 254,148.
+- Operating cash inflow 673,611; capex 193,456; financing cash inflow 150,251; shareholder dividends nil; NCI dividends 12,069; treasury share purchases 21,907.
+- Cost of Risk 2.2%; Basel III Tier 1 and total capital ratios 19.6%; NBK Tier 1 and total capital ratios 12.7%.
+
+7. Dividend forecast
+- Management stated an intention, subject to shareholder approval, to pay KZT850 quarterly per ADS.
+- Annualized KZT3,400 multiplied by 189,875,085 shares outstanding at 2026-01-31.
+- Converted forecast cash dividend: CNY 8,976,177,849.24.
+- Forecast yield: 8,976,177,849.24 / 113,842,947,285.21973 = 0.07884515662750359.
+- Treated as a forecast/policy intention, not a declared full-year dividend.
+
+8. Protocol edits and validation
+- Populated result fields using repeated protocol CLI set commands; the initialized complex JSON was not handwritten from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report finalization: status ok, errors [].

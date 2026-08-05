@@ -1,0 +1,58 @@
+stock-research trace
+company=00603.HK CHINA OIL & GAS
+period=2025-12-31
+generated_for_input=2026-08-03T17:31:36+08:00
+
+1. Read required skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result
+- command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- initial input model hint was financial_brokerage/requires_special_model.
+
+3. Reuse check
+- No existing raw filing metadata, annual facts, normalized facts, or prior stock-research output for 00603.HK/2025-12-31 was present in the workspace.
+- Downloaded official Annual Report 2025 PDF from HKEX to stock_report/data/raw/filings/00603.HK/2025-12-31/annual-report-2025.pdf.
+- Browser-readable HKEX PDF text was used because local pdftotext was unavailable.
+
+4. Model verification
+- Annual report pp.4, 11, 26, 84 and 109 identifies city gas, pipeline connection, coal-derived clean energy and Canadian upstream oil/gas operations.
+- Overrode the incorrect brokerage hint with statement_model=utility_concession.
+- owner_earnback_applicability=requires_special_model because cash/deposits are operationally and financially matched against debt, infrastructure capex and concession obligations; large NCI also separates consolidated cash from parent-shareholder cash.
+
+5. Core audited facts (reported currency HKD'000)
+- Revenue 15,158,592; cost of sales 13,096,899; gross profit 2,061,693; operating profit 1,173,797; net profit 624,467; parent net profit 80,719.
+- Total assets 22,072,818; total liabilities 14,314,665; total equity 7,758,153; parent equity 4,024,483; NCI 3,733,670.
+- Operating cash flow 1,462,418.
+- Capex definition used: PP&E/exploration/prepaid construction 635,769 + land use rights 46,934 + other intangibles 15,549 = 698,252.
+- Operating free cash flow 764,166 HKD'000.
+- Cash and cash equivalents 2,137,051; time deposits over three months 2,933,828; interest-bearing debt 9,295,373.
+- Dividend paid to NCI 627,567. No final dividend proposed for 2025 or 2024.
+
+6. Currency normalization
+- Result contract requires absolute CNY yuan.
+- Applied 2025-12-31 PBOC/CFETS central parity: 1 HKD = 0.90322 CNY to audited financial statement amounts.
+- Ratios were calculated from original HKD values and are invariant to this conversion.
+- Input market cap 606,167,383.1582069 and PE TTM 8.73 were retained under the input's unified-CNY protocol convention; limitation recorded because raw HKD market cap and its conversion were not separately supplied.
+
+7. Operating facts
+- Natural-gas sales and transmission revenue was 12,796,680 HKD'000, 84.4% of total revenue.
+- Gas sales volume was 4,266 million cubic metres, down 6.9% YoY.
+- Segment results HKD'000: gas sales/transmission 1,463,551; connection 293,748; upstream 142,183; coal-derived clean energy -53,499.
+- Accumulated residential users 2,194,546; industrial/commercial users 20,695.
+
+8. Subsequent event
+- HKEX announcement dated 2026-04-29: proposed transactions are a very substantial disposal and very substantial acquisition; illustrative cash consideration RMB155.9m and share consideration RMB1,595.0m.
+- HKEX issuer index records EGM approval on 2026-07-14. No post-completion audited consolidated statements were available in this task.
+
+9. Protocol population
+- All result.json values were populated through protocol set/append commands; the complex result was not hand-written from scratch.
+- Ordinary owner-earnback fields remain null as required for requires_special_model.
+- Forecast dividend set to 0 based on two consecutive nil final dividends, thin parent profit, debt and capex requirements; this is a forecast assumption, not a declared fact.
+
+10. Validation
+- command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- status: ok

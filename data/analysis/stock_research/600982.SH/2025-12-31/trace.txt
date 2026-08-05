@@ -1,0 +1,59 @@
+stock-research trace
+company: 600982.SH 宁波能源
+period: 2025-12-31 annual
+generated_at: 2026-08-01T05:19:57+08:00
+
+[instructions]
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill explicitly routes source-reuse decisions through it.
+
+[local reuse check]
+- config/input.json existed.
+- No raw filing, annual facts package, normalized facts, or prior stock-research output existed for 600982.SH/2025-12-31.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+[sources acquired]
+- Full 2025 annual report PDF downloaded to stock_report/data/raw/filings/600982.SH/2025-12-31/annual_report_2025.pdf.
+- Local extracted text: stock_report/data/raw/filings/600982.SH/2025-12-31/annual_report_2025.txt.
+- Full report reference: 宁波能源集团股份有限公司2025年年度报告, disclosed 2026-04-21, report date 2026-04-17.
+- Official disclosure-platform annual-report summary:
+  https://dataclouds.cninfo.com.cn/shgonggao/hsomarket/2026/20260420/e679a434b77e4b3fbe78d802072d8f9f.PDF
+- Market snapshot reused from config/input.json: Tencent qt.gtimg.cn, timestamp 20260731114345, market cap CNY 5,622,000,000, PE TTM 14.87.
+
+[key annual-report locations]
+- Report pp. 2, 45-46: 2025 dividend proposal, CNY 189,996,672.45, CNY 1.70 per 10 shares, 54.61% payout.
+- Report pp. 10-13: business model, operating volumes, revenue/cost changes and segment margins.
+- Report pp. 91-93: consolidated balance sheet.
+- Report pp. 95-100: consolidated income statement and cash-flow statement.
+- Notes 16-17: finance-lease receivables and long-term equity investments.
+- Cash-flow note: finance-lease principal deployment CNY 2,314,214,503.63 and recovery CNY 1,267,632,611.89.
+- Restricted-assets note: restricted monetary funds CNY 11,457,500.27.
+- Risk section: policy/demand, fuel, safety, power-market and curtailment risks.
+
+[model decision]
+- Input hint ordinary_operating/applicable was overridden.
+- Selected statement_model=platform_financial_mixed and owner_earnback_applicability=requires_special_model.
+- Basis: gross finance-lease receivables CNY 4,373,060,650.12 plus long-term equity investments CNY 3,114,205,036.88 equal roughly 44% of assets; equity-method investment income CNY 280,201,108.60 is a major portion of operating profit. Finance-lease interest is in operating cash flow while principal deployment/recovery is in investing cash flow.
+- Consequence: ordinary discounted-net-cash, discounted-cash-profit, operating-business-price and payback fields intentionally remain null.
+
+[calculations]
+- gross_profit = 3,787,498,271.24 - 3,052,197,918.02 = 735,300,353.22
+- gross_margin = 735,300,353.22 / 3,787,498,271.24 = 0.1941387957
+- net_margin = 347,899,149.10 / 3,787,498,271.24 = 0.0918546027
+- operating_free_cash_flow (mechanical only) = 616,364,219.26 - 578,788,870.82 = 37,575,348.44
+- forecast_dividend_yield = 189,996,672.45 / 5,622,000,000 = 0.0337952103
+- minority_interest_ratio = 1,007,589,189.19 / 6,521,660,356.18 = 0.1544973448
+- The report explicitly explains why mechanical free cash flow is not sustainable owner cash profit for this mixed model.
+
+[protocol writes and validation]
+- outputs/result.json was populated with protocol `set` operations at field/section level; no complex result object was handwritten from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- First completed validation result: {"status":"ok","errors":[]}
+
+[quality notes]
+- Dividend forecast is a board proposal and may change through shareholder approval/implementation.
+- Market data is the supplied Tencent snapshot and was not independently reconstructed from exchange ticks.
+- Null owner-earnback ranking fields are mandated by the special-model decision, not missing research.

@@ -1,0 +1,49 @@
+stock-research trace
+task: 00542.HK, annual, period 2025-12-31
+generated_at: 2026-08-03T17:15:24+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No annual facts, normalized facts, prior stock-research result, or filing metadata existed for this company/period.
+- Downloaded official filing to stock_report/data/raw/filings/00542.HK/2025-12-31/annual-report-2025.pdf.
+
+3. Primary sources inspected
+- HKEX Annual Report 2025, published 2026-04-29:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042900860.pdf
+  Relevant pages: 106-107 audit opinion/going concern; 117 P&L; 119-120 balance sheet; 122-123 cash flow; 162-169 segments/revenue/other gains/finance costs; 183 development properties; 215-216 financial instruments; 228 dividend.
+- ECB reference rates for 2025-12-31:
+  https://eur-lex.europa.eu/eli/C/2026/44
+- Market cap and PE TTM reused from config/input.json (Tencent qt.gtimg.cn, 2026-07-31 16:08:47).
+
+4. Model decision
+- Input hint financial_brokerage rejected.
+- Confirmed real_estate_developer / requires_special_model.
+- Evidence: property sales HKD752.022m of HKD762.337m total revenue; development and held-for-sale development properties HKD1,335.801m; restricted cash HKD192.230m; borrowings HKD885.071m; project-linked payables and contract liabilities.
+- Ordinary owner earnback fields kept null as required by contract.
+
+5. Currency normalization
+- Filing currency: HKD thousands.
+- Output currency required by skill: CNY absolute yuan.
+- Applied 1 HKD = 0.89880 CNY to financial statement amounts.
+- ECB cross-rate is 8.2262 / 9.1464 = 0.899392 CNY/HKD; the chosen approximation differs by about 0.07%.
+
+6. Key interpretation checks
+- Gross margin = -129.947 / 762.337 = -17.0459%.
+- Parent net margin = 53.109 / 762.337 = 6.9666%.
+- Positive parent profit is not sustainable evidence: disposal gain HKD235.789m and tax credit HKD137.226m; loss before tax HKD117.190m.
+- OCF HKD436.820m is working-capital/project-cycle driven, including HKD785.512m reduction in properties held for sale and HKD237.926m increase in payables.
+- Dividend forecast set to zero based on no 2025 dividend, negative parent equity and material going-concern uncertainty.
+
+7. Protocol usage
+- Initialized outputs/result.json with protocol init.
+- Populated initialized paths with protocol set; no complex JSON was written from scratch.
+- Protocol validate result: status ok, errors [].
+
+8. Output status
+- data_quality.status = complete for protocol consumption under the special-model rules.
+- Limitation: no project-by-project saleable resources, remaining completion costs, encumbrance, or debt-allocation table; no special-model liquidation value is fabricated.

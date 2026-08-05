@@ -1,0 +1,72 @@
+stock-research trace
+company: 南京盛航海运股份有限公司（001205.SZ）
+period: 2025-12-31 annual
+generated_for_input: 2026-08-01T01:03:03+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the task required deciding whether existing annual facts could be reused.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked stock_report/data/analysis/annual_review/001205.SZ/2025-12-31 and stock_report/data/raw/filings/001205.SZ/2025-12-31.
+- No raw filing, annual facts package, normalized facts, or historical stock-research output was present in the workspace.
+- Therefore returned to the disclosed annual report rather than fabricating or relying on a stale result.
+
+3. Sources
+- Primary filing identity: 南京盛航海运股份有限公司2025年年度报告, announcement no. 2026-015, disclosed 2026-04-17 on CNINFO/SZSE disclosure system.
+- Full-text extraction source used locally: identical public PDF mirror at https://pdf.dfcfw.com/pdf/H2_AN202604161821270029_1.pdf because the workspace contained no filing and the searchable CNINFO result established the filing identity.
+- Official supporting disclosure: 2025年度财务决算报告; audit report 天衡审字〔2026〕00767号, standard unqualified opinion.
+- Market data was not refetched. Used input snapshot exactly: market cap CNY 2,504,000,000; PE TTM 22.76; Tencent qt.gtimg.cn; 2026-07-31 11:42:51.
+
+4. Model classification
+- Confirmed ordinary_operating/applicable.
+- Evidence: 99.91% of revenue is water transport; the economic assets are ships and working capital, and revenue/cost/capital expenditure are separable under an ordinary operating-company model.
+- Special caution: shipping is capital intensive. Ships are operating assets, not detachable cash; all borrowings, bonds, lease-related and long-term financing payables are assumed by a controlling owner.
+
+5. Extracted audited facts (CNY)
+- total assets 4,678,385,687.71
+- total liabilities 2,501,761,164.83
+- total equity 2,176,624,522.88
+- parent equity 2,164,341,295.28
+- minority interest 12,283,227.60
+- revenue 1,442,793,985.42
+- cost of sales 1,098,491,586.15
+- gross profit 344,302,399.27
+- operating profit 131,880,749.08
+- net profit 113,491,704.37
+- parent net profit 108,623,530.82
+- operating cash flow 468,095,570.56
+- capex (cash paid to acquire fixed/intangible/other long-term assets) 308,969,068.54
+- operating free cash flow 159,126,502.02
+- financing cash flow -178,957,971.47
+- dividend and buyback cash out 22,252,941.12 (2024 profit distribution paid in 2025 per the consolidated equity statement; no cash buyback included)
+- cash 224,007,499.73; restricted cash 600,000.97
+- fixed assets 3,662,077,843.26; construction in progress 128,677,395.02
+- pledged fixed assets carrying value 1,803,252,042.85
+
+6. Formula audit
+- gross margin = (1,442,793,985.42 - 1,098,491,586.15) / 1,442,793,985.42 = 0.2386358709
+- net margin = 108,623,530.82 / 1,442,793,985.42 = 0.0752869307
+- financing debt = 500,014,241.66 short-term borrowings + 458,135,360.76 current maturities + 487,356,236.57 long-term borrowings + 442,376,552.42 bonds payable + 232,655,238.06 long-term payables + 560,756.41 lease liabilities = 2,121,098,385.88
+- discounted detachable net cash = 224,007,499.73 * 95% - 2,121,098,385.88 = -1,908,291,261.1365
+- discounted sustainable cash profit = 108,623,530.82 * 90% = 97,761,177.738
+- operating business price = 2,504,000,000 - (-1,908,291,261.1365) = 4,412,291,261.1365
+- owner earnback years = 4,412,291,261.1365 / 97,761,177.738 = 45.1333685132
+- market cap / cash profit = 2,504,000,000 / 97,761,177.738 = 25.6134393830
+- discounted net cash / market cap = -1,908,291,261.1365 / 2,504,000,000 = -0.7620971490
+- forecast dividend yield = 27,816,236.10 / 2,504,000,000 = 0.0111087205
+
+7. Judgment boundaries
+- Sustainable cash profit is an analyst estimate, not company guidance. It uses audited parent net profit after interest and tax, then applies a 10% haircut for freight-rate cyclicality and capital intensity.
+- OCF was not annualized as owner cash profit because depreciation, working-capital movement, maintenance capex and expansion capex must be distinguished.
+- The annual report does not precisely split maintenance and expansion capex. 2025 total-capex free cash flow of CNY 159.13m exceeds the selected CNY 97.76m cash-profit estimate, providing a current-year coverage check only.
+- Dividend is the disclosed 2025 proposal based on 185,441,574 eligible shares at CNY 0.15/share; final amount can change with record-date shares.
+
+8. Protocol operations and validation
+- Filled scalar fields with protocol set and list items with protocol append; the complex result object was not handwritten from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report/trace creation: {"status":"ok","errors":[]}

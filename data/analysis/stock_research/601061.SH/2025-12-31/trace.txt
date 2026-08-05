@@ -1,0 +1,56 @@
+stock-research trace
+company: 601061.SH 中信金属
+period: 2025-12-31 annual
+generated_for_input: 2026-08-01T05:25:28+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar/object/list fields only through protocol set/append commands.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[local reuse check]
+- Expected annual facts, normalized facts, prior stock research, and raw filing metadata were absent.
+- stock_report/data/notes/user_stock_evaluations.md had no entry for 601061.SH.
+- Therefore returned to the original annual filing as permitted by data-reuse.md.
+
+[source acquisition]
+- Annual report URL: https://static.cninfo.com.cn/finalpage/2026-03-26/1225031793.PDF
+- Local PDF: stock_report/data/raw/filings/601061.SH/2025-12-31/annual-report-2025.pdf
+- Local extracted text: stock_report/data/raw/filings/601061.SH/2025-12-31/annual-report-2025.txt
+- PDF text extracted with pypdf in temporary virtual environment /tmp/stockpdf-601061 because pdftotext was unavailable.
+- Market data was reused exactly from config/input.json: market cap 57,329,999,999.99999 CNY, timestamp 20260731114347, Tencent qt.gtimg.cn, PE TTM 16.4.
+
+[annual report anchors]
+- pp. 7-8: revenue, parent net profit, operating cash flow, assets, parent equity, YoY explanations.
+- pp. 10-18: business model, trade products, investees, volumes and stated market positions.
+- pp. 20-22: revenue/cost, expense bridge, segment revenue and margins.
+- pp. 50-52: 2025 interim/final dividend and three-year cumulative dividend.
+- pp. 95-108: audit opinion and consolidated financial statements.
+- pp. 137-138: cash composition and restricted bill-deposit cash.
+- p. 157: long-term equity investment, equity-method earnings, declared dividends.
+- pp. 165-166: restricted assets and trade borrowings.
+
+[calculations]
+gross_profit = 141819113698.97 - 139689669407.03 = 2129444291.94
+gross_margin = 2129444291.94 / 141819113698.97 = 0.015015213650679218
+net_margin = 2689439516.83 / 141819113698.97 = 0.018963871982296366
+operating_free_cash_flow = 187054374.16 - 40491333.49 = 146563040.67
+interest_bearing_debt = 6929250608.07 + 5097206174.10 + 2252498137.19 = 14278954919.36
+cash_less_interest_bearing_debt = 7111175298.65 - 14278954919.36 = -7167779620.71
+discounted_detachable_net_cash = max(0, cash less debt after restrictions/operating needs) = 0
+cash_profit_before_haircut = 2689439516.83 - 2127747785.56 + 2077256686.69 - 40491333.49 = 2598457084.47
+discounted_sustainable_cash_profit = 2598457084.47 * 0.85 = 2208688521.7995
+operating_business_price = 57329999999.99999 - 0 = 57329999999.99999
+owner_earnback_years = 57329999999.99999 / 2208688521.7995 = 25.95657985911528
+forecast_dividend_yield = 1078000000 / 57329999999.99999 = 0.018803418803418803
+
+[judgment boundaries]
+- statement_model remains ordinary_operating because the company conducts substantive commodity trading; it is not a financial institution or pure holding company.
+- Trade working capital, restricted deposits, and long-term equity investments are excluded from detachable cash.
+- Equity-method profit is replaced by declared investee dividends to bridge accounting profit to cash available to the listed group.
+- The 15% sustainability haircut is an analyst judgment for mining dividends and trade working-capital volatility, not a reported fact.
+- No buy/sell advice or target price is provided.

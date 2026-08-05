@@ -1,0 +1,57 @@
+stock-research trace — AEO
+generated_at: 2026-08-05T05:09:15+08:00
+
+1. Read skill and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - references/result-contract.md
+   - references/report-contract.md
+   - references/data-reuse.md
+
+2. Local reuse check
+   - No pre-existing AEO filing metadata, annual facts, normalized facts, or stock-research outputs were present under the input stock_report paths.
+   - Research therefore returned to primary public sources.
+
+3. Protocol initialization
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   result: initialized stock-research-result-v1 successfully.
+
+4. Primary evidence
+   - SEC Form 10-K accession 0001193125-26-132097, fiscal year ended 2026-01-31, filed 2026-03-30.
+   - SEC Companyfacts API for CIK 0000919012; used to cross-check statement values.
+   - AEO FY2025 results release dated 2026-03-04; used for adjusted operating income, shareholder returns and FY2026 guidance.
+   - AEO FY2026 Q1 results; used only as a subsequent-event risk check for inventory and dividend continuity.
+   - Market cap, date and PE TTM reused from config/input.json (Yahoo Finance yfinance).
+
+5. Period and currency normalization
+   - Input period 2025-12-31 mapped to AEO FY2025 ended 2026-01-31 because AEO uses a 52/53-week retail calendar ending near January 31.
+   - Filing currency USD; result contract requires CNY absolute yuan.
+   - Applied USD/CNY 6.7352 consistently to filing amounts, based on Federal Reserve H.10 / contemporaneous market cross-check around the 2026-08-03 valuation date.
+
+6. Core formulas
+   - gross margin = 2,025.321 / 5,547.236 = 36.5105%.
+   - parent net margin = 198.444 / 5,547.236 = 3.5773%.
+   - FY2025 FCF = operating cash flow 456.182 - capex 260.795 = USD 195.387m.
+   - FY2023–FY2025 FCF = USD 406.273m, 254.260m, 195.387m; mean about USD 285.3m.
+   - discounted sustainable cash profit = USD 250.0m × 6.7352 = CNY 1,683,800,000.
+   - detachable net cash = USD 238.923m × 50% × 6.7352 = CNY 804,597,094.8.
+   - operating business price = CNY 19,426,884,773.418457 - CNY 804,597,094.8 = CNY 18,622,287,678.618457.
+   - owner earnback = 18,622,287,678.618457 / 1,683,800,000 = 11.0597 years.
+   - market cap / cash profit = 11.5375 years.
+   - forecast dividend = FY2025 cash dividends USD 85.257m × 6.7352 = CNY 574,222,946.4; yield = 2.9558%.
+
+7. Judgment boundaries
+   - Ordinary operating model confirmed from business and statement structure.
+   - Inventory, PP&E and lease ROU assets treated as required operating assets.
+   - Operating lease liabilities kept with matching operating assets; not treated as detachable financial debt.
+   - Only 50% of cash treated as detachable because of seasonality, inventory procurement, leases and planned capex.
+   - Sustainable cash profit set below the three-year FCF mean; FY2025 restructuring charges were not mechanically added back.
+
+8. Protocol population and validation
+   - Populated initialized result with repeated protocol `set` commands.
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: {"status":"ok","errors":[]}
+
+9. Known limitations
+   - Market cap and PE methodology were not independently reproducible from issuer filings; retained exactly from user input.
+   - FX affects CNY presentation; cash-profit and market-cap inputs are compared on the supplied/normalized CNY basis.
+   - Cash haircut and sustainable cash profit are explicit analytical judgments, not reported GAAP facts.

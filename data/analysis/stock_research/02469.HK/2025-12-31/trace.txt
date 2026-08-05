@@ -1,0 +1,62 @@
+Stock research trace
+Company: 02469.HK FENBI
+Period: 2025-12-31 annual
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields through protocol `set` commands; did not construct result.json directly.
+
+2. Reused source materials
+- stock_report/data/analysis/annual_review/02469.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/02469.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/02469.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/02469.HK/2025-12-31/imported_from_agent_runs/16a6160c299d-fenbi-2025-annual-report.txt
+- stock_report/data/raw/filings/02469.HK/2025-12-31/imported_from_agent_runs/d78b562e2078-fenbi-2025-annual-report.pdf
+- config/input.json market-cap snapshot.
+
+3. Model decision
+- Input hint said financial_brokerage/requires_special_model.
+- Annual report business and statements show vocational tutoring and book sales, no brokerage customer funds, proprietary trading book or repo financing.
+- Overrode hint with ordinary_operating/applicable.
+
+4. Unit normalization
+- Annual filing amounts are RMB'000; all result.json monetary fields were multiplied by 1,000 to absolute CNY.
+- Market cap retained exactly as supplied: CNY 693,642,687.613964.
+
+5. Core calculations
+- Gross margin = 1,433,129,000 / 2,676,628,000 = 0.5354203197.
+- Net margin = 198,126,000 / 2,676,628,000 = 0.0740214987.
+- Operating free cash flow = 226,322,000 - 9,100,000 = 217,222,000.
+- Discounted detachable net cash:
+  cash 869,141,000 x 50% = 434,570,500
+  term deposits 366,154,000 x 60% = 219,692,400
+  FVTPL assets 132,096,000 x 30% = 39,628,800
+  amortised-cost financial assets 55,449,000 x 50% = 27,724,500
+  necessary operating/refund reserve = -300,000,000
+  total = 421,616,200.
+- Sustainable cash profit:
+  2025 parent net profit 198,126,000
+  less finance income and FVTPL gains 42,812,000
+  subtotal 155,314,000
+  less 20% competition/sustainability haircut 31,062,800
+  total = 124,251,200.
+- Operating business price = 693,642,687.613964 - 421,616,200 = 272,026,487.613964.
+- Owner earnback years = 272,026,487.613964 / 124,251,200 = 2.1893250334.
+- Market cap / cash profit = 693,642,687.613964 / 124,251,200 = 5.5825824448.
+- Forecast dividend = 0 because no 2025 final dividend was proposed and no fixed payout ratio exists; forecast yield = 0.
+
+6. Judgment boundaries
+- Cash haircuts and CNY 300m operating/refund reserve are analytical assumptions, not reported amounts. The reserve is slightly above the CNY 268.676m sum of contract and refund liabilities.
+- Sustainable-profit haircut is subjective and explicitly separated from reported facts.
+- Share-based compensation was not added back because it is an economic employee/dilution cost.
+- Share repurchases were not counted as dividends.
+- No independent verification of the supplied market-cap snapshot, FX conversion, share count or treasury-share treatment was performed.
+
+7. Validation
+- Initial completed result validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed result validation status: ok; errors: [].

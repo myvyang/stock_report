@@ -1,0 +1,79 @@
+Stock research trace — VALU
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Read protocol instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+   - config/input.json exists.
+   - Referenced annual facts, normalized facts, raw filing metadata, and prior stock-research outputs were absent under stock_report/.
+   - Therefore returned to primary public filings rather than fabricating missing annual facts.
+
+3. Protocol initialization
+   - Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Initialized schema stock-research-result-v1.
+
+4. Primary sources reviewed
+   - Value Line FY2025 Form 10-K, fiscal year ended 2025-04-30, filed 2025-07-29:
+     https://www.sec.gov/Archives/edgar/data/717720/000143774925023754/valu20250430_10k.htm
+   - Value Line FY2026 Q3 Form 10-Q, quarter ended 2026-01-31, filed 2026-03-17:
+     https://www.sec.gov/Archives/edgar/data/717720/000143774926008479/valu20260131_10q.htm
+   - Market snapshot supplied by config/input.json: Yahoo Finance yfinance, market cap CNY 2,165,768,379.1963806 as of 2026-08-03, PE TTM 14.865217.
+
+5. Period handling
+   - Input period 2025-12-31 is treated as the research archive period.
+   - VALU fiscal year ends April 30. Annual financial statements use audited FY2025 figures for the year ended 2025-04-30.
+   - Later 10-Q used only for dividend run-rate, current shares, and directional EAM AUM context.
+
+6. Currency handling
+   - Source financial statements are USD.
+   - Result protocol requires absolute CNY yuan.
+   - Applied a uniform analytical conversion rate of CNY 7.20 per USD to balance sheet, income, cash flow, dividends, and owner-earnback inputs.
+   - This is an analytical normalization assumption, not a company-reported FX rate.
+
+7. Model assessment
+   - Confirmed ordinary_operating / applicable.
+   - Consolidated entity has no customer deposits, brokerage client funds, insurance reserves, or project-restricted cash.
+   - EAM is an unconsolidated equity-method investee. Its contractual revenue/profit interests are a core operating cash-flow asset and were excluded from detachable cash.
+
+8. Financial extraction (USD thousands, FY2025)
+   - Assets 144,533; liabilities 44,855; equity 99,678.
+   - Publishing revenue 35,079; production/distribution 5,987; proxy gross profit 29,092.
+   - Operating income 5,985; EAM revenue interest 16,183; EAM profit interest 2,135; investment gains 3,238; net income 20,686.
+   - Operating cash flow 20,243; equipment 178; capitalized software 59; operating FCF 20,006.
+   - Dividends paid 11,303; treasury stock purchases 453.
+
+9. Gross-margin proxy
+   - Company does not report GAAP cost of sales or gross profit.
+   - Used production and distribution expense as direct-cost proxy.
+   - Proxy gross margin = (35,079 - 5,987) / 35,079 = 82.9328%.
+   - Limitation is disclosed in result.json and report.md.
+
+10. Owner-earnback calculations
+   - Cash: USD 34.077m × 100%.
+   - Fixed income securities: USD 22.435m × 95%.
+   - Equity securities: USD 20.879m × 70%.
+   - Less dividend payable: USD 3.059m × 100%.
+   - Discounted detachable net cash: USD 66.94655m = CNY 482.01516m.
+   - Sustainable cash profit: normalized to USD 18.0m = CNY 129.6m, about 10% below FY2025 operating FCF.
+   - Operating business price: CNY 2,165.768379m - CNY 482.015160m = CNY 1,683.753219m.
+   - Owner earnback: 1,683.753219 / 129.6 = 12.9919 years.
+   - Market cap / cash profit: 2,165.768379 / 129.6 = 16.7112 times.
+
+11. Dividend forecast
+   - Quarterly run-rate USD 0.325 per share; annualized USD 1.30.
+   - Shares outstanding at 2026-02-28: 9,387,238.
+   - Forecast cash dividend: 1.30 × 9,387,238 × 7.20 = CNY 87,864,547.68.
+   - Forecast yield: CNY 87,864,547.68 / CNY 2,165,768,379.1963806 = 4.05697%.
+
+12. Protocol population and validation
+   - Populated result through repeated protocol CLI `set` commands; did not hand-write the complex JSON from scratch.
+   - Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - First validation result: status ok, errors [].
+
+13. Output consistency checks
+   - Required outputs: outputs/result.json, outputs/report.md, outputs/trace.txt.
+   - Final protocol validation and JSON parse performed after report/trace creation.

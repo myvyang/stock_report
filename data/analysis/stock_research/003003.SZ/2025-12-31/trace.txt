@@ -1,0 +1,90 @@
+task=stock_research
+company=003003.SZ 天元股份
+period=2025-12-31
+generated_at=2026-07-31T21:42:09+08:00
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+mutation=all result.json field population performed through protocol set commands
+
+[reuse_check]
+annual_facts_json=missing
+normalized_facts_json=missing
+prior_stock_research=missing
+decision=no reusable fact package; retrieve official annual filing
+
+[primary_sources]
+annual_report_url=https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-29/66cd07f1-ed17-4d99-b998-9267acbf3e90.PDF
+annual_report_local=stock_report/data/raw/filings/003003.SZ/2025-12-31/2025-annual-report.pdf
+annual_report_title=广东天元实业集团股份有限公司2025年年度报告全文
+annual_report_date=2026-04-29
+annual_report_pages=237
+dividend_notice_index=https://www.gdtengen.com/?page_id=200
+dividend_notice=2026-020-2025年年度权益分派实施公告, dated 2026-06-24
+market_snapshot=config/input.json; Tencent qt.gtimg.cn; 2026-07-31 11:43:39; market_cap=1758000000; pe_ttm=29.51
+
+[model_check]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=annual report classifies all revenue as packaging printing; operating assets are manufacturing fixed assets, receivables and inventory; no bank, brokerage, insurance, property development, construction concession or investment-holding balance-sheet economics identified
+
+[financial_extraction]
+revenue=1021268658.85
+cost_of_sales=816411380.77
+gross_profit=204857278.08
+gross_margin=204857278.08/1021268658.85=0.20059097702134487
+operating_profit=70861429.41
+net_profit=57294677.18
+parent_net_profit=58195849.59
+deducted_parent_net_profit=52149182.26
+net_margin=58195849.59/1021268658.85=0.05698387890952363
+total_assets=1856070340.46
+total_liabilities=555844714.43
+total_equity=1300225626.03
+parent_equity=1301106861.65
+minority_interest=-881235.62
+operating_cash_flow=211051112.61
+capital_expenditure=26397296.24
+operating_free_cash_flow=211051112.61-26397296.24=184653816.37
+
+[net_cash_calculation]
+unrestricted_cash=197137486.21*1.00=197137486.21
+bank_wealth_management=95153211.96*0.95=90395551.362
+broker_wealth_management=121909865.36*0.80=97527892.288
+certificates_and_term_deposits=(48391161.73+243179389.04)*0.95=276992023.2315
+restricted_cash=34317170.30*0.00=0
+financing_and_quasi_financing_debt=(271790574.88+419675.46+279829.77+7567166.21)*-1=-280057246.32
+discounted_detachable_net_cash=381995706.7715
+discounted_net_cash_to_market_cap=381995706.7715/1758000000=0.21728993559243465
+
+[cash_profit_calculation]
+parent_net_profit=58195849.59
+remove_nonrecurring=58195849.59-52149182.26=6046667.33
+base_cash_profit=deducted_parent_net_profit=52149182.26
+prudence_discount=15%
+discounted_sustainable_cash_profit=52149182.26*0.85=44326804.921
+reason=2025 revenue declined 11.31%; competitive fragmented industry; OCF uplift included operating-payables increase of 90195704.47 and inventory release of 17647945.96; do not annualize 2025 FCF
+
+[owner_earnback]
+operating_business_price=1758000000-381995706.7715=1376004293.2285
+owner_earnback_years=1376004293.2285/44326804.921=31.042262028152912
+market_cap_to_cash_profit=1758000000/44326804.921=39.65997556406644
+
+[dividend]
+forecast_basis=implemented 2025 annual distribution used as static reference, not a 2026 promise
+forecast_cash_dividend=174370000/10*2=34874000
+forecast_dividend_yield=34874000/1758000000=0.01983731513083049
+
+[limitations]
+market data not independently rechecked against exchange tick data
+broker wealth-management underlying assets, duration and redemption terms not fully disclosed; 80% factor is analytical judgment
+sustainable cash profit and all discount factors are analyst assumptions, not company guidance
+single-year free cash flow contains material working-capital release
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+initial_status=ok

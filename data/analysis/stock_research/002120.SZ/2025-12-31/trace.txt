@@ -1,0 +1,106 @@
+stock-research trace
+company=002120.SZ 韵达股份
+period=2025-12-31
+generated_at=2026-07-31T16:53:28+08:00
+
+[protocol]
+Read .agents/skills/stock-research/SKILL.md completely.
+Read references/result-contract.md completely.
+Read references/report-contract.md completely.
+Read references/data-reuse.md because the skill directed reuse decisions to it.
+Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+Populated result fields using protocol set commands; did not hand-write the JSON object.
+Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Final validation result: status=ok, errors=[]
+
+[reuse audit]
+Checked paths named by config/input.json.
+No raw filing directory, annual facts package, normalized facts, or prior stock research result existed in the workspace.
+Read stock_report/data/notes/user_stock_evaluations.md; it contained no entry for 韵达股份.
+Decision: reacquire and research the public 2025 annual report.
+
+[sources]
+1. 韵达控股集团股份有限公司2025年年度报告, disclosed 2026-04-25; full report identifier 12192258; audited by 容诚会计师事务所（特殊普通合伙）, standard unmodified opinion.
+   Public mirror used for full report text:
+   https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12192258
+   PDF:
+   https://file.finance.sina.com.cn/211.154.219.97%3A9494/MRGG/CNSESZ_STOCK/2026/2026-4/2026-04-25/12192258.PDF
+2. 韵达控股集团股份有限公司2025年年度报告摘要, disclosed 2026-04-25.
+   https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12192247&stockid=002120
+3. config/input.json: market cap CNY 20,033,000,000; PE TTM 14.98; Tencent qt.gtimg.cn; timestamp 20260731114345.
+
+[financial extraction]
+Balance sheet (CNY):
+  total_assets=37,213,402,860.84
+  total_liabilities=15,987,895,258.17
+  total_equity=21,225,507,602.67
+  parent_equity=21,121,858,791.69
+  minority_interest=103,648,810.98
+Income statement (CNY):
+  revenue=51,474,506,545.37
+  cost_of_sales=47,622,467,973.54
+  gross_profit=3,852,038,571.83
+  operating_profit=1,821,024,735.63
+  net_profit=1,166,925,668.62
+  parent_net_profit=1,171,447,387.79
+Cash flow (CNY):
+  operating_cash_flow=3,684,373,044.55
+  capital_expenditure=2,540,033,654.49
+  operating_free_cash_flow=1,144,339,390.06
+  financing_cash_flow=-3,534,009,684.29
+
+[model classification]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: revenue/cost arise from operating logistics services. Headquarters operates hubs and trunk network; terminal pickup/delivery is franchised. Cash investments and financing debt are separately identifiable. The balance sheet is not itself the regulated product as in banking, insurance, real-estate development, concession or investment-holding models.
+
+[owner earnback calculation]
+Unrestricted cash base:
+  cash book value 3,755,776,817.03
+  less restricted guarantee deposit 3,000,000.00
+  less litigation-frozen bank deposit 25,273,350.35
+  unrestricted_cash=3,727,503,466.68
+Cash discounts:
+  unrestricted_cash * 0.95 = 3,541,128,293.346
+  trading_financial_assets 5,383,974,673.88 * 0.90 = 4,845,577,206.492
+  large_certificates_of_deposit 572,896,527.78 * 0.95 = 544,251,701.391
+Financing debt deducted at 100%:
+  short_term_borrowings 1,868,628,085.34
+  current_long_term_borrowings 371,533,760.91
+  current_bonds 68,644,054.94
+  long_term_borrowings 39,824,625.19
+  noncurrent_bonds 6,395,547,523.72
+  total_financing_debt=8,744,178,050.10
+Discounted detachable net cash:
+  3,541,128,293.346 + 4,845,577,206.492 + 544,251,701.391 - 8,744,178,050.10
+  =186,779,151.129
+Lease liabilities of 341,041,175.14 were classified as operating obligations and not double-deducted from detachable net cash.
+
+Cash profit:
+  OCF 3,684,373,044.55 - capex 2,540,033,654.49 = FCF 1,144,339,390.06
+  FCF * 0.85 sustainability factor = 972,688,481.551
+The 15% haircut buffers single-year working-capital variation, price competition and capex uncertainty. All reported capex was deducted because maintenance/growth capex was not separately disclosed.
+
+Valuation:
+  operating_business_price=20,033,000,000.00-186,779,151.129=19,846,220,848.871
+  owner_earnback_years=19,846,220,848.871/972,688,481.551=20.4034706129
+  market_cap_to_cash_profit=20,033,000,000/972,688,481.551=20.5954942204
+  discounted_net_cash_to_market_cap=0.0093235737
+
+[dividend]
+2025 proposal: CNY 0.20 per eligible share.
+Year-end shares=2,899,201,071; repurchase account shares=7,403,800.
+Estimated dividend=(2,899,201,071-7,403,800)*0.20=578,359,454.20.
+Forecast yield=578,359,454.20/20,033,000,000=0.0288703367.
+Actual amount may change before implementation due to convertible-bond conversion or repurchases.
+
+[quality]
+status=complete
+Known limitations are recorded in outputs/result.json:
+  missing local fact packages/prior research;
+  market snapshot not cross-checked at the identical timestamp;
+  proposed dividend estimated from year-end eligible shares;
+  maintenance versus growth capex not disclosed.
+

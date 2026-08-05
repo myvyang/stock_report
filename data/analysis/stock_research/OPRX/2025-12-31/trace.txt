@@ -1,0 +1,58 @@
+OPRX stock-research trace
+generated_at: 2026-08-05T05:25:27+08:00
+period: 2025-12-31
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the configured annual-review, raw-filing, normalized-facts, and prior stock-research paths.
+- No OPRX files existed in those paths; no annual fact pack or prior result was available to reuse.
+- Therefore returned to primary public disclosures.
+
+3. Primary sources
+- SEC 2025 Form 10-K, filed 2026-03-12:
+  https://www.sec.gov/Archives/edgar/data/1448431/000144843126000005/oprx-20251231.htm
+  Used for business model, audited statements, debt, customer/channel concentration, stock compensation, impairment, and internal-control risk.
+- OptimizeRx FY2025 results release, 2026-03-05:
+  https://investors.optimizerx.com/news-releases/news-release-details/optimizerx-reports-strong-fourth-quarter-and-full-year-2025/
+  Used to cross-check FY2025 results, 2026 guidance, and the post-period repurchase authorization.
+- Federal Reserve H.10 release dated 2025-12-29:
+  https://www.federalreserve.gov/releases/h10/20251229/
+  Used 2025-12-26 China yuan quote of 7.0063 CNY per USD, the nearest available year-end business-day rate in that release.
+- config/input.json:
+  Used supplied 2026-08-03 market cap CNY 766,091,765.0329514 and PE TTM 16.805555, sourced there to Yahoo Finance yfinance.
+
+4. Financial extraction (USD thousands before conversion)
+- Balance sheet: assets 176,918; liabilities 48,624; equity 128,294; cash 23,365; receivables 37,752; goodwill 70,869; net identifiable intangibles 40,796.
+- Income statement: revenue 109,429; cost of revenue 35,834; gross profit 73,595; operating income 11,693; net income 5,132.
+- Cash flow: CFO 18,715; property/equipment purchases 58; operating FCF 18,657; financing cash flow -8,798.
+- Debt principal 26,290; balance-sheet debt is net of 614 issuance costs.
+- No minority interest identified; consolidated equity treated as parent equity.
+
+5. Conversion and formulas
+- All filing amounts multiplied by 1,000 and 7.0063 to produce absolute CNY yuan.
+- Gross margin = 73,595 / 109,429 = 0.6725365305.
+- Net margin = 5,132 / 109,429 = 0.0468979887.
+- Discounted detachable net cash = (23,365 - 26,290) * 1,000 * 7.0063 = -20,493,427.5 CNY.
+- Operating business price = 766,091,765.0329514 - (-20,493,427.5) = 786,585,192.5329514 CNY.
+- Operating FCF = (18,715 - 58) * 1,000 * 7.0063 = 130,716,539.1 CNY.
+- Sustainable cash profit = (18,657 - 6,962 stock compensation - 1,000 working-capital buffer) * 1,000 * 7.0063 = 74,932,378.5 CNY.
+- Owner earnback years = 786,585,192.5329514 / 74,932,378.5 = 10.4972671131.
+- Market cap / cash profit = 766,091,765.0329514 / 74,932,378.5 = 10.2237748270.
+- Dividend forecast = 0 because no cash dividend was paid or declared; repurchase authorization was not treated as a dividend or completed distribution.
+
+6. Judgment log
+- Confirmed ordinary_operating model: revenue comes from digital marketing/data/technology services; no special financial-statement model applies.
+- Cash haircut: 100% cash included but offset against 100% loan principal because the loan is secured by substantially all company/subsidiary assets. Receivables and acquisition intangibles were not treated as detachable cash.
+- Profit haircut: deducted all stock compensation because cash flow adds it back but owners bear dilution; deducted a separate USD 1.0m buffer for favorable working-capital timing. This is an explicit analyst judgment, not a company-reported metric.
+- Data quality marked complete because all protocol minimum fields and primary evidence are present. Limitations preserve the single-year sustainability and mixed-date valuation caveats.
+
+7. Protocol population and validation
+- Populated outputs/result.json exclusively through repeated protocol `set` operations after protocol initialization; did not hand-write the full JSON object.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation result: status=ok, errors=[]

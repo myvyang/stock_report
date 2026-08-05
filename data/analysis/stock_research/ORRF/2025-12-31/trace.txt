@@ -1,0 +1,25 @@
+2026-08-04 research trace — ORRF, FY2025
+
+1. Read stock-research SKILL.md, result-contract.md, report-contract.md and data-reuse.md in full.
+2. Read config/input.json. Input model hint said ordinary_operating/applicable; treated it only as a hint.
+3. Checked local stock_report. No ORRF filing, annual-facts package or prior stock-research result existed.
+4. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Located and downloaded the official 2025 Form 10-K filed 2026-03-12 (SEC accession 0001628280-26-017278) and SEC companyfacts JSON into stock_report/data/raw/filings/ORRF/2025-12-31/.
+6. Confirmed from the 10-K and company profile that Orrstown is a bank holding company. Overrode the input hint with statement_model=financial_bank and owner_earnback_applicability=requires_special_model.
+7. Extracted audited USD facts: assets 5,542.255m; liabilities 4,950.720m; parent equity 591.535m; net income 80.855m; net interest income 199.792m; noninterest income about 52.306m; loans 4,020.693m gross / 3,973.012m net; deposits 4,528.774m; securities 952.740m; 2025 cash dividends 20.643m.
+8. Extracted bank-specific facts: 2025 taxable-equivalent NIM 4.04%; NPA/assets 0.51%; NPL/loans 0.70%; ACL/loans 1.19%; net charge-offs/average loans 0.03%; holding-company CET1 11.5%, total risk-based capital 13.3%; Bank categorized well-capitalized.
+9. Used Federal Reserve G.5A via FRED AEXCHUS annual averages: 2025 7.1875, 2024 7.1957, 2023 7.0809 CNY per USD. Converted protocol monetary fields to CNY absolute yuan. Limitation: year-end balance-sheet translation would conventionally use closing FX.
+10. Forecast dividend: 19,647,812 shares outstanding at 2026-05-06 × USD 0.30 quarterly dividend × 4 × 7.1875 = CNY 169,462,378.50. Dividing by input market cap CNY 5,665,290,107.748047 gives 0.0299123920. This is mechanical annualization, not guidance.
+11. Left gross margin, ordinary free cash flow and all ordinary owner-earnback fields null because they have no comparable meaning for a bank and the result contract requires nulls for special models.
+12. Populated result.json through protocol CLI set operations, not by constructing the result from scratch.
+13. Protocol validation result: status=ok, errors=[].
+
+Primary references:
+- https://www.sec.gov/Archives/edgar/data/826154/000162828026017278/orrf-20251231.htm
+- https://data.sec.gov/api/xbrl/companyfacts/CIK0000826154.json
+- https://www.sec.gov/Archives/edgar/data/826154/000162828026032835/orrf-20260331.htm
+- https://investors.orrstown.com/corporate-profile/default.aspx
+- https://fred.stlouisfed.org/series/AEXCHUS
+
+Market snapshot source (provided input): Yahoo Finance yfinance, dated 2026-08-03.

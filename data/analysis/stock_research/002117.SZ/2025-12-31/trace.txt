@@ -1,0 +1,79 @@
+stock-research trace
+company=002117.SZ 东港股份
+period=2025-12-31
+generated_for_input=2026-07-31T20:46:22+08:00
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+mutation=protocol set commands only; result JSON not composed from scratch
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validate_result=status ok; errors=[]
+
+[reuse]
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+prior_stock_research=missing
+decision=no reusable facts; returned to public annual filing
+
+[filing]
+document=东港股份有限公司2025年年度报告
+disclosure_date=2026-03-31
+official_designated_sites=深圳证券交易所、巨潮资讯网
+discovery=https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12039163&stockid=002117
+pdf_mirror=http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESZ_STOCK/2026/2026-3/2026-03-31/12039163.PDF
+local_pdf=stock_report/data/raw/filings/002117.SZ/2025-12-31/annual-report-2025.pdf
+local_text=stock_report/data/raw/filings/002117.SZ/2025-12-31/annual-report-2025.txt
+extraction=HTML full-text mirror parsed with Python standard-library HTMLParser because PDF text utilities were unavailable
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=revenue and assets are ordinary manufacturing/service operations; no customer funds, insurance reserves, property projects, concession rights, or investment-holding structure
+
+[core_facts_yuan]
+revenue=1185658616.90
+cost_of_sales=789226029.13
+gross_profit=396432587.77
+parent_net_profit=144164774.85
+deducted_nonrecurring_parent_profit=132753902.91
+operating_cash_flow=228334447.26
+capital_expenditure=80553690.90
+operating_free_cash_flow=147780756.36
+total_assets=2034463253.20
+total_liabilities=602529624.98
+total_equity=1431933628.22
+parent_equity=1431933628.22
+cash_and_equivalents=283070015.27
+restricted_cash=42889893.67
+bank_wealth_management=410000000.00
+lease_related_liabilities=23084150.65
+
+[formulas]
+gross_margin=(1185658616.90-789226029.13)/1185658616.90=0.33435643457516045
+net_margin=144164774.85/1185658616.90=0.12159045849717721
+operating_free_cash_flow=228334447.26-80553690.90=147780756.36
+discounted_detachable_net_cash=283070015.27+410000000*0.90-42889893.67*0-23084150.65=628985864.62
+discounted_sustainable_cash_profit=132753902.91+72231737.81-80553690.90=124431949.82
+operating_business_price=4242000000-628985864.62=3613014135.38
+owner_earnback_years=3613014135.38/124431949.82=29.03606461689696
+market_cap_to_cash_profit=4242000000/124431949.82=34.09092283883975
+forecast_dividend_yield=157116286.50/4242000000=0.03703825707213579
+
+[judgment_notes]
+wealth_management_haircut=90%; non-principal-guaranteed bank products
+restricted_cash_haircut=0%; linked to acceptance bills and guarantees
+profit_base=deducted nonrecurring parent profit; avoids counting wealth-management income after cash is detached
+depreciation_amortization_addback=46543311.84+15434065.23+5728955.58+4525405.16=72231737.81
+capex_treatment=100% deducted because maintenance/growth split is unavailable
+industry_position=company qualitative statement only; no independent market share
+market_data=used input snapshot without independent refresh
+
+[outputs]
+result=outputs/result.json
+report=outputs/report.md
+trace=outputs/trace.txt

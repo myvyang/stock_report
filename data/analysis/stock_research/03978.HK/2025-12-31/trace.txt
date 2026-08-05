@@ -1,0 +1,69 @@
+stock-research trace
+company: 03978.HK / BESTSTUDY EDU / 卓越教育集团
+period: 2025-12-31 annual
+generated_at: 2026-08-04T14:01:25+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- config/input.json exists.
+- Referenced raw filing metadata, annual facts, normalized facts and prior stock-research outputs do not exist in /workspace.
+- No prior facts were reused; official filing retrieval was required.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initialization succeeded.
+
+4. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Official 2025 annual report identifies the company as a South China K-12 education service provider offering comprehensive talent, tutoring and full-time test preparation.
+- Revenue is recognized as education services are delivered; advance tuition is contract liability.
+- Conclusion: override hint with ordinary_operating / applicable.
+
+5. Primary source
+- HKEX 2025 Annual Report, released 2026-04-13:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0413/2026041300378.pdf
+- Audited by Deloitte Touche Tohmatsu; auditor report dated 2026-03-19.
+- Market-cap snapshot and PE reused exactly from config/input.json; no independent recalculation.
+
+6. Core extraction (RMB'000 in filing, converted to absolute RMB in result.json)
+- Revenue 1,904,430; cost of sales 1,040,575; gross profit 863,855.
+- Net profit 302,464; parent net profit 301,468.
+- Total assets 2,284,127; total liabilities 1,441,775; total equity 842,352; parent equity 834,160; NCI 8,192.
+- Operating cash flow 593,219.
+- Capex definition: PPE 44,382 + intangible assets 56,064 + upfront ROU payment 923 = 101,369.
+- Operating free cash flow: 593,219 - 101,369 = 491,850.
+- Cash 823,835; time deposits 483,000; restricted deposits 73,034; lease liabilities 336,079.
+- Debt investments approximately 77,800; equity investments approximately 146,800.
+- 2025 interim plus proposed final dividend: 90,753 + 90,128 = 180,881.
+
+7. Derived calculations
+- Gross margin: 863,855 / 1,904,430 = 45.3614%.
+- Parent net margin: 301,468 / 1,904,430 = 15.8302%.
+- Discounted detachable net cash:
+  cash 823.835m * 90%
+  + time deposits 483.000m * 95%
+  + debt investments 77.800m * 70%
+  + equity investments 146.800m * 50%
+  + restricted deposits 73.034m * 0%
+  - lease liabilities 336.079m
+  = 992.0825m.
+- Sustainable cash profit: parent net profit 301.468m * 85% = 256.2478m.
+- Operating business price: market cap 2,332.367945m - 992.0825m = 1,340.285445m.
+- Owner earnback: 1,340.285445m / 256.2478m = 5.23043 years.
+- Market cap / cash profit: 2,332.367945m / 256.2478m = 9.10200 years.
+- Forecast dividend: 301.468m * 70% = 211.0276m; yield = 9.0478%.
+
+8. Judgment flags
+- Cash discounts and 15% profit haircut are analyst judgments, fully disclosed in result.json and report.md.
+- Forecast uses the company's 2026 payout-plan ratio but holds profit flat at 2025; it is not company guidance for dividend amount.
+- Industry position is company-stated; no independent market-share evidence was found.
+
+9. Protocol build and validation
+- result.json was populated through protocol set/append commands in outputs/build_result.sh, not handwritten from scratch.
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok; errors: [].

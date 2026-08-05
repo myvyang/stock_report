@@ -1,0 +1,72 @@
+stock-research trace
+company=601369.SH 陕鼓动力
+period=2025-12-31 annual
+generated_for=2026-07-31
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, data-reuse.md.
+2. Initialized outputs/result.json:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated fields with protocol set commands through populate_result.py.
+4. Validated outputs/result.json:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result={"status":"ok","errors":[]}
+
+[sources]
+- config/input.json: company identity; Tencent market cap 16,425,000,000 yuan at 20260731114341; PE TTM 23.74.
+- stock_report/data/raw/filings/601369.SH/2025-12-31/metadata.json: official CNINFO filing URL, local PDF, SHA-256.
+- stock_report/data/raw/filings/601369.SH/2025-12-31/annual-report.pdf: audited 2025 annual report.
+- stock_report/data/analysis/annual_review/601369.SH/2025-12-31/result.json and report.md: verified ROIC, cash assets, financing debt, OCF, capex and matched financial-return adjustments.
+
+[extraction]
+- Local environment lacked pdftotext. Created temporary venv /tmp/sgdl-pdfenv and installed pypdf.
+- Extracted 241-page local PDF text to /tmp/sgdl2025.txt; did not alter the filing.
+- Annual report key pages:
+  p7 revenue, parent net profit, OCF, parent equity, total assets.
+  p21-27 business segments, margins, asset/liability composition.
+  p57-59 dividend plan and history.
+  p86-94 consolidated statements.
+  p141, p187, p195 funding assets and financial income details (reused from verified annual review).
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Equipment, service and industrial-gas operation use ordinary contracts, working capital and fixed assets. Company is not a bank, broker, insurer, real-estate developer or investment holding platform. Gas operation is capital intensive but does not make the full consolidated model special.
+
+[core_calculations]
+gross_profit=9,421,617,647.18-7,562,199,304.08=1,859,418,343.10
+gross_margin=1,859,418,343.10/9,421,617,647.18=0.1973565913
+net_margin=747,958,687.04/9,421,617,647.18=0.0793875017
+operating_fcf=941,484,672.00-476,026,811.82=465,457,860.18
+
+discounted_net_cash=
+  1,051,462,088.32*0.80
+  +7,487,400,820.95*0.95
+  +757,303,938.39*0.85
+  -2,918,926,355.50
+  =5,678,982,442.69
+
+adjusted_profit_before_sustainability_discount=
+  747,958,687.04
+  -255,855,737.31*(1-0.2276470262)
+  -25,502,705.86*(1-0.2276470262)
+  =530,650,656.75
+discounted_cash_profit=530,650,656.75*0.90=477,585,591.08
+operating_business_price=16,425,000,000.00-5,678,982,442.69=10,746,017,557.31
+owner_earnback_years=10,746,017,557.31/477,585,591.08=22.5007
+market_cap_to_cash_profit=16,425,000,000.00/477,585,591.08=34.3917
+forecast_dividend_yield=534,277,092.52/16,425,000,000.00=0.0325282857
+
+[judgment_notes]
+- Necessary cash retained at 25% of annual operating cash outflow, inherited from verified annual review.
+- Restricted cash excluded from detachable cash.
+- Long-term deposits discounted to 95%, excess cash 80%, liquid wealth-management products 85%; financing debt deducted at 100%.
+- Profit strips returns paired with detached funding assets after effective tax, then applies 10% sustainability discount.
+- 2025 operating FCF of 465.46m is used as an independent reasonableness check against discounted cash profit of 477.59m.
+- Final dividend includes paid interim dividend and proposed final dividend; final portion was pending shareholder approval at annual-report date.
+
+[limitations]
+- Market snapshot not independently re-queried.
+- Legal availability of each long-term deposit is not disclosed.
+- Accrual interest income and cash interest receipts differ in timing.
+- Owner earnback is a transparent analytical estimate, not a forecast or investment recommendation.

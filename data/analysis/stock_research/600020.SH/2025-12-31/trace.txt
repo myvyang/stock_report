@@ -1,0 +1,73 @@
+task=stock_research
+company=600020.SH 中原高速
+period=2025-12-31
+generated_at=2026-08-01T03:25:20+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Read references/data-reuse.md because the skill requires prioritizing reusable local facts.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields through protocol set/append commands; did not construct the result JSON from scratch.
+6. Validated outputs/result.json with protocol validate; status=ok, errors=[].
+
+[local_reuse_check]
+- Checked stock_report/data/analysis/annual_review/600020.SH/2025-12-31, raw filing directory, normalized facts, and prior stock research directory.
+- No reusable filing, annual facts package, normalized facts, or prior research result existed in the workspace for this period.
+
+[official_sources]
+- Shanghai Stock Exchange bulletin query located:
+  * 2025 annual report, disclosure date 2026-04-23, SSE path /disclosure/listedinfo/announcement/c/new/2026-04-23/600020_20260423_ZCN7.pdf
+  * 2025 annual shareholder meeting resolution, disclosure date 2026-05-16, SSE path /disclosure/listedinfo/announcement/c/new/2026-05-16/600020_20260516_G8E6.pdf
+  * 2025 annual equity distribution implementation announcement, disclosure date 2026-07-07, SSE path /disclosure/listedinfo/announcement/c/new/2026-07-07/600020_20260707_ISW4.pdf
+- Direct SSE PDF retrieval encountered the exchange anti-bot challenge. Used the identical annual report PDF indexed by CNINFO DataCloud for text extraction:
+  https://dataclouds.cninfo.com.cn/shgonggao/hsomarket/2026/20260422/c217b6a171d0478b94b0f3b5b197d43d.PDF
+- Annual report PDF: 229 pages, dated 2026-04-22, standard unqualified audit opinion.
+- Market data reused exactly from config/input.json: market cap CNY 8,585,000,000 (floating representation in input 8584999999.999999), timestamp 20260731114347, source Tencent qt.gtimg.cn, PE TTM 13.42.
+
+[key_extractions]
+- Revenue: 6,598,781,551.16
+- Cost of sales: 4,235,237,791.42
+- Gross profit: 2,363,543,759.74
+- Parent net profit: 628,486,055.17
+- Operating cash flow: 2,456,202,493.30
+- Purchases of fixed/intangible/other long-term assets: 1,905,820,883.04
+- Mechanical operating FCF: 550,381,610.26; not treated as normalized owner cash because it includes construction/growth investment.
+- Total assets: 53,545,897,731.88
+- Total liabilities: 37,913,487,289.79
+- Total equity: 15,632,410,442.09
+- Parent equity: 15,632,636,471.68
+- Cash: 477,455,218.60; restricted cash: 10,943,934.17
+- Fixed assets: 9,808,729,714.93
+- Intangible assets: 29,013,318,474.92
+- Operating concession rights: 19,861,934,432.51
+- Concession rights under construction: 8,709,397,461.41
+- Inventory: 3,870,333,778.29
+- Short-term borrowings: 1,314,692,654.90
+- Current non-current liabilities: 1,909,080,261.11
+- Long-term borrowings: 29,969,010,973.96
+- Bonds payable: 769,930,376.00
+- Toll revenue: 4,511,661,074.02; toll cost: 2,184,475,040.65; toll gross margin 51.58%.
+- Investment income: 777,201,675.42; cash investment income received: 35,040,414.09.
+- Inventory impairment loss: 916,861,237.92, principally Jiaotou Yikang real estate inventory.
+- 2025 dividend implemented: CNY 0.12 per share, total 269,684,619.84.
+
+[calculations]
+- Consolidated gross margin=(6,598,781,551.16-4,235,237,791.42)/6,598,781,551.16=0.35817881550034225.
+- Parent net margin=628,486,055.17/6,598,781,551.16=0.0952427429666191.
+- Static implemented dividend yield=269,684,619.84/8,585,000,000=0.03141346765754222.
+- Interest-bearing debt approximation=short-term borrowings + current non-current liabilities + long-term borrowings + bonds payable=33,962,714,265.97; rounded in report to CNY 33.963 billion. Current non-current liabilities contain a small lease component, so this is an approximation.
+
+[model_decision]
+- Confirmed statement_model=utility_concession.
+- Confirmed owner_earnback_applicability=requires_special_model.
+- Reason: core assets are finite-life toll-road infrastructure and concession rights; most financing is linked to or secured by toll rights; cash and debt cannot be detached without impairing the operating system.
+- All ordinary owner earnback ranking fields remain null as required by result-contract.md.
+- Required special model: route-by-route remaining concession term, traffic and tariff scenarios, maintenance capital expenditure, construction commitments, debt service, investment/dividend cash, and terminal expiry.
+- No special-model earnback year was fabricated because several concession periods remain temporarily estimated at 30 years or await formal approval, and the annual report lacks route-level forecast cash flows and maintenance-capex separation.
+
+[quality]
+- data_quality.status=complete under the special-model minimum consumption contract.
+- Important limitation: complete means the structured result is consumable, not that route-level intrinsic value can be calculated from disclosed data.
+- Final protocol validation: ok, no errors.

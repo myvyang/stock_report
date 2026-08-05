@@ -1,0 +1,74 @@
+task: stock research 601020.SH / 华钰矿业
+period: 2025-12-31 annual
+generated_for_input_at: 2026-07-31T20:37:18+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated each result section with protocol `set`; no complex JSON result was written from scratch.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[local reuse check]
+- No annual facts package, normalized facts, prior stock-research result, or raw filing existed under the input paths.
+- Therefore fetched the disclosed 2025 annual report and archived it at:
+  stock_report/data/raw/filings/601020.SH/2025-12-31/annual_report.pdf
+- Extracted text for local verification at:
+  stock_report/data/raw/filings/601020.SH/2025-12-31/annual_report.txt
+
+[primary filing]
+title: 西藏华钰矿业股份有限公司2025年年度报告
+disclosure date: 2026-04-29
+report signed/audited: 2026-04-28
+source URL: https://dataclouds.cninfo.com.cn/shgonggao/hsomarket/2026/20260428/959c7c27c030402195152d9495dfce01.PDF
+official disclosure venue stated by company: 上海证券交易所 www.sse.com.cn
+audit: 立信会计师事务所（特殊普通合伙）, 标准无保留意见
+
+[key page checks]
+- pp.2, 56-58: 2025 dividend proposal, CNY 64,777,211.14; CNY 0.79 per 10 shares; payout 7.44%.
+- pp.7-10: revenue, parent net profit, operating cash flow, non-recurring gains; CNY 413,323,706.20 step-acquisition remeasurement gain.
+- pp.10-22: business model, mine portfolio, domestic/foreign segment revenue and margins, production/sales data, construction status.
+- pp.90-99: consolidated balance sheet, income statement, and cash-flow statement.
+- p.136: cash and cash-equivalent / foreign cash details.
+- pp.169-176: pledged assets, borrowings, payables, contract liabilities, and financing details.
+- pp.183-187: revenue/cost, taxes, investment-income notes.
+
+[formula reconciliation]
+gross_profit = 2,070,622,505.07 - 1,056,531,728.89 = 1,014,090,776.18
+gross_margin = 1,014,090,776.18 / 2,070,622,505.07 = 0.4897516441
+net_margin = 870,733,068.99 / 2,070,622,505.07 = 0.4205175337
+operating_free_cash_flow = 1,044,965,950.20 - 346,594,494.64 = 698,371,455.56
+
+discounted_fund_assets:
+- cash and cash equivalents: 488,372,693.06 * 100% = 488,372,693.06
+- trading financial asset: 100,033,345.35 * 90% = 90,030,010.82
+- bank acceptance note: 50,000,000.00 * 95% = 47,500,000.00
+- total = 625,902,703.88
+
+financing_and_quasi_financing_liabilities:
+- short-term borrowings: 386,785,008.91
+- current portion of long-term borrowings: 186,000,000.00
+- long-term borrowings: 420,029,133.42
+- current lease liabilities: 2,166,593.59
+- long-term payables including current portion: 339,558,069.72
+- borrowings and interest in other payables: 784,424,200.20
+- total = 2,038,533,782.70
+
+discounted_detachable_net_cash = 625,902,703.88 - 2,038,533,782.70 = -1,412,631,078.83
+operating_business_price = 15,940,000,000.00 - (-1,412,631,078.83) = 17,352,631,078.83
+normalized_parent_profit = reported parent profit 870,733,068.99 - non-recurring 419,285,185.22 = 451,447,883.77
+discounted_sustainable_cash_profit = 451,447,883.77 * 70% = 316,013,518.64
+owner_earnback_years = 17,352,631,078.83 / 316,013,518.64 = 54.91104037
+market_cap_to_cash_profit = 15,940,000,000.00 / 316,013,518.64 = 50.44088009
+forecast_dividend_yield = 64,777,211.14 / 15,940,000,000.00 = 0.0040638150
+
+[judgment boundaries]
+- `ordinary_operating` confirmed because mining rights, mine plant and construction assets are operating assets; no bank/insurance/property-development/concession balance-sheet model applies.
+- 70% sustainable-profit factor is an analytical haircut, not a reported fact. It reflects commodity cyclicality, continuing mine construction, and minority interests. This is disclosed as a limitation.
+- Market capitalization and PE TTM are reused from config/input.json (Tencent qt.gtimg.cn snapshot) and were not independently recalculated.
+- No buy/sell advice, target price, or ranking label is produced.
+
+[validation]
+final protocol validation: status=ok, errors=[]

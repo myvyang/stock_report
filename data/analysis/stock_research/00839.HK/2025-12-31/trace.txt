@@ -1,0 +1,63 @@
+stock-research trace
+company: China Education Group Holdings Limited (00839.HK)
+task input period: 2025-12-31
+effective annual-report period: 2025-08-31
+generated at: 2026-08-03 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the input-declared raw filing, annual facts, normalized facts, and historical stock-research paths.
+- No filing, annual fact package, normalized fact package, or historical research result existed locally at task start.
+- Downloaded the official annual report PDF to stock_report/data/raw/filings/00839.HK/2025-12-31/annual-report-2025.pdf.
+- Extracted text locally to annual-report-2025.txt for page-level verification.
+
+3. Primary sources
+- HKEX annual report 2024/2025, published 2025-12-18:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2025/1218/2025121800443.pdf
+- Company financial-reports index:
+  https://www.chinaeducation.hk/en/ir_reports.php
+- Company announcements index, used to verify the later disclosure timeline:
+  https://www.chinaeducation.hk/en/ir_announcements.php
+- Market snapshot supplied by config/input.json: Tencent qt.gtimg.cn, 2026/07/31 16:08:45.
+
+4. Model correction
+- input hint: financial_brokerage / requires_special_model.
+- filing fact: note 5 states the group mainly provides vocational education services; customers are primarily students and revenue comes from education and ancillary services.
+- conclusion: ordinary_operating / applicable.
+- Education contract liabilities are student prepayments for services still to be delivered, not brokerage customer funds.
+
+5. Key annual-report extraction
+- pp.129: revenue RMB7,363m; cost RMB3,437m; gross profit RMB3,926m; net profit RMB506m; parent profit RMB977m; NCI loss RMB471m.
+- pp.130-131: total assets RMB39,361m; total liabilities derived as RMB20,403m; total equity RMB18,958m; parent equity RMB16,744m; NCI RMB2,214m.
+- pp.134-135: CFO RMB3,885m; investing cash flow -RMB3,579m; financing cash flow -RMB743m; cash dividend paid RMB82m.
+- p.15: capital expenditure RMB2,660m; cash reserve RMB6,744m; borrowings and bonds RMB10,233m; net gearing 18.4%.
+- note 24, p.179: contract liabilities RMB4,610m, substantially education services paid before service commencement.
+- note 12, p.162: FY2025 recognized distribution RMB279m; FY2025 interim dividend nil; no dividend proposed after year-end.
+- pp.13-14: goodwill and intangible impairment RMB1,706m across Hainan, Guangdong, and Henan CGUs.
+
+6. Calculations
+- gross margin = 3,926 / 7,363 = 0.5332065734.
+- net margin = parent profit 977 / 7,363 = 0.1326904794.
+- operating free cash flow = CFO 3,885m - capex 2,660m = RMB1,225m.
+- discounted sustainable cash profit = RMB1,225m * 80% = RMB980m.
+- discounted detachable net cash = zero: disclosed cash reserve RMB6,744m is below interest-bearing debt RMB10,233m; restricted deposits and operating obligations add constraints.
+- operating business price = market cap RMB4,577,303,600.85 - zero = RMB4,577,303,600.85.
+- owner earnback years = RMB4,577,303,600.85 / RMB980,000,000 = 4.670718.
+- forecast cash dividend = zero because FY2025 had no proposed year-end dividend and no reliable restoration basis was used.
+
+7. Protocol writes and checks
+- All result fields were written through repeated protocol `set` commands after protocol initialization.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Expected final status: ok, errors: [].
+
+8. Known limitations
+- Input period differs from the issuer's statutory fiscal year-end; result analysis.period was corrected to 2025-08-31.
+- Market cap and PE were accepted from the input and were not independently recomputed.
+- Maintenance versus growth capex is not disclosed reliably; full reported capex was deducted and the residual FCF was discounted by 20%.
+- A zero dividend forecast is an evidence-constrained forecast, not a claim that the board cannot resume dividends.

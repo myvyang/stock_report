@@ -1,0 +1,74 @@
+SNFCA stock research trace
+generated_for_period=2025-12-31
+report_type=annual
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json using:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields only after initialization, using repeated protocol `set` commands.
+5. Validation status before report finalization: ok, no errors.
+
+[reuse_check]
+- Expected local filing metadata, annual facts, annual facts markdown and normalized facts were absent under the paths supplied in config/input.json.
+- No prior SNFCA stock research result was found in the workspace or stated sync target.
+- Consequently, the primary filing was fetched and analyzed rather than inventing or reusing missing facts.
+
+[primary_sources]
+- SEC Form 10-K, fiscal year ended 2025-12-31, filed 2026-03-16
+  accession=0001493152-26-010228
+  url=https://www.sec.gov/Archives/edgar/data/318673/000149315226010228/form10-k.htm
+  used_for=company identity; business segments; consolidated balance sheet, income statement and cash flow; segment earnings; insurance statutory capital; dividend limitations; mortgage covenants; risks; internal control
+- Security National Financial Corporation annual results release, dated 2026-03-16
+  url=https://investor.securitynational.com/news-releases/news-release-details/security-national-financial-corporation-reports-financial-69
+  used_for=cross-check of revenue, operating earnings, EPS, book value and equivalent shares
+- Federal Reserve Board H.10 weekly release, dated 2026-01-05
+  url=https://www.federalreserve.gov/releases/h10/20260105/
+  used_for=2025-12-31 exchange rate of 6.9931 CNY per USD
+- config/input.json
+  source_label=Yahoo Finance yfinance
+  used_for=market cap CNY 1647055546.2935486 as of 2026-08-03 and PE TTM 7.6803274
+
+[model_decision]
+- Input hint ordinary_operating/applicable was rejected after filing review.
+- Selected statement_model=platform_financial_mixed.
+- Selected owner_earnback_applicability=requires_special_model.
+- Reason: life insurance supplies most profit and holds investment assets against policy benefit and account liabilities; mortgage operations use held-for-sale loans and warehouse funding. These balances are operating structures, not detachable cash/debt.
+- In accordance with result-contract.md, all ordinary owner earnback fields remain null.
+
+[currency]
+- Filing values are USD.
+- All monetary amounts in outputs/result.json, except ratios and source-native narrative figures, were multiplied by 6.9931 and recorded as absolute CNY yuan.
+- Revenue and income use the same closing rate for structural consistency, not a period-average rate. This is disclosed as a limitation.
+
+[key_fact_checks]
+- total_assets_usd=1561844604
+- total_liabilities_usd=1151475876
+- total_equity_usd=410368728
+- revenue_usd=344587538
+- net_earnings_usd=32152330
+- operating_cash_flow_usd=45539897
+- property_equipment_purchases_usd=1691272
+- insurance_segment_net_earnings_usd=29439000
+- cemetery_mortuary_segment_net_earnings_usd=6584000
+- mortgage_segment_net_loss_usd=-3871000
+- investments_usd=1038862460
+- future_policy_benefits_unpaid_claims_usd=799706946
+- policyholder_account_balances_usd=140605750
+- statutory_capital_surplus_usd=139068212
+- statutory_net_income_usd=22199319
+- cash_dividend_history=company states never paid Class A or C cash dividends
+- forecast_cash_dividend_cny=0
+
+[known_limitations]
+- PE TTM and market capitalization were supplied by Yahoo Finance yfinance and were not independently verified with an exchange-operated official market data feed.
+- Gross profit and gross margin are null because the consolidated insurance/mortgage model has no comparable standard gross-profit presentation.
+- The filing states all insurance subsidiaries exceed the first RBC regulatory action level but does not provide their exact RBC ratios.
+- Market cap date and financial statement date differ, and the CNY conversion uses the financial statement closing rate.
+
+[validation]
+- Run final command after all files are written:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final result: status=ok, errors=[]
+- Output existence checks: result.json, report.md and trace.txt are all non-empty.

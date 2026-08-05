@@ -1,0 +1,67 @@
+stock-research trace
+company: 招商轮船 (601872.SH)
+period: 2025-12-31 annual
+generated context date: 2026-08-01 Asia/Shanghai
+
+1. Instructions read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No raw filing, annual facts package, normalized facts, or prior stock-research output existed for 601872.SH/2025-12-31.
+- config/input.json was used for identity, market cap, quote date, quote source, and PE TTM.
+
+3. Protocol lifecycle
+- Initialized with: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields with repeated protocol `set` calls; the complex JSON result was not hand-written from scratch.
+- Final validation: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+
+4. Core filing source
+- 招商轮船2025年年度报告, disclosed 2026-03-27.
+- Announcement mirror URL: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12023996&stockid=601872
+- The report itself identifies www.sse.com.cn as the exchange disclosure site.
+- Auditor: KPMG Huazhen LLP; opinion: standard unqualified.
+
+5. Extracted facts (CNY)
+- Revenue: 28,177,211,131.95
+- Cost of sales: 20,717,507,250.47
+- Gross profit (calculated): 7,459,703,881.48
+- Operating profit: 6,808,680,613.68
+- Net profit: 6,070,713,066.81
+- Parent net profit: 6,012,096,267.97
+- Recurring parent net profit: 5,024,011,136.90
+- Total assets: 82,054,880,078.89
+- Total liabilities: 38,300,086,642.94
+- Total equity: 43,754,793,435.95
+- Parent equity: 43,005,621,793.17
+- Minority interest: 749,171,642.78
+- Operating cash flow: 9,054,927,611.30
+- Capital expenditure: 7,796,879,055.42
+- Operating free cash flow (calculated): 1,258,048,555.88
+- Cash and cash equivalents: 4,718,465,706.96
+- Financing liabilities per financing-liability roll-forward: 29,300,877,968.79
+- 2025 cash dividend plan: 2,583,852,320.64
+
+6. Analysis model decision
+- statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- Reason: assets and liabilities arise from shipping operations and ordinary financing, not a financial, property-development, concession, or investment-holding statement model.
+- Special handling: shipping is highly cyclical and capital intensive; financing debt is netted against cash; sustainable profit is haircut for cycle and maintenance-capex uncertainty.
+
+7. Calculations
+- gross_margin = 7,459,703,881.48 / 28,177,211,131.95 = 0.2647424490
+- net_margin = 6,012,096,267.97 / 28,177,211,131.95 = 0.2133673286
+- discounted_net_cash = 4,718,465,706.96 - 29,300,877,968.79 = -24,582,412,261.83
+- discounted_cash_profit = 5,024,011,136.90 * 0.80 = 4,019,208,909.52
+- operating_business_price = 134,683,000,000 - (-24,582,412,261.83) = 159,265,412,261.83
+- owner_earnback_years = 159,265,412,261.83 / 4,019,208,909.52 = 39.6260597165
+- market_cap_to_cash_profit = 134,683,000,000 / 4,019,208,909.52 = 33.5098281856
+- forecast_dividend_yield = 2,583,852,320.64 / 134,683,000,000 = 0.0191846953
+
+8. Judgment and limitation
+- The 20% haircut is an analyst judgment, not a filing fact.
+- The filing does not split maintenance and growth capex. Total capex includes a large newbuilding program, so total 2025 free cash flow was not used as sustainable cash profit.
+- Core filing facts were read from an announcement mirror because no local filing package was present; the mirror reproduces the exchange-filed annual report text.

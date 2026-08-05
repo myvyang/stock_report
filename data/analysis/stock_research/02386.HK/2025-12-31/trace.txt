@@ -1,0 +1,28 @@
+stock-research trace
+company: SINOPEC SEG (02386.HK)
+period: 2025-12-31 annual
+generated_at: 2026-08-04T11:30:18+08:00
+
+1. Read the complete stock-research SKILL.md and required result-contract.md and report-contract.md. Also read data-reuse.md because the workflow required deciding whether existing annual facts could be reused.
+2. Checked configured long-term paths. No annual facts package, normalized facts, metadata, or prior stock-research outputs existed for this company/period.
+3. Located the official 2025 annual report through HKEX title search and downloaded:
+   https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0315/2026031500027.pdf
+   Local source: stock_report/data/raw/filings/02386.HK/2025-12-31/annual-report-2025.pdf
+4. Extracted all 187 PDF pages to annual-report-2025.txt for auditable text search. A temporary isolated Python environment and pypdf were used because pdftotext was unavailable.
+5. Initialized outputs/result.json with the required protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+6. Rechecked analysis_model_hint against the annual report. Overrode financial_brokerage with construction_project because the company provides engineering consulting, EPC, construction, and equipment manufacturing, and carries material contract assets/liabilities. Set ordinary owner earnback applicability to requires_special_model.
+7. Populated result fields only with protocol CLI set/append commands. Core figures were taken from annual report pages 23, 32-44, 106-112, and 144. Amounts in the PDF were RMB'000 and were multiplied by 1,000.
+8. Key calculations:
+   gross_margin = 5,177,326,000 / 70,074,081,000 = 0.073881
+   net_margin = 1,797,681,000 / 70,074,081,000 = 0.025654
+   operating_free_cash_flow = 8,186,346,000 - 961,414,000 = 7,224,932,000
+   forecast_cash_dividend = 703,066,000 + 413,038,000 + 456,978,000 = 1,573,082,000
+   forecast_dividend_yield = 1,573,082,000 / 20,450,767,807.551025 = 0.076920
+   Note: operating free cash flow is arithmetic only and is not treated as sustainable cash profit because contract-liability growth contributed RMB8.865bn to operating cash inflow.
+9. Kept discounted net cash, discounted cash profit, operating business price, owner earnback years, and market-cap-to-cash-profit null, as required for a non-applicable ordinary earnback model.
+10. Recorded a market-cap currency limitation: input market cap did not explicitly identify currency. Protocol initialization treated it as CNY; if Tencent supplied HKD, dividend yield requires FX normalization.
+11. Wrote outputs/report.md as an operating narrative, separating reported facts, calculations, inference, and limitations; no buy/sell recommendation or target price was produced.
+12. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status ok, errors [].

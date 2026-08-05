@@ -1,88 +1,87 @@
 富维股份 600742.SH 2025 年股票研究 trace
 
-1. 协议和契约
-- 使用 stock-research skill。
-- 已读取 /workspace/.agents/skills/stock-research/SKILL.md。
-- 已读取 /workspace/.agents/skills/stock-research/references/result-contract.md。
-- 已读取 /workspace/.agents/skills/stock-research/references/report-contract.md。
-- 补充读取 /workspace/.agents/skills/stock-research/references/data-reuse.md，用于确认本地事实包复用边界。
+1. 协议与初始化
+- 使用 /workspace/.agents/skills/stock-research/SKILL.md。
+- 已完整读取 references/result-contract.md、references/report-contract.md。
+- 为确认复用边界，补充读取 references/data-reuse.md。
+- 执行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- 所有复杂结果分区均通过 protocol set 写入，未从零手写完整 JSON。
 
-2. 初始化和验证
-- 运行协议初始化：
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- 使用协议 set 命令写入 valuation、metrics、financials、asset_analysis、owner_earnback、dividend、business、risks、evidence、data_quality。
-- 运行协议验证：
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-- 验证结果：status=ok，errors=[]。
+2. 复用来源
+- config/input.json
+- stock_report/data/analysis/annual_review/600742.SH/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/600742.SH/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/600742.SH/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/600742.SH/2025-12-31/metadata.json
+- stock_report/data/raw/filings/600742.SH/2025-12-31/600742_2025_annual.txt
+- stock_report/data/analysis/stock_research/600742.SH/2025-12-31/result.json（历史研究仅作线索和可复用事实）
+- stock_report/data/notes/user_stock_evaluations.md（仅作主观风险备注）
 
-3. 复用的数据文件
-- config/input.json。
-- stock_report/data/analysis/annual_review/600742.SH/2025-12-31/facts.json。
-- stock_report/data/normalized/facts/600742.SH/2025-12-31/annual-facts.json。
-- stock_report/data/analysis/annual_review/600742.SH/2025-12-31/annual_facts.md。
-- stock_report/data/analysis/annual_review/600742.SH/2025-12-31/extraction_trace.txt。
-- stock_report/data/raw/filings/600742.SH/2025-12-31/metadata.json。
-- stock_report/data/raw/filings/600742.SH/2025-12-31/600742_2025_annual.txt。
-- stock_report/data/notes/user_stock_evaluations.md。
-
-4. 关键来源
-- 原始年报：长春富维集团汽车零部件股份有限公司2025年年度报告。
-- 上交所公告 PDF URL：https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-23/600742_20260423_CY5L.pdf。
+3. 原始披露定位
+- 上交所年报 PDF：https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-23/600742_20260423_CY5L.pdf
 - 年报第6页：2023-2025主要会计数据。
-- 年报第7-8页：非经常性损益和交易性金融资产公允价值计量项目。
 - 年报第12-13页：主营业务分行业、分产品、分地区。
 - 年报第38-39页：利润分配和最近三年现金分红。
-- 年报第73-74页：合并资产负债表。
+- 年报第73-79页：合并资产负债表、利润表。
 - 年报第81-82页：合并现金流量表。
-- 年报第115-116页：货币资金、交易性金融资产附注。
-- 年报第152页、第157-158页：短期借款、一年内到期非流动负债、长期借款、租赁负债。
-- 年报第170页：财务费用和投资收益，结构性存款持有收益。
-- 年报第184页：所有权或使用权受限资产。
+- 年报第115-116页：货币资金、交易性金融资产。
+- 年报第152、157-158页：借款与租赁负债。
+- 年报第170页：投资收益及结构性存款持有收益。
+- 年报第184页：受限资产。
 
-5. 核心财报数字
-- 营业收入：19,867,847,784.24 元。
-- 营业成本：17,725,377,875.62 元。
-- 毛利：2,142,469,908.62 元。
-- 归母净利润：465,090,417.84 元。
-- 扣非归母净利润：428,585,061.03 元。
-- 经营现金流：1,407,805,733.92 元。
-- 资本开支：934,586,964.30 元。
-- 经营自由现金流：473,218,769.62 元。
-- 总资产：22,803,102,654.86 元。
-- 总负债：12,741,269,511.85 元。
-- 归母权益：8,444,248,055.00 元。
+4. 财报模型复核
+- 业务是汽车零部件设计、生产和销售，资产负债表现为普通制造业资金、应收、存货、固定资产、供应链应付和少量借款。
+- 不存在客户存款、保险准备金、预售监管资金、项目收费权等特殊财报结构。
+- statement_model=ordinary_operating。
+- owner_earnback_applicability=applicable。
 
-6. 行情和估值口径
-- 市值：5,424,000,000.00 元。
-- 市值时间：2026-07-23 16:14:47+08:00。
-- 市值来源：年度事实包 extraction_trace，Tencent qt.gtimg.cn quote_time=20260723161447。
-- PE TTM：11.662248440186012，由市值除以 2025 年归母净利润计算。
+5. 核心财务数据（人民币元）
+- 总资产 22,803,102,654.86。
+- 总负债 12,741,269,511.85。
+- 总权益 10,061,833,143.01。
+- 归母权益 8,444,248,055.00。
+- 营业收入 19,867,847,784.24。
+- 营业成本 17,725,377,875.62。
+- 毛利 2,142,469,908.62；毛利率 0.10783603397241122。
+- 合并净利润 761,652,878.67。
+- 归母净利润 465,090,417.84；归母净利率 0.02340919977295824。
+- 扣非归母净利润 428,585,061.03。
+- 经营现金流 1,407,805,733.92。
+- 资本开支 934,586,964.30。
+- 经营自由现金流 473,218,769.62。
 
-7. 控股回本主口径
-- 未受限货币资金 = 9,085,644,851.55 - 362,521,168.57 = 8,723,123,682.98 元。
-- 未受限货币资金折后 = 8,723,123,682.98 * 0.90 = 7,850,811,314.68 元。
-- 结构性存款折后 = 336,000,000.00 * 0.70 = 235,200,000.00 元。
-- 有息借款扣除 = 35,032,809.74 + 41,947,952.02 + 220,800,617.37 = 297,781,379.13 元。
-- 必要经营现金 = 1,500,000,000.00 元。
-- 现金抽取摩擦准备 = 200,000,000.00 元。
-- 折后可剥离净资金 = 6,088,229,935.55 元。
-- 折前现金利润 = min(428,585,061.03, 473,218,769.62) - 6,676,783.98 = 421,908,277.05 元。
-- 利润折扣 = 0.80。
-- 折后可持续现金利润 = 337,526,621.64 元。
-- 经营业务购买价 = 5,424,000,000.00 - 6,088,229,935.55 = -664,229,935.55 元。
-- 回本年 = -664,229,935.55 / 337,526,621.64 = -1.9679334694329866。
-- 市值/现金利润 = 5,424,000,000.00 / 337,526,621.64 = 16.069843538993922。
+6. 行情
+- 市值 5,588,000,000.00。
+- 时间 20260731114331。
+- 来源 Tencent qt.gtimg.cn。
+- PE TTM 12.47。
 
-8. 分红
-- 2025 年每 10 股派息 5.20 元。
-- 2025 年现金分红合计 386,390,097.60 元。
-- 2025 年分红占归母净利润 83.08%。
-- 2023-2025 三年现金分红累计 832,224,825.60 元，三年现金分红比例 167.07%。
-- 预测分红率 = 386,390,097.60 / 5,424,000,000.00 = 0.07123711238938053。
+7. 控股回本计算
+- 未受限货币资金 = 9,085,644,851.55 - 362,521,168.57 = 8,723,123,682.98。
+- 折后现金 = 8,723,123,682.98 × 0.90 = 7,850,811,314.68。
+- 折后结构性存款 = 336,000,000.00 × 0.70 = 235,200,000.00。
+- 有息借款扣除 = 297,781,379.13。
+- 必要经营现金 = 1,500,000,000.00。
+- 现金抽取摩擦准备 = 200,000,000.00。
+- 折后可剥离净现金 = 6,088,229,935.55。
+- 折前现金利润 = min(428,585,061.03, 473,218,769.62) - 6,676,783.98 = 421,908,277.05。
+- 折后现金利润 = 421,908,277.05 × 0.80 = 337,526,621.64。
+- 经营业务购买价 = 5,588,000,000.00 - 6,088,229,935.55 = -500,229,935.55。
+- 回本年 = -500,229,935.55 / 337,526,621.64 = -1.4820458698026395。
+- 市值/现金利润 = 5,588,000,000.00 / 337,526,621.64 = 16.55573113862427。
+- 折后净现金/市值 = 1.0895185997763064。
 
-9. 数据限制
-- 市值不是本次实时重新抓取，而是复用 2026-07-23 16:14:47+08:00 的行情快照。
-- 年报未披露货币资金在母公司、非全资子公司和合资公司之间的完整分布。
-- 结构性存款未逐笔披露期限、底层条款和是否全部对应募集资金现金管理。
-- 2023 年资本开支未在单份 2025 年年报中直接列出，三年自由现金流只完整覆盖 2024-2025。
-- 用户评价文件中的“业务竞争激烈，可能转盈为亏”为主观备注，不替代年报事实。
+8. 分红情景
+- 2025年度现金分红合计 386,390,097.60。
+- 以该金额持平作为预测基准情景，不视为公司承诺。
+- 预测分红率 = 386,390,097.60 / 5,588,000,000.00 = 0.06914640257695061。
+
+9. 限制
+- 未披露现金在母公司、非全资子公司和合资公司之间的完整分布。
+- 结构性存款未逐笔披露期限、底层条款和用途。
+- 2023年资本开支未在单份2025年报中直接取得。
+- 用户“可能转盈为亏”的评价是主观判断，不作为财报事实。
+
+10. 验证
+- 执行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- 最终验证结果：status=ok，errors=[]。

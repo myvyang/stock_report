@@ -1,0 +1,60 @@
+stock-research trace
+company: 铁大科技 (920541.BJ)
+period: 2025-12-31 annual
+generated_at_input: 2026-08-03T11:23:06+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields only through protocol set/append commands.
+5. Initial completed JSON validation: status=ok, errors=[]
+
+[reuse audit]
+- Checked stock_report/data/raw/filings/920541.BJ/2025-12-31: absent.
+- Checked stock_report/data/analysis/annual_review/920541.BJ/2025-12-31: absent.
+- Checked stock_report/data/normalized/facts/920541.BJ/2025-12-31: absent.
+- Checked stock_report/data/analysis/stock_research/920541.BJ/2025-12-31: absent.
+- Only stock_report/data/notes/user_stock_evaluations.md existed; no company fact package was reusable.
+
+[sources]
+- 铁大科技2025年年度报告全文，披露日期2026-04-21，年报指向北京证券交易所；公开全文镜像：
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12134839&stockid=920541
+- 铁大科技2025年年度报告摘要，披露日期2026-04-21：
+  https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12134838&stockid=920541
+- config/input.json: market cap CNY 1,310,000,000; snapshot 20260731153820; source Tencent qt.gtimg.cn; PE TTM 17.74.
+
+[key extraction]
+- Revenue 339,136,148.12; cost of sales 176,999,518.13; gross profit computed 162,136,629.99.
+- Parent net profit 70,614,649.98; operating profit 80,191,508.98.
+- Total assets 719,930,183.53; liabilities 252,393,630.75; parent equity 467,536,552.78; minority interest 0.
+- Operating cash flow 47,008,252.24; capex 15,238,315.55; operating FCF computed 31,769,936.69.
+- Cash 80,808,851.72; one-year non-current liability 4,304,725.17.
+- Receivables/inventory/contract-heavy operating current assets and customer concentration were taken from annual report operating review and statements.
+- Proposed 2025 dividend: CNY 0.20/share x 136,700,000 shares = CNY 27,340,000.
+
+[formula audit]
+- gross_margin = 162,136,629.99 / 339,136,148.12 = 0.4781 (rounded).
+- net_margin = 70,614,649.98 / 339,136,148.12 = 0.2082 (rounded).
+- discounted_net_cash = 80,808,851.72 x 50% - 4,304,725.17 = 36,099,699.40.
+- discounted_net_cash_to_market_cap = 36,099,699.40 / 1,310,000,000 = 0.0275570.
+- operating_free_cash_flow = 47,008,252.24 - 15,238,315.55 = 31,769,936.69.
+- discounted_cash_profit = 31,769,936.69 x 90% = 28,592,943.021.
+- operating_business_price = 1,310,000,000 - 36,099,699.40 = 1,273,900,300.60.
+- owner_earnback_years = 1,273,900,300.60 / 28,592,943.021 = 44.553 (rounded).
+- market_cap_to_cash_profit = 1,310,000,000 / 28,592,943.021 = 45.816 (rounded).
+- forecast_dividend_yield = 27,340,000 / 1,310,000,000 = 0.0208702.
+
+[judgment boundaries]
+- statement_model confirmed ordinary_operating: products/services and operating working capital dominate; no special financial statement model applies.
+- Cash haircut is analyst judgment, not a reported fact. It preserves half of cash for working capital and operating safety.
+- Sustainable cash-profit haircut is analyst judgment. It starts from reported single-year FCF and applies 10% for receivable growth, customer concentration, and cash-flow volatility.
+- Long-term equity investment and investment property are excluded from detachable cash because liquid realization and control-level separability are not established.
+- No recommendation or target price produced.
+
+[final checks]
+- Final protocol validation: status=ok, errors=[].
+- Independently recalculated gross profit, free cash flow, operating business price, earnback years, market-cap/cash-profit, and dividend yield; all matched stored values within rounding tolerance.
+- Confirmed data_quality.status=complete, incomplete_reasons is empty, evidence and both asset/liability analyses are populated.
+- Confirmed outputs/result.json, outputs/report.md, and outputs/trace.txt are non-empty.

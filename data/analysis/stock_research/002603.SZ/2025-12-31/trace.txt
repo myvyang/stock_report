@@ -1,0 +1,78 @@
+stock-research trace
+company: 002603.SZ 以岭药业
+period: 2025-12-31 annual
+generated_for_input: config/input.json
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full, as explicitly requested.
+3. Read references/data-reuse.md because no local fact package was available and reuse boundaries were relevant.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields with repeated protocol `set` commands; the complex result object was not handwritten from scratch.
+6. Validated outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[local reuse audit]
+- Checked stock_report/data/analysis/annual_review/002603.SZ/2025-12-31: no fact package present.
+- Checked stock_report/data/raw/filings/002603.SZ/2025-12-31: no local filing present.
+- Checked stock_report/data/analysis/stock_research/002603.SZ/2025-12-31: no prior research result present.
+- Therefore retrieved the official annual report from the company website.
+
+[primary sources]
+1. 石家庄以岭药业股份有限公司2025年年度报告
+   issuer annual-report page: https://www.yiling.cn/%E5%B9%B4%E5%BA%A6%E6%8A%A5%E5%91%8A/
+   PDF: https://cncdn.yiling.com/uploads/2026/04/以岭药业2025年年度报告_2c39a2fad44adf9.pdf
+   disclosed: 2026-04-28; audit report dated 2026-04-27
+   used for: business, financial statements, segment/product data, cash restrictions, debt, R&D, dividends, risks.
+2. 石家庄以岭药业股份有限公司2025年年度权益分派实施公告
+   issuer announcements page: https://www.yiling.cn/slt/
+   published: 2026-06-09
+   used for: confirmation that the RMB 0.50/share final dividend was implemented after the balance-sheet date and before the market-cap date.
+3. Tencent qt.gtimg.cn snapshot embedded in config/input.json
+   timestamp: 2026-07-31 11:43:30 Asia/Shanghai
+   market cap: CNY 28,018,000,000
+   PE TTM: 20.46
+
+[statement model]
+- Confirmed ordinary_operating.
+- Reason: revenue is pharmaceutical manufacturing; assets are cash, receivables, inventory, production and R&D assets. No customer deposits, insurance reserves, regulated presale funds, project concession rights or other special-model balance-sheet items.
+- owner_earnback applicability: applicable.
+
+[core extracted facts, CNY]
+- revenue: 7,830,737,438.74
+- cost of sales: 2,797,410,173.75
+- gross profit: 5,033,327,264.99 (calculated)
+- parent net profit: 1,286,478,662.67
+- recurring parent net profit: 1,221,723,222.61
+- operating cash flow: 1,776,508,378.47
+- capex (cash paid to acquire/build long-term assets): 245,617,151.14
+- operating free cash flow: 1,530,891,227.33 (calculated)
+- total assets: 13,674,998,496.95
+- total liabilities: 2,693,101,474.16
+- total equity: 10,981,897,022.79
+- parent equity: 10,989,102,712.08
+- cash: 1,104,952,885.33
+- restricted cash: 28,261,328.70
+- trading financial assets / wealth-management products: 764,422,789.94
+- current and non-current bank borrowings: zero
+- current non-current liabilities plus lease liabilities: 25,738,174.88
+- final dividend implemented after year-end: 835,352,688.00
+
+[calculations and judgments]
+- gross margin = (revenue - cost of sales) / revenue = 0.6427654234.
+- net margin = parent net profit / revenue = 0.1642857614.
+- sustainable cash profit starts from recurring parent net profit, then applies a 10% prudence discount because 2024 was loss-making and 2025 respiratory revenue rebounded 153.71%.
+- discounted sustainable cash profit = 1,221,723,222.61 * 90% = 1,099,550,900.349.
+- cash timing adjustment: balance-sheet cash is pre-final-dividend while market cap is post-final-dividend. Deducted CNY 835,352,688 final dividend before applying a 50% operating-liquidity haircut.
+- discounted detachable net cash = (cash - restricted cash - final dividend) * 50% + wealth-management products * 90% - lease/current non-current liabilities = 782,911,770.381.
+- operating business price = market cap - discounted detachable net cash = 27,235,088,229.619.
+- owner earnback years = operating business price / discounted sustainable cash profit = 24.769283733.
+- market cap / cash profit = 25.481312408.
+- forecast dividend uses the implemented 2025 final distribution only: 835,352,688 / 28,018,000,000 = 2.9814858%. It is a baseline, not a promise.
+
+[data limitations]
+- Market cap date and reporting date differ by seven months. The known final dividend was adjusted, but 2026 H1 operating cash flow and other balance-sheet movements were not incorporated.
+- Industry positions from Minet and the MIIT ranking are cited by the issuer annual report; underlying databases were not independently reproduced.
+- Cash and sustainable-profit discounts are explicit analytical judgments and must be revisited with subsequent annual results.

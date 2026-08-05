@@ -1,0 +1,18 @@
+2026-08-03 stock research trace — 00086.HK — FY2025
+
+1. Read stock-research/SKILL.md, result-contract.md, report-contract.md and data-reuse.md in full.
+2. Ran protocol init with config/input.json to create outputs/result.json.
+3. Checked the configured annual-review, normalized-facts and raw-filing paths. No local 2025 facts package or filing existed, so official disclosure retrieval was required under data-reuse.md.
+4. Located HKEX issuer title-search page for stock 00086 and identified:
+   - 2025 final-results announcement, released 2026-03-19:
+     https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0319/2026031901260.pdf
+   - 2025 annual report, released 2026-04-13:
+     https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0413/2026041300464.pdf
+   - Company 2025 results presentation:
+     https://www.shkco.com/pdf/reports/ARP_2025_EN.pdf?v=1
+5. Model verification: filing segments are Consumer Finance, Mortgage Loans, Investment Management, Alternative Solutions, and Group Management and Support. No brokerage segment is reported. Overrode input hint financial_brokerage with platform_financial_mixed. Ordinary owner earnback is requires_special_model because loans, investments, borrowings, notes and liquidity are operating balance-sheet items.
+6. Core source figures (HK$ million): total assets 38,708.8; liabilities 13,176.9; total equity 25,531.9; parent equity 22,338.2; total revenue 3,705.2; total income 5,473.6; net profit 1,815.3; parent profit 1,593.1. Segment PBT: Consumer Finance 793.5; Mortgage 6.6; Investment Management 1,826.4; Alternative Solutions 63.1; Group Management and Support -679.3. Net impairment loss 1,089.6. ROE 7.3%; ROA 4.8%; net gearing 25.8%; total AUM about US$3.2bn.
+7. Currency conversion: result contract requires absolute CNY. Used 2025-12-31 CNY central parity, HKD 1 = CNY 0.90322, for all filing amounts. This is a presentation conversion, not a restatement of the audited HKD accounts. Source cross-check: Xinhua/CFETS release, https://www1.xinhuanet.com/20251231/fe9f6466f6884589b5287e6ee946baed/c.html
+8. Dividend scenario: maintained FY2025 HK$0.27/share (HK$0.12 interim + HK$0.15 second interim). Using approximately 1,957.0m shares gives HK$528.4m, translated to CNY477,261,448. Forecast yield = 477,261,448 / 6,951,490,729.218125 = 0.06865599. This is a baseline scenario, not guidance.
+9. Left all ordinary owner-earnback fields null. Also left gross margin, net margin, and cash-flow metrics null because financial-platform revenue presentation and balance-sheet deployment make ordinary operating-company ratios misleading.
+10. Populated result fields through protocol set commands, then ran protocol validate.

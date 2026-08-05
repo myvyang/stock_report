@@ -1,0 +1,69 @@
+Stock research trace — JILL
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Instructions and contracts
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md, report-contract.md, and data-reuse.md.
+- Initialized outputs/result.json with the protocol CLI from config/input.json.
+
+2. Reuse audit
+- Checked the configured raw filing, annual review, normalized facts, and prior stock-research paths.
+- No JILL filing, annual facts package, or prior research result existed locally; only the user evaluation notes file existed.
+- Therefore retrieved primary company/SEC disclosure rather than relying on third-party financial statements.
+
+3. Period resolution
+- Input period: 2025-12-31, report_type annual.
+- J.Jill uses a 52/53-week fiscal year ending on the Saturday closest to January 31.
+- SEC FY2025 10-K defines FY2025 as the 52 weeks ended 2026-01-31.
+- Research maps the requested 2025 annual period to company FY2025 and discloses the one-month fiscal-calendar mismatch.
+
+4. Primary sources
+- SEC Form 10-K, filed 2026-03-31:
+  https://www.sec.gov/Archives/edgar/data/1687932/000119312526134566/jill-20260131.htm
+- Company FY2025 results and FY2026 outlook, dated 2026-03-31:
+  https://investors.jjill.com/Investors-Relations/News-Events/News/News-details/2026/J-Jill-Inc--Announces-Fourth-Quarter-and-Full-Year-2025-Results/default.aspx
+- Market snapshot reused from config/input.json: Yahoo Finance yfinance, 2026-08-03.
+
+5. Model determination
+- Confirmed ordinary_operating/applicable.
+- Reason: branded apparel retailer selling through owned ecommerce/catalog and leased stores; no banking, insurance, property development, concession, or investment-holding balance-sheet economics.
+
+6. Currency normalization
+- SEC statements are USD thousands; output contract requires absolute CNY yuan.
+- Input provided no FX rate. Applied a single disclosed research conversion of USD 1 = CNY 7.00 to all statement, dividend, and forecast amounts.
+- Margins and operating ratios are unaffected.
+
+7. Core extracted USD facts (thousands unless noted)
+- Assets 450,216; liabilities 328,717; equity/parent equity 121,499; minority interest 0.
+- Revenue 596,549; cost of goods sold 186,804; gross profit 409,745; operating income 50,610; net/parent net income 27,891.
+- CFO 42,144; capex 18,915; operating FCF 23,229; financing cash flow -17,641.
+- Cash 41,015; inventory 70,066; interest-bearing debt 73,310 book value; operating lease liabilities 151,490.
+- FY2025 dividends paid 4,859; repurchases 10,365.
+- FY2026 company outlook: FCF approximately 20,000; capex approximately 25,000.
+
+8. Formula trail
+- Gross margin = 409,745 / 596,549 = 0.6868574649.
+- Net margin = 27,891 / 596,549 = 0.0467539104.
+- Discounted cash = USD 41.015m × 50% × 7.00 = CNY 143,552,500.
+- Debt deduction = USD 73.310m × 100% × 7.00 = CNY 513,170,000.
+- Discounted detachable net cash = 143,552,500 - 513,170,000 = CNY -369,617,500.
+- Sustainable cash profit anchor = FY2026 outlook USD 20m × 7.00 = CNY 140,000,000.
+- 15% risk discount = CNY 21,000,000; discounted sustainable cash profit = CNY 119,000,000.
+- Operating business price = 1,838,255,001.9208374 - (-369,617,500) = CNY 2,207,872,501.9208374.
+- Owner earnback = 2,207,872,501.9208374 / 119,000,000 = 18.5535504363 years.
+- Market cap/cash profit = 1,838,255,001.9208374 / 119,000,000 = 15.4475210245.
+- Forecast annual dividend = USD 0.36 × 14,865,040 shares × 7.00 = CNY 37,459,900.80.
+- Forecast dividend yield = 37,459,900.80 / 1,838,255,001.9208374 = 0.020378 (rounded in result).
+
+9. Judgment boundaries
+- 50% cash haircut reflects required retail working liquidity; it is a conservative analytical assumption, not a company disclosure.
+- 15% profit haircut reflects sales, promotion, tariff, inventory, and expansion uncertainty; it is a scenario assumption.
+- No tariff refund is recognized.
+- Forecast dividends depend on board action and share count.
+- No recommendation, target price, or ranking label was produced.
+
+10. Output process and validation
+- outputs/result.json populated using protocol CLI set/append commands, not hand-written from scratch.
+- outputs/report.md and outputs/trace.txt written as human-readable outputs.
+- Protocol validation completed: status=ok, errors=[].
+- JSON parse check completed successfully; no null fields or legacy ranking labels remain in the result.

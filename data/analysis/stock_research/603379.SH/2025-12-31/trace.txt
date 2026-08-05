@@ -1,0 +1,73 @@
+stock-research trace
+company: 三美股份 (603379.SH)
+period: 2025-12-31 annual
+generated for task: 2026-08-01 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked configured raw filing, annual review and normalized fact paths.
+- No filing metadata, facts.json, annual_facts.md or normalized fact file was present in the workspace.
+- Therefore public filing retrieval was required.
+
+3. Sources
+- Primary filing URL identified from the Shanghai Stock Exchange:
+  https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-28/603379_20260428_2I5N.pdf
+- Direct download returned the exchange anti-bot challenge rather than the PDF.
+- Filing text was read through the searchable public mirror:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12209778&stockid=603379
+- Annual-report summary cross-check:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12209768&stockid=603379
+- Market-cap and PE source was not re-fetched; values were reused from config/input.json:
+  Tencent qt.gtimg.cn, timestamp 20260731114330.
+
+4. Financial facts captured (CNY yuan)
+- revenue: 5,849,546,738.26
+- cost of sales: 2,889,779,107.80
+- gross profit: 2,959,767,630.46
+- operating profit: 2,585,592,051.02
+- consolidated net profit: 2,044,194,714.99
+- parent net profit: 2,061,141,136.65
+- operating cash flow: 2,160,886,170.57
+- capital expenditure: 1,357,093,312.24
+- operating free cash flow: 803,792,858.33
+- total assets: 9,823,489,497.31
+- total liabilities: 1,622,316,318.77
+- total equity: 8,201,173,178.54
+- parent equity: 8,095,521,137.65
+- minority interest: 105,652,040.89
+
+5. Model decision
+- Confirmed ordinary_operating / applicable.
+- Reason: manufacturing and selling fluorochemical products; balance sheet contains ordinary cash, receivables, inventory, plant, construction in progress and project debt. No special-model customer funds, insurance reserves, regulated presale cash, concession assets or holding-company structure.
+
+6. Derived metrics
+- gross margin = 2,959,767,630.46 / 5,849,546,738.26 = 0.5063738663
+- net margin = 2,061,141,136.65 / 5,849,546,738.26 = 0.3523604913
+- operating FCF = 2,160,886,170.57 - 1,357,093,312.24 = 803,792,858.33
+- disclosed 2025 cash dividend = 927,928,136.24
+- static dividend yield = 927,928,136.24 / 36,122,000,000 = 0.0256887268
+
+7. Owner earnback assumptions
+- Cash after restriction: 2,564,970,755.87; applied 50% due to 2.201bn construction in progress and 1.357bn annual capex.
+- Trading financial assets: 1,121,345,033.05; applied 90% liquidity/valuation factor.
+- Interest-bearing and lease liabilities: 620,502,549.71; deducted at 100%.
+- Discounted detachable net cash: 1,671,193,358.00.
+- Sustainable cash profit starts from 2025 parent net profit, removes non-recurring gains, applies explicit 744.405m refrigerant-cycle normalization and a 50m maintenance/working-capital safety buffer.
+- Discounted sustainable cash profit: 1,250,000,000.00.
+- Operating business price: 36,122,000,000 - 1,671,193,358 = 34,450,806,642.
+- Owner earnback: 34,450,806,642 / 1,250,000,000 = 27.5606453136 years.
+- Market cap / cash profit: 28.8976 years.
+- Cycle normalization and cash discounts are analyst assumptions, not reported facts or company guidance.
+
+8. Protocol operations and validation
+- Populated result fields using repeated protocol CLI `set` operations; the complex result object was not hand-written from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report completion: status ok, errors [].
+

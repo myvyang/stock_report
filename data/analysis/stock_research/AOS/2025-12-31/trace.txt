@@ -1,0 +1,76 @@
+task=AOS annual stock research
+period=2025-12-31
+generated_at=2026-08-04T22:15:31+08:00
+
+[protocol]
+initialized=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+population=protocol set/append commands only; result.json was not handwritten
+validation=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[reuse]
+annual_facts_json=not found
+annual_facts_md=not found
+prior_stock_research=not found
+decision=extract from primary public filings because no reusable local fact package existed
+
+[primary_sources]
+1=https://www.sec.gov/Archives/edgar/data/91142/000009114226000008/aos-20251231.htm
+  type=SEC Form 10-K
+  accession=0000091142-26-000008
+  filed=2026-02-10
+  used_for=business model, segments, balance sheet, income statement, cash flow, debt, acquisition, guidance, risks
+2=https://investor.aosmith.com/news-releases/news-release-details/o-smith-reports-record-2025-diluted-earnings-share-eps-385-and
+  type=company earnings release
+  date=2026-01-29
+  used_for=2025 cross-check and 2026 guidance
+3=https://investor.aosmith.com/stocks/dividend-history
+  type=company dividend history
+  accessed=2026-08-04
+  used_for=2026 quarterly dividend declarations
+4=https://fred.stlouisfed.org/series/DEXCHUS
+  type=Federal Reserve Bank of St. Louis / Federal Reserve daily FX series
+  observation=2025-12-31 USD/CNY 6.9931
+  used_for=all USD-to-CNY conversions
+5=config/input.json market_cap block
+  type=Yahoo Finance yfinance snapshot supplied by task input
+  observation=market cap CNY 55145892338.54736; PE TTM 16.749304; date 2026-08-03
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=manufacturer of water heaters, boilers and water treatment products; working capital and productive assets are separable from financing debt; no special financial-statement model applies
+
+[currency]
+fx=6.9931 CNY per USD
+fx_date=2025-12-31
+method=all reported USD amounts multiplied by 6.9931 and 1,000,000
+limitation=income-statement and cash-flow amounts use period-end rather than annual-average FX for protocol comparability
+
+[core_calculations]
+gross_margin=1487.4/3830.2=0.388334812803509
+net_margin=546.2/3830.2=0.14260351939846486
+operating_free_cash_flow_usd_m=616.8-70.8=546.0
+discounted_net_cash_usd_m=174.5*0.50+18.7*0.80-155.0-470.0=-522.79
+discounted_net_cash_cny=-522.79*6993100=-3655922749
+discounted_cash_profit_usd_m=525.0*0.90=472.5
+discounted_cash_profit_cny=472.5*6993100=3304239750
+operating_business_price_cny=55145892338.54736-(-3655922749)=58801815087.54736
+owner_earnback_years=58801815087.54736/3304239750=17.79586819859163
+market_cap_to_cash_profit=55145892338.54736/3304239750=16.68943433615777
+forecast_share_count_m=195.7/1.38=141.8115942
+forecast_dividend_usd_m=141.8115942*1.44=204.2086957
+forecast_dividend_cny=1428051829.57
+forecast_dividend_yield=1428051829.57/55145892338.54736=0.02589588759935614
+
+[judgment_notes]
+cash_haircut=50%; maintains operating liquidity and recognizes overseas/tax constraints
+marketable_securities_haircut=80%; short-term deposits but mainly China/Hong Kong
+debt_haircut=100%
+post_balance_sheet_adjustment=include USD470m January 2026 acquisition loan because valuation snapshot is August 2026
+cash_profit_basis=low end of company 2026 FCF guidance, then additional 10% haircut
+dividend_basis=annualized USD0.36 quarterly rate; share count inferred from 2025 total cash dividend/per-share dividend
+
+[quality]
+status=complete
+known_limitations=period mismatch, estimated dividend share count, end-date FX translation, supplied third-party market snapshot

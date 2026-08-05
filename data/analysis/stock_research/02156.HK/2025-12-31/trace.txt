@@ -1,0 +1,62 @@
+Stock research trace — 02156.HK — period 2025-12-31
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- config/input.json existed.
+- No annual facts, normalized facts, prior stock-research result, filing metadata, or filing were present for 02156.HK/2025-12-31.
+- Downloaded official 2025 Annual Report to stock_report/data/raw/filings/02156.HK/2025-12-31/annual-report-2025.pdf and extracted a local text copy for review.
+
+3. Official sources
+- HKEX 2025 Annual Report, published 2026-04-30:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0430/2026043002000.pdf
+- HKEX Annual Results Announcement, published 2026-03-25:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0325/2026032501120.pdf
+- HKEX final dividend announcement, published 2026-03-25:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0325/2026032501188.pdf
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, dated 2026/08/03 09:45:42.
+
+4. Model determination
+- Input hint said financial_brokerage/requires_special_model.
+- Filing says the group provides property management, community value-added and synergy services, non-property-owner value-added services, and commercial property operation management.
+- Balance sheet contains ordinary service-company cash, receivables, payables, contract liabilities, leases, and minimal borrowing; no brokerage client funds, proprietary financial assets, or repo funding.
+- Overrode hint with ordinary_operating/applicable.
+
+5. Core extraction (RMB unless stated)
+- Revenue 3,880,549,000; cost of sales 3,057,316,000; gross profit 823,233,000.
+- Net profit 373,775,000; parent net profit 358,909,000.
+- Total assets 4,569,009,000; liabilities 2,511,154,000; equity 2,057,855,000; parent equity 2,006,742,000.
+- Operating cash flow 598,938,000.
+- PPE purchases 14,192,000 plus intangible purchases 4,570,000 = capex 18,762,000.
+- Operating FCF = 598,938,000 - 18,762,000 = 580,176,000.
+- Cash equivalents 3,414,435,000; restricted deposits separately stated 17,594,000; interest-bearing borrowing 9,006,000.
+- Proposed 2025 final + special dividend RMB254,394,000.
+
+6. Owner earnback assumptions and formulas
+- Cash haircut: 3,414,435,000 x 70% = 2,390,104,500.
+- Borrowing deduction: 9,006,000 x 100%.
+- Discounted detachable net cash = 2,381,098,500.
+- Sustainable cash profit starts from parent profit 358,909,000, removes approximately 61,680,000 after-tax net finance income, and applies a further prudence deduction 17,229,000; rounded result 280,000,000.
+- Operating business price = 3,143,923,351.380229 - 2,381,098,500 = 762,824,851.380229.
+- Owner earnback years = 762,824,851.380229 / 280,000,000 = 2.7243744692.
+- Market cap/cash profit = 3,143,923,351.380229 / 280,000,000 = 11.2282976835.
+- Forecast dividend yield = 254,394,000 / 3,143,923,351.380229 = 0.0809160948.
+
+7. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields through repeated protocol `set` commands; did not hand-write the JSON skeleton.
+- First completed validation result: status=ok, errors=[].
+- Final validation is run after report and trace creation; its result is recorded below when complete.
+
+8. Limitations
+- Market cap and PE are accepted from input and not independently reconstructed from HKEX historical trading data.
+- Cash haircut and sustainable cash profit are analytical estimates, not reported company facts.
+- PE TTM 9.2 differs from market cap / FY2025 parent profit (about 8.76x), likely because of timing or vendor methodology.
+
+FINAL_VALIDATION: ok — protocol returned status=ok and errors=[]; JSON syntax and non-empty report/trace checks also passed.

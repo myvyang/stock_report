@@ -1,0 +1,84 @@
+[2026-08-01 Asia/Shanghai] Task initialized
+- Input: config/input.json
+- Company: 美畅股份 (300861.SZ)
+- Period: 2025-12-31 annual
+- Required outputs: outputs/result.json, outputs/report.md, outputs/trace.txt
+
+[Protocol and contracts]
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md in full (107 lines).
+- Read references/report-contract.md in full (69 lines).
+- Read references/data-reuse.md because the selected skill routes reuse decisions through this reference.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+[Reuse audit]
+- Checked stock_report paths and outputs.
+- No 2025 annual facts, normalized facts, prior stock-research result, or raw filing existed for 300861.SZ.
+- Therefore fetched the official annual-report PDF from Shenzhen Stock Exchange disclosure storage:
+  https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-29/3739c4e0-6439-4aa4-94cf-8617a719cd51.PDF
+- Saved local source: stock_report/data/raw/filings/300861.SZ/2025-12-31/annual_report_2025.pdf
+- Local PDF text utility was unavailable; used the indexed official SZSE PDF text for page/line extraction and verification.
+
+[Model classification]
+- Confirmed statement_model=ordinary_operating.
+- Confirmed owner_earnback_applicability=applicable.
+- Basis: company manufactures and sells consumable diamond wire and operates tungsten recycling; balance sheet has production assets, receivables, inventory and proprietary financial assets, without customer deposits, insurance reserves, property presale funds, concession rights, or other special-model structures.
+
+[Official filing facts extracted]
+- Revenue: 2,160,324,701.34
+- Cost of sales: 1,654,017,519.47
+- Gross profit: 506,307,181.87
+- Parent net profit: 243,892,563.42
+- Deducted-nonrecurring parent net profit: 191,622,619.84
+- Operating cash flow: 169,851,261.53
+- Capital expenditure: 8,391,565.93
+- Operating free cash flow: 161,459,695.60
+- Total assets: 7,103,229,946.38
+- Total liabilities: 688,728,027.07
+- Parent/total equity: 6,414,501,919.31
+- Cash: 255,515,674.30
+- Trading financial assets: 1,969,412,085.36
+- Other debt investments: 960,042,169.88
+- Other equity instrument investments: 34,951,457.44
+- Accounts receivable: 1,278,730,142.36 (prior year 442,537,394.00)
+- Inventory: 722,080,416.69
+- Fixed assets: 742,265,777.19
+- Construction in progress: 204,035,566.18
+- Diamond wire revenue: 1,768,465,443.63; gross margin 8.93%; volume down 16.89%.
+- Recycled tungsten revenue: 354,344,124.69; gross margin 91.63%.
+- 2025 dividend proposal: 120,573,831.60, CNY 1.8 per 10 shares.
+
+[Calculated fields]
+- Gross margin = 506,307,181.87 / 2,160,324,701.34 = 0.23436624205423812.
+- Net margin = 243,892,563.42 / 2,160,324,701.34 = 0.11289625271086286.
+- Free cash flow = 169,851,261.53 - 8,391,565.93 = 161,459,695.60.
+- Forecast dividend yield = 120,573,831.60 / 10,723,000,000 = 0.011244412160775902.
+
+[Owner earnback judgments]
+- Cash: 100% of 255,515,674.30.
+- Trading financial assets: 90% of 1,969,412,085.36.
+- Other debt investments: 90% of 960,042,169.88.
+- Other equity investments: 50% of 34,951,457.44.
+- Lease-related liabilities deducted: 39,420,529.63.
+- Operating cash reserve deducted: 300,000,000.00.
+- Discounted detachable net cash: 2,570,079,703.106.
+- Rationale for operating reserve: roughly 27% of annual operating cash outflows, retained for purchases, payroll, taxes and cyclical volatility.
+- Discounted sustainable cash profit: 150,000,000.00.
+- Rationale: start from actual 2025 FCF of 161,459,695.60 and apply a further 11,459,695.60 haircut for diamond-wire volume/margin pressure, tungsten-price sensitivity, and unproven collection of expanded receivables. This is analyst judgment, not company guidance.
+- Operating business price = 10,723,000,000 - 2,570,079,703.106 = 8,152,920,296.894.
+- Owner earnback years = 8,152,920,296.894 / 150,000,000 = 54.35280197929334.
+- Market cap / cash profit = 10,723,000,000 / 150,000,000 = 71.48666666666666.
+
+[Quality and limitations]
+- Core statements, business mix, dividend proposal, market snapshot and formulas are present.
+- Market share is not disclosed in a reproducible form.
+- Financial-product maturities/restrictions were not fully penetrated; explicit haircuts and operating cash reserve are used.
+- Market cap and PE TTM were inherited from the requested input snapshot and not independently reconstructed.
+- Sustainable cash profit is a conservative normalized estimate and is sensitive to receivable collection, photovoltaic cycle and tungsten prices.
+
+[Protocol mutation and validation]
+- All complex result content was written through stock_analysis.stock_research.protocol set after protocol init; result.json was not hand-created from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]

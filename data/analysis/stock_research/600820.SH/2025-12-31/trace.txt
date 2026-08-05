@@ -1,0 +1,66 @@
+stock-research trace
+company: 600820.SH 上海隧道工程股份有限公司（隧道股份）
+period: 2025-12-31 annual
+generated_at: 2026-08-01 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- Expected annual facts and raw filing directories under stock_report were empty.
+- Sync target /root/aicode also contained no reusable 600820.SH/2025-12-31 files.
+- Therefore fetched the public 2025 annual-report PDF and saved it at:
+  stock_report/data/raw/filings/600820.SH/2025-12-31/2025-annual-report.pdf
+- PDF public mirror: https://stockmc.xueqiu.com/202604/600820_20260423_USLE.pdf
+- Cross-check HTML: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12139260&stockid=600820
+- The document identifies itself as 上海隧道工程股份有限公司2025年年度报告 and states SSE as the disclosure venue.
+
+3. Model verification
+- Input hint: construction_project / requires_special_model.
+- Verified from annual report:
+  * construction revenue CNY 45,618,057,289.39, 79.23% of segment revenue;
+  * contract assets CNY 51,635,623,612.51;
+  * accounts receivable CNY 22,898,928,953.38;
+  * long-term receivables CNY 29,779,471,381.16;
+  * disclosed debt financing CNY 42.627 billion;
+  * contract revenue recognized by performance progress; BT/BOT/PPP create long collection cycles.
+- Conclusion: ordinary detachable-net-cash owner earnback is not economically valid. All ordinary owner-earnback ranking fields remain null.
+
+4. Core financial extraction (CNY)
+- total_assets: 181,804,244,902.78
+- total_liabilities: 137,808,993,756.01
+- total_equity: 43,995,251,146.77
+- parent_equity: 40,953,058,353.76
+- minority_interest: 3,042,192,793.01
+- revenue: 57,927,229,927.95
+- cost_of_sales: 49,823,032,544.14
+- gross_profit: 8,104,197,383.81
+- parent_net_profit: 2,213,961,158.55
+- operating_cash_flow: 2,192,089,410.51
+- capital_expenditure proxy (purchase of fixed/intangible/other long-term assets): 1,683,304,908.50
+- simple operating_free_cash_flow: 508,784,502.01
+- Source: 2025 annual report consolidated statements and notes.
+
+5. Derived metrics
+- gross_margin = (57,927,229,927.95 - 49,823,032,544.14) / 57,927,229,927.95 = 0.13990307138611693
+- net_margin = 2,213,961,158.55 / 57,927,229,927.95 = 0.03821969670056258
+- disclosed 2025 full-year cash dividend = CNY 628,819,218.80
+- static dividend yield = 628,819,218.80 / 17,544,000,000 = 0.03584240873233014
+- market cap and PE TTM taken without alteration from config/input.json.
+
+6. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields with repeated protocol `set` commands; no complex JSON was handwritten from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+
+7. Quality notes
+- Core annual-report figures were extracted from the company's disclosed annual report and cross-checked against its public HTML rendering.
+- Market data is an input snapshot dated 2026-07-31 11:43:21, not independently recomputed.
+- The dividend yield is a static comparison of disclosed 2025 total dividend with the input market cap, not a future promise.
+- No owner earnback years are produced because the special construction/project model makes the ordinary formula inapplicable.

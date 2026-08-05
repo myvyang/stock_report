@@ -1,0 +1,121 @@
+Stock research trace: SFD / Smithfield Foods, Inc.
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md in full.
+- Read references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields using repeated protocol `set` commands. The complex JSON was not authored as a standalone object from scratch.
+
+2. Local data reuse check
+- config/input.json exists.
+- The referenced local filing, annual-review facts, annual_facts.md, extraction trace, and normalized facts did not exist under stock_report/ at research time.
+- No prior stock-research output for SFD was available for reuse.
+- Result was therefore rebuilt from primary public disclosures.
+
+3. Company identity and reporting period
+- Entity: Smithfield Foods, Inc.; Nasdaq ticker SFD; CIK 0000091388.
+- Input period: 2025-12-31.
+- Actual fiscal year end in Form 10-K: 2025-12-28 (52 weeks).
+- The result retains the protocol input period but reports the actual fiscal close in limitations and report text.
+
+4. Primary sources consulted
+- SEC Form 10-K filed 2026-03-24:
+  https://www.sec.gov/Archives/edgar/data/91388/000009138826000014/smf-20251228.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/91388/000009138826000014/0000091388-26-000014-index.htm
+- Smithfield FY2025 results release dated 2026-03-24:
+  https://investors.smithfieldfoods.com/news-events/press-releases/detail/1434/smithfield-foods-reports-record-fiscal-2025-results
+- Smithfield quarterly-dividend release dated 2026-04-30:
+  https://investors.smithfieldfoods.com/news-events/press-releases/detail/1443/smithfield-foods-declares-quarterly-dividend
+- Federal Reserve G.5A annual exchange rate (2025 average CNY/USD 7.1875):
+  https://www.federalreserve.gov/Releases///g5a/current/
+- Federal Reserve G.5 monthly exchange rate (December 2025 average CNY/USD 7.0432):
+  https://www.federalreserve.gov/releases/g5/20260302/
+- Market cap, date and PE TTM: config/input.json, labeled Yahoo Finance yfinance.
+
+5. Financial statement extraction (USD millions)
+Income statement, fiscal 2025:
+- Sales 15,531
+- Cost of sales 13,442
+- Gross profit 2,089
+- Operating profit 1,292
+- Net income 998
+- Net income attributable to Smithfield 987
+
+Balance sheet, 2025-12-28:
+- Cash and cash equivalents 1,539
+- Accounts receivable 1,023
+- Inventory 2,328
+- PP&E 3,226
+- Goodwill 1,623
+- Intangible assets 1,260
+- Total assets 12,177
+- Stated liabilities 5,112 (derived from listed liability rows)
+- Redeemable noncontrolling interests 264, presented outside equity
+- Smithfield shareholders' equity 6,801
+- Economic total equity used by protocol 7,065 = 6,801 + 264
+- Interest-bearing debt and finance leases 2,003 = current 3 + long-term 2,000
+
+Cash flow, fiscal 2025:
+- Operating cash flow from continuing operations 1,059
+- Capital expenditure 341
+- Operating free cash flow 718 = 1,059 - 341
+- Financing cash flow -164
+- Cash dividends paid 396
+
+6. Currency conversion
+- Protocol requires absolute CNY yuan.
+- Income statement, cash flow and dividend amounts converted at 2025 average 7.1875 CNY/USD.
+- Balance-sheet amounts converted at December 2025 monthly average 7.0432 CNY/USD because the fiscal close was 2025-12-28.
+- Ratios use the underlying USD figures where currency conversion cancels.
+
+Key converted figures (CNY yuan):
+- Revenue 111,629,062,500
+- Gross profit 15,014,687,500
+- Parent net profit 7,094,062,500
+- Total assets 85,765,046,400
+- Total liabilities 36,004,838,400
+- Economic total equity 49,760,208,000
+- Parent equity 47,900,803,200
+- Operating cash flow 7,611,562,500
+- Capital expenditure 2,450,937,500
+- Operating free cash flow 5,160,625,000
+
+7. Analysis model decision
+- Confirmed statement_model = ordinary_operating.
+- Confirmed owner_earnback_applicability = applicable.
+- Basis: food manufacturing and vertically integrated pork operations; ordinary inventory, PP&E, receivables, payables, debt and leases. No customer deposits, insurance reserves, regulated project cash, concession rights or equivalent special-model balance sheet structure.
+
+8. Formula calculations
+- Gross margin = 2,089 / 15,531 = 0.1345051832.
+- Net margin = 987 / 15,531 = 0.0635503187.
+- Cash at 80% = 1,539m USD * 7.0432 * 0.80 = CNY 8,671,587,840.
+- Debt at 100% = 2,003m USD * 7.0432 = CNY 14,107,529,600.
+- Discounted detachable net cash = 8,671,587,840 - 14,107,529,600 = CNY -5,435,941,760.
+- Input market cap = CNY 69,141,008,837.07422.
+- Operating business price = market cap - discounted net cash = CNY 74,576,950,597.07422.
+- Sustainable cash profit = CNY 5,160,625,000 * 90% = CNY 4,644,562,500.
+- Owner earnback years = 74,576,950,597.07422 / 4,644,562,500 = 16.0568300.
+- Market cap / cash profit = 69,141,008,837.07422 / 4,644,562,500 = 14.8864417.
+- Discounted net cash / market cap = -0.0786210941.
+- Forecast dividend = USD 1.25/share * 393,112,711 shares * 7.1875 = CNY 3,531,872,012.89.
+- Forecast dividend yield = 3,531,872,012.89 / 69,141,008,837.07422 = 0.0510821591.
+
+9. Judgment calls
+- Cash discount of 20%: reserves working capital/liquidity for commodity purchasing, inventory and ordinary operations.
+- Debt deduction of 100%: contractual financing claim.
+- Sustainable cash profit starts from reported operating free cash flow rather than adjusted EBITDA or net income.
+- A 10% aggregate haircut was applied because FY2025 operating profit was a record and Fresh Pork/Hog Production remain cyclical. This is an explicit scenario assumption, not a reported fact.
+- Operating leases, pension obligations and litigation provisions were explained but not added to interest-bearing debt in the owner-earnback formula to avoid mixing operating commitments with the protocol's detachable-net-cash convention. They remain limitations on future cash.
+
+10. Data-quality decision
+- status = complete because all ordinary-company minimum fields, business story, asset/liability explanations, dividend forecast, owner-earnback components and evidence are present.
+- Limitations disclose missing local facts packages, fiscal-date mismatch, FX translation, reliance on supplied market data, and single-year/cyclical cash-profit estimation.
+
+11. Validation
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Expected/observed final status: ok, errors: [].

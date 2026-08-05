@@ -1,0 +1,57 @@
+2026-08-05T03:21:31+08:00 stock-research trace
+
+1. Read skill and contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check:
+   - config/input.json found.
+   - No local raw filing metadata, annual facts, normalized facts, or prior research files found for WSFS/2025-12-31.
+   - Public primary-source retrieval was therefore required.
+
+3. Protocol initialization:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Primary sources used:
+   - SEC 2025 Form 10-K, accession 0000828944-26-000006, filed 2026-03-02, period 2025-12-31.
+     https://www.sec.gov/Archives/edgar/data/828944/000082894426000006/wsfs-20251231.htm
+   - WSFS 4Q/FY2025 official earnings release dated 2026-01-26.
+     https://investors.wsfsbank.com/news-and-events/press-releases/press-releases-details/2026/WSFS-Reports-4Q-2025-EPS-of-1-34-and-ROA-of-1-33-Results-Driven-by-Loan-and-Deposit-Growth-2025-Full-Year-EPS-of-5-09-and-ROA-of-1-36/
+   - Federal Reserve H.10 release dated 2026-01-05: 2025-12-31 CNY per USD = 6.9931.
+     https://www.federalreserve.gov/releases/h10/20260105/
+   - Market cap, market-cap date, source, and PE TTM were reused from config/input.json.
+
+5. Model decision:
+   - Overrode input hint ordinary_operating/applicable.
+   - Confirmed financial_bank/requires_special_model because deposits fund loans and securities, and regulatory capital/liquidity constrain distributions.
+   - Ordinary owner-earnback fields intentionally remain null.
+
+6. Currency conversion:
+   - All filing amounts were reported in USD and converted to absolute CNY yuan at 6.9931 CNY/USD.
+   - Formula: USD thousands * 1,000 * 6.9931.
+   - This uses a single period-end translation rate for protocol consistency; it is not IFRS/GAAP translation accounting.
+
+7. Key extracted USD facts:
+   - Assets 21,314.076m; liabilities 18,586.001m; total equity 2,728.075m; WSFS equity 2,738.545m; NCI -10.470m.
+   - Net interest income 726.087m; noninterest income 339.898m; provision 49.206m; parent net income 287.349m.
+   - Deposits 17,642.488m; net loans/leases 13,082.027m; AFS securities 3,542.246m; HTM securities 968.331m; cash/restricted cash 1,699.154m.
+   - NIM 3.87%; ROA 1.36%; ROE 10.7%; CET1 13.92%; total risk capital 15.67%.
+   - NPA 72.098m and NPA/assets 0.34%; loan ACL 179.647m and ACL/gross loans 1.36%.
+   - 2025 cash dividends 37.166m; buybacks disclosed by company as 287.5m; total capital returned 324.7m.
+   - Uninsured deposits 7.1bn/40%; uninsured and uncollateralized deposits 5.3bn/30%.
+
+8. Dividend forecast:
+   - Annualized $0.17 quarterly dividend = $0.68/share.
+   - Shares outstanding at 2026-02-23 = 52,732,172.
+   - Forecast = $35,857,876.96 = CNY 250,757,719.37.
+   - Yield = 0.0090166076 on input market cap CNY 27,810,650,250.66797.
+
+9. Data-quality judgment:
+   - complete for the special bank model under result-contract minimums.
+   - Gross margin and ordinary cash-flow/free-cash-flow metrics are null because they lack comparable economic meaning for a bank, not because sources are missing.
+   - Input valuation was not independently reconstructed; limitation recorded.
+
+10. Final validation command:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

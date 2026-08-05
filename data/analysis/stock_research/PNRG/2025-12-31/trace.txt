@@ -1,0 +1,79 @@
+stock-research trace
+task_created_at=2026-08-04T20:57:48+08:00
+company=PNRG | PrimeEnergy Resources Corporation
+period=2025-12-31
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated initialized fields using protocol set commands; no complex JSON was created from scratch.
+
+[local reuse]
+- Checked configured annual review, normalized facts and raw filing directories.
+- No PNRG 2025 filing metadata, annual facts, normalized facts, or prior research result existed in the workspace.
+- Therefore obtained and checked the primary filing and SEC XBRL facts.
+
+[primary sources]
+- PrimeEnergy Resources 2025 Form 10-K, filed 2026-04-16, accession 0001437749-26-012531:
+  https://www.sec.gov/Archives/edgar/data/56868/000143774926012531/pnrg20251231_10k.htm
+- SEC Companyfacts API, CIK 0000056868:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0000056868.json
+- IRS 2025 yearly average exchange rates, China CNY/USD=7.129:
+  https://www.irs.gov/individuals/international-taxpayers/yearly-average-currency-exchange-rates
+- Federal Reserve H.10 monthly exchange rate, 2025-12 CNY/USD=7.0432:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.M.CH&rel=H10
+- Market cap, date, source and PE TTM reused exactly from config/input.json.
+
+[identity and model]
+- Form 10-K identifies ticker PNRG on Nasdaq and an independent US oil and natural gas acquisition, development and production business.
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Special handling: oil/gas reserves naturally decline; property expenditures cannot be ignored when deriving distributable cash. ARO is an operating lifecycle obligation, not detachable financial debt.
+
+[currency conversion]
+- 2025 income statement and cash-flow amounts: USD x 7.129 CNY/USD.
+- 2025-12-31 balance-sheet amounts: USD x 7.0432 CNY/USD.
+- Market cap already supplied in CNY and was not reconverted.
+
+[financial extraction: USD]
+- Assets 323,895,000; liabilities 108,210,000; parent equity 215,685,000; minority interest 0.
+- Cash 7,425,000; AR net 19,412,000; PP&E net 295,443,000.
+- Long-term bank debt 0; ARO 14,337,000; deferred tax liabilities 55,468,000.
+- Total revenue 189,052,000; parent net income 26,312,000.
+- CFO 96,734,000; property expenditures 75,954,000; operating FCF 20,780,000.
+- Financing cash flow -17,552,000; treasury-share purchases 13,552,000.
+
+[gross-profit research proxy]
+- Company does not report GAAP gross profit.
+- Direct-cost proxy = oil/gas production 44,983,000 + production/ad valorem taxes 10,000,000 + field service cost 6,197,000 = USD 61,180,000.
+- Proxy gross profit = total revenue 189,052,000 - 61,180,000 = USD 127,872,000.
+- Proxy gross margin = 127,872,000 / 189,052,000 = 0.6763853331.
+- Net margin = 26,312,000 / 189,052,000 = 0.1391786387.
+
+[owner earnback]
+- Reported cash in CNY = 7,425,000 x 7.0432 = 52,295,760.
+- Discounted detachable net cash = 52,295,760 x 80% - zero bank debt = 41,836,608.
+- CFO in CNY = 96,734,000 x 7.129 = 689,616,686.
+- Property expenditures in CNY = 75,954,000 x 7.129 = 541,476,066.
+- Operating FCF = 148,140,620.
+- Discounted sustainable cash profit = 148,140,620 x 80% = 118,512,496.
+- Market cap = 2,010,052,607.5313416.
+- Operating business price = market cap - discounted net cash = 1,968,215,999.5313416.
+- Owner earnback years = operating business price / discounted cash profit = 16.6076664146.
+- Market cap / discounted cash profit = 16.9606807330.
+
+[operating checks]
+- 2025 proved reserves 28,388 MBOE; 82.3% proved developed and 17.7% PUD.
+- Production 5,574 MBOE; extensions/additions 5,575 MBOE; positive revisions 1,875 MBOE.
+- Oil revenue USD 144.749m was 76.6% of total reported revenue.
+- WTI first-of-month average fell from USD 75.48/bbl in 2024 to USD 65.34/bbl in 2025.
+- No cash dividend was identified in 2025 or 2024. Forecast dividend is zero; buybacks are disclosed separately.
+- Outstanding options 767,500 versus 1,632,500 basic shares outstanding at year end; dilution flagged as a limitation/risk.
+
+[quality]
+- data_quality.status=complete.
+- Main limitations recorded in result.json: currency translation basis, proxy gross margin, inability to split maintenance/growth capex, and market-cap/PE reliance on input without a fully diluted rebuild.
+
+[validation]
+- Protocol validation after population: status=ok, errors=[].

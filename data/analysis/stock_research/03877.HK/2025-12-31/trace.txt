@@ -1,0 +1,71 @@
+stock-research trace
+company=CSSC SHIPPING (03877.HK)
+period=2025-12-31
+generated_at=2026-08-05T02:42:19+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Read references/data-reuse.md because the skill points to reuse boundaries.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated scalar/object records with protocol `set`, and array records with protocol `append`; result.json was not hand-written.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse audit]
+- No annual facts package, normalized facts file, raw filing metadata, or prior stock-research result was present under the input-specified workspace paths.
+- Returned to the original HKEX filing rather than relying on the erroneous input model hint.
+
+[primary filing]
+- CSSC (Hong Kong) Shipping Company Limited Annual Report 2025.
+- HKEX publication date: 2026-04-28.
+- URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042802857.pdf
+- Audited by Baker Tilly Hong Kong Limited; audit report dated 2026-03-26.
+- Relevant annual-report locations:
+  * pp.23-26: fleet, lease term, financing cost, credit quality and dividend summary.
+  * pp.27-41: financial review, revenue split, expenses, asset and debt breakdown.
+  * pp.56: customer concentration.
+  * pp.101-107: audited income statement, balance sheet, equity and cash flow.
+  * pp.137-145: expected-credit-loss stages and leverage/covenants.
+  * pp.164-175: vessels and loan/lease receivables.
+  * pp.191-195: cash-flow reconciliation, lease backlog, commitments, guarantees and dividends.
+
+[model correction]
+- Input hint: financial_brokerage / requires_special_model.
+- Finding: the brokerage classification is contradicted by the annual report. The company provides operating ship leases, finance leases, vessel-secured loans and minor shipbroking services; it has no securities brokerage client-money model.
+- Selected statement_model: platform_financial_mixed.
+- owner_earnback_applicability: requires_special_model.
+- Reason: HK$18.542bn loan/lease receivables and HK$15.536bn operating vessels are funded in material part by HK$26.467bn borrowings. Cash, earning assets and debt jointly produce the spread and lease return. Detachable net cash and ordinary cash-profit payback would be economically misleading.
+
+[currency normalization]
+- Annual report presentation currency: HKD, figures generally HK$'000.
+- Required result currency: CNY absolute yuan.
+- Conversion: 1 HKD = CNY 0.90322, the 2025-12-31 CNY central parity published by CFETS under PBOC authorization.
+- Formula for filing amounts: HK$'000 * 1,000 * 0.90322.
+- Limitation: the closing rate was also applied to full-year income and cash-flow values for protocol consistency; it is not an average-rate translation.
+
+[key calculations]
+- net_margin = parent net profit / revenue = 1,845,236 / 4,044,191 = 0.4562682623.
+- parent ROE (report narrative only) = 1,845,236 / average(14,181,121, 15,011,335) = 0.1264186884.
+- market cap / parent equity = CNY11,743,284,327.18 / CNY13,558,537,998.70 = 0.8661; inverse equity/market cap = 1.1546.
+- mechanical operating FCF = CFO 4,203,308 - vessel/PPE cash purchases 236,088 = HK$3,967,220k = CNY3,583,272,448.40.
+- Warning: CFO includes principal collection/derecognition of loan and lease receivables and is not treated as distributable cash profit.
+- 2025 total disclosed dividend = about 6,199,218,600 shares * HK$0.16 = HK$991,874,976 = CNY895,881,315.82.
+- forecast dividend yield = CNY895,881,315.82 / CNY11,743,284,327.18 = 0.0762888210.
+- All ordinary owner-earnback sorting fields remain null under the result contract.
+
+[market data]
+- market_cap=CNY11,743,284,327.18396
+- pe_ttm=7.4
+- timestamp=2026/08/03 09:47:05
+- source=Tencent qt.gtimg.cn, supplied by config/input.json; not independently reconstructed.
+
+[important judgment checks]
+- Gross profit/gross margin left null: the mixed leasing/financing income statement presents financing costs, depreciation, vessel costs and credit impairment by nature and does not disclose a comparable cost-of-sales/gross-profit subtotal.
+- Stage 2 gross loan/lease receivables rose from HK$2.602bn to HK$6.384bn; Stage 3 was HK$0.162bn; allowance was HK$0.752bn. This was retained as a major risk despite the reported 464% NPL provision ratio.
+- Contracted operating lease receipts were HK$11.390bn, vessel capital commitments HK$3.447bn, and utilized JV financing guarantees HK$2.750bn.
+- Dividend forecast uses the company's disclosed 2025 total of HK$0.16/share. It includes a special dividend and is not assumed to recur automatically.
+
+[validation]
+- Final protocol validation status: ok; errors: none.

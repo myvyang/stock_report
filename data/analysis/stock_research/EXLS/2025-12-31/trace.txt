@@ -1,0 +1,101 @@
+EXLS 2025 stock-research trace
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields only through protocol set/append commands (or a Python driver invoking those CLI commands).
+
+2. Reuse check
+- No existing EXLS/2025-12-31 annual facts package, normalized facts, raw filing, or prior stock-research result was present.
+- Downloaded the company IR-hosted copy of the filed 2025 Form 10-K to:
+  stock_report/data/raw/filings/EXLS/2025-12-31/exls-2025-10k.pdf
+- SEC command-line download returned HTTP 403. SEC web page remained available and was used to cross-check issuer, period, filing date, and filing identity.
+
+3. Primary sources
+- SEC 2025 Form 10-K:
+  https://www.sec.gov/Archives/edgar/data/1297989/000129798926000008/exls-20251231.htm
+- Company IR-hosted 2025 Form 10-K PDF:
+  https://ir.exlservice.com/static-files/d7e1d647-a244-4a08-a444-962ef8668700
+- Company 2025 Q4/full-year release:
+  https://ir.exlservice.com/news-releases/news-release-details/exl-reports-2025-fourth-quarter-and-year-end-results-issues-2026
+- Federal Reserve H.10:
+  https://www.federalreserve.gov/releases/h10/20251229/
+- Market data supplied by config/input.json: Yahoo Finance yfinance, market-cap date 2026-08-03.
+
+4. Model determination
+- statement_model = ordinary_operating.
+- owner_earnback_applicability = applicable.
+- Reason: EXLS sells data/AI and digital operations services to enterprise clients. Cash, receivables, facilities, technology assets, goodwill, leases, and corporate borrowings have ordinary operating-company meanings. There are no customer deposits, insurance reserves, regulated project cash, or other special-model balance sheet items.
+
+5. Source figures in USD
+Balance sheet, 2025-12-31, USD thousands:
+- Total assets 1,702,235
+- Total liabilities 789,530
+- Total equity / parent equity 912,705
+- Cash and equivalents 146,326
+- Short-term investments 182,041
+- Restricted cash, current + non-current 19,643
+- Accounts receivable, net 343,105
+- Goodwill + other intangibles 455,858
+- Current + long-term borrowings, net 298,598
+
+Income statement, FY2025, USD thousands:
+- Revenue 2,087,679
+- Cost of revenue 1,286,603
+- Gross profit 801,076
+- Operating profit 313,750
+- Net income / parent net income 251,019
+
+Cash flow, FY2025, USD thousands:
+- Operating cash flow 350,717
+- Purchases of property and equipment 52,598
+- Operating free cash flow 298,119
+- Stock-based compensation 79,469
+- Financing cash flow -312,764
+- Acquisition of treasury stock 328,490
+
+6. FX conversion
+- Flow items: 7.0432 CNY/USD, Federal Reserve H.10 December 2025 monthly rate.
+- Balance sheet items: 7.0063 CNY/USD, latest daily rate shown in the Federal Reserve release immediately preceding 2025-12-31.
+- Ratios use original USD figures and are unaffected by translation.
+
+7. Calculations
+- Gross margin = 801.076 / 2,087.679 = 0.383716079.
+- Net margin = 251.019 / 2,087.679 = 0.120238312.
+- Operating FCF = (350.717 - 52.598) million USD = 298.119 million USD = CNY 2,099,711,740.8.
+- SBC owner-cost deduction = 79.469 million USD = CNY 559,707,300.8.
+- Post-SBC cash profit = CNY 1,540,004,440.0.
+- Sustainability haircut = 10% = CNY 154,008,328.0.
+- Discounted sustainable cash profit = CNY 1,385,996,112.0.
+
+Discounted detachable net cash:
+- Domestic cash + short-term investments: (328.367 - 285.800) million USD * 7.0063 * 100% = CNY 298,237,172.1.
+- Foreign cash + short-term investments: 285.800 million USD * 7.0063 * 90% = CNY 1,802,160,486.0.
+- Restricted cash: 19.643 million USD * 0% = CNY 0.
+- Borrowings: 298.598 million USD * 7.0063 * -100% = CNY -2,092,067,167.4.
+- Discounted detachable net cash = CNY 8,330,490.7.
+
+Valuation:
+- Market cap = CNY 34,713,143,105.76123.
+- Operating business price = market cap - discounted net cash = CNY 34,704,812,615.06123.
+- Owner earnback years = 34,704,812,615.06123 / 1,385,996,112.0 = 25.0396175823.
+- Market cap / cash profit = 34,713,143,105.76123 / 1,385,996,112.0 = 25.0456280542.
+- Forecast cash dividend = 0; forecast dividend yield = 0.
+
+8. Judgment/fact separation
+- Facts: reported financial statements, segment growth, customer concentration, overseas cash, dividend history, contractual descriptions.
+- Analyst assumptions: 10% haircut on foreign cash; exclusion of restricted cash; full deduction of SBC; 10% sustainability haircut on post-SBC FCF.
+- Inference: most valuation is payment for the operating franchise because discounted net cash is nearly zero.
+
+9. Known limitations
+- Supplied 2026-08-03 market cap and PE were not independently verified against a second market-data source.
+- Owner cash profit starts from one strong cash-flow year; explicit haircuts reduce but do not eliminate normalization risk.
+- Foreign cash and sustainability haircut percentages are analytical judgments, not company guidance.
+
+10. Validation
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

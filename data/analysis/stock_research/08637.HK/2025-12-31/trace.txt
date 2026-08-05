@@ -1,0 +1,70 @@
+stock-research trace
+company: METASURFACE (08637.HK)
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse check
+- Checked configured annual-review and raw-filing paths.
+- Only config/input.json was present; facts.json, annual_facts.md, metadata.json and normalized facts were absent.
+- Therefore no prior fact pack or prior stock-research result could be reused.
+
+3. Primary filing retrieved
+- HKEX Annual Report 2025 PDF:
+  https://www1.hkexnews.hk/listedco/listconews/gem/2026/0428/2026042803343.pdf
+- Published 2026-04-28; audited by PricewaterhouseCoopers LLP; financial statements approved 2026-04-21.
+- A local temporary download was used for availability checking; web-indexed filing text was used because pdftotext was unavailable.
+
+4. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Filing evidence: Note 1 and Note 37 state precision machining and precision welding operations; balance sheet has ordinary manufacturing cash, receivables, inventory, PPE/ROU assets, bank debt and leases.
+- No brokerage customer funds, proprietary trading book, margin financing or repo funding found.
+- Override: statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+
+5. Extracted filing facts (S$'000)
+- Revenue 47,598; cost of sales 29,906; gross profit 17,692; operating profit 13,695; parent/net profit 10,103.
+- Total assets 115,541; total liabilities 35,640; parent/total equity 79,901; minority interest nil.
+- Operating cash flow 10,858; PPE additions 2,674; operating FCF 8,184; financing cash flow -4,001.
+- Cash 22,263; FVOCI MetaOptics shares 35,977; bank borrowings 2,294; lease liabilities 25,280.
+- Inventories 6,950; trade and other receivables 9,221; PPE 7,668; ROU assets 24,056.
+- MetaOptics remeasurement gain 6,397; net currency loss approximately 1,300.
+- Final dividend 2025 nil; 2024 nil.
+
+6. Currency conversion
+- Applied 1 SGD = 5.4378 CNY for all absolute CNY amounts.
+- This is a 2025-12-31 historical market rate. ECB official cross rates on the same date imply about 5.445 CNY/SGD, a roughly 0.1% difference.
+- Limitation: income statement was translated at closing rather than average rate for uniformity.
+
+7. Formula calculations
+- Gross margin = 17,692 / 47,598 = 0.3716962898.
+- Net margin = 10,103 / 47,598 = 0.2122568175.
+- Operating FCF = (10,858 - 2,674) * 1,000 * 5.4378 = CNY 44,502,955.20.
+- Discounted detachable net cash:
+  cash 22,263 * 90% + MetaOptics 35,977 * 50% - borrowings 2,294
+  = S$35,732.5k = CNY 194,299,119.36.
+- Normalized sustainable cash profit before final discount:
+  net profit 10,103 - remeasurement gain 6,397 + FX loss 1,300
+  + depreciation/amortisation 3,559 - PPE capex 2,674 = S$5,891k.
+- Apply 75% sustainability factor: S$4,418.25k = CNY 24,025,559.85.
+- Operating business price = market cap 464,260,897.42 - discounted net cash 194,299,119.36
+  = CNY 269,961,778.06.
+- Owner earnback years = 269,961,778.06 / 24,025,559.85 = 11.2364.
+- Market cap / cash profit = 464,260,897.42 / 24,025,559.85 = 19.3236.
+- Discounted net cash / market cap = 0.4185128.
+
+8. Judgment flags
+- 90% cash factor, 50% MetaOptics factor and 75% sustainable-profit factor are analyst judgments, not filing facts.
+- Share-based payment was not added back: although non-cash, it represents economic dilution/compensation.
+- Lease liabilities were not deducted as detachable net debt because they correspond to operating ROU assets and lease costs already affect operating economics.
+- Forecast dividend set to zero because neither an announced dividend nor an established cash payout basis supports a positive forecast.
+
+9. Protocol writing and validation
+- All result fields were populated using protocol `set` and evidence items using protocol `append`; complex result JSON was not hand-written.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].

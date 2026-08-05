@@ -1,0 +1,16 @@
+[2026-08-03 13:35 Asia/Shanghai] 读取 config/input.json。任务标的 01153.HK，报告期 2025-12-31，输入市值 234,208,073.220253，行情日期 2026/07/31 16:08:46，来源 Tencent qt.gtimg.cn，PE TTM 1.91。
+[2026-08-03 13:36 Asia/Shanghai] 完整读取 .agents/skills/stock-research/SKILL.md、references/result-contract.md、references/report-contract.md，并补读 references/data-reuse.md。
+[2026-08-03 13:36 Asia/Shanghai] 检查长期目录：未发现 01153.HK 的原始财报、年度事实包、标准化事实或历史股票研究结果，无法复用。
+[2026-08-03 13:36 Asia/Shanghai] 使用协议 CLI 初始化：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json。
+[2026-08-03 13:37 Asia/Shanghai] 通过港交所披露易识别公司为 Jiayuan Services Holdings Limited（佳源服务控股有限公司），并定位 2025 年报（2026-04-23）：https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042301315.pdf 。下载保存至 stock_report/data/raw/filings/01153.HK/2025-12-31/annual_report_2025.pdf。
+[2026-08-03 13:38 Asia/Shanghai] 环境缺少 pdftotext；在 /tmp/stock-pdf-env 建立临时虚拟环境并安装 pypdf，仅用于从已下载官方 PDF 提取全文。文本保存为同目录 annual_report_2025.txt，共 135 个 PDF 页面。
+[2026-08-03 13:38 Asia/Shanghai] 财报模型复核：年报第60、99-100页确认收入来自物业管理、开发商增值服务和社区增值服务，不存在券商经营资产负债。覆盖输入 financial_brokerage 提示，analysis_model 改为 ordinary_operating / applicable。
+[2026-08-03 13:39 Asia/Shanghai] 三张表取数（年报第55-59页，单位由人民币千元换算为绝对元）：总资产710,600,000；总负债689,352,000；总权益21,248,000；归母权益-1,404,000；少数股东权益22,652,000；收入821,237,000；成本590,012,000；毛利231,225,000；归母净利129,054,000；经营现金流35,596,000；物业设备和无形资产资本开支3,354,000；经营自由现金流32,242,000。
+[2026-08-03 13:39 Asia/Shanghai] 经营复核（年报第6-10、99-100页）：物业管理收入765,515,000，占93.2%；开发商增值服务7,367,000；社区增值服务48,355,000。259个项目，合同面积约53.0百万平方米，在管面积约45.7百万平方米。
+[2026-08-03 13:39 Asia/Shanghai] 盈利质量复核（年报第55、120-122页）：归母净利含未经授权担保拨备转回109,340,000，并含未经授权股份质押损失21,552,000。输入PE TTM受一次性项目显著影响。
+[2026-08-03 13:39 Asia/Shanghai] 资产负债复核（年报第56-57、114-121页）：贸易应收净额391,180,000，原值698,102,000，减值306,922,000；现金等价物33,927,000，受限存款1,699,000；银行借款6,461,000；质押拨备68,414,000；合同负债122,502,000；流动所得税负债99,452,000。
+[2026-08-03 13:40 Asia/Shanghai] 持续经营复核（独立核数师报告第49页、附注第61-62页）：年末净流动负债177,654,000、累计亏损426,799,000；审计师指出存在可能对持续经营产生重大疑虑的重大不确定性，但审计意见未因此修改。
+[2026-08-03 13:40 Asia/Shanghai] 分红复核（年报第108、123页）：2024及2025董事会均不建议派息；2025年末内地子公司无可汇往境外控股公司的可分配盈利。预测未来十二个月普通股现金分红0，预测股息率0%。
+[2026-08-03 13:40 Asia/Shanghai] 回本假设：折后可剥离净现金为0，原因是所有现金需覆盖净流动负债、税项、质押拨备与持续经营。持续现金利润以经营自由现金流32,242,000为锚，折至30,000,000。经营业务购买价234,208,073.220253；回本年=234,208,073.220253/30,000,000=7.806935774008。
+[2026-08-03 13:41 Asia/Shanghai] 通过协议 CLI 分字段写入 result.json。首次 validate 返回 status=ok、errors=[]。
+[2026-08-03 13:42 Asia/Shanghai] 生成 outputs/report.md 和 outputs/trace.txt。完成 JSON 解析、公式、文件存在性及协议二次校验；validate 最终返回 status=ok、errors=[]。

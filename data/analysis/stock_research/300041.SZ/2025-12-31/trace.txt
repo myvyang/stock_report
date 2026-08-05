@@ -1,0 +1,64 @@
+stock-research trace
+company: 回天新材 (300041.SZ)
+period: 2025-12-31 annual
+generated_at: 2026-08-01 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields using protocol set/append commands; result.json was not hand-written from scratch.
+5. Final validation command and result are recorded below.
+
+[reuse check]
+- Expected annual facts, normalized facts and prior stock research outputs for 300041.SZ/2025-12-31 were absent.
+- Because core fields were missing, fetched the official complete annual report from CNINFO and extracted page-level text.
+
+[official filing]
+title: 湖北回天新材料股份有限公司2025年年度报告
+publication_time: 2026-04-22 00:00:00 +08:00
+url: https://static.cninfo.com.cn/finalpage/2026-04-22/1225140444.PDF
+local_pdf: stock_report/data/raw/filings/300041.SZ/2025-12-31/300041_SZ_2025_annual_report.pdf
+working_pdf: stock_report/data/analysis/annual_review/300041.SZ/2025-12-31/300041_SZ_2025_annual_report.pdf
+page_text: stock_report/data/analysis/annual_review/300041.SZ/2025-12-31/300041_SZ_2025_annual_report_pages.txt
+page_count: 184
+
+[evidence map]
+- PDF p.7: revenue, parent net profit, operating cash flow, total assets, parent equity, quarterly profit and cash flow.
+- PDF pp.13-17: industry structure, company positioning, R&D, capacity, customers and sales model.
+- PDF pp.19-21: revenue by industry/product/region/sales mode and segment gross margins.
+- PDF p.27: cash-flow discussion, investment/fair-value gains, impairment and government-related other income.
+- PDF p.51: 2025 dividend proposal, share base and forecast cash dividend.
+- PDF pp.83-85: consolidated balance sheet and equity.
+- PDF pp.87-89: consolidated income statement.
+- PDF pp.91-92: consolidated cash-flow statement and capital expenditure.
+- PDF pp.126-127: cash, restricted monetary funds and wealth-management products.
+- PDF pp.149-153: restricted assets, borrowings, payables and current maturities.
+- PDF p.164: cash and cash equivalents.
+
+[key formulas]
+gross_profit = 4,435,571,544.40 - 3,388,280,685.44 = 1,047,290,858.96
+gross_margin = 1,047,290,858.96 / 4,435,571,544.40 = 0.2361118175
+net_margin = 220,591,048.49 / 4,435,571,544.40 = 0.0497322715
+operating_free_cash_flow = 304,954,510.15 - 185,102,364.58 = 119,852,145.57
+discounted_sustainable_cash_profit = 119,852,145.57 * 0.80 = 95,881,716.456
+discounted_cash_assets = 732,508,170.26 + 0.90 * (368,654,070.26 + 436,244,786.58 + 20,957,369.88) = 1,475,778,774.308
+interest_bearing_financing = 805,443,168.01 + 75,092,927.71 + 27,947,623.94 + 157,049.24 + 120,300,000.08 + 850,657,074.58 + 18,734,820.81 + 4,324,409.34 = 1,902,657,073.71
+discounted_net_cash = 1,475,778,774.308 - 1,902,657,073.71 = -426,878,299.402
+operating_business_price = 5,818,000,000 - (-426,878,299.402) = 6,244,878,299.402
+owner_earnback_years = 6,244,878,299.402 / 95,881,716.456 = 65.13106492
+market_cap_to_cash_profit = 5,818,000,000 / 95,881,716.456 = 60.67893041
+forecast_dividend_yield = 83,915,210.85 / 5,818,000,000 = 0.0144233776
+
+[judgment boundaries]
+- Fact: statement and segment amounts above are audited annual-report figures.
+- Judgment: 90% realization rate on wealth-management/debt investments.
+- Judgment: 80% sustainability factor on 2025 free cash flow, reflecting receivable intensity, Q4 loss and downstream cyclicality.
+- Limitation: maintenance and growth capital expenditure are not separately disclosed; all capex was deducted.
+- Limitation: industry position is mainly management's description and is not an independently verified market-share statistic.
+- Market data: market cap and PE TTM were supplied in config/input.json from Tencent qt.gtimg.cn at 2026-07-31 11:42:51.
+
+[validation]
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+result: {"status":"ok","errors":[]}

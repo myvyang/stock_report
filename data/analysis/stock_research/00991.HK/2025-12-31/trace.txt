@@ -1,0 +1,48 @@
+2026-08-03T16:41:32+08:00 INIT
+- Read stock-research/SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+- Initialized outputs/result.json with protocol CLI from config/input.json.
+
+SOURCE DISCOVERY
+- Local annual facts, normalized facts, and raw filing metadata were absent.
+- Located official HKEX disclosures for stock code 00991.
+- Primary source: HKEX Announcement of 2025 Annual Results, published 2026-03-27, audited IFRS, 33 pages:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0327/2026032702874.pdf
+- Primary source: HKEX 2025 Annual Report, published 2026-04-28:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042803157.pdf
+- Dividend cross-check: HKEX final dividend announcements dated 2026-03-27 and 2026-06-26.
+- Market data reused exactly from config/input.json: Tencent qt.gtimg.cn, 2026/07/31 16:08:45.
+
+MODEL REVIEW
+- Input hint financial_brokerage rejected.
+- Filing facts: principal activities are power generation and power plant development; electricity and heat revenue RMB115,392.071m of total RMB121,255.419m (95.16%).
+- Selected statement_model=utility_concession and owner_earnback_applicability=requires_special_model.
+- Reason: generation assets, project debt, operating liquidity, and continuing capital expenditure are economically linked. Cash is not detachable net cash.
+- Per result contract, discounted net cash, discounted cash profit, operating business price, owner earnback years, and market-cap-to-cash-profit remain null.
+
+KEY EXTRACTION (RMB absolute yuan in result.json)
+- Revenue 121,255,419,000; operating costs 105,657,651,000; operating profit 15,597,768,000.
+- Consolidated net profit 10,157,264,000.
+- Profit attributable to owners 5,991,446,000; other equity instruments 1,547,771,000; combined company equity-instrument holders 7,539,217,000; NCI 2,618,047,000.
+- Total assets 333,636,493,000; liabilities 234,029,771,000; equity 99,606,722,000.
+- Ordinary share capital and reserves 34,079,711,000; other equity instruments 46,303,465,000; NCI 19,223,546,000.
+- Cash and restricted deposits 9,267,252,000; PPE 240,860,407,000.
+- Revenue mix: electricity/heat 115,392,071,000; other 5,863,348,000.
+- On-grid power 273.1092bn kWh; clean-energy capacity 37,058.081MW; clean share 42.99%.
+- Annual dividend RMB0.148/share on 18,506,710,504 shares, disclosed total approximately RMB2,739,000,000.
+
+CALCULATIONS
+- net_margin = 7,539,217,000 / 121,255,419,000 = 0.062195 (protocol definition uses parent equity-holder profit).
+- forecast_dividend_yield = 2,739,000,000 / 40,121,733,882.03919 = 0.068267.
+- power_and_heat_revenue_share = 115,392,071,000 / 121,255,419,000 = 0.95165.
+- minority_interest_ratio = 19,223,546,000 / 99,606,722,000 = 0.192994.
+- Gross margin left null because the IFRS statement presents expenses by nature and does not disclose comparable cost of sales/gross profit; operating margin was not relabeled as gross margin.
+- Cash-flow fields left null because the verified annual-results source did not include a complete cash-flow statement. This is disclosed as a limitation and a key follow-up for the special utility model.
+
+PROTOCOL OPERATIONS
+- Updated result.json only through protocol CLI set commands after init.
+- Final protocol validation: status=ok, errors=[].
+
+OUTPUTS
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

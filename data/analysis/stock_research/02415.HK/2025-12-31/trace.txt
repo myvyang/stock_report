@@ -1,0 +1,75 @@
+stock-research trace
+company: MEDSCI (02415.HK)
+period: 2025-12-31
+generated_for_task: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because no local annual facts package was available.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse check
+- config/input.json existed.
+- No raw filing, annual facts, normalized facts, or prior stock-research output existed for 02415.HK / 2025-12-31 at the start of research.
+- Therefore the task required retrieval of the primary annual filing.
+
+3. Primary source retrieval
+- Official HKEX filing URL:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0430/2026043004282.pdf
+- Document: MEDSCI Healthcare Holdings Limited Annual Report 2025.
+- HKEX publication date: 2026-04-30.
+- Saved locally as stock_report/data/raw/filings/02415.HK/2025-12-31/annual-report-2025.pdf.
+- Extracted text saved beside the PDF as annual-report-2025.txt using pypdf in a temporary virtual environment because pdftotext was unavailable.
+
+4. Model verification
+- Input hint stated financial_brokerage / requires_special_model.
+- Annual report business descriptions and revenue note show physician platform, precision omni-channel marketing, real-world study, and data/AI service contracts.
+- No brokerage customers' funds, securities dealing, margin financing, investment banking, or repurchase financing were found.
+- Overrode hint with ordinary_operating / applicable.
+
+5. Financial statement extraction (all annual-report figures were RMB'000 and converted to absolute RMB)
+- Profit or loss, annual report pp. 82-83:
+  revenue 270,374,000; cost of sales 109,929,000; gross profit 160,445,000; operating profit before finance cost 19,742,000; net and parent profit 17,937,000.
+- Financial position, pp. 84-85:
+  total assets 1,385,711,000; total liabilities 204,674,000; total and parent equity 1,181,037,000; minority interest zero.
+- Cash flow, pp. 88-89:
+  operating cash flow 2,022,000; PPE purchase 31,000; intangible purchase zero; operating FCF 1,991,000; financing cash flow -10,350,000; dividends plus share-award repurchase cash out 6,125,000.
+- Revenue note, pp. 115-116:
+  precision marketing 121,848,000; physician platform 92,958,000; RWS 43,208,000; data/AI 12,360,000.
+- Asset notes, pp. 130-136:
+  trade receivables net 41,329,000; contract assets net 68,743,000; wealth-management products 809,605,000; cash and cash equivalents 367,734,000; time deposits 10,000,000; restricted cash 50,030,000.
+- Liability notes, p. 136:
+  contract liabilities 145,800,000; lease liabilities 6,256,000; no bank or other interest-bearing borrowing per MD&A p. 16.
+- Dividend evidence, financial highlights p. 7, directors' report p. 67 and note 11 p. 122:
+  2025 interim dividend 5,756,000; no final dividend; 2024 nil.
+
+6. Calculations
+- gross margin = 160,445,000 / 270,374,000 = 0.5934201883.
+- net margin = 17,937,000 / 270,374,000 = 0.0663420270.
+- operating FCF = 2,022,000 - 31,000 = 1,991,000.
+- discounted detachable net cash:
+  367,734,000 * 80% + 10,000,000 * 90% + 809,605,000 * 70% + 50,030,000 * 0% - 204,674,000
+  = 665,236,700.
+- operating business price = 376,088,749.95946884 - 665,236,700 = -289,147,950.04053116.
+- sustainable cash profit chosen as 12,000,000 after removing bank interest and government grants from parent profit, reversing wealth-product fair-value loss, and applying a normalization buffer for weak reported operating cash flow and contract-asset credit losses.
+- owner earnback years = -289,147,950.04053116 / 12,000,000 = -24.0956625034. Negative value is formulaic asset coverage, not a literal negative recovery period.
+- market cap / cash profit = 376,088,749.95946884 / 12,000,000 = 31.3407291633.
+- forecast dividend yield = 5,756,000 / 376,088,749.95946884 = 0.0153048981.
+
+7. Market data
+- From config/input.json, sourced there to Tencent qt.gtimg.cn:
+  market cap RMB 376,088,749.95946884; PE TTM 22.01; timestamp 2026/08/03 09:20:05.
+- This snapshot was not independently reconciled to exchange tick data; recorded as a limitation.
+
+8. Protocol writes and validation
+- Populated scalar fields with protocol set commands.
+- Populated asset_analysis, cash_breakdown, profit_adjustments, dividend.history, risks, and evidence using protocol append commands.
+- First completed validation result: status ok, errors [].
+- Final validation after report and trace creation: status ok, errors [].
+
+9. Judgment boundaries
+- Facts are tied to the audited annual report or supplied market snapshot.
+- The 70% wealth-product discount, 80% cash discount, 90% term-deposit discount, zero value for restricted cash, and RMB 12 million sustainable cash profit are analyst assumptions, not company guidance.
+- The report gives no buy/sell recommendation or target price.

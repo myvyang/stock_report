@@ -1,0 +1,42 @@
+2026-08-05 stock research trace: IIPR FY2025
+
+1. Read skill and required contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check:
+   - No local annual facts, normalized facts, filing metadata, or prior stock-research result existed for IIPR/2025-12-31.
+
+4. Primary sources retrieved:
+   - SEC 2025 Form 10-K filed 2026-02-24, accession 0001677576-26-000001.
+   - SEC Company Facts JSON for CIK 0001677576.
+   - FY2025 earnings release furnished with 2026-02-23 Form 8-K.
+   - SEC 2026-05-27 Form 8-K reporting full repayment of 2026 notes.
+   - Federal Reserve H.10 release dated 2025-12-29.
+
+5. Model override:
+   - Input hint ordinary_operating/applicable rejected.
+   - Company is an equity REIT; protocol has no equity_reit enum, so statement_model=unknown_special and owner_earnback_applicability=requires_special_model.
+   - Ordinary discounted-net-cash and earnback fields left null.
+
+6. Currency conversion:
+   - FY2025 USD statement values multiplied by 7.0063 CNY/USD, the last available H.10 observation (2025-12-26) in the 2025-12-29 release.
+   - Input market capitalization retained without conversion because input amount is already protocol CNY.
+
+7. Key calculations:
+   - net margin = USD 114.435m common-stockholder net income / USD 265.955m revenue = 0.4302795586.
+   - static forecast dividend = 28,774,470 shares x USD 7.60 x 7.0063 = CNY 1,532,179,525.62.
+   - forecast dividend yield = CNY 1,532,179,525.62 / CNY 11,506,806,452.63 = 0.1331541929.
+   - AFFO dividend coverage observation: USD 205.412m AFFO / USD 216.275m common cash dividends = about 0.95x.
+
+8. Limitations:
+   - REIT cost of sales/gross margin is not comparable to an ordinary operating company.
+   - Capital expenditure and ordinary operating FCF kept null because acquisitions, tenant improvements, life-science investments, and maintenance capex cannot be reliably separated into an ordinary-company capex field from the supplied annual disclosures.
+   - Dividend forecast is a static annualization, not guidance.
+
+9. Validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

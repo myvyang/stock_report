@@ -1,0 +1,97 @@
+ABCB stock research trace
+generated_for_period=2025-12-31
+task_created_at=2026-08-05T00:45:03+08:00
+
+[protocol]
+1. Read stock-research/SKILL.md completely.
+2. Read references/result-contract.md completely.
+3. Read references/report-contract.md completely.
+4. Read references/data-reuse.md because the skill directs reuse decisions.
+5. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+6. Populated result fields through repeated protocol `set` commands; no complex JSON was handwritten directly to outputs/result.json.
+7. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[reuse_check]
+Expected annual facts paths were inspected:
+- stock_report/data/analysis/annual_review/ABCB/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/ABCB/2025-12-31/annual_facts.md
+- stock_report/data/normalized/facts/ABCB/2025-12-31/annual-facts.json
+No reusable fact package was present, so primary-source extraction was required.
+
+[primary_sources]
+1. Ameris Bancorp Form 10-K for year ended 2025-12-31.
+   Filed: 2026-02-26
+   SEC accession: 0000351569-26-000050
+   URL: https://www.sec.gov/Archives/edgar/data/351569/000035156926000050/abcb-20251231.htm
+   Local copy: stock_report/data/raw/filings/ABCB/2025-12-31/abcb-20251231.htm
+   Used sections: Item 1 Business; MD&A; audited balance sheet F-6; income statement F-7; shareholders equity F-9/F-10; Notes 19 and 20.
+2. Ameris Bancorp 2025 full-year earnings release, 2026-01-29.
+   URL: https://ir.amerisbank.com/news/news-details/2026/Ameris-Bancorp-Announces-Fourth-Quarter-and-Record-Full-Year-2025-Financial-Results/default.aspx
+   Used as cross-check for net interest margin, balance sheet, asset quality and tangible book value.
+3. Federal Reserve H.10 Data Download Program, China spot exchange rate.
+   Series: H10/H10/RXI_N.A.CH
+   Date: 2025-12-31
+   Value: 7.1875 CNY per USD
+4. config/input.json market snapshot.
+   Market cap: CNY 39,491,761,973.726074
+   Date: 2026-08-03
+   PE TTM: 15.770343
+   Source represented by input: Yahoo Finance yfinance
+
+[model_override]
+Input hint: ordinary_operating / applicable.
+Verified model: financial_bank / requires_special_model.
+Reason: Ameris is a financial holding company operating primarily through Ameris Bank. Customer deposits fund loans and securities; these are operating assets and liabilities, not detachable cash and ordinary debt. Ordinary owner earnback fields therefore remain null.
+
+[key_usd_facts]
+All statement amounts below are USD unless noted.
+Total assets=27,515,879,000
+Total liabilities=23,439,851,000
+Total shareholders equity=4,076,028,000
+Gross loans=21,513,522,000
+Allowance for credit losses on loans=348,141,000
+Net loans=21,165,381,000
+Deposits=22,375,995,000
+Cash and cash equivalents=1,088,920,000
+AFS plus HTM debt securities=2,410,415,000
+Goodwill plus other intangibles=1,070,470,000
+Net interest income=936,923,000
+Noninterest income=271,035,000
+Provision for credit losses=70,244,000
+Income before tax=533,764,000
+Net income=412,154,000
+2025 declared common dividends=55,197,000; 0.80 per share
+2025 share repurchases=83,570,000
+2024 declared common dividends=45,214,000; 0.65 per share
+2023 declared common dividends=41,683,000; 0.60 per share
+
+[special_bank_metrics]
+Tax-equivalent net interest margin: 2025=3.79%, 2024=3.56%
+Net charge-offs / average loans: 2025=0.18%, 2024=0.19%
+Nonperforming assets / total assets: 2025=0.44%, 2024=0.47%
+NPA excluding GNMA-guaranteed serviced mortgages: 2025=0.35%, 2024=0.42%
+Allowance / loans: 2025=1.62%, 2024=1.63%
+Consolidated CET1 ratio=13.17%
+Consolidated Tier 1 leverage ratio=11.44%
+Bank CET1 ratio=13.43%; regulatory category=well-capitalized
+Estimated uninsured deposits=10.67bn, 47.7% of deposits
+Collateralized municipal portion of uninsured deposits=3.76bn
+Real-estate-secured share of loan portfolio=70.4%
+
+[derived_metrics]
+Translation convention: USD statement values multiplied by 7.1875.
+Average equity ROE=412.154m / average(4,076.028m, 3,751.522m)=10.53%.
+2025 cash dividend payout=55.197m / 412.154m=13.39%.
+Forecast dividend yield=(55.197m * 7.1875) / CNY 39,491,761,973.726074=1.0046%.
+Market cap / 2025 year-end book equity=1.3480x.
+Market cap / 2025 audited net income=13.3312x.
+The last measure differs from input PE TTM 15.770343; both are retained with their distinct bases.
+
+[limitations]
+- Market cap and PE TTM were accepted from the supplied third-party snapshot and were not independently reproducible at the same historical timestamp.
+- CNY statement amounts are presentation translations at one year-end spot rate, not accounting functional-currency figures.
+- Dividend forecast is a flat continuation of 2025 declared dividends, not management guidance or a board commitment.
+- Ordinary revenue, gross margin, operating cash flow, capex, free cash flow and owner-earnback fields remain null because they are not economically comparable for a bank under this protocol.

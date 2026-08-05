@@ -1,0 +1,73 @@
+task=stock_research
+company=601865.SH 福莱特
+period=2025-12-31
+generated_for=2026-08-01 Asia/Shanghai
+
+[protocol]
+read .agents/skills/stock-research/SKILL.md
+read .agents/skills/stock-research/references/result-contract.md
+read .agents/skills/stock-research/references/report-contract.md
+initialized: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+populated: protocol set commands; complex JSON was not handwritten from a blank file
+validated: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[path_audit]
+missing=stock_report/data/raw/filings/601865.SH/2025-12-31
+missing=stock_report/data/analysis/annual_review/601865.SH/2025-12-31/facts.json
+missing=stock_report/data/analysis/annual_review/601865.SH/2025-12-31/annual_facts.md
+missing=stock_report/data/normalized/facts/601865.SH/2025-12-31/annual-facts.json
+missing=/root/aicode/stock_report equivalents
+action=used public annual report, audited statements and dividend announcements directly; recorded limitation in result.json
+
+[primary_sources]
+1. 福莱特玻璃集团股份有限公司2025年年度报告，2026-03-27；公司官网/HKEX/公开上交所公告镜像；德勤华永标准无保留意见。
+2. 福莱特玻璃集团股份有限公司关于2025年度利润分配预案的公告，公告编号2026-016。
+3. 福莱特玻璃集团股份有限公司2025年年度权益分派实施公告，公告编号2026-038。
+4. config/input.json market snapshot: Tencent qt.gtimg.cn, 2026-07-31 11:43:25.
+
+[core_extraction_cny]
+revenue=15566788573.36
+cost_of_sales=12934724797.63
+gross_profit=2632063775.73
+operating_profit=1079887169.34
+net_profit=992608892.40
+parent_net_profit=980574130.35
+operating_cash_flow=2911113956.32
+capital_expenditure=2879537781.50
+operating_free_cash_flow=31576174.82
+total_assets=42384414248.41
+total_liabilities=19772889994.81
+total_equity=22611524253.60
+parent_equity=22515025380.28
+minority_interest=96498873.32
+fixed_assets=17571474371.61
+construction_in_progress=3413645753.55
+cash_and_cash_equivalents=3719428902.79
+interest_expense=514688309.56
+fixed_asset_depreciation=1571185607.90
+
+[formula_trace]
+gross_margin=(15566788573.36-12934724797.63)/15566788573.36=0.1690820019380456
+net_margin=980574130.35/15566788573.36=0.06299142085273075
+operating_free_cash_flow=2911113956.32-2879537781.50=31576174.82
+discounted_positive_cash=3719428902.79*0.50+480018805.88*0.80+(140576000+290377868.35+377653709.50)*0.80=2890615558.379
+financing_and_lease_debt=832480837.67+2393385639.52+6442996957.67+4065908075.91+766355039.78=14501126550.55
+discounted_detachable_net_cash=2890615558.379-14501126550.55=-11610510992.171
+operating_business_price=23710000000-(-11610510992.171)=35320510992.171
+discounted_sustainable_cash_profit=800000000 (judgment; anchored to 2025 parent profit and cash/capex evidence)
+owner_earnback_years=35320510992.171/800000000=44.15063874021376
+market_cap_to_cash_profit=23710000000/800000000=29.6375
+forecast_dividend_yield=349435785.90/23710000000=0.014737907460986924
+
+[judgment_boundary]
+fact=2025 parent net profit 980574130.35; deducted non-recurring parent profit 1032922149.80; OCF 2911113956.32; capex 2879537781.50; fixed asset depreciation 1571185607.90.
+inference=business is ordinary operating but capital intensive; reported cash cannot be detached before operating buffer and debt service.
+judgment=sustainable distributable cash profit set at 800000000 because maintenance versus expansion capex is undisclosed and sector pricing remains depressed.
+limitation=if actual long-run maintenance capex is close to reported 2025 capex, 800000000 is optimistic; if capex normalizes materially and pricing recovers, it may be conservative.
+
+[final_validation]
+result_contract=passed
+report_contract=checked: business story, operations, assets/liabilities, cash conversion, owner earnback, disconfirming facts
+no_buy_sell_advice=true
+no_target_price=true
+no_ranking_label=true

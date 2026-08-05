@@ -1,0 +1,93 @@
+stock-research trace
+company=603259.SH 药明康德
+period=2025-12-31 annual
+generated_at=2026-07-31T22:38:57+08:00
+
+[skill_and_contract]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+protocol_init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+[reuse_audit]
+requested_annual_facts=stock_report/data/analysis/annual_review/603259.SH/2025-12-31/facts.json (missing)
+requested_raw_metadata=stock_report/data/raw/filings/603259.SH/2025-12-31/metadata.json (missing)
+requested_prior_research=stock_report/data/analysis/stock_research/603259.SH/2025-12-31/result.json (missing)
+available_user_note=stock_report/data/notes/user_stock_evaluations.md
+decision=no reusable annual fact pack; return to official audited disclosure.
+
+[primary_sources]
+1. HKEX official disclosure, WuXi AppTec 2025 audited financial statements and notes, 2026-03-23:
+   https://www.hkexnews.hk/listedco/listconews/sehk/2026/0323/2026032301006_c.pdf
+   local_copy=stock_report/data/raw/filings/603259.SH/2025-12-31/2025-annual-results-cn.pdf
+2. WuXi AppTec official 2025 full-year results release and 2026 outlook, 2026-03-23:
+   https://wuxiapptec.com/news/wuxi-news/ukp6jpdhyncifp8ovk4kv1z6
+3. market snapshot=config/input.json; source=Tencent qt.gtimg.cn; timestamp=20260731114345
+
+[model_check]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=global CRDMO service and manufacturing company; deposits, receivables, inventory, fixed assets, construction in progress and customer advances have ordinary operating meaning. No customer deposits, insurance reserves, regulated presale cash, concession rights or comparable special-model structure.
+
+[financial_extraction_cny]
+total_assets=103120968579.11
+total_liabilities=22873254977.59
+total_equity=80247713601.52
+parent_equity=79712290246.44
+minority_interest=535423355.08
+revenue=45456165774.18
+cost_of_sales=23801434557.94
+gross_profit=21654731216.24
+operating_profit=23930083791.60
+net_profit=19333065892.26
+parent_net_profit=19150582400.69
+deducted_parent_net_profit=13240556954.42
+operating_cash_flow=17203161622.00
+capital_expenditure=5538150829.94
+operating_free_cash_flow=11665010792.06
+gross_margin=(45456165774.18-23801434557.94)/45456165774.18=0.4763871049709238
+net_margin=19150582400.69/45456165774.18=0.4212977947992241
+
+[discounted_net_cash]
+cash=35131309638.47*0.80=28105047710.78
+trading_financial_assets=5806211811.42*0.90=5225590630.28
+bank_time_deposits_due_within_one_year=1402987153.42*0.90=1262688438.08
+disposal_and_investment_related_receivables=642753182.13*0.70=449927227.49
+short_borrowings=5986138418.73
+long_borrowings=1819100000.00
+current_long_borrowings=600000.00
+lease_liabilities=614274756.08
+interest_bearing_debt_and_lease_total=8420113174.81
+discounted_detachable_net_cash=28105047710.78+5225590630.28+1262688438.08+449927227.49-8420113174.81=26623140831.81
+excluded=other_noncurrent_financial_assets 8131208431.70 and long_term_equity_investment 2144876912.07 because valuation/exit/strategic constraints are material.
+
+[cash_profit]
+reported_parent_net_profit=19150582400.69
+less_nonrecurring_items=5910025446.27
+deducted_parent_net_profit=13240556954.42
+reported_ocf_less_capex=17203161622.00-5538150829.94=11665010792.06
+company_adjusted_free_cash_flow_rounded=11100000000
+reason_for_company_adjustment=excludes income tax payments related to significant equity/business disposals per company release.
+sustainability_discount=10%
+discounted_sustainable_cash_profit=11100000000*0.90=9990000000
+
+[valuation_math]
+market_cap=380787000000
+discounted_net_cash_to_market_cap=26623140831.81/380787000000=0.0699160970
+operating_business_price=380787000000-26623140831.81=354163859168.19
+owner_earnback_years=354163859168.19/9990000000=35.45183775
+market_cap_to_cash_profit=380787000000/9990000000=38.11681682
+forecast_cash_dividend=5700000000
+forecast_dividend_yield=5700000000/380787000000=0.0149689984
+
+[judgment_boundaries]
+fact: audited statement numbers and disclosed business segment/order metrics.
+company_forward_looking: 2026 revenue 51.3-53.0bn, capex 6.5-7.5bn, adjusted FCF 10.5-11.5bn, proposed dividend 5.7bn.
+research_inference: cash discounts, exclusion of nonlisted investments, 11.1bn sustainable baseline and additional 10% discount.
+limitation: maintenance vs growth capex is not disclosed; offshore cash remittance was not tested entity by entity; market-cap convention was inherited from input.
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+initial_status=ok
+final_status=ok; errors=[]

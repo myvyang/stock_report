@@ -1,0 +1,78 @@
+stock-research trace v1
+company=MGY Magnolia Oil & Gas Corporation
+period=2025-12-31
+generated_for_input=2026-08-05T02:58:49+08:00
+
+[protocol]
+read .agents/skills/stock-research/SKILL.md
+read .agents/skills/stock-research/references/result-contract.md
+read .agents/skills/stock-research/references/report-contract.md
+read .agents/skills/stock-research/references/data-reuse.md
+initialized outputs/result.json with protocol CLI
+populated outputs/result.json with protocol CLI set/append commands
+
+[reuse]
+No MGY raw filing, annual facts, normalized facts, or prior stock-research files existed in stock_report.
+Core financial data therefore retrieved from primary SEC filings.
+
+[primary sources]
+SEC 2025 Form 10-K: https://www.sec.gov/Archives/edgar/data/1698990/000169899026000005/mgy-20251231.htm
+SEC FY2025 results Exhibit 99.1: https://www.sec.gov/Archives/edgar/data/1698990/000169899026000002/ye2025pressrelease.htm
+NBS 2025 statistical communique: https://www.stats.gov.cn/sj/zxfb/202602/t20260228_1962662.html
+Market snapshot: config/input.json (Yahoo Finance yfinance)
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=single upstream oil and gas operating segment; no financial/developer/concession balance-sheet model
+
+[translation]
+USD_CNY=7.1429
+basis=2025 full-year average exchange rate in NBS statistical communique
+all USD statement amounts translated at the same rate for protocol consistency
+
+[derived gross profit]
+revenue_usd_m=1311.845
+direct_cost_usd_m=lease_operating 186.559 + gathering_transport_processing 67.096 + taxes_other_than_income 76.452 = 330.107
+gross_profit_usd_m=981.738
+gross_margin=0.7483643265782162
+note=analytical upstream margin, not a reported GAAP subtotal
+
+[cash flow]
+operating_cash_flow_usd_m=878.639
+oil_gas_property_additions_usd_m=469.477
+operating_fcf_usd_m=409.162
+operating_fcf_cny=2922603249.8
+
+[owner earnback]
+cash_cny=1905618576.5; discount=0.80; discounted=1524494861.2
+long_term_debt_cny=-2808952567.9; discount=1.00; discounted=-2808952567.9
+discounted_detachable_net_cash_cny=-1284457706.7
+fcf_start_cny=2922603249.8
+less_stock_compensation_cny=194686882.4
+post_stock_comp_cny=2727916367.4
+commodity_cycle_haircut=0.20
+discounted_sustainable_cash_profit_cny=2182333093.92
+market_cap_cny=42070210617.91553
+operating_business_price_cny=43354668324.615524
+owner_earnback_years=19.866201197884052
+market_cap_to_cash_profit=19.277630319186155
+
+[dividend]
+announced_2026_quarterly_rate_usd_per_share=0.165
+annualized_rate_usd_per_share=0.66
+year_end_economic_interests_m=Class_A 181.230 + Class_B_LLC 5.523 = 186.753
+forecast_cash_dividend_cny=880412282.442
+forecast_dividend_yield=0.020927213567765644
+
+[limitations]
+No separate oil/gas price scenario or well-level decline curve model.
+No independent re-verification of input market cap/PE snapshot.
+Asset retirement obligation discussed but not separately deducted again from net cash.
+2025 average FX used for both flow and stock items; not formal accounting translation.
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]
+jq_parse=ok

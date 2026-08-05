@@ -1,0 +1,81 @@
+stock-research trace | XZO | period 2025-12-31
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with protocol CLI; did not hand-write the schema.
+
+2. Reuse audit
+- Checked configured raw filing, annual review, normalized facts, and prior stock-research paths.
+- No XZO filing or annual facts package existed locally; only config/input.json and the user evaluation note existed.
+- Conclusion: official-source acquisition was necessary.
+
+3. Official sources acquired/used
+- SEC 2025 Form 10-K, accession 0001193125-26-076686:
+  https://www.sec.gov/Archives/edgar/data/1873951/000119312526076686/xzo-20251231.htm
+- SEC XBRL Company Facts, CIK 0001873951:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0001873951.json
+- Federal Reserve H.10 historical CNY/USD:
+  https://www.federalreserve.gov/releases/h10/Hist/dat00_ch.htm
+- SEC 2026-05-26 Form 8-K for $12m repurchase authorization:
+  https://www.sec.gov/Archives/edgar/data/1873951/000119312526239353/xzo-20260526.htm
+- Market cap and PE were reused exactly from config/input.json (Yahoo Finance yfinance, 2026-08-03).
+- Raw SEC 10-K HTML and Company Facts were cached under stock_report/data/raw/filings/XZO/2025-12-31/.
+
+4. Model classification
+- Fact: TTIC insurance carrier was sold to HCI on 2024-07-01 and is discontinued operations.
+- Fact: 2025 balance sheet has no insurance reserves, underwriting investment portfolio, or outstanding debt.
+- Fact: continuing business earns fees for underwriting/management, claims, and software/technology services.
+- Determination: ordinary_operating; owner earnback applicability = applicable.
+- Special handling: related-party concentration and contract liabilities must be reflected in cash/profit discounts.
+
+5. Financial extraction (USD, 2025 Form 10-K)
+- Assets 347,734,000; liabilities 93,578,000; equity/parent equity 254,156,000; NCI 0.
+- Revenue 216,980,000; cost of revenue 85,957,000; gross profit 131,023,000; operating income 105,990,000; parent net income 82,749,000.
+- CFO 100,298,000; capex 2,844,000; operating FCF 97,454,000; financing CF 153,646,000.
+- Cash 305,372,000; contract liabilities 74,460,000; other liabilities 19,118,000; debt 0.
+- Related-party revenue 214,611,000 / total revenue 216,980,000 = 98.908%.
+- Gross margin = 131,023,000 / 216,980,000 = 0.6038482809.
+- Net margin = 82,749,000 / 216,980,000 = 0.3813669463.
+
+6. Currency conversion
+- Applied 2025-12-31 Federal Reserve H.10 spot rate: USD 1 = CNY 6.9931.
+- All JSON monetary values are absolute CNY yuan.
+- Limitation disclosed: income/cash-flow items use period-end rather than average FX for a consistent protocol display.
+
+7. Detachable cash calculation
+- Cash discounted: USD 305,372,000 * 80% = USD 244,297,600.
+- Less all liabilities at 100%: USD 93,578,000.
+- Discounted detachable net cash = USD 150,719,600 * 6.9931 = CNY 1,053,997,234.76.
+- Rationale: cash contains IPO proceeds and cash associated with prepaid service obligations; all contract, lease, tax, commission and other liabilities remain real claims.
+
+8. Sustainable cash-profit calculation
+- Parent net income: USD 82,749,000.
+- Add D&A: USD 2,934,000.
+- Less capex: USD 2,844,000.
+- Less after-tax investment income: USD 4,302,000 * 75% = USD 3,226,500.
+- Standardized cash profit = USD 79,612,500.
+- Apply 25% concentration/related-pricing haircut: USD 19,903,125.
+- Discounted sustainable cash profit = USD 59,709,375 * 6.9931 = CNY 417,553,630.3125.
+- Judgment boundary: the 25% haircut is analyst stress testing, not company guidance; it is based on 98.9% related revenue and lack of meaningful 2025 third-party revenue.
+
+9. Earnback formulas
+- Market cap = CNY 9,521,793,136.384277.
+- Operating business price = market cap - discounted net cash = CNY 8,467,795,901.624277.
+- Discounted net cash / market cap = 0.1106931457.
+- Owner earnback years = 8,467,795,901.624277 / 417,553,630.3125 = 20.2795408467.
+- Market cap / cash profit = 9,521,793,136.384277 / 417,553,630.3125 = 22.8037608708.
+
+10. Dividend forecast
+- 2025 common cash dividend = 0.
+- No fixed common-dividend policy identified in 10-K.
+- 2026 repurchase authorization is not treated as a dividend and is not assumed to be fully executed.
+- Forecast cash dividend = CNY 0; forecast dividend yield = 0.
+
+11. Protocol writes and validation
+- Populated result fields using repeated protocol CLI `set` commands.
+- Protocol validation after population: status=ok, errors=[].
+- Final protocol validation after report/trace creation: status=ok, errors=[].
+- JSON parse check passed; result.json, report.md, and trace.txt are all non-empty.
+- data_quality.status=complete; incomplete_reasons=[]; required core metrics, both asset/liability analyses, owner-earnback bridge, dividend forecast, business story, risks, and evidence are present.

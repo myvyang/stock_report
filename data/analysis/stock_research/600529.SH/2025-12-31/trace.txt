@@ -1,0 +1,58 @@
+task: stock research 600529.SH / 山东药玻
+period: 2025-12-31 annual
+generated_at: 2026-07-31T23:22:56+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated every JSON field through protocol set/append commands in /workspace/populate_result.sh; no complex JSON object was handwritten as the result file.
+5. Validated with protocol validate. Initial completed validation: status=ok, errors=[].
+
+[reuse audit]
+- config/input.json exists and supplied company identity, valuation snapshot and model hint.
+- No raw filing directory, metadata.json, annual facts JSON/Markdown, normalized facts, or prior stock-research result existed in the workspace.
+- Therefore no prior research conclusion was reused; public filing data had to be collected.
+
+[sources]
+- Primary disclosure identity: 山东药玻2025年年度报告, disclosed 2026-03-07 via Shanghai Stock Exchange.
+- Accessible full-text mirror used for extraction:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=11985540&stockid=600529
+- Annual report summary mirror:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=11985539&stockid=600529
+- Valuation: config/input.json; Tencent qt.gtimg.cn snapshot at 20260731114336.
+
+[model review]
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Basis: manufacturer of pharmaceutical glass bottles, rubber stoppers and caps; assets are factories/equipment, inventory, trade receivables, own cash and bank structured deposits. No customer deposits, insurance reserves, regulated presale funds, concession rights, or other special-model balance-sheet structure.
+
+[core facts]
+- Revenue 4,474,018,978.75; cost of sales 2,983,735,053.33; gross profit 1,490,283,925.42.
+- Operating profit 837,960,826.94; net profit and parent net profit 689,626,040.66.
+- Total assets 10,043,769,725.38; liabilities 1,749,127,568.90; parent/total equity 8,294,642,156.48; no minority interest.
+- Operating cash flow 576,924,963.36; capex 231,864,537.19; operating FCF 345,060,426.17.
+- Cash 1,073,778,650.87; cash equivalents 942,557,504.68; structured deposits 1,671,299,943.56.
+- Inventory net 1,695,693,730.74 vs 1,278,683,724.80; inventory write-down allowance 183,766,246.79.
+- 2025 total dividend 305,262,491.98, CNY 4.60 per 10 shares, payout ratio 44.26%.
+
+[derived formulas]
+- gross_margin=(4,474,018,978.75-2,983,735,053.33)/4,474,018,978.75=0.33309736335458545.
+- net_margin=689,626,040.66/4,474,018,978.75=0.15414016881365022.
+- discounted_net_cash=942,557,504.68 + 1,671,299,943.56*0.95 - 14,105,433.87 - 23,397,844.45 = 2,492,789,172.742.
+- discounted_cash_profit=576,924,963.36-231,864,537.19=345,060,426.17.
+- operating_business_price=13,093,000,000-2,492,789,172.742=10,600,210,827.258.
+- owner_earnback_years=10,600,210,827.258/345,060,426.17=30.719868241383384.
+- market_cap_to_cash_profit=13,093,000,000/345,060,426.17=37.94407879607007.
+- forecast_dividend_yield=305,262,491.98/13,093,000,000=0.023315778812342474.
+
+[judgment boundaries]
+- 95% structured-deposit recovery is a conservative analyst discount, not a filing fact.
+- Non-cash-equivalent currency funds receive 0% because their free availability was not sufficiently established.
+- Sustainable cash profit uses single-year OCF less all capex. Inventory growth is not normalized away because physical inventory and write-down allowance both rose substantially.
+- Dividend forecast assumes the 2025 total dividend amount repeats; it is not company guidance.
+
+[known limitations]
+- The original SSE PDF was not present locally; extraction used the complete mirrored text of the exchange-disclosed annual report.
+- No authoritative market-share data exists in the annual report; industry position remains qualitative.
+- Maintenance vs expansion capex was not separable with sufficient confidence, so all capex was deducted.

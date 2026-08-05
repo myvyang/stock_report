@@ -1,0 +1,48 @@
+stock-research trace
+company=600578.SH 京能电力
+period=2025-12-31
+generated_for_input=2026-07-31T20:03:00+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar/object/list fields through protocol set/append commands; result.json was not authored as a monolithic hand-written JSON object.
+
+[reuse audit]
+- No files existed in the configured annual_review, raw_filing, normalized_facts, or prior stock_research directories in /workspace.
+- No corresponding files existed at the /root/aicode sync targets.
+- Consequently fetched the official 2025 annual filing from the Shanghai Stock Exchange and extracted its text for field-level verification.
+
+[official sources]
+- 京能电力2025年年度报告, disclosed 2026-04-25:
+  https://www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-25/600578_20260425_KNWV.pdf
+- 京能电力2025年年度权益分派实施公告, disclosed 2026-07-11:
+  https://www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-07-11/600578_20260711_0QKZ.pdf
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, timestamp 20260731114326.
+
+[model review]
+- Confirmed statement_model=utility_concession and owner_earnback_applicability=requires_special_model.
+- Evidence: fixed assets CNY 59,932,091,495.42 and construction in progress CNY 5,267,773,164.32 are core generating assets; electricity fee collection rights, receivables and generating assets are pledged/mortgaged for project financing.
+- Therefore all ordinary owner-earnback ranking fields remain null as required by the result contract.
+- Appropriate replacement model: project/region remaining-life DCF using volume, tariff, fuel/operating cost, maintenance and growth capex, tax, debt/perpetual service, and minority distributions.
+
+[key calculations]
+- gross_profit = 35,425,723,476.94 - 27,887,116,324.38 = 7,538,607,152.56
+- gross_margin = 7,538,607,152.56 / 35,425,723,476.94 = 0.2128003725
+- net_margin = 3,529,539,444.59 / 35,425,723,476.94 = 0.0996321062
+- operating_free_cash_flow = 10,597,801,414.20 - 4,549,901,578.39 = 6,047,899,835.81
+- forecast_dividend_yield = 1,138,085,572.55 / 38,896,000,000 = 0.0292597072
+- balance check: 100,226,197,925.80 - 64,397,397,742.17 = 35,828,800,183.63
+- minority_interest_ratio = 7,271,185,442.80 / 35,828,800,183.63 = 0.2029424766
+
+[judgment boundaries]
+- Fact: revenue was broadly flat, generation fell 3.09%, thermal generation fell 5.91%, and inbound standard-coal unit cost fell 15%.
+- Inference: 2025 profit improvement was driven mainly by fuel-cost relief and cost control rather than volume expansion.
+- Assumption: the implemented 2025 dividend is used only as a neutral next-year run-rate forecast; it is not management guidance.
+- Limitation: no project-level remaining life, maintenance capex split, amortization schedule, or upstreamable cash data; no special-model earnback number was fabricated.
+
+[validation]
+- Protocol validate executed after population: status=ok, errors=[].
+- Final validation and JSON parse checks are executed after report/trace creation.

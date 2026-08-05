@@ -1,0 +1,53 @@
+stock-research trace
+generated_at=2026-08-05T02:35:02+08:00
+query=01599.HK
+period=2025-12-31
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse check
+- Checked configured annual-review facts.json, annual_facts.md, extraction_trace.txt, normalized facts, raw filing metadata.
+- No reusable fact package or filing metadata was present.
+
+3. Identity/model verification
+- HKEX 2025 Annual Report identifies issuer as Beijing Urban Construction Design & Development Group Co., Limited, stock code 1599.
+- Annual report states two segments: design/survey/consultancy and construction contracting.
+- Input hint financial_brokerage rejected as factually incorrect.
+- Final model: construction_project; owner_earnback_applicability=requires_special_model.
+
+4. Primary sources
+- HKEX 2025 Annual Report, published 2026-04-13:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0413/2026041300342.pdf
+- HKEX Distribution of Final Dividend for year ended 2025, published 2026-04-24:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042400682.pdf
+- Market snapshot from config/input.json: Tencent qt.gtimg.cn, timestamp 2026/08/03 09:20:05.
+
+5. Key extraction locations
+- Annual report pp. 5-6 and 12: identity, segments, revenue mix and revenue change.
+- Annual report pp. 114-117: consolidated balance sheet.
+- Annual report pp. 118-119: consolidated income statement.
+- Annual report pp. 120-122: consolidated cash-flow statement.
+- Annual report pp. 109-110: key audit matter for receivables and contract assets impairment.
+- Annual report p. 17: borrowings, interest rates and maturity.
+- Dividend announcement p. 1: RMB0.0717/share and RMB96,699,639 aggregate dividend.
+
+6. Calculations
+- gross_profit = revenue - cost_of_sales = 7,527,306,503.62 - 6,033,259,159.07 = 1,494,047,344.55.
+- gross_margin = 1,494,047,344.55 / 7,527,306,503.62 = 0.198483739303.
+- net_margin = parent_net_profit / revenue = 515,193,735.86 / 7,527,306,503.62 = 0.068443306879.
+- operating_free_cash_flow = 307,663,040.24 - 47,791,922.87 = 259,871,117.37.
+- forecast_dividend_yield = 96,699,639 / 1,195,068,545.2264547 = 0.080915558514.
+- receivables_plus_contract_assets = 4,245,031,623.74 + 5,778,305,372.01 = 10,023,336,995.75.
+
+7. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields only through protocol set/append commands.
+- Ordinary owner-earnback metrics retained as null because the construction-project model requires special handling.
+
+8. Validation
+- Protocol validation result before report completion: status=ok, errors=[].
+- Final validation repeated after all outputs were written.

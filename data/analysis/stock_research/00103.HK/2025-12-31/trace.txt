@@ -1,0 +1,39 @@
+stock-research trace for 00103.HK / 2025-12-31
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Checked local annual-review, raw-filing, normalized-facts and prior stock-research paths. No reusable filing/facts/research artifacts existed in the workspace.
+4. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Located official/company-hosted 2025 Annual Report and results announcement through Shougang Century investor-relations page and HKEX title search.
+6. Model verification: annual report pp.2 and 125 identifies manufacturing and sales of steel cords, sawing wires and hose wires. Overrode erroneous input hint financial_brokerage with ordinary_operating/applicable.
+7. Core extraction from annual report (HK$000):
+   revenue 2,424,159; cost of sales 2,052,558; gross profit 371,601; parent profit 54,240.
+   total assets 3,785,617; total liabilities 1,849,679; total/parent equity 1,935,938.
+   OCF 114,926; PPE purchase 50,997; PPE prepayment 44,731; intangible additions 3,332; financing CF 158,455.
+   cash 570,361; pledged deposits 33,959; interest-bearing borrowings 724,540.
+8. Currency normalization: used HKD/CNY 0.90909, consistent with the company's May 2026 circular approximation HK$604.320m = RMB549.382m. All result monetary values are absolute CNY yuan.
+9. Formula checks:
+   gross margin = 371,601 / 2,424,159 = 0.15329069.
+   net margin = 54,240 / 2,424,159 = 0.02237482.
+   operating FCF = 114,926 - 50,997 - 44,731 - 3,332 = HK$15.866m = CNY14.424m.
+   discounted sustainable cash profit = CNY14.424m * 80% = CNY11.539m.
+   detachable net cash = zero because cash plus pledged deposits is below interest-bearing debt and expansion funding remains required.
+   operating business price = CNY740.219m market cap - zero = CNY740.219m.
+   earnback years = 740.219 / 11.539 = 64.148.
+   forecast dividend = HK$40.5m * 0.90909 = CNY36.818m; yield = 36.818 / 740.219 = 4.9756%.
+10. Populated all structured fields using protocol CLI set commands; did not hand-write result.json.
+11. Wrote outputs/report.md and outputs/trace.txt.
+12. Final protocol validation executed after file creation: status=ok, errors=[].
+
+Source URLs:
+https://doc.irasia.com/listco/hk/shougangcentury/annual/2025/ar2025.pdf
+https://doc.irasia.com/listco/hk/shougangcentury/annual/2025/res.pdf
+https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=165
+https://www.hkexnews.hk/listedco/listconews/sehk/2026/0529/2026052901157.pdf
+
+Limitations:
+- Market cap and PE use the supplied Tencent snapshot rather than an exchange official quote.
+- Dividend forecast is a flat carry-forward of the 2025 declared amount, not company guidance for 2026.
+- Single-year expansion-period FCF is sensitive to capital expenditure timing.

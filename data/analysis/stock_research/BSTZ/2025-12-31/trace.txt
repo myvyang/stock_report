@@ -1,0 +1,48 @@
+BSTZ stock-research trace
+generated_at: 2026-08-04T15:00:21+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Initialized protocol result
+- command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- result: initialized stock-research-result-v1 skeleton
+
+3. Local-data reuse check
+- Expected annual facts, normalized facts, filing metadata and historical research paths from config/input.json were absent in /workspace.
+- No prior BSTZ research result was available for reuse.
+
+4. Primary-source research
+- SEC EDGAR accession 0001193125-26-093603 confirmed issuer, N-CSR filing type, period 2025-12-31 and filing date 2026-03-05.
+- BlackRock 2025 Annual Report to Shareholders supplied statements of assets and liabilities, operations, changes in net assets, portfolio allocation, distribution rate, NAV and limited-term provisions.
+- BlackRock official BSTZ product materials supplied current fund identity and investment approach context.
+- 2025-12-31 USD/CNY central parity of 7.0288 used to convert USD filing amounts to absolute CNY yuan.
+- Input market cap, market-cap date and PE retained as supplied; not treated as filing facts.
+
+5. Model decision
+- Overrode input hint ordinary_operating/applicable.
+- Selected investment_holding/requires_special_model because BSTZ is a closed-end investment trust and its securities portfolio is the operating asset itself.
+- Left ordinary owner-earnback fields null by contract.
+- Used NAV discount, portfolio valuation/liquidity, expenses, distribution sources and term realization mechanics as the special-model framework.
+
+6. Key calculations
+- 2025-12-31 NAV discount = 22.61 / 24.98 - 1 = -9.4876%.
+- CNY figures = reported USD figures * 7.0288.
+- Forecast annual distribution = USD 1.95/share * 68,744,150 shares * 7.0288 = CNY 942,218,318.964.
+- Forecast distribution yield = CNY 942,218,318.964 / input market cap CNY 13,188,266,434.730347 = 7.1444%.
+- Dividend and repurchase cash out proxy = (USD 196,402,227 distributions + USD 74,446,790 repurchase offer) * 7.0288 = CNY 1,903,703,168.2064.
+
+7. Protocol population
+- Populated fields through repeated protocol set commands; did not construct result.json manually.
+
+8. Validation
+- command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- result: status=ok, errors=[]
+
+Limitations recorded in result.json:
+- Market snapshot is later than the fiscal report date.
+- Cross-date valuation comparison includes asset-price and FX timing differences.
+- Ordinary-company revenue, gross profit, operating cash flow and capex are not economically comparable for this fund and remain null.
+- Distribution forecast is a mechanical annualization, not a guarantee.

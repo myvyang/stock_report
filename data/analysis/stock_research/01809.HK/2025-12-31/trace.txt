@@ -1,0 +1,60 @@
+stock-research trace
+company: 01809.HK / PRINX CHENGSHAN
+period: 2025-12-31
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md, references/report-contract.md and references/data-reuse.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked the configured annual facts, normalized facts, prior stock-research outputs and raw filing paths.
+- No annual facts package, normalized facts or prior research existed for 01809.HK/2025-12-31.
+- Downloaded the official Chinese 2025 annual report from HKEX to:
+  stock_report/data/raw/filings/01809.HK/2025-12-31/annual-report-2025-cn.pdf
+- Official filing URL:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042803340_c.pdf
+
+3. Model verification
+- Input hint classified the company as financial_brokerage.
+- Annual report pages 7-8 and 62-63 identify the business as tire design, R&D, manufacturing and sales, with revenue basically derived from tire sales.
+- Balance sheet is a manufacturing structure: factories/equipment, inventory and trade receivables on the asset side; supplier payables and ordinary borrowings on the liability side.
+- Overrode the hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+4. Core evidence extracted
+- Annual report p.109: revenue RMB11,806,801,000; cost of sales RMB9,669,014,000; gross profit RMB2,137,787,000; operating profit RMB1,194,415,000; net profit RMB1,087,594,000; parent net profit RMB1,087,559,000.
+- Annual report pp.111-112: total assets RMB11,744,674,000; total liabilities RMB4,555,265,000; total equity RMB7,189,409,000; parent equity RMB7,189,455,000.
+- Annual report p.115: operating cash flow RMB1,201,152,000; purchases of PPE/land-use rights RMB577,295,000; purchases of intangibles RMB4,159,000; financing cash flow -RMB167,456,000; paid dividends RMB285,013,000; treasury share purchases RMB27,438,000.
+- Annual report p.155 and pp.111-112: cash, deposits, restricted cash, financial assets, borrowings, lease liabilities and related-party balances used in cash breakdown.
+- Annual report pp.5, 63-64: gross margin, net margin, turnover days and management explanation of tariff and receivable changes.
+- HKEX dividend schedule: final dividend HKD0.5 per share, shown as CNY0.45 equivalent.
+- config/input.json: market cap RMB3,719,618,908.379674; date 2026/08/03 09:45:34; source Tencent qt.gtimg.cn; PE TTM 3.59.
+
+5. Calculations
+- gross_margin = 2,137,787,000 / 11,806,801,000 = 0.1810640325.
+- net_margin = 1,087,559,000 / 11,806,801,000 = 0.0921129271.
+- 2025 operating FCF = 1,201,152,000 - 577,295,000 - 4,159,000 = 619,698,000.
+- 2024 operating FCF = 1,250,208,000 - 582,427,000 - 7,400,000 = 660,381,000.
+- sustainable cash profit = average(619,698,000, 660,381,000) * 85% = 544,033,575.
+- discounted detachable net cash = cash 1,034,913,000 + long deposit 30,000,000 + wealth products 141,771,000*80% + listed securities 8,687,000*70% - borrowings/leases/related-party payable 963,321,000 = 221,089,700.
+- operating business price = 3,719,618,908.379674 - 221,089,700 = 3,498,529,208.379674.
+- owner earnback years = 3,498,529,208.379674 / 544,033,575 = 6.4307229722.
+- market cap / cash profit = 3,719,618,908.379674 / 544,033,575 = 6.8371127800.
+- estimated dividend shares = 1,087,559,000 / CNY1.71 EPS = about 635,999,415 shares.
+- forecast cash dividend = estimated shares * CNY0.45 = RMB286,199,737; yield = 0.0769432955.
+
+6. Judgment boundaries
+- Restricted cash received a 0% detachable value.
+- Related-party receivable was excluded from detachable cash because collection timing and governance constraints were not sufficiently evidenced.
+- Wealth products and listed securities received 80% and 70% values respectively.
+- All borrowings, lease liabilities and related-party payables were deducted at 100%.
+- The 15% cash-profit haircut reflects tariff/raw-material volatility and ongoing expansion; it is a research judgment, not a reported fact.
+- Industry-leading language is attributed to the company and not presented as independently verified market share.
+
+7. Protocol writes and validation
+- All result fields were populated with protocol CLI set commands after protocol initialization; no complex result JSON was created from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[].

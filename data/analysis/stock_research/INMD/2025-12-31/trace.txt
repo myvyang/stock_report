@@ -1,0 +1,56 @@
+stock-research trace
+task: INMD / annual / 2025-12-31
+generated context: 2026-08-04 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse audit
+- config/input.json exists.
+- Requested annual facts, normalized facts, raw filing metadata, and historical stock-research files did not exist under stock_report.
+- Therefore returned to primary public filing sources.
+
+3. Protocol lifecycle
+- Initialized: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields only through protocol set commands (temporary outputs/populate.sh was used as a command driver and then removed).
+- Validated: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+
+4. Primary sources
+- SEC 20-F filing index, filed 2026-02-10, period 2025-12-31:
+  https://www.sec.gov/Archives/edgar/data/1742692/000117891326000377/0001178913-26-000377-index.htm
+- SEC 20-F document:
+  https://www.sec.gov/Archives/edgar/data/1742692/000117891326000377/zk2634286.htm
+- SEC Exhibit 99.1, 2025 full-year results:
+  https://www.sec.gov/Archives/edgar/data/1742692/000117891326000375/exhibit_99-1.htm
+- CFETS/PBOC-authorized 2025-12-31 central parity, Xinhua publication: USD/CNY 7.0288
+  https://www1.xinhuanet.com/20251231/fe9f6466f6884589b5287e6ee946baed/c.html
+- Market snapshot reused as supplied: config/input.json, Yahoo Finance yfinance, market cap date 2026-08-03.
+
+5. Source USD facts (thousands unless noted)
+- Total assets 766,429; liabilities 83,231; shareholders' equity 683,198; no NCI shown.
+- Revenue 370,495; cost of revenue 79,525; gross profit 290,970; operating income 85,387; net income 93,831.
+- CFO 85,257; fixed asset purchases 972; operating FCF 84,285; financing CF -126,059; repurchases 127,444.
+- Cash 302,543; marketable securities 83,632; short-term deposits 169,159; lease liabilities 8,227.
+- Capital equipment revenue 289,118; consumables/service 81,377.
+- All statement amounts converted at 7.0288 CNY/USD.
+
+6. Model and calculations
+- Model confirmed ordinary_operating/applicable because products and services drive the business; there are no customer-fund, reserve, project-finance, or concession structures.
+- Gross margin = 290,970 / 370,495 = 0.7853547281.
+- Net margin = 93,831 / 370,495 = 0.2532584785.
+- Discounted detachable net cash USD = 302.543m*100% + 169.159m*95% + 83.632m*90% - 8.227m = 530.2884m.
+- Discounted detachable net cash CNY = 3,727,273,182.48.
+- Sustainable cash profit judgment = USD 65m = CNY 456,872,000. Starting point was USD 84.285m FCF; adjustment removes detachable-cash interest and adds conservatism for revenue decline and working-capital build.
+- Operating business price = 5,872,507,048.391418 - 3,727,273,182.48 = 2,145,233,865.9114184.
+- Owner earnback = 2,145,233,865.9114184 / 456,872,000 = 4.6954811543 years.
+- Market cap / cash profit = 12.8537250004.
+- Dividend forecast = zero because no cash dividend has ever been declared/paid and none was announced; buybacks are separately discussed.
+
+7. Quality limitations
+- Income/cash-flow translation uses year-end FX, not an average rate, to satisfy one consistent CNY protocol basis.
+- Market cap and PE were supplied by yfinance and not independently exchange-verified.
+- Sustainable cash profit is an analytical estimate, not company guidance; cash-interest removal and working-capital normalization are the key judgment sensitivities.

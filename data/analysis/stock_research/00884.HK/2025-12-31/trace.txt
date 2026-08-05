@@ -1,0 +1,57 @@
+stock-research trace
+company: 00884.HK / 旭辉控股（集团）有限公司
+period: 2025-12-31 annual
+generated_at_input: 2026-08-03T15:20:07+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar and list fields through protocol set/append commands in populate_result.sh.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse audit]
+- No filing metadata, annual facts, normalized facts, or prior stock-research result existed for 00884.HK/2025-12-31.
+- Downloaded official annual report to stock_report/data/raw/filings/00884.HK/2025-12-31/2025-annual-report.pdf.
+- Extracted a local text copy at stock_report/data/raw/filings/00884.HK/2025-12-31/2025-annual-report.txt for verification.
+
+[model correction]
+- Input hint: financial_brokerage.
+- Verified model: real_estate_developer.
+- Basis: annual report states principal activities are property development, property investment, and property management in China.
+- Owner earnback applicability: requires_special_model. Ordinary net-cash earnback fields left null.
+
+[primary sources]
+- HKEX 2025 annual report, published 2026-04-30:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0430/2026043000075.pdf
+- HKEX announcement of 2025 annual results, published 2026-03-31:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0331/2026033101607.pdf
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, timestamp 2026/07/31 16:08:44.
+
+[key extraction]
+- Income statement: revenue RMB25,451,996,000; cost RMB23,708,461,000; gross profit RMB1,743,535,000; net profit RMB15,895,106,000; parent net profit RMB17,666,379,000.
+- Balance sheet: assets RMB203,310,865,000; liabilities RMB144,001,636,000 (assets less equity); equity RMB59,309,229,000; parent equity RMB30,340,873,000; NCI RMB28,968,356,000.
+- Cash flow: OCF RMB3,119,513,000; additions to investment properties RMB723,562,000; PP&E purchases RMB49,390,000; descriptive FCF RMB2,346,561,000; financing cash flow RMB-3,696,727,000.
+- Cash structure: cash equivalents RMB1,027,430,000; restricted project cash RMB4,130,772,000; pledged deposits RMB1,467,451,000.
+- Total indebtedness RMB50,439,752,000 based on disclosed components; disclosed rounded total RMB50,439.8 million.
+- No ordinary shareholder dividend paid in 2025 or 2024; no 2025 final dividend proposed.
+
+[calculations]
+- gross_margin = 1,743,535,000 / 25,451,996,000 = 0.0685028786642048.
+- net_margin = 17,666,379,000 / 25,451,996,000 = 0.6941041868977203; mechanically follows contract but is distorted by restructuring gains.
+- minority_interest_ratio = 28,968,356,000 / 59,309,229,000 = 0.4884282933988467.
+- capital_expenditure = 723,562,000 + 49,390,000 = 772,952,000.
+- operating_free_cash_flow = 3,119,513,000 - 772,952,000 = 2,346,561,000; descriptive only, not an earnback denominator.
+- forecast dividend = RMB0; forecast yield = 0 / 609,014,976.1730433 = 0.
+
+[judgment boundaries]
+- Facts: financial statements, cash restrictions, debt balances, audit emphasis, operating statistics, and dividend decisions.
+- Inference: company is in shrinkage, delivery, and restructuring mode; reported PE lacks normal earnings meaning.
+- Forecast/judgment: zero cash dividend baseline; no management dividend guidance claimed.
+
+[limitations]
+- Market cap and PE were accepted from the supplied snapshot and not independently recomputed.
+- Auditor expressed an unmodified opinion but highlighted material uncertainty related to going concern.
+- Core loss and audit-note loss exclusions use different definitions; both are reported with their labels rather than conflated.

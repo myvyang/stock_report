@@ -1,0 +1,23 @@
+2026-08-04T17:54:13+08:00 START query=CASH requested_period=2025-12-31 report_type=annual
+SKILL read .agents/skills/stock-research/SKILL.md
+CONTRACT read result-contract.md and report-contract.md
+REUSE read data-reuse.md
+REUSE_CHECK annual facts, normalized facts and raw filing paths absent; no prior output reused
+SOURCE SEC FY2025 10-K https://www.sec.gov/Archives/edgar/data/907471/000090747125000116/cash-20250930.htm filed 2025-11-25
+SOURCE Pathward annual reports https://pathwardfinancial.com/financials/annual-reports/default.aspx
+SOURCE task input market cap=12569832627.397339 CNY date=2026-08-03 PE_TTM=11.043805 source=Yahoo Finance yfinance
+PERIOD_DECISION requested 2025-12-31 is not a Pathward annual fiscal endpoint; used audited FY ended 2025-09-30 and did not mix subsequent quarter into annual results
+MODEL_OVERRIDE input hint ordinary_operating/applicable rejected
+MODEL_CONFIRMED financial_bank/requires_special_model because Pathward is a bank holding company and deposits, loans, securities and liquidity are operating balance-sheet items
+FX_TRANSLATION 1 USD=7.12 CNY used consistently for result.json absolute-yuan amounts; research display convention, not filing datum
+EXTRACT audited FY2025: assets=7172344k USD liabilities=6314890k equity=857454k parent_equity=858045k revenue=839894k parent_net_income=185872k
+EXTRACT operating: NIM=7.34% deposit_cost=0.09% deposits=5886947k USD noninterest_bearing_share=95.5% loans_net=4611589k USD ACL_ratio=1.14%
+EXTRACT capital: company CET1=12.70% tier1=12.95% total=14.27% leverage=9.79%
+EXTRACT distribution: FY2025 dividends=4686k USD repurchases=163047k USD; quarterly dividend=0.05 USD/share
+FORECAST dividend assumes 0.20 USD/share times 22,339,006 shares times 7.12; no growth and not company guidance
+NULL_POLICY gross margin, ordinary OCF/capex/FCF, detachable net cash, discounted cash profit, operating business price and earnback multiples left null because bank model makes them economically non-comparable
+PROTOCOL initialized outputs/result.json with CLI; populated fields using repeated protocol set commands
+VALIDATION protocol validate status=ok errors=[]
+OUTPUT outputs/result.json
+OUTPUT outputs/report.md
+OUTPUT outputs/trace.txt

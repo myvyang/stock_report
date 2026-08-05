@@ -3,66 +3,55 @@ stock_research trace
 company: 00118.HK 大同机械 / COSMOS MACH
 period: 2025-12-31
 report_type: annual
-generated_at: 2026-07-27 Asia/Shanghai
+generated_at: 2026-08-03 Asia/Shanghai
 
 skill_and_contracts_read:
 - /workspace/.agents/skills/stock-research/SKILL.md
 - /workspace/.agents/skills/stock-research/references/result-contract.md
 - /workspace/.agents/skills/stock-research/references/report-contract.md
-- /workspace/.agents/skills/stock-research/references/data-reuse.md
 
 protocol_cli:
-- initialized outputs/result.json with:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- populated outputs/result.json using stock_analysis.stock_research.protocol set/append commands
-- validated outputs/result.json with:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-- validation result: ok
+- initialized outputs/result.json from config/input.json with protocol init
+- populated fields with protocol set and evidence with protocol append
+- final validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
 
 input_and_reused_files:
 - config/input.json
 - stock_report/data/analysis/annual_review/00118.HK/2025-12-31/facts.json
 - stock_report/data/analysis/annual_review/00118.HK/2025-12-31/annual_facts.md
-- stock_report/data/normalized/facts/00118.HK/2025-12-31/annual-facts.json
 - stock_report/data/analysis/annual_review/00118.HK/2025-12-31/extraction_trace.txt
 - stock_report/data/raw/filings/00118.HK/2025-12-31/metadata.json
 - stock_report/data/raw/filings/00118.HK/2025-12-31/00118_2025_annual_cosmel.txt
 - stock_report/data/analysis/stock_research/00118.HK/2025-12-31/result.json
 - stock_report/data/analysis/stock_research/00118.HK/2025-12-31/report.md
-- stock_report/data/analysis/stock_research/00118.HK/2025-12-31/trace.txt
-- stock_report/data/notes/user_stock_evaluations.md
 
-core_data_points_checked:
-- revenue, cost of sales, gross profit, operating profit, net profit and parent net profit from Annual Report 2025 consolidated income statement, p.156.
-- balance sheet totals, parent equity and minority interest from Annual Report 2025 statement of financial position, pp.158-159.
-- segment revenue and segment result from Annual Report 2025 note 5, p.215.
-- operating cash flow, capex and working capital movements from Annual Report 2025 cash flow statement, pp.162-164.
-- cash, pledged bank deposits and RMB cash restriction from Annual Report 2025 note 27, pp.255-256.
-- trade receivables credit period and aging from Annual Report 2025 note 25, pp.253-254.
-- payables, contract liabilities, bank borrowings and lease liabilities from Annual Report 2025 notes 28-30.
-- dividend disclosure from Annual Report 2025 directors report and note 15, pp.25,237.
+model_review:
+- input hint financial_brokerage rejected after filing review
+- confirmed statement_model: ordinary_operating
+- confirmed owner_earnback_applicability: applicable
+- basis: segment revenue is industrial consumables trading, plastic processing/manufacturing, machinery manufacturing and machinery leasing; balance sheet has ordinary operating assets and liabilities, not brokerage client money or securities financing structure
 
 valuation_and_conversion:
-- market cap used: 149,000,000 CNY from config/input.json, as-of 2026-07-24.
-- PE TTM used: 12.87 from config/input.json.
-- financial statement source currency: HKD.
-- conversion used for financial statement display: 1 HKD = 0.8636 CNY, reused from existing stock_research result and facts.
-- old stock_research result contained prior market cap of 148.873 million CNY; this run uses the current input market cap, so operating business price and earnback years were recalculated.
+- market cap: 140,891,331.73406124 CNY, as of 2026/07/31 16:08:47, source Tencent qt.gtimg.cn
+- PE TTM: 12.23
+- filing currency: HKD
+- financial statement conversion: 1 HKD = 0.8636 CNY, reused from prior fact/research package
 
 owner_earnback:
-- discounted detachable net cash: 60,776,972.68 CNY.
-- discounted sustainable cash profit: 7,772,400.00 CNY.
-- operating business price: 88,223,027.32 CNY.
-- owner earnback years: 11.35080892903093.
-- market cap to cash profit: 19.17039781791982.
-- calculation used current input market cap minus reused discounted detachable net cash.
+- discounted detachable net cash: 60,776,972.68 CNY
+- discounted sustainable cash profit: 7,772,400.00 CNY
+- operating business price: 80,114,359.05406123 CNY
+- owner earnback years: 10.3075445234498
+- market cap to cash profit: 18.12713341233869
+- assumptions reused from prior research because no newer filing changed the 2025 balance-sheet facts; current market cap metrics recalculated
 
 unresolved_items:
-- complete cash distribution among listed parent, Hong Kong/offshore subsidiaries and PRC operating subsidiaries.
-- exact required operating cash model.
-- split between maintenance and growth capex.
-- next-year customer order renewals, price competition intensity and working-capital trajectory.
+- complete treasury distribution across listed parent, offshore entities and PRC operating subsidiaries
+- exact required operating cash
+- maintenance versus growth capex split
+- future order renewals, price competition and working-capital trajectory
 
 data_quality:
-- status: complete.
-- limitation: result is consumable, but cash detachability and sustainable cash profit remain estimate-driven because public filings do not disclose the internal treasury map or exact maintenance capex.
+- status: complete
+- incomplete_reasons: none
+- limitations are recorded in outputs/result.json and outputs/report.md

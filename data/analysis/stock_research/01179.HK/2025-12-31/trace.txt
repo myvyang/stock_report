@@ -1,0 +1,77 @@
+stock-research trace
+task: 01179.HK / HWORLD-S
+period: 2025-12-31 annual
+generated_at: 2026-08-03 Asia/Shanghai
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated initialized paths exclusively through protocol `set` commands.
+4. Validated with protocol `validate`; result: status=ok, errors=[].
+
+[reuse check]
+- Checked configured annual review, normalized facts, raw filing, and prior stock research paths.
+- No reusable 01179.HK / 2025-12-31 facts package, filing, or prior research output was present in the workspace.
+- Therefore retrieved official company filings/publication pages.
+
+[model verification]
+- Input hint classified the company as financial_brokerage.
+- Official Form 20-F identifies H World as a hotel group earning revenue from leased/owned hotels and manachised/franchised hotels.
+- No broker customer funds, proprietary securities book, repo funding, brokerage, investment-banking, or asset-management operating model was found.
+- Overrode hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Lease liabilities are matched to hotel right-of-use assets and ongoing hotel operations; they were analyzed as operating obligations, not deducted again as ordinary interest-bearing debt. Cash flow used for earnback already contains lease cash payments.
+
+[primary sources]
+- H World Group Limited 2025 Form 20-F, filed 2026-04-24:
+  https://ir.hworld.com/static-files/1457eb01-47cb-43e2-83ca-df48ca863e2c
+  Relevant sections: Item 4.B/4.D; Item 5; F-5 balance sheet; F-6 income statement; F-8/F-9 cash flow; Note 14 geographic assets; Note 15 dividends; Note 16 leases.
+- H World Group Limited Q4 and full-year 2025 results, published 2026-03-18:
+  https://ir.hworld.com/news-releases/news-release-details/h-world-group-limited-reports-fourth-quarter-and-full-year-2025
+- Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, timestamp 2026/07/31 16:08:45.
+
+[key extraction: RMB absolute yuan]
+- total_assets=64,774,000,000
+- total_liabilities=51,816,000,000
+- total_equity=12,958,000,000
+- parent_equity=12,804,000,000
+- revenue=25,307,000,000
+- direct operating costs=hotel operating costs 15,339,000,000 + other operating costs 61,000,000
+- analytical gross_profit=9,907,000,000; gross_margin=0.39147271505907455
+- operating_profit=6,819,000,000
+- net_profit=5,115,000,000
+- parent_net_profit=5,080,000,000; net_margin=0.20073497451298059
+- operating_cash_flow=8,379,000,000
+- cash capital expenditure=828,000,000 PPE + 10,000,000 intangible = 838,000,000
+- operating_free_cash_flow=7,541,000,000
+- cash=10,386,000,000; restricted cash excluded=146,000,000
+- short_term_investments=4,894,000,000
+- interest_bearing_debt=5,337,000,000 current + 479,000,000 long term = 5,816,000,000
+- lease liabilities=3,478,000,000 current operating + 23,653,000,000 noncurrent operating + 59,000,000 current finance + 3,063,000,000 noncurrent finance = 30,253,000,000
+
+[owner earnback calculations]
+- discounted detachable net cash = cash*100% + short-term investments*90% - debt*100%
+  = 10,386,000,000 + 4,404,600,000 - 5,816,000,000
+  = 8,974,600,000
+- operating business price = market cap 88,046,483,437.73305 - 8,974,600,000
+  = 79,071,883,437.73305
+- FCF 2023 = 7,674,000,000 - 901,000,000 = 6,773,000,000
+- FCF 2024 = 7,518,000,000 - 898,000,000 = 6,620,000,000
+- FCF 2025 = 8,379,000,000 - 838,000,000 = 7,541,000,000
+- three-year mean FCF = 6,978,000,000
+- discounted sustainable cash profit = mean*90% = 6,280,200,000
+- owner earnback years = 79,071,883,437.73305 / 6,280,200,000 = 12.590663265140131
+- market cap / cash profit = 88,046,483,437.73305 / 6,280,200,000 = 14.019694187722214
+
+[dividend calculation]
+- Company disclosed FY2025 shareholder cash dividends of approximately USD650m.
+- Translation uses company FY-end convenience rate USD1=RMB6.9931.
+- forecast_cash_dividend/run-rate basis = 650,000,000*6.9931 = 4,545,515,000
+- forecast_dividend_yield = 4,545,515,000 / 88,046,483,437.73305 = 0.05162630945067344
+- This is a run-rate based on declared FY2025 dividends, not a board commitment for FY2026.
+
+[limitations]
+- H World does not present US GAAP gross profit. Analytical gross profit equals revenue less hotel operating costs and other operating costs.
+- Market cap and PE were accepted from the task input and were not revalidated against exchange tick data.
+- Detachable cash was not traced through every subsidiary/jurisdiction; cross-border distribution and statutory reserve friction remains.
+- No buy/sell recommendation or target price was produced.

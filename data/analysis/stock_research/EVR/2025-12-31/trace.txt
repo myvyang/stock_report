@@ -1,0 +1,54 @@
+stock-research trace: EVR / 2025-12-31 annual
+generated_at_input: 2026-08-05T05:40:06+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Also read references/data-reuse.md because the skill directs reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the configured raw filing, annual review, normalized facts, and historical stock-research paths.
+- No EVR filing package, annual facts package, normalized facts, or prior EVR research result existed in this workspace.
+- Therefore retrieved primary public materials rather than inventing or substituting third-party financial summaries.
+
+3. Primary evidence used
+- SEC 2025 Form 10-K, accession 0001628280-26-010273, filed 2026-02-20:
+  https://www.sec.gov/Archives/edgar/data/1360901/000162828026010273/evr-20251231.htm
+- Evercore FY2025 earnings release, dated 2026-02-04:
+  https://investors.evercore.com/news-releases/news-release-details/evercore-reports-record-fourth-quarter-and-full-year-2025
+- Evercore quarterly-results page, including Q1 2026 dividend increase:
+  https://investors.evercore.com/financial-information/quarterly-results
+- SAFE/PBOC central parity query; 2025-12-31 USD/CNY = 7.0288:
+  https://www.safe.gov.cn/AppStructured/hlw/RMBQuery.do
+- Market cap and PE TTM were reused exactly from config/input.json (Yahoo Finance yfinance, 2026-08-03).
+
+4. Model determination
+- Input hint: ordinary_operating / applicable.
+- Filing facts: 98% of revenue excluding Other Revenue, net came from Investment Banking & Equities; EGL is a U.S. registered broker-dealer; U.K. affiliates are FCA-regulated; regulated subsidiaries held approximately USD 1.65bn of cash and securities; distributions may be delayed or restricted; part of the securities portfolio economically hedges deferred cash compensation.
+- Override applied: financial_brokerage / requires_special_model.
+- Consequence: all ordinary discounted-net-cash, discounted-cash-profit, operating-business-price and payback fields remain null by contract.
+
+5. Currency conversion and calculations
+- All filing amounts were reported in USD thousands and multiplied by 1,000 * 7.0288 to produce CNY yuan.
+- This year-end translation is a display convention, not an income-statement average-rate translation.
+- Net margin = parent net income / net revenue = 591,922 / 3,855,820 = 0.1535139088.
+- Operating free cash flow = operating cash flow 1,256,464 - capex 74,002 = USD 1,182,462 thousand; retained as a descriptive cash-flow metric despite the special model.
+- Dividend and buyback outflow = treasury stock purchases 661,059 + Class A cash dividends 128,489 = USD 789,548 thousand. Deferred cash dividends and NCI distributions are not included in this field.
+- Forecast dividend = USD 0.89 * 4 * 39,605,448 Class A shares * 7.0288 = CNY 991,028,430 (rounded).
+- Forecast yield = 991,028,430 / 83,675,588,754.80566 = 0.0118436983.
+
+6. Important interpretation choices
+- Gross margin remains null because the filing does not present cost of sales/gross profit and personnel compensation is the principal production cost; manufacturing-style gross margin would be misleading.
+- OCF and FCF are disclosed but not used as ordinary owner earnings because annual bonus timing materially affects working capital.
+- Regulatory capital excess is described, not deducted from market cap or labeled fully distributable.
+- Repurchases used for employee RSU net settlement are distinguished from open-market program repurchases.
+- No buy/sell advice, target price, ranking label, or unsupported deterministic conclusion is included.
+
+7. Result construction and validation
+- Populated outputs/result.json through repeated protocol CLI `set` calls; did not hand-write the complex JSON object.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].
+

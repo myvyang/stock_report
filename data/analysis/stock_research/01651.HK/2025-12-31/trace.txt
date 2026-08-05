@@ -1,0 +1,81 @@
+stock-research trace
+company_input=01651.HK / TSUGAMI CHI-500
+task_period_input=2025-12-31
+effective_annual_period=2025-03-31
+generated_for_timezone=Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md completely.
+3. Read references/report-contract.md completely.
+4. Read references/data-reuse.md because the referenced annual fact package was absent.
+5. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+6. Populated result fields using protocol set commands; arrays were also set through the protocol CLI.
+7. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result=status ok, errors=[]
+
+[local-reuse-check]
+Expected paths under stock_report/data/raw/filings/01651.HK/2025-12-31 and stock_report/data/analysis/annual_review/01651.HK/2025-12-31 were absent.
+No historical stock-research result was available under /workspace or /root/aicode for this company/period.
+
+[official-sources]
+S1 HKEX annual results announcement, published 2025-06-25:
+https://www.hkexnews.hk/listedco/listconews/sehk/2025/0625/2025062500912.pdf
+Used for company identity, business model, FY2025 statements, product/geographic revenue, receivables, dividends, liquidity, capex, gearing and management discussion.
+
+S2 Company FY2025 annual results presentation, published 2025-06-26:
+https://www.tsugami.com.cn/media/2290/fy2025-e-0624-169.pdf
+Used for product/business narrative and FY2025 dividend per share/payout ratio.
+
+S3 Input market snapshot:
+source=Tencent qt.gtimg.cn
+timestamp=2026/08/03 09:47:54
+market_cap_cny=16220621067.51144
+pe_ttm=15.21
+
+[model-review]
+Input hint classified the company as financial_brokerage. Official filing states the group primarily manufactures and sells high-precision CNC machine tools. Balance sheet contains manufacturing PPE, inventory, trade/notes receivables, cash and supplier payables; there are no bank loans. Overrode hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+[period-review]
+The company year-end is 31 March, not 31 December. At the requested cutoff 2025-12-31, the latest fully published annual report was FY2025 ending 2025-03-31. analysis.period was corrected accordingly. The input market cap is dated 2026-08-03, so valuation and financial statements are not contemporaneous; this is disclosed as a limitation.
+
+[core-calculations]
+total_assets=659512000+3594974000=4254486000
+total_liabilities=973945000+146379000=1120324000
+gross_margin=1410433000/4261557000=0.3309751653
+net_margin=782417000/4261557000=0.1835988360
+capex=42405000+2524000=44929000
+operating_free_cash_flow=352914000-44929000=307985000
+dividend_and_buyback_cash_out=294857000+61736000=356593000
+
+discounted_cash=1081652000*0.70=757156400
+lease_liabilities=1338000+1005000=2343000
+discounted_detachable_net_cash=757156400-2343000=754813400
+discounted_net_cash_to_market_cap=754813400/16220621067.51144=0.0465342524
+
+sustainable_cash_profit judgment:
+782417000 parent profit
++60923000 depreciation/amortisation
+-44929000 capex
+-198411000 cycle and normalized working-capital safety deduction
+=600000000
+
+operating_business_price=16220621067.51144-754813400=15465807667.51144
+owner_earnback_years=15465807667.51144/600000000=25.7763461125
+market_cap_to_cash_profit=16220621067.51144/600000000=27.0343684459
+
+forecast_cash_dividend=782417000*0.394=308272298
+forecast_dividend_yield=308272298/16220621067.51144=0.0190050313
+Dividend amount is an RMB estimate inferred from disclosed payout ratio and is FX-sensitive.
+
+[fact-inference-judgment-separation]
+Facts: statement figures, revenue mix, cash balances, receivable composition, no bank loans, dividend per share, industry statements made by management.
+Calculations: margins, free cash flow, ratios and formula outputs above.
+Judgments: 70% cash haircut, RMB600m sustainable cash profit, cycle/working-capital deduction, interpretation of competitive position.
+
+[final-check]
+outputs/result.json initialized and validated by protocol CLI.
+outputs/report.md contains business story, model correction, statement interpretation, cash conversion, owner earnback and uncertainties.
+outputs/trace.txt records sources, period/model corrections, calculations and validation.

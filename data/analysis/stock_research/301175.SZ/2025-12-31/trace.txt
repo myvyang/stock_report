@@ -1,0 +1,59 @@
+stock-research trace
+company: 301175.SZ 中科环保
+period: 2025-12-31 annual
+generated_at_input: 2026-08-01T02:43:00+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because SKILL.md routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- No files existed under the input-designated raw filing, annual review, normalized facts, or prior stock research paths.
+- No prior outputs existed.
+- Therefore retrieved official/public filing material rather than inventing missing facts.
+
+3. Sources used
+- Beijing Zhongke Runyu Environmental Technology Co., Ltd. 2025 Annual Report, disclosed 2026-03-27. Official China Money page: https://www.chinamoney.com.cn/chinese/cwbg/20260327/3306064.html
+- Searchable full-text mirror of the same annual report: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12023770&stockid=301175
+- Company investor-relations / Hudongyi response dated 2026-05-11 regarding revised 2025 final dividend and expected 2026 interim dividend: https://irm.cninfo.com.cn/interview/interview/activityInfo?activityId=1441903783762620416
+- Market snapshot from config/input.json: Tencent qt.gtimg.cn, 2026-07-31 11:43:30, market cap CNY 8,036,000,000, PE TTM 19.45.
+
+4. Model determination
+- Input hint ordinary_operating was overridden.
+- Annual report says core business uses BOT/BOO concession arrangements; normal terms are 25-30 years and assets transfer to government after restoration/overhaul.
+- Auditor identifies CNY 5,895,094,907.06 of fixed assets + construction in progress + intangible assets as mainly waste-incineration operating assets.
+- Long-term borrowings including current portion are CNY 2,562,150,939.41, with receivable collection rights and project assets pledged/mortgaged.
+- Classification: utility_concession; ordinary owner earnback requires_special_model.
+- Consequently all ordinary owner-earnback sorting metrics remain null per result contract.
+
+5. Core calculations
+- Gross profit = 1,872,576,369.94 - 1,119,833,112.07 = 752,743,257.87.
+- Gross margin = 752,743,257.87 / 1,872,576,369.94 = 0.4020125899.
+- Parent net margin = 381,764,715.90 / 1,872,576,369.94 = 0.2038756446.
+- Simple operating FCF = operating cash flow 771,405,793.46 - purchases of fixed/intangible/other long-term assets 602,674,258.39 = 168,731,535.07.
+- This FCF is descriptive only: capex is not split between maintenance, expansion and PPP construction.
+- Forecast 2026 interim cash dividend floor = 381,764,715.90 * 30% = 114,529,414.77.
+- Forecast dividend yield = 114,529,414.77 / 8,036,000,000 = 0.0142501929.
+- Financing liabilities estimate = short borrowings 169,080,403.43 + short bond principal 300,000,000 + long borrowings including current portion 2,562,150,939.41 + lease liabilities including current portion 1,728,681.21 + long payables including current portion 10,950,359.67 = 3,043,910,383.72.
+
+6. Dividend treatment
+- 2024 final dividend implemented during 2025: CNY 198,703,800.
+- 2025 interim dividend: CNY 88,312,800.
+- Subsidiary dividends to minority holders per cash-flow statement: CNY 8,586,600.
+- Total dividend cash out represented in financials: CNY 295,603,200.
+- Original annual-report 2025 final proposal was CNY 147,188,000, later revised to zero due to the equity-transfer transition arrangement; it is not included as a forecast payment.
+- Forecast uses the later company statement for 2026 interim dividend, explicitly marked as not yet a formally approved plan.
+
+7. Data limitations
+- No project-by-project remaining concession life, tariff path, maintenance capex, debt amortization schedule or equity cash flow was available.
+- Ordinary discounted net cash, sustainable cash profit, operating business price and payback years cannot be responsibly calculated.
+- Market snapshot was accepted from task input and not independently reconstructed.
+
+8. Protocol operations
+- Populated result fields using repeated protocol `set` commands; did not hand-write the initialized JSON structure.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok, errors: [].

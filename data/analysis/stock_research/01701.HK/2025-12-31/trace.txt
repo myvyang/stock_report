@@ -1,0 +1,64 @@
+stock-research trace
+company: 01701.HK / TU YI HLDG / Tu Yi Holding Company Limited
+period: 2025-12-31 annual
+generated context: 2026-08-04 Asia/Shanghai
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as explicitly requested.
+- Read references/data-reuse.md because the skill directs reuse of annual facts and prior research.
+- Initialized outputs/result.json using:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields using repeated protocol `set` calls; did not construct result.json by hand.
+
+2. Existing-data audit
+- config/input.json existed.
+- No annual facts package, normalized facts file, raw filing metadata, or prior stock-research output existed under the input-specified 01701.HK/2025-12-31 paths.
+- Therefore returned to the primary filing.
+
+3. Primary filing used
+- Tu Yi Holding Company Limited, Annual Report 2025.
+- HKEX publication date: 2026-04-24.
+- URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042401196.pdf
+- Local temporary extraction copy: /tmp/stock_research_01701/annual-report-2025.pdf and .txt.
+- Temporary files are extraction aids, not research outputs.
+
+4. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Filing fact: outbound package tours and day tours, FIT and visa services, hotels, duty-free retail, and tour-related catering.
+- No brokerage customer money, proprietary securities trading business, investment banking, asset management, or repo funding model was found.
+- Override: ordinary_operating / applicable.
+
+5. Key audited facts transcribed (RMB'000 in filing; multiplied by 1,000 in result.json)
+- Income statement, annual report p.84: revenue 317,111; cost of sales/services 249,446; gross profit 67,665; profit for year 8,440; parent profit 8,538.
+- Balance sheet, pp.85-86: assets 244,107; liabilities 94,395; equity 149,712; parent equity 147,305; NCI 2,407.
+- Cash flow, pp.88-89: operating cash flow 38,071; PPE purchases 32,418; financing cash flow -9,042.
+- Computed operating free cash flow: 38,071 - 32,418 = 5,653 (RMB'000).
+- Segment/revenue note, p.129: tours/day tours 276,404; hotels 26,173; FIT margin 2,006; visa margin 2,870; duty-free 3,107; catering 6,551.
+- Cash note, p.149: unrestricted cash 39,571; pledged tourism-service-quality deposit 1,500.
+- Borrowing and lease notes, pp.142 and 151-153: bank debt 41,662; lease liabilities 10,318; secured by operating/investment properties and land.
+- Dividend note, p.137: no 2025 dividend; 2024 nil.
+
+6. Calculations and judgments
+- Gross margin = 67,665 / 317,111 = 21.3377%.
+- Parent net margin = 8,538 / 317,111 = 2.6923%.
+- Detachable net cash = 0. Cash plus pledged deposit (41.071m) is below bank and lease debt (51.980m); pledged cash is restricted and remaining cash supports operations.
+- Sustainable cash profit base = 2025 operating FCF 5.653m.
+- Sustainability haircut = 20%, because only one recovery/expansion year is observed and maintenance versus growth capex cannot be reliably separated.
+- Discounted sustainable cash profit = 5.653m * 80% = 4.5224m.
+- Operating business price = market cap 61.9416003227m - discounted detachable net cash 0 = 61.9416003227m.
+- Owner earnback years = 61.9416003227m / 4.5224m = 13.6966 years.
+- Forecast dividend = 0 based on 2024/2025 nil dividends, no fixed payout, debt/capex/acquisition needs, and no demonstrated VIE cash distributions.
+
+7. Market data
+- Reused input market cap: RMB61,941,600.32272339.
+- Timestamp: 2026/08/03 09:20:05.
+- Source: Tencent qt.gtimg.cn.
+- PE TTM: 7.62.
+- Limitation: market quote is not audited and was not recomputed from HKD price/share count/FX.
+
+8. Validation
+- Command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial populated validation result: {"status":"ok","errors":[]}.
+- Final validation is rerun after report and trace creation.

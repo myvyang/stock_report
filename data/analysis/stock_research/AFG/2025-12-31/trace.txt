@@ -1,0 +1,74 @@
+AFG stock research trace
+task_created_at=2026-08-04T20:40:47+08:00
+period=2025-12-31
+report_type=annual
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields using protocol set commands; did not hand-write the initialized complex JSON.
+
+[local reuse check]
+- Searched stock_report/data/analysis/annual_review/AFG/2025-12-31, raw filing directory, and normalized facts path.
+- No local annual facts, normalized facts, or raw filing files were present; only config/input.json existed.
+- Public official filings were therefore required.
+
+[model determination]
+- Input hint: ordinary_operating/applicable.
+- Verified business: AFG is an insurance holding company primarily conducting specialty commercial property and casualty insurance through Great American Insurance Group.
+- Override: financial_insurance/requires_special_model.
+- Reason: cash and investments are economically matched to claim reserves, unearned premiums, other insurance liabilities, and regulatory capital. They are not detachable cash.
+- Consequence: all ordinary owner-earnback amount and ratio fields remain null, as required by the result contract.
+
+[official sources]
+1. SEC Form 10-K for FY ended 2025-12-31, filed 2026-02-25:
+   https://www.sec.gov/Archives/edgar/data/1042046/000104204626000010/afg-20251231.htm
+   Used for audited balance sheet, income statement, cash flow, insurance reserves, investment portfolio, business description, and risks.
+2. AFG FY2025 fourth-quarter/full-year release, dated 2026-02-03:
+   https://www.afginc.com/news-releases/news-release-details/american-financial-group-inc-announces-2025-fourth-quarter-and
+   Used for combined ratio, written premiums, segment results, core operating earnings, ROE, alternative investment return, capital returned, and 2026 plan assumptions.
+3. AFG regular quarterly dividend release, dated 2026-07-01:
+   https://www.afginc.com/news-releases/news-release-details/american-financial-group-inc-declares-quarterly-dividend-87
+   Used to confirm the regular quarterly dividend remained $0.88 per share through July 2026.
+4. Market snapshot from config/input.json:
+   source=Yahoo Finance yfinance
+   date=2026-08-03
+   market_cap_cny=79457429195.64844
+   pe_ttm=13.45869
+   Limitation: task input did not provide price/share count/FX components supporting the market-cap conversion.
+
+[currency conversion]
+- Protocol requires absolute CNY yuan.
+- Original filing currency is USD.
+- Applied a uniform research conversion rate of USD 1 = CNY 7.00 to statement values and dividend estimates.
+- This is a presentation convention, not a claim of exact transaction-date or period-average FX translation.
+
+[key source figures, USD millions unless noted]
+- Total assets 32,642; total liabilities 27,822; shareholders' equity 4,820.
+- Cash and investments 17,182; reinsurance recoverables 5,528; prepaid reinsurance premiums 1,089.
+- Unpaid losses and LAE 15,094; unearned premiums 3,736; long-term debt 1,820.
+- Revenue 8,174; net earnings 842; core net operating earnings 860.
+- Operating cash flow 1,533; real estate/property/equipment purchases 135.
+- Cash dividends paid 606; common stock repurchases 99.
+- Gross written premium 10,694; net written premium 7,110; specialty combined ratio 91.0%.
+- 2025 alternative investment return 2.5% versus 6.1% in 2024.
+
+[derived values]
+- net_margin=842/8174=0.10301.
+- mechanical operating_free_cash_flow=(1533-135)*7,000,000=CNY 9,786,000,000; flagged as not equivalent to distributable insurance earnings.
+- 2026 visible dividend per share=0.88*4+1.50=USD 5.02.
+- forecast_cash_dividend=5.02*83.4m*7=CNY 2,930,676,000.
+- forecast_dividend_yield=2,930,676,000/79,457,429,195.64844=0.03688.
+- No unannounced additional special dividend was assumed.
+
+[validation]
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]
+
+[outputs]
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

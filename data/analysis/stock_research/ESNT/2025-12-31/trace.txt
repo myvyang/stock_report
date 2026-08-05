@@ -1,0 +1,57 @@
+stock-research trace: ESNT / 2025-12-31 annual
+generated_at: 2026-08-04T12:16:29+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- references/result-contract.md
+- references/report-contract.md
+- references/data-reuse.md
+
+2. Reuse audit
+- config/input.json present.
+- Requested annual facts, normalized facts, raw filing metadata, and prior stock-research outputs were absent.
+- Returned to primary filing rather than inventing missing facts.
+
+3. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated initialized fields exclusively through protocol `set` commands.
+- Did not construct result.json manually from scratch.
+
+4. Model decision
+- Input hint ordinary_operating/applicable rejected.
+- Verified business is regulated private mortgage insurance and reinsurance.
+- Selected financial_insurance / requires_special_model.
+- Kept discounted net cash, cash profit, operating business price, owner earnback years, and market-cap-to-cash-profit null as required.
+
+5. Primary sources
+- SEC Form 10-K: https://www.sec.gov/Archives/edgar/data/1448893/000144889326000009/esnt-20251231.htm
+  Filing date 2026-02-18; report period 2025-12-31.
+- Company FY2025 results/dividend release: https://ir.essentgroup.com/news/news-details/2026/Essent-Group-Ltd--Announces-Fourth-Quarter--Full-Year-2025-Results-and-Increases-Quarterly-Dividend/default.aspx
+- Federal Reserve H.10 China spot rate preview: 2025-12-31 = 7.1875 CNY per USD.
+- Market cap and PE: config/input.json, Yahoo Finance yfinance, dated 2026-08-03.
+
+6. Extraction checkpoints (USD thousands unless stated)
+- Total assets 7,441,003; liabilities 1,684,276; equity 5,756,727.
+- Investments 6,486,598; cash 123,049.
+- Total revenue 1,260,935; net premiums earned 983,718; net investment income 236,517.
+- Net income 689,969; operating cash flow 856,053; financing cash flow (709,746).
+- Mortgage insurance loss ratio 16.8%; combined ratio 32.9%; default rate 2.50%.
+- PMIERs available assets $3.5bn; minimum required assets $2.1bn; coverage 169%.
+- 2026-01-01 dividend capacity: Essent Guaranty $245.8m; Essent Re $423.0m.
+
+7. Currency convention
+- All result JSON monetary values are absolute CNY.
+- Financial statement amounts translated at 7.1875 CNY/USD (2025-12-31).
+- Market cap was already supplied in CNY and was not retransformed.
+
+8. Dividend forecast
+- $0.35 quarterly dividend annualized to $1.40.
+- Shares: 94,542,845 as of 2026-02-13.
+- Forecast = 94,542,845 * 1.40 * 7.1875 = CNY 951,337,377.81.
+- Yield = CNY 951,337,377.81 / CNY 41,017,064,810.97 = 2.31937%.
+
+9. Validation
+- Protocol validation executed after population.
+- Final result: {"status":"ok","errors":[]}.
+- Post-validation reconciliation corrected two CNY residual-category translations; protocol validation was rerun and remained ok.

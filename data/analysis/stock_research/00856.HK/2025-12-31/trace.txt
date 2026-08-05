@@ -1,0 +1,69 @@
+stock-research trace
+company: VSTECS Holdings Limited (00856.HK)
+period: 2025-12-31 annual
+generated_at: 2026-08-03T14:45:47+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes existing-fact reuse through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- No annual facts package, normalized facts, prior stock-research result, or raw filing existed under the paths supplied in config/input.json.
+- Retrieved the official 2025 annual report from HKEX and used the official results/dividend announcements as corroboration.
+
+3. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Annual report fact: principal activities are IT product channel development and technical solution integration; segments are consumer electronics, enterprise systems, and cloud computing; revenue is substantially point-in-time sale of goods.
+- Decision: override hint with ordinary_operating / applicable.
+- Reason: receivables, inventory, payables and bank debt are the operating working-capital structure of an IT distributor, not brokerage client money, proprietary securities or repo financing.
+
+4. Sources
+- VSTECS Holdings Limited Annual Report 2025, HKEX, published 2026-04-23:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042301786_c.pdf
+- VSTECS final dividend announcement, HKEX, 2026-03-19:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0319/2026031900241.pdf
+- RMB central parity on 2025-12-31: 1 HKD = 0.90322 CNY, announced by CFETS under PBOC authorization.
+- Market cap and PE TTM: config/input.json, Tencent qt.gtimg.cn snapshot dated 2026-07-31 16:08:45.
+
+5. Currency conversion
+- Protocol requires absolute CNY amounts.
+- Applied 0.90322 CNY/HKD to all HKD statement amounts for consistency.
+- This is an analytical translation. Income and cash-flow amounts were not translated at a separate annual-average exchange rate; limitation recorded in data_quality.
+
+6. Key reported HKD facts and converted CNY values
+- Revenue HKD 97,626,188,000 -> CNY 88,177,925,525.36.
+- Gross profit HKD 4,353,774,000 -> CNY 3,932,415,752.28.
+- Parent net profit HKD 1,353,492,000 -> CNY 1,222,501,044.24.
+- Total assets HKD 43,019,873,000 -> CNY 38,856,409,691.06.
+- Total liabilities HKD 32,604,252,000 -> CNY 29,448,812,491.44.
+- Parent equity HKD 10,138,776,000 -> CNY 9,157,545,258.72.
+- Operating cash flow HKD 1,954,632,000 -> CNY 1,765,462,715.04.
+- PPE purchases HKD 38,723,000 -> CNY 34,975,388.06.
+- Operating free cash flow = OCF - PPE purchases = CNY 1,730,487,326.98.
+- Cash and bank balances HKD 4,910,098,000 -> CNY 4,434,898,715.56.
+- Borrowings HKD 8,795,163,000 -> CNY 7,943,967,124.86.
+
+7. Ratios and owner earnback
+- Gross margin = 4,353,774 / 97,626,188 = 0.0445963741.
+- Parent net margin = 1,353,492 / 97,626,188 = 0.0138640259.
+- Discounted detachable net cash = max(0, cash - borrowings plus accepted detachable assets) = 0.
+- Other financial assets less other financial liabilities were assigned a 0% detachable value because use and separability were not sufficiently established.
+- Sustainable cash profit = converted parent net profit x 80% = CNY 978,000,835.392.
+- The 20% haircut is an analytical judgment for working-capital and cycle volatility; it avoids extrapolating one strong cash-flow year.
+- Operating business price = CNY 11,562,440,663.241745.
+- Owner earnback years = 11,562,440,663.241745 / 978,000,835.392 = 11.8225263669.
+
+8. Dividend
+- 2025 final dividend: HKD 600,000,000 / HKD 0.4177 per share, paid July 2026.
+- Converted baseline: CNY 541,932,000.
+- Forecast dividend yield = 541,932,000 / 11,562,440,663.241745 = 0.0468700351.
+- Forecast assumes no growth and reuses the latest declared/paid annual dividend as the baseline.
+
+9. Output construction and validation
+- All complex JSON structure was initialized and populated through the stock-research protocol CLI; it was not hand-written from scratch.
+- report.md and trace.txt were written as human-readable artifacts.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

@@ -1,0 +1,81 @@
+stock-research trace
+company=002375.SZ 亚厦股份
+period=2025-12-31
+generated_for_input=2026-07-31T16:58:15+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because no annual facts package or historical research result was present.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated the initialized result using repeated protocol set commands; result.json was not authored from a blank object.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   status=ok, errors=[]
+
+[source discovery and reuse]
+- config/input.json existed.
+- No pre-existing annual facts, normalized facts, raw filing metadata, or stock research output was available under the paths supplied by input.
+- Located the disclosed 2025 annual report published 2026-04-28.
+- Downloaded a PDF copy to:
+  stock_report/data/raw/filings/002375.SZ/2025-12-31/2025-annual-report.pdf
+- Public text/PDF mirror:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12233050&stockid=002375
+  https://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESZ_STOCK/2026/2026-4/2026-04-28/12233050.PDF
+- Core filing identity:
+  浙江亚厦装饰股份有限公司2025年年度报告
+  audit report 容诚审字〔2026〕361Z0455号
+  audit opinion 标准无保留意见
+  audit date 2026-04-24
+
+[model decision]
+- Input hint ordinary_operating/applicable was treated only as a hint.
+- Filing facts show 96.48% of revenue from the building decoration industry.
+- Engineering revenue is recognized by performance progress based on cumulative actual cost / estimated total cost.
+- Accounts receivable and contract assets including amounts over one year have carrying value equal to 55.50% of total assets according to the key audit matter.
+- Engineering revenue recognition and receivable/contract-asset impairment were both key audit matters.
+- Overrode model to:
+  statement_model=construction_project
+  owner_earnback_applicability=requires_special_model
+- Consequence: discounted net cash, discounted cash profit, operating business price, owner earnback years, and market-cap/cash-profit metrics remain null by contract.
+
+[core facts and calculations]
+revenue=9117670855.74
+cost_of_sales=7694152828.96
+gross_profit=1423518026.78
+gross_margin=1423518026.78/9117670855.74=0.1561273761
+parent_net_profit=329958027.40
+net_margin=329958027.40/9117670855.74=0.0361888505
+operating_cash_flow=240599737.77
+capital_expenditure=53365164.79
+operating_free_cash_flow=240599737.77-53365164.79=187234572.98
+
+total_assets=22023326508.94
+total_liabilities=13475270858.78
+total_equity=8548055650.16
+parent_equity=8258244059.00
+minority_interest=289811591.16
+
+cash=2716369932.60
+restricted_cash=702902938.61
+accounts_receivable=4017373606.12
+contract_assets=7746707518.82
+accounts_receivable_plus_contract_assets=11764081124.94
+inventory=1935296627.14
+notes_payable_plus_accounts_payable=1801604282.68+8078939961.04=9880544243.72
+
+forecast_cash_dividend=166240012.03
+forecast_dividend_yield=166240012.03/4730000000=0.0351458799
+forecast status at annual-report date=board proposal, shareholder approval pending
+
+[quality limitations]
+- Market-cap snapshot is about seven months after the reporting date.
+- PE TTM is the quote-source definition and is not the static 2025 parent-profit multiple.
+- The annual report does not provide complete project-by-project counterparty credit and post-year-end collection data.
+- Dividend yield ignores tax, ex-dividend effects, and later share-base changes.
+
+[final checks]
+- Protocol validation re-run after report and trace creation: status=ok, errors=[].
+- Confirmed outputs/result.json, outputs/report.md, and outputs/trace.txt are non-empty.
+- Confirmed result.json parses as JSON and special-model owner-earnback sorting fields remain null.

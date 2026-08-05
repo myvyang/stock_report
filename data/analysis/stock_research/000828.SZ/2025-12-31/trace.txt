@@ -1,0 +1,75 @@
+stock-research trace
+company: 东莞控股 (000828.SZ)
+period: 2025-12-31 annual
+generated for input created_at: 2026-07-31T15:22:12+08:00
+
+[1] Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because no annual facts package was present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+[2] Reuse check
+- Checked the input-designated raw filing, annual review, normalized facts, and prior stock research paths.
+- No reusable 2025 annual facts, raw filing metadata, or prior research output existed at task start.
+
+[3] Primary source retrieval
+- Retrieved the official Shenzhen Stock Exchange PDF:
+  https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-03-28/b322cdee-0632-4745-97f0-b5141364d87f.PDF
+- Local copy:
+  stock_report/data/raw/filings/000828.SZ/2025-12-31/2025-annual-report.pdf
+- Extracted text locally for research:
+  stock_report/data/raw/filings/000828.SZ/2025-12-31/2025-annual-report.txt
+- The annual report is dated 2026-03-28 and contains a standard unqualified audit opinion dated 2026-03-26.
+
+[4] Model determination
+- Input hint: ordinary_operating / applicable.
+- Overridden from filing facts to utility_concession / requires_special_model.
+- Reasons:
+  * toll-road revenue was RMB 1,290,048,247.07, 83.13% of revenue;
+  * core toll rights currently run to 2027-06-30 and extension years require authority approval;
+  * expansion project approved budget is RMB 17,584,000,000 and accumulated investment was RMB 4,322,000,000;
+  * consolidated statements contain material leasing/factoring receivables and equity-method investments.
+- Ordinary detachable-net-cash and owner-earnback fields therefore remain null by contract.
+
+[5] Key calculations
+- Gross profit = revenue RMB 1,551,933,747.48 - cost RMB 497,281,310.30
+  = RMB 1,054,652,437.18.
+- Gross margin = RMB 1,054,652,437.18 / RMB 1,551,933,747.48
+  = 0.679574.
+- Net margin = parent net profit RMB 823,505,964.25 / revenue RMB 1,551,933,747.48
+  = 0.530628.
+- Mechanical operating free cash flow = operating cash flow RMB 2,319,560,003.58
+  - capex RMB 1,370,946,310.91 = RMB 948,613,692.67.
+- This mechanical FCF is not treated as distributable cash because operating cash flow includes leasing/factoring principal recoveries; operating receivables decreased RMB 1,174,532,982.55.
+- Proposed dividend = 1,039,516,992 shares * RMB 0.325/share
+  = RMB 337,843,022.40.
+- Forecast dividend yield = RMB 337,843,022.40 / market cap RMB 10,468,000,000
+  = 0.032274.
+- Interest-bearing financing liabilities:
+  short-term loans RMB 50,640,112.24
+  + long-term loans including current portion RMB 4,471,791,988.84
+  + lease liabilities including current portion RMB 137,271,481.71
+  = RMB 4,659,703,582.79.
+- Leasing/factoring receivables:
+  gross RMB 3,904,629,604.33
+  - impairment allowance RMB 453,846,620.70
+  = net RMB 3,450,782,983.63.
+
+[6] Structured-result construction
+- Updated initialized JSON through protocol CLI set commands.
+- Did not construct the result JSON directly from scratch.
+- Set data_quality.status to complete because the special-model minimum fields, asset/liability explanations, dividend forecast, business story, risks, and evidence are populated.
+- Recorded limitations: unresolved toll extension, incomplete lifecycle capex schedule, mismatched valuation/report dates, and financial-principal effects in operating cash flow.
+
+[7] Validation
+- Command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result:
+  {"status":"ok","errors":[]}
+
+[8] Output files
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

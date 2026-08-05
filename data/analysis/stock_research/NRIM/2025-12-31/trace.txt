@@ -1,0 +1,60 @@
+Stock research trace — NRIM — period 2025-12-31
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Initialized the result using the required protocol CLI
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse audit
+   - Checked configured raw filing, annual review, and normalized facts paths.
+   - No local facts.json, annual_facts.md, normalized annual facts, or filing metadata existed.
+   - Downloaded the official SEC inline-XBRL 2025 Form 10-K to stock_report/data/raw/filings/NRIM/2025-12-31/nrim-20251231.htm.
+   - Used the official SEC 2026 Q1 Form 10-Q for post-year-end dividend and credit-quality context.
+
+4. Model decision
+   - Overrode input hint ordinary_operating/applicable.
+   - Confirmed financial_bank/requires_special_model from the 10-K business description and balance sheet.
+   - Reason: customer deposits fund loans and securities; those balances are the operating model, not detachable net cash.
+   - Kept all ordinary owner-earnback ranking fields null as required by the result contract.
+
+5. Core source facts (original USD; 10-K amounts generally USD thousands)
+   - Total assets 3,290.273m; liabilities 2,963.729m; equity 326.544m.
+   - Net interest income 135.609m; other operating income 77.203m; pretax income 84.519m; net income 64.608m.
+   - Loans 2,295.499m; allowance 23.737m; deposits 2,813.029m.
+   - NIM 4.69%; ROA 2.02%; ROE 21.72%; adjusted efficiency ratio 58.45%.
+   - Net NPL ratio 0.49%; allowance/loans 1.03%; allowance/net NPL about 210%.
+   - Company CET1 10.38%; bank CET1 11.84%; bank total capital 12.79%; bank leverage 9.61%.
+   - 2025 dividends per share USD 0.64; cash paid USD 14.547m; payout ratio 21.89%.
+   - Pacific Wealth Advisors sale gain USD 14.486m is nonrecurring.
+   - 2026 Q1 dividend remained USD 0.16 per share; net NPL increased to USD 14.2m.
+
+6. Currency conversion
+   - Result contract requires CNY absolute yuan.
+   - Banque de France 2025-12-31 parity: EUR/USD 1.1750 and EUR/CNY 8.2262.
+   - Cross rate used: 8.2262 / 1.1750 = approximately 7.001 CNY per USD.
+   - Original USD facts remain visible in report for auditability; JSON monetary fields are CNY.
+
+7. Dividend forecast
+   - Used latest disclosed quarterly dividend USD 0.16, annualized without growth to USD 0.64.
+   - Multiplied by 2025 year-end shares 22,111,637 = USD 14.151m.
+   - Converted forecast = CNY 99.074m.
+   - Forecast yield = 99.074m / input market cap CNY 3,979.355m = 2.4898%.
+
+8. Structured result construction
+   - Used protocol CLI set and append operations for every populated field/list entry.
+   - Did not directly hand-write outputs/result.json.
+
+9. Sources
+   - SEC 2025 10-K: https://www.sec.gov/Archives/edgar/data/1163370/000116337026000007/nrim-20251231.htm
+   - SEC 2026 Q1 10-Q: https://www.sec.gov/Archives/edgar/data/1163370/000116337026000021/nrim-20260331.htm
+   - Banque de France FX: https://www.banque-france.fr/en/statistics/rates-and-prices/exchange-rates-daily-parities-2025-12-31
+   - Market cap and PE: config/input.json, Yahoo Finance yfinance snapshot dated 2026-08-03.
+
+10. Validation
+   - Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Outcome: {"status":"ok","errors":[]}
+   - python3 -m json.tool also parsed outputs/result.json successfully.
+   - Confirmed ordinary owner-earnback fields remain null under financial_bank/requires_special_model.

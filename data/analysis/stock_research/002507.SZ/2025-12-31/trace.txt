@@ -1,0 +1,71 @@
+stock-research trace
+company=002507.SZ 涪陵榨菜
+period=2025-12-31
+generated_for=2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because local annual facts and prior research were checked for reuse.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated scalar and narrative fields with protocol `set`; populated analysis rows with protocol `append`.
+6. Validated outputs/result.json with protocol `validate`; final status recorded below.
+
+[reuse audit]
+No local annual facts package, normalized facts, raw filing metadata, or prior stock-research result existed for 002507.SZ/2025-12-31 at task start.
+Downloaded the official 2025 annual report PDF from Shenzhen Stock Exchange disclosure storage:
+https://disc.static.szse.cn/disc/disk03/finalpage/2026-03-28/6a3ca5db-e27b-42d1-b3e5-a818504e6b05.PDF
+Local source copy: stock_report/data/raw/filings/002507.SZ/2025-12-31/2025-annual-report.pdf
+Local extracted text: stock_report/data/raw/filings/002507.SZ/2025-12-31/2025-annual-report.txt
+PDF disclosure date: 2026-03-28.
+
+[model audit]
+Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+Evidence: production and sale of packaged vegetables; buyout distribution and advance payment dominate; no short-term borrowings, long-term borrowings, or bonds; no customer funds or special financial/real-estate/project/concession balance-sheet structure.
+
+[financial extraction]
+revenue=2431922780.17
+cost_of_sales=1176382059.33
+gross_profit=1255540720.84
+parent_net_profit=768034038.98
+operating_cash_flow=657219112.63
+capital_expenditure=412339337.48
+operating_free_cash_flow=244879775.15
+total_assets=9684089402.26
+total_liabilities=933907003.66
+parent_equity=8750182398.60
+All amounts above are CNY yuan and come from the audited consolidated statements or notes.
+
+[owner earnback calculation]
+market_cap=13974000000.00 (Tencent input snapshot, 2026-07-31)
+cash_and_cash_equivalents=1117186272.52 * 100%
+term_deposits=2945263902.56 * 95%
+trading_financial_assets=2245687645.39 * 90%
+income_certificates=401681054.53 * 90%
+less_2025_period_dividends=484645991.76
+discounted_detachable_net_cash=5813172818.12
+operating_business_price=13974000000.00-5813172818.12=8160827181.88
+
+reported_parent_profit=768034038.98
+less_estimated_after_tax_cash-asset_income=143735573.13
+additional_prudence_and_rounding_adjustment=24298465.85
+discounted_sustainable_cash_profit=600000000.00
+owner_earnback_years=8160827181.88/600000000.00=13.6013786365
+market_cap_to_cash_profit=13974000000.00/600000000.00=23.29
+
+[dividend]
+2025 interim dividend=230783805.60 (CNY 2.00 per 10 shares)
+2025 annual dividend=253862186.16 (CNY 2.20 per 10 shares)
+forecast/report-period combined dividend=484645991.76
+forecast_dividend_yield=484645991.76/13974000000.00=0.0346819802
+
+[limitations]
+Market-cap date is about seven months after the balance-sheet date. Dividends attributable to 2025 were adjusted, but 2026 trading, operations, capital spending, and treasury reallocations were not incorporated.
+The CNY 600 million sustainable cash-profit estimate is analytical, not audited guidance.
+Industry leadership is company disclosure; the annual report does not provide independently verified market share.
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

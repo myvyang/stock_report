@@ -1,0 +1,60 @@
+task=stock_research
+company=000591.SZ 太阳能
+period=2025-12-31
+generated_for=2026-08-01 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Read references/data-reuse.md because the skill requires prioritizing reusable annual facts.
+4. Ran protocol init with config/input.json to create outputs/result.json.
+5. Populated result fields only through protocol set commands.
+6. Ran protocol validate; final status: ok, errors: [].
+
+[reuse_check]
+- stock_report/data/analysis/annual_review/000591.SZ/2025-12-31: no reusable files present at start.
+- stock_report/data/raw/filings/000591.SZ/2025-12-31: no metadata or filing present at start.
+- stock_report/data/analysis/stock_research/000591.SZ/2025-12-31: no prior result present at start.
+- Therefore fetched the official annual report from CNINFO and extracted it locally for verification.
+
+[primary_source]
+title=中节能太阳能股份有限公司2025年年度报告全文
+publisher=中节能太阳能股份有限公司 / 巨潮资讯
+publication_date=2026-04-24
+url=https://static.cninfo.com.cn/finalpage/2026-04-24/1225161470.PDF
+local_pdf=stock_report/data/raw/filings/000591.SZ/2025-12-31/annual_report_2025.pdf
+local_text=stock_report/data/raw/filings/000591.SZ/2025-12-31/annual_report_2025.txt
+pages=201
+audit=致同会计师事务所（特殊普通合伙），审计报告日期2026-04-22
+
+[key_extractions]
+- Annual report p8: revenue 4,957,477,263.11; parent net profit 822,649,685.21; OCF 4,133,466,777.62; total assets 51,833,672,998.79; parent equity 23,829,324,892.97.
+- Annual report p11-12: operating capacity 7.170GW; sales volume 8.369bn kWh; average tariff 0.583 CNY/kWh; curtailment 15.91%; subsidies received 3.318bn; unsettled subsidies 11.534bn.
+- Annual report p17-18: generation revenue 4,272,494,761.85 and margin 54.08%; manufacturing revenue 610,128,591.72 and margin 2.09%; consolidated cost 2,648,076,566.71.
+- Annual report p23: OCF increase mainly from collection of prior-year national subsidy receivables.
+- Annual report p91-93: cash 2,177,964,203.85; trading financial assets 100,000,000; receivables 11,855,793,198.18; fixed assets 29,827,655,741.51; construction in progress 3,347,805,752.55; total liabilities 27,933,206,346.51.
+- Annual report p96: operating profit 1,104,198,148.30; net profit 825,991,106.75; finance cost 603,392,099.60; impairment loss 219,957,543.06.
+- Annual report p98-99: capex cash payment 3,857,160,554.65; financing cash flow 65,882,831.68.
+- Annual report p195: 2025 cumulative cash dividend 297,929,168.49.
+- Input market snapshot: market cap 17,650,000,000; PE TTM 24.61; time 2026-07-31 11:42:51; source Tencent qt.gtimg.cn.
+
+[calculations]
+gross_profit=4,957,477,263.11-2,648,076,566.71=2,309,400,696.40
+gross_margin=2,309,400,696.40/4,957,477,263.11=0.4658511708
+net_margin=822,649,685.21/4,957,477,263.11=0.1659379554
+operating_free_cash_flow_simple=4,133,466,777.62-3,857,160,554.65=276,306,222.97
+forecast_dividend_yield=297,929,168.49/17,650,000,000=0.01687983957450425
+power_and_build_assets=29,827,655,741.51+3,347,805,752.55+2,005,510,907.33+989,938,382.45=36,170,910,783.84
+financing_and_lease_liabilities=1,207,899,862.77+2,984,900,166.87+13,489,130,684.60+4,624,232,864.31+1,396,509,150.38+554,482,150.51=24,257,154,879.44
+
+[model_decision]
+input_hint=ordinary_operating/applicable
+final_model=utility_concession/requires_special_model
+reason=Generation contributed 86.18% of revenue. Power plants, construction assets, site-use rights and matched project financing are the operating system itself. Value depends on remaining operating lives, volume, tariff, curtailment, subsidy timing, maintenance capex and debt service. Cash cannot be treated as detachable independently of project liabilities, and 2025 OCF includes collection of old subsidy receivables.
+ordinary_owner_earnback_fields=all null as required by result contract
+special_model_needed=project/grouped shareholder cash-flow model after maintenance capex and debt service
+
+[limitations]
+- No plant-by-plant remaining operating life, tariff, maintenance capex or debt schedule was disclosed at sufficient granularity for a special-model DCF/payback calculation.
+- Dividend forecast is a base case using disclosed 2025 cumulative cash dividends, not a 2026 management commitment.
+- Market valuation was accepted from the supplied Tencent snapshot.

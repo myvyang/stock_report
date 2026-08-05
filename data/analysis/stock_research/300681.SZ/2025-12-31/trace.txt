@@ -1,0 +1,79 @@
+stock-research trace
+company: 300681.SZ 英搏尔
+period: 2025-12-31 annual
+generated context date: 2026-08-01 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Read references/data-reuse.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked stock_report/data/analysis/annual_review/300681.SZ/2025-12-31 and raw filing paths.
+- No prior annual facts package, normalized facts, historical stock-research result, or raw filing existed in the workspace.
+- Therefore returned to public filing sources.
+
+3. Sources acquired and inspected
+- Official Shenzhen Stock Exchange disclosure PDF dated 2026-04-15:
+  https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-15/7f5b58a1-8ad3-4f7c-be0d-897cee0b327e.PDF
+- Public full annual-report text corresponding to Sina announcement id 12090209, used to inspect the complete statements and notes:
+  https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12090209&stockid=300681
+- Market-cap snapshot supplied by config/input.json: Tencent qt.gtimg.cn, 2026-07-31 11:42:54, market cap CNY 6,191,000,000, PE TTM 26.71.
+- Saved local source material under stock_report/data/raw/filings/300681.SZ/2025-12-31/.
+
+4. Model decision
+- Confirmed ordinary_operating / applicable.
+- Basis: the company develops, manufactures, and directly sells new-energy vehicle power-domain hardware; balance-sheet items are ordinary production assets, receivables, inventory, payables and financing.
+- Special handling: restricted cash excluded; discounted notes, supplier-chain finance and borrowings treated as financing obligations; subsidiary disposal gain and working-capital release excluded from sustainable cash profit.
+
+5. Core reported facts used (CNY)
+- Total assets 7,489,088,014.84
+- Total liabilities 4,444,277,929.72
+- Total equity 3,044,810,085.12
+- Parent equity 3,040,816,301.03
+- Revenue 3,874,362,592.87
+- Cost of sales 3,259,016,137.44
+- Gross profit 615,346,455.43
+- Parent net profit 185,758,373.40
+- Deducted non-recurring parent net profit 85,633,550.70
+- Operating cash flow 848,793,901.09
+- Capital expenditure 785,006,463.04
+- Operating free cash flow 63,787,438.05
+- Cash and cash equivalents 779,178,271.96
+- Restricted cash includes bill/pool deposits 264,438,308.25 and judicial freeze 3,463,645.73.
+
+6. Derived formulas
+- Gross margin = 615,346,455.43 / 3,874,362,592.87 = 15.8825%.
+- Net margin = 185,758,373.40 / 3,874,362,592.87 = 4.7946%.
+- Financing obligations included in owner cash calculation:
+  284,151,573.15 short-term borrowings
+  + 54,875,893.86 current portion of long-term borrowing
+  + 398,316,566.77 supplier-chain finance
+  + 358,368,572.97 long-term borrowings
+  + 9,067,728.58 bonds payable
+  + 4,817,790.93 lease liabilities
+  + 1,020,231.50 current lease liabilities
+  = 1,110,618,357.76.
+- Discounted detachable net cash = 779,178,271.96 cash equivalents + 125,950,772.36 * 50% other equity instruments - 1,110,618,357.76 financing obligations = -268,464,699.62.
+- Discounted sustainable cash profit = 85,633,550.70 deducted non-recurring parent profit * 80% = 68,506,840.56.
+- Operating business price = 6,191,000,000 - (-268,464,699.62) = 6,459,464,699.62.
+- Owner earnback years = 6,459,464,699.62 / 68,506,840.56 = 94.2893.
+- Market cap / cash profit = 6,191,000,000 / 68,506,840.56 = 90.3705.
+- Forecast dividend = 306,055,340 shares * CNY 0.062 = 18,975,431.08.
+- Forecast dividend yield = 18,975,431.08 / 6,191,000,000 = 0.3065%.
+
+7. Judgment notes
+- The 20% sustainable-profit haircut is an analyst estimate, not company guidance. It reflects 77.07% top-five customer concentration, 15.88% gross margin, expansion-stage capex, and working-capital volatility.
+- OCF was not used directly because the cash-flow reconciliation shows CNY 1.731bn increase in operating payables, while inventory and operating receivables also expanded materially.
+- 2025 parent profit was not used directly because reported non-recurring gains were CNY 100.125m, mainly from disposal of a subsidiary.
+- Industry position is recorded as company-reported and not treated as an independently verified market-share ranking.
+- 2025 dividend is a board proposal pending shareholder approval.
+
+8. Protocol mutation and validation
+- Populated the initialized skeleton exclusively through protocol set commands; the complex result object was not handwritten from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].

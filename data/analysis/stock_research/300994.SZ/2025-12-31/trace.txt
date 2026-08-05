@@ -1,0 +1,101 @@
+[task]
+company=久祺股份
+code=300994.SZ
+period=2025-12-31
+report_type=annual
+input=config/input.json
+generated_for=2026-07-31 Asia/Shanghai
+
+[skill_and_contracts]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+protocol_init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+[reuse_check]
+annual_facts_json=not present
+annual_facts_md=not present
+normalized_facts_json=not present
+historical_stock_research=not present
+decision=no reusable annual fact pack; retrieve official filing
+
+[primary_sources]
+1. 久祺股份有限公司2025年年度报告
+   issuer=久祺股份有限公司
+   disclosure_platform=深圳证券交易所
+   disclosure_date=2026-04-29
+   url=https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-29/18efbd12-ed43-4c5e-a9d2-8788cf94286f.PDF
+   local_pdf=stock_report/data/raw/filings/300994.SZ/2025-12-31/annual-report-2025.pdf
+   local_text=stock_report/data/raw/filings/300994.SZ/2025-12-31/annual-report-2025.txt
+2. 久祺股份关于2025年年度权益分派实施公告
+   disclosure_date=2026-06-03
+   verified_facts=233088000 shares; CNY 5.60 per 10 shares; total CNY 130529280; ex-dividend date 2026-06-11
+3. Tencent qt.gtimg.cn market snapshot supplied in config/input.json
+   market_cap=CNY 2480000000
+   timestamp=2026-07-31 11:42:48 Asia/Shanghai
+   pe_ttm=19.96
+
+[model_review]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+evidence=Revenue is almost entirely bicycle, parts and derivative-product sales. Balance sheet consists mainly of cash, receivables, inventory, production assets, supplier payables and customer advances. No bank, brokerage, insurance, real-estate-development, construction, concession or investment-holding economics identified.
+
+[financial_extraction_cny]
+revenue=3360563169.85
+cost_of_sales=2889925025.79
+gross_profit=470638144.06
+operating_profit=169639204.18
+net_profit=136215191.89
+parent_net_profit=148025699.79
+operating_cash_flow=189400114.49
+capital_expenditure=91544972.62
+operating_free_cash_flow=97855141.87
+financing_cash_flow=-71865032.05
+total_assets=2301214313.91
+total_liabilities=1048046686.86
+total_equity=1253167627.05
+parent_equity=1216395549.84
+minority_interest=36772077.21
+
+[formula_checks]
+gross_margin=470638144.06/3360563169.85=0.140047402852721
+net_margin=148025699.79/3360563169.85=0.04404788492537314
+operating_free_cash_flow=189400114.49-91544972.62=97855141.87
+discounted_cash_profit=97855141.87*0.90=88069627.683
+
+[discounted_net_cash]
+unrestricted_cash_base=827149374.94-15671754.67=811477620.27
+discounted_cash=811477620.27*0.80=649182096.216
+discounted_trading_financial_assets=36393684.38*0.90=32754315.942
+financing_and_quasi_financing_liabilities=46030171.56+3303529.17+76305666.67+538581.93=126177949.33
+dividend_timing_adjustment=130529280.00
+reason_for_dividend_adjustment=The 2025 balance sheet predates the dividend cash outflow, while the 2026-07-31 market-cap snapshot is after the 2026-06-11 ex-dividend date.
+discounted_detachable_net_cash=649182096.216+32754315.942-126177949.33-130529280=425229182.828
+discounted_net_cash_to_market_cap=425229182.828/2480000000=0.17146338017258067
+
+[owner_earnback]
+operating_business_price=2480000000-425229182.828=2054770817.172
+owner_earnback_years=2054770817.172/88069627.683=23.331208172787928
+market_cap_to_cash_profit=2480000000/88069627.683=28.159537689049543
+
+[dividend]
+forecast_proxy=implemented 2025 annual dividend
+forecast_cash_dividend=130529280
+forecast_dividend_yield=130529280/2480000000=0.052632774193548386
+limitation=proxy is not company guidance for the 2026 dividend
+
+[quality_judgments]
+cash_haircut_reason=Working capital is required for an export trading/ODM business; overseas and foreign-currency cash and restricted/earmarked funds reduce immediate detachability.
+profit_haircut_reason=Use reported operating free cash flow rather than accounting profit, deduct all capex without classifying growth versus maintenance, then apply 10% sustainability haircut for working-capital volatility.
+industry_position_limitation=Company annual-report characterization is available, but no independent market-share statistic was found or used.
+time_mismatch_limitation=Financial statements are at 2025-12-31 and valuation at 2026-07-31; implemented dividend adjusted, 2026 interim operations not incorporated.
+
+[protocol_population]
+method=outputs/result.json initialized with protocol CLI, then populated through repeated protocol set commands in populate_result.sh
+complex_json_handwritten_from_scratch=no
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

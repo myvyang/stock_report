@@ -1,0 +1,55 @@
+stock-research trace
+company: BFH / Bread Financial Holdings, Inc.
+period: 2025-12-31 annual
+generated_at: 2026-08-05T00:01:19+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md; no reusable BFH filing, annual facts, normalized facts, or prior stock-research files existed in the supplied stock_report paths.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields only through protocol set/append commands; did not hand-write the JSON object.
+
+2. Primary sources retrieved
+- SEC 2025 Form 10-K, filed 2026-02-13:
+  https://www.sec.gov/Archives/edgar/data/1101215/000110121526000016/bfh-20251231.htm
+- Company filing index:
+  https://investor.breadfinancial.com/sec-filings/sec-filing/10-k/0001101215-26-000016/
+- Company FY2025 earnings release, published 2026-01-29:
+  https://investor.breadfinancial.com/news-releases/news-release-details/bread-financial-reports-fourth-quarter-and-full-year-2025
+- Market snapshot was supplied in config/input.json: Yahoo Finance yfinance, dated 2026-08-03. It was not independently reconstructed because the input lacks the original USD market-cap and FX components.
+
+3. Model decision
+- Input hint ordinary_operating/applicable was rejected after filing review.
+- Two insured depository subsidiaries originate credit-card and consumer loans.
+- Loans, deposits, securitization debt, liquidity, and regulatory capital are operating structure.
+- Selected statement_model=financial_bank and owner_earnback_applicability=not_applicable.
+- Ordinary discounted net cash, cash profit, operating-business price, and payback metrics remain null per contract.
+
+4. Core extraction (USD millions unless noted)
+- Revenue (total net interest and non-interest income): 3,845.
+- Provision for credit losses: 1,242.
+- Income from continuing operations before tax: 615.
+- Income from continuing operations: 521.
+- Net income available to common stockholders: 518.
+- Total assets: 22,663; liabilities: 19,336; stockholders' equity: 3,327.
+- Cash: 3,604; gross loans: 18,805; allowance: 2,106; net loans: 16,699.
+- Deposits: 13,916; consolidated VIE debt: 3,422; long-term/other debt: 886.
+- 2025 NIM: 18.4%; ROTCE: 20.4%; CET1 ratio: 13.0%.
+- Delinquency: 5.8%; net principal loss rate: 7.7%; reserve rate: 11.2%.
+- Credit sales: 27,777; co-brand share approximately 52%; private-label share approximately 43%.
+- 2025 common dividends: USD 40 million / USD 0.86 per share.
+- 2026-01-29 quarterly dividend declaration: USD 0.23 per common share.
+
+5. Currency and derived calculations
+- Contract requires absolute CNY amounts. A transparent research conversion rate of CNY 7.20/USD was applied to all filing amounts; no claim is made that this is an audited or official translation rate.
+- Net margin = 518 / 3,845 = 13.4720%. For a bank, this is only a supplementary revenue ratio; gross margin is null.
+- Forecast annual dividend = USD 0.23 * 4 * 43,115,116 shares * 7.20 = approximately CNY 285,595,000.
+- Forecast dividend yield = CNY 285,595,000 / CNY 29,467,107,434.66748 = 0.9692%.
+- Operating cash flow and capex/free-cash-flow fields remain null because ordinary corporate FCF is not economically comparable for this banking model.
+
+6. Validation
+- Ran:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Protocol response: status=ok, errors=[]

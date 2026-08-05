@@ -1,0 +1,81 @@
+stock-research trace
+company=601002.SH 晋亿实业
+period=2025-12-31
+generated_for=2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md.
+4. Ran:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated every result field using protocol `set` and `append` commands; result.json was not authored from scratch.
+6. Ran protocol validation after population.
+
+[reuse check]
+Requested annual-review, normalized-facts, raw-filing and prior stock-research paths did not exist in the workspace.
+Only stock_report/data/notes/user_stock_evaluations.md existed; it contained no reusable 601002 research.
+Therefore the research returned to the published 2025 annual report and dividend announcements.
+
+[sources]
+S1 晋亿实业股份有限公司2025年年度报告, disclosed 2026-03-20:
+   https://pdf.dfcfw.com/pdf/H2_AN202603191820647347_1.pdf
+   The report identifies www.sse.com.cn as the designated exchange disclosure site.
+   Tianjian audit report 天健审〔2026〕508号 gives an unmodified opinion.
+S2 晋亿实业2025年度利润分配预案公告:
+   company proposal: CNY 0.80 per 10 shares; CNY 76,355,257.60 total.
+S3 晋亿实业2025年年度股东会决议公告:
+   2026-04-10 meeting approved the 2025 profit distribution proposal.
+S4 config/input.json:
+   Tencent qt.gtimg.cn market cap CNY 4,610,000,000 at 20260731114339; PE TTM 17.96.
+
+[reported facts]
+Revenue=2,336,420,650.18
+Cost of sales=1,744,763,141.31
+Gross profit=591,657,508.87
+Operating profit=274,695,746.45
+Net profit=242,976,221.82
+Parent net profit=242,215,077.70
+Deducted parent net profit=235,415,920.27
+Operating cash flow=373,828,548.26
+Capital expenditure=90,918,417.03
+Total assets=5,256,438,131.79
+Total liabilities=915,960,435.15
+Total equity=4,340,477,696.64
+Parent equity=4,329,757,737.17
+Minority interest=10,719,959.47
+Cash=616,454,855.83
+Trading financial assets=348,770,000.01; annual report describes the balance as wealth-management products.
+Short-term borrowing=0
+Long-term borrowing=0
+Major restricted assets disclosed=none
+
+[formula checks]
+gross_margin=(2,336,420,650.18-1,744,763,141.31)/2,336,420,650.18=0.2532366984
+net_margin=242,215,077.70/2,336,420,650.18=0.1036692805
+operating_free_cash_flow=373,828,548.26-90,918,417.03=282,910,131.23
+forecast_dividend_yield=76,355,257.60/4,610,000,000=0.016563
+discounted_cash=616,454,855.83*0.90=554,809,370.25
+discounted_wealth_management=348,770,000.01*0.95=331,331,000.01
+discounted_detachable_net_cash=554,809,370.25+331,331,000.01=886,140,370.26
+operating_business_price=4,610,000,000-886,140,370.26=3,723,859,629.74
+discounted_sustainable_cash_profit=220,000,000.00
+owner_earnback_years=3,723,859,629.74/220,000,000=16.9266
+market_cap_to_cash_profit=4,610,000,000/220,000,000=20.9545
+discounted_net_cash_to_market_cap=886,140,370.26/4,610,000,000=0.192221
+
+[judgment boundaries]
+FACT: 2025 revenue fell 1.40%; cost of sales fell 7.55%; management attributed lower unit cost mainly to lower steel market prices.
+INFERENCE: the large profit increase was driven more by input-cost/margin improvement than demand growth.
+JUDGMENT: cash gets a 10% haircut and bank wealth-management products a 5% haircut.
+JUDGMENT: sustainable distributable cash profit is CNY 220m, 6.5% below deducted parent profit and 22.2% below 2025 operating FCF.
+JUDGMENT: receivables, inventory, long-term equity investments and operating payables are retained in the operating business rather than treated as detachable cash/debt.
+
+[limitations]
+The Tencent market snapshot supplied by the task was not independently reconciled to an exchange closing-price record.
+Only one improved year is available for the steady-state profit judgment.
+Individual wealth-management maturity and early-redemption terms were not available; the discount is applied at portfolio level.
+
+[validation]
+Final protocol validation command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

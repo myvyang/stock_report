@@ -1,0 +1,21 @@
+2026-08-03 stock-research trace
+
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Checked configured annual-review, normalized-facts and raw-filing paths. No reusable filing or facts package existed in the workspace.
+4. Ran protocol CLI init:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Located primary filings on HKEX:
+   - Annual Report 2024/25, published 2025-10-20, audited year ended 2025-06-30.
+   - Interim Report 2025/26, published 2026-03-05, unaudited six months ended 2025-12-31.
+6. Identified input-period mismatch: Tai Ping's fiscal year ends 30 June, so 2025-12-31 is an interim date and no annual report exists for that date.
+7. Overrode analysis_model_hint after filing review. Company is an ordinary carpet design/manufacturing/sales business, not a brokerage.
+8. Annual statement extraction (HK$000): revenue 658,809; cost of sales 257,160; gross profit 401,649; operating profit 50,981; attributable profit 43,780; operating cash flow 96,250; PP&E/CIP purchases 14,538; intangible purchases 2,953; financing cash flow -59,359; dividends paid 25,462.
+9. Interim balance extraction at 2025-12-31 (HK$000): assets 852,309; liabilities 375,898; equity 476,411; inventory 58,106; receivables 88,250; fixed deposits 55,348; cash 217,400; lease liabilities 121,871; customer deposits 104,633; no bank borrowings.
+10. Currency normalization assumption: 1 HKD = 0.9113 CNY, consistent with the supplied market-cap conversion convention. All result.json amounts are absolute CNY yuan.
+11. Owner earnback assumptions: detachable cash = HK$272.748m cash/fixed deposits - HK$121.871m leases - HK$120m operating reserve = HK$30.877m; sustainable cash profit = HK$36m. Result: operating business price CNY232.903m; owner earnback 7.10 years; market cap/cash profit 7.96x.
+12. Dividend forecast assumes HK$0.12/share final dividend on 212.187m shares, no interim dividend; CNY23.204m and 8.89% yield. This is an estimate, not guidance.
+13. Populated result.json using repeated protocol CLI set commands executed by update_result.py; JSON was initialized by the protocol and not authored from scratch.
+14. Validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status ok, errors [].

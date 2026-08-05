@@ -1,0 +1,89 @@
+stock-research trace
+company=00926.HK BESUNYEN
+period=2025-12-31
+generated_at=2026-08-03T13:00:01+08:00
+
+[protocol]
+initialized outputs/result.json with:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+populated fields with protocol set commands; complex JSON was not created from an empty hand-written object.
+
+[local reuse]
+Checked the configured raw filing, annual review, normalized facts and prior stock-research paths.
+No filing metadata, annual facts, normalized facts, or prior result existed for 00926.HK/2025-12-31.
+Checked stock_report/data/notes/user_stock_evaluations.md; it contained no entry for 00926.HK.
+
+[primary source retrieval]
+HKEX issuer title search identified Annual Report 2025, released 2026-04-29.
+Downloaded primary filing:
+https://www.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042903033.pdf
+local copy:
+stock_report/data/raw/filings/00926.HK/2025-12-31/annual-report-2025.pdf
+PDF has 203 pages. Text was extracted locally for research only.
+
+[model verification]
+Input hint said financial_brokerage/requires_special_model.
+Annual Report p.123 states principal activities are manufacturing and sales of therapeutic tea products and sales of weight-loss and other medicines.
+Balance sheet contains ordinary operating assets/liabilities and no bank borrowings; no brokerage customer funds, margin financing, proprietary trading leverage, or repo funding.
+Override: statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+
+[financial extraction; RMB'000 multiplied by 1000]
+Annual Report pp.118-120:
+revenue=494322000
+cost_of_sales=147740000
+gross_profit=346582000
+operating_profit=27496000
+parent_net_profit=20443000
+total_assets=563304000
+total_liabilities=95035000
+total_equity=parent_equity=468269000
+minority_interest=0
+
+Annual Report p.122:
+operating_cash_flow=60954000
+capex cash paid=6079000 PPE + 319000 intangible = 6398000
+operating_free_cash_flow=60954000-6398000=54556000
+financing_cash_flow=-33279000
+dividends_paid=27862000
+
+[ratios]
+gross_margin=346582000/494322000=0.7011221033
+net_margin=20443000/494322000=0.0413556374
+
+[discounted detachable net cash]
+cash: 177926000 * 0.80 = 142340800 (display/JSON breakdown rounded to 142341000)
+FVTPL excluding GOSP6: (140960000-86505000) * 0.50 = 27227500 (rounded 27228000)
+GOSP6: 86505000 * 0 = 0 because redemption overdue and auditor could not verify fair value
+joint ventures: 8129000 * 0.50 = 4064500 (rounded 4064000)
+all liabilities: -95035000
+unrounded total=78597800; result rounded to discounted_net_cash=78598000
+discounted_net_cash_to_market_cap=78598000/251388264.3097639=0.3126534231
+
+[sustainable cash profit]
+parent profit 20443000
++ depreciation/amortisation 19925000 (5062000 ROU + 14490000 PPE + 373000 intangible)
+- capex 6398000
+- share of JV profit 4650000
++ JV dividends received 7210000
+= mechanical cash profit 36530000
+- prudence adjustment 7530000
+= discounted_sustainable_cash_profit 29000000
+Reason for prudence: 2025 earnings improvement included lower R&D/admin costs, much higher e-commerce marketing spend, and one-year working-capital movements.
+
+[owner earnback]
+market_cap=251388264.3097639
+operating_business_price=251388264.3097639-78598000=172790264.3097639
+owner_earnback_years=172790264.3097639/29000000=5.9582849762
+market_cap_to_cash_profit=251388264.3097639/29000000=8.6685608383
+
+[dividend forecast]
+Annual Report p.175: 2025 interim dividend RMB16725000; 2024 final dividend recognized in 2025 RMB11137000; total 2025 distribution RMB27862000. No 2025 final dividend proposed.
+Forecast scenario uses only RMB16725000, equal to the observed 2025 interim dividend.
+forecast_dividend_yield=16725000/251388264.3097639=0.0665305520
+
+[audit qualification]
+Annual Report pp.108-113: auditor issued a qualified opinion concerning inability to verify the fair value of GOSP6, carrying value RMB86505000. Full redemption request was not fulfilled; only about 10% was returned and no substantive plan existed by the report date.
+
+[validation]
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok; errors=[]

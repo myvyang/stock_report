@@ -1,0 +1,66 @@
+stock-research trace
+company: 00831.HK / Convenience Retail Asia Limited / 利亚零售有限公司
+period: 2025-12-31 annual
+generated_for_input: 2026-08-03T13:48:07+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked stock_report/data/analysis/annual_review/00831.HK/2025-12-31,
+  stock_report/data/raw/filings/00831.HK/2025-12-31, and
+  stock_report/data/normalized/facts/00831.HK/2025-12-31.
+- No local annual facts package or raw filing existed, so official disclosure retrieval was necessary.
+
+3. Company and model verification
+- Official filing: HKEX Annual Report 2025, released 2026-04-13:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0413/2026041300569.pdf
+- Annual report p.74 says the group operates Saint Honore bakeries, Mon cher pâtisserie,
+  Zoff eyewear stores and bakery wholesale.
+- Balance sheet contains ordinary retail/manufacturing assets and liabilities, not brokerage
+  client money, proprietary trading financial assets or repo funding.
+- Overrode input hint financial_brokerage -> ordinary_operating; owner earnback applicable.
+
+4. Core reported figures (HK$000)
+- Revenue 1,445,476; cost of sales 707,459; gross profit 738,017.
+- Core operating profit 46,950; attributable profit 33,806.
+- Total assets 1,181,181; liabilities 531,738; equity/parent equity 649,443.
+- Cash and cash equivalents 190,795; short-term deposits 15,857; restricted deposit 1,050.
+- Operating cash flow 215,169; fixed asset purchases 45,874; lease payments 152,485.
+- Dividends paid in cash flow 15,548.
+- Source pages: annual report pp.68-73, 97-99, 120-122.
+
+5. Currency conversion
+- Protocol requires absolute CNY yuan.
+- Used 1 HKD = CNY 0.90486 from PBOC 2025-12-26 central parity announcement:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- Limitation: near-year-end spot conversion, not exact 2025-12-31 or average annual rate.
+
+6. Key calculations
+- gross_margin = 738,017 / 1,445,476 = 0.5105702205.
+- net_margin = 33,806 / 1,445,476 = 0.0233874516.
+- protocol operating_free_cash_flow = (215,169 - 45,874) HK$000 = CNY 153,188,274.
+- lease-adjusted cash = (215,169 - 45,874 - 152,485) HK$000 = CNY 15,210,697.
+- discounted detachable cash = CNY 90,000,000, about 48% of unrestricted cash.
+- discounted sustainable cash profit = CNY 18,000,000, judged from 2025 lease-adjusted
+  cash, 2024 comparable cash and 2025 attributable profit.
+- operating business price = 238,870,899.2445469 - 90,000,000 = 148,870,899.2445469.
+- owner earnback = 148,870,899.2445469 / 18,000,000 = 8.2706055136 years.
+- market cap / cash profit = 238,870,899.2445469 / 18,000,000 = 13.2706055136.
+- 2025 dividend estimate = 777.42m shares * HK$0.04 * 0.90486 = CNY 28,138,250.
+- forecast/historical dividend yield = 28,138,250 / 238,870,899.2445469 = 0.1177948116.
+
+7. Protocol writes and validation
+- All structured sections were written using repeated protocol `set` commands after `init`.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validator output: {"status":"ok","errors":[]}.
+
+8. Material limitations
+- Tencent market-cap value was accepted as CNY per input/protocol; original quote currency is not explicit.
+- Detachable cash and sustainable cash profit are analyst haircuts, not company guidance.
+- Minimum operating cash required for coupons, leases, working capital and new factory was not disclosed.

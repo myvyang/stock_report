@@ -1,0 +1,84 @@
+task: FDS stock research
+archive_period: 2025-12-31
+financial_period_used: FY2025 ended 2025-08-31
+generated_timezone: Asia/Shanghai
+
+protocol:
+1. Read stock-research SKILL.md.
+2. Read result-contract.md, report-contract.md, and data-reuse.md.
+3. Ran protocol init with config/input.json to create outputs/result.json.
+4. Populated result fields only through protocol set commands.
+5. Ran protocol validate; final status: ok, errors: [].
+
+reuse_audit:
+- No raw filing, annual facts package, normalized facts, or prior FDS stock-research output existed locally.
+- Public official sources were therefore required.
+
+source_1:
+title: FactSet 2025 Annual Report / Form 10-K
+url: https://investor.factset.com/static-files/5c6fcdf0-adc4-4efc-bb3d-fb491541ae97
+used_for: business model; clients/users/retention/ASV; income statement; balance sheet; cash flow; debt; cash location; risk context.
+key_pages: 9, 30-40, 56, 58-59
+
+source_2:
+title: FactSet Reports Results for Fourth Quarter and Fiscal 2025
+date: 2025-09-18
+url: https://investor.factset.com/news-releases/news-release-details/factset-reports-results-fourth-quarter-and-fiscal-2025/
+used_for: cross-check FY2025 revenue, margins, EPS, OCF, FCF, ASV, client/user counts, shareholder returns.
+
+source_3:
+title: FactSet Dividends & Splits
+url: https://investor.factset.com/stock-information/dividends-splits/
+used_for: latest declared quarterly dividend and dividend history.
+
+source_4:
+title: Federal Reserve H.10 Foreign Exchange Rates
+url: https://www.federalreserve.gov/releases/h10/
+used_for: approximate USD/CNY translation.
+
+source_5:
+title: input market snapshot
+path: config/input.json
+used_for: market cap CNY 63,167,030,436.99902; date 2026-08-03; PE TTM 17.32719; source Yahoo Finance yfinance.
+
+model_audit:
+- Input hint ordinary_operating was confirmed.
+- FactSet sells financial information, software, and workflow subscriptions; it is not a bank, broker, insurer, or investment holding company.
+- No customer deposits, client funds, insurance reserves, or matched proprietary financial asset/liability structure was found.
+- owner_earnback_applicability: applicable.
+
+currency_method:
+- FY2025 income statement, cash flow, and balance-sheet amounts translated at approximate USD/CNY 7.15 for a consistent, reproducible presentation.
+- Forecast dividend translated at approximate USD/CNY 6.76 near the market snapshot period.
+- These are analytical translations, not statutory CNY financial statements.
+
+core_calculations:
+- gross_profit_usd = 2,321,748,000 - 1,097,782,000 = 1,223,966,000
+- gross_margin = 1,223,966,000 / 2,321,748,000 = 0.5271743531
+- net_margin = 597,040,000 / 2,321,748,000 = 0.2571510776
+- operating_free_cash_flow_usd = 726,260,000 - 108,806,000 = 617,454,000
+- operating_free_cash_flow_cny = 617,454,000 * 7.15 = 4,414,796,100
+- sustainable_cash_profit_usd = 617,454,000 - 61,229,000 stock_comp = 556,225,000
+- sustainable_cash_profit_cny = 556,225,000 * 7.15 = 3,977,008,750
+- discounted_cash_cny = 337,651,000 * 7.15 * 0.90 = 2,172,784,185
+- discounted_investments_cny = 17,445,000 * 7.15 * 0.80 = 99,785,400
+- debt_cny = 1,368,260,000 * 7.15 = 9,783,059,000
+- discounted_detachable_net_cash = 2,172,784,185 + 99,785,400 - 9,783,059,000 = -7,510,489,415
+- operating_business_price = 63,167,030,436.99902 - (-7,510,489,415) = 70,677,519,851.99902
+- owner_earnback_years = 70,677,519,851.99902 / 3,977,008,750 = 17.7715273702
+- market_cap_to_cash_profit = 63,167,030,436.99902 / 3,977,008,750 = 15.8830504049
+- forecast_dividend_cny = 1.16 * 4 * 37,645,870 * 6.76 = 1,180,815,416.768
+- forecast_dividend_yield = 1,180,815,416.768 / 63,167,030,436.99902 = 0.0186935401
+
+judgment_notes:
+- Cash haircut 10% reflects operating liquidity needs, global cash locations, and foreign earnings constraints.
+- Investments haircut 20% reflects market/tax friction.
+- Interest-bearing debt deducted at 100%.
+- Lease liabilities excluded from detachable net cash to avoid double counting because lease payments already burden operating cash flow.
+- Stock-based compensation deducted from FCF because it is recurring employee compensation and maintaining per-share ownership may require offsetting repurchases.
+- Acquisition cash spending was not treated as annual maintenance capex; if acquisitions are economically required to sustain growth, sustainable cash profit is overstated.
+
+final_files:
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

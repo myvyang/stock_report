@@ -1,0 +1,22 @@
+2026-08-05 research trace — ITRN FY2025
+
+1. Read stock-research SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Inspected config/input.json. The referenced raw filing, annual facts, normalized facts, and prior research artifacts were absent, so no prior facts could be reused.
+3. Initialized outputs/result.json with the required protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Retrieved and inspected the official Ituran FY2025 Form 20-F filed with the SEC on 2026-04-23 (accession 0001178913-26-002205). Used audited consolidated statements, business discussion, subscriber/geography tables, notes, dividend policy, and risk disclosures.
+5. Retrieved the official Ituran Q1 2026 results furnished to the SEC on 2026-05-26 for post-period evidence on subscriber growth and the continuing $10m quarterly dividend.
+6. Retrieved SAFE's 2025-12-31 currency conversion workbook. The workbook reports CNY at 0.1422717960 USD per CNY; inverted conversion used throughout: 1 USD = 7.0288 CNY.
+7. Converted all FY2025 USD statement amounts to CNY absolute yuan using 7.0288. Percentages were calculated from original USD amounts.
+8. Confirmed analysis model as ordinary_operating: telematics subscriptions and products are ordinary customer operations; cash, receivables, inventories, fixed assets, deferred revenue and leases do not form a regulated financial balance-sheet business.
+9. Owner earnback assumptions:
+   - cash and cash equivalents: $107.551m × 70%; haircut reflects multi-country working cash, operating requirements and currency constraints.
+   - accrued dividend: $10.428m deducted at 100% because already declared at year-end.
+   - no marketable securities value added ($0.003m immaterial); no bank debt at year-end.
+   - discounted detachable net cash = ($107.551m × 70% - $10.428m) × 7.0288 = CNY455,871,801.76.
+   - cash-profit base = parent net income $57.967m, selected because it is below FY2025 operating FCF $66.802m and below the three-year average operating FCF; apply 10% sustainability haircut.
+   - discounted sustainable cash profit = $57.967m × 90% × 7.0288 = CNY366,694,604.64.
+10. Dividend forecast uses the continuing ordinary policy of $10m per quarter ($40m annualized), excluding the March 2026 one-time $30m dividend. Forecast CNY281,152,000 and yield 3.8187% against input market cap.
+11. Populated outputs/result.json using protocol CLI set/append commands, not by constructing a replacement JSON document.
+12. Validated outputs/result.json using protocol CLI validate.
+    Final validation result: {"status":"ok","errors":[]}.

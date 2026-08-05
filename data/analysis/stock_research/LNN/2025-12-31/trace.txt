@@ -1,0 +1,63 @@
+stock-research trace: LNN / Lindsay Corporation
+generated_at=2026-08-04T20:41:36+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- Checked paths specified by config/input.json.
+- No LNN raw filing, annual facts, normalized facts, or prior stock-research result existed in the workspace.
+- Therefore used primary public filing sources rather than inventing a local fact pack.
+
+3. Primary sources
+- SEC FY2025 Form 10-K, filed 2025-10-23:
+  https://www.sec.gov/Archives/edgar/data/836157/000119312525248751/lnn-20250831.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/836157/000119312525248751/0001193125-25-248751-index.html
+- Federal Reserve H.10 weekly FX releases around August 2025; CNY observations approximately 7.18-7.21 per USD. A transparent rounded rate of 7.20 CNY/USD was used for every statement amount.
+- Market cap, market-cap date, PE TTM, and market-data source were reused exactly from config/input.json.
+
+4. Period resolution
+- Input period: 2025-12-31, report_type=annual.
+- Lindsay fiscal year end: August 31.
+- Applicable complete annual filing: FY ended 2025-08-31.
+- Did not combine quarterly data into an unaudited synthetic annual period.
+
+5. Statement model
+- Confirmed ordinary_operating / applicable.
+- Rationale: manufacturing and distribution company with ordinary cash, receivables, inventory, PP&E, trade liabilities, leases, and corporate debt; no special-model balance-sheet structure.
+
+6. Core USD facts (millions unless stated)
+- Revenue 676.368; cost 465.588; gross profit 210.780; operating income 88.124; net earnings 74.052.
+- Total assets 840.836; liabilities 307.986; equity 532.850.
+- Cash 250.575; debt current 0.233 plus long-term 114.810 = 115.043.
+- Operating cash flow 132.9; capex 42.496; operating FCF 90.404.
+- FY2025 paid dividends 15.7; repurchases 11.5.
+- Irrigation revenue 568.000 / segment operating income 96.963.
+- Infrastructure revenue 108.368 / segment operating income 26.338.
+
+7. Conversion and formulas
+- All USD statement amounts multiplied by 7.20 and by 1,000,000 to produce absolute CNY yuan.
+- Gross margin = 210.780 / 676.368 = 0.3116350862.
+- Net margin = 74.052 / 676.368 = 0.1094847775.
+- Discounted detachable net cash = (250.575 * 80% - 115.043) * 7.20m = CNY 615,002,400.
+- Normalized cash-profit starting point = USD 65.0m, below FY2025 FCF and around recent earnings capacity.
+- Discounted sustainable cash profit = 65.0 * 85% * 7.20m = CNY 397,800,000.
+- Operating business price = 7,604,428,251.676025 - 615,002,400 = CNY 6,989,425,851.676025.
+- Owner earnback = 6,989,425,851.676025 / 397,800,000 = 17.5702007 years.
+- Market cap / cash profit = 7,604,428,251.676025 / 397,800,000 = 19.1162098.
+- Dividend forecast = FY2025 paid dividend USD 15.7m * 7.20 = CNY 113,040,000; yield = 0.0148650229.
+
+8. JSON construction
+- Used protocol CLI set operations for all populated objects and arrays; did not hand-write result.json from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+
+9. Known limitations
+- Market valuation date is about eleven months after the annual balance-sheet date.
+- FX conversion is a uniform analytical translation, not GAAP historical-rate translation.
+- Sustainable cash profit and discounts are analyst assumptions, clearly separated from reported facts.

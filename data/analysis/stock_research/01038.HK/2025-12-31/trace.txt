@@ -1,0 +1,53 @@
+stock-research trace
+company=CK Infrastructure Holdings Limited (01038.HK)
+period=2025-12-31
+generated_at=2026-08-03T17:47:58+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md; no annual facts, normalized facts, prior research result, or filing metadata existed for this company/period.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Primary evidence acquired
+- Downloaded issuer annual report:
+  https://www.cki.com.hk/english/PDF_file/annualReport/2025/cki_ar25_full.pdf
+  saved as stock_report/data/raw/filings/01038.HK/2025-12-31/cki_ar25_full.pdf
+- Consulted issuer annual-results investor presentation:
+  https://www.cki.com.hk/english/PDF_file/ir_presentation/20260318_1.pdf
+- Consulted issuer/HKEX announcement indexes for the UKPN disposal status.
+- Market cap and PE were reused exactly from config/input.json (Tencent qt.gtimg.cn snapshot).
+
+3. Model adjudication
+- Input hint financial_brokerage/construction-related tags rejected as inconsistent with issuer identity and audited statements.
+- Audited 2025 facts: share of associate results HK$2,895m; share of JV results HK$6,127m; parent profit HK$8,265m; associate interests HK$40,063m; JV interests HK$110,520m; total assets HK$166,262m.
+- Associate/JV interests are 90.6% of total assets; equity-accounted results exceed parent profit.
+- Set statement_model=investment_holding and owner_earnback_applicability=requires_special_model.
+- All ordinary owner-earnback fields retained as null per result contract.
+
+4. Currency and calculations
+- Protocol requires CNY absolute yuan.
+- Conversion used for all HKD filing amounts: HK$1 = RMB0.897878955 at 2025-12-31.
+- Input market cap was already supplied in CNY and was not reconverted.
+- Capex = PP&E purchases HK$302m + intangible additions HK$34m = HK$336m.
+- Operating free cash flow = reported operating cash flow HK$2,213m - capex HK$336m = HK$1,877m.
+- Issuer FFO cross-check = OCF HK$2,213m + associate dividends HK$2,319m + JV dividends HK$3,983m = HK$8,515m.
+- Forecast dividend uses flat 2025 DPS run-rate: HK$6,576m; converted CNY amount divided by supplied market cap = 4.351328177%.
+- gross_margin and net_margin set null because consolidated turnover excludes equity-accounted investee revenue while profit includes their results; ratios would mix scopes.
+
+5. Post-balance-sheet event treatment
+- Annual report note 38: expected direct CKI consideration for UKPN about GBP4.2bn / HK$44.3bn, subject to conditions.
+- Investor presentation: expected effective disposal gain about HK$14.5bn including CKI share through Power Assets.
+- No completion announcement located in issuer/HKEX index through the generation date; transaction treated as pending and no 2025 balance-sheet adjustment made.
+
+6. Result construction and validation
+- outputs/result.json was populated only through repeated protocol CLI `set` commands after protocol initialization; no complex result object was written directly to the file.
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok; errors: [].
+
+7. Output files
+- outputs/result.json: structured protocol result.
+- outputs/report.md: human-readable operating-quality and special-model report.
+- outputs/trace.txt: this provenance and calculation trace.

@@ -1,0 +1,63 @@
+stock-research trace — 01547.HK
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+   - No raw filing, annual facts, normalized facts, or prior stock-research result existed for 01547.HK/2025-12-31.
+   - Only stock_report/data/notes/user_stock_evaluations.md existed; it did not provide company facts used here.
+
+3. Protocol initialization
+   - Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Skeleton successfully created.
+
+4. Company and period identification
+   - Official company annual-report index and HKEX title search reviewed.
+   - Company statutory year end is 31 March, not 31 December.
+   - Selected Annual Report 2024/2025, year ended 2025-03-31, because it was the latest annual filing published before the requested 2025-12-31 cutoff.
+   - Excluded Annual Report 2025/2026, published in July 2026, from core financial facts.
+
+5. Source filing
+   - IBI Group Holdings Limited Annual Report 2024/2025:
+     https://ibighl.com/doc/En/Financial%20Reports/Annual%20Report/2024-2025%20Annual%20Report.pdf
+   - HKEX issuer title search:
+     https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=146360
+   - Relevant filing sections: Chairman's Statement; MD&A pp.16-21; Directors' Report p.36; financial statements pp.114-118; Notes 6, 7, 13, 18-24.
+
+6. Model override
+   - Input hint: financial_brokerage.
+   - Filing fact: renovation main contractor with contract assets, project cost accruals and retention balances; ancillary building products, property investment and securities.
+   - Final model: construction_project / requires_special_model.
+   - Ordinary owner-earnback fields intentionally left null.
+
+7. Currency normalization
+   - Filing currency: HKD thousands.
+   - Protocol currency: CNY absolute yuan.
+   - Applied an explicit approximate conversion of HKD 1 = CNY 0.93 to all statement and dividend amounts.
+   - Ratios calculated from original-currency values; conversion does not affect margins.
+
+8. Key calculations
+   - gross_margin = 44,303 / 330,863 = 0.1339013429
+   - net_margin = 8,390 / 330,863 = 0.0253579276
+   - operating_profit = profit before tax 10,432 + finance costs 4,189 = HKD 14,621 thousand
+   - operating_free_cash_flow = operating cash flow 6,407 - PPE cash capex 31 = HKD 6,376 thousand
+   - forecast dividend = HKD 4,000,000 × 0.93 = CNY 3,720,000
+   - forecast dividend yield = CNY 3,720,000 / CNY 134,206,800.69923401 = 0.0277184165
+   - Forecast is a mechanical carry-forward of FY2025 declared dividend, not company guidance.
+
+9. Market data
+   - Reused exactly from config/input.json.
+   - Market cap: CNY 134,206,800.69923401
+   - PE TTM: 11.5
+   - Timestamp: 2026/08/03 09:20:05
+   - Source: Tencent qt.gtimg.cn
+   - Limitation recorded: market snapshot post-dates both the requested cutoff and the selected filing.
+
+10. Protocol population and validation
+    - Populated the initialized skeleton only through protocol `set` commands.
+    - Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    - Validation result: status=ok, errors=[]

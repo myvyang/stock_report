@@ -1,0 +1,54 @@
+stock-research trace
+generated_at: 2026-08-05T04:19:10+08:00
+query: 08017.HK
+requested_period: 2025-12-31
+requested_report_type: annual
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No annual facts, normalized facts, prior stock-research output, or filing metadata existed in the requested stock_report paths.
+- Downloaded official HKEX PDF to stock_report/data/raw/filings/08017.HK/2025-12-31/annual-report-2025-2026.pdf.
+
+3. Period resolution
+- Input requests annual period 2025-12-31.
+- TRADEGO has a 31 March fiscal year end; no annual report ends 2025-12-31.
+- Latest audited report available by created_at is the year ended 2026-03-31, published 2026-05-28.
+- Retained requested period in protocol output and marked data_quality.status=partial with explicit mismatch reason.
+
+4. Primary sources
+- HKEX annual report: https://www1.hkexnews.hk/listedco/listconews/gem/2026/0528/2026052800091.pdf
+- HKMA daily FX API: https://api.hkma.gov.hk/public/market-data-and-statistics/monthly-statistical-bulletin/er-ir/er-eeri-daily
+- Market snapshot: Tencent qt.gtimg.cn, supplied in config/input.json.
+
+5. Model review
+- Confirmed financial_brokerage / requires_special_model.
+- Basis: SFO-licensed financial services supplied HK$102.552m of HK$186.565m external revenue; brokerage receivables, settlement balances, regulatory deposits and off-balance-sheet segregated client money are integral to operations.
+- Ordinary discounted net-cash and owner earnback fields left null as required.
+
+6. Currency conversion
+- HKMA 2026-03-31 CNY quote: 1 CNY = 1.1343 HKD.
+- Applied 1 HKD = 0.8816009873931058 CNY to all statement amounts for protocol consistency.
+- Limitation: income and cash-flow items were not translated at an annual average rate.
+
+7. Key calculations
+- gross_margin = (186,565,446 - 22,093,344) / 186,565,446 = 0.8815785856.
+- net_margin = 59,561,557 / 186,565,446 = 0.3192528857.
+- capex = PPE purchases 56,755 + intangible additions 6,206,119 = HK$6,262,874.
+- operating_free_cash_flow = 33,023,677 - 6,262,874 = HK$26,760,803.
+- rough average parent ROE = 59,561,557 / ((183,323,528 + 400,874,412) / 2) = 0.2039088224.
+- forecast dividend = 0 because no dividend was paid or proposed for FY2026 and no new commitment was evidenced.
+
+8. Protocol operations
+- Initialized outputs/result.json with protocol init.
+- Populated branches with protocol set; no complex result object was handwritten from scratch.
+- Validation result recorded after final validate command below.
+
+9. Validation
+- protocol validate: PASS
+- balance-sheet identity check: PASS
+- special-model null-field check: PASS

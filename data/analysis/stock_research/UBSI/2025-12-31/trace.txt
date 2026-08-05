@@ -1,0 +1,111 @@
+stock-research trace
+company=UBSI / United Bankshares, Inc.
+period=2025-12-31
+generated_for_input=2026-08-04T23:25:02+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md in full.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated result fields only with protocol set/append commands.
+4. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   validation_status=ok
+
+[reuse audit]
+Expected local annual facts, normalized facts, raw filing, and prior stock-research outputs for UBSI/2025-12-31 were absent.
+Only stock_report/data/notes/user_stock_evaluations.md existed and contained no UBSI facts used here.
+Therefore official public sources were retrieved.
+
+[model override]
+input_hint.statement_model=ordinary_operating
+verified.statement_model=financial_bank
+verified.owner_earnback_applicability=requires_special_model
+reason=SEC 10-K identifies United Bankshares as a financial holding company whose present business is community banking. Loans, deposits, securities, cash, borrowings and regulatory capital are integral to banking operations. Ordinary detachable-net-cash and free-cash-flow earnback calculations are economically invalid.
+ordinary_owner_earnback_fields=all null
+
+[primary sources]
+SEC 2025 Form 10-K, filed 2026-02-27:
+https://www.sec.gov/Archives/edgar/data/729986/000119312526081470/d90970d10k.htm
+
+United Bankshares 2025 earnings release, published 2026-01-22:
+https://www.ubsi-inc.com/news/news-details/2026/United-Bankshares-Inc--Announces-Record-Earnings-for-the-Year-of-2025/default.aspx
+
+United Bankshares dividend history:
+https://ubsi-inc.com/stock-info/dividend-history/default.aspx
+
+United Bankshares 52nd consecutive dividend increase release, published 2025-11-20:
+https://ubsi-inc.com/news/news-details/2025/52nd-Consecutive-Year-of-Dividend-Increases-for-United-Bankshares-Inc-/default.aspx
+
+Federal Reserve G.5A 2025 annual FX release, published 2026-01-05:
+https://www.federalreserve.gov/releases/g5a/current/
+
+[market source carried from input]
+market_cap_cny=44771950083.31348
+market_cap_date=2026-08-03
+pe_ttm=13.237705
+source=Yahoo Finance yfinance (task input)
+
+[currency conversion]
+Protocol requires absolute CNY yuan.
+USD/CNY 2025 annual average=7.1875, Federal Reserve G.5A.
+All filing USD amounts were multiplied by 7.1875 for consistency.
+Limitation: balance-sheet translation would differ under a 2025-12-31 spot rate.
+
+[reported USD facts and converted CNY]
+total_assets_usd=33,660,281,000 -> cny=241,933,269,687.50
+total_liabilities_usd=28,164,298,000 -> cny=202,430,891,875.00
+common_equity_usd=5,495,983,000 -> cny=39,502,377,812.50
+cash_equivalents_usd=2,542,250,000 -> cny=18,272,421,875.00
+investment_securities_usd=3,400,400,000 -> cny=24,440,375,000.00
+loans_net_unearned_income_usd=24,709,122,000 -> cny=177,596,814,375.00
+allowance_loans_usd=297,518,000 -> cny=2,138,410,625.00
+deposits_usd=27,060,939,000 -> cny=194,500,499,062.50
+borrowings_usd=730,390,000 -> cny=5,249,678,125.00
+goodwill_usd=2,018,848,000
+other_intangibles_usd=32,267,000
+goodwill_plus_intangibles_cny=14,742,389,062.50
+net_interest_income_usd=1,102,164,000
+noninterest_income_usd=135,154,000
+net_operating_revenue_usd=1,237,318,000 -> cny=8,893,223,125.00
+net_income_usd=464,603,000 -> cny=3,339,334,062.50
+common_dividends_2025_usd=212,002,000 -> cny=1,523,764,375.00
+
+[derived operating metrics]
+net_margin_display=464,603,000 / 1,237,318,000 = 0.3754919915
+Note: this is net income divided by net interest income plus noninterest income; it is not a manufacturing gross/net margin analogue.
+net_interest_margin_2025=3.78%
+net_interest_margin_2024=3.49%
+ROA_2025=1.41%
+ROE_2025=8.63%
+ROTE_2025_non_GAAP=13.95%
+efficiency_ratio_2025=48.50%
+NPL_usd=101,500,000
+NPL_ratio=0.41%
+allowance_coverage_NPL=297,518,000 / 101,500,000 = 2.9312x
+net_charge_off_ratio_2025=0.19%
+CET1_estimated=13.4%
+total_risk_based_capital_estimated=15.7%
+leverage_ratio_estimated=11.3%
+
+[dividend forecast]
+2026 Q1 declared dividend per share USD=0.38
+2026 Q2 declared dividend per share USD=0.38
+forecast assumption=Q3 and Q4 remain USD 0.38
+annualized dividend per share USD=1.52
+shares=139,419,485 (10-K disclosed shares outstanding at 2026-01-31)
+forecast_dividend_usd=1.52 * 139,419,485 = 211,917,617.20
+forecast_dividend_cny=211,917,617.20 * 7.1875 = 1,523,157,873.625
+forecast_dividend_yield=1,523,157,873.625 / 44,771,950,083.31348 = 0.03402036031
+forecast is conditional, not declared for the full year.
+
+[cash flow field handling]
+Bank operating_cash_flow, capital_expenditure, and operating_free_cash_flow were left null because they do not have ordinary-company free-cash-flow meaning.
+dividend_and_buyback_cash_out is an approximation:
+2025 dividends USD 212.002m + repurchases 3.6m shares * USD 35.24 average = USD 338.866m.
+Converted and rounded to CNY 2.4359bn in result.json.
+
+[quality]
+status=complete
+Core identity, period, market data, bank model, balance-sheet totals, net income, dividend forecast, asset/liability explanations, business story, specialty bank metrics, risks, and evidence are present.
+Known limitations are recorded in outputs/result.json data_quality.limitations and report.md.

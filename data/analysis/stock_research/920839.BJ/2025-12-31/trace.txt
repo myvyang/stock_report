@@ -1,0 +1,46 @@
+stock-research trace
+company=万通液压 code=920839.BJ period=2025-12-31
+generated_for_input_created_at=2026-08-03T10:47:22+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result.json exclusively through protocol set commands after initialization.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse audit]
+- Expected annual facts, normalized facts, raw filing metadata and historical stock-research files were absent from the supplied workspace.
+- No sufficiently explicit prior research artifact was available to reuse.
+- Core facts were therefore re-verified against the 2025 annual-report announcement text and the implemented dividend announcement.
+
+[sources]
+- Annual report: 山东万通液压股份有限公司2025年年度报告, disclosed 2026-04-20, source disclosure venue BSE; searchable mirror used for line-level extraction:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12125833&stockid=920839
+- Dividend implementation: 山东万通液压股份有限公司2025年年度权益分派实施公告, disclosed 2026-06-11:
+  https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?CompanyCode=80477737&gather=1&id=12387829
+- Valuation snapshot: config/input.json; Tencent qt.gtimg.cn; timestamp 20260731153802.
+
+[model decision]
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Basis: manufacturing company selling hydraulic cylinders and hydro-pneumatic springs; balance sheet contains ordinary cash, receivables, inventory, production equipment, operating payables and financing debt. It is not a financial, property-development, construction-project, concession or investment-holding model.
+
+[derived calculations]
+- gross_profit = 696465267.50 - 487952339.06 = 208512928.44
+- gross_margin = 208512928.44 / 696465267.50 = 0.2993874040387807
+- net_margin = 125532435.84 / 696465267.50 = 0.1802422054592981
+- operating_free_cash_flow = 158638895.82 - 12557128.36 = 146081767.46
+- discounted_detachable_net_cash = 164661965.99 + 80000000*0.95 + 90071010.64*0.95 - 27482495.09 - 137929207.59 - 19143.95 = 160798579.468
+- discounted_sustainable_cash_profit = 120000000.00, judgment based on 123105578.60 recurring parent profit, rounded down for cyclicality, customer concentration and receivable growth; 146081767.46 FCF used as cross-check.
+- operating_business_price = 2934000000 - 160798579.468 = 2773201420.532
+- owner_earnback_years = 2773201420.532 / 120000000 = 23.110011837766667
+- market_cap_to_cash_profit = 2934000000 / 120000000 = 24.45
+- forecast_dividend_yield = 65015484.05 / 2934000000 = 0.022159333350374913
+
+[limitations]
+- The workspace lacked the annual-report PDF and extracted annual-facts package; the report text was checked through the searchable announcement mirror rather than a locally archived original PDF.
+- Sustainable cash profit and asset haircuts are analyst judgments, not company guidance.
+- Market cap and PE were accepted from the supplied input snapshot and were not independently reconstructed from price and share count.

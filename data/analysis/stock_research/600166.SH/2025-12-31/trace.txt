@@ -1,0 +1,92 @@
+stock-research trace
+company=福田汽车
+code=600166.SH
+period=2025-12-31
+generated_for_input=2026-07-31T16:43:43+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Read references/data-reuse.md because the task required reuse of existing facts.
+4. Ran protocol init:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated scalar/object fields with protocol set and list fields with protocol append.
+6. Ran protocol validate. Result: {"status":"ok","errors":[]}.
+
+[reuse check]
+Expected 2025 annual facts, normalized facts, raw filing metadata and prior stock research were absent from /workspace/stock_report.
+No prior company research result was reused.
+The input market-cap snapshot was reused as instructed.
+
+[primary filing]
+Title: 北汽福田汽车股份有限公司2025年年度报告
+Disclosure date: 2026-04-25
+Source URL: https://dataclouds.cninfo.com.cn/shgonggao/hsomarket/2026/20260424/22237e3bd17f48d7b434dade7bd3cf96.PDF
+Local PDF: stock_report/data/raw/filings/600166.SH/2025-12-31/annual-report-2025.pdf
+Local extracted text: stock_report/data/raw/filings/600166.SH/2025-12-31/annual-report-2025.txt
+Audit opinion: standard unqualified opinion, Tianzhi International.
+
+[model decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: Revenue and balance-sheet structure are those of an ordinary vehicle manufacturer. Inventory, receivables, plants, development costs and supplier liabilities are operating items. The company is not a bank, broker, insurer, property developer, construction contractor, concession utility or investment holding platform. Cash nevertheless requires a strong haircut because of restricted deposits, supplier settlement needs and deposits at BAIC Finance.
+
+[core filing facts, CNY]
+revenue=61247393438.93
+cost_of_sales=55139903816.58
+gross_profit=6107489622.35
+operating_profit=1366638977.69
+net_profit=1285819082.43
+parent_net_profit=1363826801.45
+deducted_nonrecurring_parent_profit=825706306.14 (derived as 1363826801.45 - 538120495.31; annual report rounds it to 826 million)
+total_assets=53457131290.66
+total_liabilities=37245980604.38
+total_equity=16211150686.28
+parent_equity=15617463399.87
+minority_interest=593687286.41
+operating_cash_flow=1894598193.50
+capital_expenditure=856401820.64
+operating_free_cash_flow=1038196372.86
+financing_cash_flow=-1346754259.25
+cash_and_cash_equivalents=7197826532.08
+restricted_cash=1910544465.25
+cash_at_group_finance_company=3075365488.23
+
+[derived metrics]
+gross_margin=(61247393438.93-55139903816.58)/61247393438.93=0.0997183599076718
+net_margin=1363826801.45/61247393438.93=0.022267507641935434
+minority_interest_ratio=593687286.41/16211150686.28=0.03662287493607784
+operating_free_cash_flow=1894598193.50-856401820.64=1038196372.86
+
+[owner earnback]
+market_cap=24781000000.00
+cash_credit=7197826532.08*0.50=3598913266.04
+interest_bearing_debt_and_lease=174671972.22+742565974.36+2209917387.56+167830609.43=3294985943.57
+discounted_detachable_net_cash=3598913266.04-3294985943.57=303927322.47
+operating_business_price=24781000000.00-303927322.47=24477072677.53
+discounted_sustainable_cash_profit=800000000.00
+owner_earnback_years=24477072677.53/800000000.00=30.5963408469
+market_cap_to_cash_profit=24781000000.00/800000000.00=30.97625
+
+Sustainable cash profit rationale:
+- Start with 2025 operating free cash flow of 1.038 billion.
+- Cross-check against deducted-nonrecurring parent profit of about 0.826 billion.
+- Apply a 0.238 billion prudence reduction from the FCF baseline for working-capital normalization, heavy 55.02% R&D capitalization, truck cyclicality and reliance on investment/other income.
+- Rounded result: 0.800 billion.
+
+[dividend]
+forecast_cash_dividend=0
+forecast_dividend_yield=0
+Basis: 2025 distribution plan was no dividend; parent-company undistributed profit at year end was -3810421754.54, so the company stated it did not meet the prerequisite for cash dividends. No formal evidence available in the task supports a 2026 restoration forecast.
+
+[market data]
+market_cap=24781000000.0
+market_cap_date=20260731114347
+market_cap_source=Tencent qt.gtimg.cn
+pe_ttm=17.33
+These fields came from config/input.json and were not independently reconstructed.
+
+[limitations]
+Only one annual period was available in the workspace; there was no multi-year normalized free-cash-flow fact pack.
+The sustainable cash profit and cash haircut are explicit research judgments, not company guidance.
+The 2026 dividend forecast is a conservative placeholder based on currently disclosed constraints, not a board proposal.

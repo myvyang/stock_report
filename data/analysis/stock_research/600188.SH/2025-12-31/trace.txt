@@ -1,0 +1,53 @@
+stock-research trace
+company=600188.SH 兖矿能源
+period=2025-12-31 annual
+generated_at=2026-08-01T05:06:41+08:00
+
+1. Read skill and contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit:
+   - Expected annual facts, normalized facts, raw filing metadata, and prior stock-research outputs were absent under stock_report.
+   - Only stock_report/data/notes/user_stock_evaluations.md existed.
+   - Therefore returned to primary public disclosure, per data-reuse protocol.
+
+3. Protocol initialization:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Primary sources read:
+   - Company annual-report index: https://www.ykenergy.com/451722/451725/
+   - 2025 PRC GAAP annual-report page: https://www.ykenergy.com/451722/451725/2026/03/43046901.html
+   - Company-hosted DOCX attachment: https://img11.litenews.cn/700/2026/03/27/06edfad0a705d61ebca5446f9ce93c8f.docx
+   - Market cap and PE: config/input.json, source Tencent qt.gtimg.cn, timestamp 20260731114336.
+
+5. Statement model judgment:
+   - ordinary_operating / applicable.
+   - Mining rights, mines, chemical plants and logistics assets are operating assets.
+   - Special caution applied to finance-company cash flows, restricted cash, perpetual securities and minority interests.
+
+6. Core calculations (CNY):
+   gross_profit = 144932859000 - 102409181000 = 42523678000
+   gross_margin = 42523678000 / 144932859000 = 0.29340
+   net_margin = 8380948000 / 144932859000 = 0.05783
+   operating_free_cash_flow = 19484794000 - 18520825000 = 963969000
+   explicit_financing_debt = 20958181000 + 32074029000 + 57099723000 + 22964152000 + 425643000 = 133521728000
+   discounted_cash = 37428025000 * 0.70 = 26199617500
+   discounted_net_cash = 26199617500 - 133521728000 = -107322110500
+   operating_business_price = 201640000000 - (-107322110500) = 308962110500
+   owner_earnback_years = 308962110500 / 5179292300 = 59.65
+   discounted_cash_profit = 7398989000 * 0.70 = 5179292300
+   forecast_dividend = 10037481000 shares * CNY 0.50 = 5018740500
+
+7. Research assumptions:
+   - Long-term equity and financial investments receive 0% detachable value because evidence was insufficient on disposal constraints and operating linkage.
+   - Sustainable cash profit starts with attributable recurring profit and keeps 70% to absorb commodity cycle, cash conversion, acquisition comparability and ownership complexity.
+   - Dividend forecast follows the disclosed 2025 policy; final record-date share count may differ.
+
+8. Result populated through protocol CLI set commands; complex JSON was not authored from a blank file.
+
+9. Validation:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   status=ok, errors=[]

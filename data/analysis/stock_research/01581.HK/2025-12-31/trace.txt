@@ -1,0 +1,80 @@
+stock-research trace
+generated_at: 2026-08-04T18:16:39+08:00
+query: 01581.HK
+requested_period: 2025-12-31
+report_type: annual
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields only through protocol set/append commands in fill_result.sh.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[local_reuse_check]
+- No raw filing metadata, annual facts JSON/Markdown, normalized facts, or prior stock-research output existed under the input paths.
+- Therefore returned to primary HKEX disclosures.
+
+[identity_and_model]
+- Input hint classified 01581.HK as financial_brokerage.
+- HKEX Annual Report 2025 identifies Progressive Path Group Holdings Limited and states its businesses are construction works and construction machinery rental in Hong Kong.
+- Overrode hint with statement_model=construction_project.
+- owner_earnback_applicability=requires_special_model because receivables, contract assets, equipment, payables, bank debt and lease liabilities jointly support project execution and cannot be treated as detachable cash.
+
+[period_handling]
+- Company statutory year-end: 31 March.
+- No annual report exists for requested 2025-12-31.
+- Primary financial period used: FY ended 2025-03-31, the latest audited annual period before requested date.
+- Subsequent validation: FY ended 2026-03-31 Annual Report, published 2026-07-21.
+- data_quality.status=partial to prevent FY2025 figures being represented as an annual report ended 2025-12-31.
+
+[primary_sources]
+- HKEX Annual Report 2025:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2025/0721/2025072100149.pdf
+- HKEX Annual Report 2026 (subsequent-period check):
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0721/2026072100157.pdf
+- 2025-03-31 RMB central parity, 1 HKD=0.92283 CNY:
+  https://finance.ce.cn/fe/gdxw/202503/31/t20250331_39335345.shtml
+- Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026-08-03 09:20:05.
+
+[fy2025_hkd_source_values]
+- Revenue: HKD 913,784,000
+- Cost of sales: HKD 850,349,000
+- Gross profit: HKD 63,435,000
+- Profit attributable to owners: HKD 34,099,000
+- Total assets: HKD 590,761,000
+- Total liabilities: HKD 300,050,000 (derived as assets less equity)
+- Total/parent equity: HKD 290,711,000
+- Operating cash flow: HKD 107,515,000
+- Capital expenditure: HKD 45,763,000 (management capex table, includes financed additions)
+- Operating free cash flow: HKD 61,752,000
+- Bank cash: HKD 30,396,000
+- Trade receivables: HKD 257,012,000
+- Contract assets: HKD 91,270,000
+- Property, plant and equipment: HKD 178,568,000
+- Trade and other payables: HKD 170,941,000
+- Bank borrowings: HKD 59,312,000
+- Lease liabilities: HKD 57,709,000
+- Amount due to director: HKD 7,400,000
+- Final/cash dividend: zero
+
+[conversion]
+- All financial statement monetary fields multiplied by 0.92283 and recorded as absolute CNY yuan.
+- Gross margin = 63,435 / 913,784 = 0.0694201255.
+- Net margin = 34,099 / 913,784 = 0.0373162585.
+- Operating free cash flow = 107,515,000 - 45,763,000 = HKD 61,752,000; converted CNY 56,986,598.16.
+- Market cap was already supplied as CNY 124,958,575.65104961 and was not converted.
+
+[subsequent_check]
+- FY2026 revenue: HKD 841,321,000, down 7.9%.
+- FY2026 gross margin: 3.8%, versus 6.9% in FY2025.
+- FY2026 owner profit: HKD 20,387,000, down 40.2%.
+- FY2026 final dividend: zero.
+- These facts were used as sustainability evidence, not substituted into FY2025 financial fields.
+
+[validation]
+- protocol validation status: ok
+- errors: []
+

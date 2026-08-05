@@ -1,0 +1,53 @@
+stock-research trace
+company: 600008.SH 首创环保
+period: 2025-12-31 annual
+generated_at: 2026-08-01T02:44:09+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- Checked configured raw filing, annual review, normalized facts, and prior stock research directories.
+- No reusable 2025 annual fact package or prior research files were present.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result skeleton initialized successfully.
+
+4. Sources consulted
+- 首创环保2025年年度报告，披露日2026-04-11，审计报告日2026-04-09。核心数字取自年报主要财务指标、经审计合并报表、业务分部和关键审计事项。
+- 首创环保2025年年度权益分派实施公告，用于确认年度股东会通过及2026年实施。
+- 首创环保公司官网公司简介，用于截至2025年末覆盖城市及处理能力；水处理能力与年报供水、污水产能合计交叉核对。
+- config/input.json：2026-07-31 11:43:30 市值21361000000元、PE TTM 11.85，来源 Tencent qt.gtimg.cn。
+
+5. Model decision
+- Confirmed statement_model=utility_concession.
+- Confirmed owner_earnback_applicability=requires_special_model.
+- Evidence: 特许经营权净值44487016600元，为重大资产；另有PPP相关金融/合同资产、项目债务、永续债和少数股东权益。
+- Consequence: all ordinary detachable-net-cash, cash-profit, operating-price and payback fields remain null.
+- Required alternative: project-by-project discounted equity cash flow after remaining concession term, volume/price, maintenance capex, restricted cash and debt service.
+
+6. Calculations
+- gross_profit = 18885592685.09 - 11958741943.99 = 6926850741.10
+- gross_margin = 6926850741.10 / 18885592685.09 = 0.3667796323
+- net_margin = 1771876566.48 / 18885592685.09 = 0.0938216023
+- operating_free_cash_flow observation = 3761575610.48 - 2759827071.67 = 1001748538.81
+- forecast/static announced dividend yield = 880870881.24 / 21361000000 = 0.0412373429
+- minority_interest_ratio = 8809330999.87 / 39548468702.14 = 0.2227477141
+- FCF is not used as owner-earnback cash profit because capex is not split between maintenance and growth and the special project model applies.
+
+7. Protocol population
+- Populated result fields exclusively through protocol CLI set/append commands.
+- A first attempt passed a plain text scalar instead of JSON-encoded text; protocol rejected it before writing that field. Retried with valid JSON string encoding.
+
+8. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final status: ok; errors: []
+
+9. Data limitations
+- No consolidated disclosure of every project's remaining concession term, tariff adjustment, restricted cash, project debt and maintenance capex.
+- Market snapshot is an intraday Tencent quote input, not an official exchange closing valuation.
+- The announced 2025 dividend yield is static and is not a forecast commitment for 2026.

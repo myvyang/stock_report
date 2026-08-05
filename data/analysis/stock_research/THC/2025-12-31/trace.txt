@@ -1,0 +1,65 @@
+stock-research trace — THC — period 2025-12-31
+generated: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md in full.
+- Read references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked the annual_review, normalized facts, and raw filing paths from config/input.json.
+- No existing THC 2025 annual facts package or raw filing was present in the workspace, so official-source retrieval was required.
+
+3. Official sources retrieved and reviewed
+- SEC 2025 Form 10-K, accession 0000070318-26-000012, filed 2026-02-17:
+  https://www.sec.gov/Archives/edgar/data/70318/000007031826000012/thc-20251231.htm
+- Saved local source copy:
+  stock_report/data/raw/filings/THC/2025-12-31/thc-20251231.htm
+- SEC Companyfacts API, CIK 0000070318, used to cross-check major XBRL facts:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0000070318.json
+- Tenet investor filing index used to confirm the filing date and report identity.
+- U.S. Treasury Reporting Rates of Exchange page used as methodology reference. The report applies a rounded analysis translation assumption of 7.00 CNY/USD rather than claiming an exact spot rate.
+- Market cap, market-cap date, PE TTM and Yahoo Finance yfinance source were reused from config/input.json as instructed.
+
+4. Key USD facts extracted from the 10-K (USD millions)
+- Revenue 21,310; parent net income 1,407; consolidated net income 2,367.
+- Operating income 3,508; interest expense 821.
+- Operating cash flow 3,540; capex 1,010; consolidated operating FCF 2,530.
+- Distributions to noncontrolling interests 809; common-stock repurchases 1,386.
+- Assets 29,677; liabilities 20,704; permanent equity 6,017; parent equity 4,220.
+- Cash 2,883; long-term debt including current portion 13,171.
+- Redeemable NCI 2,956; permanent NCI 1,797.
+- Hospital revenue/operating income 16,138/1,730; Ambulatory Care 5,172/1,778.
+
+5. Model decision
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: revenue is earned from healthcare services and revenue-cycle services using ordinary operating assets, receivables, facilities and capex. Customer deposits or financial reserves are not the business model.
+- Special treatment: USPI and other joint ventures create material NCI claims, so consolidated cash flow is not wholly attributable to common shareholders.
+
+6. Derived fields and judgments
+- All financial-statement amounts translated at 7.00 CNY/USD for a consistent comparison to the CNY market cap.
+- Tenet does not report standard gross profit. Structured gross profit is an explicitly labeled operating-contribution proxy:
+  revenue - salaries/wages/benefits - supplies - other operating expenses
+  = USD 4,302m; margin 20.1877%.
+- Net margin = parent net income / revenue = 1,407 / 21,310 = 6.6025%.
+- Detachable net cash = cash USD 2,883m - debt USD 13,171m = -USD 10,288m = -CNY 72.016bn.
+- Parent cash capacity = OCF 3,540 - capex 1,010 - NCI distributions 809 = USD 1,721m.
+- Discounted sustainable cash profit = USD 1,721m * 85% * 7.00 = CNY 10.23995bn.
+- Operating business price = market cap - discounted net cash = CNY 210.448737550bn.
+- Owner earnback = operating business price / discounted sustainable cash profit = 20.5517 years.
+- Market cap/cash profit = 13.5189x.
+- Forecast dividend = zero because no common cash dividend was paid in 2023-2025 and no declared common dividend basis was identified. Buybacks are disclosed separately and not treated as dividends.
+
+7. Protocol writes and validation
+- Populated the initialized result using repeated protocol `set` and `append` commands; the JSON object was not created manually from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: {"status":"ok","errors":[]}
+
+8. Data-quality notes
+- Result status is complete under the contract, with limitations explicitly recorded.
+- Gross margin is a healthcare operating-contribution proxy, not GAAP gross margin.
+- The 15% sustainability haircut is analyst judgment, not company guidance.
+- Rounded FX translation and third-party market snapshot are disclosed limitations.

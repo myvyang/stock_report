@@ -1,0 +1,56 @@
+task=stock_research
+query=GRBK
+period=2025-12-31
+report_type=annual
+started_from=config/input.json
+
+[protocol]
+2026-08-04T22:26:39+08:00 initialized outputs/result.json with:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+All structured fields were populated through protocol set commands; the complex result object was not handwritten.
+
+[local_reuse]
+Checked stock_report/data/raw/filings/GRBK/2025-12-31, stock_report/data/analysis/annual_review/GRBK/2025-12-31, and stock_report/data/normalized/facts/GRBK/2025-12-31.
+No GRBK filing or annual facts package existed locally. Only stock_report/data/notes/user_stock_evaluations.md was present, so no prior financial facts or owner-earnback conclusion was reused.
+
+[primary_sources]
+SEC Form 10-K, accession 0001628280-26-011798, filed 2026-02-25:
+https://www.sec.gov/Archives/edgar/data/1373670/000162828026011798/grbk-20251231.htm
+SEC company facts used as XBRL cross-check:
+https://data.sec.gov/api/xbrl/companyfacts/CIK0001373670.json
+IRS 2025 yearly average exchange rate, USD 1 = CNY 7.129:
+https://www.irs.gov/individuals/international-taxpayers/yearly-average-currency-exchange-rates
+Federal Reserve H.10 release dated 2025-12-29; latest displayed pre-year-end observation on 2025-12-26, USD 1 = CNY 7.0063:
+https://www.federalreserve.gov/releases/h10/20251229/
+Market cap CNY 20,528,405,427.86499, date 2026-08-03, and PE TTM 10.652109 reused exactly from config/input.json (source label: Yahoo Finance yfinance).
+
+[model_decision]
+Input hint ordinary_operating/applicable was rejected after filing review.
+Confirmed model=real_estate_developer and owner_earnback_applicability=requires_special_model.
+Evidence: company acquires and develops land, builds and delivers homes; community lifecycle can span several years to eight or more; real estate inventory was USD 2.099211bn, 82.8% of total assets. Cash, inventory, deposits and financing are linked to project delivery.
+Protocol consequence: discounted_net_cash, discounted_cash_profit, operating_business_price, owner_earnback_years and market_cap_to_cash_profit remain null in both metrics and owner_earnback.
+
+[extracted_usd]
+Balance sheet, 2025-12-31: assets=2,534,767,000; liabilities=601,782,000; total equity=1,880,714,000; parent equity=1,858,962,000; noncontrolling interests=21,752,000; redeemable NCI=52,271,000; cash=154,590,000; restricted cash=36,395,000; inventory=2,099,211,000; receivables=39,982,000; mortgage loans held for sale=49,099,000; unconsolidated investments=93,050,000; total debt=320,276,000.
+Income statement, FY2025: revenue=2,098,471,000; cost of revenue=1,457,665,000; gross profit=640,806,000; SG&A=231,363,000; operating profit proxy=gross profit-SG&A=409,443,000; consolidated net income=343,511,000; parent net income=313,225,000.
+Cash flow, FY2025: CFO=213,244,000; PP&E purchases=4,798,000; operating FCF proxy=208,446,000; financing cash flow=138,401,000; common stock repurchases=83,770,000; preferred dividends paid=2,875,000.
+Operating: deliveries=3,943 (+4.2%); average delivered home price=530,400 (-3.1%); backlog=520 units and 354,328,000 (-22.2% and -28.5%); net new orders=3,795 (+3.1%); homebuilding gross margin change=-330bp.
+
+[calculations]
+Flow amounts converted at 7.129; balance-sheet amounts converted at 7.0063.
+gross_margin=640,806,000/2,098,471,000=0.3053680513.
+net_margin=313,225,000/2,098,471,000=0.1492634399.
+operating_free_cash_flow=(213,244,000-4,798,000)*7.129=CNY 1,486,011,534.
+inventory_share_of_assets=2,099,211,000/2,534,767,000=82.82%.
+ordinary common dividend forecast=0 because disclosed 2023-2025 cash dividends were Series A preferred dividends and no common dividend policy/declared common dividend was evidenced.
+No owner earnback result calculated due to special-model requirement.
+
+[limitations]
+Market data was supplied by the task and was not independently reconstructed.
+Valuation date is about seven months after the reporting date.
+Currency translation changes presentation but not USD-derived margins.
+The operating profit field is gross profit less SG&A because the filing does not label a separate operating-income subtotal; equity income and other income sit below this proxy.
+Financing cash flow includes redeemable NCI contributions and should not be read as net debt issuance.
+
+[validation]
+Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

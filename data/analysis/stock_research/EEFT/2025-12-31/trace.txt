@@ -1,0 +1,18 @@
+2026-08-04 stock-research trace: EEFT / 2025-12-31 annual
+
+1. Read skill protocol and mandatory result/report contracts, plus data-reuse guidance.
+2. Inspected config/input.json. No reusable annual facts package, normalized facts, metadata, or prior stock-research result existed in the workspace.
+3. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Located primary filing: SEC accession 0001554855-26-000131, Form 10-K filed 2026-02-26 for year ended 2025-12-31.
+5. Downloaded the SEC filing to stock_report/data/raw/filings/EEFT/2025-12-31/eeft-20251231.htm and extracted filing text for review.
+6. Confirmed model as ordinary_operating/applicable. Special handling: settlement assets and obligations are matched pass-through balances; ATM cash is operating working capital; neither is detachable cash.
+7. Financial statement source values (USD millions): assets 6,488.7; liabilities 5,166.2; equity 1,322.5; parent equity 1,307.5; revenue 4,244.2; direct operating cost 2,490.6; gross profit 1,753.6; operating income 529.8; net income 313.0; parent net income 309.5; CFO 559.8; capex 125.5; financing cash flow -788.6.
+8. Balance-sheet interpretation (USD millions): unrestricted cash 1,040.3; ATM cash 650.3; settlement assets and obligations each 1,910.4; debt carrying value 2,020.8; goodwill 1,042.3; acquired intangibles 261.2.
+9. Currency conversion: Federal Reserve H.10, 2025-12-31, 1 USD = 6.9931 CNY. All filing amounts in result.json converted to absolute CNY yuan.
+10. Owner earnback assumptions: 50% credit to unrestricted cash due to overseas/operating constraints; 0% credit to ATM, restricted and settlement cash; deduct 100% of debt. Discounted detachable net cash = 1,040.3m*50% - 2,020.8m = -1,500.65m USD = -10,494,195,515 CNY.
+11. Sustainable cash profit: parent NI 309.5m + D&A 138.5m - all capex 125.5m = 322.5m USD = 2,255,274,750 CNY. Stock compensation is not added back. 2025 working-capital-driven CFO uplift is not capitalized.
+12. Dividend forecast: zero. Filing states no common dividends since inception and no intention to distribute dividends for the foreseeable future. Buybacks are separately disclosed and not treated as forecast dividends.
+13. Valuation formulas: operating business price 28,821,066,003.54 CNY; owner earnback 12.7794 years; market cap/cash profit 8.1262; discounted net cash/market cap -0.5726.
+14. Populated result through protocol CLI set commands, then validated with protocol CLI. See final validation output in execution log.
+15. Wrote outputs/report.md and outputs/trace.txt. No external sync target was modified because the requested deliverables are outputs/*.

@@ -1,0 +1,67 @@
+Stock research trace: 03686.HK / 2025-12-31 annual
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Read instructions
+   - /workspace/AGENTS.md
+   - .agents/skills/stock-research/SKILL.md
+   - references/result-contract.md
+   - references/report-contract.md
+   - references/data-reuse.md
+
+2. Reuse check
+   - config/input.json existed.
+   - No annual facts package, normalized facts, raw filing metadata, or prior stock-research outputs existed for this company/period.
+   - Returned to primary filing sources.
+
+3. Protocol initialization
+   Command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Model verification
+   - Input hint: financial_brokerage / requires_special_model.
+   - Annual report evidence: business consists of property management, retail, off-campus training, IT, and ancillary living services.
+   - No brokerage balance-sheet features found.
+   - Overrode hint with ordinary_operating / applicable.
+
+5. Primary sources
+   - HKEX Annual Report 2025, published 2026-04-27:
+     https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042702002.pdf
+   - HKEX Annual Results Announcement, published 2026-03-27:
+     https://www.hkexnews.hk/listedco/listconews/sehk/2026/0327/2026032702672.pdf
+   - Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026/08/03 09:20:05.
+   - Local filing copy saved at stock_report/data/raw/filings/03686.HK/2025-12-31/annual-report-2025.pdf.
+
+6. Core reported figures (RMB absolute yuan)
+   - Revenue 320,272,000; gross profit 166,272,000; parent net profit 284,629,000.
+   - Silver fair-value gain 202,792,000.
+   - Total assets 718,021,000; liabilities 127,401,000; parent equity 590,620,000.
+   - Cash 204,772,000; term deposit 80,000,000; unallocated silver 344,082,000.
+   - Operating cash flow 81,565,000; PPE + intangible purchases 714,000; operating FCF 80,851,000.
+   - Proposed final dividend 88,407,000 RMB equivalent.
+
+7. Derived formulas
+   - Gross margin = 166,272,000 / 320,272,000 = 0.5191587151.
+   - Net margin = 284,629,000 / 320,272,000 = 0.8887102213.
+   - Discounted detachable net cash = cash*50% + term deposit*90% + silver*50% - lease liabilities
+     = 204,772,000*0.5 + 80,000,000*0.9 + 344,082,000*0.5 - 30,507,000
+     = 315,920,000.
+   - Discounted sustainable cash profit = (81,565,000 - 714,000)*85% = 68,723,350.
+   - Operating business price = 480,615,200.50406456 - 315,920,000 = 164,695,200.50406456.
+   - Owner earnback years = 164,695,200.50406456 / 68,723,350 = 2.3964955216.
+   - Market cap / cash profit = 480,615,200.50406456 / 68,723,350 = 6.9934774790.
+   - Forecast dividend yield = 88,407,000 / 480,615,200.50406456 = 0.1839454930.
+
+8. Key judgement boundaries
+   - Silver gain excluded from sustainable operating profit because it is non-cash and commodity-price dependent.
+   - Report-date silver received a 50% haircut despite post-period sale proceeds of about RMB387.9m, because proceeds were subsequently rotated into gold and silver and current holdings are unknown.
+   - Cash received a 50% haircut for operating needs, Mainland remittance limits, and capital-allocation uncertainty.
+   - Sustainable cash profit received a 15% haircut for revenue contraction, segment weakness, concentration, and mild two-year OCF decline.
+
+9. Known limitations
+   - Report-date balance sheet and 2026-08-03 market cap are not contemporaneous.
+   - Post-period precious-metal disclosures only extend to the annual report date, 2026-04-27.
+   - Market cap and PE TTM were supplied by the task and not independently reconstructed.
+
+10. Final validation
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Expected status: ok, errors: []

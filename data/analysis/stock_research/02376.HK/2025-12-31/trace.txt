@@ -1,0 +1,52 @@
+stock-research trace
+company: 02376.HK / Lushang Life Services Co., Ltd. / 鲁商生活服务股份有限公司
+period: 2025-12-31
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- No local raw filing, metadata, annual facts, normalized facts, or prior stock-research files existed for 02376.HK/2025-12-31.
+- Therefore retrieved the official HKEX 2025 annual report.
+
+3. Primary sources
+- HKEX title search: https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=1000156827
+- 2025 annual report: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042402829.pdf
+- Market cap, timestamp, source, and PE TTM: config/input.json (Tencent qt.gtimg.cn snapshot supplied by task).
+
+4. Model decision
+- Input hint financial_brokerage rejected.
+- Annual report pp.10-15 identifies property management, non-property-owner value-added services, and community value-added services.
+- Balance sheet pp.76-77 has no brokerage client funds, securities inventory, or repo financing.
+- Selected ordinary_operating / applicable.
+
+5. Core reported values (RMB)
+- Revenue 570,698,759.11; cost of sales 449,887,330.95; gross profit 120,811,428.16.
+- Parent net profit 33,948,762.31.
+- Total assets 850,441,298.67; liabilities 260,185,143.21; parent equity 586,026,561.76.
+- OCF 30,190,322.59; capex 6,325,570.73; operating FCF 23,864,751.86.
+- Cash and cash equivalents 418,083,023.70; no restricted cash equivalents. Other monetary funds with limited liquidity 2,522,732.65.
+- Short-term borrowing and lease liabilities 8,684,943.51.
+- Proposed/final 2025 dividend RMB0.0815 x 133,340,000 shares = 10,867,210.00.
+
+6. Formulas and judgments
+- gross_margin = 120,811,428.16 / 570,698,759.11 = 0.2116903642.
+- net_margin = 33,948,762.31 / 570,698,759.11 = 0.0594863083.
+- operating FCF = 30,190,322.59 - 6,325,570.73 = 23,864,751.86.
+- cash reserve judgment = 150,000,000.00 (about four months of cost of sales; not a reported fact).
+- discounted detachable net cash = (418,083,023.70 - 150,000,000.00) x 70% - 8,684,943.51 = 178,973,173.08.
+- discounted sustainable cash profit = 23,864,751.86 x 80% = 19,091,801.488.
+- operating business price = 238,604,206.2431574 - 178,973,173.08 = 59,631,033.1631574.
+- owner earnback years = 59,631,033.1631574 / 19,091,801.488 = 3.1233843072.
+- market cap / cash profit = 238,604,206.2431574 / 19,091,801.488 = 12.4977313635.
+- forecast dividend yield = 10,867,210 / 238,604,206.2431574 = 0.0455449222.
+
+7. Protocol operations
+- Initialized outputs/result.json with `PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init`.
+- Populated result through protocol `set` and `append` commands; did not hand-write the JSON object.
+- Final command: `PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json`.
+- Validation result: status=ok, errors=[].

@@ -1,0 +1,71 @@
+stock-research trace
+company=000733.SZ 振华科技
+period=2025-12-31
+generated_for_input=2026-07-31T16:58:06+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Read references/data-reuse.md because local-data reuse was required by the skill and workspace instructions.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated initialized fields using repeated protocol set commands; no result JSON was handwritten from scratch.
+6. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: {"status":"ok","errors":[]}
+
+[local reuse check]
+- Expected annual facts, normalized facts, raw filing metadata and prior stock-research paths did not exist in /workspace.
+- Only stock_report/data/notes/user_stock_evaluations.md existed and contained no reusable company research for this task.
+- Therefore official/public filing retrieval was required.
+
+[primary filing]
+- Full report: 中国振华（集团）科技股份有限公司2025年年度报告, disclosed 2026-04-29.
+- PDF retrieved from the public filing mirror linked by the announcement page:
+  https://file.finance.sina.com.cn/211.154.219.97%3A9494/MRGG/CNSESZ_STOCK/2026/2026-4/2026-04-29/12267545.PDF
+- Official exchange summary:
+  https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-29/3001b5af-7ad7-437f-aae5-ef7b2928725d.PDF
+- Profit distribution evidence: 2025年度利润分配预案, announcement no. 2026-013.
+
+[key extracted facts, CNY]
+revenue=5754973967.98
+cost_of_sales=3110557156.61
+gross_profit=2644416811.37
+operating_profit=1176747807.86
+net_profit=1025533245.46
+parent_net_profit=1025416831.83
+parent_net_profit_ex_nonrecurring=945017706.26
+operating_cash_flow=1394269765.68
+capital_expenditure=360884715.54
+operating_free_cash_flow=1033385050.14
+total_assets=19279980767.67
+total_liabilities=3536266319.33
+total_equity=15743714448.34
+parent_equity=15744867197.30
+minority_interest=-1152748.96
+cash=4189225738.80
+trading_financial_assets=1704520833.34
+accounts_receivable=4984514708.13
+notes_receivable=1941801644.82
+receivables_financing=213312232.90
+inventory=2181995156.71
+
+[formula checks]
+gross_margin=(5754973967.98-3110557156.61)/5754973967.98=0.4595010900280739
+net_margin=1025416831.83/5754973967.98=0.1781792302685119
+operating_free_cash_flow=1394269765.68-360884715.54=1033385050.14
+interest_and_lease_debt=676876907.33+288882759.31+40700000+85972435.55=1093432102.19
+discounted_net_cash=4189225738.80*0.80+1704520833.34*0.90-1093432102.19=3793017238.856
+discounted_cash_profit=945017706.26*0.90=850515935.634
+operating_business_price=22898000000-3793017238.856=19104982761.144
+owner_earnback_years=19104982761.144/850515935.634=22.46281575771132
+market_cap_to_cash_profit=22898000000/850515935.634=26.922482037836417
+forecast_cash_dividend=554169431*0.38=210584383.78
+forecast_dividend_yield=210584383.78/22898000000=0.009196627818150057
+
+[judgment boundaries]
+- Fact: company is an electronic-components R&D/manufacturing and direct-sales business; ordinary_operating model applies.
+- Judgment: cash discount 80%, structural-deposit discount 90%, and sustainable-profit discount 90%.
+- Judgment rationale: preserve buffers for operating needs, restricted/use-designated funds, maturity constraints, receivable collection, inventory impairment and demand cyclicality.
+- Limitation: market cap and PE were taken from the supplied Tencent snapshot and were not independently reconstructed from exchange closing price and shares.
+- Limitation: report gives no independently verifiable market share.

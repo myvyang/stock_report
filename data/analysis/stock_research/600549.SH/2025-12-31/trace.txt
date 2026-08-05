@@ -1,0 +1,48 @@
+stock-research trace
+company=600549.SH 厦门钨业
+period=2025-12-31 annual
+generated_for=2026-08-01 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- config/input.json exists.
+- Input-referenced raw filing, annual facts, normalized facts and prior stock-research outputs were absent locally.
+- Therefore initialized outputs/result.json with protocol CLI, then reacquired the 2025 annual report.
+
+3. Filing acquisition and extraction
+- Searched official/company-oriented disclosure sources; identified 2025 annual report disclosed 2026-04-24.
+- Downloaded a reproducible PDF mirror to stock_report/data/raw/filings/600549.SH/2025-12-31/annual-report-2025.pdf.
+- Extracted 350 pages to annual-report-2025.txt with pypdf in an isolated temporary venv.
+- Cross-checked headline figures against the annual-report summary/search result and audited statements.
+
+4. Model decision
+- ordinary_operating / applicable.
+- Evidence: industrial mining, smelting and manufacturing of tungsten-molybdenum, rare earth and battery materials; real-estate supporting revenue is immaterial.
+- Minority ownership handled through parent-profit basis; operating assets and investments excluded from detachable cash.
+
+5. Core calculations (CNY)
+- gross_profit = 46,264,582,688.14 - 37,984,398,767.21 = 8,280,183,920.93
+- gross_margin = 8,280,183,920.93 / 46,264,582,688.14 = 0.1789745728
+- net_margin = 2,309,374,213.97 / 46,264,582,688.14 = 0.0499166766
+- operating_free_cash_flow = 2,970,674,635.16 - 1,988,793,436.64 = 981,881,198.52
+- discounted_net_cash = 3,904,875,677.96 + 1,878,996,642.37*0.90 - 11,399,924,630.47 = -5,803,951,974.377
+- sustainable_cash_profit = ((2,189,799,470.95 + 981,881,198.52)/2)*0.90 = 1,427,256,301.2615
+- operating_business_price = 75,013,000,000 - (-5,803,951,974.377) = 80,816,951,974.377
+- owner_earnback_years = 80,816,951,974.377 / 1,427,256,301.2615 = 56.6239938145
+- market_cap_to_cash_profit = 75,013,000,000 / 1,427,256,301.2615 = 52.5574838476
+- forecast_dividend_yield = 927,150,120.71 / 75,013,000,000 = 0.0123598592
+
+6. Protocol usage
+- Initialized with: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated each result path through repeated protocol set commands, driven by protocol-updates.json.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+7. Limitations
+- Market snapshot is about seven months after the financial period end.
+- Haircuts and cash-profit weighting are explicit analyst assumptions, not management guidance.
+- PDF source stored locally is a mirror copy; report text identifies the Shanghai Stock Exchange as the disclosure venue.

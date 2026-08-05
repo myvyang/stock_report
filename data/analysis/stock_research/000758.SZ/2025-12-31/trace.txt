@@ -1,0 +1,59 @@
+stock-research trace
+company: 中色股份 (000758.SZ)
+period: 2025-12-31 annual
+generated_at: 2026-08-01 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md and references/report-contract.md.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields only through protocol set/append commands.
+
+2. Reuse audit
+- Checked configured raw filing, annual review, normalized facts, and prior stock research paths.
+- No reusable files were present; directory inventory returned zero files/bytes.
+
+3. Official filing retrieval
+- Queried CNINFO historical-announcement API for security 000758 and annual reports in 2026.
+- Located announcement ID 1225199883, title “2025年年度报告”, disclosure date 2026-04-28.
+- Official PDF: https://static.cninfo.com.cn/finalpage/2026-04-28/1225199883.PDF
+- Downloaded to a temporary /tmp file and extracted all 179 pages with a temporary Python virtual environment and pypdf. No project dependency files were changed.
+
+4. Model determination
+- Input hint: ordinary_operating/applicable.
+- Filing facts: engineering contracting revenue CNY 5,155,420,381.21 (50.94%); EP/EPC and financing+EPC modes; contract liabilities CNY 5,865,145,153.76; prepayments CNY 2,620,891,780.00; contract performance costs CNY 1,794,913,971.32.
+- Determination: construction_project/requires_special_model. The company is mixed with mining and smelting, but project working capital and performance obligations make consolidated cash non-detachable under the ordinary formula.
+- Consequence: all ordinary owner-earnback amount and ratio fields remain null, as required by the contract.
+
+5. Core extracted facts (CNY)
+- Revenue 10,120,109,569.42; cost of sales 8,499,338,581.77; gross profit calculated 1,620,770,987.65.
+- Operating profit 721,794,934.16; net profit 513,372,082.66; parent net profit 475,537,227.19; deducted parent profit 343,039,674.99.
+- Total assets 24,630,143,879.84; total liabilities 15,232,188,179.24; total equity 9,397,955,700.60; parent equity 5,979,525,013.62; minority interest 3,418,430,686.98.
+- Operating cash flow 471,170,044.07; capex proxy 344,064,433.01; simple operating FCF calculated 127,105,611.06.
+- Cash 3,788,008,900.22, of which restricted cash disclosed 288,243,160.97.
+- Receivables gross 1,598,525,040.89; allowance 680,391,494.37; net 918,133,546.52.
+- Interest-bearing borrowings summarized as short-term borrowings + current portion of long-term borrowings + long-term borrowings = 5,079,558,734.87.
+- Proposed 2025 cash dividend 109,474,196.15; 2024 implemented cash dividend 91,670,702.74.
+
+6. Calculations
+- Gross margin = 1,620,770,987.65 / 10,120,109,569.42 = 0.16015350194898026.
+- Parent net margin = 475,537,227.19 / 10,120,109,569.42 = 0.04698933582961729.
+- Forecast dividend yield = 109,474,196.15 / 11,843,000,000 = 0.00924378925525627.
+- Minority interest ratio = 3,418,430,686.98 / 9,397,955,700.60 = 0.363741945151088.
+- Simple operating FCF = 471,170,044.07 - 344,064,433.01 = 127,105,611.06.
+
+7. Market data
+- Used task input without alteration: market cap CNY 11,843,000,000; PE TTM 24.28; timestamp 2026-07-31 11:42:57; source Tencent qt.gtimg.cn.
+- Limitation: not independently reconciled to exchange tick data.
+
+8. Output checks
+- outputs/result.json is the machine-readable source of truth.
+- outputs/report.md follows the operating-story sequence and explicitly distinguishes facts, calculations, and judgments.
+- Final protocol validation is run after file creation; its outcome is reported at the end of this trace.
+
+9. Validation outcome
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}
+- Cross-checked headline values and model language between result.json and report.md.

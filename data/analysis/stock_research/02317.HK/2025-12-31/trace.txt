@@ -1,0 +1,82 @@
+stock-research trace for 02317.HK / period 2025-12-31
+generated_at_input: 2026-08-04T14:48:34+08:00
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+   - Checked stock_report/data/analysis/annual_review/02317.HK/2025-12-31,
+     stock_report/data/normalized/facts/02317.HK/2025-12-31, and raw filing path.
+   - No existing annual facts, normalized facts, prior research result, or filing was present.
+
+3. Protocol initialization
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   outcome: stock-research-result-v1 skeleton created.
+
+4. Primary filing acquisition and extraction
+   - HKEX title search: https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=6280
+   - HKEX Annual Report 2025, released 2026-04-22:
+     https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0422/2026042201564.pdf
+   - Saved to stock_report/data/raw/filings/02317.HK/2025-12-31/annual-report-2025.pdf
+   - Extracted locally to annual-report-2025.txt with pypdf in a temporary virtual environment.
+   - Key pages used: financial highlights p.5; MD&A pp.15-23; consolidated balance sheet pp.126-127;
+     income statement p.128; cash flow statement p.131; notes 1, 15, 18, 19, 22, 25 and 26.
+
+5. Analysis model verification
+   - Input hint: financial_brokerage / requires_special_model.
+   - Filing fact: group manufactures and sells fermentation-based food additives, biochemical products,
+     and cassava starch industrial products; it has ordinary manufacturing assets and liabilities.
+   - Override: ordinary_operating / applicable.
+   - Reason: no brokerage client money, proprietary financial assets, repo financing, or similar brokerage model appears.
+
+6. Currency convention
+   - Annual report presentation currency: USD, figures mainly US$'000.
+   - Required result currency: CNY absolute yuan.
+   - Conversion used for all filing amounts: 1 USD = CNY 7.1429.
+   - Source: National Bureau of Statistics 2025 communiqué supporting publication:
+     https://www.stats.gov.cn/zs/tjwh/tjkw/tjqk/zgxxb/202603/P020260302324455449803.pdf
+   - Limitation: balance sheet amounts would differ under a year-end spot rate; one average rate was used for formula consistency.
+
+7. Core reported figures before conversion (US$'000)
+   revenue 374,740; cost of sales 308,272; gross profit 66,468; operating profit 23,102;
+   net profit 17,081; parent net profit 17,056.
+   total assets 385,597; total liabilities 78,530; total equity 307,067; parent equity 306,842;
+   non-controlling interest 225.
+   operating cash flow 27,676; PPE purchases 9,320; intangible purchases 15;
+   operating free cash flow 18,341; financing cash flow -11,118; dividends paid 13,246.
+
+8. Owner earnback assumptions and calculations
+   cash and equivalents: US$47.025m x 95% = US$44.674m.
+   short-term bank deposits: US$23.640m x 90% = US$21.276m.
+   less bank borrowings: US$28.038m x 100%.
+   less lease liabilities: US$2.781m x 100%.
+   restricted deposits, inventory, receivables and production assets: excluded from detachable cash.
+   discounted detachable net cash = US$35.131m = CNY250,935,434.18.
+   sustainable cash profit base = parent net profit US$17.056m.
+   10% haircut for product cycle, US advance ordering and working-capital volatility.
+   discounted sustainable cash profit = US$15.3504m = CNY109,646,372.16.
+   operating business price = CNY930,113,349.85 - CNY250,935,434.18 = CNY679,177,915.67.
+   owner earnback years = 6.1943; market cap / cash profit = 8.4828.
+
+9. Dividend scenario
+   2025 interim 0.300 US cents/share plus proposed final 0.820 US cents/share.
+   Total US$17.056m, converted CNY121,829,302.40.
+   Forecast basis: repeat FY2025 total dividend as a scenario, not management guidance.
+   Forecast yield versus input market cap: 13.0983%.
+
+10. Market data
+   market cap CNY930,113,349.8460054; timestamp 2026/08/03 09:20:05;
+   source Tencent qt.gtimg.cn; PE TTM 8.15. All values reused from config/input.json and not independently back-verified.
+
+11. Protocol population and validation
+   - Populated outputs/result.json only through repeated protocol `set` commands after `init`.
+   - Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - First completed validation outcome: {"status":"ok","errors":[]}
+
+12. Output files
+   - outputs/result.json
+   - outputs/report.md
+   - outputs/trace.txt

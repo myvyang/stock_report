@@ -1,0 +1,70 @@
+stock-research trace
+generated_at: 2026-08-03T14:18:12+08:00
+company: ENERGY INTINV (00353.HK)
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because no reusable facts package was present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked annual review, normalized facts, raw filing and prior stock-research paths under stock_report for 00353.HK.
+- No existing annual facts or prior research existed at task start.
+
+3. Primary filing
+- Downloaded official HKEX annual report:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2025/0725/2025072500637.pdf
+- Local copy:
+  stock_report/data/raw/filings/00353.HK/2025-12-31/annual_report_2024_25.pdf
+- Extracted local text copy for search and verification:
+  stock_report/data/raw/filings/00353.HK/2025-12-31/annual_report_2024_25.txt
+- Relevant PDF pages:
+  pp. 4-10: chairman statement, business and financial review
+  pp. 62-69: audited consolidated statements
+  pp. 134-142: revenue and segment information
+  pp. 152-153: dividends and attributable earnings
+  pp. 159-160: investment properties and associates
+  pp. 168-173: deposits, cash, payables and borrowings
+  pp. 175-177: preferred shares and promissory notes
+  pp. 197-199: subsequent events, including April 2025 Shundong Port acquisition
+
+4. Model verification
+- Input hint financial_brokerage was rejected.
+- Filing facts show 2025 revenue of HKD151.679m, of which HKD150.691m was terminal rental and HKD0.988m electronic-product trading.
+- Insurance brokerage had already been discontinued; the financial-services exposure is a 28% associate, not a brokerage statement model.
+- Selected statement_model=utility_concession and owner_earnback_applicability=requires_special_model because the core asset is a term-limited port/storage rental right with sea-use rights, a lease ending in 2030, non-controlling interests and preferred-share distribution claims.
+
+5. Currency normalization
+- HKMA daily exchange-rate API record for 2025-03-31: cny=1.07225, defined as HKD per unit of CNY.
+- Conversion used: CNY = HKD / 1.07225 = HKD * 0.932618325950105.
+- All filing monetary fields in result.json are absolute CNY yuan.
+- Market cap was retained from config/input.json as already supplied in the task's required CNY result convention.
+
+6. Key calculations
+- gross_margin = 135.495 / 151.679 = 0.893297161.
+- net_margin = parent net profit 256.330 / revenue 151.679 = 1.689942576; distorted by fair-value gain and not treated as sustainable.
+- total liabilities = current liabilities HKD77.280m + non-current liabilities HKD855.720m = HKD933.000m.
+- minority_interest_ratio = CNY508,951,271 / CNY1,678,668,221 = 0.303187568.
+- capital_expenditure = PPE purchases HKD28.163m + ROU additions HKD7.180m + investment-property additions HKD9.645m = HKD44.988m = CNY41,957,595.
+- operating_free_cash_flow = operating cash flow HKD90.817m - capital expenditure HKD44.988m = HKD45.829m = CNY42,740,004.
+- forecast cash dividend = 0; forecast yield = 0 because FY2024 and FY2025 ordinary dividends were zero and no new board guidance supports a positive forecast.
+- Ordinary owner-earnback fields deliberately left null under the special-model rule.
+
+7. Data-period correction
+- config/input.json requested period 2025-12-31.
+- Company annual reporting date is 31 March; official FY2024/25 annual report covers year ended 2025-03-31.
+- analysis.period was corrected to 2025-03-31 and the mismatch is disclosed in data_quality.limitations and report.md.
+
+8. Protocol population and validation
+- outputs/result.json was populated using repeated protocol `set` commands; it was not authored as a complex JSON object from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validator output: {"status":"ok","errors":[]}
+
+9. Known limitations
+- The April 2025 HKD300m acquisition is post-balance-sheet and is not consolidated into the 2025-03-31 balance sheet.
+- Filing does not disclose throughput, tenant credit data, maintenance-only capex, or actual preferred-share special-dividend cash paid.
+- Income-statement and cash-flow HKD figures use the period-end rate rather than an annual average rate for consistent display.
+- Tencent market cap and PE TTM were not independently recomputed from exchange price and share count.

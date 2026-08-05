@@ -1,0 +1,21 @@
+2026-08-04T10:44:30+08:00 START query=09608.HK period=2025-12-31
+INPUT config/input.json loaded; market_cap=138749184.7229004; pe_ttm=8.41; hint=financial_brokerage
+SKILL read .agents/skills/stock-research/SKILL.md
+CONTRACT read references/result-contract.md and references/report-contract.md
+REUSE checked local raw filing, annual review, normalized facts and historical research paths; no reusable company files found
+PROTOCOL init outputs/result.json via PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init
+SOURCE HKEX Annual Report 2025 https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0430/2026043001033.pdf
+MODEL_OVERRIDE financial_brokerage -> ordinary_operating; reason: audited report identifies integrated property management provider and 81.2% revenue is property management; no brokerage balance-sheet structure
+FACT revenue=231411000 gross_profit=67833000 parent_net_profit=17311000
+FACT total_assets=572932000 total_liabilities=162342000 parent_equity=401423000
+FACT operating_cash_flow=380000 capex=178000 operating_free_cash_flow=202000; prior_year_ocf=-69005000
+FACT cash=139344000 restricted_cash=18970000 current_fvtpl=24800000 unlisted_equity=16000000 properties_held_for_sale=147372000
+FACT gross_trade_receivables=232109000 loss_allowance=69579000 trade_receivables_net=162530000
+JUDGMENT discounted_cash=139344000*0.50=69672000; structured_deposit=24800000*0.80=19840000; restricted_cash/unlisted_equity/properties=0
+CALC discounted_detachable_net_cash=89512000; ratio_to_market_cap=0.645135; operating_business_price=49237184.7229004
+JUDGMENT discounted_sustainable_cash_profit=0 because 2025 FCF is immaterial and 2024 FCF=-69600000; owner_earnback_years and market_cap_to_cash_profit left null
+DIVIDEND FY2025 final dividend=nil; forecast_cash_dividend=0; forecast_yield=0
+PROTOCOL populated initialized result using set and append commands; complex JSON was not handwritten from scratch
+VALIDATE first pass error: complete status requires discounted_cash_profit and discounted_sustainable_cash_profit to be finite; set both to 0 without fabricating a positive denominator
+VALIDATE final pass status=ok errors=[]
+OUTPUT outputs/result.json outputs/report.md outputs/trace.txt completed

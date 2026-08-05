@@ -1,0 +1,48 @@
+stock-research trace
+company=600258.SH 首旅酒店
+period=2025-12-31 annual
+generated_at=2026-07-31T20:44:23+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated scalar/object fields with protocol set and list fields with protocol append.
+4. Validated with protocol validate; initial completed result returned status=ok.
+
+[reuse]
+- Requested annual facts, normalized facts, raw filing metadata, and prior stock-research paths were absent from /workspace.
+- No historical research result was reused.
+- Core facts were rebuilt from the public 2025 annual report text.
+
+[sources]
+- Beijing BTG Hotels (Group) Co., Ltd. 2025 Annual Report, disclosed 2026-03-31; public full text mirror:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12048278&stockid=600258
+- config/input.json market snapshot: Tencent qt.gtimg.cn, timestamp 20260731114331, market cap CNY 13,924,000,000, PE TTM 16.62.
+
+[model]
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Lease liabilities are operating obligations for directly operated hotels, not detachable debt.
+- Lease-related cash payments classified in financing cash flow are deducted when estimating distributable cash profit.
+
+[calculations]
+- gross_profit = 7,606,797,307.66 - 4,573,133,076.49 = 3,033,664,231.17
+- gross_margin = gross_profit / revenue = 0.3988096578
+- net_margin = 811,136,343.11 / 7,606,797,307.66 = 0.1066330954
+- operating_free_cash_flow = 3,313,341,174.11 - 432,968,112.73 = 2,880,373,061.38
+- discounted_net_cash = cash*80% + trading_financial_assets*70% - financing_debt
+  = 1,439,601,880.73*80% + 1,056,304,566.12*70% - 390,893,527.82
+  = 1,500,201,173.05
+- pre_discount_cash_profit = 3,313,341,174.11 - 432,968,112.73 - 1,459,812,288.09 = 1,420,560,773.29
+- discounted_sustainable_cash_profit = 1,050,000,000 (conservative sustainability adjustment)
+- operating_business_price = 13,924,000,000 - 1,500,201,173.05 = 12,423,798,826.95
+- owner_earnback_years = 12,423,798,826.95 / 1,050,000,000 = 11.83218936
+- market_cap_to_cash_profit = 13,924,000,000 / 1,050,000,000 = 13.26190476
+- forecast_dividend = 1,116,603,126 shares * CNY 0.45 = 502,471,406.70
+- forecast_dividend_yield = 502,471,406.70 / 13,924,000,000 = 0.0360867141
+
+[limitations]
+- The annual report source available in this workspace is a public full-text mirror rather than a locally archived SSE PDF.
+- Financing cash outflow labelled "other" was used as a conservative proxy for lease and related payments; pure lease principal was not separately available in the extracted text.
+- Market data was accepted from the supplied task snapshot and not independently refreshed.

@@ -1,0 +1,29 @@
+2026-08-01 stock-research trace: 600177.SH 雅戈尔
+
+1. Read SKILL.md, result-contract.md, report-contract.md completely.
+2. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Reuse check:
+   - Requested annual facts, normalized facts, raw filing metadata and historical stock-research files were absent from /workspace.
+   - Fell back to public filing research.
+4. Sources checked:
+   - 雅戈尔时尚股份有限公司2025年年度报告, disclosed 2026-04-28 via SSE; full announcement text mirror used for extraction.
+   - 2025年度利润分配方案及2026年中期分红规划公告, 临2026-022.
+   - config/input.json market snapshot: Tencent qt.gtimg.cn, 2026-07-31 11:43:26.
+5. Model decision:
+   - Overrode ordinary_operating hint with platform_financial_mixed / requires_special_model.
+   - Evidence: long-term equity investments CNY 26,768,408,554.45; Ningbo Bank CNY 22,911,323,392.14; investment income CNY 3,264,899,499.46 versus parent net profit CNY 2,447,339,231.76; real-estate inventory and contract liabilities remain material.
+   - Therefore ordinary detachable-net-cash and earnback fields remain null by contract.
+6. Calculations:
+   - gross_profit = 11,581,812,280.44 - 6,265,232,662.44 = 5,316,579,618.00
+   - gross_margin = 5,316,579,618.00 / 11,581,812,280.44 = 0.4590317592
+   - net_margin = 2,447,339,231.76 / 11,581,812,280.44 = 0.2113096844
+   - operating_free_cash_flow = 1,233,890,166.32 - 367,121,714.79 = 866,768,451.53
+   - forecast/base dividend yield = 1,995,549,220.52 / 35,739,000,000 = 0.0558366275
+   - financing liabilities = short-term borrowings + current portion of non-current liabilities + long-term borrowings + lease liabilities = CNY 21,465,545,751.26
+7. Dividend forecast limitation:
+   - 2026 interim dividend plan states conditions but no amount. Used 2025 full-year cash dividend as a baseline scenario, not a company commitment.
+8. outputs/result.json populated on the protocol-initialized skeleton.
+9. Final validation:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]

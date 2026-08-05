@@ -1,0 +1,82 @@
+stock-research trace: 00293.HK / 2025-12-31
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Missing: stock_report/data/raw/filings/00293.HK/2025-12-31/*
+- Missing: stock_report/data/analysis/annual_review/00293.HK/2025-12-31/facts.json
+- Missing: stock_report/data/analysis/annual_review/00293.HK/2025-12-31/annual_facts.md
+- Missing: stock_report/data/normalized/facts/00293.HK/2025-12-31/annual-facts.json
+- No prior research result for this company/period was present.
+- Action: rebuilt core facts from the official 2025 Annual Results announcement.
+
+3. Primary sources
+- Cathay Pacific Airways Limited, 2025 Annual Results, dated 2026-03-11:
+  https://www.cathaypacific.com/content/dam/cx/about-us/investor-relations/announcements/en/2025-cx-annual-results-en.pdf
+  Pages used: 2-7, 13-19, 21.
+- Cathay Group 2025 Annual Results news release, dated 2026-03-11:
+  https://news.cathaypacific.com/the-cathay-group-announces-2025-annual-results-d8fv9x
+- 2025-12-31 CFETS central parity, Xinhua republication:
+  https://www3.xinhuanet.com/20251231/fe9f6466f6884589b5287e6ee946baed/c.html
+  Applied rate: HKD 1 = CNY 0.90322.
+- Market data: task input snapshot, Tencent qt.gtimg.cn, 2026-07-31 16:08:41.
+  Market cap CNY 76,381,279,938.9559; PE TTM 8.2. Original response not archived.
+
+4. Model override
+- Input hint: financial_brokerage / requires_special_model.
+- Filing facts: revenue is passenger services, cargo services and other airline services; the balance sheet contains aircraft, airline working capital, borrowings and lease liabilities, not brokerage client money or proprietary securities books.
+- Override: ordinary_operating / applicable.
+- Airline-specific handling: liquid funds are offset against all interest-bearing borrowings and lease liabilities; contract liabilities are service obligations; sustainable profit receives a cycle/capital-intensity haircut.
+
+5. Currency conversion and extracted facts
+- All structured monetary amounts are CNY absolute yuan.
+- HKD million x 1,000,000 x 0.90322 = CNY yuan.
+- Revenue: HKD 116,766m -> CNY 105,465,386,520.
+- Operating expenses: HKD 102,693m -> CNY 92,754,371,460.
+- Gross-profit proxy / operating profit before non-recurring items: HKD 14,073m -> CNY 12,711,015,060.
+- Operating profit: HKD 14,458m -> CNY 13,058,754,760.
+- Parent net profit: HKD 10,828m -> CNY 9,780,066,160.
+- Underlying parent profit: HKD 9,565m -> CNY 8,639,299,300.
+- Total assets: HKD 177,051m -> CNY 159,916,004,220.
+- Total equity: HKD 60,117m -> CNY 54,298,876,740.
+- Parent equity: HKD 60,110m -> CNY 54,292,554,200.
+- Total liabilities calculated as assets minus equity: HKD 116,934m -> CNY 105,617,127,480.
+- Net operating cash flow: HKD 25,381m -> CNY 22,924,626,820.
+- PPE/intangible cash payments: HKD 9,830m -> CNY 8,878,652,600.
+- Operating FCF proxy: HKD 15,551m -> CNY 14,045,974,220.
+
+6. Metric formulas
+- Gross margin proxy = 14,073 / 116,766 = 0.1205230975.
+  Caveat: Cathay does not disclose conventional gross profit; this is pre-non-recurring operating margin and is not manufacturing-gross-margin comparable.
+- Net margin = 10,828 / 116,766 = 0.0927324735.
+- Liquid funds = HKD 12,289m -> CNY 11,099,670,580.
+- Interest-bearing borrowings and lease liabilities = HKD 59,101m -> CNY 53,381,205,220.
+- Discounted detachable net cash = 11,099,670,580 - 53,381,205,220 = CNY -42,281,534,640.
+- Sustainable cash profit = underlying profit CNY 8,639,299,300 x 80% = CNY 6,911,439,440.
+  Judgment: 20% haircut for yield normalization, HK Express losses and fleet capital requirements.
+- Operating business price = market cap - discounted net cash
+  = 76,381,279,938.9559 - (-42,281,534,640)
+  = CNY 118,662,814,578.9559.
+- Owner earnback years = 118,662,814,578.9559 / 6,911,439,440 = 17.1690449738.
+- Market cap / cash profit = 76,381,279,938.9559 / 6,911,439,440 = 11.0514286643.
+- Forecast dividend: HKD 5,228m -> CNY 4,722,034,160.
+- Forecast dividend yield = 4,722,034,160 / 76,381,279,938.9559 = 0.0618218779.
+  Basis: known 2025 ordinary dividend reused as a baseline scenario; not company guidance for 2026.
+
+7. Protocol writes and validation
+- Populated result sections using repeated protocol CLI `set` commands; result was not handwritten from an empty object.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].
+
+8. Known limitations
+- Local filing/facts packages declared by input were absent.
+- Tencent market snapshot was accepted from input without an archived raw response.
+- Income statement and cash flow were translated at year-end FX for protocol consistency, not accounting average FX.
+- Gross margin is an explicitly labeled proxy.
+- Sustainable cash-profit haircut is analyst judgment; the annual timing of >100 aircraft deliveries and >HKD100bn investment was not fully quantified.

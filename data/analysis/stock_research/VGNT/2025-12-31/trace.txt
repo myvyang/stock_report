@@ -1,0 +1,68 @@
+stock-research trace
+generated_at=2026-08-04T14:47:20+08:00
+query=VGNT
+period=2025-12-31
+
+1. Read instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+- config/input.json exists.
+- No local raw filing, annual facts package, normalized facts, or historical stock-research output existed under the paths supplied by input.
+- Therefore primary public filings were consulted.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- result.json was initialized from the protocol template before field population.
+- All result.json mutations were made with protocol set/append commands; no complex JSON was authored from scratch.
+
+4. Primary evidence
+- SEC Form 10-12B/A Exhibit 99.1, filed 2026-02-17:
+  https://www.sec.gov/Archives/edgar/data/2078008/000119312526055012/d51729dex991.htm
+  Used for audited 2025 carve-out statements, pro forma standalone adjustments, business model, operating discussion, assets and liabilities.
+- SEC Form 10-Q for quarter ended 2026-03-31, filed 2026-05-05:
+  https://www.sec.gov/Archives/edgar/data/2078008/000207800826000008/vgnt-20260331.htm
+  Used for post-financing cash/debt, $1.9bn distribution to Aptiv, share count, dividend policy, and separation facts.
+- Federal Reserve H.10:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+  2025-12-31 CNY per USD = 7.1875.
+- Input market data: Yahoo Finance yfinance, market cap CNY 19,781,444,783.083008 as of 2026-08-03; PE TTM 6.1808667.
+
+5. Model decision
+- statement_model=ordinary_operating.
+- Rationale: revenue-producing automotive electrical architecture manufacturer with ordinary inventories, receivables, property and supplier payables.
+- owner_earnback_applicability=applicable.
+- Special handling: 2025 balance sheet is pre-spin carve-out and does not reflect the debt-funded separation distribution. Owner earnback therefore uses cash and debt at 2026-03-31 after financing transactions.
+
+6. Currency conversion
+- Protocol requires absolute CNY yuan.
+- All USD statement values were multiplied by 7.1875.
+- A single period-end rate was intentionally used for balance sheet, income statement and cash flow consistency; this is a research normalization, not GAAP currency translation.
+
+7. Core calculations
+- Gross profit USD 1,082m = 8,818m revenue - 7,736m cost of sales.
+- Gross margin = 1,082 / 8,818 = 0.122704.
+- Net margin = parent net income 528 / revenue 8,818 = 0.0598775.
+- 2025 operating FCF = CFO USD 641m - capex USD 160m = USD 481m = CNY 3,457,187,500.
+- Post-spin net cash = cash USD 282m - debt USD 2,141m = -USD 1,859m = -CNY 13,361,562,500.
+- Sustainable cash profit before discount = USD 481m + USD 42m separation cost - USD 36m pro forma financing impact = USD 487m.
+- Discounted sustainable cash profit = USD 487m * 85% = USD 413.95m = CNY 2,975,265,625.
+- Operating business price = market cap - discounted net cash = CNY 33,143,007,283.083008.
+- Owner earnback years = 33,143,007,283.083008 / 2,975,265,625 = 11.1395.
+- Market cap / cash profit = 19,781,444,783.083008 / 2,975,265,625 = 6.64863.
+- Dividend forecast = USD 0.13 * 4 * 70,893,660 shares = about USD 36.865m; stored as CNY 264,940,000 after rounding.
+- Forecast dividend yield = 264,940,000 / 19,781,444,783.083008 = 0.0133934.
+
+8. Inference boundaries
+- The USD 36m financing/standalone profit adjustment is inferred from SEC pro forma parent net income of USD 492m versus historical USD 528m; it is not a company cash-flow forecast.
+- The 85% sustainability factor is an explicit analyst haircut for carve-out cost uncertainty, cyclicality and working-capital volatility.
+- Industry ranking and vehicle penetration are company disclosures and were not independently corroborated with a like-for-like market-share dataset.
+- Dividend forecast annualizes a board policy; the company states dividends remain subject to quarterly declaration.
+
+9. Output status
+- outputs/result.json: protocol initialized and populated.
+- outputs/report.md: human-readable operating story and owner-earnback analysis.
+- outputs/trace.txt: sources, formulas, assumptions and protocol actions.

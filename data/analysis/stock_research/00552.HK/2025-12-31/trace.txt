@@ -1,0 +1,62 @@
+stock-research trace
+company: 00552.HK / 中国通信服务股份有限公司
+period: 2025-12-31 annual
+generated for task timestamp: 2026-08-03T17:37:10+08:00
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields only through protocol set/append commands.
+
+2. Local reuse audit
+- Checked the paths declared in config/input.json.
+- No annual facts package, normalized facts, filing metadata, or prior stock-research result existed for 00552.HK/2025-12-31.
+- Created no synthetic annual facts package. Research returned to the issuer's official 2025 annual report and investor-relations pages.
+- Attempted direct CLI download of the full annual-report PDF from the issuer; server returned HTTP 403. Used the issuer's indexed full report, chapter PDFs, official five-year summary, FAQ, and dividend page instead.
+
+3. Identity and model correction
+- Input hint said financial_brokerage. This was rejected after checking the issuer annual report.
+- Annual report principal activities: telecom infrastructure design/construction/project management; network maintenance, property, supply chain and distribution; system integration, software and support.
+- TIS was 49.6% of 2025 revenue; construction alone was RMB61.015bn.
+- Contract assets RMB41.078bn and trade/bills payable RMB63.142bn dominate working capital.
+- Final model: construction_project / requires_special_model.
+- Consequence: all ordinary detachable-net-cash and owner-earnback sorting fields remain null.
+
+4. Core official-source extraction (RMB absolute yuan)
+- Revenue 150,092,609,000; cost of revenue 133,135,975,000; gross profit 16,956,634,000.
+- Net profit 3,749,738,000; attributable profit 3,610,019,000.
+- Gross margin 0.112974; attributable net margin 0.0240519.
+- Total assets 136,681,831,000; liabilities 87,593,864,000; equity 49,087,967,000; parent equity 47,838,700,000; NCI 1,249,267,000.
+- Operating cash flow 937,716,000; management-disclosed capex 742,000,000; management-disclosed free cash flow approximately 795,000,000; financing cash flow -2,113,776,000.
+- Cash dividends paid in financing cash flow 1,602,184,000.
+- Cash and equivalents 14,341,265,000; deposits/short-term deposits/restricted cash combined 19,414,179,000.
+- Receivables net 22,428,627,000; contract assets net 41,078,390,000; trade/bills payable 63,142,294,000; contract liabilities 9,660,358,000.
+
+5. Dividend and market data
+- Issuer-declared FY2025 final DPS: RMB0.2241; payout ratio: 43%; shares: 6,926,018,000.
+- Estimated declared cash dividend: 1,552,120,634.
+- Input market cap: 25,442,598,362.559082 as of 2026/07/31 16:08:47; PE TTM 7.4; source Tencent qt.gtimg.cn.
+- Static declared-dividend yield: 0.0610048.
+- This is explicitly described as a declared-dividend static yield, not a forward forecast.
+
+6. Judgement boundaries and limitations
+- Fact: 2025 operating cash flow fell from RMB6.221bn to RMB0.938bn, while contract assets increased RMB3.311bn.
+- Fact: issuer-disclosed FCF RMB0.795bn was below cash dividends paid RMB1.602bn.
+- Inference: 2025 profit-to-cash conversion was weak and requires later collection evidence; no claim was made that receivables are unrecoverable.
+- The issuer's RMB0.795bn FCF does not equal OCF less the management-disclosed RMB0.742bn capex. Both figures are preserved and the scope mismatch is disclosed.
+- Market snapshot was accepted from task input and not independently rebuilt from HKEX prices and FX.
+
+7. Sources
+- https://www.chinaccs.com.hk/en/ir/reports/ar2025.php
+- https://www.chinaccs.com.hk/en/ir/reports/ar2025/ar2025_08.pdf
+- https://www.chinaccs.com.hk/en/ir/reports/ar2025/ar2025_20.pdf
+- https://www.chinaccs.com.hk/sc/ir/five_year_summary.php
+- https://www.chinaccs.com.hk/en/ir/faqs.php
+- https://www.chinaccs.com.hk/en/ir/dividend.php
+- config/input.json
+
+8. Validation
+- Protocol validation run after population: status ok, errors [].

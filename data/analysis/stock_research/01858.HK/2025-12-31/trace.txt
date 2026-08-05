@@ -1,0 +1,88 @@
+stock-research trace
+company: 01858.HK / CHUNLI MEDICAL / 北京市春立正达医疗器械股份有限公司
+period: 2025-12-31 annual
+generated_at: 2026-08-04T13:11:18+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as explicitly requested.
+- Read references/data-reuse.md because no annual facts package or prior research result was present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- config/input.json existed.
+- No files existed under the supplied raw filing, annual review, normalized facts, or prior stock research paths.
+- Therefore core annual-report evidence had to be acquired from an official source.
+
+3. Source acquisition
+- Located the 2025 annual report through HKEX title search and the issuer website.
+- Downloaded issuer-hosted PDF:
+  https://www.clzd.com/upload/202604/5a1bd4bb56ef7c53488b60b63534d42a.pdf
+- Local evidence files:
+  stock_report/data/raw/filings/01858.HK/2025-12-31/annual-report-2025.pdf
+  stock_report/data/raw/filings/01858.HK/2025-12-31/annual-report-2025.txt
+- PDF contains 202 pages. Text was extracted with pypdf in a temporary virtual environment because pdftotext was unavailable.
+- Market-cap evidence was reused from config/input.json: CNY 2,966,555,299.456119 at 2026/08/03 09:42:03, Tencent qt.gtimg.cn; PE TTM 11.43.
+
+4. Model override
+- Input hint classified the company as financial_brokerage.
+- Annual-report business sections identify it as a manufacturer of orthopedic implantable medical devices and tissue-repair products.
+- The balance sheet contains no brokerage client funds, proprietary securities business, repurchase funding, or margin-financing structure.
+- Overrode statement_model to ordinary_operating and owner_earnback_applicability to applicable.
+
+5. Core extracted facts (CNY yuan)
+- revenue: 1,045,766,405.34
+- cost_of_sales: 355,128,323.72
+- gross_profit: 690,638,081.62
+- operating_profit: 302,245,079.93
+- net_profit: 272,625,119.37
+- parent_net_profit: 272,542,347.59
+- adjusted_parent_net_profit: 255,525,502.91
+- operating_cash_flow: 404,839,925.08
+- capex: 59,127,974.35
+- operating_free_cash_flow: 345,711,950.73
+- total_assets: 3,661,134,861.13
+- total_liabilities: 674,142,399.68
+- total_equity: 2,986,992,461.45
+- parent_equity: 2,985,467,836.15
+- minority_interest: 1,524,625.30
+- cash: 1,409,120,983.52
+- restricted_or_frozen_cash: 6,648,496.54
+- trading_financial_assets: 811,246,684.93
+- wealth_management_products: 791,246,684.93
+- equity_instrument_investment: 20,000,000.00
+- accounts_receivable: 225,456,558.88
+- inventory_net: 535,925,459.39
+- inventory_impairment_allowance: 64,068,901.77
+- 2025 total cash dividend (paid interim plus proposed final): 137,588,993.64
+
+6. Derived arithmetic
+- gross_margin = 690,638,081.62 / 1,045,766,405.34 = 0.6604133371
+- net_margin = 272,542,347.59 / 1,045,766,405.34 = 0.2606149387
+- operating_free_cash_flow = 404,839,925.08 - 59,127,974.35 = 345,711,950.73
+- forecast_dividend_yield = 137,588,993.64 / 2,966,555,299.456119 = 0.0463800535
+
+7. Owner earnback judgments
+- Available cash after restricted/frozen balance: 1,402,472,486.98; discounted at 90%.
+- Wealth-management products: 791,246,684.93; discounted at 90%.
+- Equity instrument investment: 20,000,000.00; discounted at 50%.
+- Lease and current lease-related obligations: 3,275,142.49; deducted at 100%.
+- Minimum operating cash buffer: 250,000,000.00; deducted at 100%.
+- discounted_detachable_net_cash = 1,731,072,112.229
+- Sustainable cash profit starts from 2025 adjusted parent profit 255,525,502.91 and is reduced to 230,000,000 because 2025 cash flow benefited from receivable collection, 2024 OCF was negative, and procurement/inventory/R&D remain volatile.
+- operating_business_price = 2,966,555,299.456119 - 1,731,072,112.229 = 1,235,483,187.2271192
+- owner_earnback_years = 1,235,483,187.2271192 / 230,000,000 = 5.3716660314
+- market_cap_to_cash_profit = 2,966,555,299.456119 / 230,000,000 = 12.8980665194
+
+8. Protocol operations and validation
+- All result fields were populated using protocol set commands against the initialized JSON; no complex result JSON was created from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: {"status":"ok","errors":[]}
+
+9. Known limitations
+- Market cap and PE were not independently recomputed; they use the supplied Tencent snapshot.
+- Cash discounts, the CNY 250m operating buffer, and CNY 230m sustainable cash profit are analyst judgments, not filing facts.
+- The final 2025 dividend was pending shareholder approval at annual-report publication.
+- No independent market-share dataset was used; industry-position language is attributed to the annual report and MIIT recognition.

@@ -1,0 +1,85 @@
+stock-research trace
+company: Prudential plc / 02378.HK
+period: 2025-12-31
+generated for task date: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because it is directly linked by SKILL.md and governs reuse.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked configured annual review, normalized facts, raw filing, and prior stock-research paths.
+- No reusable 2025 facts.json, annual_facts.md, extraction trace, normalized facts, or prior result existed.
+- Downloaded the official 2025 Annual Report PDF to:
+  stock_report/data/raw/filings/02378.HK/2025-12-31/prudential-plc-ar-2025.pdf
+- Used temporary /tmp PDF parsing dependency only for extraction; project dependencies were not changed.
+
+3. Identity and model correction
+- Official report identifies Prudential plc (HKEX: 2378) as an Asia- and Africa-focused life/health insurer with Eastspring asset management.
+- Overrode input hint financial_brokerage with financial_insurance.
+- Set owner_earnback_applicability=requires_special_model.
+- Reason: investment assets are substantially matched to insurance contract liabilities and regulatory capital; neither is detachable cash/debt under an ordinary operating-company model.
+
+4. Primary financial evidence (Annual Report 2025, USD million)
+- Consolidated income statement, PDF page 247:
+  profit for year 4,119; attributable to equity holders 3,978; NCI 141.
+- Segment result note B1.1, PDF page 261:
+  adjusted operating profit 3,306; adjusted operating profit after tax 2,772;
+  corporate transaction gain 1,515, mainly IPAMC partial disposal.
+- Consolidated statement of financial position, PDF page 250:
+  total assets 212,195; total liabilities 190,835; total equity 21,360;
+  shareholders' equity 20,117; NCI 1,243;
+  cash 7,706; insurance contract liabilities 174,498;
+  reinsurance contract liabilities 640;
+  equity/fund investments 89,558; debt securities 92,051; deposits 6,246.
+- Consolidated cash flow statement, PDF page 251:
+  operating cash flow 2,450; PPE purchase 104; financing cash flow -1,744;
+  buybacks paid 1,252; dividends to equity holders 594.
+- Financial review / TEV and additional information:
+  new business profit 2,782; gross operating free surplus generated 3,059;
+  operating free surplus after new business investment and central costs 1,675;
+  Group TEV equity 37,803; free surplus excluding intangibles 9,408;
+  free surplus ratio 221%; GWS shareholder surplus 17.1bn and cover 262%.
+- Dividend disclosure:
+  FY2025 DPS 26.60 US cents (7.71 + 18.89), +15%;
+  guidance: DPS growth >10% p.a. in 2026 and 2027.
+
+5. Currency conversion
+- Protocol requires CNY absolute yuan.
+- SAFE/PBOC/CFETS central parity query for 2025-12-31: USD 100 = CNY 702.88.
+- Conversion factor used for all financial statement amounts: 1 USD = CNY 7.0288.
+- Formula: CNY yuan = USD million * 1,000,000 * 7.0288.
+- Limitation: the same period-end factor was applied to income/cash-flow items rather than an annual average rate. USD originals and page references are retained in this trace/report.
+
+6. Dividend forecast
+- End-2025 shares estimated from TEV equity / TEV equity per share:
+  USD37.803bn / USD14.83 = approximately 2.54909bn shares.
+- Conservative forecast DPS uses exactly 10% growth, the lower boundary implied by management's >10% guidance:
+  USD0.2660 * 1.10 = USD0.2926 per share.
+- Forecast cash dividend:
+  2.54909bn * USD0.2926 = approximately USD745.88m
+  = CNY5,242,526,361.74 at 7.0288.
+- Forecast ordinary dividend yield:
+  CNY5,242,526,361.74 / CNY253,377,355,347.12732 = 0.0206905876.
+- Excludes buybacks and additional capital returns. This is an inference, not company-guaranteed cash payment.
+
+7. Null and comparability decisions
+- revenue, cost of sales, gross profit, gross margin and net margin left null because IFRS 17 insurance presentation does not provide a comparable ordinary-company sales/gross-profit denominator for this analysis.
+- Ordinary owner earnback fields kept null as required for requires_special_model:
+  discounted net cash, discounted cash profit, operating business price,
+  owner earnback years, and market cap/cash profit.
+- OCF, capex and mechanical OCF-minus-capex are populated for protocol completeness but explicitly not used as ordinary-company free cash flow.
+
+8. Protocol population and validation
+- Populated scalar fields with protocol `set` and lists with protocol `append`; did not hand-write result.json from scratch.
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validator output: {"status":"ok","errors":[]}
+
+9. Data quality
+- status=complete under the special-financial-model minimum: identity, period, market snapshot, model, balance sheet, parent profit, dividend forecast, asset/liability explanations, business story and evidence are present.
+- Timing limitation: market cap is dated 2026-08-03 while statements are dated 2025-12-31.
+- PE TTM 9.51 is carried from input/Tencent and was not recomputed.

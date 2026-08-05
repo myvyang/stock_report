@@ -1,0 +1,64 @@
+stock-research trace — SFM — fiscal 2025
+generated_at: 2026-08-05T04:37:04+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result.json with protocol `set` commands; did not hand-write the initialized complex object.
+
+2. Reuse audit
+- Checked paths supplied in config/input.json.
+- No annual facts, normalized facts, extraction trace, raw filing, or prior research files for SFM/2025-12-31 existed in the workspace.
+- Proceeded to primary public sources.
+
+3. Primary evidence used
+- SEC 2025 Form 10-K, filed 2026-02-19, actual fiscal year ended 2025-12-28:
+  https://www.sec.gov/Archives/edgar/data/1575515/000157551526000008/sfm-20251228.htm
+- Federal Reserve H.10 release dated 2025-12-29; 2025-12-26 China yuan rate = 7.0063 per USD:
+  https://www.federalreserve.gov/releases/h10/20251229/
+- Market cap, date, PE TTM, and Yahoo Finance yfinance source taken directly from config/input.json.
+
+4. Model classification
+- Confirmed ordinary_operating / applicable.
+- Reason: specialty grocery retailer earns at point of sale, holds merchandise inventory, operates stores and distribution assets, and has ordinary trade and lease obligations.
+- Special treatment: operating lease assets/liabilities represent the store network and are not detachable cash or ordinary financial net debt.
+
+5. Currency translation
+- Protocol requires absolute CNY amounts.
+- Used one transparent rate for all balance sheet, income statement and cash-flow values: USD × 7.0063.
+- This is the latest official H.10 trading-day observation before the 2025-12-28 fiscal year-end.
+- Limitation: did not apply an annual average rate to flow statements, preserving internal comparability and ratios at the cost of translation precision.
+
+6. Core reported USD figures (thousands)
+- Assets 4,158,649; liabilities 2,755,575; equity 1,403,074.
+- Revenue 8,806,159; cost of sales 5,389,770; gross profit 3,416,389; operating income 686,158; net income 523,670.
+- Operating cash flow 715,998; property/equipment purchases 248,267; operating free cash flow 467,731.
+- Financing cash outflow 474,050; repurchases plus excise tax 474,017.
+- Cash 257,282; current and long-term finance obligations 83,656.
+
+7. Owner earnback judgments
+- Detachable cash: 50% × USD 257.282m cash, less 100% × USD 83.656m finance obligations.
+- Discounted detachable net cash: USD 44.985m × 7.0063 = CNY 315,178,405.50.
+- Base operating FCF: USD (715.998m − 248.267m) = USD 467.731m.
+- Sustainability haircut: 85%, reflecting elevated 2025 comparable-store growth, shrink improvement, inventory-management benefit and sales leverage.
+- Discounted sustainable cash profit: USD 397.57135m × 7.0063 = CNY 2,785,504,149.505.
+- Operating business price: CNY 54,844,124,363.296875 − CNY 315,178,405.50 = CNY 54,528,945,957.796875.
+- Owner earnback: 19.575970104904 years.
+- Market cap / discounted cash profit: 19.689119606245 times.
+- These haircuts are analyst judgments, not company guidance.
+
+8. Dividend forecast
+- Forecast dividend = 0; yield = 0.
+- Basis: 10-K states no cash dividends since the 2013 listing and none anticipated in the near future.
+- Buybacks were disclosed separately and not treated as dividends.
+
+9. Data quality
+- Set complete because identity, market data, model, three statements, asset/liability explanations, owner-earnback bridge, dividend forecast, business story and primary evidence are populated.
+- Key limitations are retained in result.json: actual fiscal date differs from input label, uniform period-end FX translation, subjective haircuts, and market/filing timing mismatch.
+
+10. Validation
+- Executed: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}.
+- jq syntax check passed; result.json, report.md and trace.txt are all non-empty.

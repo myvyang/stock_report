@@ -1,0 +1,48 @@
+2026-08-05 stock-research trace — LPG / Dorian LPG Ltd.
+
+1. Read skill and required contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - references/result-contract.md
+   - references/report-contract.md
+   - references/data-reuse.md
+2. Inspected configured annual-review/raw/normalized paths. No reusable LPG fact package or filing existed under the requested 2025-12-31 path.
+3. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Period resolution:
+   - Input says annual / 2025-12-31.
+   - SEC identifies Dorian fiscal year end as 03-31; 2025-12-31 is a 10-Q for nine months.
+   - Latest audited filing available by created_at is FY2026 Form 10-K, period 2026-03-31, accession 0001596993-26-000025, filed 2026-05-27.
+   - Analysis period therefore reset to 2026-03-31 and limitation recorded.
+5. Primary-source retrieval:
+   - SEC filing HTML and SEC companyfacts JSON.
+   - Dorian investor relations for business/dividend cross-check.
+   - SAFE RMB central parity page for currency conversion reference.
+6. Currency convention:
+   - All result amounts are CNY absolute yuan.
+   - USD financial statements converted at USD/CNY 6.791, SAFE 2026-07-15, nearest verified official pre-valuation-date observation.
+   - Market cap retained from input (already CNY absolute yuan).
+7. Model decision: ordinary_operating / applicable, with capital-intensive cyclical-shipping special handling.
+8. Gross-profit convention: revenue less voyage expenses, charter-hire expenses, profit-sharing expenses, and vessel operating expenses. Dorian does not report GAAP gross profit; limitation recorded.
+9. Owner-earnback assumptions:
+   - 50% of cash detachable.
+   - 100% of debt and operating-lease liabilities deducted.
+   - Sustainable cash profit = (FY2024-FY2026 average CFO - FY2026 D&A maintenance-capex proxy) × 80%.
+10. Dividend forecast: FY2026 actual cash dividend held flat as a scenario; dividends are explicitly irregular and discretionary.
+11. Populated initialized JSON through protocol CLI set commands, not by replacing it with a hand-written JSON document.
+12. Validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Initial populated result: status ok, errors [].
+
+Core USD facts from FY2026 10-K:
+- assets 1,871,692,717; liabilities 732,696,339; equity 1,138,996,378
+- revenue 481,511,242; operating income 210,175,509; net income 193,665,933
+- CFO 210,143,612; vessel capex 93,843,962; financing cash flow -105,900,182
+- cash 327,409,120; debt 560,394,693; lease liabilities 148,723,541
+- dividends paid 105,007,158; repurchases 7,012,220
+
+Sources:
+- https://www.sec.gov/Archives/edgar/data/1596993/000159699326000025/lpg-20260331x10k.htm
+- https://data.sec.gov/api/xbrl/companyfacts/CIK0001596993.json
+- https://www.sec.gov/Archives/edgar/data/1596993/000159699326000007/lpg-20251231x10q.htm
+- https://dorianlpg.com/investors/financial-reports/sec-filings/default.aspx
+- https://www.safe.gov.cn/AppStructured/hlw/RMBQuery.do

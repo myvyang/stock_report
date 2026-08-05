@@ -1,0 +1,90 @@
+[2026-08-04 Asia/Shanghai] Stock research trace: 03918.HK / NagaCorp / FY2025
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as explicitly requested.
+- Read references/data-reuse.md because the skill routes reuse decisions through this reference.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked stock_report/data/analysis/annual_review/03918.HK/2025-12-31, normalized facts, raw filings, prior stock research, and outputs.
+- No existing FY2025 facts package, normalized facts, raw filing, or prior stock-research output was present.
+- Therefore retrieved the official FY2025 annual report and used official NagaCorp/HKEX disclosure pages.
+
+3. Primary sources retrieved/used
+- NagaCorp 2025 Annual Report, published 2026-04-28; audited financial statements dated 2026-03-23:
+  https://doc.irasia.com/listco/hk/nagacorp/annual/2025/ar2025.pdf
+- NagaCorp FY2025 Final Results Announcement, published 2026-03-23:
+  https://doc.irasia.com/listco/hk/nagacorp/annual/2025/res.pdf
+- NagaCorp official Financial Highlights:
+  https://www.nagacorp.com/en/ir/finhigh.php
+- NagaCorp official Operational Highlights:
+  https://www.nagacorp.com/en/ir/operational.php
+- NagaCorp official annual/interim reports index:
+  https://www.nagacorp.com/en/ir/reports.php
+- HKEX title-search page used to confirm publication dates and filing identity:
+  https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&market=SEHK&stockId=12284
+- USD/CNY translation rate: 2025-12-31 PBOC-authorized CFETS central parity, USD 1 = CNY 7.0288. Search result cross-check from China Economic Net reproducing the official release:
+  https://www.ce.cn/xwzx/gnsz/gdxw/202512/t20251231_2676993.shtml
+- Market cap and PE: config/input.json, Tencent qt.gtimg.cn snapshot, 2026/08/03 09:45:11.
+
+4. Local source artifacts
+- Downloaded official annual report to stock_report/data/raw/filings/03918.HK/2025-12-31/ar2025.pdf.
+- Extracted searchable text to stock_report/data/raw/filings/03918.HK/2025-12-31/ar2025.txt using pypdf in an isolated temporary virtual environment because system pdftotext was unavailable.
+- The temporary environment was outside the workspace and is not a research output.
+
+5. Analysis-model override
+- Input hint: financial_brokerage / requires_special_model.
+- Audited facts: casino tables, electronic gaming machines, hotel and entertainment revenue; core assets are casino/hotel PPE, construction work in progress, land ROU assets, and casino licence premium.
+- No brokerage client funds, proprietary financial book, repo funding, or capital-market business model found.
+- Final classification: ordinary_operating / applicable.
+- Special constraints retained: finite licence/exclusivity, Naga 3 capital commitment, gaming win-rate normalization.
+
+6. Audited FY2025 facts (USD thousands unless stated)
+- Revenue 709,673; gaming tax 43,706; cost of sales 89,052; gross profit 576,915.
+- Operating profit 311,253; parent net profit 309,907.
+- Total assets 2,769,098; total liabilities 367,576 derived as assets less equity; total/parent equity 2,401,522; minority interest nil.
+- Cash and cash equivalents 372,094; fixed deposits 179; restricted bank deposit 5,113.
+- Shareholder loan 70,000; lease liabilities 113,910; trade and other payables 180,688.
+- Operating cash flow 388,545; property/equipment/construction cash payment 85,312; free cash flow 303,233; financing cash flow -55,833; dividend cash paid 44,639.
+- FY2025 interim dividend 44,639 and proposed final dividend 48,333; total 92,972.
+- Contracted but not incurred hotel/casino capital commitments 3,110,824.
+- Naga 3 subscription/funding agreement mutually terminated 2025-12-15.
+- Russian project pre-impairment PPE 154,674 plus construction prepayments 126,982 = 281,656; FY2024 impairment 89,110.
+
+7. Currency conversion
+- All output monetary amounts = audited USD amount x 1,000 x 7.0288 CNY/USD.
+- Ratios are computed from same-currency amounts; no rounding used in result.json formulas beyond floating-point representation.
+
+8. Owner earnback judgments
+- Gross liquid funds (cash plus fixed deposits): USD 372.273m.
+- Discounted detachable net cash: CNY 0.
+- Reason: USD 3.111bn contracted Naga 3 commitment dwarfs liquid funds; original 50% shareholder subscription funding agreement terminated; USD 70m shareholder loan due May 2026. Cash cannot be evidenced as safely detachable.
+- FY2025 operating FCF: USD 303.233m.
+- Company quantified excess mass-table win-rate contribution: approximately USD 39m revenue.
+- Sustainable cash profit: USD 303.233m - USD 39m = USD 264.233m = CNY 1,857,240,910.40.
+- Operating business price: market cap - CNY 0 = CNY 13,260,767,505.090237.
+- Owner earnback years and market-cap/cash-profit: 13,260,767,505.090237 / 1,857,240,910.40 = 7.140036292994548.
+- Judgment limitation: no full multi-year normalized FCF series was built; capex was not separable into maintenance and expansion, so all reported cash capex was deducted.
+
+9. Dividend forecast
+- Baseline forecast uses FY2025 total declared/proposed dividends of USD 92.972m without assuming payout expansion.
+- Forecast cash dividend: CNY 653,481,593.60.
+- Forecast yield: 653,481,593.60 / 13,260,767,505.090237 = 0.049279319115515495.
+
+10. Protocol population and validation
+- Populated outputs/result.json only through repeated protocol `set` commands after protocol initialization; did not hand-write the JSON object from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed result validation status: ok; errors: [].
+
+11. Required deliverables
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt
+
+12. Final verification
+- Reran protocol validation after report/trace creation: status ok; errors [].
+- Confirmed outputs/result.json parses as JSON and all three required files are non-empty.
+- Searched deliverables for legacy ranking labels and unintended buy/sell/target-price language; none used as a conclusion. The obsolete input model appears only in the trace as the explicitly rejected hint.

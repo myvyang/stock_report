@@ -1,0 +1,50 @@
+[2026-08-03 Asia/Shanghai] stock-research trace for 001233.SZ / 2025-12-31
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- references/result-contract.md
+- references/report-contract.md
+- references/data-reuse.md
+
+2. Reuse check
+- stock_report/data/analysis/annual_review/001233.SZ/2025-12-31: absent
+- stock_report/data/raw/filings/001233.SZ/2025-12-31: absent
+- No prior annual facts or research result was available for reuse.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: initialized stock-research-result-v1 skeleton.
+
+4. Primary disclosures used
+- 海安橡胶集团股份公司2025年年度报告, disclosed 2026-04-29 through the exchange-designated disclosure channel.
+- 深交所PDF摘要: https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-29/15f3dd34-b0bb-4198-948e-32a8397fa80f.PDF
+- 2025年度利润分配预案公告 and annual-report dividend section.
+- Market-cap snapshot from config/input.json: Tencent qt.gtimg.cn, 2026-07-31 16:14:06.
+
+5. Model decision
+- Confirmed ordinary_operating/applicable.
+- Reason: tire manufacturing plus mine-site tire service; balance sheet contains ordinary cash, receivables, inventory, PPE, borrowings and trade liabilities.
+- Special handling: earmarked IPO proceeds are operating capital, not detachable cash.
+
+6. Core calculations (CNY)
+- Gross profit = 2,232,180,657.28 - 1,244,832,052.41 = 987,348,604.87.
+- Gross margin = 987,348,604.87 / 2,232,180,657.28 = 44.2325%.
+- Net margin = 559,628,419.38 / 2,232,180,657.28 = 25.0709%.
+- Operating FCF = 347,099,692.41 - 159,622,961.87 = 187,476,730.54.
+- Discounted detachable net cash = (3,069,495,469.62 - 1,995,020,600.00 - 45,664,821.87) * 80% - 384,103,452.80 - 371,946,668.00 = 66,998,417.40.
+- Sustainable cash profit judgment = 250,000,000.00, constrained by 2025 FCF, three-year OCF and capex; not company guidance.
+- Operating business price = 8,175,000,000.00 - 66,998,417.40 = 8,108,001,582.60.
+- Owner earnback = 8,108,001,582.60 / 250,000,000.00 = 32.4320 years.
+- Market cap / cash profit = 32.7000.
+- Forecast dividend yield = 371,946,668.00 / 8,175,000,000.00 = 4.5498%.
+
+7. Protocol population and validation
+- outputs/result.json was populated using repeated protocol `set` commands in outputs/populate.sh; it was not composed by directly writing the final JSON.
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}
+
+8. Known limitations
+- Local raw filing and annual-facts package were absent; searchable official/disclosure-channel content was used.
+- Market cap and PE were accepted from the supplied Tencent snapshot.
+- Maintenance versus growth capex cannot be precisely separated while IPO projects are under construction.
+- 2026 Q1 deterioration is a sensitivity warning only and is not mixed into 2025 statements.

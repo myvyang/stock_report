@@ -1,0 +1,62 @@
+stock-research trace
+company=01763.HK China Isotope & Radiation Corporation / 中国同辐股份有限公司
+period=2025-12-31 annual
+generated_at=2026-08-04T21:21:05+08:00
+
+1. Read protocol and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- config/input.json exists.
+- No annual facts, normalized facts, raw filing metadata, or prior stock-research outputs existed under the supplied workspace paths.
+- Returned to the primary annual filing.
+
+3. Primary sources
+- HKEX issuer title search for stock 01763.
+- 2025 Annual Report, published 2026-04-22:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0422/2026042200023.pdf
+- Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026-08-03 09:42:16.
+
+4. Model verification
+- Input hint said financial_brokerage / requires_special_model.
+- Annual report business description and segment data show radiopharmaceuticals, radioactive sources, irradiation, nuclear medical equipment and trading services.
+- No brokerage customer funds, proprietary securities portfolio, margin financing or repo funding model found.
+- Overrode hint with ordinary_operating / applicable.
+
+5. Key extraction (annual report page numbers)
+- pp.2-3: corporate profile, network and industry position.
+- p.36: segment revenue.
+- p.67: capital expenditure RMB714.6m.
+- pp.118-119: 2025 total dividend RMB98,233,581.79, DPS RMB0.3071.
+- p.180: income statement.
+- pp.182-183: balance sheet.
+- pp.186-188: cash flow statement.
+- pp.293-300: receivable aging and cash restrictions.
+
+6. Calculations
+- gross_margin = 3,621,598,000 / 7,187,661,000 = 0.5038506584.
+- net_margin = 327,425,000 / 7,187,661,000 = 0.0455549985.
+- operating_free_cash_flow = 538,343,000 - 714,600,000 = -176,257,000.
+- debt plus leases = 896,293,000 + 1,247,338,000 + 499,538,000 + 27,524,000 + 54,910,000 = 2,725,603,000.
+- detachable net cash = max(0, 2,591,226,000 - 2,725,603,000) = 0.
+- dividend_yield = 98,233,581.79 / 4,474,566,574.313045 = 0.0219537591.
+- sustainable distributable cash profit set to 0 because annual operating FCF is negative and maintenance/growth capex is not reliably separable.
+- owner earnback years and market cap/cash profit left null because the denominator is not positive.
+
+7. Protocol usage
+- Initialized outputs/result.json with `protocol init`.
+- Populated scalar and list fields with `protocol set` and `protocol append`; no complex JSON was handwritten from scratch.
+- Final validation command and output recorded below during completion.
+
+8. Limitations
+- Market cap and PE were accepted from task input and not independently reconstructed across share classes and FX.
+- Company claims about domestic leadership were identified as company disclosure.
+- One-year negative FCF may reflect expansion capex; later years are needed to establish normalized distributable cash profit.
+
+9. Final validation
+- command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- result: {"status":"ok","errors":[]}
+- exit_code: 0

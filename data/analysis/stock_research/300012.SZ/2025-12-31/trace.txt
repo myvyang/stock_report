@@ -1,0 +1,90 @@
+stock-research trace
+company: 300012.SZ 华测检测
+period: 2025-12-31 annual
+generated_for_input_at: 2026-07-31T23:46:10+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Read references/data-reuse.md because SKILL.md routes reuse decisions to it.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields only through protocol set/append commands.
+6. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: {"status":"ok","errors":[]}
+
+[reuse audit]
+- No files existed under the configured 2025 annual_review, normalized facts, raw filing, or prior stock_research paths.
+- Only stock_report/data/notes/user_stock_evaluations.md existed and contained no reusable company facts.
+- Therefore fetched the company-hosted 2025 annual report PDF and extracted text locally.
+
+[primary source]
+- Title: 华测检测认证集团股份有限公司2025年年度报告全文
+- Company URL: https://www.cti-cert.com/upload/2026-05/177814174869814300.pdf
+- Local PDF: stock_report/data/raw/filings/300012.SZ/2025-12-31/annual_report_2025.pdf
+- Local extracted text: stock_report/data/raw/filings/300012.SZ/2025-12-31/annual_report_2025.txt
+- The annual report states the designated disclosure website is www.cninfo.com.cn.
+- Audit report date shown in filing: 2026-03-27; auditor: 北京德皓国际会计师事务所（特殊普通合伙）.
+
+[financial facts: CNY]
+revenue=6620735906.71
+cost_of_sales=3401869926.29
+gross_profit=3218865980.42
+operating_profit=1116536758.33
+net_profit=1019868809.15
+parent_net_profit=1016418093.67
+deducted_nonrecurring_parent_profit=950385943.03
+operating_cash_flow=1371300496.60
+capex_cash_paid=658207124.97
+operating_free_cash_flow=713093371.63
+total_assets=10379101079.04
+total_liabilities=2478411958.33
+total_equity=7900689120.71
+parent_equity=7673017639.13
+minority_interest=227671481.58
+
+[derived metrics]
+gross_margin=(6620735906.71-3401869926.29)/6620735906.71=0.4861794861
+net_margin=1016418093.67/6620735906.71=0.1535204104
+operating_free_cash_flow=1371300496.60-658207124.97=713093371.63
+
+[analysis model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason: fee-for-service testing, inspection, certification and calibration business; no customer deposits, insurance reserves, regulated presale cash, concession rights, or other special statement structures. Laboratories, receivables and qualifications are operating assets.
+
+[owner earnback calculation]
+input_market_cap=24216000000.00
+cash=1275482258.23; discount=80%; discounted=1020385806.58
+trading_financial_assets=102549436.04; discount=90%; discounted=92294492.44
+short_and_long_borrowings=40110856.53+21280121.23=61390977.76; deducted at 100%
+discounted_detachable_net_cash=1020385806.58+92294492.44-61390977.76=1051289321.26
+discounted_net_cash_to_market_cap=1051289321.26/24216000000=0.0434130047
+operating_business_price=24216000000-1051289321.26=23164710678.74
+discounted_sustainable_cash_profit_proxy=2025 operating FCF=713093371.63
+owner_earnback_years=23164710678.74/713093371.63=32.4848212
+market_cap_to_cash_profit=24216000000/713093371.63=33.9590872
+note: all disclosed capex is deducted because maintenance/growth split is unavailable. Acquisition cash paid 421899612.96 is excluded from operating FCF but discussed as capital allocation and goodwill risk.
+
+[dividend]
+2025 proposal=1.5 CNY per 10 shares
+approx participating shares=1682828214-9747400=1673080814
+forecast_cash_dividend=1673080814*0.15=250962122.10
+forecast_dividend_yield=250962122.10/24216000000=0.0103634837
+actual amount may change with record-date participating shares.
+
+[market source]
+market_cap=24216000000.0
+market_cap_date=20260731114327
+market_cap_source=Tencent qt.gtimg.cn
+pe_ttm=22.88
+Source: config/input.json. Not independently reconstructed from price and shares.
+
+[quality]
+status=complete
+limitations:
+- Single-year operating FCF is a conservative sustainable cash-profit proxy.
+- Maintenance vs growth capex is not separately disclosed.
+- Forecast dividend uses year-end treasury shares as an approximation.
+- Market snapshot was supplied by the task input and was not independently reconstructed.

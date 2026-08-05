@@ -1,0 +1,74 @@
+stock-research trace
+company: JMSB / John Marshall Bancorp, Inc.
+period: 2025-12-31 annual
+generated_at_timezone: Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: initialized stock-research-result-v1 skeleton.
+
+3. Local data reuse check
+- Checked configured raw filing, annual review, and normalized facts paths.
+- Result: configured JMSB directories/files were absent; no reusable annual fact pack or prior research result existed.
+
+4. Primary-source collection
+- SEC 2025 Form 10-K, accession 0001104659-26-027378, filed 2026-03-13:
+  https://www.sec.gov/Archives/edgar/data/1710482/000110465926027378/jmsb-20251231x10k.htm
+- SEC Form 8-K for quarterly dividend declared 2026-04-28:
+  https://www.sec.gov/Archives/edgar/data/1710482/000110465926050966/jmsb-20260428x8k.htm
+- Federal Reserve H.10 release dated 2026-01-05, containing 2025-12-31 USD/CNY rate:
+  https://www.federalreserve.gov/releases/h10/20260105/
+- Market cap and PE TTM reused from config/input.json; source identified there as Yahoo Finance yfinance.
+
+5. Model determination
+- Input hint: ordinary_operating / applicable.
+- Filing fact: registrant is a bank holding company and substantially all operations are through John Marshall Bank; loans and investments generate interest and deposits fund the assets.
+- Override: financial_bank / requires_special_model.
+- Consequence: all ordinary detachable-net-cash, cash-profit, operating-business-price, and payback fields remain null.
+
+6. Currency conversion
+- Presentation currency required by contract: CNY absolute yuan.
+- Rate: 1 USD = 6.9931 CNY on 2025-12-31, Federal Reserve H.10.
+- Balance sheet and annual income statement USD amounts were multiplied by 6.9931.
+- Limitation: annual income statement conversion uses closing rather than average exchange rate.
+
+7. Key audited facts extracted from 10-K
+- Total assets USD 2,332,550,000.
+- Total liabilities USD 2,066,912,000.
+- Total/parent equity USD 265,638,000; no minority interest reported.
+- Net income USD 21,233,000.
+- Net loans USD 1,955,555,000; allowance USD 19,805,000.
+- Deposits USD 1,972,285,000.
+- Net interest income USD 60,564,000; non-interest income USD 2,074,000.
+- NIM 2.68%; ROAA 0.93%; ROAE 8.26%; efficiency ratio 53.6%.
+- Nonperforming assets/total assets 0.05%; no nonaccrual loans.
+- Total capital 16.3%; CET1 15.2%; Tier 1 leverage 12.5%.
+- Loans originated during the last three years USD 738.6 million / 37.5% of portfolio.
+- Uninsured or uncollateralized deposits 35.1% of total deposits.
+
+8. Dividend forecast
+- 2025 cash dividend: USD 0.30/share, disclosed in 10-K.
+- 2026 Q1 and Q2 declared dividend: USD 0.09/share each.
+- Forecast assumption: USD 0.09 quarterly maintained for four quarters = USD 0.36/share annualized.
+- Share count used: 14,214,603 at 2025-12-31.
+- Forecast cash dividend: USD 5,117,257.08 = CNY 35,785,490.49.
+- Forecast yield: CNY 35,785,490.49 / CNY 2,209,319,432.29 = 0.0161975176.
+- This is an assumption, not a declared full-year amount.
+
+9. Valuation interpretation
+- Input market cap date 2026-08-03 differs from financial statement date 2025-12-31.
+- Approximate market cap / 2025 year-end book equity = 1.1893x.
+- This cross-date ratio is explanatory only; no buy/sell recommendation or target price produced.
+
+10. Protocol population
+- Used repeated protocol CLI `set` operations to populate the initialized result.
+- Did not hand-write outputs/result.json from scratch.
+
+11. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial populated result: status ok, errors [].

@@ -1,0 +1,73 @@
+stock-research trace — 00398.HK ORIENTAL WATCH
+generated_at: 2026-08-03T13:10:35+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Searched the configured annual-review, normalized-facts and historical stock-research paths.
+- No reusable 00398.HK fact package or prior research output was present.
+- Downloaded the issuer-hosted 2025 annual report to:
+  stock_report/data/raw/filings/00398.HK/2025-12-31/annual-report-2025.pdf
+- Local pdftotext was unavailable, so page-level facts were read from the web-indexed issuer PDF.
+
+3. Primary sources used
+- Oriental Watch Holdings Limited, Annual Report 2025, FY ended 31 March 2025:
+  https://www.orientalwatch.com/owh/pdf/250716/2025071600825.pdf
+  Relevant pages: 3-4 (business and stores), 88-89 (income), 90-91 (balance sheet),
+  94-96 (cash flow), 159-163 (investments, inventory and loan receivables), 178-179 (financial risks).
+- Oriental Watch Holdings Limited, final results FY ended 31 March 2026, 17 June 2026:
+  https://www.orientalwatch.com/owh/pdf/260617/e00398.pdf
+  Used for latest full-year dividend components and proposal status.
+- Tencent qt.gtimg.cn snapshot in config/input.json:
+  market cap CNY 1,379,413,630.1869152; PE TTM 8.9; timestamp 2026/07/31 16:08:47.
+
+4. Model review
+- Input hint: financial_brokerage / requires_special_model.
+- Filing facts: watch trading and luxury-watch retail; store network, inventory, ROU assets and leases;
+  no brokerage customer funds, proprietary trading balance sheet or repo funding.
+- Override: ordinary_operating / applicable.
+
+5. Currency and formulas
+- Filing presentation currency: HKD.
+- Result-contract currency: CNY absolute yuan.
+- Applied a fixed analytical conversion rate of 1 HKD = 0.92 CNY to filing amounts.
+- Total assets: (HKD 589.431m non-current + HKD 1,654.082m current) × 0.92 = CNY 2,064,031,960.
+- Total liabilities: (HKD 346.991m current + HKD 141.740m non-current) × 0.92 = CNY 449,632,520.
+- Operating FCF: (HKD 288.086m OCF - HKD 17.237m PPE purchases - HKD 7.414m PPE deposits) × 0.92
+  = CNY 242,360,200.
+- Gross margin: HKD 1,085.737m / HKD 3,449.857m = 31.4719%.
+- Net margin: HKD 200.496m parent profit / HKD 3,449.857m revenue = 5.8117%.
+
+6. Owner earnback assumptions
+- Detachable cash base: cash and equivalents plus long-term bank deposits.
+- Cash discount: 70%; loan receivables, securities, unlisted investments and inventory assigned zero detachable value.
+- Discounted detachable cash: CNY 769,194,520 × 70% = CNY 538,436,164.
+- Sustainable profit base: management-adjusted FY2025 parent profit of approximately HKD 225m,
+  multiplied by 80% and 0.92 = CNY 165,600,000.
+- Operating-business price: CNY 1,379,413,630.1869152 - CNY 538,436,164 = CNY 840,977,466.1869152.
+- Owner earnback: CNY 840,977,466.1869152 / CNY 165,600,000 = 5.0783663417 years.
+- Market-cap/cash-profit: CNY 1,379,413,630.1869152 / CNY 165,600,000 = 8.3297924528 years.
+
+7. Dividend forecast
+- FY2026 per-share components: HKD 0.053 interim + HKD 0.155 interim special
+  + HKD 0.040 proposed final + HKD 0.123 proposed final special = HKD 0.371.
+- Forecast cash dividend: HKD 0.371 × 487,358,224 shares × 0.92 = CNY 166,345,109.016.
+- Forecast yield: CNY 166,345,109.016 / CNY 1,379,413,630.1869152 = 12.0591%.
+- Caveat: final and final-special components were proposed and subject to shareholder approval at research date.
+
+8. Protocol write and validation
+- All result branches were written via stock_analysis.stock_research.protocol set calls from outputs/build_result.py.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[].
+
+9. Known limitations
+- Protocol period 2025-12-31 does not match the issuer's 31 March fiscal year-end; FY2025 annual statements are the core filing.
+- Fixed HKD/CNY conversion is an analytical normalization, not transaction-date translation.
+- Market-cap and PE fields are inherited from the supplied Tencent snapshot.
+- Discounted cash and sustainable cash profit are analyst assumptions, not issuer-reported measures.

@@ -1,0 +1,60 @@
+stock-research trace
+generated_for=02657.HK
+period=2025-12-31
+timezone=Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar fields with protocol `set`; populated rows with protocol `append`.
+5. Final validation command recorded below after file creation.
+
+[local reuse check]
+- Checked paths supplied in config/input.json.
+- No annual facts, normalized facts, filing metadata, or prior stock-research result existed in the workspace.
+- Therefore used primary public filing rather than fabricating or substituting third-party financial data.
+
+[primary sources]
+- HKEX 2025 Annual Report, published 2026-04-17:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0417/2026041700672.pdf
+  Used audited statements pp.86-92; notes 1, 5, 12, 14-25; MD&A pp.16-39; risks pp.48-50.
+- HKEX AGM Poll Results, published 2026-05-08:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0508/2026050801454.pdf
+  Used to confirm approval and distribution of the RMB0.95 per-share 2025 final dividend.
+- config/input.json market snapshot:
+  market_cap=5905383129.767776 CNY
+  market_cap_date=2026/08/03 09:30:01
+  source=Tencent qt.gtimg.cn
+  pe_ttm=17.2
+
+[model decision]
+- Input hint said financial_brokerage/requires_special_model.
+- Annual report note 1 states the group researches, manufactures, and sells skincare products.
+- Balance sheet contains ordinary consumer-operating assets and liabilities, not brokerage customer funds or trading finance.
+- Overrode hint with ordinary_operating/applicable.
+
+[financial calculations]
+- gross_margin = 2008818000 / 2449537000 = 0.8200806928003129
+- net_margin = 360367000 / 2449537000 = 0.147116373420773
+- capital_expenditure = 73173000 PPE purchases + 4771000 intangible purchases = 77944000
+- operating_free_cash_flow = 410447000 - 77944000 = 332503000
+- discounted_cash = 1541547000 * 0.80 = 1233237600
+- discounted_detachable_net_cash = 1233237600 - 62384000 bank borrowings - 91393000 lease liabilities = 1079460600
+- discounted_sustainable_cash_profit = 332503000 * 0.85 = 282627550
+- operating_business_price = 5905383129.767776 - 1079460600 = 4825922529.767776
+- owner_earnback_years = 4825922529.767776 / 282627550 = 17.075202080504095
+- market_cap_to_cash_profit = 5905383129.767776 / 282627550 = 20.89457708481631
+- forecast_dividend_yield = 134671273.25 / 5905383129.767776 = 0.022804832521560008
+
+[judgment boundaries]
+- 80% cash recognition is an analytical haircut because year-end cash includes IPO proceeds and future expansion needs.
+- 15% free-cash-flow haircut reflects one-year hypergrowth, marketing dependence, inventory build, and expansion capex uncertainty.
+- No buy/sell recommendation or target price was produced.
+- Company-stated category ranking was labelled as company disclosure and not extrapolated to total skincare market share.
+
+[validation]
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}
+- JSON parse check: passed.

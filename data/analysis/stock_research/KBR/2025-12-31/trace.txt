@@ -1,0 +1,44 @@
+[2026-08-05T00:42:56+08:00] Initialized outputs/result.json with protocol CLI:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+[source-reuse] Checked configured annual-review, normalized-facts, raw-filing and prior stock-research paths. No KBR 2025 local facts package, filing metadata or prior result existed. Checked stock_report/data/notes/user_stock_evaluations.md; no KBR entry found.
+
+[primary-source] Retrieved KBR 2025 Form 10-K filed 2026-02-26, accession 0001357615-26-000051, fiscal year ended 2026-01-02:
+https://www.sec.gov/Archives/edgar/data/1357615/000135761526000051/kbr-20260102.htm
+Local research copy: stock_report/data/raw/filings/KBR/2025-12-31/kbr-20260102.htm
+
+[primary-source] Used KBR FY2025 results release dated 2026-02-26 for management discussion, 2026 guidance, backlog, net leverage and planned spin context:
+https://investors.kbr.com/news-and-events/news/news-details/2026/KBR-Reports-Fourth-Quarter-and-Fiscal-2025-Results/default.aspx
+
+[primary-source] Used KBR dividend declaration dated 2026-05-14 to confirm quarterly dividend of USD 0.165 per share:
+https://investors.kbr.com/news-and-events/news/news-details/2026/KBR-Dividend-Declaration-60dfe8a2b/default.aspx
+
+[market-source] Reused input snapshot: market cap CNY 31,144,318,659.944824 as of 2026-08-03 and PE TTM 11.027109, source Yahoo Finance yfinance. The input did not include original USD market cap or conversion rate.
+
+[model] Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable. Rationale: KBR is a capital-light professional/technology service contractor; fixed-price contracts are about 28% of revenue, PPE is only USD 232m, and there is no construction-developer inventory/project-financing balance-sheet structure. Receivables, contract assets and contract liabilities remain operating working capital and were excluded from detachable cash.
+
+[currency] Converted all filing USD amounts to CNY at a stated research convention of USD/CNY 7.00. This convention is a limitation because the input market-cap conversion rate is unavailable. Ratios calculated wholly from filing amounts are invariant to this convention; cross-date CNY values retain FX sensitivity.
+
+[financial extraction] Form 10-K values, USD millions: assets 6,584; liabilities 5,072; total equity 1,512; KBR equity 1,503; NCI 9; revenue 7,786; cost of revenue 6,636; gross profit 1,150; operating income 778; consolidated net income 403; KBR net income 415; continuing operating cash flow 557; capex 42; financing cash flow -403; dividends 84; repurchases 329.
+
+[cash-profit] Continuing FCF calculations, USD millions:
+2023: 301 OCF - 62 capex = 239.
+2024: 450 OCF - 52 capex = 398.
+2025: 557 OCF - 42 capex = 515.
+Three-year mean = 384. Applied 10% sustainability haircut = 345.6, converted to CNY 2,419,200,000.
+
+[net-cash] USD millions: cash 500 x 80% = 400; current debt 49 + long-term debt 2,547 = 2,596 deducted at 100%; discounted detachable net cash = -2,196, converted to CNY -15,372,000,000. Receivables, contract assets, equity-method interests and lease assets/liabilities were treated as operating rather than detachable cash.
+
+[formulas] Operating business price = 31,144,318,659.944824 - (-15,372,000,000) = 46,516,318,659.944824 CNY. Owner earnback = 46,516,318,659.944824 / 2,419,200,000 = 19.2288129403 years. Market cap/cash profit = 12.8738937940. Discounted net cash/market cap = -0.4935705973.
+
+[dividend] Annualized dividend = USD 0.66/share x 126,454,289 fiscal-year-end shares = USD 83,459,830.74; x 7.00 = CNY 584,218,815.18; yield = 0.0187584394.
+
+[protocol] Populated initialized result through repeated protocol CLI set commands in a temporary helper script; did not replace the initialized object with a hand-written JSON document. The helper was removed after successful validation.
+
+[validation] First completed validation:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Result: {"status":"ok","errors":[]}
+
+[validation] Final validation after report and dividend precision check:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Result: {"status":"ok","errors":[]}

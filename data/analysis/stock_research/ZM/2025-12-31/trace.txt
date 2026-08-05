@@ -1,0 +1,85 @@
+stock-research trace
+generated_at=2026-08-04 Asia/Shanghai
+query=ZM
+input=config/input.json
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read result-contract.md, report-contract.md, and data-reuse.md.
+3. Initialized outputs/result.json using:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated all result fields using protocol `set`; no complex JSON result was hand-written from scratch.
+
+[reuse-check]
+- Requested annual facts paths and prior stock-research paths did not exist in the workspace.
+- Returned to primary filing sources because all core fields were missing.
+
+[primary-sources]
+- SEC submissions API identified FY2026 Form 10-K:
+  filing_date=2026-02-27
+  report_date=2026-01-31
+  accession=0001585521-26-000030
+  url=https://www.sec.gov/Archives/edgar/data/1585521/000158552126000030/zm-20260131.htm
+- SEC Companyfacts:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0001585521.json
+- U.S. Treasury Reporting Rates of Exchange:
+  country=China; currency=Renminbi; record_date=2025-12-31; USD/CNY=6.998
+- Market cap and PE: supplied input snapshot, Yahoo Finance yfinance, date=2026-08-03.
+
+[period-resolution]
+- Input period is 2025-12-31.
+- Zoom fiscal year ends January 31. Used FY2026 Form 10-K ended 2026-01-31 because it is the annual filing that most closely covers the requested research period.
+- This one-month mismatch is disclosed in result.json and report.md.
+
+[model-check]
+- Confirmed ordinary_operating.
+- Zoom sells cloud software subscriptions and does not have customer deposits, insurance reserves, property projects, concession assets, or other special-model balance-sheet structures.
+- Deferred revenue is a service performance obligation, not conventional interest-bearing debt.
+- Ordinary owner earnback is applicable.
+
+[core-usd-facts FY2026]
+assets=11960416000
+liabilities=2152158000
+parent_equity=9808258000
+revenue=4868769000
+cost_of_revenue=1119036000
+gross_profit=3749733000
+operating_income=1123633000
+parent_net_income=1900148000
+operating_cash_flow=1989048000
+capex=64961000
+free_cash_flow=1924087000
+financing_cash_flow=-1805358000
+share_repurchases=1620691000
+share_based_compensation=760776000
+cash_and_equivalents=1272877000
+marketable_securities=6544031000
+lease_liabilities=58475000
+strategic_investments=1578611000
+
+[currency]
+- All statement values converted to CNY yuan at 6.998.
+- Market cap was already supplied in CNY and was not converted again.
+
+[owner-earnback]
+discounted_net_cash = cash*100% + marketable_securities*95% - lease_liabilities*100%
+                    = CNY 52003757687.10
+strategic_investments_discount=0% due to uncertain realizability
+reported_fcf=CNY 13464760826.00
+less_sbc=CNY 5323910448.00
+post_sbc_cash_profit=CNY 8140850378.00
+sustainability_discount=10%
+discounted_cash_profit=CNY 7326765340.20
+operating_business_price=market_cap-discounted_net_cash=CNY 138092936949.33
+owner_earnback_years=operating_business_price/discounted_cash_profit=18.8477357384
+market_cap_to_cash_profit=market_cap/discounted_cash_profit=25.9455142631
+
+[dividend]
+- Form 10-K states Zoom has never declared or paid cash dividends and does not expect to pay them in the foreseeable future.
+- forecast_cash_dividend=0; forecast_dividend_yield=0.
+- Buybacks are disclosed separately and are not treated as proportional cash dividends.
+
+[validation]
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}
+- jq parse check passed; report.md and trace.txt non-empty checks passed.

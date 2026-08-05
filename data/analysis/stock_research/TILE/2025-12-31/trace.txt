@@ -1,0 +1,58 @@
+TILE stock research trace
+generated: 2026-08-05 Asia/Shanghai
+
+1. Protocol and local reuse
+- Read stock-research/SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Checked configured annual-review, normalized-facts and raw-filing paths. No TILE files existed locally, so official public sources were required.
+- Populated result.json only through protocol `set` commands after initialization; did not hand-write the JSON skeleton.
+
+2. Primary sources
+- SEC Form 10-K, accession 0000715787-26-000006, filed 2026-02-25, fiscal year ended 2025-12-28:
+  https://www.sec.gov/Archives/edgar/data/715787/000071578726000006/tile-20251228.htm
+- Interface dividend release, 2026-05-19; confirms quarterly $0.03 per share. The 2026-02-24 release also states the increase from $0.02 to $0.03:
+  https://investors.interface.com/news/news-details/2026/Interface-Declares-Regular-Quarterly-Dividend/default.aspx
+- Federal Reserve H.10 release dated 2025-12-29; 2025-12-26 China yuan rate = 7.0063 currency units per USD:
+  https://www.federalreserve.gov/releases/h10/20251229/
+- Valuation fields were supplied by config/input.json: market cap CNY 13,421,806,406.211182, date 2026-08-03, Yahoo Finance yfinance; PE TTM 16.009344.
+
+3. Model classification
+- Fact: Company manufactures/sells modular carpet and rubber flooring, sources LVT, and provides flooring services. Balance sheet consists of ordinary cash, receivables, inventory, PP&E, goodwill/intangibles, payables, leases and borrowings.
+- Inference: statement_model = ordinary_operating and owner_earnback_applicability = applicable. No financial customer balances, insurance reserves, regulated project cash, development inventory, concession right or holding-company structure was found.
+
+4. USD source facts (thousands unless noted)
+- Revenue 1,386,854; cost of sales 849,474; gross profit calculated 537,380; operating income 163,995; net income 116,098.
+- Total assets 1,206,522; total liabilities 565,848; equity 640,674. No noncontrolling interest line; parent equity = total equity, minority interest = 0.
+- Cash 71,323; accounts receivable 174,457; inventory 275,014; net PP&E 309,449; operating lease ROU assets 78,191; goodwill 112,127; intangibles 50,885.
+- Debt: current 8,778 + long-term 172,801 = 181,579.
+- Accounts payable 64,768 + accrued expenses 147,770 = 212,538.
+- Lease liabilities: current 15,748 + long-term 67,205 = 82,953.
+- Operating cash flow 167,906; capex 46,192; free cash flow 121,714.
+- Share-based compensation 14,385; dividends paid 3,559; repurchases 18,175; financing cash flow -159,292.
+- Shares outstanding at 2025 year-end: 57,891,000.
+
+5. Currency conversion
+- All filing amounts use one deterministic rate: USD amount x 7.0063 = CNY amount.
+- This uses a closing rate even for income/cash-flow amounts. It improves cross-field reproducibility but differs from a conventional annual-average translation. Ratios calculated within the same USD reporting set are unchanged.
+
+6. Formula checks and judgments
+- Gross margin = 537,380 / 1,386,854 = 0.3874799301.
+- Net margin = 116,098 / 1,386,854 = 0.0837122750.
+- Judgment: only 50% of cash counted as detachable because 10-K says most cash is outside the U.S. and treated as indefinitely reinvested, and operations require liquidity.
+- Discounted detachable net cash = (71.323m x 50% - 181.579m) USD x 7.0063 = CNY -1,022,341,780.25.
+- Statutory operating FCF = (167.906m - 46.192m) USD x 7.0063 = CNY 852,764,798.20.
+- Judgment: deduct share-based compensation as an economic dilution cost.
+- Sustainable cash profit = (121.714m - 14.385m) USD x 7.0063 = CNY 751,979,172.70.
+- Operating business price = market cap - discounted net cash = CNY 14,444,148,186.461182.
+- Owner earnback years = 14,444,148,186.461182 / 751,979,172.70 = 19.2081758523.
+- Market cap / cash profit = 13,421,806,406.211182 / 751,979,172.70 = 17.8486411506.
+- Forecast dividend = $0.03 x 4 x 57,891,000 x 7.0063 = CNY 48,672,205.596.
+- Forecast yield = 48,672,205.596 / 13,421,806,406.211182 = 0.0036263528.
+
+7. Quality and validation
+- Fiscal year ended 2025-12-28 rather than literal input date 2025-12-31; disclosed in result and report.
+- No precise independently verified market-share statistic was used. Industry position is explicitly framed as company characterization plus disclosed competitive context.
+- Cash haircut and sustainable-profit adjustment are judgments, not filing facts.
+- Final protocol validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

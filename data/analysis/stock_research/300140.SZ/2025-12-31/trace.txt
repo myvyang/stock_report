@@ -1,0 +1,68 @@
+stock-research trace
+company: 300140.SZ 节能环境
+period: 2025-12-31 annual
+generated_at: 2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated initialized paths with repeated protocol `set` commands; the result was not created as a hand-written JSON document.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: {"status":"ok","errors":[]}
+
+[reuse check]
+- Expected annual facts and normalized facts paths in config/input.json did not exist in the workspace.
+- No prior stock-research output existed for this company/period.
+- Returned to the official annual filing as required by data-reuse.md.
+
+[primary filing]
+title: 中节能环境保护股份有限公司2025年年度报告
+issuer: 中节能环境保护股份有限公司
+filing date: 2026-04-03
+source: Shenzhen Stock Exchange
+url: https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-03/9693cad2-142d-4eb6-b8b5-a8e6c02cc299.PDF
+local copy: stock_report/data/raw/filings/300140.SZ/2025-12-31/annual-report-2025.pdf
+
+[extraction map]
+- Annual report p.8: revenue, parent net profit, operating cash flow, total assets, parent equity, quarterly results.
+- pp.11-18: BOO/BOT model, 25-30 year concession term, segment revenue/margins, waste volume, electricity and heat volumes, customer concentration, cost composition.
+- p.22: major asset and liability movements.
+- p.41: 2025 final dividend proposal, CNY 185,944,020.96.
+- pp.101-103: consolidated balance sheet.
+- pp.105-107: consolidated income statement.
+- pp.108-110: consolidated and parent cash flow statements.
+- p.154: accounts receivable gross balance and impairment allowance.
+- pp.180-182: intangible assets, including concession rights.
+- p.188: restricted assets.
+- pp.194-195: long-term borrowings and long-term payables.
+- pp.197 and 208-210: dividends, debt changes, cash-flow reconciliation and restricted cash.
+
+[market data]
+market cap: 17,262,000,000 CNY
+PE TTM: 18.97
+as of: 2026-07-31 11:43:24 Asia/Shanghai
+source: Tencent qt.gtimg.cn, supplied by config/input.json
+
+[calculations]
+gross_profit = 5,987,380,008.88 - 3,802,404,588.77 = 2,184,975,420.11
+gross_margin = 2,184,975,420.11 / 5,987,380,008.88 = 0.3649216446
+net_margin = 871,168,510.25 / 5,987,380,008.88 = 0.1454991246
+operating_free_cash_flow = 2,199,976,148.00 - 540,366,425.33 = 1,659,609,722.67
+forecast_dividend_yield = 185,944,020.96 / 17,262,000,000 = 0.0107729996
+minority_interest_ratio = 410,576,088.83 / 14,446,581,107.53 = 0.028419 (rounded)
+receivables exposure = accounts receivable 5,019,983,630.24 + contract assets 1,428,512,975.60 = 6,448,496,605.84
+
+[model decision]
+Input hint ordinary_operating was overridden by filing evidence.
+Selected statement_model: utility_concession.
+Selected owner_earnback_applicability: requires_special_model.
+Reason: 84.71% of revenue is solid-waste integrated treatment; core projects are 25-30 year BOO/BOT concessions. Concession assets, fixed assets, project debt and operating cash are economically linked.
+Consequence: discounted net cash, discounted cash profit, operating business price, ordinary owner earnback years and market-cap/cash-profit fields remain null.
+
+[limitations]
+- The annual report does not provide a complete project-level schedule of remaining concession years, treatment fees, tariffs, maintenance capex and matched debt amortization.
+- The market snapshot is an input datum and was not independently reconstructed from exchange trade data.
+- The 2025 final dividend is a board proposal and remains subject to shareholder approval and implementation disclosure.

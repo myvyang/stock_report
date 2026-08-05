@@ -1,0 +1,44 @@
+task: stock research 09878.HK, FY2025 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+protocol:
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields through protocol set/append commands; did not construct result.json manually.
+5. Validated with protocol validate. Initial completed result returned status=ok and errors=[].
+
+local_reuse_check:
+- Searched config, stock_report and outputs.
+- No raw filing, annual facts, normalized facts or prior stock-research result existed for 09878.HK/2025-12-31.
+- Only config/input.json and stock_report/data/notes/user_stock_evaluations.md were present.
+
+primary_source_retrieval:
+- HKEX title search for stock 09878 identified Annual Report 2025, released 2026-04-28.
+- Official PDF: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042801935.pdf
+- Saved source PDF locally at stock_report/data/raw/filings/09878.HK/2025-12-31/annual-report-2025.pdf.
+- Browser-extracted annual-report lines/pages used: chairman/MD&A pp.8-21; audited statements pp.92-99; revenue note pp.126-127; expense note pp.130-132; financial assets note p.150; receivables/prepayments notes pp.151-154; deposits and cash-flow notes pp.154-160; dividends/treasury shares pp.174-175.
+
+model_review:
+- Input hint financial_brokerage rejected.
+- Annual report Note 1 says principal activities are merchandise sales, subscription marketing, merchant solutions and related services.
+- No brokerage client money, proprietary securities financing structure or repurchase liabilities were found.
+- Final model: ordinary_operating; owner earnback applicability: applicable.
+
+key_calculations (CNY):
+- gross_margin = 2,331,529,000 / 52,297,458,000 = 0.044582071273903984.
+- net_margin = 300,294,000 / 52,297,458,000 = 0.005742038169426897.
+- operating_free_cash_flow = 418,971,000 - 28,200,000 = 390,771,000. Capex uses management's total disclosed figure; cash purchase of PPE in the cash-flow statement was 22,196,000.
+- unpledged_structured_deposits_and_wealth = 4,348,753,000 - 1,883,000,000 = 2,465,753,000.
+- discounted_detachable_net_cash = cash 2,543,239,000*50% + time deposits 300,000,000*90% + unpledged structured deposits/wealth 2,465,753,000*70% - financing/lease/minority loans 665,925,000 = 2,601,721,600.
+- operating_business_price = 3,640,144,393.965602 - 2,601,721,600 = 1,038,422,793.9656019.
+- discounted_sustainable_cash_profit = 250,000,000, an analyst haircut from parent net profit 300,294,000 for working-capital volatility, impairment and cash attribution uncertainty.
+- owner_earnback_years = 1,038,422,793.9656019 / 250,000,000 = 4.1536911758624075.
+- market_cap_to_cash_profit = 3,640,144,393.965602 / 250,000,000 = 14.560577575862407.
+- forecast dividend = 0; 2025 annual report states directors proposed no dividend for FY2024 and FY2025.
+
+limitations:
+- Market cap and PE were accepted from the task's Tencent quote snapshot and not independently recomputed.
+- Cash haircuts and sustainable cash profit are analyst estimates, fully explained in result.json and report.md.
+- No adjustment for announcements after 2026-08-03.

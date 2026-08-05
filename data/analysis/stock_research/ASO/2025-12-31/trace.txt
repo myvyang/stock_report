@@ -1,0 +1,60 @@
+stock-research trace — ASO — generated 2026-08-05 Asia/Shanghai
+
+1. Read protocol and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+   - config/input.json existed.
+   - No local annual facts, normalized facts, filing metadata, or prior stock-research outputs existed for ASO/2025-12-31.
+   - Returned to primary filing sources as required by the reuse policy.
+
+3. Protocol initialization
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Primary sources retrieved/read
+   - SEC 10-K HTML: https://www.sec.gov/Archives/edgar/data/1817358/000181735826000031/aso-20260131.htm
+     accession 0001817358-26-000031; filed 2026-03-17; FY ended 2026-01-31.
+     Local copy: stock_report/data/raw/filings/ASO/2025-12-31/aso-20260131.htm
+   - SEC Companyfacts: https://data.sec.gov/api/xbrl/companyfacts/CIK0001817358.json
+   - Company FY2025 results: https://investors.academy.com/news-releases/news-release-details/academy-sports-outdoors-reports-fourth-quarter-and-fiscal-2025
+   - Company dividend release: https://investors.academy.com/news-releases/news-release-details/academy-sports-outdoors-increases-quarterly-cash-dividend-2
+   - Market valuation: supplied by config/input.json, source Yahoo Finance yfinance, date 2026-08-03.
+
+5. Period/model resolution
+   - Input period 2025-12-31 treated as research anchor.
+   - Latest released annual report covering the anchor is retail FY2025 ended 2026-01-31.
+   - Model confirmed ordinary_operating; owner earnback applicable.
+   - Operating lease liabilities excluded from detachable-net-cash debt because lease rent is already reflected in operating earnings/cash flow; interest-bearing debt is deducted in full.
+
+6. Currency normalization
+   - Filing currency USD; output contract requires CNY absolute yuan.
+   - USD/CNY 6.7682 used consistently for statement, asset, cash-profit, and dividend translations.
+   - Input market cap was retained unchanged as CNY per protocol input.
+
+7. Core source facts (USD)
+   - Revenue 6,053,414,000; gross profit 2,105,613,000; operating income 512,184,000; net income 376,768,000.
+   - Assets 5,277,036,000; liabilities 3,105,659,000; equity 2,171,377,000.
+   - CFO 434,798,000; capex 212,668,000; FY2025 FCF 222,130,000.
+   - Cash 330,320,000; current debt 3,000,000; long-term debt 480,793,000; inventory 1,503,756,000.
+   - FY2025 dividends 34,657,000; common-stock repurchases 198,978,000.
+
+8. Derived methods
+   - Gross margin = 2,105,613,000 / 6,053,414,000 = 34.7839%.
+   - Net margin = 376,768,000 / 6,053,414,000 = 6.2241%.
+   - Detachable net cash = (330,320,000 - 483,793,000) * 6.7682 = -1,038,735,958.60 CNY.
+   - FY2023–FY2025 average FCF = average(CFO) - average(capex) = 292,877,333.33 USD.
+   - Discounted sustainable cash profit = average FCF * 90% * 6.7682 = 1,784,027,130.72 CNY.
+   - Operating business price = market cap - discounted net cash = 20,896,559,897.76 CNY.
+   - Owner earnback = operating business price / discounted cash profit = 11.7131 years.
+   - Forecast dividend = 0.15 * 4 * 64,383,459 * 6.7682 = 261,456,076.32 CNY; yield = 1.3166%.
+
+9. Protocol population
+   - All result fields were written using repeated `protocol set` calls against the initialized result; no result object was constructed from scratch.
+
+10. Validation
+   Command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Output: {"status":"ok","errors":[]}

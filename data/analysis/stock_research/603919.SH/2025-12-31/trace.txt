@@ -1,0 +1,71 @@
+stock-research trace
+company: 金徽酒（603919.SH）
+period: 2025-12-31 annual
+generated_at_input: 2026-08-01T03:41:43+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the configured raw filing, annual review, normalized facts, and prior stock research directories.
+- No reusable filing, annual facts package, normalized facts, or prior research result existed for 603919.SH/2025-12-31 at the start of this task.
+
+3. Primary filing acquisition
+- Located the official 2025 annual report disclosure dated 2026-03-20.
+- Downloaded the PDF from the CNINFO-hosted Shanghai disclosure mirror:
+  https://dataclouds.cninfo.com.cn/shgonggao/hsomarket/2026/20260320/5cd8afc6aa00495cb76afb302cab8724.PDF
+- Saved to stock_report/data/raw/filings/603919.SH/2025-12-31/annual-report-2025.pdf.
+- Extracted 225 pages locally to annual-report-2025.txt using pypdf in a temporary virtual environment because no system PDF text extractor was installed.
+
+4. Filing sections used
+- Annual report pp. 2-3: audit status, 2025 interim dividend, annual dividend proposal, buyback.
+- pp. 8-10: three-year headline financials, quarterly data, non-recurring items.
+- pp. 11-14: products, production process, procurement, sales channels, strategy.
+- pp. 17-21: revenue, costs, expenses, product/region/channel splits and volumes.
+- pp. 28-33: industry data, capacity, inventory volume, distributor count, online sales.
+- pp. 83-93: audited consolidated balance sheet, income statement and cash flow statement.
+- pp. 139, 152-154: cash restrictions and inventory composition.
+- pp. 174-179: borrowings, payables and contract liabilities.
+- pp. 185-186: taxes and sales expense composition.
+- pp. 193-194: cash-flow reconciliation and cash-equivalent composition.
+- pp. 213-214: post-balance-sheet dividend detail.
+
+5. Model decision
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: merchandise revenue is recognized on delivery; cash, inventory, productive assets, customer advances, and bank borrowings have ordinary operating-company meanings. No banking, brokerage, insurance, property development, concession, construction-project, or holding-company balance-sheet model applies.
+
+6. Core calculations
+- Gross profit = 2,918,472,595.78 - 1,074,912,757.42 = 1,843,559,838.36.
+- Gross margin = 1,843,559,838.36 / 2,918,472,595.78 = 0.6316865339.
+- Net margin = 354,386,738.61 / 2,918,472,595.78 = 0.1214288389.
+- Operating free cash flow = 480,139,995.41 - 394,779,170.19 = 85,360,825.22.
+- Debt deducted = 169,308,397.44 short-term + 27,057,500.00 current long-term + 123,419,625.88 long-term = 319,785,523.32.
+- Discounted cash = (990,288,889.74 - 200,000.00 restricted guarantee) * 70% = 693,062,222.818.
+- Discounted detachable net cash = 693,062,222.818 - 319,785,523.32 = 373,276,699.498.
+- Sustainable cash profit starts from parent net profit 354,386,738.61 and applies a 54,386,738.61 safety deduction (15.35%) for declining revenue/profit, rising selling expense, and industry/channel uncertainty, giving 300,000,000.
+- Operating business price = 8,436,000,000 - 373,276,699.498 = 8,062,723,300.502.
+- Owner earnback years = 8,062,723,300.502 / 300,000,000 = 26.8757443350.
+- Market cap / cash profit = 8,436,000,000 / 300,000,000 = 28.12.
+- Forecast dividend = 99,366,210.80 interim + approximately 149,049,316.20 annual = 248,415,527.00.
+- Forecast dividend yield = 248,415,527 / 8,436,000,000 = 0.0294470753.
+
+7. Judgment boundaries
+- Inventory is treated as an operating asset, not detachable cash, because RMB 1.480bn is semi-finished liquor and production requires aging.
+- Contract liabilities and related output tax are treated as fulfillment obligations, not financial debt, but they support the 30% cash haircut.
+- Full reported capex is not assumed to be recurring maintenance capex because the filing identifies an active industrial-park expansion. Conversely, it is not ignored: the cash-profit estimate is below reported parent profit and report text flags the low 2025 free cash flow.
+- No terminal growth, target price, or buy/sell recommendation was used.
+
+8. Output construction and validation
+- Populated outputs/result.json using protocol set and append commands; did not hand-write the complete JSON object.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok, errors: [].
+
+9. Data limitations
+- Market cap and PE TTM are reused from the input Tencent quote snapshot and were not reconstructed from exchange tick data.
+- Maintenance capex is not separately disclosed.
+- Terminal channel inventory and price realization are not fully disclosed; contract-liability growth is therefore not interpreted as definitive end-demand growth.

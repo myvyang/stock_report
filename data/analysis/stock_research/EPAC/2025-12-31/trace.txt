@@ -1,0 +1,73 @@
+EPAC stock-research trace
+generated_at: 2026-08-05T03:12:23+08:00
+
+1. Read required skill and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+   - No pre-existing EPAC annual facts, normalized facts, annual review, or raw filing was present in the requested stock_report paths.
+   - Returned to primary sources rather than using third-party summaries for core statements.
+
+3. Primary filing acquired
+   - SEC FY2025 Form 10-K, accession 0000006955-25-000030, filed 2025-10-17.
+   - Source URL: https://www.sec.gov/Archives/edgar/data/6955/000000695525000030/epac-20250831.htm
+   - Local copy: stock_report/data/raw/filings/EPAC/2025-12-31/epac-20250831.htm
+   - Cross-check: Enerpac FY2025 earnings release dated 2025-10-15.
+
+4. Period resolution
+   - Input period is 2025-12-31, but EPAC fiscal 2025 ended 2025-08-31.
+   - Used the audited FY2025 10-K for annual statements and retained the input period in the protocol-required analysis field.
+   - Flagged the mismatch in data_quality.limitations and report.md.
+
+5. Model determination
+   - statement_model: ordinary_operating
+   - owner_earnback_applicability: applicable
+   - Basis: branded industrial tool manufacturing/distribution plus service and rental; no customer deposits, insurance reserves, regulated project cash, concession rights, or investment-holding structure.
+
+6. Currency treatment
+   - Filing currency: USD.
+   - Output protocol currency: CNY absolute yuan.
+   - Convenience translation used for all filing amounts: USD/CNY 7.12.
+   - Input market cap was already CNY and was not retranslated.
+   - This is a comparability convention, not transaction-date FX accounting.
+
+7. Core audited FY2025 inputs (USD thousands)
+   - Revenue 616,899; cost of sales 305,070; gross profit 311,829.
+   - Operating profit 133,471; net/parent earnings 92,749.
+   - Total assets 827,867; total liabilities 394,173; equity 433,694.
+   - Cash 151,558; current debt 7,500; long-term debt 182,168.
+   - Operating cash flow 111,284; capex 19,340; operating FCF 91,944.
+   - Financing cash flow -81,457; dividends plus buybacks 70,909.
+
+8. Formula checks before protocol validation
+   - Gross margin = 311,829 / 616,899 = 0.5054782063.
+   - Net margin = 92,749 / 616,899 = 0.1503471395.
+   - Operating FCF = 111,284 - 19,340 = USD 91,944 thousand.
+   - Discounted cash = 151,558 * 75% = USD 113,668.5 thousand.
+   - Interest-bearing debt = 7,500 + 182,168 = USD 189,668 thousand.
+   - Discounted detachable net cash = (113,668.5 - 189,668) * 7.12 = CNY -541,116,440.
+   - Sustainable cash profit = [91,944 - 13,016 SBC + 5,862 * (1 - 23.2%) restructuring] * 7.12 = CNY 594,021,713.92.
+   - Operating business price = 12,430,848,441.115723 - (-541,116,440) = CNY 12,971,964,881.115723.
+   - Owner earnback = 12,971,964,881.115723 / 594,021,713.92 = 21.8375264357 years.
+   - Market cap / cash profit = 12,430,848,441.115723 / 594,021,713.92 = 20.9265892977.
+   - Forecast dividend = USD 0.04 * 52,946,336 shares * 7.12 = CNY 15,080,160.
+   - Forecast dividend yield = 15,080,160 / 12,430,848,441.115723 = 0.00121312395.
+
+9. Protocol operations
+   - Initialized outputs/result.json with protocol CLI init; did not hand-author the JSON skeleton.
+   - Populated scalar fields with protocol CLI set.
+   - Populated assets, liabilities, cash breakdown, profit adjustments, dividend history, risks, and evidence with protocol CLI append.
+   - Final validation command and result recorded below after execution.
+
+10. Data limitations
+   - Market cap date 2026-08-03 is almost one year after FY2025 balance-sheet date.
+   - No strict same-date TTM recast was substituted into this annual task.
+   - Maintenance capex is not separately disclosed; FY2025 capex includes new headquarters build-out.
+   - Cash discount and sustainable-profit adjustments are explicit analytical judgments.
+
+11. Final protocol validation
+   - Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Result: status=ok, errors=[]

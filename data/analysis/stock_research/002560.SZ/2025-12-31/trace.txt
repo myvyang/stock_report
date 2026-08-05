@@ -1,0 +1,91 @@
+stock-research trace
+company: 河南通达电缆股份有限公司（002560.SZ）
+period: 2025-12-31
+generated_for_input: config/input.json
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read .agents/skills/stock-research/references/result-contract.md in full.
+- Read .agents/skills/stock-research/references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local-data reuse check
+- Searched stock_report for 002560.SZ.
+- No raw filing, annual facts package, normalized facts, or prior stock-research result existed in /workspace or the supplied /root/aicode sync paths.
+- The existing stock_report/data/notes/user_stock_evaluations.md was not needed for core financial facts and was not modified.
+
+3. Public filing retrieval
+- Located the 2025 annual-report disclosure dated 2026-03-31.
+- Annual-report summary (official SZSE static disclosure):
+  https://disc.static.szse.cn/disc/disk03/finalpage/2026-03-31/164dd562-16f1-40f9-8fae-e87f8beb5b24.PDF
+- Goodwill impairment test report (official SZSE static disclosure):
+  https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-03-31/8c8ffcc4-4d49-485a-83b4-28c50a6e176e.PDF
+- Full annual report retrieval/index page:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12045002&stockid=002560
+- Full annual report PDF retrieved from the page's disclosed PDF link; file size about 4.7 MB, 228 pages.
+- Extracted PDF text with pypdf in a temporary virtual environment because poppler/pdftotext was not installed. Temporary extraction was used only for read-only research and was not treated as a canonical filing store.
+
+4. Core financial facts checked against annual report
+- Revenue: 7,998,740,420.84
+- Cost of sales: 7,387,113,717.21
+- Gross profit: 611,626,703.63
+- Operating profit: 194,615,141.07
+- Net profit: 169,027,770.44
+- Parent net profit: 161,411,902.52
+- Deducted-nonrecurring parent net profit: 152,495,824.71
+- Total assets: 5,667,475,898.41
+- Total liabilities: 2,873,751,493.18
+- Total equity: 2,793,724,405.23
+- Parent equity: 2,720,256,692.63
+- Minority interest: 73,467,712.60
+- Operating cash flow: 727,037,792.14
+- Capital expenditure: 134,457,984.29
+- Operating free cash flow: 592,579,807.85
+- Financing cash flow: -293,295,737.30
+- Cash paid for distributions/dividends/interest: 42,061,649.13
+
+5. Statement-model decision
+- Confirmed ordinary_operating / applicable.
+- Reason: revenue comes from manufactured-product sales and machining services; all sales are direct; operating segments are cable, machining, aluminum material, and material sales; contract assets were zero.
+- Not classified as construction_project because the company is a product supplier rather than a contractor whose balance sheet is dominated by contract assets/project advances.
+
+6. Owner-earnback calculations
+- Market cap: 4,463,000,000.00 from config/input.json; snapshot 2026-07-31 11:43:15; source Tencent qt.gtimg.cn.
+- Unrestricted cash/cash equivalents at 100%: 900,362,744.61.
+- Bank wealth-management product at 90%: 39,948,000.00 * 0.90 = 35,953,200.00.
+- Restricted guarantee deposits at 0%: 655,951,018.05 * 0 = 0.
+- Less short-term borrowings: 890,774,118.16.
+- Less long-term borrowings including current portion: 274,008,282.87 + 92,193,483.05 = 366,201,765.92.
+- Less lease liabilities including current portion: 20,691,175.04 + 14,160,521.79 = 34,851,696.83.
+- Discounted detachable net cash:
+  900,362,744.61 + 35,953,200.00 - 890,774,118.16 - 366,201,765.92 - 34,851,696.83
+  = -355,511,636.30.
+- Operating business price:
+  4,463,000,000.00 - (-355,511,636.30) = 4,818,511,636.30.
+- Sustainable cash profit judgment:
+  parent net profit 161,411,902.52
+  less nonrecurring items 8,916,077.81
+  less prudence/rounding buffer 2,495,824.71
+  = 150,000,000.00.
+- Prudence reason: 2025 operating cash flow included a 669,983,181.18 increase in operating payables; capex of 134,457,984.29 exceeded depreciation/amortization of about 91,247,835.12. The single-year free cash flow was therefore not used as sustainable profit.
+- Owner earnback years: 4,818,511,636.30 / 150,000,000 = 32.1234109087.
+- Market cap / cash profit: 4,463,000,000 / 150,000,000 = 29.7533333333.
+
+7. Dividend calculation
+- 2025 proposal: CNY 1.00 per 10 shares on 523,832,763 eligible shares.
+- Forecast cash dividend: 52,383,276.30.
+- Forecast dividend yield: 52,383,276.30 / 4,463,000,000 = 0.0117372342 (1.17%).
+- The proposal may be adjusted if the share base changes before implementation.
+
+8. Protocol population and validation
+- Populated outputs/result.json using repeated protocol CLI `set` commands; the complex result object was not handwritten from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result after population: {"status":"ok","errors":[]}.
+
+9. Known limitations
+- No prebuilt annual facts package was available locally.
+- Market capitalization and PE TTM were accepted from the task input and were not independently reconstructed.
+- Sustainable cash profit is an analyst normalization, not management guidance; working-capital volatility is material.
+- Dividend is a board proposal as disclosed in the annual report.

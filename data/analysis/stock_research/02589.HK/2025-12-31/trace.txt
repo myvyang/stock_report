@@ -1,0 +1,97 @@
+stock-research trace
+task: 02589.HK / AUNTEA JENNY
+period: 2025-12-31 annual
+generated: 2026-08-04 Asia/Shanghai
+
+1. Required instructions read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- /workspace/AGENTS.md
+
+2. Local reuse audit
+- Checked configured raw filing, annual review, normalized facts and prior stock research paths.
+- No filing, facts package, normalized facts or historical stock research existed locally for this issuer/period.
+- Therefore obtained the official filing from HKEX rather than substituting third-party summaries.
+
+3. Primary documents
+- HKEX issuer disclosure index:
+  https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&market=SEHK&stockId=1000254488
+- 2025 Annual Report, released 2026-04-28:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042804495.pdf
+- The annual report carries an Ernst & Young audit report dated 2026-03-24.
+- Valuation snapshot was taken from config/input.json: Tencent qt.gtimg.cn, 2026/08/03 09:47:40.
+
+4. Analysis-model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Annual report business facts: franchised freshly-made beverages; revenue from goods sold to franchisees, franchising services and self-operated stores.
+- No brokerage client money, securities dealing book, margin finance or repo liabilities were present.
+- Override: ordinary_operating / applicable.
+
+5. Audited statement extraction (RMB yuan)
+- Revenue: 4,465,644,000 (annual report p.81)
+- Cost of sales: 3,061,415,000 (p.81)
+- Gross profit: 1,404,229,000 (p.81)
+- Profit before tax: 675,468,000 (p.81)
+- Finance costs: 4,217,000 (p.81); operating_profit field set to PBT + finance costs = 679,685,000
+- Profit attributable to parent: 501,317,000 (p.81)
+- Total assets: 2,981,426,000 (p.83-84)
+- Total equity / parent equity: 1,925,103,000 (p.84)
+- Total liabilities derived as assets - equity: 1,056,323,000
+- Operating cash flow: 752,983,000 (p.87)
+- PPE purchases: 24,619,000; intangible purchases: 4,977,000 (p.88)
+- Capital expenditure: 29,596,000
+- Operating free cash flow: 752,983,000 - 29,596,000 = 723,387,000
+- Financing cash flow: 185,464,000 (p.88)
+- 2025 cash-flow-statement dividends paid: 0; 2025 interim dividend was paid on 2026-02-04.
+
+6. Formula checks
+- Gross margin = 1,404,229,000 / 4,465,644,000 = 0.3144487061
+- Net margin = 501,317,000 / 4,465,644,000 = 0.1122597576
+- Forecast dividend = 71,117,242 interim + 105,203,020 final = 176,320,262
+- Forecast dividend yield = 176,320,262 / 9,385,485,913.89954 = 0.0187864823
+
+7. Detachable cash judgment
+- Cash and cash equivalents: 1,208,354,000 at 100% = 1,208,354,000
+- Short + long time deposits: 331,889,000 at 95% = 315,294,550
+- Current/non-current FVTPL financial assets: 707,581,000 at 85% = 601,443,850
+- FVOCI financial investment: 73,968,000 at 50% = 36,984,000
+- Less bank debt 2,000,000 and lease liabilities 92,428,000 at 100% = -94,428,000
+- Less operating liquidity reserve = -300,000,000
+- Discounted detachable net cash = 1,767,648,400
+- Restricted cash 4,506,000 excluded rather than counted.
+- Inventory, receivables and other operating assets excluded from detachable cash.
+
+8. Sustainable cash-profit judgment
+- Starting audited parent profit: 501,317,000
+- Add one-off listing expense: +11,648,000
+- Share-based payment 57,368,000 not added back because dilution is an owner cost.
+- Normalize down by 62,965,000 for expansion-stage working-capital release and franchise quality uncertainty.
+- Discounted sustainable cash profit: 450,000,000.
+- Supporting caution: trade payables +123,123,000, other payables/accruals +131,842,000 and contract liabilities +93,634,000 contributed about 348,599,000 to operating cash flow in 2025.
+
+9. Owner earnback
+- Market cap: 9,385,485,913.89954
+- Operating business price = market cap - discounted net cash = 7,617,837,513.89954
+- Owner earnback years = 7,617,837,513.89954 / 450,000,000 = 16.9285278087
+- Market cap / cash profit = 9,385,485,913.89954 / 450,000,000 = 20.8566353642
+- Discounted net cash / market cap = 0.1883385659
+
+10. Operating evidence
+- 2025 year-end stores: 11,449; franchised: 11,423; self-operated: 26.
+- New franchised stores: 3,654; closed franchised stores: 1,383.
+- Franchisee goods revenue: 3,616,601,000; franchise services: 690,394,000; self-operated stores: 55,658,000.
+- Third-tier and lower cities: 52.7% of stores.
+
+11. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields using repeated protocol set commands; complex JSON was not handwritten from a blank file.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].
+
+12. Limitations
+- Market positioning depends on issuer-cited CIC research and issuer store data; no independent industry database was obtained.
+- Market cap and PE were accepted from the supplied Tencent snapshot and not reconstructed from shares outstanding or FX.
+- Haircuts, RMB300m liquidity reserve and RMB450m sustainable cash profit are explicit analytical judgments, not audited facts.

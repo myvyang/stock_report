@@ -1,0 +1,56 @@
+stock-research trace — FFIN — period 2025-12-31
+generated_at: 2026-08-05T03:37:51+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the skill routes reuse decisions through this reference.
+- Initialized outputs/result.json with the protocol CLI:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- Checked the configured raw filing, annual review, normalized facts, and prior stock-research paths.
+- No FFIN 2025 filing or annual fact package existed locally; only the user evaluation notes file was present.
+- Conclusion: official-source retrieval was required.
+
+3. Primary-source retrieval
+- SEC filing: Form 10-K for FY ended 2025-12-31, accession 0001193125-26-071549, filed 2026-02-25.
+  URL: https://www.sec.gov/Archives/edgar/data/36029/000119312526071549/ffin-20251231.htm
+  Saved: stock_report/data/raw/filings/FFIN/2025-12-31/ffin-20251231.htm
+- SEC Company Facts for CIK 0000036029.
+  URL: https://data.sec.gov/api/xbrl/companyfacts/CIK0000036029.json
+  Saved: stock_report/data/raw/filings/FFIN/2025-12-31/companyfacts.json
+- Company IR 2025 earnings release, dividend history, and Q2 2026 earnings release used for cross-checks and latest declared dividend.
+- ECB 2025-12-31 reference rates used to cross-convert EUR/CNY 8.2262 and EUR/USD 1.1750, yielding USD/CNY approximately 7.001.
+
+4. Model decision
+- Input hint ordinary_operating/applicable was rejected after filing review.
+- Filing states FFIN is a financial holding company owning First Financial Bank; revenue comes primarily from loans, securities, trust, mortgage, and deposit services, funded primarily by customer deposits.
+- Final model: financial_bank.
+- Ordinary owner earnback applicability: not_applicable.
+- Consequently all ordinary discounted net cash, discounted cash profit, operating business price, and payback-year fields remain null.
+
+5. Core extracted facts (USD unless ratio)
+- Total assets 15,446,476,000; liabilities 13,529,159,000; equity 1,917,317,000.
+- Net interest income 500,887,000; noninterest income 130,716,000; noninterest expense 293,391,000; provision 28,609,000; pretax income 309,603,000; net income 253,579,000.
+- Loans HFI 8,158,276,000; allowance 105,536,000; securities 5,514,113,000; deposits 13,345,529,000.
+- NIM 3.79%; ROAA 1.76%; ROAE 14.59%; efficiency ratio 45.53%.
+- ACL/loans 1.29%; NPA ratio 0.69%; net charge-offs/average loans 0.29%.
+- CET1 19.99%; tier 1 risk-based 19.99%; total risk-based capital 21.17%; leverage 12.55%.
+- AFS securities pretax unrealized loss 342,030,000.
+- 2025 dividends per share 0.75; payout ratio 42.38%.
+
+6. Currency and valuation treatment
+- All structured financial-statement amounts converted to CNY at USD/CNY 7.001 for protocol consistency.
+- Input market cap 33,984,671,765.44043 CNY, dated 2026-08-03, and PE TTM 18.791443 retained unchanged.
+- Implied market cap / 2025 year-end book equity: approximately 2.53x.
+- Dividend forecast: latest Q2 2026 quarterly dividend USD 0.22 annualized to USD 0.88, multiplied by 143,228,602 shares and translated at 7.001 = CNY 882,414,229.49; forecast yield = 2.59650655%.
+- Forecast is explicitly described as mechanical annualization, not company guidance.
+
+7. Output construction and validation
+- Populated outputs/result.json exclusively through protocol CLI set commands after protocol initialization; no complex JSON file was handwritten from scratch.
+- Wrote outputs/report.md as the human-readable operating story under the report contract.
+- Data-quality status set to complete because special-model minimum fields, asset/liability explanations, dividend forecast, business story, and evidence are present.
+- Protocol validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before final file review: status ok; errors [].

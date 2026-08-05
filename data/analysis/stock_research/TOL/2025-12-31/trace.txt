@@ -1,0 +1,84 @@
+stock-research trace
+task_created_at: 2026-08-04T22:07:31+08:00
+company: TOL / Toll Brothers, Inc.
+input_period: 2025-12-31
+actual_fiscal_period_end: 2025-10-31
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar fields with protocol `set` and list rows with protocol `append`; did not construct result.json by hand.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: {"status":"ok","errors":[]}
+
+[reuse audit]
+- No files existed under stock_report/data/analysis/annual_review/TOL/2025-12-31 or stock_report/data/raw/filings/TOL/2025-12-31 at research time.
+- No prior annual facts package or stock research result was reused.
+- Official filing and company releases were therefore retrieved and checked.
+
+[model decision]
+- Input hint: ordinary_operating / applicable.
+- Overridden with: real_estate_developer / requires_special_model.
+- Evidence: the 10-K describes land acquisition/control, land development, build-to-order and speculative homes, delivery-based revenue recognition, customer deposits, and $10.678bn of inventory equal to about 73.5% of assets.
+- Consequence: all ordinary owner-earnback fields remain null by contract. Cash, inventory, customer deposits, debt, and future development spending are analyzed together.
+
+[primary sources]
+- SEC Form 10-K HTML, accession 0000794170-25-000112, filed 2025-12-19:
+  https://www.sec.gov/Archives/edgar/data/794170/000079417025000112/tol-20251031.htm
+- SEC XBRL Companyfacts, CIK 0000794170:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0000794170.json
+- Toll Brothers FY2025 Q4 results, dated 2025-12-08:
+  https://investors.tollbrothers.com/news-and-events/press-releases/2025/12-08-2025-213057278
+- Toll Brothers dividend release, dated 2026-03-11:
+  https://investors.tollbrothers.com/news-and-events/press-releases/2026/03-11-2026-203035468
+- Toll Brothers FY2026 Q2 results, dated 2026-05-19:
+  https://investors.tollbrothers.com/news-and-events/press-releases/2026/05-19-2026-213049516
+- PBOC statistical table: October 2025 monthly average USD/CNY = 7.0948, sourced by PBOC from CFETS.
+- Market cap and PE: config/input.json, Yahoo Finance yfinance, as of 2026-08-03.
+
+[currency conversion]
+- Contract requires absolute CNY yuan.
+- Applied one consistent translation rate to statement and dividend amounts: USD 1 = CNY 7.0948 (October 2025 monthly average).
+- This translation supports comparability and is not a claim that each cash flow occurred at that exchange rate.
+
+[key extracted USD facts]
+- Total assets: 14,519,866,000
+- Total liabilities: 6,233,802,000
+- Total equity: 8,286,064,000
+- Parent equity: 8,270,663,000
+- Noncontrolling interest: 15,401,000
+- Revenue: 10,966,723,000
+- Cost of revenues: 8,212,487,000
+- Gross profit (calculated): 2,754,236,000
+- Operating income: 1,720,614,000
+- Parent net income: 1,346,486,000
+- Operating cash flow: 1,112,411,000
+- PP&E purchases: 86,195,000
+- Operating cash flow less PP&E purchases: 1,026,216,000
+- Financing cash flow: -833,875,000
+- Dividends paid plus repurchases: 748,091,000
+- Cash: 1,258,997,000
+- Inventory: 10,678,460,000
+- Customer deposits: 418,897,000
+- Loans payable plus senior notes: 2,637,913,000
+
+[formulas]
+- gross_profit = 10,966,723,000 - 8,212,487,000 = 2,754,236,000 USD
+- gross_margin = 2,754,236,000 / 10,966,723,000 = 0.2511448497422612
+- net_margin = 1,346,486,000 / 10,966,723,000 = 0.12277924772970011
+- operating_free_cash_flow (reported helper metric only) = 1,112,411,000 - 86,195,000 = 1,026,216,000 USD
+- forecast shares = 95,003,000 (10-K shares outstanding at 2025-12-17)
+- annualized dividend/share = 0.26 * 4 = 1.04 USD
+- forecast dividend CNY = 95,003,000 * 1.04 * 7.0948 = 700,988,375.776
+- forecast yield = 700,988,375.776 / 92,018,996,656.53223 = 0.007617865889067357
+- ordinary discounted net cash, cash profit, operating business price, and payback formulas: intentionally not calculated because applicability is requires_special_model.
+
+[quality and limitations]
+- status: complete under the special-model minimum requirements.
+- Input period differs from issuer fiscal year end; explicitly disclosed in result and report.
+- Yahoo Finance market-cap conversion inputs could not be independently reconstructed from the task payload.
+- Dividend forecast assumes the current $0.26 quarterly dividend persists for four quarters and uses a dated outstanding share count; buybacks will change the total.
+- The accounting OCF-minus-PP&E figure is not treated as sustainable distributable cash profit because land and construction inventory is the core capital requirement.

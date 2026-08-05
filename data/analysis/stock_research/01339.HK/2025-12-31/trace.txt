@@ -1,43 +1,42 @@
-stock-research trace for 01339.HK / 中国人民保险集团 / 2025-12-31 annual
+stock-research trace: 01339.HK / 中国人民保险集团 / 2025-12-31 annual
 
-1. Read required instructions:
-   - /workspace/.agents/skills/stock-research/SKILL.md
-   - /workspace/.agents/skills/stock-research/references/result-contract.md
-   - /workspace/.agents/skills/stock-research/references/report-contract.md
-   - /workspace/.agents/skills/stock-research/references/data-reuse.md
+1. Required instructions read
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
 
-2. Initialized structured result with protocol CLI:
-   - PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Protocol initialization
+   - Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Initialization inherited financial_brokerage from analysis_model_hint; this was treated as an unverified hint.
 
-3. Reused local fact sources:
+3. Sources inspected and reused
    - config/input.json
    - stock_report/data/raw/filings/01339.HK/2025-12-31/metadata.json
    - stock_report/data/analysis/annual_review/01339.HK/2025-12-31/facts.json
    - stock_report/data/analysis/annual_review/01339.HK/2025-12-31/annual_facts.md
-   - stock_report/data/analysis/stock_research/01339.HK/2025-12-31/result.json
-   - stock_report/data/analysis/stock_research/01339.HK/2025-12-31/report.md
+   - stock_report/data/analysis/annual_review/01339.HK/2025-12-31/extraction_trace.txt
+   - Prior stock-research result/report were used only as clues for dividend and insurance operating metrics.
 
-4. Core source decisions:
-   - H-share official annual report and annual results announcement are present locally, but the existing fact pack records that their PDF text layer did not reliably expose numeric tables.
-   - Core financial statement numbers were reused from the annual fact pack, which states they were checked against same-company same-period A-share annual report page images.
-   - Existing stock_research output was used as a clue only; the new outputs/result.json follows stock-research-result-v1 and removes non-contract list/tag fields.
+4. Model decision
+   - Overrode hint financial_brokerage with financial_insurance.
+   - Basis: the company operates P&C, life and health insurance; insurance contract liabilities were RMB 1,239,519 million at 2025 year-end.
+   - Set owner_earnback_applicability to requires_special_model.
+   - Per result contract, discounted net cash, discounted cash profit, operating business price, owner earnback years, and market-cap-to-cash-profit remain null.
+   - Removed the prior output's 7.75-year ordinary earnback calculation because it violated the special-model contract.
 
-5. Main calculations:
-   - Market cap: 199,223,000,000 yuan from config/input.json, as of 2026-07-24.
-   - Insurance service gross spread: 570,717,000,000 - 527,170,000,000 = 43,547,000,000 yuan.
-   - Gross margin metric: 43,547,000,000 / 570,717,000,000 = 0.0763022654. This is an insurance service spread ratio, not ordinary manufacturing gross margin.
-   - Net margin metric: 46,646,000,000 / 570,717,000,000 = 0.0817322771.
-   - Discounted detachable net cash: 0 yuan, because insurance funds and investment assets support insurance liabilities, solvency and the investment business.
-   - Sustainable cash profit: 2023-2025 parent net profit median 42,869,000,000 * 0.60 = 25,721,400,000 yuan.
-   - Operating business price: 199,223,000,000 - 0 = 199,223,000,000 yuan.
-   - Owner earnback years: 199,223,000,000 / 25,721,400,000 = 7.7454182121.
-   - Forecast dividend yield: 9,729,000,000 / 199,223,000,000 = 0.0488347229, using 2025 full-year cash dividend as a conservative next-year proxy.
+5. Unit conversion and calculations
+   - Fact pack amounts were RMB million; multiplied by 1,000,000 for result.json absolute yuan.
+   - Net margin = parent net profit 46,646,000,000 / total operating revenue 669,044,000,000 = 0.0697203768.
+   - Gross margin = null because insurance service costs are not ordinary cost of sales.
+   - Operating free cash flow = null because insurance operating cash flow is not an ordinary distributable FCF proxy.
+   - Forecast dividend yield = 9,729,000,000 / 207,730,611,379.30215 = 0.0468346821.
+   - Forecast basis is a flat-dividend scenario using 2025 cash dividend, not company guidance.
 
-6. Data limitations kept in result/report:
-   - Subsidiary-level legal dividend capacity, solvency surplus extraction and cash upstream path were not available in public fact sources.
-   - Insurance operating cash flow is not treated as ordinary distributable free cash flow.
-   - Financial investments are not treated as detachable excess cash.
+6. Data limitations
+   - H-share annual report tables could not be reliably extracted from the local PDF text layer; the annual fact pack used page-image checks against the same-company A-share filing.
+   - Subsidiary legal distributable profit, solvency capital surplus and cash upstream path were not extracted.
+   - These gaps prevent a reliable insurance-special-model earnback calculation but do not prevent consumption of the disclosed financial, market and dividend fields.
 
-7. Validation:
-   - PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-   - Result: {"status": "ok", "errors": []}
+7. Protocol validation
+   - Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Result: {"status":"ok","errors":[]}

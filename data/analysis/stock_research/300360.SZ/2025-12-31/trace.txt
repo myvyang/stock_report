@@ -1,75 +1,85 @@
 stock-research trace
 
-company: 炬华科技 300360.SZ
-period: 2025-12-31
-report_type: annual
-timezone: Asia/Shanghai
-created_at: 2026-07-27T02:19:14+08:00
+task
+- company: 300360.SZ 炬华科技
+- period: 2025-12-31
+- report_type: annual
+- task_created_at: 2026-07-31T12:59:13+08:00
+- workspace: /workspace
 
-protocol:
-- Read /workspace/.agents/skills/stock-research/SKILL.md.
-- Read result contract: /workspace/.agents/skills/stock-research/references/result-contract.md.
-- Read report contract: /workspace/.agents/skills/stock-research/references/report-contract.md.
-- Initialized outputs/result.json with:
+protocol
+- read .agents/skills/stock-research/SKILL.md
+- read references/result-contract.md
+- read references/report-contract.md
+- read references/data-reuse.md
+- initialized outputs/result.json with:
   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- Populated initialized protocol skeleton from reused fact pack and prior stock_research work.
-- Validated outputs/result.json with:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-- Validation status: ok.
+- populated result fields with repeated protocol set commands; complex result JSON was not handwritten from scratch
 
-inputs read:
-- config/input.json
+reused_sources
 - stock_report/data/analysis/annual_review/300360.SZ/2025-12-31/facts.json
 - stock_report/data/analysis/annual_review/300360.SZ/2025-12-31/annual_facts.md
-- stock_report/data/analysis/stock_research/300360.SZ/2025-12-31/result.json
-- stock_report/data/analysis/stock_research/300360.SZ/2025-12-31/report.md
-- stock_report/data/analysis/stock_research/300360.SZ/2025-12-31/trace.txt
-- stock_report/data/notes/user_stock_evaluations.md
+- stock_report/data/analysis/annual_review/300360.SZ/2025-12-31/extraction_trace.txt
+- stock_report/data/analysis/annual_review/300360.SZ/2025-12-31/result.json
+- stock_report/data/analysis/annual_review/300360.SZ/2025-12-31/report.md
+- stock_report/data/raw/filings/300360.SZ/2025-12-31/metadata.json
+- stock_report/data/raw/filings/300360.SZ/2025-12-31/annual-report.pdf
+- official filing URL: https://static.cninfo.com.cn/finalpage/2026-04-28/1225207123.PDF
+- market snapshot from config/input.json: Tencent qt.gtimg.cn, 20260731114336
 
-core source:
-- 2025 annual report fact pack based on CNINFO official PDF:
-  https://static.cninfo.com.cn/finalpage/2026-04-28/1225207123.PDF
+model_review
+- confirmed statement_model=ordinary_operating
+- confirmed owner_earnback_applicability=applicable
+- reason: business is manufacturing and direct sales of energy metering/IoT equipment; cash, receivables, inventory, plant and normal supplier liabilities dominate the statements; no financial, real-estate, construction, concession or investment-holding economic model was identified
 
-reused facts:
-- Revenue: 1,686,995,898.59 yuan.
-- Cost of sales: 959,892,729.98 yuan.
-- Gross profit: 727,103,168.61 yuan.
-- Parent net profit: 566,795,972.25 yuan.
-- Operating cash flow: 507,093,704.45 yuan.
-- Capital expenditure: 69,770,930.34 yuan.
-- Operating free cash flow: 437,322,774.11 yuan.
-- Total assets: 4,933,953,165.45 yuan.
-- Total liabilities: 754,804,897.46 yuan.
-- Parent equity: 4,156,483,582.29 yuan.
+core_facts_yuan
+- total_assets: 4933953165.45
+- total_liabilities: 754804897.46
+- total_equity: 4179148267.99
+- parent_equity: 4156483582.29
+- revenue: 1686995898.59
+- cost_of_sales: 959892729.98
+- gross_profit: 727103168.61
+- parent_net_profit: 566795972.25
+- operating_cash_flow: 507093704.45
+- capital_expenditure: 69770930.34
+- operating_free_cash_flow: 437322774.11
 
-valuation input:
-- Market cap: 6,263,000,000 yuan.
-- Market cap date: 2026-07-24.
-- PE TTM: 11.05.
-- Source: config/input.json AH Note published stock payload.
+owner_earnback_cash_yuan
+- excess_cash_and_equivalents: 463302695.11 * 100% = 463302695.11
+- term_deposits_over_3_months: 2154038339.43 * 95% = 2046336422.46
+- wealth_products: 50000000.00 * 95% = 47500000.00
+- other_noncurrent_financial_assets: 325239532.69 * 50% = 162619766.35
+- financing_debt: 653756.92 * 100% = -653756.92
+- discounted_detachable_net_cash: 2719105126.99
+- limitations: term deposit maturity/withdrawal details unavailable; noncurrent financial asset underlying items and exit costs unavailable
 
-owner earnback:
-- Reused prior stock_research owner_earnback figures where available, then recalculated protocol formulas.
-- Discounted detachable net cash: 2,082,538,727.337 yuan.
-- Discounted sustainable cash profit: 382,500,000 yuan.
-- Operating business price: 4,180,461,272.663 yuan.
-- Owner earnback years: 10.929310516766014.
-- Market cap to cash profit: 16.373856209150325.
-- Removed prior ranking/list labels from output. Result only keeps sortable numbers, explanations, sources and data quality.
+owner_earnback_profit_yuan
+- base_2025_operating_free_cash_flow: 437322774.11
+- subtract_interest_income_matched_to_deducted_funds: 70027461.12
+- discounted_sustainable_cash_profit: 367295312.99
+- other financial asset and wealth-product returns were not deducted again because they are mainly outside operating free cash flow
 
-industry context reused from prior research:
-- NDRC distribution grid policy, 2024-03-01:
-  https://www.ndrc.gov.cn/xxgk/zcfb/tz/202403/t20240301_1364313.html
-- NEA new power system pilot notice, 2025-06-04:
-  https://www.nea.gov.cn/20250604/54a7b76e53ca4ec0bfab0a187cf7ddf7/c.html
-- Measurement support policy page, 2025-07-17:
-  https://www.hlj.gov.cn/hljzqc/c100116/202507/c00_31858075.shtml
-- Chyxx smart meter industry article:
-  https://www.chyxx.com/industry/1258199.html
+formula_checks
+- gross_margin = 727103168.61 / 1686995898.59 = 0.4310047044
+- net_margin = 566795972.25 / 1686995898.59 = 0.3359794607
+- discounted_net_cash_to_market_cap = 2719105126.99 / 6335000000 = 0.4292194360
+- operating_business_price = 6335000000 - 2719105126.99 = 3615894873.01
+- owner_earnback_years = 3615894873.01 / 367295312.99 = 9.8446529131
+- market_cap_to_cash_profit = 6335000000 / 367295312.99 = 17.2477017156
+- forecast_cash_dividend = 514187126 * 0.30 = 154256137.80
+- forecast_dividend_yield = 154256137.80 / 6335000000 = 0.0243498244
 
-limitations:
-- Asset categorization uses important items already extracted in the fact pack, not a full line-by-line reclassification of total assets.
-- 3-month-plus time deposits lack itemized bank, maturity and early withdrawal terms.
-- Other non-current financial assets lack itemized holdings, liquidity and exit-tax disclosures.
-- Forecast dividend is a research estimate, not company guidance.
-- User evaluation file has no 300360.SZ row.
+dividend_evidence
+- 2025 annual report board proposal: RMB 3.00 per 10 shares on 514187126 shares
+- 2024 annual distribution reused from official annual report: RMB 4.00 per 10 shares, RMB 205674850.40
+
+data_quality
+- status: complete
+- official filing verified in annual fact pack
+- known limitations retained in outputs/result.json and outputs/report.md
+
+validation
+- protocol validate executed after population
+- initial validation result: {"status":"ok","errors":[]}
+- final validation and cross-file checks performed at completion

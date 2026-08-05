@@ -1,0 +1,57 @@
+stock-research trace
+generated_at=2026-08-04T16:29:52+08:00
+company=01540.HK LEFT FIELD PRINTING GROUP LIMITED
+period=2025-12-31
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse check
+- Checked config/input.json.
+- Input-referenced annual facts, normalized facts, raw filing metadata and prior research files were absent from /workspace.
+- No existing research result was reused.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result skeleton created successfully.
+
+4. Primary disclosures reviewed
+- HKEX 2025 Annual Report, published 2026-04-23:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042301475.pdf
+  Reviewed business and MD&A (pp. 3-6), consolidated statements (pp. 42-46), segment information (pp. 65-67), dividends (pp. 72-73), fixed assets/goodwill/inventory/receivables/cash/payables/leases (pp. 75-82).
+- HKEX joint announcement, published 2026-06-25:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0625/2026062502310.pdf
+  Reviewed transaction conditions, HK$132m consideration, estimated HK$129m net proceeds, proposed HK$0.30 per-share special dividend, target-group 2025 revenue/profit, and continuing connected transactions.
+- HKEX issuer title search used to confirm filing chronology and that the 2026-07-17 circular dispatch was delayed.
+
+5. Model override
+- Input hint: financial_brokerage / requires_special_model.
+- Verified fact: one reportable segment, printing solutions and services in Australia; no brokerage balance-sheet items.
+- Final model: ordinary_operating / applicable.
+- The ordinary formula is applicable in principle, but current sortable figures are null because a pending disposal changes the continuing group.
+
+6. Currency conversion
+- Financial statement amounts: HKD x 0.90322 CNY, the 2025-12-31 RMB central parity rate.
+- Conditional special dividend: HKD x 0.86627 CNY, the latest official central parity rate available before the 2026-08-03 valuation timestamp (2026-07-28).
+- All result.json monetary fields are absolute CNY amounts.
+
+7. Key calculations
+- gross_margin = 108,195 / 506,892 = 0.2134478350.
+- net_margin = 28,547 / 506,892 = 0.0563177166.
+- operating_free_cash_flow = (68,365 - 8,578) thousand HKD = 59,787 thousand HKD; lease principal of HK$19.080m is separately classified in financing cash flow.
+- forecast conditional special dividend = 498,671,823 shares x HK$0.30 x 0.86627 = CNY129,595,332.03.
+- conditional dividend yield = CNY129,595,332.03 / CNY268,129,702.40 = 0.4833307570.
+- Target Group share of 2025 revenue = 362,240 / 506,892 = about 71%.
+- Target Group share of 2025 net profit = 18,187 / 28,547 = about 64%.
+
+8. Data-quality decision
+- status=partial.
+- Reason: no post-completion pro-forma financial statements for Remaining Group; transaction and special dividend remain conditional.
+- Ordinary owner-earnback sortable fields kept null to avoid mixing pre-transaction balance sheet/profit with post-transaction valuation.
+
+9. Protocol writes and validation
+- result.json was initialized and populated through protocol CLI set commands, not hand-written from scratch.
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: {"status":"ok","errors":[]}.

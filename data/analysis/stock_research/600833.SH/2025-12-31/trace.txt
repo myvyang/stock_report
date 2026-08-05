@@ -1,0 +1,54 @@
+task: stock research 600833.SH, period 2025-12-31
+generated_at: 2026-08-01T00:07:40+08:00
+
+protocol:
+1. Read stock-research/SKILL.md, result-contract.md, report-contract.md, data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated sections only through protocol set commands.
+4. Validated with protocol validate; status ok, errors [].
+
+reuse audit:
+- config/input.json exists.
+- No annual facts package, normalized facts, raw filing metadata, or prior stock research result existed for 600833.SH/2025-12-31.
+- Public filing research was therefore required.
+
+source audit:
+- Primary filing identity: Shanghai First Medicine Co., Ltd. 2025 annual report, disclosed 2026-04-09, SSE announcement URL:
+  https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-09/600833_20260409_TLOR.pdf
+- Direct download in this environment returned a 3.8 KB interception page, not a usable PDF. The misleading local file was not used as evidence.
+- Filing body read from Sina Finance full-text mirror of the same announcement:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12069259&stockid=600833
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, timestamp 20260731114338.
+
+key extracted facts (CNY):
+- revenue 2,130,234,461.61; cost 1,788,731,205.80; gross profit 341,503,255.81.
+- parent net profit 57,747,287.47; recurring parent net profit 7,144,899.99; non-recurring gain 50,602,387.48.
+- CFO 88,880,503.84; capex 15,927,763.41; reported operating FCF 72,952,740.43.
+- other financing cash out 62,389,023.04, principally lease-related under the annual-report cash-flow presentation.
+- assets 2,021,324,312.87; liabilities 850,462,901.49; equity 1,170,861,411.38; parent equity 1,161,285,666.10.
+- cash 322,594,697.71; finance-company deposit 216,146,116.82; short-term borrowing 49,898,402.77.
+- retail revenue 1,267,543,422.03 at 20.50% gross margin; wholesale revenue 802,946,194.21 at 3.49%.
+- proposed 2025 cash dividend 17,400,735.07.
+
+model decisions:
+- Confirmed ordinary_operating: business is pharmaceutical retail and wholesale, not drug manufacturing and not a special financial statement model.
+- Discounted detachable net cash:
+  cash 322,594,697.71 * 70%
+  + debt-like investments 168,257,935.30 * 80%
+  + equity/other financial investments 286,469,925.39 * 50%
+  - short-term borrowing 49,898,402.77
+  = 453,759,196.562.
+- Lease liabilities were not deducted again as financial net debt because paired use-right assets are required by store operations. Lease cash payment was instead deducted from cash profit.
+- Sustainable cash profit:
+  CFO 88,880,503.84 - capex 15,927,763.41 - lease/other financing cash out 62,389,023.04
+  = 10,563,717.39; conservatively rounded down to 10,000,000.
+- Operating business price = 2,144,000,000 - 453,759,196.562 = 1,690,240,803.438.
+- Owner earnback years = 1,690,240,803.438 / 10,000,000 = 169.0241.
+- Market cap / cash profit = 214.4.
+- Forecast dividend yield = 17,400,735.07 / 2,144,000,000 = 0.008116.
+
+quality limitations:
+- Filing body depends on a secondary mirror because the official direct PDF was blocked, though the underlying document is the audited annual report.
+- Sustainable cash profit is a one-year normalized estimate and is highly sensitive to lease classification and future recurring profitability.
+- Market cap and PE TTM are accepted from the supplied snapshot and not recomputed.

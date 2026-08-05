@@ -1,0 +1,88 @@
+stock-research trace
+company=002967.SZ 广电计量
+period=2025-12-31 annual
+generated_for_input=2026-07-31T21:44:30+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields with protocol set commands; JSON was not handwritten from a blank object.
+5. Validated with protocol validate; final status expected: ok.
+
+[reuse audit]
+- No local raw filing, annual facts package, normalized facts, or prior stock-research result existed for 002967.SZ/2025-12-31 at task start.
+- Existing stock_report/data/notes/user_stock_evaluations.md was unrelated and not modified.
+
+[source acquisition]
+- Web search identified the 2025 annual report published 2026-03-27.
+- Annual report HTML page: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12024463&stockid=002967
+- PDF mirror of the exchange disclosure: http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESZ_STOCK/2026/2026-3/2026-03-27/12024463.PDF
+- Saved PDF to stock_report/data/raw/filings/002967.SZ/2025-12-31/2025-annual-report.pdf.
+- PDF text utilities were unavailable. Core tables were parsed and checked from the annual-report HTML using Python standard-library HTMLParser; no third-party financial data replaced statement numbers.
+- Company business cross-check: https://www.grgtest.com/
+- Valuation source retained from config/input.json: Tencent qt.gtimg.cn, market cap 10875000000, timestamp 20260731114303, PE TTM 24.91.
+
+[model decision]
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Basis: revenue is earned from directly sold metrology, testing, certification and technical-evaluation services. There are no customer deposits, insurance reserves, regulated presale cash, concession rights, or comparable special-model balance-sheet items.
+- Special care: laboratories and testing equipment are operating assets; receivables/contract assets are working capital; cash is assessed after financing and lease obligations.
+
+[statement facts: CNY]
+- revenue=3603407453.09
+- cost_of_sales=1915608589.07
+- gross_profit=1687798864.02
+- operating_profit=468347079.12
+- net_profit=443414131.15
+- parent_net_profit=424537089.40
+- non_recurring_gain_after_tax=39647469.21
+- attributable_net_profit_ex_nonrecurring=384889620.19
+- total_assets=6744516049.34
+- total_liabilities=3010061901.39
+- total_equity=3734454147.95
+- parent_equity=3610694987.02
+- minority_interest=123759160.93
+- operating_cash_flow=951810586.23
+- capital_expenditure=473826101.38
+- operating_free_cash_flow=477984484.85
+- financing_cash_flow=-599474639.01
+
+[formula checks]
+- gross_profit = 3603407453.09 - 1915608589.07 = 1687798864.02
+- gross_margin = 1687798864.02 / 3603407453.09 = 0.4683907466
+- net_margin = 424537089.40 / 3603407453.09 = 0.1178143452
+- operating_free_cash_flow = 951810586.23 - 473826101.38 = 477984484.85
+- sustainable_cash_profit = min(477984484.85, 384889620.19) = 384889620.19
+
+[cash and debt]
+- cash=1106170898.19
+- restricted/non-cash-equivalent funds=14939991.97
+- short_term_borrowings=569356137.23
+- long_term_borrowings=802898564.69
+- current_portion_noncurrent_liabilities=146767264.03
+- noncurrent_lease_liabilities=115206711.00
+- financing_and_lease_obligations_used=1634228676.95
+- raw net after restricted funds and obligations is negative; discounted_detachable_net_cash capped at 0.
+
+[owner earnback]
+- discounted_detachable_net_cash=0
+- operating_business_price=10875000000-0=10875000000
+- discounted_sustainable_cash_profit=384889620.19
+- owner_earnback_years=10875000000/384889620.19=28.25484933
+- market_cap_to_cash_profit=28.25484933
+- Interpretation excludes growth value and does not treat post-report private-placement proceeds as detachable cash.
+
+[dividend]
+- 2025 proposal: CNY 0.20 per eligible share.
+- eligible shares=614421808
+- forecast_cash_dividend=122884361.60
+- forecast_dividend_yield=122884361.60/10875000000=0.0112997114
+- Annual report states the proposal remained subject to shareholder approval and the amount could change with the record-date eligible share count.
+
+[limitations]
+- Market cap and PE were accepted from the supplied snapshot and not independently reconstructed.
+- Maintenance versus growth capital expenditure was not disclosed separately.
+- Sustainable cash profit is an analytical estimate anchored to the lower of 2025 free cash flow and ex-nonrecurring attributable profit.
+- Annual-report PDF came through a mirrored exchange-disclosure file; statement numbers were cross-checked against the HTML annual report.

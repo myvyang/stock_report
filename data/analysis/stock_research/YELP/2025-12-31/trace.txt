@@ -1,0 +1,65 @@
+stock-research trace
+query: YELP
+period: 2025-12-31
+generated_at: 2026-08-04T16:16:18+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol output
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: initialized stock-research-result-v1 skeleton.
+
+3. Reuse check
+- Expected annual facts, normalized facts and extraction trace were absent.
+- No prior stock-research result existed for YELP/2025-12-31.
+- Returned to primary filing source.
+
+4. Primary evidence acquired
+- SEC filing: Yelp 2025 Form 10-K, accession 0001345016-26-000019.
+- Filing date: 2026-02-27; report period: 2025-12-31.
+- Local raw copy: stock_report/data/raw/filings/YELP/2025-12-31/yelp-20251231.htm
+- URL: https://www.sec.gov/Archives/edgar/data/1345016/000134501626000019/yelp-20251231.htm
+
+5. Model decision
+- statement_model: ordinary_operating.
+- owner_earnback_applicability: applicable.
+- Basis: performance advertising/subscription platform; no special financial, project, regulated-capital or concession accounting model.
+- Special time adjustment: current market-cap date follows the February 2026 Hatch closing.
+
+6. Currency translation
+- Filing currency: USD; protocol currency: CNY.
+- 2025 income statement and cash flow translated at assumed annual-average USD/CNY 7.1429.
+- 2025-12-31 balance sheet translated at assumed closing USD/CNY 7.0288.
+- These assumptions are explicitly recorded as a limitation because no task-local official FX source was supplied.
+
+7. Key USD facts extracted from 10-K
+- Revenue 1,464.955m; cost of revenue 142.596m; operating income 184.521m; attributable net income 145.600m.
+- Assets 958.478m; liabilities 247.626m; equity 710.852m.
+- Cash 216.062m; short-term securities 103.290m; accounts receivable 153.224m.
+- Operating cash flow 372.029m; purchases of property/equipment/software 48.353m; operating FCF 323.676m.
+- Stock-based compensation expense 133.993m; cash repurchases 290.949m; repurchase excise tax 1.218m.
+- Subsequent Hatch cash consideration 270m, partly funded by credit-facility borrowings and approximately 162m of security sales.
+
+8. Owner earnback construction
+- Gross margin = (1,464.955 - 142.596) / 1,464.955 = 90.2662%.
+- Net margin = 145.600 / 1,464.955 = 9.9389%.
+- Sustainable cash profit = (FCF 2,311.985m CNY - SBC economic cost 957.099m CNY) * 90% = 1,219.398m CNY.
+- Cash discounts: cash 80%, securities 90%, lease liabilities 100% deduction.
+- Post-year-end Hatch cash consideration then makes discounted detachable balance negative; final discounted detachable net cash floored at zero because exact post-close cash/debt was not disclosed.
+- Operating business price = market cap 9,807.572m CNY.
+- Owner earnback years = 9,807.572 / 1,219.398 = 8.043 years.
+
+9. Dividend forecast
+- Forecast cash dividend: zero.
+- Basis: company has never paid a cash dividend and states no intent to do so for the foreseeable future.
+- Buybacks excluded from dividends.
+
+10. Protocol population and validation
+- Populated scalar fields with protocol `set` commands.
+- Populated assets, liabilities, cash breakdown, profit adjustments, dividend history, risks and evidence with protocol `append` commands.
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]

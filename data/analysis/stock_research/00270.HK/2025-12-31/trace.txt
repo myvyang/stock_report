@@ -1,0 +1,60 @@
+stock-research trace
+company: Guangdong Investment Limited / 00270.HK
+period: 2025-12-31 annual
+generated_for: config/input.json created_at 2026-08-03T15:15:52+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked stock_report/data/analysis/annual_review/00270.HK/2025-12-31 and stock_report/data/raw/filings/00270.HK/2025-12-31.
+- No annual facts package or filing metadata was available at the start, so core filing evidence had to be added.
+
+3. Primary-source retrieval
+- HKEX title search identified the audited 2025 Annual Report released 2026-04-24 and the 2025 Annual Results Announcement released 2026-03-30.
+- Downloaded the annual report from:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042403928.pdf
+- Local copy:
+  stock_report/data/raw/filings/00270.HK/2025-12-31/annual-report-2025.pdf
+- Extracted the PDF text locally for fact checking. Key audited pages used: financial highlights pp. 6-9; management discussion pp. 18-28; statements pp. 68-76; segment note pp. 111-118; dividends note p. 128; financial risk note pp. 185-188.
+
+4. Model override
+- Input hint said financial_brokerage. This was rejected as factually inconsistent.
+- Annual report identifies investment holding, water resources, property investment, department stores, hotels, energy and roads.
+- Water resources represented 75.11% of 2025 continuing revenue and 77.67% of segment results.
+- Major balance-sheet items are operating concession rights and service-concession receivables; project revenue rights also secure borrowings.
+- Final model: utility_concession; owner_earnback_applicability: requires_special_model.
+- Consequence: ordinary detachable net cash, discounted cash profit, operating-business price, and payback multiples remain null.
+
+5. Currency conversion
+- Contract requires CNY absolute yuan; filing currency is HKD.
+- Applied 1 HKD = 0.90486 CNY from the People's Bank of China 2025-12-26 central-parity announcement.
+- This is a simplifying single-rate conversion. It does not separately apply annual-average rates to income/cash flow and closing rates to the balance sheet; disclosed under data_quality.limitations.
+
+6. Calculation notes
+- gross_margin = HKD 10,034,308,000 / HKD 18,824,908,000 = 0.5330335745.
+- net_margin = HKD 4,656,261,000 parent profit / HKD 18,824,908,000 revenue = 0.2473457506.
+- cash capital expenditure = HKD 873,402,000 PP&E purchases + HKD 854,064,000 service-concession additions + HKD 30,365,000 investment-property additions = HKD 1,757,831,000.
+- operating_free_cash_flow = HKD 8,805,423,000 operating cash flow - HKD 1,757,831,000 cash capex = HKD 7,047,592,000; converted to CNY 6,377,084,097.12.
+- Management's broader capital-expenditure disclosure is HKD 5,434,000,000 and includes acquisitions of subsidiaries; report distinguishes this from cash-flow capex.
+- forecast dividend = HKD 3,026,357,000 x 0.90486 = CNY 2,738,423,241.97.
+- forecast dividend yield = CNY 2,738,423,241.97 / CNY 47,639,413,853.20723 = 0.0574823034.
+
+7. Result construction
+- Used protocol `set` commands path-by-path to populate the initialized result; the full JSON was not handwritten from scratch.
+- Market cap, timestamp, source and PE TTM were retained from config/input.json.
+- Core financial figures were taken from the audited annual report, not third-party summaries.
+
+8. Outputs
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt
+
+9. Validation
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Outcome: status=ok, errors=[]
+- Also parsed outputs/result.json with python3 -m json.tool successfully.

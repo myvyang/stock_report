@@ -1,0 +1,128 @@
+stock-research trace
+company=NCS Multistage Holdings, Inc.
+code=NCSM
+period=2025-12-31
+report_type=annual
+generated_context_date=2026-08-04 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely as explicitly requested.
+3. Read references/data-reuse.md because the skill routes reuse decisions through this reference.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields only through repeated protocol `set` commands; did not write the result JSON directly.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   validation_status=ok
+   validation_errors=[]
+
+[reuse check]
+Checked the input-designated paths under:
+- stock_report/data/raw/filings/NCSM/2025-12-31
+- stock_report/data/analysis/annual_review/NCSM/2025-12-31
+- stock_report/data/normalized/facts/NCSM/2025-12-31
+- stock_report/data/analysis/stock_research/NCSM/2025-12-31
+No existing NCSM filing, annual fact package, normalized fact package, or prior research result was present. Research therefore returned to the original filing and official disclosures.
+
+[primary sources]
+1. SEC Form 10-K, accession 0001437749-26-007065, filed 2026-03-05, period 2025-12-31:
+   https://www.sec.gov/Archives/edgar/data/1692427/000143774926007065/ncsm20251231_10k.htm
+   Used for company identity, business model, business mix, geography, customers, competition, financial statements, asset/liability detail, cash flow, taxes, minority interests, dividend policy, and risks.
+2. SEC Form 8-K, accession 0001193125-26-252096, filed 2026-06-02:
+   https://www.sec.gov/Archives/edgar/data/1692427/000119312526252096/d23867d8k.htm
+   Used for the Weatherford merger terms, approval status, closing conditions, exchange ratios, and outside date.
+3. Federal Reserve G.5A Annual, released 2026-01-05:
+   https://www.federalreserve.gov/releases/g5a/current/
+   Used for 2025 average USD/CNY=7.1875.
+4. Task input / Yahoo Finance yfinance snapshot:
+   market_cap_CNY=832383254.7130051
+   market_cap_date=2026-08-03
+   pe_ttm=9.49495
+
+[model decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: NCS sells engineered oil-and-gas completion/well-construction consumables and technical services. Its receivables, inventory, property/equipment, debt, and leases are ordinary operating assets and obligations; deposits, insurance reserves, regulated project cash, construction contract assets, concession rights, or holding-company financial assets are not the economic core of the business.
+
+[currency conversion]
+All USD filing amounts were converted to protocol-required absolute CNY using 7.1875 CNY/USD.
+This single annual-average rate was used for both flow and balance-sheet values for internal consistency. This is a research normalization, not GAAP currency translation. The supplied CNY market capitalization was preserved unchanged.
+
+[financial extraction: USD thousands]
+balance_sheet_2025:
+total_assets=181199
+total_liabilities=38101
+total_equity=143098
+parent_equity=126239
+noncontrolling_interest=16859
+cash=36725
+trade_receivables=40507
+inventory=39011
+ppe_net=19849
+goodwill=16387
+identifiable_intangibles=5989
+deferred_tax_assets_net=11653
+interest_bearing_debt=7644
+operating_lease_liabilities=5303
+contingent_purchase_consideration=1250
+
+income_statement_2025:
+revenue=183627
+cost_of_sales_including_attributable_DA=111214
+gross_profit=72413
+gross_margin=0.39434832568195305
+operating_profit=10540
+net_profit=26037
+parent_net_profit=23748
+parent_net_margin=0.12932738649545
+
+cash_flow_2025:
+operating_cash_flow=22175
+ppe_capex=1201
+software_and_technology_capex=106
+total_capex=1307
+operating_free_cash_flow=20868
+financing_cash_flow=-5303
+treasury_shares_withheld=326
+noncontrolling_distribution=2700
+share_based_compensation=6205
+
+[gross profit definition]
+The face statement presents cost of product and service sales exclusive of depreciation/amortization. MD&A allocates USD 2.099m of D&A to product cost and USD 0.914m to service cost. Result uses total cost of sales USD 111.214m and total gross profit USD 72.413m, matching MD&A's reported 39.4% gross margin.
+
+[owner earnback calculations]
+discounted_cash_USD_m=36.725*0.70=25.7075
+less_interest_bearing_debt_USD_m=7.644
+less_contingent_purchase_consideration_USD_m=1.250
+discounted_detachable_net_cash_USD_m=16.8135
+discounted_detachable_net_cash_CNY=120847031.25
+
+operating_fcf_USD_m=22.175-1.201-0.106=20.868
+less_noncontrolling_distribution_USD_m=2.700
+less_share_based_compensation_USD_m=6.205
+pre_cycle_discount_cash_profit_USD_m=11.963
+cycle_discount=0.70
+discounted_sustainable_cash_profit_USD_m=8.3741
+discounted_sustainable_cash_profit_CNY=60188843.75
+
+operating_business_price_CNY=832383254.7130051-120847031.25=711536223.4630051
+owner_earnback_years=711536223.4630051/60188843.75=11.821729395873387
+market_cap_to_cash_profit=832383254.7130051/60188843.75=13.829527248776982
+discounted_net_cash_to_market_cap=120847031.25/832383254.7130051=0.145181958629942
+
+[dividend]
+forecast_cash_dividend_CNY=0
+forecast_dividend_yield=0
+Basis: 2025 Form 10-K states the company does not currently intend to pay cash dividends on common stock. No contrary board action was identified for this task.
+
+[key judgment boundaries]
+- Facts: filing numbers, business mix, geography, customer concentration, merger terms, and stated dividend policy.
+- Inferences: ordinary-operating model classification and interpretation of working-capital needs.
+- Subjective but explicit assumptions: 70% recognition of cash, full deduction of debt and contingent consideration, deduction of NCI distributions and stock compensation, and 70% cycle discount applied to adjusted 2025 cash profit.
+- Merger synergies were excluded because they accrue to the combined entity and were management expectations, not standalone NCS sustainable cash profit.
+- Acquisition payment for ResMetrics was excluded from maintenance free cash flow but its contingent purchase obligation was deducted from detachable cash.
+
+[data quality]
+status=complete
+Core annual financials and business evidence are available from the SEC filing. Main limitations are the single-year cash-profit normalization, the uniform annual-average FX conversion, the lack of decomposition for the supplied yfinance CNY market cap, and the pending Weatherford transaction.

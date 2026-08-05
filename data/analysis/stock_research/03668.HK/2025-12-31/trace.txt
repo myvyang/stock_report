@@ -1,0 +1,78 @@
+stock-research task trace
+company: Yancoal Australia Ltd / 03668.HK / YAL.AX
+period: 2025-12-31 annual
+generated_at_input: 2026-08-04T19:10:42+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read result-contract.md, report-contract.md, and data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse check
+- Checked stock_report paths supplied by config/input.json.
+- No raw filing, annual facts, normalized facts, or prior stock-research output existed for 03668.HK/2025-12-31.
+- Only stock_report/data/notes/user_stock_evaluations.md existed; it did not supply company facts.
+
+3. Primary-source retrieval
+- HKEX 2025 annual results announcement containing the full audited Annual Financial Report:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0225/2026022500262.pdf
+- Yancoal official investor page / 2025 Full Year Financial Report listing:
+  https://www.yancoal.com.au/document/2025-full-year-financial-report/
+- HKEX/company Kestrel acquisition announcement dated 2026-04-14:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0414/2026041400556.pdf
+- RBA Table F11 AUD/CNY data:
+  https://www.rba.gov.au/statistics/tables/csv/f11-data.csv
+- Market data reused exactly from config/input.json: Tencent qt.gtimg.cn, market cap CNY 34,306,415,559.74066 at 2026/08/03 09:45:10, PE TTM 17.46.
+
+4. Model verification
+- Rejected input hint statement_model=financial_brokerage.
+- Audited report says the group owns, operates, or has joint-venture stakes in Australian coal mines and exports thermal, semi-soft coking, and PCI coal.
+- Selected statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Special caution retained for commodity cyclicality, mine rehabilitation obligations, sustaining capex, and acquisition funding.
+
+5. Audited source facts in AUD millions
+- Revenue 5,949; operating profit/EBIT 665; NPAT and parent NPAT 440.
+- Total assets 12,205; total liabilities 3,172; total equity 9,033; parent equity 9,031; NCI 2.
+- Cash 2,127; receivables current+non-current 635; inventory 489; PP&E 4,283; mining tenements 3,593.
+- Payables current+non-current 1,148; interest-bearing liabilities 84; current/deferred tax liabilities 343; provisions 1,597.
+- Operating cash flow 1,257; PP&E capex 750; exploration capex 1; operating free cash flow 506; financing cash flow -816; dividends paid 769.
+- 2025 interim dividend 82 and final dividend 161, total 243.
+- Attributable saleable production 38.6Mt; ex-mine sales 38.1Mt; cash operating cost per saleable production tonne A$92.
+- Average ex-mine selling price A$146/t, down 17%; ex-mine sales volume up 1%.
+
+6. Currency normalization
+- Protocol requires CNY absolute yuan.
+- Flow FX: simple average of 12 RBA F11 month-end AUD/CNY observations for 2025 = 4.62911.
+- Stock FX: RBA F11 AUD/CNY on 2025-12-31 = 4.6777.
+- Flow values (income, cash flow, dividends) multiplied by 4.62911.
+- Balance-sheet values multiplied by 4.6777.
+- FX method is a presentation normalization and not an assertion of transaction exchange rates.
+
+7. Gross margin treatment
+- The audited income statement classifies expenses by nature and does not disclose protocol-comparable cost of sales or gross profit.
+- Did not fabricate gross profit by grouping operating and period expenses.
+- financials.income_statement.cost_of_sales, gross_profit, and metrics.gross_margin remain null.
+- Because the result contract requires gross profit/margin for an ordinary operating company to qualify as complete, data_quality.status is partial.
+
+8. Owner earnback construction
+- 2025 operating FCF: (1,257 - 750 - 1) AUDm = 506 AUDm = CNY 2,342,329,660.
+- Applied a subjective 30% sustainability haircut for coal-price cyclicality, 2026 capex guidance of A$750m-A$900m, and acquisition/integration uncertainty.
+- Discounted sustainable cash profit: CNY 1,639,630,762.
+- Kestrel announcement: upfront US$1.85bn funded with existing cash plus US$1.2bn five-year acquisition loan; up to US$550m contingent consideration; completion targeted around end-Q3 2026 subject to conditions.
+- Therefore 2025 year-end net cash is not treated as detachable at the 2026-08-03 valuation date. Discounted detachable net cash = 0.
+- Operating business price = market cap - 0 = CNY 34,306,415,559.74066.
+- Owner earnback years = market cap / discounted cash profit = 20.923256842225957.
+- This is a conservative standalone historical bridge, not a post-acquisition forecast; it excludes both Kestrel cash flows and acquisition debt effects.
+
+9. Dividend construction
+- Report-period dividend basis: 2025 interim A$82m plus declared final A$161m = A$243m.
+- Converted amount CNY 1,124,873,730.
+- Yield on supplied market cap = 0.03278901953604457.
+- This is not a forecast commitment for the 2026 financial year.
+
+10. Validation
+- Populated outputs/result.json through protocol CLI set commands, not by hand-writing the JSON object.
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validator output: {"status":"ok","errors":[]}

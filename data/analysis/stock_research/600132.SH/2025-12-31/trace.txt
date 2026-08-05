@@ -1,0 +1,55 @@
+stock-research trace
+company=重庆啤酒
+code=600132.SH
+period=2025-12-31
+generated_for_input_at=2026-07-31T17:11:02+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields using protocol set/append commands; did not construct the result schema manually.
+5. Validated with protocol validate.
+
+[sources]
+official_filing=stock_report/data/raw/filings/600132.SH/2025-12-31/annual-report.pdf
+official_filing_url=https://static.cninfo.com.cn/finalpage/2026-03-11/1225004448.PDF
+official_filing_sha256=f778f60394d644b7f84f19dd77812d83cb6301b509ed0aa83dd4575f82d2b370
+official_filing_metadata=stock_report/data/raw/filings/600132.SH/2025-12-31/metadata.json
+reused_annual_review=stock_report/data/analysis/annual_review/600132.SH/2025-12-31/result.json
+market_snapshot=market_cap 22742000000 CNY, PE_TTM 19.02, Tencent qt.gtimg.cn, 20260731114323
+
+[extraction]
+The local official PDF was text-extracted page by page with pypdf in a temporary virtual environment.
+Identity and dividend proposal: PDF pages 2, 46-47.
+Business, product, region, sales mode, volume: PDF pages 17-20.
+Industry position and trends: PDF pages 30-32.
+Balance sheet: PDF pages 72-75.
+Income statement: PDF pages 79-81.
+Cash flow statement: PDF pages 84-85.
+Trading financial assets note: PDF page 112.
+Other payables and lease notes: PDF pages 145-147.
+Revenue and cost note: PDF page 154.
+
+[key_calculations]
+gross_profit = 14721871107.45 - 7232045839.16 = 7489825268.29
+gross_margin = 7489825268.29 / 14721871107.45 = 0.5087549818650278
+net_margin = 1230897085.41 / 14721871107.45 = 0.08361009795739244
+operating_free_cash_flow = 2624190299.49 - 419524022.63 = 2204666276.86
+parent_profit_share = 1230897085.41 / 2478207663.11 = 0.4966813085
+implied_parent_free_cash_flow = 2204666276.86 * 0.4966813085 = 1095032242.41
+discounted_money_market_fund = 380090698.69 * 0.95 = 361086163.76
+discounted_detachable_net_cash = 361086163.76 - 115655889.58 = 245430274.18
+operating_business_price = 22742000000.00 - 245430274.18 = 22496569725.82
+discounted_sustainable_cash_profit = 1100000000.00
+owner_earnback_years = 22496569725.82 / 1100000000.00 = 20.4514270235
+market_cap_to_cash_profit = 22742000000.00 / 1100000000.00 = 20.6745454545
+forecast_dividend_yield = 1209927995.00 / 22742000000.00 = 0.05320235665288893
+
+[judgment_log]
+analysis_model=ordinary_operating; the company sells branded beer through distributors and does not exhibit a special financial-statement model.
+cash_policy=Daily cash was assigned a 0% detachable rate because cash and cash equivalents were below the uniform operating-cash threshold of 25% of annual operating cash outflows. The money-market fund was discounted at 95%; lease liabilities were deducted at 100%.
+profit_policy=Consolidated free cash flow was not treated as wholly attributable to listed-company shareholders because minority shareholders receive roughly half of consolidated profit. Sustainable cash profit was set at CNY 1.10bn, close to implied parent-attributable FCF of CNY 1.095bn and below parent net profit of CNY 1.231bn.
+dividend_policy=Forecast uses 2025 full-year cash dividend of CNY 1.209927995bn (CNY 2.50/share) as a base case, not a guarantee.
+data_quality=complete with limitations recorded in outputs/result.json.

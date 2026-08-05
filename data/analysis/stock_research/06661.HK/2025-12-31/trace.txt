@@ -1,0 +1,56 @@
+stock-research trace
+company: 06661.HK HUZHOU GAS / 湖州燃气
+period: 2025-12-31 annual
+generated_at_input: 2026-08-04T16:04:55+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated scalar fields with protocol set and list fields with protocol append.
+4. Final validation command and result are recorded at the end of this trace.
+
+[reuse check]
+- No files existed under the configured raw filing, annual review, normalized facts or prior stock research paths.
+- Therefore no prior facts package or historical research result could be reused.
+
+[source acquisition]
+- Official HKEX 2025 annual report located from issuer title search.
+- Downloaded Chinese annual report from:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042804384_c.pdf
+- Local copy:
+  stock_report/data/raw/filings/06661.HK/2025-12-31/2025-annual-report-zh.pdf
+- Extracted local text with pypdf in a temporary virtual environment because pdftotext was unavailable.
+- Cross-checked annual results announcement:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0331/2026033101595.pdf
+- Used official 2022 prospectus for concession start/end terms:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2022/0629/2022062900044_c.pdf
+- Market cap and PE were taken exactly from config/input.json; not independently reconstructed.
+
+[model review]
+- Input hint financial_brokerage rejected as a stock-master classification error.
+- Filing confirms gas sales under exclusive concessions, installation services and small ancillary energy businesses.
+- Selected statement_model=utility_concession and owner_earnback_applicability=requires_special_model.
+- Ordinary discounted net cash, cash profit, operating business price and payback fields kept null as required by result contract.
+
+[calculations]
+- gross_margin = 264,257,000 / 2,275,914,000 = 0.1161108552.
+- net_margin = 94,677,000 / 2,275,914,000 = 0.0415995501 (parent profit basis).
+- minority_interest_ratio = 100,969,000 / 1,372,977,000 = 0.0735401944.
+- operating_profit = gross profit 264,257,000 + other income/gains 25,012,000 - selling 35,860,000 - administrative 49,212,000 - impairment 1,236,000 - other expenses 12,192,000 = 190,769,000.
+- capital_expenditure = PPE purchases 151,986,000 + intangible purchases 35,000 = 152,021,000.
+- operating_free_cash_flow = 203,894,000 - 152,021,000 = 51,873,000.
+- dividend_and_buyback_cash_out = parent-owner dividend 60,814,000 + subsidiary dividend to NCI 50,426,000 = 111,240,000; no buyback identified.
+- forecast_dividend_yield = 60,814,350 / 868,490,060.5249405 = 0.0700230810.
+- 2025 parent payout ratio = 60,814,350 / 94,677,000 = 0.6423.
+- pipeline gas revenue share = 1,878,259,000 / 2,275,914,000 = 0.8253.
+
+[data limitations]
+- Annual report does not split maintenance capex from growth capex.
+- The cash-flow statement capex number is therefore not a normalized maintenance estimate.
+- Market capitalization conversion and FX mechanics embedded in the Tencent snapshot were not independently verified.
+- Dividend forecast is a flat baseline using the approved/paid FY2025 final dividend, not company guidance.
+
+[validation]
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+result: {"status":"ok","errors":[]}

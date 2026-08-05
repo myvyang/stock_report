@@ -1,0 +1,59 @@
+stock-research trace: NUTX / 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill directs reuse decisions through it.
+- Initialized outputs/result.json using:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Searched the configured raw filing, annual review, normalized facts, and prior stock-research paths.
+- No NUTX filing package, annual facts package, normalized facts, or prior research result existed in the workspace.
+- Reconstructed the required facts from the primary SEC filing rather than relying on media summaries.
+
+3. Primary sources
+- SEC 2025 Form 10-K, filed 2026-03-05:
+  https://www.sec.gov/Archives/edgar/data/1479681/000162828026015168/nutx-20251231.htm
+- Nutex Health FY2025 results release, 2026-03-05:
+  https://nutexhealth.com/nutex-health-reports-2025-financial-results-and-announces-second-stock-repurchase-program/
+- Market cap and PE TTM: config/input.json, Yahoo Finance yfinance snapshot dated 2026-08-03.
+
+4. Statement model review
+- Confirmed ordinary_operating because revenue comes from hospital patient services and PHM management/capitation, with ordinary revenue, operating costs, receivables, fixed assets, and capex.
+- Retained owner_earnback applicability but added special handling for consolidated VIEs and noncontrolling interests.
+- Key constraint: parent has no direct ownership in Physician LLCs and limited/no direct ownership in certain consolidated real-estate VIEs. Consolidated cash flow is not automatically attributable to common shareholders.
+
+5. Extracted USD facts (thousands unless stated)
+- Revenue 875,257; operating costs 430,976; gross profit 444,281; operating income 275,625.
+- Net income 180,357; NCI income 109,568; parent net income 70,789.
+- CFO 248,125; capex 2,526; operating FCF 245,599; financing CF -97,949.
+- Cash 185,574; receivables 319,440; related-party receivables 5,978.
+- Assets 918,525; liabilities 495,088; equity 423,437; parent equity 329,447; NCI 93,990.
+- Lines of credit and current/long-term debt 43,250; total lease liabilities 308,143.
+- No common cash dividends; share repurchases 5,000; NCI distributions 74,276.
+
+6. Translation and formulas
+- Result-contract requires CNY absolute yuan. Used a transparent research conversion assumption of USD/CNY 7.20 for every filing amount.
+- Gross margin = 444,281 / 875,257 = 50.7599%.
+- Parent net margin = 70,789 / 875,257 = 8.0879%.
+- Detachable cash: 185.574m USD x 30% - 43.250m USD debt = 12.4222m USD = CNY 89,439,840.
+- Sustainable cash profit: parent NI CNY 509,680,800 less CNY 77,680,800 judgmental haircut = CNY 432,000,000.
+- Operating business price: CNY 6,845,952,603.510681 - CNY 89,439,840 = CNY 6,756,512,763.510681.
+- Owner earnback: CNY 6,756,512,763.510681 / CNY 432,000,000 = 15.6401 years.
+- Market cap / cash profit = 15.8471x.
+- Forecast dividend = zero because no dividend history, cash retained for operations, and continued hospital expansion.
+
+7. Judgment controls
+- Did not use consolidated FCF as parent cash profit because 60.8% of consolidated net income was attributable to NCI and 2025 NCI distributions were material.
+- Did not add back the USD 117.0m stock compensation to sustainable profit because earn-out shares dilute common owners even when non-cash.
+- Recognized only 30% of consolidated cash due to VIE ownership, growth, and debt-service constraints.
+- Did not mechanically subtract lease liabilities in detachable net cash because they finance essential facilities and match right-of-use assets; their burden is reflected in the sustainable-profit haircut.
+- These discounts are analytical judgments, not company guidance.
+
+8. Protocol completion
+- Populated result sections through repeated protocol `set` commands after initialization; no complex result JSON was handwritten from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok; errors: [].

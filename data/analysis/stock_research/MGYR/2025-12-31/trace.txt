@@ -1,0 +1,67 @@
+MGYR stock-research trace
+generated_at=2026-08-05T01:25:38+08:00
+input=config/input.json
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- No existing raw filing, annual facts, normalized facts, or prior stock-research outputs for MGYR were present under stock_report.
+- Returned to primary SEC filings.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized successfully from supplied identity, period, market cap, PE, and model hint.
+
+4. Primary sources reviewed
+- SEC 10-K, fiscal year ended 2025-09-30, filed 2025-12-19:
+  https://www.sec.gov/Archives/edgar/data/1337068/000207709625000193/ea0267256-10k_magyar.htm
+- SEC 10-Q, quarter ended 2025-12-31, filed 2026-02-13:
+  https://www.sec.gov/Archives/edgar/data/1337068/000117494726000170/mgyr-20251231.htm
+- SEC 8-K Exhibit 99.1, filed 2026-04-23:
+  https://www.sec.gov/Archives/edgar/data/1337068/000117494726000505/ex99-1.htm
+- Federal Reserve H.10 USD/CNY historical series:
+  https://www.federalreserve.gov/releases/h10/Hist/dat00_ch.htm
+- Market snapshot supplied by input: Yahoo Finance yfinance, dated 2026-08-03.
+
+5. Model decision
+- Input hint ordinary_operating/applicable was rejected.
+- Confirmed financial_bank/not_applicable because Magyar Bancorp owns Magyar Bank and the balance sheet is primarily loans, securities, deposits and bank borrowings.
+- Required ordinary owner-earnback ranking fields remain null.
+
+6. Currency and period normalization
+- Contract requires CNY absolute yuan.
+- Used 2025-12-31 Federal Reserve H.10 rate: USD 1 = CNY 6.9931.
+- Balance sheet is the 2025-12-31 10-Q balance sheet.
+- TTM net income calculation (USD thousands): 9,760 FY2025 - 2,085 quarter ended 2024-12-31 + 3,136 quarter ended 2025-12-31 = 10,811.
+- TTM net income in CNY: 10,811,000 * 6.9931 = 75,602,404.
+- Estimated TTM ROE: 10,811 / average(111,676 equity at 2024-12-31, 121,748 equity at 2025-12-31) = 9.26%.
+- Price/book: supplied market cap CNY 835,140,973 / translated 2025-12-31 equity CNY 851,395,939 = 0.98x.
+
+7. Bank-specific checks
+- 2025-12-31 net interest margin: 3.59% (prior-year quarter 3.22%).
+- Gross loans: USD 877.836m; commercial real estate: USD 548.935m, 62.5%.
+- Non-owner occupied CRE / total risk-based capital: approximately 276%.
+- Non-performing loans: USD 0.361m, 0.04% of loans.
+- Allowance: USD 8.423m, 0.96% of loans and approximately 23.3x NPL.
+- Tier 1 capital / total assets: 11.42%; total qualifying capital / risk-weighted assets: 15.77%.
+- Gross loans / deposits using balance-sheet loan receivable and deposits: approximately 102.0%.
+
+8. Dividend forecast
+- Latest official quarterly declaration available before generated_at: USD 0.10/share on 2026-04-23.
+- Scenario annualization: USD 0.40 * 6,477,991 shares = USD 2,591,196.40.
+- Translated forecast cash dividend: CNY 18,120,496 (rounded).
+- Forecast yield: CNY 18,120,496 / CNY 835,140,973 = 2.1698%.
+- This is a scenario, not company guidance.
+
+9. Result population
+- Used protocol CLI set commands for all populated fields and arrays; result.json was not composed manually from scratch.
+
+10. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final result: {"status":"ok","errors":[]}.
+- Confirmed outputs/result.json, outputs/report.md, and outputs/trace.txt are non-empty.
+- Reconciled asset-analysis categories to total assets and confirmed all ordinary owner-earnback ranking fields remain null.

@@ -1,0 +1,97 @@
+LEGH stock-research trace
+generated_for_period=2025-12-31
+task_created_at=2026-08-05T04:45:55+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated initialized fields with protocol `set` commands; no complex result JSON was created manually from a blank file.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   validation_status=ok
+
+[reuse_audit]
+Expected annual facts, normalized facts, raw filing metadata and prior stock-research files for LEGH/2025-12-31 were absent at task start.
+Downloaded the official SEC filing to stock_report/data/raw/filings/LEGH/2025-12-31/legh-20251231x10k.htm for local inspection.
+
+[primary_sources]
+SEC 2025 Form 10-K, filed 2026-03-12:
+https://www.sec.gov/Archives/edgar/data/1436208/000110465926027133/legh-20251231x10k.htm
+
+Company FY2025 results release, dated 2026-03-12:
+https://investors.legacyhousingcorp.com/news-releases/news-release-details/legacy-housing-corporation-reports-full-year-2025-financial/
+
+SAFE/CFETS 2025-12-31 currency conversion table:
+https://www.safe.gov.cn/big5/big5/www.safe.gov.cn%3A443/safe/2025/1231/26980.html
+usd_cny=7.0288
+
+Market snapshot reused from config/input.json:
+market_cap_cny=4214158696.8632812
+market_cap_date=2026-08-03
+market_cap_source=Yahoo Finance yfinance
+pe_ttm=14.836159
+
+[model_classification]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: Legacy manufactures, distributes and finances manufactured homes. It is an operating company, not a bank or investment holding platform. However, loans are inseparable operating assets: 2025 loan interest was USD 43.674m / USD 164.567m revenue = 26.54%, and consumer/MHP/dealer/other loan receivables were USD 428.131m / USD 580.337m assets = 73.77%. Loan assets were therefore excluded from detachable cash.
+
+[currency_conversion]
+All filing amounts were reported in USD thousands and converted to absolute CNY yuan using amount_usd_thousands * 1000 * 7.0288.
+This period-end translation is a comparison convention, not transaction-date accounting translation.
+
+[financials_usd_thousands]
+total_assets=580337
+total_liabilities=51723
+total_equity=528614
+parent_equity=528614
+minority_interest=0
+revenue=164567
+cost_of_sales=84829+1723=86552
+gross_profit=164567-86552=78015
+operating_profit=48407
+net_profit=parent_net_profit=41809
+operating_cash_flow=37152
+capital_expenditure=9001
+operating_free_cash_flow=37152-9001=28151
+financing_cash_flow=-7745
+dividend_and_buyback_cash_out=7609 (buybacks; dividends zero)
+
+[formula_checks]
+gross_margin=78015/164567=0.4740622360
+net_margin=41809/164567=0.2540545796
+forecast_cash_dividend=0
+forecast_dividend_yield=0/4214158696.8632812=0
+
+discounted_detachable_net_cash=0
+Reason: USD 8.478m cash is needed for operations and lending and is below USD 13.109m customer escrow liability. No loan receivables were treated as detachable cash. USD 1.2m line borrowing remains economically embedded in the operating purchase price.
+
+2025_operating_fcf_cny=(37152-9001)*1000*7.0288=197867748.8
+sustainability_buffer_cny=8090148.8
+discounted_sustainable_cash_profit_cny=197867748.8-8090148.8=189777600.0
+operating_business_price_cny=4214158696.8632812-0=4214158696.8632812
+owner_earnback_years=4214158696.8632812/189777600.0=22.2057750591
+market_cap_to_cash_profit=22.2057750591
+
+[dividend]
+The 10-K states no cash dividends were declared or paid in 2024 or 2025 and the company currently has no plan to pay cash dividends. Forecast next-12-month dividend is therefore zero absent a new board decision. The company repurchased USD 7.6m shares in 2025, but all repurchase programs expired on 2025-10-31.
+
+[key_evidence_notes]
+2025 units sold=1703, down 20.0%; revenue per unit=USD 68.7k, up 13.0%.
+Product sales=USD 116.932m; loan interest revenue=USD 43.674m; other revenue=USD 3.961m.
+Loan receivables used for asset analysis: dealer 26.685m + consumer current 9.458m + consumer long-term 189.356m + MHP current 59.632m + MHP long-term 136.906m + other current 4.868m + other long-term 1.226m = USD 428.131m.
+Consumer gross loans=USD 203.601m; related allowance=USD 2.4m; repossessed consumer homes=USD 8.4m vs 3.9m in 2024.
+Auditor expressed an adverse opinion on internal control over financial reporting. Disclosed material weaknesses concerned control design/segregation and documentation, insufficient qualified accounting staff, and IT general controls.
+
+[judgment_boundaries]
+Facts: reported financial statements, units, portfolio amounts, dividend policy, repurchases and disclosed control weaknesses.
+Inference: loan receivables are non-detachable operating assets because they facilitate sales and produce material interest revenue.
+Research judgment: zero detachable cash; CNY 8.09m sustainability buffer; CNY 189.78m sustainable cash profit.
+No buy/sell recommendation or target price was produced.
+
+[limitations]
+Market capitalization and PE TTM were reused from the supplied yfinance snapshot and were not independently checked against an exchange-native record.
+Single-year free cash flow is sensitive to loan originations and collections; it is not a full-cycle average.
+Gross profit under the result protocol is revenue less product/other cost of sales. Loan interest has no separately reported direct cost, so gross margin is not directly comparable with a pure manufacturer.

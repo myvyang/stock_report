@@ -1,0 +1,72 @@
+stock-research trace
+company: 厦钨新能 (688778.SH)
+period: 2025-12-31 annual
+generated_at: 2026-08-01T01:55:49+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields through repeated protocol set commands; result.json was not composed directly from scratch.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: {"status":"ok","errors":[]}
+
+[source acquisition]
+- No annual facts, normalized facts, metadata, or prior stock-research result existed in the configured local paths at task start.
+- Located the 2025 annual report disclosed 2026-04-23.
+- Primary filing URL: https://static.cninfo.com.cn/finalpage/2026-04-23/1225146590.PDF
+- Saved local copy: stock_report/data/raw/filings/688778.SH/2025-12-31/2025-annual-report.pdf
+- PDF length: 288 pages.
+- Market data reused from config/input.json: market cap CNY 23,377,000,000; timestamp 2026-07-31 11:43:49; source Tencent qt.gtimg.cn; PE TTM 24.89.
+
+[source map]
+- Annual report PDF pp.10-11: 2025/2024 headline financials and same-control-combination restatement note.
+- PDF pp.15-18: products, procurement/production/sales modes, customer certification, raw-material-cost-plus-processing-fee pricing.
+- PDF pp.35-37: revenue/cost changes, product revenue and margins, production/sales volumes.
+- PDF pp.41-42: balance-sheet item changes and management explanations.
+- PDF p.76: 2025 interim dividend and annual proposal; total CNY 251,760,247, payout ratio 33.35%.
+- PDF pp.131-133: consolidated balance sheet.
+- PDF pp.135-137: consolidated income statement.
+- PDF pp.139-140: consolidated cash-flow statement.
+- PDF pp.181-182: cash unrestricted statement; bank wealth-management products and structured deposits.
+- PDF pp.217-223: short borrowings, bank acceptance notes, payables, current portion and long-term borrowings.
+- PDF pp.241-243: cash-flow reconciliation and cash-equivalent composition.
+
+[calculations]
+gross_profit = 19,879,565,539.77 - 17,898,946,393.59 = 1,980,619,146.18
+gross_margin = 1,980,619,146.18 / 19,879,565,539.77 = 0.0996309070
+net_margin = 754,831,699.59 / 19,879,565,539.77 = 0.0379702312
+2025 operating_free_cash_flow = 1,224,012,462.06 - 805,208,978.49 = 418,803,483.57
+2024 operating_free_cash_flow = 1,784,938,792.36 - 971,934,323.87 = 813,004,468.49
+two_year_average_FCF = (418,803,483.57 + 813,004,468.49) / 2 = 615,903,976.03
+discounted_sustainable_cash_profit = 615,903,976.03 * 0.85 = 523,518,379.63
+
+cash counted = 1,753,749,792.16 * 0.30 = 526,124,937.65
+wealth management counted = 300,034,787.74 * 0.80 = 240,027,830.19
+debt deducted = short borrowings 134,125,192.89
+              + current long-term borrowing principal 414,800,000.03
+              + long-term borrowings 84,416,071.43
+              + current lease liabilities 13,323,794.08
+              + non-current lease liabilities 6,523,929.44
+              = 653,188,987.87
+discounted_detachable_net_cash = 526,124,937.65 + 240,027,830.19 - 653,188,987.87 = 112,963,779.97
+operating_business_price = 23,377,000,000 - 112,963,779.97 = 23,264,036,220.03
+owner_earnback_years = 23,264,036,220.03 / 523,518,379.63 = 44.43785954
+market_cap_to_cash_profit = 23,377,000,000 / 523,518,379.63 = 44.65363760
+forecast_dividend_yield = 251,760,247 / 23,377,000,000 = 0.0107695704
+
+[judgment log]
+- Statement model confirmed as ordinary_operating. The company is a manufacturer; financial assets and liabilities are not the business itself.
+- Cash haircut of 70% is judgment, justified by CNY 6.822bn inventory, CNY 4.027bn receivables, continuing capex, and supplier-credit dependence. The annual report says cash is unrestricted, so the haircut reflects operating necessity rather than legal restriction.
+- Wealth-management haircut of 20% is judgment for liquidity/operating reserve uncertainty.
+- All identified interest-bearing and lease debt is deducted at 100%.
+- Long-term equity investments, receivables, inventory, and productive assets are excluded from detachable cash because immediate separation without harming operations was not established.
+- Sustainable cash profit uses the restated 2024 and 2025 operating FCF average, then a 15% haircut. Two years do not cover a full commodity cycle; this is a limitation, not a fact.
+- 2025 total dividends are used as an annualized forecast basis, not as a 2026 company commitment.
+
+[quality]
+- result status: complete
+- core statements, owner-earnback components, dividend basis, business narrative, asset/liability rows, risks, evidence, and limitations are populated.
+- limitations are recorded in outputs/result.json and outputs/report.md.

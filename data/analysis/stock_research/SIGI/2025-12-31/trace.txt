@@ -1,0 +1,62 @@
+stock-research trace: SIGI, period 2025-12-31
+generated_at: 2026-08-04T18:50:49+08:00
+
+1. Read required skill and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+   No pre-existing SIGI annual facts, raw filing, normalized facts, or stock-research result was present under stock_report. Core facts were therefore retrieved from primary filings.
+
+4. Primary sources used
+   - SEC Form 10-K, accession 0000230557-26-000006, filed 2026-02-09:
+     https://www.sec.gov/Archives/edgar/data/230557/000023055726000006/sigi-20251231.htm
+   - SEC companyfacts XBRL API for CIK 0000230557:
+     https://data.sec.gov/api/xbrl/companyfacts/CIK0000230557.json
+   - Selective 2025 year-end earnings release, dated 2026-01-29:
+     https://www.selective.com/investors/news-and-filings/company-news/2026/01-29-2026-211532989
+   - Market cap, market date, PE TTM: supplied input; source Yahoo Finance yfinance.
+
+5. Model decision
+   Input hint ordinary_operating/applicable was overridden.
+   Confirmed statement_model=financial_insurance and owner_earnback_applicability=requires_special_model.
+   Evidence: invested assets USD 11.302440bn are economically matched to claims and claim-expense reserves USD 7.225398bn, unearned premiums USD 2.745521bn, other insurance obligations, liquidity needs, and regulatory capital. They are not detachable cash.
+
+6. Key USD facts from 2025 Form 10-K XBRL
+   Assets 15,155,710,000
+   Liabilities 11,546,735,000
+   Stockholders' equity 3,608,975,000
+   Investments 11,302,440,000
+   Premium receivables 1,533,901,000
+   Reinsurance recoverables 915,495,000
+   Claims and claim-expense liability 7,225,398,000
+   Unearned premiums 2,745,521,000
+   Long-term debt and lease obligations 901,873,000
+   Revenue 5,336,928,000
+   Net premiums earned 4,768,196,000
+   Net investment income 531,150,000
+   Net income attributable to parent 466,411,000
+   Net income available to common 457,211,000
+   Operating cash flow 1,233,021,000
+   Property and equipment purchases 38,742,000
+   Common dividends paid 92,884,000
+
+7. Translation and derived figures
+   Protocol requires absolute CNY amounts. Financial statement and forecast dividend amounts were translated at USD/CNY 7.1886. This is a presentation conversion, not a claim that the balance sheet was economically converted at year-end.
+   Net margin = 466,411,000 / 5,336,928,000 = 0.08739316.
+   Forecast dividend = USD 0.43 quarterly * 4 * 61,000,000 diluted shares * 7.1886 = CNY 743,099,959.
+   Forecast dividend yield = 743,099,959 / 38,122,720,794.364746 = 0.01949231.
+   Gross margin left null because a P&C insurer does not report a comparable gross-profit concept.
+   Ordinary discounted net cash, cash profit, operating-business price, and payback fields left null per special-model contract.
+
+8. Protocol updates
+   outputs/result.json was populated through repeated protocol set and append commands; the initialized object was not replaced with a hand-written complex JSON object.
+
+9. Validation
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]

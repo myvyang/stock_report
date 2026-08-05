@@ -1,0 +1,115 @@
+task=stock-research
+query=SIGA
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-04T13:23:39+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields only after initialization, using protocol `set` commands.
+5. Validated result with protocol `validate`; status=ok, errors=[].
+
+[local_reuse_check]
+Checked paths declared in config/input.json.
+Missing at research start:
+- stock_report/data/raw/filings/SIGA/2025-12-31/metadata.json
+- stock_report/data/analysis/annual_review/SIGA/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/SIGA/2025-12-31/annual_facts.md
+- stock_report/data/normalized/facts/SIGA/2025-12-31/annual-facts.json
+- prior stock-research outputs for SIGA/2025-12-31
+Action: acquired primary public filing data rather than relying on third-party summaries.
+
+[primary_sources]
+SEC 2025 Form 10-K
+URL=https://www.sec.gov/Archives/edgar/data/1010086/000143774926007557/siga20251231_10k.htm
+Accession=0001437749-26-007557
+Filed=2026-03-10
+Used for company identity, business model, contracts, customers, manufacturing, risks, all three financial statements, working capital and capital expenditure.
+
+SEC Companyfacts
+URL=https://data.sec.gov/api/xbrl/companyfacts/CIK0001010086.json
+Used to cross-check balance sheet, income statement and cash-flow facts tied to accession 0001437749-26-007557.
+
+SIGA FY2025 results
+URL=https://investor.siga.com/investors/news/news-details/2026/SIGA-Reports-Financial-Results-for-Three-and-Twelve-Months-Ended-December-31-2025-and-Provides-Business-Update/default.aspx
+Used to cross-check 2025 revenue, operating income, pretax income, net income and January 2026 international order.
+
+SIGA dividend history
+URL=https://investor.siga.com/investors/stock-info/dividend-history/default.aspx
+Used for per-share special dividends for 2022-2025.
+
+SIGA Q1 2026 results/update
+URL=https://investor.siga.com/investors/news/news-details/2026/SIGA-Reports-Financial-Results-for-Three-Months-Ended-March-31-2026-and-Provides-Business-Update/default.aspx
+Used to verify 2026 special dividend declaration and payment dates.
+
+Federal Reserve H.10
+URL=https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+Used for annual-average USD/CNY conversion: 2023=7.0809, 2024=7.1957, 2025=7.1875.
+
+SAFE RMB central parity
+URL=https://www.safe.gov.cn/safe/rmbhlzjj/
+Used for nearest verified market-cap conversion rate: 2026-07-28, 100 USD=679.28 CNY, or 6.7928 CNY/USD.
+
+Market-cap input
+Source=config/input.json / Yahoo Finance yfinance
+Original amount=1582661054.4142456 USD
+Date=2026-08-03
+PE_TTM=11.678572
+Converted market cap=10750700010.425087 CNY using 6.7928 CNY/USD.
+
+[core_facts_usd]
+total_assets=219467434
+total_liabilities=20645862
+stockholders_equity=198821572
+cash_and_cash_equivalents=154966414
+accounts_receivable=3263736
+inventory=49054873
+revenue=94574902
+cost_of_sales_and_supportive_services=29703893
+protocol_gross_profit=64871009
+operating_income=23702156
+net_income=23279143
+operating_cash_flow=43471453
+capital_expenditure=355009
+operating_free_cash_flow=43116444
+cash_dividends_paid=43116529
+
+[formulas]
+gross_margin=(94574902-29703893)/94574902=0.6859218506
+net_margin=23279143/94574902=0.2461450255
+discounted_detachable_net_cash_CNY=(154966414*0.80-20645862)*7.1875=742664747.375
+three_year_FCF_USD: 2023=94777645; 2024=48719357; 2025=43116444
+median_FCF_USD=48719357
+median_FCF_CNY=48719357*7.1875=350170378.128125
+discounted_sustainable_cash_profit_CNY=350170378.128125*0.70=245119264.90625
+operating_business_price_CNY=10750700010.425087-742664747.375=10008035263.050087
+owner_earnback_years=10008035263.050087/245119264.90625=40.8292482708
+market_cap_to_cash_profit=10750700010.425087/245119264.90625=43.8590578326
+forecast_2026_dividend_CNY=71611302*0.60*6.7928=291864751.33536
+forecast_dividend_yield=291864751.33536/10750700010.425087=0.0271484542
+
+[judgment_log]
+analysis_model=ordinary_operating; owner_earnback_applicability=applicable.
+Reason: pharmaceutical product sales and outsourced manufacturing are ordinary operations; no financial-customer funds, insurance reserves, project finance, regulated project cash or concession rights make the balance sheet the business itself.
+
+Cash discount=80%.
+Reason: cash has no interest-bearing debt match, but business needs liquidity for lumpy procurements, inventory, R&D and third-party manufacturing performance.
+
+Profit normalization=70% of 2023-2025 median operating FCF.
+Reason: median smooths delivery timing; additional discount recognizes single-product and government-customer concentration, contract renewal, supply chain, inventory and R&D uncertainty. R&D and stock compensation were not added back.
+
+Dividend forecast basis=2026 actually declared and paid $0.60 special dividend.
+Limitation: special dividend is not a recurring commitment.
+
+[limitations]
+The exact 2026-08-03 official USD/CNY fixing was not directly verifiable during the run. The nearest verified official observation, 2026-07-28 at 6.7928, was used. This is disclosed in result.json and report.md.
+Protocol gross profit subtracts reported cost of sales and supportive services from total revenue. Costs related to reimbursed R&D are included in R&D expense, so the resulting margin is not a pure product gross margin.
+Normalized cash profit is an explicit analytical scenario, not company guidance.
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

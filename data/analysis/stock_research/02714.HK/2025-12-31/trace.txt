@@ -1,0 +1,51 @@
+stock-research trace
+company: 02714.HK / 牧原食品股份有限公司
+period: 2025-12-31 annual
+generated_for_input: 2026-08-04T21:41:37+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No raw filing, annual facts package, normalized facts, or historical stock-research output existed under the input paths.
+- Returned to official disclosures because core fields were absent.
+
+3. Identity and model correction
+- Official 2025 annual report cover identifies stock codes 002714.SZ and 02714.HK as Muyuan Foods Co., Ltd.
+- Annual report business facts identify hog breeding/sales and slaughtering/meat products, not securities brokerage.
+- Overrode input analysis_model_hint from financial_brokerage/requires_special_model to ordinary_operating/applicable.
+
+4. Primary sources inspected
+- HKEX 2025 annual report, published 2026-03-29:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0329/2026032900195.pdf
+  Relevant report pages: 5-6, 9-13, 24, 30-34, 70-71, 108-118, 121, 212, 258-260.
+- HKEX updated final dividend announcement, published 2026-05-20:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0520/2026052001332.pdf
+- Market snapshot reused from config/input.json: Tencent qt.gtimg.cn, 2026/08/03 09:48:06.
+
+5. Core calculations (CNY absolute yuan)
+- gross_profit = 144144965371.68 - 118461055325.37 = 25683910046.31
+- gross_margin = 25683910046.31 / 144144965371.68 = 0.17818111080108587
+- net_margin = 15486891254.04 / 144144965371.68 = 0.10743969596237243
+- operating_free_cash_flow = 30056186914.47 - 9528929651.93 = 20527257262.54
+- discounted_sustainable_cash_profit = 20527257262.54 * 0.65 = 13342717220.651001
+- discounted_detachable_net_cash = 0 because cash is materially below financing debt
+- operating_business_price = 167172679585.9903 - 0 = 167172679585.9903
+- owner_earnback_years = 167172679585.9903 / 13342717220.651001 = 12.529133070979812
+- forecast_cash_dividend = 5002294529.06 + 2435355283.04 = 7437649812.10
+- forecast_dividend_yield = 7437649812.10 / 167172679585.9903 = 0.044490821290414394
+
+6. Judgment flags
+- 35% cash-profit haircut is an analyst assumption to absorb hog-price cyclicality, disease risk, working-capital movements, and maintenance-capex uncertainty.
+- Market-cap date post-dates the balance sheet and follows the 2026 H-share issuance; capital structure is not fully date-matched.
+- Market cap and PE were accepted from task input and were not independently reconstructed from A/H prices, total shares, and FX.
+
+7. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated scalar and list fields using protocol set/append commands.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

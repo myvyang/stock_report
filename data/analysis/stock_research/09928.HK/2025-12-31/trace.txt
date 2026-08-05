@@ -1,0 +1,73 @@
+stock-research trace
+company: 09928.HK / TIMES NEIGHBOR
+period: 2025-12-31 annual
+generated_at: 2026-08-04T10:49:49+08:00
+
+1. Required instructions read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- /workspace/AGENTS.md (provided as workspace instructions)
+
+2. Reuse audit
+- Checked configured annual-review, normalized-facts, raw-filing, prior research, and /root/aicode sync paths.
+- No 09928.HK 2025-12-31 filing/facts/research artifacts were present locally.
+- Therefore fetched the official HKEX annual report rather than fabricating a facts package.
+
+3. Primary sources
+- HKEX Annual Report 2025, published 2026-04-28:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042804283.pdf
+- HKEX issuer title search for 09928, used to confirm annual report, annual results, and 2026-05-28 AGM/dividend approval:
+  https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=1000017525
+- Market cap RMB432,464,209.253192, PE TTM 26.57, timestamp 2026/08/03 09:20:05: config/input.json, source Tencent qt.gtimg.cn.
+
+4. Source extraction
+- Downloaded official PDF to /tmp/stock09928/annual-report-2025.pdf.
+- Environment lacked pdftotext; created an isolated /tmp virtual environment and used pypdf for read-only text extraction.
+- Consolidated profit or loss: annual report pp.129-130.
+- Consolidated financial position: pp.131-132.
+- Consolidated cash flows: pp.135-137.
+- Business and financial review: pp.37-49.
+- Revenue note and dividend note: notes 6 and 13.
+- Trade receivables/ECL: note 22.
+- Cash/restricted deposits: note 26.
+- Trade and other payables: notes 27-28.
+
+5. Analysis-model override
+- Input hint: financial_brokerage / requires_special_model.
+- Annual report fact: subsidiaries provide property management and related services; no brokerage client funds, proprietary financial inventory, repo liabilities, or interest-bearing borrowings.
+- Applied model: ordinary_operating / applicable.
+
+6. Core calculations (RMB yuan)
+- gross_margin = 496,039,000 / 2,495,853,000 = 0.1987452786682549.
+- net_margin = 17,090,000 / 2,495,853,000 = 0.006847358398110786.
+- capex = PPE purchases 12,847,000 + intangible purchases/development 2,239,000 = 15,086,000.
+- operating_free_cash_flow = 117,812,000 - 15,086,000 = 102,726,000.
+- discounted detachable net cash = 1,102,338,000 x 30% + 41,309,000 x 70% - 38,887,000 = 320,730,700.
+- discounted sustainable cash profit = 102,726,000 - 22,726,000 safety adjustment = 80,000,000.
+- operating business price = 432,464,209.253192 - 320,730,700 = 111,733,509.253192.
+- owner earnback years = 111,733,509.253192 / 80,000,000 = 1.3966688656649.
+- market cap / cash profit = 432,464,209.253192 / 80,000,000 = 5.4058026156649.
+- forecast dividend yield = 47,312,000 / 432,464,209.253192 = 0.10940096079095542.
+
+7. Judgment notes
+- Only 30% of unrestricted cash was treated as detachable because trade payables plus other payables/accruals exceed RMB1.03bn and collection quality is weak.
+- Restricted deposits were excluded entirely.
+- Wealth-management products received a 70% realization weight.
+- Lease liabilities were deducted in full.
+- Sustainable cash profit starts from reported operating free cash flow, not management's core profit, because impairment losses are recurrent and economically relevant.
+- A further RMB22.726m safety deduction reflects falling OCF, rising gross receivables, and RMB258.432m annual financial/contract-asset impairment.
+
+8. Protocol operations
+- Initialized with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields only through protocol set/append commands.
+- Validated with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before final report write: {"status":"ok","errors":[]}.
+
+9. Known limitations
+- No local annual facts package existed; research is directly sourced from the audited annual report.
+- Market quote was accepted from task input and not independently reconstructed from closing price and current shares.
+- Only 2024-2025 OCF was directly used; no longer cash-flow normalization series was constructed.
+- Detachable cash and sustainable cash profit are analytical assumptions, not reported facts.

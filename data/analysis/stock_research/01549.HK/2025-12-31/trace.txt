@@ -1,0 +1,67 @@
+Stock research trace — 01549.HK — period 2025-12-31
+Generated for task created_at: 2026-08-04T12:24:51+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read result-contract.md and report-contract.md in full.
+- Read data-reuse.md because the skill routes existing-data reuse through this reference.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Expected annual facts, normalized facts, raw filing metadata and prior stock-research files were absent from /workspace/stock_report for this company/period.
+- Therefore no historical conclusion or fact package was reused.
+
+3. Identity and model correction
+- Input model hint said financial_brokerage while its tags said automobile/EV; both conflicted with the filing.
+- HKEX Annual Report 2025 identifies Ever Harvest Group Holdings Limited, stock code 1549, as a PRC/Hong Kong waterborne trade and freight provider.
+- Confirmed services: feeder shipping, carrier-owned container, sea-freight forwarding agency and barge services.
+- Overrode model to ordinary_operating; owner earnback applicability = applicable.
+
+4. Primary filing
+- Official filing URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0422/2026042200926_c.pdf
+- Saved local copy: stock_report/data/raw/filings/01549.HK/2025-12-31/annual-report-2025.pdf
+- Extracted text locally to annual-report-2025.txt with pypdf in a temporary virtual environment because pdftotext was unavailable.
+- Key PDF pages checked: 7-14 (business/MD&A), 95-101 (audited statements), 138-140 (revenue, grants, costs), 147 (dividend), 150-163 (PPE, investments, receivables, payables, borrowings, leases), 166 (cash from operations).
+
+5. Currency normalization
+- Filing currency: HKD; protocol currency: CNY absolute yuan.
+- Applied 2025-12-31 CFETS central parity 1 HKD = CNY 0.90322.
+- Source: https://www1.xinhuanet.com/20251231/fe9f6466f6884589b5287e6ee946baed/c.html
+- Used one end-date rate consistently for balance sheet and performance fields; recorded limitation that income/cash-flow translation is not at an annual average rate.
+
+6. Core extracted HKD values (HK$000)
+- Revenue 450,321; cost of services 385,615; gross profit 64,706.
+- EBIT/operating profit 10,316; parent profit 7,684.
+- Total assets 360,120; liabilities 147,226; equity attributable to owners 212,894; NCI nil.
+- Bank balances/cash 136,207; pledged deposits 839; FVPL assets 4,461.
+- Receivables 71,610; PPE 93,416; investment property 53,587.
+- Trade/other payables 101,640; borrowings 40,409; lease liabilities 4,229.
+- Operating cash flow 25,618; cash PPE purchase 755; operating FCF 24,863.
+- Government grants 28,608; working-capital cash release 7,294.
+- Dividend 2025 nil; 2024 nil.
+
+7. Owner earnback judgments
+- Cash: 15% haircut for operating liquidity, discounted CNY 104,571,153.559.
+- FVPL assets: 50% haircut, discounted CNY 2,014,632.21.
+- Borrowings and lease liabilities: deducted at 100%.
+- Pledged deposit excluded; investment property excluded from net cash because it is a non-cash asset pledged for financing.
+- Discounted detachable net cash = CNY 66,267,851.409.
+- Operating business price = market cap CNY 90,675,620.47243118 minus discounted net cash = CNY 24,407,769.06343118.
+- Sustainable cash profit starts from FCF CNY 22,456,758.86, removes government grants CNY 25,839,317.76 and working-capital release CNY 6,588,086.68. Adjusted value is negative, so protocol denominator recorded as zero; payback ratios left null.
+- Forecast dividend = zero based on two consecutive nil recommendations and negative normalized core cash profit.
+
+8. Market data
+- Reused task input without alteration: market cap CNY 90,675,620.47243118, snapshot 2026/08/03 09:20:05, source Tencent qt.gtimg.cn, PE TTM 13.72.
+- Limitation: market snapshot was not independently replicated; TTM period may differ from FY2025.
+
+9. Protocol writes and validation
+- Populated result fields using stock_analysis.stock_research.protocol set commands.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final protocol validation status: ok; errors: [].
+
+10. Output status
+- outputs/result.json: complete under stock-research-result-v1.
+- outputs/report.md: completed, no buy/sell advice or target price.
+- outputs/trace.txt: completed.

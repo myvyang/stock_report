@@ -1,0 +1,47 @@
+stock-research trace — AUBN — period 2025-12-31
+
+1. Read skill and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized result through protocol CLI
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+   No AUBN 2025 annual facts, normalized facts, or raw filing existed under stock_report. Returned to primary filings per data-reuse protocol.
+
+4. Primary sources used
+   - SEC 2025 Form 10-K, accession 0001193125-26-111012, filed 2026-03-17:
+     https://www.sec.gov/Archives/edgar/data/750574/000119312526111012/d87304d10k.htm
+   - Company/SEC 2026 Q1 earnings release:
+     https://investors.auburnbank.com/press-releases/news-details/2026/Auburn-National-Bancorporation-Inc--Reports-First-Quarter-Net-Earnings/default.aspx
+   - SEC Q2 2026 dividend release:
+     https://www.sec.gov/Archives/edgar/data/750574/000119312526220850/d125735dex991.htm
+   - Federal Reserve H.10 USD/CNY daily rate, 2025-12-31 = 7.1875:
+     https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+   - Market cap and PE: config/input.json, Yahoo Finance yfinance snapshot dated 2026-08-03.
+
+5. Model decision
+   Overrode input hint ordinary_operating/applicable with financial_bank/requires_special_model. Auburn National is a bank holding company; customer deposits, loans, securities and liquidity are operating balance-sheet items. Ordinary detachable-net-cash and free-cash-flow earnback metrics remain null.
+
+6. Currency handling
+   Protocol requires CNY absolute yuan. All 2025 filing USD amounts were multiplied by 7.1875. Ratios were kept in native dimensionless form. This translation is analytical presentation only.
+
+7. Key extracted facts (native USD)
+   Total assets 1,018.797m; liabilities 926.744m; equity 92.053m; loans 565.354m; allowance 7.176m; deposits 922.926m; securities 233.259m; cash equivalents 147.832m.
+   Total revenue 32.793m; GAAP net interest income 29.674m; net earnings 7.255m; dividends paid 3.773m.
+   NIM 3.27%; ROE 8.61%; ROA 0.73%; efficiency ratio 69.83%; NPA/assets 0.05%; NPL/loans 0.09%; CET1 16.06%; total risk capital 17.14%; leverage 10.71%.
+
+8. Forecast dividend
+   3,493,699 shares × USD 1.08 annualized dividend × 7.1875 = CNY 27,119,838.4875.
+   CNY 27,119,838.4875 / CNY 616,420,635.9617615 market cap = 4.3995669%.
+   Basis: 2025 actual USD 1.08 per share and 2026 Q1/Q2 maintained USD 0.27 quarterly; no growth assumed.
+
+9. Result population
+   Used protocol CLI set/append commands for every structured mutation; result JSON was not handwritten.
+
+10. Validation
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: {"status":"ok","errors":[]}

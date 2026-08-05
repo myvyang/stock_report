@@ -1,0 +1,77 @@
+stock-research trace
+company=300864.SZ 南大环境
+period=2025-12-31 annual
+generated_for=2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar/object fields with protocol set; populated array rows with protocol append.
+5. Final validation command and result are recorded at the end of this trace.
+
+[reuse audit]
+- No annual facts package, normalized facts, historical stock-research result, or raw filing existed for 300864.SZ/2025-12-31.
+- Downloaded the official Shenzhen Stock Exchange annual-report PDF to stock_report/data/raw/filings/300864.SZ/2025-12-31/annual_report_2025.pdf.
+- Source URL: https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-28/54527e90-b287-43e5-8580-198d92ccdad3.PDF
+- Extracted text locally to annual_report_2025.txt using pypdf in an isolated /tmp virtual environment because pdftotext was unavailable.
+
+[source hierarchy]
+- Core financial/business facts: audited 2025 annual report disclosed by Shenzhen Stock Exchange, announcement date 2026-04-28, standard unqualified opinion.
+- Market cap and PE TTM: config/input.json, Tencent qt.gtimg.cn snapshot at 2026-07-31 11:42:51.
+
+[model audit]
+- Confirmed statement_model=ordinary_operating.
+- Company sells project-based environmental technical services and equipment/system integration. It is not a bank, brokerage, insurer, real-estate developer, concession utility, or investment holding platform.
+- Receivables, contract assets, inventory, payables and contract liabilities were treated as operating items rather than detachable cash.
+
+[key audited facts, CNY]
+revenue=800598707.26
+cost_of_sales=510836146.41
+gross_profit=289762560.85
+parent_net_profit=151238597.77
+deducted_nonrecurring_parent_profit=138183082.05
+operating_cash_flow=150661688.78
+capital_expenditure=77476990.01
+operating_free_cash_flow=73184698.77
+total_assets=1986376887.07
+total_liabilities=589540358.62
+total_equity=1396836528.45
+parent_equity=1354405333.54
+minority_interest=42431194.91
+
+[cash computation, CNY]
+unrestricted_bank_deposit=96212919.09 * 0.90 = 86591627.181
+trading_financial_assets_wealth_management=653004111.28 * 0.90 = 587703700.152
+transferable_certificates_of_deposit=483432181.98 * 0.90 = 435088963.782
+lease_related_liabilities=(13395425.48 + 96656552.09) * -1.00 = -110051977.57
+discounted_detachable_net_cash=999332313.545
+restricted_guarantee_deposit=2048443.93 excluded
+
+[cash profit computation, CNY]
+profit_basis=deducted_nonrecurring_parent_profit=138183082.05
+cash_basis=operating_cash_flow 150661688.78 - estimated_maintenance_capex 20000000 = 130661688.78
+pre_haircut_average=(138183082.05 + 130661688.78) / 2 = 134422385.415
+discounted_sustainable_cash_profit=134422385.415 * 0.85 = 114259027.60275
+Note: maintenance capex is not separately disclosed. The estimate references 2025 fixed-asset depreciation and amortization; actual reported capex was 77476990.01. This is a material judgment disclosed as a limitation.
+
+[valuation computation]
+market_cap=2880000000.0
+discounted_net_cash_to_market_cap=999332313.545 / 2880000000 = 0.3469903866475694
+operating_business_price=2880000000 - 999332313.545 = 1880667686.455
+owner_earnback_years=1880667686.455 / 114259027.60275 = 16.459685732611078
+market_cap_to_cash_profit=2880000000 / 114259027.60275 = 25.205885787975
+
+[dividend]
+2025 proposal: 157910683 shares, CNY 8.50 per 10 shares, forecast_cash_dividend=134224080.55
+forecast_dividend_yield=134224080.55 / 2880000000 = 0.046605583524305556
+Status is proposal, not completed distribution.
+
+[quality]
+- Complete under result-contract minimum fields.
+- Main limitations: external quote snapshot not reverified; maintenance capex estimated; some wealth-management/CD assets may be restricted by fundraising purposes; dividend is a proposal.
+
+[validation]
+Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Result: {"status":"ok","errors":[]}

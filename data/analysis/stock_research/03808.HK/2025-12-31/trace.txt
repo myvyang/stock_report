@@ -1,0 +1,58 @@
+Stock research trace: 03808.HK / 2025-12-31 annual
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All result fields were populated using protocol `set` and `append`; the complex JSON result was not handwritten.
+
+2. Local reuse check
+- Checked configured raw filing, annual review, normalized facts, and prior stock research paths.
+- No local annual facts package, normalized facts, metadata, or prior research result existed for 03808.HK/2025-12-31.
+- Downloaded the official 2025 annual report PDF to stock_report/data/raw/filings/03808.HK/2025-12-31/annual-report-2025.pdf for durable reuse.
+
+3. Primary sources
+- HKEX 2025 annual report, released 2026-04-30:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0430/2026043000287.pdf
+- HKEX announcement of annual results, released 2026-03-27:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0327/2026032703228.pdf
+- Valuation snapshot from config/input.json: Tencent qt.gtimg.cn, 2026/08/03 09:48:13.
+
+4. Model decision
+- Input hint financial_brokerage was rejected as a company-master classification error.
+- Annual report says the group researches, manufactures and sells heavy/medium-heavy/light trucks and key components, plus financial services.
+- 2025 finance segment external revenue RMB740.480m / group revenue RMB109,540.885m = 0.676%; manufacturing is economically dominant.
+- Final model: ordinary_operating; ordinary owner earnback applicable with special exclusion of financing receivables and operating financial assets from detachable cash.
+
+5. Extracted core facts (RMB)
+- Revenue 109,540,885,000; cost of sales 93,022,223,000; gross profit 16,518,662,000.
+- Operating profit 8,137,086,000; net profit 7,664,443,000; parent net profit 7,019,303,000.
+- Total assets 153,128,651,000; total liabilities 99,914,676,000; total equity 53,213,975,000; parent equity 44,990,219,000; NCI 8,223,756,000.
+- Operating cash flow 7,623,000,000; CAPEX 1,120,000,000; operating FCF 6,503,000,000.
+- Financing cash outflow 3,511,000,000.
+- Cash equivalents 18,412,000,000; restricted cash 5,984,000,000; borrowings 5,465,034,000.
+- Statement combined cash/cash equivalents/restricted cash 30,484,627,000; inferred other time deposits = 30,484,627,000 - 18,412,000,000 - 5,984,000,000 = 6,088,627,000.
+- 2025 declared dividends: interim 1,873,624,000 + final 2,153,575,000 = 4,027,199,000.
+
+6. Calculations
+- Gross margin = 16,518,662,000 / 109,540,885,000 = 0.1507990555.
+- Parent net margin = 7,019,303,000 / 109,540,885,000 = 0.0640792979.
+- Discounted detachable net cash = 18,412,000,000 + 6,088,627,000 * 0.95 - 5,465,034,000 = 18,731,161,650.
+- Parent attribution ratio = 7,019,303,000 / 7,664,443,000 = 0.9159172721.
+- Discounted sustainable cash profit = 6,503,000,000 * 0.9159172721 * 0.90 = 5,360,060,041.95.
+- Operating business price = 98,051,669,253.86131 - 18,731,161,650 = 79,320,507,603.86131.
+- Owner earnback years = 79,320,507,603.86131 / 5,360,060,041.95 = 14.7984.
+- Market cap / cash profit = 98,051,669,253.86131 / 5,360,060,041.95 = 18.2930.
+- Dividend yield = 4,027,199,000 / 98,051,669,253.86131 = 0.0410722125.
+
+7. Judgment boundaries
+- Financing receivables, bank acceptance bills, restricted cash, inventories, and associate investments were excluded from detachable cash because they support sales, settlement, production, or strategic operations.
+- The 10% cycle/working-capital discount is an explicit analyst judgment, not a reported fact.
+- The time-deposit split is inferred from management's disclosed cash-equivalent and restricted-cash amounts reconciled to the statement total; a 5% haircut addresses liquidity and split uncertainty.
+- Market cap and PE were reused exactly from the task input and were not independently reconstructed.
+
+8. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[] before report/trace finalization.

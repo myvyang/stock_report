@@ -1,0 +1,69 @@
+Stock research trace: MAS / Masco Corporation
+Period: 2025-12-31 annual
+Generated context date: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the task required deciding whether existing facts were sufficient.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked the configured raw filing, annual review, normalized facts and historical stock research paths.
+- No MAS 2025 annual facts package, raw filing metadata or prior research output existed in the workspace; only config/input.json was present.
+- Returned to primary public sources rather than fabricating or filling from third-party summaries.
+
+3. Primary sources examined
+- SEC filing index: accession 0000062996-26-000005, filed 2026-02-10, period 2025-12-31.
+- SEC inline XBRL 10-K: https://www.sec.gov/Archives/edgar/data/62996/000006299626000005/mas-20251231.htm
+- SEC company facts API for CIK 0000062996, used to cross-check statement concepts and values.
+- Masco 2025 year-end result and dividend announcement: https://investor.masco.com/news-stream/news-details/2026/Masco-Corporation-Reports-Fourth-Quarter-and-2025-Year-End-Results/default.aspx
+- Input market snapshot: Yahoo Finance yfinance, market cap CNY 95,112,775,712.04785 dated 2026-08-03 and PE TTM 16.470047.
+- FX reference: official-authorized 2026-07-01 USD/CNY central parity 6.8067, https://guangdong.chinatax.gov.cn/gdsw/lvxx/2026-07/01/content_ba81c8e3923f4642920eee26c09b592e.shtml
+
+4. Model decision
+- Confirmed ordinary_operating / applicable.
+- Reason: branded product design, manufacturing and distribution; receivables, inventory, plant, leases and funded debt are conventional operating-company items. No customer deposits, regulated project cash, insurance reserves, concession rights or investment-holding structure makes the balance sheet itself a special business model.
+
+5. Core extracted USD facts (millions unless stated)
+- Revenue 7,562; cost of sales 4,883; gross profit 2,679; operating profit 1,248.
+- Consolidated net income 858; NCI income 48; parent net income 810.
+- Operating cash flow 1,022; capex 156; operating FCF 866.
+- Financing cash flow -888; common share repurchase 571; repurchase excise tax 6; common dividends 261; NCI dividends 45.
+- Assets 5,201; liabilities 5,125; total equity 76; parent equity -185; NCI equity 261.
+- Cash 647; receivables 1,028; inventories 1,046; PP&E 1,195; goodwill 623; other intangibles 205; operating lease ROU assets 233.
+- Accounts payable 810; accrued liabilities 761; notes payable 2; long-term debt 2,945; noncurrent lease liabilities 221; other liabilities 387.
+- Segment revenue: Plumbing 4,992; Decorative Architectural 2,570. Segment operating profit: 895 and 443.
+
+6. Currency normalization
+- All filing USD amounts multiplied by 6.8067 to produce CNY absolute yuan in outputs/result.json.
+- The input did not disclose the market-data provider's exact FX conversion. This is retained as a data-quality limitation; ratios computed wholly from statement values are unaffected, while CNY absolute values and market-cap-based ratios can move modestly with FX.
+
+7. Owner earnback calculation
+- Cash haircut: USD 647m x 80% = USD 517.6m.
+- Debt deduction: USD 2,945m long-term debt + USD 2m notes payable = USD 2,947m at 100%.
+- Discounted detachable net cash: (517.6 - 2,947) x 6.8067 = CNY -16,536,196,980.
+- Parent-accessible operating FCF before sustainability haircut: (1,022 - 156 - 45) x 6.8067 = CNY 5,588,300,700.
+- Sustainability haircut: 10%, based on 2025 revenue -3%, gross margin -80bp, tariff/input-cost pressure and weaker demand.
+- Discounted sustainable cash profit: CNY 5,029,470,630.
+- Operating business price: 95,112,775,712.04785 - (-16,536,196,980) = CNY 111,648,972,692.04785.
+- Owner earnback years: 111,648,972,692.04785 / 5,029,470,630 = 22.19895112.
+- Market cap / cash profit: 95,112,775,712.04785 / 5,029,470,630 = 18.91109079.
+
+8. Dividend forecast
+- Company intention: USD 1.28 per share annual dividend for 2026.
+- Estimate uses 204.3m shares outstanding at 2025-12-31: USD 261.504m.
+- CNY forecast: 261.504m x 6.8067 = CNY 1,779,979,276.8.
+- Yield: 1,779,979,276.8 / 95,112,775,712.04785 = 1.871441%.
+
+9. Protocol operations and validation
+- Populated the initialized JSON through protocol set and append commands; the complex result object was not authored from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status before final file checks: ok, errors: [].
+
+10. Judgment boundaries
+- Facts from filings and announcements are identified separately from analysis judgments.
+- The 80% cash haircut and 10% cash-profit sustainability haircut are analyst assumptions, explicitly disclosed.
+- No buy/sell recommendation, target price, ranking label or certainty claim was produced.

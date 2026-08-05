@@ -1,0 +1,73 @@
+Stock research trace
+Run date: 2026-08-04 Asia/Shanghai
+Company: 01808.HK Enterprise Development Holdings Limited / 企展控股有限公司
+Period: 2025-12-31 annual
+
+Protocol
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the skill directs reuse of existing fact packs.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields through protocol `set` commands; did not construct the result JSON from an empty object.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+Sources read
+- config/input.json
+- stock_report/data/analysis/annual_review/01808.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/01808.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/01808.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/01808.HK/2025-12-31/metadata.json
+- Local 2025 and 2024 annual-report PDFs listed in metadata.json (reused via the annual fact pack)
+- HKEX Annual Results for the year ended 31 December 2025, released 2026-03-23:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0323/2026032301820.pdf
+- HKEX Statement of Disciplinary Action, dated 2026-03-17:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0317/2026031700734.pdf
+- Tencent qt.gtimg.cn market snapshot supplied in config/input.json
+
+Identity and model resolution
+- Input hint said financial_brokerage; its tags simultaneously said automobile/EV, so the hint was internally inconsistent.
+- 2025 annual report note 3 states the principal activities are sales of software licences, hardware and other products and integrated business software solutions.
+- Software and Hardware Business is the only major reportable segment. Securities trading is within an unreportable "Others" segment.
+- Resolved statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+Unit conversion
+- Annual report presentation unit: RMB'000.
+- Every financial amount in result.json was multiplied by 1,000 and stored as absolute CNY yuan.
+
+Key calculations
+- gross_margin = 148,652,000 / 3,858,546,000 = 0.03852667482129331
+- net_margin = 152,186,000 / 3,858,546,000 = 0.03944127969955346
+- operating_free_cash_flow = 43,677,000 - 8,221,000 = 35,456,000
+- 2023-2025 aggregate operating cash flow
+  = -12,608,000 - 65,638,000 + 43,677,000
+  = -34,569,000
+- Three-year average operating cash flow = -11,523,000.
+- Three-year capex proxy total = 6,188,000 + 12,640,000 + 8,221,000 = 27,049,000.
+- Because the multi-year cash-flow test is negative and 2025 cash flow depended materially on customer advances, sustainable distributable cash profit was not established and remains null.
+
+Owner earnback cash calculation
+- Cash and cash equivalents: 168,527,000 x 0% = 0; necessary operating cash cannot be separated and RMB80,532,000 is held in PRC institutions subject to remittance restrictions.
+- Pledged deposits: 89,738,000 x 0% = 0; paired with secured bank debt.
+- Listed equities: 110,832,000 x 70% = 77,582,400.
+- Tokenised notes: 21,870,000 x 50% = 10,935,000.
+- Unlisted AI equities: 60,000,000 x 20% = 12,000,000.
+- Associates: 185,080,000 x 30% = 55,524,000.
+- Interest-bearing borrowings: -134,734,000.
+- Amounts due to broker: -73,936,000.
+- discounted_detachable_net_cash = -52,628,600.
+- operating_business_price = 547,761,615.8539057 - (-52,628,600)
+  = 600,390,215.8539057.
+- discounted_net_cash_to_market_cap = -52,628,600 / 547,761,615.8539057
+  = -0.096079386548145.
+- owner_earnback_years and market_cap_to_cash_profit remain null because the cash-profit denominator is not established.
+
+Dividend
+- HKEX annual-results note 7 states no dividend was paid or proposed for 2025, 2024 was nil, and none was proposed after period end.
+- Forecast dividend = 0; forecast yield = 0.
+
+Data-quality decision
+- status=partial, not complete: company identity, financial statements, assets/liabilities, valuation input and dividend evidence are available, but the defining cash-profit denominator is not supportable after the three-year cash conversion check.
+- Result should not enter formal owner-earnback sorting until later periods demonstrate sustainable cash conversion.

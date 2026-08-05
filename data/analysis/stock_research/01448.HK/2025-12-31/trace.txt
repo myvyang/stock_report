@@ -1,0 +1,73 @@
+stock-research trace
+company=01448.HK FU SHOU YUAN
+requested_period=2025-12-31
+as_of=2026-08-04 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because no annual facts were visible and reuse boundaries were relevant.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated individual paths using protocol set/append commands; did not construct result.json manually.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: status=ok, errors=[]
+
+[local-data-check]
+Checked the configured raw filing, annual review, normalized facts and prior stock research locations.
+No reusable 2025 annual filing, facts package or prior result was present in /workspace at research time.
+
+[company-and-model]
+Input hint said financial_brokerage. Rejected after checking the company's official filing: Fu Shou Yuan earns revenue from burial, funeral and related services and has cemetery/operating assets rather than brokerage client funds, proprietary trading assets and repo funding.
+Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable in principle.
+Owner earnback values remain null because missing annual audited data prevents reliable calculation; this is a data-availability limitation, not a special-industry model.
+
+[primary-sources]
+HKEX 2025 Interim Report, published 2025-09-23:
+https://www1.hkexnews.hk/listedco/listconews/sehk/2025/0923/2025092300688.pdf
+- IAS 34 interim statements reviewed by Deloitte; no audit opinion.
+- Revenue RMB610.850m; operating loss RMB229.249m; net loss RMB263.873m; parent loss RMB261.411m.
+- At 2025-06-30: assets RMB7,238.279m; liabilities RMB2,372.648m; equity RMB4,865.631m; parent equity RMB4,291.235m; NCI RMB574.396m.
+- IFRS operating cash flow RMB56.940m; payments for property/equipment/landscape and intangibles RMB72.197m; simple FCF computed as RMB-15.257m, rounded to RMB-15.260m in result.
+- Bank cash RMB1,622.742m; time deposits RMB381.824m; FVTPL cash products RMB311.892m; no bank borrowing.
+- Revenue -44.5% YoY; comparable cemetery ordinary plot revenue -51.4%, volume -7.8%, ASP -47.3%.
+- Impairment on PPE, cemetery assets, intangibles and goodwill RMB217.638m.
+- Interim dividend declared after period end: HKD0.07/share. Not converted into a forecast cash amount because annual dividend and current exchange-rate basis are unavailable and unreliable.
+
+HKEX investigation/delay announcement, published 2026-03-19:
+https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0319/2026031901654.pdf
+- Asset procurement transactions and payment arrangements required further verification.
+- Approximate RMB3m payment lacked fully verified supporting documents/approval procedures.
+- Special investigation committee established; forensic accountant proposed.
+
+HKEX delayed annual results announcement, published 2026-03-31:
+https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0331/2026033104489.pdf
+- 2025 annual results not published by deadline.
+- Investigation and audit work still ongoing.
+- Board said releasing unaudited 2025 management accounts could be inaccurate/misleading.
+
+HKEX prolonged suspension status report, posted 2026-07-31:
+https://www2.hkexnews.hk/-/media/HKEXnews/Homepage/Exchange-Reports/Prolonged-Suspension-Status-Report/psuspenrep_mb.pdf
+- Suspension date 2026-03-20; remedial period end 2027-09-19.
+- Guidance includes forensic investigation, all outstanding financial results, management integrity concerns, internal-control review, Rule 13.24 compliance and disclosure of material information.
+
+[market-data]
+Copied without alteration from config/input.json:
+market_cap=CNY 5,268,855,759.451389
+market_cap_date=2026/08/03 09:20:05
+market_cap_source=Tencent qt.gtimg.cn
+pe_ttm=15.2
+Limitation: the input date falls within trading suspension. PE likely relies on stale/rolling earnings and was not used as proof of cheapness.
+
+[calculation-notes]
+latest interim total assets = non-current assets 4,390.160m + current/held-for-sale assets 2,848.119m = 7,238.279m.
+latest interim total liabilities = current/held-for-sale liabilities 1,557.568m + non-current liabilities 815.080m = 2,372.648m.
+minority interest ratio = 574.396m / 4,865.631m = 0.1180525.
+financial asset total = cash 1,622.742m + time deposits 210.586m + 171.238m + FVTPL products 311.892m = 2,316.458m.
+operating free cash flow = 56.940m - (69.958m + 2.239m) = -15.257m; rounded -15.260m.
+dividend cash out = parent dividends 561.367m + subsidiary NCI dividends 116.059m = 677.426m.
+
+[quality-decision]
+status=partial.
+Reasons: requested annual statements are absent; investigation/audit incomplete; annual dividend and owner-earnback inputs cannot be validated. Interim numbers are preserved only as the latest available operating-state reference and are explicitly identified as unaudited interim figures.

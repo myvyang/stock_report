@@ -1,0 +1,64 @@
+FXNC stock research trace
+generated_at=2026-08-05T02:26:47+08:00
+period=2025-12-31
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Initialized structured output with protocol CLI
+- PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+- Expected annual facts, normalized facts, extraction trace, and raw filing paths under stock_report/ were absent.
+- No prior FXNC research result was available for reuse.
+- Decision: obtain the 2025 primary filing and rebuild only the fields required by the result/report contracts.
+
+4. Primary sources consulted
+- SEC Form 10-K, period 2025-12-31, filed 2026-03-25, accession 0001437749-26-009748:
+  https://www.sec.gov/Archives/edgar/data/719402/000143774926009748/fxnc20251231_10k.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/719402/000143774926009748/0001437749-26-009748-index.htm
+- SEC Form 8-K for 2025 annual results, filed 2026-01-29:
+  https://www.sec.gov/Archives/edgar/data/719402/000143774926002351/fxnc20251204_8k.htm
+- Market cap and PE: config/input.json, Yahoo Finance yfinance, market-cap date 2026-08-03.
+
+5. Model decision
+- Input hint ordinary_operating/applicable rejected.
+- Filing identifies First National Corporation as a bank holding company owning First Bank.
+- Loans and securities are earning assets; customer deposits and wholesale funding are operating funding.
+- Selected model: financial_bank.
+- Owner earnback applicability: not_applicable.
+- All ordinary discounted-net-cash and cash-profit payback metrics retained as null.
+
+6. Key source facts (USD, thousands unless ratio)
+- Assets 2,037,978; liabilities 1,851,782; equity 186,196.
+- Loans net 1,435,026; deposits 1,799,548; cash/due from banks 162,874.
+- Net interest income 73,246; noninterest income 17,018; net income 17,703.
+- Cash dividends paid, net of reinvestment 5,520.
+- NIM 3.88%; ROA 0.87%; ROE 10.10%; efficiency ratio 68.18%.
+- Nonperforming assets 4,700 / 0.23% of assets; ACL on loans 14,719 / 1.02% of loans.
+- CET1 12.59%; Tier 1 leverage 9.13%; total capital 13.64%.
+- Estimated uninsured deposits 538,200; wealth-management AUM 478,000.
+
+7. Currency normalization
+- Protocol requires CNY absolute yuan.
+- Used 7.1217 CNY per USD as the 2025 annual-average conversion assumption for filing amounts.
+- Market cap was already supplied in CNY and was not reconverted.
+- Forecast dividend: USD 0.17 quarterly rate x 4 x 9,025,395 year-end shares x 7.1217 = CNY 43,707,785.79.
+- Forecast yield = CNY 43,707,785.79 / CNY 1,937,374,162.7060852 = 2.2560%.
+
+8. Protocol construction
+- Used protocol set commands to populate initialized outputs/result.json; did not hand-write the JSON document.
+
+9. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Status: ok
+- Errors: none
+
+10. Limitations
+- No local annual facts package was available.
+- Forecast dividend is a mechanical annualization, not management guidance.
+- Input yfinance market cap/PE was accepted as supplied; its internal calculation workpaper was unavailable.
+- Bank cash-flow and ordinary owner-earnback fields are intentionally null because they lack comparable economic meaning.

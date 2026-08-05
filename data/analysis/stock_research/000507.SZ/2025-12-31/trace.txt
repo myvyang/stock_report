@@ -1,0 +1,69 @@
+stock-research trace
+company=000507.SZ 珠海港
+period=2025-12-31
+generated_for=2026-08-01
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Ran protocol init with config/input.json -> outputs/result.json.
+3. Populated result fields only through protocol set/append commands.
+4. Final protocol validation recorded below after file construction.
+
+[reuse audit]
+- Expected raw filing directory: stock_report/data/raw/filings/000507.SZ/2025-12-31 (absent).
+- Expected annual facts files: stock_report/data/analysis/annual_review/000507.SZ/2025-12-31 (absent).
+- Expected normalized facts and prior stock research: absent.
+- Therefore supplemented with public 2025 annual-report disclosure; did not fabricate a local facts package.
+
+[source records]
+- Public annual report page: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12249768&stockid=000507
+  The page reproduces the 2025 annual report disclosed on CNINFO; report itself identifies CNINFO as disclosure site and Beijing Dahua/Dehao International as auditor.
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, market_cap=4691000000, date=20260731114300, pe_ttm=20.29.
+
+[model audit]
+- Input hint ordinary_operating/applicable was independently reviewed.
+- Revenue and cash flow arise from consolidated port, shipping/logistics, wind/solar, gas, and glass operations, so ordinary operating statements have economic meaning.
+- Port, vessel, energy, gas and related intangible assets are necessary operating assets. Their financing is inseparable from the business for owner-earnback purposes.
+- Final model: ordinary_operating; owner_earnback_applicability=applicable with special handling for net debt, minority interests, and investment-income volatility.
+
+[financial calculations, CNY]
+gross_profit = revenue 4386840886.95 - cost_of_sales 3183717246.55 = 1203123640.40
+gross_margin = 1203123640.40 / 4386840886.95 = 0.2742574147
+net_margin = parent_net_profit 241196844.04 / 4386840886.95 = 0.0549818993
+operating_free_cash_flow = operating_cash_flow 957915576.49 - capex 322429741.68 = 635485834.81
+minority_interest_ratio = 2983740934.20 / 9347468908.81 = 0.3191977829
+
+[owner earnback calculations, CNY]
+cash_equivalents = 2592924716.04
+financing_debt = short_borrowings 927961218.98
+  + current_noncurrent_liabilities 1760166184.85
+  + other_current_liabilities 1719998551.53
+  + long_borrowings 2407306509.87
+  + bonds_payable 2196925865.80
+  + lease_liabilities 48911517.29
+  + long_term_payables 363067788.62
+  = 9424337636.94
+discounted_detachable_net_cash = 2592924716.04 - 9424337636.94 = -6831412920.90
+discounted_net_cash_to_market_cap = -6831412920.90 / 4691000000 = -1.4562807335
+discounted_sustainable_cash_profit = recurring_parent_profit 239301363.16 * 0.80 = 191441090.528
+operating_business_price = market_cap 4691000000 - (-6831412920.90) = 11522412920.90
+owner_earnback_years = 11522412920.90 / 191441090.528 = 60.18777311
+market_cap_to_cash_profit = 4691000000 / 191441090.528 = 24.50362139
+
+[dividend]
+forecast_cash_dividend = 48902664.33 (2025 annual distribution proposal, RMB 0.54 per 10 shares on 905604895 shares)
+forecast_dividend_yield = 48902664.33 / 4691000000 = 0.0104247846
+Proposal remains subject to shareholder approval and implementation.
+
+[judgment boundaries]
+- Fact: 2025 statement values, segment data, restricted assets, proposed dividend.
+- Calculation: margins, simplified operating FCF, net debt, owner-earnback ratios.
+- Judgment: all other-current-liabilities treated as financing debt for conservatism; recurring parent profit discounted 20% for investment-income volatility and capital intensity.
+- Limitation: other-current-liabilities may include non-financing components, while exact maintenance capex is unavailable. These choices bias the earnback estimate conservatively but do not eliminate uncertainty.
+
+[validation]
+{
+  "status": "ok",
+  "errors": []
+}
+exit_code=0

@@ -1,0 +1,28 @@
+2026-08-05 stock-research trace — ABG FY2025
+
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md in full.
+2. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Reuse check: no ABG FY2025 raw filing, annual facts, normalized facts, or prior stock-research result existed under stock_report/data.
+4. Primary filing retrieved and inspected: Asbury Automotive Group 2025 Form 10-K, accession 0001144980-26-000051, filed 2026-02-20.
+   URL: https://www.sec.gov/Archives/edgar/data/1144980/000114498026000051/abg-20251231.htm
+5. SEC companyfacts API cross-check used for headline XBRL values: assets, equity, revenue, gross profit, operating income, net income, operating cash flow.
+   URL: https://data.sec.gov/api/xbrl/companyfacts/CIK0001144980.json
+6. FX sources:
+   - 2025 P&L/cash flow: Federal Reserve annual average 7.1875 CNY/USD.
+   - 2025-12-31 balance sheet approximation: Federal Reserve December 2025 monthly average 7.0432 CNY/USD.
+7. Statement model confirmed as ordinary_operating. Special handling retained for vehicle floorplan financing and TCA securities.
+8. Owner earnback calculation (USD millions before translation):
+   - Detachable funds = cash 40.4 + 80% × (short-term investments 0.5 + investments 414.7) = 372.56.
+   - Financing debt = non-trade floorplan 1,683.9 + current maturities 479.2 + long-term debt 3,092.8 = 5,255.9.
+   - Discounted detachable net cash = -4,883.34 USDm × 7.0432 = -34,394,340,288 CNY.
+   - 2025 FCF = OCF 775.2 - capex 205.3 = 569.9 USDm.
+   - Remove inventory/trade-floorplan net cash benefit 65.9 USDm, then apply 80% durability factor: (569.9 - 65.9) × 80% = 403.2 USDm = 2,898,000,000 CNY.
+   - Operating business price = 29,110,709,377.731445 - (-34,394,340,288) = 63,505,049,665.731445 CNY.
+   - Owner earnback = 63,505,049,665.731445 / 2,898,000,000 = 21.9134 years.
+   - Market cap / cash profit = 10.0451.
+9. Dividend forecast set to zero because FY2023-FY2025 cash flow/equity statements show repurchases but no common cash dividend.
+10. Populated result fields through protocol CLI set commands; complex JSON was not authored from a blank file.
+11. Final validation after unit correction:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Result: {"status":"ok","errors":[]}

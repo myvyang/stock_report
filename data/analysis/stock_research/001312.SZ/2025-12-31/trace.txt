@@ -1,0 +1,56 @@
+stock-research trace
+company: 001312.SZ 福恩股份
+period: 2025-12-31 annual
+generated_at: 2026-08-03T11:20:14+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No raw filing, annual facts, normalized facts, or prior stock-research outputs existed for 001312.SZ/2025-12-31.
+- Existing user evaluation note was not needed for core financial facts.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result skeleton generated successfully.
+
+4. Primary disclosure collected
+- Shenzhen Stock Exchange annual-report PDF:
+  https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-29/f81127b4-893c-4965-ba3d-db2e584333cf.PDF
+- Publication date: 2026-04-29.
+- Local copy: stock_report/data/raw/filings/001312.SZ/2025-12-31/2025-annual-report.pdf
+- Core pages reviewed: business and MD&A pp. 9-27; consolidated statements pp. 82-92; cash/restricted-funds and financial-asset notes pp. 118-169; financial-instrument notes pp. 182-186.
+
+5. Key extracted facts
+- Revenue 1,720,304,485.73; cost of sales 1,257,194,621.68; gross profit 463,109,864.05.
+- Parent net profit 230,344,719.72; operating cash flow 256,513,698.25.
+- Capital expenditure 137,119,877.64; operating free cash flow 119,393,820.61.
+- Total assets 1,983,062,450.88; liabilities 673,687,076.11; parent equity 1,309,375,374.77.
+- Cash 430,890,450.31, of which 132,662,926.75 restricted; cash and equivalents 298,227,523.56.
+- Wealth-management products 87,251,280.43; large certificates of deposit 250,965,266.38.
+- Proposed dividend: CNY 0.20/share on 233,333,334 shares = 46,666,666.80.
+
+6. Analysis model
+- Confirmed ordinary_operating and owner-earnback applicable.
+- Reason: textile manufacturing and sales; operating assets are receivables, inventory, plant and equipment, with no special financial-statement model.
+
+7. Owner-earnback assumptions
+- Unrestricted cash: 50% haircut.
+- Wealth-management products: 20% haircut.
+- Large certificates of deposit: 10% haircut.
+- Restricted guarantee deposits: excluded.
+- Lease/current lease and derivative liabilities: deducted.
+- Discounted detachable net cash rounded to 424,800,000.
+- Sustainable cash profit starts from 2025 OCF, deducts about 58,000,000 estimated maintenance capex based on depreciation/amortization, then a 28,513,698.25 safety adjustment; rounded to 170,000,000.
+- Market cap 4,142,000,000; operating business price 3,717,200,000; owner earnback 21.8659 years.
+
+8. Important limitation
+- 2025 year-end statements predate the April 2026 IPO and do not include IPO proceeds, while market cap is dated 2026-07-31. IPO cash was not backfilled because a same-date post-IPO balance sheet was outside the requested annual period.
+
+9. Protocol population and validation
+- outputs/result.json populated exclusively through protocol set/append commands after init.
+- Final validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].

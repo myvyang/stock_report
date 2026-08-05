@@ -1,0 +1,75 @@
+stock-research trace
+task: UCB / United Community Banks, Inc.
+period: 2025-12-31 annual
+generated_at_input: 2026-08-04T21:08:02+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Expected raw filing, annual facts, normalized facts, and historical stock-research paths were absent in /workspace.
+- Only stock_report/data/notes/user_stock_evaluations.md existed; it contained no reusable UCB fact package.
+- Therefore primary public sources were fetched to fill the missing evidence.
+
+3. Company and model resolution
+- SEC CIK 0000857855, accession 0000857855-26-000008, FY ended 2025-12-31.
+- SEC filing identifies United Community Banks, Inc. as a bank holding/financial holding company and UCB as its NYSE ticker.
+- Overrode input hint ordinary_operating/applicable with financial_bank/not_applicable.
+- Reason: deposits, loans, and securities are operating funding/assets of a bank; they cannot be treated as detachable net cash.
+- All ordinary owner-earnback sorting fields remained null by contract.
+
+4. Primary sources
+- SEC 10-K HTML: https://www.sec.gov/Archives/edgar/data/857855/000085785526000008/ucbi-20251231.htm
+- SEC filing index: https://www.sec.gov/Archives/edgar/data/857855/000085785526000008/0000857855-26-000008-index.htm
+- SEC Companyfacts API: https://data.sec.gov/api/xbrl/companyfacts/CIK0000857855.json
+- Company FY2025/Q4 results: https://ir.ucbi.com/news-releases/news-release-details/united-community-banks-inc-reports-fourth-quarter-earnings
+- FX fixing (PBOC-authorized CFETS announcement, reproduced by CE.cn): https://www.ce.cn/xwzx/gnsz/gdxw/202512/t20251231_2676993.shtml
+- Market cap and PE: config/input.json, source Yahoo Finance yfinance.
+
+5. Currency convention
+- Financial statement source currency: USD.
+- Result contract currency: CNY absolute yuan.
+- Conversion used for all filing-derived monetary fields: USD 1 = CNY 7.0288, 2025-12-31 central parity.
+- Ratios reported by the company were not currency-converted.
+- Market cap was already supplied in CNY and was not converted.
+
+6. Key extracted USD facts
+- Assets 28,002,554,000; liabilities 24,363,868,000; equity 3,638,686,000.
+- Gross loans 19,384,317,000; loan ACL 210,429,000; net loans 19,173,888,000.
+- Deposits 23,798,430,000; cash equivalents 395,754,000.
+- AFS securities 3,750,863,000; HTM securities 2,237,356,000; HTM fair value 1,918,426,000.
+- Goodwill and other intangibles 967,882,000.
+- Total revenue 1,063,152,000; net interest income 909,107,000; noninterest income 154,045,000.
+- Provision for credit losses 48,806,000; net income 328,095,000; common income 318,183,000.
+- FY NIM 3.52%; ROA 1.17%; ROE 9.12%; GAAP efficiency ratio 55.46%.
+- NPA 93,498,000 / assets 0.33%; FY net charge-off ratio 0.22%; Q4 annualized 0.34%.
+- Consolidated CET1 13.44%; company and bank characterized as well-capitalized.
+- FY2025 common dividends paid 118,518,000; declared dividend 0.98/share; Q4 dividend 0.25/share.
+
+7. Forecast dividend method
+- No management dividend guidance was assumed.
+- Baseline = Q4 declared dividend USD 0.25/share x 4 x 120,598,266 year-end shares.
+- Forecast USD cash dividend = 120,598,266.
+- Forecast CNY cash dividend = 847,661,092.0644608.
+- Forecast yield = 847,661,092.0644608 / 28,641,413,067.618164 = 0.029595644951581016.
+
+8. Quality and limitations
+- data_quality.status = complete because special-model minimum fields, asset/liability explanations, dividend forecast, business story, and evidence are populated.
+- Complete means consumable, not an investment-quality label.
+- Cash flow, capex, gross profit, gross margin, ordinary discounted cash profit, and earnback years remain null because they lack comparable economic meaning under the banking model.
+- P/B and P/TBV cited in narrative are approximate comparisons from input market cap and period-end book values; they are not protocol sorting fields or fixed payback measures.
+
+9. Protocol operations
+- result.json was created with protocol init.
+- Fields and list entries were populated with protocol set/append commands; the complex result object was not handwritten from scratch.
+- Final validation command is recorded in the completion step below.
+
+10. Completion validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}
+- Confirmed all ordinary owner-earnback metric fields are null under financial_bank/not_applicable.
+- Confirmed outputs/result.json, outputs/report.md, and outputs/trace.txt exist.

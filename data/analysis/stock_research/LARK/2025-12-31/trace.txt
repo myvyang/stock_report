@@ -1,0 +1,63 @@
+stock-research trace
+company=LARK / Landmark Bancorp, Inc.
+period=2025-12-31
+generated_for=2026-08-04 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: initialized stock-research-result-v1 template.
+
+3. Reuse audit
+- No LARK 2025 annual facts, normalized facts, raw filing, or previous stock-research result existed under stock_report/data.
+- Existing user evaluation note file contained no task-specific source package used here.
+
+4. Primary filing acquisition
+- SEC Form 10-K URL: https://www.sec.gov/Archives/edgar/data/1141688/000149315226016495/form10-k.htm
+- SEC accession: 0001493152-26-016495
+- Filed: 2026-04-14
+- Period: 2025-12-31
+- Saved local raw filing: stock_report/data/raw/filings/LARK/2025-12-31/form10-k.htm
+- Saved extracted XBRL instance: stock_report/data/raw/filings/LARK/2025-12-31/form10-k_htm.xml
+
+5. Model decision
+- Input hint ordinary_operating/applicable was overridden.
+- Filing identifies Landmark Bancorp as a financial holding company operating Landmark National Bank.
+- Selected statement_model=financial_bank and owner_earnback_applicability=not_applicable.
+- Reason: deposits, loans, securities, and interbank positions are operating balance-sheet items and cannot be treated as detachable net cash.
+
+6. Core source facts (USD thousands unless ratios)
+- Total assets 1,606,642; total liabilities 1,446,011; stockholders' equity 160,631.
+- Net loans 1,098,393; investment securities 351,946; cash plus interest-bearing bank deposits 24,200.
+- Deposits 1,388,854; FHLB/other borrowings 10,567; subordinated debentures 21,651; repurchase agreements 1,501.
+- Net interest income 55,685; non-interest income 14,951; provision 2,350; non-interest expense 45,233; net earnings 18,775.
+- NIM 3.86%; ROA 1.17%; ROE 12.68%.
+- NPL ratio 0.90%; allowance/gross loans 1.12%; allowance/NPL 124.65%; net charge-offs/average net loans 0.25%.
+- Bank CET1 12.92%; total risk-based capital 13.96%; leverage 9.67%.
+- Cash dividends paid 4,861; dividend per share USD 0.80; payout ratio 26.06%.
+
+7. Currency conversion
+- Result contract requires CNY absolute yuan.
+- Research conversion assumption: USD/CNY=7.20.
+- Formula: USD thousands * 1,000 * 7.20.
+- This is a display normalization assumption, not an asserted spot or accounting translation rate.
+- Ratios are calculated in common currency and are unaffected.
+
+8. Dividend forecast
+- Base case holds 2025 actual cash dividends flat at USD 4.861m.
+- CNY amount = 4,861,000 * 7.20 = 34,999,200.
+- Yield = 34,999,200 / 1,290,165,263.2349396 = 0.02712769 (2.712769%).
+- This is an analyst scenario, not company guidance.
+
+9. Protocol population
+- Used protocol set/append commands to populate initialized outputs/result.json.
+- Ordinary owner-earnback metrics and non-comparable gross margin/cash-flow metrics remain null by contract.
+
+10. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok; errors=[].

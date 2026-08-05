@@ -1,0 +1,57 @@
+stock-research trace
+company: CLP HOLDINGS (00002.HK)
+period: 2025-12-31 annual
+generated_at: 2026-08-03T16:53:04+08:00
+
+1. Read instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- Checked annual review, normalized facts, raw filing, and prior stock-research paths supplied in config/input.json.
+- No reusable local facts, filing, or prior research files were present.
+- An attempted direct download of the official annual-report PDF returned an access-block HTML page; it was not used as evidence.
+
+3. Official evidence used
+- CLP Holdings 2025 Annual Report, Financials, pp.182 and 254:
+  https://www.clpgroup.com/content/dam/clp-group/channels/investor/document/3-3-financial-reports/2025/e_2025E113.pdf.coredownload.pdf
+- CLP Holdings 2025 Annual Report, Financial Review, p.27:
+  https://www.clpgroup.com/content/dam/clp-group/channels/investor/document/3-3-financial-reports/2025/e_2025E107.pdf.coredownload.pdf
+- CLP Group Quick Facts 2025:
+  https://www.clpgroup.com/en/investor-relations/financial-reporting/quick-facts.html
+- CFETS-authorised 2025-12-31 RMB central parity announcement, republished by Xinhua:
+  https://www1.xinhuanet.com/20251231/fe9f6466f6884589b5287e6ee946baed/c.html
+- Market cap and PE: config/input.json, Tencent qt.gtimg.cn snapshot dated 2026-07-31 16:08:47.
+
+4. Model decision
+- Input hint: financial_brokerage.
+- Verified fact: CLP is an electric utility group, not a brokerage.
+- Overridden model: utility_concession.
+- Owner earnback applicability: requires_special_model.
+- Reason: regulated utility assets, cash, debt, tariff reserve accounts, and ongoing capital expenditure form the operating and financing system; cash cannot be treated as detachable without analysing regulatory and debt-service constraints.
+- Ordinary owner-earnback fields intentionally left null per result contract.
+
+5. Currency conversion
+- Reporting currency: HKD.
+- Result-contract currency: CNY absolute yuan.
+- Rate: HKD 1 = CNY 0.90322 at 2025-12-31.
+- Balance-sheet and period-flow amounts were multiplied by 0.90322.
+- Limitation: period income/cash-flow figures use the year-end rate for protocol consistency, not an average annual translation rate.
+
+6. Key calculations
+- net_margin = parent net profit / revenue = 10,468 / 88,018 = 0.1189302.
+- simple operating free cash flow = operating cash flow - capital expenditure = 24,378 - 15,539 = HKD 8,839 million.
+- forecast cash dividend = 2025 actual ordinary dividend HKD 8,085 million x 0.90322 = CNY 7,302,533,700.
+- forecast dividend yield = CNY 7,302,533,700 / CNY 169,750,775,021.42252 = 0.0430191.
+- Forecast basis is a flat-dividend scenario, not company guidance.
+- Gross profit and gross margin were left null because the annual report presents expenses by nature and does not state comparable cost of sales/gross profit.
+
+7. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields using protocol set and append commands; no complex JSON result was handwritten from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status before final file audit: ok, errors: [].

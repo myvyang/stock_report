@@ -1,0 +1,70 @@
+stock-research trace
+task: SPFI, annual period 2025-12-31
+generated_at: 2026-08-04T22:31:52+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Initialized protocol result
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Input hint was ordinary_operating/applicable.
+
+3. Reuse check
+- Searched configured annual-review, normalized-facts and raw-filing paths.
+- No reusable SPFI 2025 filing or annual fact files were present in /workspace.
+
+4. Primary-source retrieval
+- SEC filing index: https://www.sec.gov/Archives/edgar/data/1163668/000114036126008087/0001140361-26-008087-index.html
+  Form 10-K filed 2026-03-05, period 2025-12-31, CIK 1163668, SIC 6022 State Commercial Banks.
+- SEC 10-K document: https://www.sec.gov/Archives/edgar/data/1163668/000114036126008087/ef20060591_10k.htm
+- Company FY2025 results: https://www.globenewswire.com/news-release/2026/01/26/3225987/0/en/South-Plains-Financial-Inc-Reports-Fourth-Quarter-and-Year-End-2025-Financial-Results.html
+- Company dividend announcement: https://www.spfi.bank/news-releases/news-release-details/south-plains-financial-inc-declares-quarterly-cash-dividend-9
+- Federal Reserve H.10 CNY/USD series: https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Market valuation: config/input.json, Yahoo Finance yfinance, dated 2026-08-03.
+
+5. Model override
+- Confirmed financial_bank.
+- Confirmed owner_earnback_applicability=not_applicable.
+- Reason: loans, deposits, cash and securities are interdependent regulated banking operating assets/liabilities; detachable-net-cash logic is economically invalid.
+- Ordinary owner earnback metrics remain null.
+
+6. Core extracted USD facts
+- Total assets: 4,480,500,000
+- Total liabilities: 3,986,663,000
+- Total equity / parent equity: 493,837,000
+- Net income / parent net income: 58,471,000
+- Net interest income: 166,999,000
+- Noninterest income: 44,889,000
+- Loans held for investment: 3,144,502,000
+- Allowance for credit losses: 45,131,000
+- Deposits: 3,874,077,000
+- NIM (tax equivalent): 3.98%; 2024: 3.65%
+- ROA: 1.33%
+- NPL/loans: 0.31%; allowance/loans: 1.44%
+- CET1: 14.45%; total capital: 17.26%; leverage: 12.53%
+- Tangible common equity: 473,389,000
+
+7. Translation and calculations
+- Translation rate: 7.1875 CNY per USD on 2025-12-31 (Federal Reserve H.10).
+- All result.json monetary statement values translated at that rate.
+- P/B = input market cap / translated year-end equity = approximately 1.61x.
+- P/TBV = input market cap / translated tangible common equity = approximately 1.68x.
+- Latest declared quarterly dividend: USD 0.17/share.
+- Forecast: 0.17 x 4 x 16,331,422 shares x 7.1875 = CNY 79,819,825.03.
+- Forecast yield = CNY 79,819,825.03 / CNY 5,700,342,135.64 = 1.4003%.
+- Implied payout against FY2025 net income = approximately 19.0%.
+- Approximate ROE in report is an inference using annual net income divided by average 2024/2025 ending equity.
+
+8. Protocol writes and validation
+- Used protocol set commands for populated fields and arrays after protocol initialization.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report/trace completion: status=ok, errors=[]
+
+9. Known limitations
+- Income statement translated at period-end rather than annual-average FX.
+- Bank revenue/gross margin/ordinary OCF/capex/FCF are not comparable and are null.
+- Input market cap and PE were not independently reconstructed.
+- Dividend forecast annualizes one declared quarter and is not management guidance.
+- Full 2025 dividend payment history was not sufficiently verified; no annual historical total was asserted.

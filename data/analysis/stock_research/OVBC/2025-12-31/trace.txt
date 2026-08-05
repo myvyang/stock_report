@@ -1,0 +1,62 @@
+OVBC stock research trace
+generated_at: 2026-08-04T23:14:47+08:00
+period: 2025-12-31
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: initialized stock-research-result-v1 skeleton.
+
+3. Reuse audit
+- Expected raw filing, annual review, normalized facts, and prior stock research paths for OVBC/2025-12-31 were absent.
+- No historical OVBC fact package was available; primary-source retrieval was required.
+
+4. Primary sources reviewed
+- SEC 2025 Form 10-K, filed 2026-03-13:
+  https://www.sec.gov/Archives/edgar/data/894671/000114036126009342/sec10k123125.htm
+- SEC Exhibit 13, 2025 Annual Report to Shareholders:
+  https://www.sec.gov/Archives/edgar/data/894671/000114036126009342/sec10k123125ex13.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/894671/000114036126009342/0001140361-26-009342-index.htm
+- SEC 2026-07-14 dividend 8-K:
+  https://www.sec.gov/Archives/edgar/data/894671/000089467126000041/ovbc-20260714.htm
+- Federal Reserve H.10 exchange rates:
+  https://www.federalreserve.gov/releases/h10/20251229/
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Market cap and PE: config/input.json, sourced there to Yahoo Finance yfinance.
+
+5. Model decision
+- Input hint ordinary_operating/applicable was overridden.
+- Confirmed statement_model=financial_bank and owner_earnback_applicability=requires_special_model.
+- Reason: loans and securities are operating earning assets; customer deposits and borrowings are operating funding; cash is constrained by liquidity and regulatory capital. Ordinary detachable-net-cash and FCF payback calculations are economically invalid.
+
+6. Currency conversion
+- Protocol requires CNY absolute yuan.
+- 2025-12-31 balance-sheet amounts use nearest available H.10 spot rate on 2025-12-26: CNY 7.0063/USD.
+- 2025 income and cash dividends use H.10 2025 annual average: CNY 7.1875/USD.
+- 2024 cash dividends use H.10 2024 annual average: CNY 7.1957/USD.
+- Forecast dividend uses latest reproducible H.10 rate used in research: CNY 6.7760/USD.
+
+7. Key calculations
+- Total assets: USD 1,582,654,000 * 7.0063 = CNY 11,088,548,720.20.
+- Total liabilities: USD 1,412,397,000 * 7.0063 = CNY 9,895,677,101.10.
+- Equity: USD 170,257,000 * 7.0063 = CNY 1,192,871,619.10.
+- 2025 net income: USD 15,601,000 * 7.1875 = CNY 112,132,187.50.
+- Implied price/book reference: CNY 1,337,080,815.22 / CNY 1,192,871,619.10 = 1.1209x.
+- Historical market cap/2025 net income reference: 11.9241x; not reported as owner earnback.
+- Forecast annual dividend: USD 0.25 * 4 * 4,711,001 shares = USD 4,711,001.
+- Forecast cash dividend: USD 4,711,001 * 6.7760 = CNY 31,921,742.78.
+- Forecast dividend yield: CNY 31,921,742.78 / CNY 1,337,080,815.22 = 0.0238742.
+
+8. Protocol population
+- All result.json mutations after initialization were executed through protocol set/append commands.
+- Ordinary owner-earnback metrics, gross margin, net margin, revenue, ordinary operating cash flow, capex and FCF retained as null per special-model contract.
+
+9. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[].

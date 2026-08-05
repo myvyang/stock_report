@@ -1,0 +1,79 @@
+Stock research trace: 01070.HK / TCL ELECTRONICS / FY2025
+Generated for task date: 2026-08-03 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because no existing annual facts package was present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the configured raw filing, annual review, normalized facts and prior stock research paths.
+- No reusable FY2025 filing, facts package, or prior research result existed in the workspace.
+
+3. Primary sources retrieved and reviewed
+- HKEX annual report PDF, released 2026-04-29:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042900031.pdf
+- Company FY2025 results release, dated 2026-03-27:
+  https://www.tcl.com/global/en/news/tcl-electronics-achieving-high-quality-global-growth-in-2025-with-adjusted-profit-attributable-to-owners-of-the-parent-and-dividends-surging-by-over-56percent
+- PBOC/CFETS central parity for 2025-12-31, carried by Xinhua:
+  https://www1.xinhuanet.com/20251231/fe9f6466f6884589b5287e6ee946baed/c.html
+- Market capitalization, date, PE TTM and quote source were taken from config/input.json as instructed.
+
+4. Annual report sections checked
+- Financial highlights and management discussion: annual report pp.9-54.
+- Audited profit or loss and OCI: pp.131-133.
+- Audited financial position: pp.134-135.
+- Changes in equity: pp.136-137.
+- Cash flow statement: pp.138-141.
+- Revenue and segment/business disclosures: MD&A pp.28-47 and notes.
+- Goodwill and intangible assets: notes 16-17.
+- Associates and financial investments: notes 19-20 and 26-28.
+- Inventory and receivables: notes 21-25.
+- Payables, provisions, borrowings, leases and put liability: notes 29-35.
+- Financial risk and liquidity maturity: note 49.
+
+5. Model decision
+- Input hint said financial_brokerage/requires_special_model.
+- Filing evidence shows ordinary sales of displays, internet services, photovoltaic solutions and smart devices, supported by inventory, receivables, supplier payables and bank debt.
+- No brokerage client money, proprietary securities book, margin finance, or repo funding exists.
+- Overrode hint with ordinary_operating/applicable.
+
+6. Currency normalization
+- Contract requires absolute CNY yuan.
+- Used 1 HKD = 0.90322 CNY, the 2025-12-31 CFETS central parity.
+- This year-end conversion is a normalization convention. It is not an average-rate translation of the income statement; limitation disclosed in result.json and report.md.
+
+7. Core calculations
+- Gross margin = HKD 17,900.188m / HKD 114,582.832m = 15.6221%.
+- Parent net margin = HKD 2,495.131m / HKD 114,582.832m = 2.1776%.
+- Operating capex = PPE purchases HKD 502.638m + intangible additions HKD 439.799m + other deferred asset additions HKD 418.246m = HKD 1,360.683m.
+- Operating FCF = CFO HKD 4,922.571m - capex HKD 1,360.683m = HKD 3,561.888m.
+- Dividend forecast/known proposal = HKD 0.498 x 2,520,935,155 issued shares x 0.90322 = CNY 1,133,925,607.25.
+- Forecast dividend yield = CNY 1,133,925,607.25 / CNY 35,068,856,438.71307 = 3.2334%.
+
+8. Owner earnback judgments
+- Cash and cash equivalents: include 90%; 10% retained as operating liquidity buffer.
+- Restricted cash: include 0%.
+- FVTPL products: include 70% due liquidity/credit risk.
+- FVOCI equity: include 50% due strategic/unlisted nature.
+- Associates: include 30% because holdings support semiconductor/internet ecosystem and are not freely detachable in substance.
+- Borrowings, lease liabilities and minority put liability: deduct 100%.
+- Resulting discounted detachable net cash: CNY 7,002,723,369.30.
+- Starting profit: adjusted parent profit HKD 2,512.389m.
+- Sustainable/distributable haircut: 20%, reflecting 51% inventory growth, payable-supported FY2025 cash conversion, and reinvestment needs of fast-growing photovoltaic operations.
+- Discounted sustainable cash profit: CNY 1,815,391,994.06.
+- Operating business price: CNY 35,068,856,438.71 - CNY 7,002,723,369.30 = CNY 28,066,133,069.41.
+- Owner earnback: 15.4601 years.
+- Market cap / discounted cash profit: 19.3175x.
+
+9. Data-quality judgment
+- Status set to complete: identity, period, valuation input, model, three statements, asset/liability explanations, owner-earnback details, dividend basis, business story and evidence are present.
+- Subjective haircuts are explicitly separated from audited facts.
+- No ranking label, recommendation, target price or certainty claim used.
+
+10. Protocol validation
+- First completed validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[]

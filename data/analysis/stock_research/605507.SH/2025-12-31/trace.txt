@@ -1,0 +1,60 @@
+[2026-08-01 Asia/Shanghai] stock-research trace for 605507.SH / 2025-12-31
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- config/input.json present.
+- No staged annual facts, normalized facts, filing metadata, or prior stock-research result existed for 605507.SH/2025-12-31.
+- stock_report/data/notes/user_stock_evaluations.md contained no matched 605507/国邦医药 entry.
+- Decision: retrieve and inspect public 2025 annual-report disclosure.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: initialized stock-research-result-v1 skeleton.
+
+4. Sources inspected
+- 国邦医药2025年年度报告（披露日2026-03-27；审计报告信会师报字[2026]第ZF10122号）公开网页全文。
+- 可检索年度报告 PDF 搜索结果，用于交叉核对主要财务数据。
+- 国邦医药官网公司简介与年度报告入口。
+- config/input.json supplied Tencent qt.gtimg.cn market snapshot at 2026-07-31 11:43:20.
+- Attempted local PDF download from stockmc.xueqiu.com; endpoint produced no local file, so it was not treated as local evidence.
+
+5. Confirmed reporting model
+- ordinary_operating / applicable.
+- Reason: physical manufacturing and sales business; balance sheet separates cash, financial products, operating working capital, plant and interest-bearing debt; no special-model balance-sheet economics.
+
+6. Core reported figures (CNY)
+- Revenue 6,011,397,499.10; cost of sales 4,446,532,644.49; gross profit 1,564,864,854.61.
+- Operating profit 963,993,951.63; net profit 817,573,712.50; parent net profit 820,820,433.45.
+- Total assets 10,984,635,667.95; liabilities 2,429,079,147.88; equity 8,555,556,520.07; parent equity 8,553,123,737.00.
+- CFO 559,278,159.58; capex cash out 277,711,058.05; operating FCF 281,567,101.53.
+- Cash 1,460,007,401.61, including restricted 342,123,137.87.
+- Trading financial assets 1,242,959,821.37, including pledged 110,000,000.00.
+- Interest-bearing debt 991,405,412.11.
+- Proposed 2025 cash dividend 335,294,100.00, pending shareholder approval.
+
+7. Analytical calculations
+- Gross margin = 1,564,864,854.61 / 6,011,397,499.10 = 0.2603179747.
+- Net margin = 820,820,433.45 / 6,011,397,499.10 = 0.1365473675.
+- Unrestricted cash = 1,460,007,401.61 - 342,123,137.87 = 1,117,884,263.74, haircut 100%.
+- Unrestricted trading assets = 1,242,959,821.37 - 110,000,000.00 = 1,132,959,821.37, haircut 90% = 1,019,663,839.23.
+- Discounted detachable net cash = 1,117,884,263.74 + 1,019,663,839.23 - 991,405,412.11 = 1,146,142,690.86.
+- Sustainable cash profit judgment = 400,000,000.00; rationale: between reported FCF 281,567,101.53 and recurring accounting profit, allowing partial working-capital normalization while reserving maintenance capex.
+- Operating business price = 12,674,000,000.00 - 1,146,142,690.86 = 11,527,857,309.14.
+- Owner earnback = 11,527,857,309.14 / 400,000,000.00 = 28.8196432729 years.
+- Market cap / cash profit = 31.685.
+- Forecast dividend yield = 335,294,100 / 12,674,000,000 = 0.0264556573.
+
+8. Protocol population and validation
+- Populated outputs/result.json exclusively through protocol set commands after initialization.
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final protocol status before report creation: ok, errors=[]
+
+9. Known limitations
+- Market cap and PE were accepted from task input and not independently reconstructed.
+- Sustainable cash profit and financial-product haircut are explicit analyst assumptions.
+- Company-claimed industry positions were not independently verified product by product.

@@ -1,0 +1,56 @@
+task: stock research for 00763.HK / ZTE / annual period 2025-12-31
+generated_at: 2026-08-03 Asia/Shanghai
+
+protocol:
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely as requested.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields exclusively through protocol `set` commands; did not hand-write the JSON object.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation result: {"status":"ok","errors":[]}
+
+reuse_and_retrieval:
+- No annual facts package, normalized facts, historical stock-research result, or raw filing existed for this company/period.
+- Downloaded the official Chinese 2025 annual report from ZTE's investor-relations domain to:
+  stock_report/data/raw/filings/00763.HK/2025-12-31/zte-2025-annual-report.pdf
+- Extracted a local text copy for page-level checks:
+  stock_report/data/raw/filings/00763.HK/2025-12-31/zte-2025-annual-report.txt
+- Official annual report URL:
+  https://www.zte.com.cn/content/dam/zte-site/investorrelations/cn_annual_report/2025%E5%B9%B4%E5%B9%B4%E5%BA%A6%E6%8A%A5%E5%91%8A.pdf
+- Official investor-relations index:
+  https://www.zte.com.cn/china/about/investorrelations.html
+- Market cap and PE were reused from config/input.json as instructed: Tencent qt.gtimg.cn, 2026/07/31 16:08:44.
+
+model_decision:
+- Overrode input hint financial_brokerage / requires_special_model.
+- Evidence: annual report identifies the group as computer, communications and other electronic equipment manufacturing; reporting segments are carrier networks, government-enterprise business, and consumer business.
+- Confirmed model: ordinary_operating; ordinary owner-earnback applicability: applicable.
+
+key_financial_checks (annual report units converted from CNY thousand or million to absolute CNY):
+- Revenue 133,895,460,000; cost of sales 93,391,318,000; gross profit 40,504,142,000.
+- Parent net profit 5,617,745,000; recurring parent net profit 3,370,400,000.
+- Operating cash flow 3,918,746,000; capex 3,892,988,000; simplified operating FCF 25,758,000.
+- Total assets 217,739,375,000; liabilities 142,098,134,000; equity 75,641,241,000; parent equity 75,425,601,000.
+- Cash 33,751,116,000; trading financial assets 17,396,415,000; debt investments 31,081,323,000.
+- Inventory 47,017,122,000; receivables 21,670,066,000; contract assets 5,881,166,000.
+- Interest-bearing financing proxy 65,051,330,000: short borrowings + current non-current liabilities + long borrowings + bonds.
+- Proposed 2025 dividend 1,966,032,838.56 based on CNY 0.411 per share and 4,783,534,887 shares.
+
+formula_checks:
+- gross_margin = 40,504,142,000 / 133,895,460,000 = 0.3025057160.
+- net_margin = 5,617,745,000 / 133,895,460,000 = 0.0419562022.
+- operating_free_cash_flow = 3,918,746,000 - 3,892,988,000 = 25,758,000.
+- forecast_dividend_yield = 1,966,032,838.56 / 102,305,740,937.02554 = 0.0192172289.
+- discounted detachable net cash = 0 after liquidity haircuts, full financing deduction, and operating-liquidity reserve.
+- discounted sustainable cash profit = 3,370,400,000 * 50% = 1,685,200,000.
+- operating business price = 102,305,740,937.02554 - 0 = 102,305,740,937.02554.
+- owner earnback years = 102,305,740,937.02554 / 1,685,200,000 = 60.7083675154.
+
+judgment_boundaries:
+- The 50% cash-profit discount is an analyst judgment, not a reported company metric. It reflects near-zero 2025 simplified FCF, inventory growth, and low-margin server-led mix shift.
+- Detachable net cash is conservatively zero because liquid financial assets substantially match financing and the residual supports working capital; this is not a claim that the financial assets have no value.
+- Industry-position statements are company disclosures and were not independently verified with a 2025 industry market-share dataset.
+- No buy/sell recommendation or target price was produced.

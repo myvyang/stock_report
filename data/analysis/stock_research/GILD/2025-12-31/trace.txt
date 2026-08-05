@@ -1,0 +1,84 @@
+stock-research trace
+generated_at: 2026-08-05 Asia/Shanghai
+query: GILD
+period: 2025-12-31
+report_type: annual
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as explicitly requested.
+- Read references/data-reuse.md because SKILL.md directly routes reuse decisions to that reference.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the paths declared in config/input.json under:
+  stock_report/data/raw/filings/GILD/2025-12-31
+  stock_report/data/analysis/annual_review/GILD/2025-12-31
+  stock_report/data/normalized/facts/GILD/2025-12-31
+- None existed in /workspace. No annual facts package, raw filing metadata, normalized facts, or prior stock-research result was available to reuse.
+- Therefore returned to primary sources rather than fabricating local facts.
+
+3. Primary sources used
+- SEC Gilead 2025 Form 10-K, filed 2026-02-24:
+  https://www.sec.gov/Archives/edgar/data/882095/000088209526000006/gild-20251231.htm
+- Gilead FY2025 results and initial FY2026 guidance, 2026-02-10:
+  https://www.gilead.com/news/news-details/2026/gilead-sciences-announces-fourth-quarter-and-full-year-2025-financial-results
+- Gilead Q1 2026 results and SEC 10-Q for post-balance acquisition facts:
+  https://investors.gilead.com/news/news-details/2026/Gilead-Sciences-Announces-First-Quarter-Financial-Results/default.aspx
+  https://www.sec.gov/Archives/edgar/data/882095/000088209526000024/gild-20260331.htm
+- FRED / Federal Reserve Board AEXCHUS annual 2025 FX rate:
+  https://fred.stlouisfed.org/series/AEXCHUS
+- Market cap and PE were taken from config/input.json (Yahoo Finance yfinance), as required input facts; not independently recalculated.
+
+4. Model decision
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: Gilead earns product revenue from developing/licensing, obtaining approval for, and selling medicines. Depositor funds, insurance reserves, regulated presale cash, project advances, or concession liabilities are not the business model. Cash, marketable securities, and corporate debt are separately identifiable.
+- Special caution: acquired IPR&D, acquisitions, and stock compensation are economically relevant reinvestment/dilution even when cash-flow classification or non-GAAP presentation makes them look removable.
+
+5. Currency conversion
+- Protocol requires CNY absolute yuan.
+- Used 2025 annual average USD/CNY = 7.1875 CNY per USD for all financial statement and owner-earnback amounts.
+- Formula: USD millions * 1,000,000 * 7.1875.
+- Limitation: balance-sheet stocks could instead use a 2025-12-31 spot rate; one common rate was used to preserve internal consistency across statements and formulas.
+
+6. Financial statement extraction (USD millions)
+- Balance sheet: assets 59,023; liabilities 36,405 derived as assets 59,023 minus equity 22,618; total equity 22,618; parent equity 22,703; NCI -84.
+- Income statement: revenue 29,443; cost of goods sold 6,234; gross profit 23,209; operating income 10,022; net income and parent net income 8,510.
+- Cash flow: CFO 10,019; PP&E purchases 563; operating FCF 9,456; financing cash flow -7,745; dividends plus program buybacks 5,925.
+- Formula checks: gross margin 23,209 / 29,443 = 0.7882688585; net margin 8,510 / 29,443 = 0.2890330469.
+
+7. Owner earnback
+- Cash 7,564 at 100% = 7,564 USDm.
+- Short- and long-term marketable debt securities 3,042 at 95% = 2,889.9 USDm.
+- Current and long-term debt 24,936 at 100% deduction = -24,936 USDm.
+- Discounted detachable net cash = -14,482.1 USDm = -104,090,093,750 CNY.
+- Three-year operating FCF:
+  2023: CFO 8,006 - capex 585 = 7,421 USDm
+  2024: CFO 10,828 - capex 523 = 10,305 USDm
+  2025: CFO 10,019 - capex 563 = 9,456 USDm
+  average = 9,060.6667 USDm.
+- Three-year average SBC = (766 + 835 + 894) / 3 = 831.6667 USDm.
+- Discounted sustainable cash profit = 9,060.6667 - 831.6667 = 8,229 USDm = 59,145,937,500 CNY.
+- Did not mechanically deduct all acquisitions/acquired IPR&D because growth versus maintenance cannot be reliably separated. Explicitly recorded this as a possible upward bias in sustainable cash profit.
+- Operating business price = market cap - discounted net cash = 1,195,004,372,425.9062 CNY.
+- Owner earnback years = operating business price / cash profit = 20.2043356304.
+- Market cap / cash profit = 18.4444498606.
+- Post-balance warning: Arcellx acquisition closed in April 2026 for about USD 7.1bn cash. It is disclosed but not mixed into 2025-12-31 statement amounts.
+
+8. Dividend forecast
+- Q1 and Q2 2026 declared dividend: USD 0.82/share each.
+- Mechanical annualization: 0.82 * 4 * 1,241,420,528 shares = USD 4,071,859,331.84.
+- Converted forecast dividend = CNY 29,266,488,947.60.
+- Forecast yield = 29,266,488,947.60 / 1,090,914,278,675.9062 = 0.0268274873.
+- Future dividends remain subject to Board approval.
+
+9. Protocol writes and validation
+- All result mutations were made with protocol CLI `set`; result.json was not hand-written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: {"status":"ok","errors":[]}.
+
+10. Output scope
+- Created outputs/result.json, outputs/report.md, and outputs/trace.txt only.
+- Did not sync or mutate long-term stock_report paths or /root/aicode sync targets because the user requested the three outputs under outputs/.

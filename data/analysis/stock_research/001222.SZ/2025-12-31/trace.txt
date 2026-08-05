@@ -1,0 +1,40 @@
+2026-08-01T04:43:17+08:00 INIT
+- 按 stock-research 技能运行 protocol init，基于 config/input.json 创建 outputs/result.json 标准骨架。
+
+SOURCE REUSE CHECK
+- 检查 stock_report/data/analysis/annual_review/001222.SZ/2025-12-31、normalized facts、raw filings 和既有 stock research 路径。
+- 工作区仅有用户评价文件，不存在本期原始财报、年度事实包或历史研究结果，无法复用。
+
+PRIMARY RESEARCH
+- 获取深交所披露《温州源飞宠物玩具制品股份有限公司2025年年度报告》，披露日 2026-04-28：
+  https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-28/915d3bb1-2f02-4871-b770-87a7be453614.PDF
+- 交叉核对年报全文网页文本及天衡审字(2026)00962号审计报告；审计意见为标准无保留意见。
+- 核对公司《关于2025年度拟不进行利润分配的公告》和 2025 年年度股东会决议：本期现金分红为零。
+- 行情未重新抓取，沿用 config/input.json：市值 2,703,000,000 元，日期 20260731114342，来源 Tencent qt.gtimg.cn，PE TTM 23.88。
+
+MODEL
+- statement_model=ordinary_operating。
+- 理由：主营宠物食品用品制造销售；资产是现金、应收、存货和生产设备，负债以经营应付和少量租赁为主，不具有金融、地产、收费权等特殊报表特征。
+- owner_earnback_applicability=applicable。
+
+FORMULAS
+- gross_profit = 1,733,738,812.52 - 1,354,404,382.36 = 379,334,430.16。
+- gross_margin = 379,334,430.16 / 1,733,738,812.52 = 0.2187956037。
+- net_margin = 115,874,167.50 / 1,733,738,812.52 = 0.0668348466。
+- operating_free_cash_flow = 98,859,372.51 - 89,661,393.80 = 9,197,978.71。
+- discounted_net_cash = 434,074,516.59 * 70% - (2,749,073.27 + 2,653,316.40) = 298,449,771.943。
+- discounted_net_cash_to_market_cap = 298,449,771.943 / 2,703,000,000 = 0.1104142700。
+- discounted_sustainable_cash_profit = 70,000,000：以归母净利润 115,874,167.50 为起点，结合实际自由现金流仅 9,197,978.71、扩张资本开支与营运资金需求，主观审慎折减 45,874,167.50。此为估算而非事实或公司指引。
+- operating_business_price = 2,703,000,000 - 298,449,771.943 = 2,404,550,228.057。
+- owner_earnback_years = 2,404,550,228.057 / 70,000,000 = 34.3507175437。
+- market_cap_to_cash_profit = 2,703,000,000 / 70,000,000 = 38.6142857143。
+- forecast_dividend_yield = 0 / 2,703,000,000 = 0。
+
+PROTOCOL WRITES
+- 使用 protocol set 逐字段写入财务数字、资产负债解释、现金折扣、利润调整、业务、风险、证据和数据质量。
+- 未从空文件手写复杂 JSON。
+
+OUTPUTS
+- outputs/result.json：结构化研究结果。
+- outputs/report.md：人读经营质量与控股回本报告。
+- outputs/trace.txt：来源、公式、判断与操作轨迹。

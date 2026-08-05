@@ -1,0 +1,60 @@
+stock-research trace
+task: 00934.HK / annual / 2025-12-31
+generated_at_context: 2026-08-03 Asia/Shanghai
+
+1. Read instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- The initialized analysis_model_hint said financial_brokerage. This was treated only as a hint and overridden after filing review.
+
+3. Reuse check
+- No annual facts, normalized facts, raw filing, or previous stock-research output existed locally for 00934.HK / 2025-12-31.
+- Downloaded official 2025 annual report from HKEX:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0417/2026041700608.pdf
+- Saved as stock_report/data/raw/filings/00934.HK/2025-12-31/annual_report_2025.pdf
+- Extracted read-only text to annual_report_2025.txt for line-level research.
+
+4. Model decision
+- Filing identifies crude-oil jetty/storage and vessel chartering/logistics, not brokerage.
+- 2025 share of JV results HK$527.623m and associates HK$76.711m; combined 53.5% of profit before tax.
+- JV and associate carrying values HK$6,818.274m and HK$902.399m.
+- Model set to investment_holding / requires_special_model.
+- All ordinary owner-earnback sorting metrics retained as null, per result contract.
+
+5. Key filing locations
+- Annual report p.85: income statement.
+- Annual report p.87: statement of financial position.
+- Annual report p.90: cash flow statement.
+- Annual report pp.9-16: throughput, segment performance, financial review and cash flows.
+- Annual report pp.120-125: segment results, assets, liabilities, customer concentration and revenue split.
+- Annual report pp.130-138: associates and joint ventures, underlying activities and selected project debt/financials.
+- Annual report pp.76-77 and dividend note: 2025-2027 shareholder return plan, dividend policy and 2025 dividend.
+
+6. Conversion and calculations
+- Protocol requires CNY absolute yuan; filing currency is HKD.
+- Convention used for research outputs: HKD1 = CNY0.90. Ratios remain based on original HKD values.
+- Gross margin = 319.249 / 658.637 = 48.4704%.
+- Net margin = 1,028.261 / 658.637 = 156.1193%; exceeds 100% because equity-accounted profit is in net profit but underlying revenue is not consolidated.
+- Operating free cash flow = operating cash flow HK$251.426m - PP&E purchases HK$47.797m = HK$203.629m.
+- Forecast dividend = 2025 actual HK$621.540m x 0.90 = CNY559.386m.
+- Forecast dividend yield = CNY559.386m / input market cap CNY7,956.502m = 7.0307%.
+- Parent equity / market cap comparison in report uses CNY14,857.817m parent equity and CNY7,956.502m market cap.
+
+7. Protocol population
+- Used repeated protocol set and append commands; result.json was not hand-written from scratch.
+- Evidence entries point to official annual report pages and task market snapshot.
+
+8. Limitations retained in result.json
+- Approximate currency conversion.
+- Market value snapshot not independently recomputed.
+- Dividend forecast is conditional.
+- Full look-through project cash flows, covenants and concession terms are not disclosed item by item, so no ordinary owner-earnback number is produced.
+
+9. Final checks
+- Protocol validation command recorded after final execution.
+- JSON parse and output file existence checked after validation.

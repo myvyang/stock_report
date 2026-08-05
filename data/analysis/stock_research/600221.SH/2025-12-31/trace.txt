@@ -1,0 +1,56 @@
+stock-research trace
+company: 海南航空控股股份有限公司 / 600221.SH
+period: 2025-12-31 annual
+generated_for_input: config/input.json
+
+1. Instructions read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- Expected annual facts, normalized facts and prior stock-research artifacts were absent under stock_report/data for 600221.SH/2025-12-31.
+- No prior result was reused.
+
+3. Primary filing acquired
+- Title: 海南航空控股股份有限公司2025年年度报告
+- Issuer filing date: 2026-04-18
+- Source: Shanghai Stock Exchange
+- URL: https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-18/600221_20260418_J5YM.pdf
+- Local PDF: stock_report/data/raw/filings/600221.SH/2025-12-31/annual-report.pdf
+- Local extracted text: stock_report/data/raw/filings/600221.SH/2025-12-31/annual-report.txt
+- PDF pages: 220
+
+4. Model decision
+- statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- rationale: airline transport is an operating business, but lease liabilities, lease principal repayments, fleet capex, restricted deposits and return-maintenance provisions were explicitly treated as operating/funding constraints.
+
+5. Key statement facts (all filing amounts converted from CNY thousand to absolute CNY)
+- Revenue 68,470,915,000; cost of sales 63,212,452,000; gross profit 5,258,463,000.
+- Parent net profit 1,979,588,000; recurring parent profit 930,015,000.
+- Total assets 152,285,310,000; total liabilities 146,911,165,000; parent equity 5,264,722,000.
+- CFO 16,051,070,000; capex 2,188,703,000; financing cash flow -12,533,231,000.
+- Lease principal paid 10,252,954,000; dividend/profit/interest cash paid 1,549,656,000.
+- Cash and cash equivalents 2,552,353,000; restricted monetary funds 10,993,873,000.
+- Borrowings 51,450,095,000; lease liabilities 54,170,480,000; long-term payables 2,122,190,000.
+
+6. Owner earnback calculations
+- Haircut detachable assets = 2,552,353,000 + 30% * 406,790,000 + 30% * 3,689,493,000 + 30% * 8,821,502,000 = 6,427,688,500.
+- Discounted detachable net cash = 6,427,688,500 - 51,450,095,000 - 54,170,480,000 - 2,122,190,000 = -101,315,076,500.
+- Pre-haircut equity cash = 16,051,070,000 - 2,188,703,000 - 10,252,954,000 - 1,549,656,000 = 2,059,757,000.
+- Sustainable cash profit pressure test = 50% * 2,059,757,000 = 1,029,878,500.
+- Operating business price = 58,341,000,000 - (-101,315,076,500) = 159,656,076,500.
+- Owner earnback years = 159,656,076,500 / 1,029,878,500 = 155.0242.
+- Market cap / cash profit = 58,341,000,000 / 1,029,878,500 = 56.6484.
+
+7. Protocol CLI
+- Initialized with: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated using repeated protocol set commands; result was not constructed from scratch.
+- Final validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+8. Judgment boundaries
+- Facts are sourced to the annual report or input market snapshot.
+- The 30% financial-asset recovery factor and 50% sustainable-profit haircut are analyst assumptions, not issuer guidance.
+- Forecast dividend is zero because the 2025 proposal is zero and parent accumulated undistributed profit remains negative; this is a near-term base case, not a perpetual forecast.

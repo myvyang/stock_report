@@ -1,0 +1,69 @@
+stock-research trace: WFRD / 2025-12-31 annual
+generated_at=2026-08-04T23:24:33+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- stock_report/data/analysis/annual_review/WFRD/2025-12-31: no reusable files found.
+- stock_report/data/raw/filings/WFRD/2025-12-31: no reusable files found.
+- Research therefore returned to primary public filings and company disclosures.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: initialized schema stock-research-result-v1.
+
+4. Primary sources inspected
+- SEC filing index: accession 0001603923-26-000014, filed 2026-02-04, period 2025-12-31.
+- SEC 10-K: https://www.sec.gov/Archives/edgar/data/1603923/000160392326000014/wfrd-20251231.htm
+  - Business and segment descriptions: Form 10-K pp.2-4.
+  - Operations: revenue USD 4,918m; cost of services/products USD 3,384m; operating income USD 756m; net income USD 457m; attributable net income USD 431m.
+  - Balance sheet: assets USD 5,197m; liabilities USD 3,501m; total equity USD 1,696m; parent equity USD 1,699m; cash USD 987m; restricted cash USD 55m; debt USD 1,485m.
+  - Cash flow: CFO USD 676m; capex USD 226m; operating FCF USD 450m; financing cash flow USD -474m; dividends USD 72m; repurchases USD 101m.
+  - Receivables: Mexico 27% of net AR; largest Mexico customer 24% of total net AR and has late-payment history; USD 250m receivables factored for USD 247m proceeds in 2025.
+  - Cash restriction: USD 31m cannot be immediately repatriated.
+- Company FY2025 results: https://www.weatherford.com/investor-relations/investor-news-and-events/news/news-article/?ItemID=18266
+  - Segment and geography trends cross-checked.
+- Company dividend announcement: https://www.weatherford.com/investor-relations/investor-news-and-events/news/news-article/?ItemID=18251
+  - Quarterly dividend increased to USD 0.275 in 2026.
+- Market snapshot: config/input.json, Yahoo Finance yfinance, dated 2026-08-03.
+
+5. Model determination
+- statement_model=ordinary_operating.
+- owner_earnback_applicability=applicable.
+- Rationale: products/services, receivables, inventory, PP&E and financing debt have ordinary operating-company meanings; no customer funds, insurance reserves, regulated project cash or concession rights that would invalidate the ordinary framework.
+
+6. Currency translation
+- Protocol requires absolute CNY amounts.
+- Applied USD/CNY=6.7939 consistently to all USD filing and dividend amounts.
+- Market cap was already supplied in CNY.
+- This is a research translation assumption near late-July 2026 quoted rates, not an audited reporting rate.
+
+7. Owner earnback calculations
+- Cash included: USD 987m * 90% = USD 888.3m.
+- Restricted cash included: USD 0m.
+- Debt deducted: USD 1,485m.
+- Discounted detachable net cash: USD -596.7m = CNY -4,053,920,130.
+- Operating business price: CNY 42,466,952,430.470215 - (-4,053,920,130) = CNY 46,520,872,560.470215.
+- 2025 operating FCF: USD 676m - USD 226m = USD 450m.
+- Sustainable cash profit judgment: USD 380m = CNY 2,581,682,000, a ~15.6% haircut for cyclicality, declining activity, receivables concentration and factoring timing.
+- Owner earnback years: 46,520,872,560.470215 / 2,581,682,000 = 18.0195982931.
+- Market cap / cash profit: 42,466,952,430.470215 / 2,581,682,000 = 16.4493351352.
+
+8. Dividend calculation
+- Annualized dividend: USD 0.275 * 4 * 71.6m shares = USD 78.76m.
+- Forecast cash dividend: CNY 535,087,564.
+- Forecast dividend yield: 535,087,564 / 42,466,952,430.470215 = 0.0126000933.
+- Buybacks excluded from forecast dividend yield.
+
+9. Protocol population and validation
+- outputs/result.json was populated using repeated protocol `set` commands; the complex object was not handwritten from scratch.
+- Initial completed-result validation: status=ok, errors=[].
+- Final validation is rerun after report and trace creation.
+
+10. Important judgment/status
+- data_quality.status=complete because required financials, model, asset/liability explanations, earnback rows, dividend basis and evidence are present.
+- Limitations are preserved in result.json and report.md; complete means consumable, not that the company is attractive.

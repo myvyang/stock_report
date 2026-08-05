@@ -1,0 +1,51 @@
+stock-research trace
+company=001965.SZ 招商公路
+period=2025-12-31 annual
+generated_at=2026-07-31T20:41:46+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse audit
+- No files existed under stock_report/data/raw/filings/001965.SZ/2025-12-31.
+- No annual facts or prior stock-research output existed for this company/period.
+- Therefore fetched official company and CNINFO disclosures.
+
+3. Primary sources
+- 2025 annual report (company official site):
+  https://www.cmexpressway.com/uploadfiles/tzzgx/xxpl/dqbg/files/2041811616230973441/2026/04/08/2041811615434055682.pdf
+- 2025 audited financial statements (company official site):
+  https://www.cmexpressway.com/uploadfiles/tzzgx/xxpl/lsgg/files/2041809749920882690/2026/04/08/2041809749535006721.pdf
+- 2025 profit distribution proposal (CNINFO):
+  https://static.cninfo.com.cn/finalpage/2026-04-03/1225074924.PDF
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn.
+
+4. Model determination
+- Confirmed statement_model=utility_concession.
+- Confirmed owner_earnback_applicability=requires_special_model.
+- Evidence: operating toll-road concession rights net carrying value CNY 82.685bn; long-term equity investments CNY 57.868bn; equity-method/investment income dominates profit; large debt, perpetual securities and minority interests are matched to the operating/investment structure.
+- All ordinary owner-earnback sorting fields intentionally remain null.
+
+5. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated scalar/object/list fields with protocol set/append commands; did not hand-write the result object.
+
+6. Derived calculations
+- gross_profit = 13,360,481,923.55 - 9,375,361,473.67 = 3,985,120,449.88
+- gross_margin = 3,985,120,449.88 / 13,360,481,923.55 = 0.29827669934986273
+- net_margin = 4,610,171,908.56 / 13,360,481,923.55 = 0.34506030058944437
+- mechanical operating FCF = 6,511,290,313.31 - 1,163,767,197.13 = 5,347,523,116.18
+- forecast dividend yield = 2,534,570,432.02 / 67,679,000,000 = 0.037449880051714714
+- Note: mechanical FCF is not treated as sustainable distributable cash profit because concession capex and equity-method investee cash distributions require special treatment.
+
+7. Known limitations
+- Annual report does not centrally disclose every controlled road's remaining concession term, project-level debt, or full future maintenance/expansion capex.
+- No special-model project DCF or earnback years were fabricated.
+- Dividend yield uses board proposal and input market cap; PE TTM was not independently recomputed.
+
+8. Validation
+- Protocol validation executed after output completion; see final CLI output in task log.

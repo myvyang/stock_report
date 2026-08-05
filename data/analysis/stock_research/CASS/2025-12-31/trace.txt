@@ -1,0 +1,48 @@
+stock-research trace — CASS — period 2025-12-31
+
+1. Read skill and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - references/result-contract.md
+   - references/report-contract.md
+   - references/data-reuse.md
+
+2. Initialized protocol result
+   Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Local reuse check
+   - No existing CASS annual fact package or raw filing was present under the paths specified by config/input.json.
+   - Therefore retrieved and analyzed the official SEC 2025 Form 10-K.
+
+4. Primary sources
+   - SEC 2025 Form 10-K: https://www.sec.gov/Archives/edgar/data/708781/000070878126000010/cass-20251231.htm
+     Filing date: 2026-03-06; accession: 0000708781-26-000010.
+     Used consolidated statements, MD&A, credit quality, regulatory capital and segment Note 18.
+   - Federal Reserve H.10 DDP: China spot exchange rate, 2025-12-31, 7.1875 CNY/USD.
+     https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+   - Market data reused from config/input.json: Yahoo Finance yfinance, market cap CNY 4,821,000,195.723267 as of 2026-08-03; PE TTM 20.187725.
+
+5. Model decision
+   - Overrode input hint ordinary_operating/applicable.
+   - Selected platform_financial_mixed/requires_special_model.
+   - Reason: Information Services and Banking Services are both reportable and profitable; deposits and payment-processing accounts/drafts payable fund loans, securities and short-term investments. These balance-sheet items are operating architecture, not detachable net cash.
+   - Per protocol, ordinary owner earnback metrics remain null.
+
+6. Currency conversion
+   - All USD filing amounts multiplied by 7.1875 to produce absolute CNY amounts.
+   - This applies an ending-rate conversion to annual flows as a consistent protocol simplification; limitation recorded in result.json.
+
+7. Derived calculations
+   - Net margin = USD 35.116m / USD 190.750m = 18.4094%.
+   - Mechanical OCF less capex = (USD 37.437m - USD 5.663m) × 7.1875 = CNY 228,375,625; retained only as an auxiliary cash-flow field because bank cash flows are classified across statements.
+   - Forecast dividend = 2025 actual USD 16.511m × 7.1875 = CNY 118,672,812.5.
+   - Forecast dividend yield = CNY 118,672,812.5 / CNY 4,821,000,195.723267 = 2.46158%.
+   - 2025 cash payout = USD 16.511m / USD 35.116m = 47.02%.
+   - NPL ratio approximation = USD 6.992m / USD 1,061.217m gross loans = 0.659%.
+
+8. Protocol writes
+   - outputs/result.json was initialized and then populated using protocol CLI set commands in outputs/build_result.sh.
+   - No complex result JSON was constructed from scratch.
+
+9. Validation
+   Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status ok; errors [].

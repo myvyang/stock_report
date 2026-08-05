@@ -1,0 +1,89 @@
+Stock research trace — 08195.HK
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because no local facts package was available.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse check
+- Checked stock_report/data/raw/filings/08195.HK/2025-12-31,
+  stock_report/data/analysis/annual_review/08195.HK/2025-12-31,
+  stock_report/data/normalized/facts/08195.HK/2025-12-31, and
+  stock_report/data/analysis/stock_research/08195.HK/2025-12-31.
+- No filing, annual facts, normalized facts, or previous stock-research output existed.
+
+3. Primary sources
+- HKEX title search for stock 08195:
+  https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=112875
+- HKEX 2024-2025 Annual Report, published 2025-07-28, fiscal year ended 2025-03-31:
+  https://www1.hkexnews.hk/listedco/listconews/gem/2025/0728/2025072800331.pdf
+- HKEX final-results announcement, published 2025-06-27:
+  https://www1.hkexnews.hk/listedco/listconews/gem/2025/0627/2025062701675.pdf
+- PBOC/CFETS central parity announcement, 2025-04-01:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/5648456/index.html
+- Input market quote: Tencent qt.gtimg.cn, market cap CNY 422,209,433.1997633,
+  quote time 2026-08-03 09:47:18, PE TTM 12.64.
+
+4. Period decision
+- Input period is 2025-12-31 and report_type is annual.
+- Company fiscal year ends on 31 March. The latest full annual report available by the
+  input period was FY2025 (year ended 2025-03-31). The 2025-09-30 filing was interim,
+  so it was not substituted for annual statements.
+- The input market-cap timestamp is later than the input period. This mismatch is retained
+  and disclosed rather than silently changing the provided valuation.
+
+5. Model review
+- Input hint: financial_brokerage / requires_special_model.
+- Filing evidence: FY2025 external revenue (HKD'000) was financial quotient and investment
+  education 215,688; private supplementary education 122,051; money-lending interest 5,423;
+  OEM, retail and property investment nil.
+- No brokerage, investment banking, asset management, client-money or repo-financing business
+  was reported. Overrode model to ordinary_operating / applicable.
+- Loan receivables remain operating capital of the money-lending segment and were excluded
+  from detachable cash.
+
+6. Currency conversion
+- Reporting currency: HKD; result contract currency: CNY.
+- Used 1 HKD = CNY 0.92257, the PBOC/CFETS central parity on 2025-04-01, the first trading day
+  after fiscal year-end. All filing amounts were multiplied by 0.92257.
+
+7. Core source figures (HKD'000)
+- Revenue 343,162; cost of sales/services 156,343; gross profit 186,819.
+- Net profit 39,805; attributable to owners 37,078.
+- Total assets 513,898; liabilities 82,807; equity 431,091; parent equity 427,518.
+- Cash 129,177; loan receivables 90,122; FVTPL assets 15,173; goodwill 161,344.
+- Operating cash flow 22,614; PP&E cash purchases 2,433; lease principal 17,018;
+  financing cash flow 39,810.
+- No final dividend for FY2025 or FY2024.
+
+8. Formulas and judgments
+- Gross margin = 186,819 / 343,162 = 54.4405%.
+- Net margin = 37,078 / 343,162 = 10.8048%.
+- Reported operating FCF = (22,614 - 2,433) * 0.92257 = CNY 18,618,385.17.
+- Conservative distributable cash profit = (22,614 - 2,433 - 17,018) * 0.92257
+  = CNY 2,918,088.91. Lease principal was deducted because education-center premises are
+  necessary recurring operating capacity despite IFRS 16 financing classification.
+- Detachable net cash = (50% * 129,177 - 4,118 bank borrowing - 15,000 convertible bonds
+  - 16,941 lease liabilities) * 0.92257 = CNY 26,320,460.82.
+- Loan receivables and FVTPL assets received zero detachable-cash credit.
+- Operating business price = 422,209,433.20 - 26,320,460.82 = CNY 395,888,972.38.
+- Owner earnback = 395,888,972.38 / 2,918,088.91 = 135.67 years.
+- Market cap / cash profit = 422,209,433.20 / 2,918,088.91 = 144.69 years.
+- Dividend forecast = CNY 0; forecast yield = 0%, based on two years of nil final dividends
+  and no predetermined payout ratio. This is an analyst assumption, not guidance.
+
+9. Protocol population and validation
+- Populated initialized paths using protocol `set`; result.json was not authored from a blank
+  complex JSON object.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report creation: {"status":"ok","errors":[]}.
+
+10. Material limitations
+- Market cap date (2026-08-03) is not aligned with input period (2025-12-31) or FY2025 year-end.
+- Input Tencent quote was reused without independent verification.
+- 50% cash haircut and full lease-principal deduction are explicit conservative judgments.
+- The owner-earnback result maps one fiscal year's cash conversion; it is not a long-term forecast.

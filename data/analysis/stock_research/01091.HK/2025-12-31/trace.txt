@@ -1,0 +1,59 @@
+stock-research trace
+task: 01091.HK / annual / 2025-12-31
+generated_at: 2026-08-03T16:35:31+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Initialized protocol result
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Local reuse check
+- Requested annual facts, normalized facts and raw filing metadata were absent.
+- Downloaded HKEX Annual Report 2025 to stock_report/data/raw/filings/01091.HK/2025-12-31/annual-report-2025.pdf.
+
+4. Primary sources
+- HKEX Annual Report 2025: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0415/2026041500949.pdf
+- HKEX 2025 annual-results announcement: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0313/2026031301107.pdf
+- Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026/07/31 16:08:47.
+
+5. Model decision
+- Input hint said financial_brokerage.
+- Filing facts show manganese mining, EMM/alloy, battery materials and trading operations.
+- Overrode hint with ordinary_operating / applicable.
+
+6. Currency treatment
+- Filing currency: HKD, amounts in HK$000.
+- Result contract currency: CNY absolute yuan.
+- Applied research translation assumption CNY 0.918 per HKD to all filing amounts.
+- Ratios use source-currency values and are translation invariant.
+
+7. Key source values (HK$000 unless stated)
+- Revenue 6,368,752; cost of sales 5,302,339; gross profit 1,066,413.
+- Operating profit 305,191; net profit 143,537; parent profit 167,065.
+- Assets 9,096,240; liabilities 6,597,236; equity 2,499,004; parent equity 2,920,795; NCI -421,791.
+- Operating cash flow 1,483,129.
+- Cash capex: PPE 407,316 + ROU 1,343 + intangible 46 = 408,705.
+- Operating FCF 1,074,424; financing cash flow -791,232.
+- Cash and equivalents 806,996; pledged deposits 858,740; restricted deposits 35,840; borrowings 3,645,622.
+- Board recommended no 2025 dividend.
+
+8. Owner earnback formulas (CNY)
+- Detachable net cash = unrestricted cash 740,822,328 - borrowings 3,346,680,996 = -2,605,858,668.
+- Restricted/pledged deposits 821,224,440 receive 0% detachable value.
+- Operating business price = market cap 1,635,206,630.5196285 - (-2,605,858,668) = 4,241,065,298.5196285.
+- Pre-haircut cash profit = parent profit 153,365,670 + D&A 367,064,136 - capex 375,191,190 = 145,238,616.
+- Sustainable cash profit = 145,238,616 * 80% = 116,190,892.8.
+- Owner earnback = 4,241,065,298.5196285 / 116,190,892.8 = 36.50084 years.
+- Market cap / cash profit = 1,635,206,630.5196285 / 116,190,892.8 = 14.07345.
+
+9. Protocol population
+- Used protocol `set` commands for analysis sources, model, metrics, all financial statements, asset/liability analysis, owner earnback, dividend, business, risks, evidence and data quality.
+- No complex JSON object was hand-authored as the initial result.
+
+10. Known limitations
+- CNY/HKD conversion is a disclosed research approximation.
+- Sustainable profit uses one turnaround year and a subjective 20% haircut.
+- Tencent PE TTM is retained as supplied and is not forced to reconcile to annual parent profit.

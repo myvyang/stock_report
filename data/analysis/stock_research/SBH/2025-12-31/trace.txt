@@ -1,0 +1,76 @@
+stock-research trace — SBH — generated 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- No SBH raw filing, annual facts, normalized facts, or prior stock-research output existed under /workspace at task start.
+- The supplied sync target /root/aicode/stock_report also contained no SBH files found by read-only search.
+- Therefore obtained the official FY2025 filing rather than fabricating an annual facts package.
+
+3. Primary sources
+- SEC FY2025 Form 10-K, accession 0001193125-25-280122, filed 2025-11-13:
+  https://www.sec.gov/Archives/edgar/data/1368458/000119312525280122/sbh-20250930.htm
+  Local copy: stock_report/data/raw/filings/SBH/2025-12-31/sbh-20250930.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/1368458/0001193125-25-280122-index.html
+- Company investor relations:
+  https://investor.sallybeautyholdings.com/investor-relations
+- PBOC/CFETS 2025-09-29 USD/CNY central parity (1 USD = 7.1089 CNY):
+  https://xining.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025100917214281884/index.html
+- Market cap and PE: config/input.json, attributed there to Yahoo Finance yfinance, market date 2026-08-03.
+
+4. Period decision
+- Input period is 2025-12-31 and report_type is annual.
+- SBH fiscal year ends September 30; the audited annual report relevant to this task is FY2025 ended 2025-09-30.
+- A 10-Q exists for quarter ended 2025-12-31, but it was not mixed into annual three-statement figures.
+- The distinction is disclosed in analysis_model.special_handling, data_quality.limitations, and report.md.
+
+5. Model verification
+- Confirmed ordinary_operating and owner_earnback applicability.
+- Reason: the company earns through retail/distribution of inventory using stores, digital channels, and professional distribution. Inventory, payables, and leases are operating items. No special financial-statement model such as banking, insurance, real-estate development, concession, or investment holding applies.
+
+6. Audited USD source figures (thousands unless noted)
+- Total assets 2,871,096; total liabilities 2,076,889; equity 794,207.
+- Cash 149,162; inventory 987,575; trade receivables 31,828; other receivables 84,734.
+- Property/equipment 284,284; operating lease assets 646,698; goodwill 540,674; other intangibles 53,018.
+- Current debt 4,000; long-term debt 861,974; operating lease liabilities 696,992.
+- Revenue 3,701,424; COGS 1,790,676; gross profit 1,910,748; operating earnings 327,810; net earnings 195,878.
+- CFO 274,831; capex 102,145; FCF 172,686; financing cash flow -178,423; repurchases 53,996.
+- FY2024 CFO/capex/FCF: 246,528 / 101,165 / 145,363.
+- FY2023 CFO/capex/FCF: 249,311 / 90,742 / 158,569.
+- No minority interest reported; consolidated net earnings treated as parent net earnings.
+
+7. Currency and formulas
+- All USD filing figures converted at 7.1089 CNY/USD; result amounts are absolute CNY yuan.
+- Gross margin = 1,910,748 / 3,701,424 = 0.5162197036.
+- Net margin = 195,878 / 3,701,424 = 0.0529196331.
+- Discounted detachable net cash = 50% × CNY cash - 100% × CNY interest-bearing debt
+  = 530,188,870.9 - 6,156,122,568.6 = -5,625,933,697.7.
+- Three-year average FCF = (172,686 + 145,363 + 158,569) / 3 = USD 158,872.667 thousand.
+- Discounted sustainable cash profit = three-year average FCF × 90% × 7.1089
+  = CNY 1,016,468,910.06.
+- Operating business price = 9,637,933,020.86316 - (-5,625,933,697.7)
+  = CNY 15,263,866,718.56316.
+- Owner earnback years = 15,263,866,718.56316 / 1,016,468,910.06 = 15.01656.
+- Market cap/cash profit = 9,637,933,020.86316 / 1,016,468,910.06 = 9.48178.
+- Forecast cash dividend = 0; forecast dividend yield = 0 / market cap = 0.
+
+8. Judgment boundaries
+- 50% cash haircut retains working liquidity; this is an analyst assumption, not company guidance.
+- All interest-bearing debt is deducted.
+- Operating lease liabilities are paired with right-of-use assets and are not added again to net debt because rent is already reflected in operating earnings and CFO.
+- Sustainable cash profit uses three-year FCF average and an extra 10% haircut due to FY2025 inventory release and ongoing capital needs.
+- Headquarters disposal cash/gain is not treated as sustainable operating cash profit.
+- Cash dividends are forecast at zero because FY2023-FY2025 distributions were repurchases, not dividends, and no declared dividend evidence was used.
+
+9. Protocol population and validation
+- Populated initialized JSON using protocol `set` commands (script: populate_result.sh); did not construct result.json from scratch.
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation output: {"status":"ok","errors":[]}.
+- Also confirmed result.json parses as JSON and all three required output files are non-empty.

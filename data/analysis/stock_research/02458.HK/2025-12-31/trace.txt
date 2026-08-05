@@ -1,0 +1,59 @@
+stock-research trace
+company: Gala Technology Holding Limited / 望尘科技控股有限公司
+code: 02458.HK
+period: 2025-12-31
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No existing raw filing, annual facts package, normalized facts, or historical stock-research result existed for 02458.HK / 2025-12-31.
+- Downloaded the official HKEX 2025 annual report to stock_report/data/raw/filings/02458.HK/2025-12-31/annual-report-2025.pdf.
+
+3. Primary sources
+- Official HKEX annual report PDF: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0410/2026041000498.pdf
+- Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026/08/03 09:20:05.
+
+4. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Filing evidence: all 2025 revenue was web/mobile online game revenue; 99.9% came from self-published games. Balance sheet contains ordinary operating cash, receivables, IP/software, contract costs, trade payables, deferred game revenue and leases. No bank borrowing, client money, brokerage assets or repo financing.
+- Override: ordinary_operating / applicable.
+
+5. Core reported figures (RMB)
+- Revenue 922,292,000; cost of revenue 442,226,000; gross profit 480,066,000.
+- Net profit 95,847,000; parent net profit 95,886,000.
+- Total assets 731,559,000; liabilities 303,520,000; total equity 428,039,000; parent equity 428,392,000; NCI -353,000.
+- Operating cash flow 198,708,000.
+- Purchases of intangible assets 33,296,000; PPE 5,366,000; capex 38,662,000.
+- Operating free cash flow 160,046,000.
+- 2025 share-based payment 21,779,000; 2024 share-based payment 13,045,000.
+- 2024 OCF 176,316,000; 2024 capex 62,782,000.
+
+6. Calculations and judgments
+- Gross margin = 480,066,000 / 922,292,000 = 52.0527%.
+- Parent net margin = 95,886,000 / 922,292,000 = 10.3965%.
+- 2025 adjusted cash profit = 198,708,000 - 38,662,000 - 21,779,000 = 138,267,000.
+- 2024 adjusted cash profit = 176,316,000 - 62,782,000 - 13,045,000 = 100,489,000.
+- Sustainable discounted cash profit = two-year simple average = 119,378,000.
+- Discounted detachable net cash = cash 452,499,000 x 70% + FVTPL 28,115,000 x 60% + FVOCI 4,000,000 x 25% - lease liabilities 25,637,000 = 308,981,000.
+- Operating business price = market cap 791,888,948.1258392 - 308,981,000 = 482,907,948.1258392.
+- Owner earnback years = 482,907,948.1258392 / 119,378,000 = 4.0452.
+- Market cap / cash profit = 791,888,948.1258392 / 119,378,000 = 6.63346.
+- Forecast dividend = 0 because the board recommended no 2025 final dividend and parent-company distributable reserves were nil at year-end.
+
+7. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated scalar/object fields through repeated protocol set/append commands; the complex JSON object was not hand-written from scratch.
+- Validated with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial validation result: {"status":"ok","errors":[]}
+
+8. Known limitations
+- Market cap and PE TTM are reused from the task input and were not independently rebuilt from share count and FX.
+- The annual report does not disclose revenue by individual title or independently verifiable market share.
+- Cash discounts and sustainable cash profit are analyst judgments, fully disclosed in result.json and report.md.

@@ -1,0 +1,57 @@
+[2026-08-03 Asia/Shanghai] Stock research trace: 00340.HK, period 2025-12-31
+
+1. Read required instructions:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Checked reusable local data:
+   - No annual facts package, normalized facts, prior stock-research output, or raw filing existed for this company/period.
+   - Existing user evaluation note was not needed for core financial facts.
+
+3. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Retrieved official filing:
+   - Tongguan Gold Group Limited Annual Report 2025
+   - HKEX release date: 2026-04-16
+   - URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0416/2026041600348.pdf
+   - Local copy: stock_report/data/raw/filings/00340.HK/2025-12-31/annual-report-2025.pdf
+
+5. Model review:
+   - Input hint classified the company as financial_brokerage.
+   - Audited filing states operations are gold mining and gold recycling; no brokerage balance-sheet structure was found.
+   - Overrode model to ordinary_operating / applicable, with mining-cycle and capital-intensity caveats.
+
+6. Key audited HKD facts extracted:
+   - Revenue HK$2,396.218m; cost HK$1,085.267m; gross profit HK$1,310.951m.
+   - Parent net profit HK$830.429m; total net profit HK$855.183m.
+   - Total assets HK$6,528.569m; liabilities HK$2,355.333m; parent equity HK$3,988.844m.
+   - Operating cash flow HK$981.467m.
+   - PPE purchases HK$355.947m; exploration/evaluation additions HK$84.731m.
+   - Cash HK$638.491m; restricted deposit HK$110.710m; borrowings HK$477.215m.
+   - Proposed final dividend HK$0.032/share.
+
+7. Currency conversion:
+   - Income/cash flow: 2025 average cross rate, HKD/CNY 0.9218.
+   - Balance sheet: 2025-12-31 closing cross rate, HKD/CNY 0.8994.
+   - Cross rates derived from ECB EUR/HKD and EUR/CNY reference rates.
+
+8. Owner earnback construction:
+   - 2025 operating FCF = operating cash flow - PPE purchases - exploration/evaluation additions = approximately CNY498.50m.
+   - Applied approximately 33.5% haircut for gold-price cyclicality, grade/volume uncertainty, and continuing mine capital needs.
+   - Discounted sustainable cash profit = CNY331.44m.
+   - Discounted detachable net cash = zero because cash supports short-term debt, contractor payables, streaming obligations, working capital, and expansion; restricted deposit excluded.
+   - Operating business price = CNY9,351.73m; earnback = 28.2154 years.
+
+9. Populated result using protocol CLI set/append commands. Did not construct result.json manually.
+
+10. Validation:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Result: {"status":"ok","errors":[]}
+
+Known limitations:
+- No full life-of-mine model, mine-level AISC, reserve table, or forward maintenance capex plan.
+- Market snapshot was supplied in config and not independently refreshed.
+- RMB figures are translations from an HKD presentation currency and may differ from subsidiary functional-currency totals.

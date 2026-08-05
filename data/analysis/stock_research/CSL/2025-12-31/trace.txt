@@ -1,0 +1,77 @@
+stock-research trace
+task: CSL / Carlisle Companies Incorporated
+period: 2025-12-31 annual
+generated_at: 2026-08-05T04:40:57+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked configured raw filing, annual-review and normalized-facts paths.
+- No pre-existing CSL 2025 filing package, facts.json, annual_facts.md or prior stock-research result existed locally.
+- Downloaded the primary 10-K HTML to stock_report/data/raw/filings/CSL/2025-12-31/csl-20251231.htm.
+
+3. Primary sources
+- SEC filing index: https://www.sec.gov/Archives/edgar/data/790051/000079005126000012/0000790051-26-000012-index.htm
+- SEC 2025 Form 10-K: https://www.sec.gov/Archives/edgar/data/790051/000079005126000012/csl-20251231.htm
+- SEC Companyfacts API: https://data.sec.gov/api/xbrl/companyfacts/CIK0000790051.json
+- Carlisle 2025 dividend increase: https://www.carlisle.com/investors/news/press-release-details/2025/Carlisle-Companies-Announces-a-10-Dividend-Increase-its-49th-Consecutive-Annual-Increase-2025-tW1m9sfrBk/default.aspx
+- Carlisle 2026-04-28 dividend declaration: https://www.carlisle.com/investors/news/press-release-details/2026/Carlisle-Companies-Declares-Regular-Quarterly-Dividend-216a80015/default.aspx
+- SAFE 2025-12-31 conversion table: https://www.safe.gov.cn/safe/2025/1231/26980.html
+- Market cap and PE: config/input.json, Yahoo Finance yfinance snapshot dated 2026-08-03.
+
+4. Model determination
+- statement_model = ordinary_operating.
+- owner_earnback_applicability = applicable.
+- Basis: two conventional manufacturing segments; cash, receivables, inventory, PP&E, goodwill and debt have ordinary operating/financing meanings. No customer deposits, insurance reserves, regulated project cash, concession rights or similar special-model balance-sheet structure dominates.
+
+5. Currency conversion
+- SAFE table gives CNY 1 = USD 0.14227179603915319.
+- Reciprocal used: USD 1 = CNY 7.0288.
+- All filing amounts in outputs/result.json are absolute CNY yuan.
+
+6. Core extracted USD facts (millions unless stated)
+- Revenue 5,019.9; cost of goods sold 3,227.3; derived gross profit 1,792.6.
+- Operating income 1,002.5; net income 740.7; continuing-operations income 742.5.
+- Assets 6,263.0; liabilities derived from assets less equity 4,467.6; equity 1,795.4.
+- Cash 1,112.1; receivables 593.8; inventory 447.3; PP&E 807.1.
+- Goodwill 1,538.9; other intangible assets 1,425.5.
+- Current debt 4.8; non-current long-term debt 2,881.6.
+- Operating cash flow 1,101.8; capex 131.2; derived operating FCF 970.6.
+- Common dividends paid 181.1; common-stock repurchases 1,300.0.
+- CCM revenue/operating income 3,721.7/997.2; CWT 1,298.2/101.9.
+
+7. Owner-earnback calculations
+- Discounted detachable net cash:
+  cash 1,112.1m x 80% - debt 2,886.4m = USD -1,996.72m = CNY -14,034,545,536.
+- Sustainable cash profit:
+  operating FCF 970.6m - stock compensation 34.8m = USD 935.8m.
+  USD 935.8m x 85% cycle/execution haircut = USD 795.43m = CNY 5,590,918,384.
+- Operating business price:
+  CNY 96,455,310,314.96777 - (-14,034,545,536) = CNY 110,489,855,850.96777.
+- Owner earnback years:
+  110,489,855,850.96777 / 5,590,918,384 = 19.7623803930 years.
+- Market cap / discounted cash profit:
+  96,455,310,314.96777 / 5,590,918,384 = 17.2521406485 times.
+
+8. Dividend forecast
+- Annualized declared run-rate: USD 1.10 quarterly x 4 = USD 4.40/share.
+- Shares: 40,883,868 outstanding at 2026-02-06 per 10-K cover.
+- Forecast: 4.40 x 40,883,868 x 7.0288 = CNY 1,264,403,938.15296.
+- Forecast yield: 1,264,403,938.15296 / 96,455,310,314.96777 = 0.0131087021961.
+- Limitation: annualization is not a board commitment for the next four quarters.
+
+9. Result construction and validation
+- Populated the initialized JSON only through repeated protocol CLI `set` operations.
+- First final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation output: {"status":"ok","errors":[]}.
+
+10. Judgment/fact separation
+- Filing facts and derived arithmetic are identified in evidence.
+- 80% cash recognition, deduction of stock compensation and 15% profit haircut are analyst judgments disclosed in owner_earnback and the report.
+- No ranking label, target price, buy/sell advice or guaranteed conclusion is used.

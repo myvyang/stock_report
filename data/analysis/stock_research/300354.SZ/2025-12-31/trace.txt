@@ -1,0 +1,15 @@
+[2026-07-31 21:52:56+08:00] protocol init: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+[2026-07-31] reuse check: 本地无 raw filing、annual facts、normalized facts 或历史 stock research 结果；仅存在 config/input.json，故需补取官方年报。
+[2026-07-31] official filing discovery: 通过巨潮资讯历史公告接口检索“东华测试”及年报分类，定位公告 1225129871，标题“2025年年度报告”，披露日 2026-04-21，公告编号 2026-005。
+[2026-07-31] downloaded: https://static.cninfo.com.cn/finalpage/2026-04-21/1225129871.PDF -> stock_report/data/raw/filings/300354.SZ/2025-12-31/annual-report-2025.pdf
+[2026-07-31] extraction: 使用隔离临时 Python 环境 /tmp/stockresearch-pdf 与 pypdf 抽取 167 页文本到 stock_report/data/raw/filings/300354.SZ/2025-12-31/annual-report-2025.txt；未修改项目依赖。
+[2026-07-31] model review: 主业为智能化测控仪器、传感器、软件与系统解决方案；报表主要是现金、理财、应收、存货、固定资产及一般经营负债，无特殊金融/地产/收费权结构。确认 statement_model=ordinary_operating，owner_earnback_applicability=applicable。
+[2026-07-31] core facts: revenue=530969039.19; cost_of_sales=180285885.52; gross_profit=350683153.67; parent_net_profit=136922367.25; OCF=187832867.55; capex cash out=12924543.86; FCF=174908323.69; total_assets=972621825.18; total_liabilities=111707747.18; parent_equity=858608343.55.
+[2026-07-31] formula: gross_margin=(530969039.19-180285885.52)/530969039.19=0.6604587608440815; net_margin=136922367.25/530969039.19=0.2578726011197881.
+[2026-07-31] cash assumption: cash equivalents 161473106.76 less operating reserve 80000000 = 81473106.76; trading financial assets 50000000 * 0.90 = 45000000; less current/non-current lease liabilities 198570.90+87164.58=285735.48. discounted detachable net cash=126187371.28. The reserve and 90% discount are analyst assumptions.
+[2026-07-31] profit assumption: sustainable cash profit anchored to average adjusted parent profit for 2023-2025: (84835502.12+120045111.81+130090419.86)/3=111657011.26333334. 2025 FCF was used only as a cross-check because annual report attributes the increase mainly to collections.
+[2026-07-31] earnback: operating business price=3986000000-126187371.28=3859812628.72; owner earnback years=3859812628.72/111657011.26333334=34.56847523544194; market cap/cash profit=35.69860911465171; discounted cash/market cap=0.03165764457601605.
+[2026-07-31] dividend: board proposal 138320201 shares * CNY 0.20=27664040.20; forecast yield=27664040.20/3986000000=0.006940301103863522. Proposal still required shareholder approval at annual-report date.
+[2026-07-31] protocol mutation: result fields populated exclusively through protocol set/append commands after init; no complex JSON object was handwritten from scratch.
+[2026-07-31] validation: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json -> status ok, errors [].
+[2026-07-31] limitations: market cap/PE reused from task input Tencent snapshot; no independent exchange tick verification. Industry leadership lacks third-party market-share evidence. Cash reserve, financial-asset discount and normalized profit are explicit analytical assumptions.

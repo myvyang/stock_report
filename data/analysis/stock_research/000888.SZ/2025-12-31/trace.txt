@@ -1,0 +1,120 @@
+stock-research trace
+company=000888.SZ 峨眉山Ａ
+period=2025-12-31
+generated_at=2026-07-31T16:30:05+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Read references/data-reuse.md because the task required checking reusable facts.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result.json only through protocol set/append commands.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   final protocol status=ok, errors=[]
+
+[local reuse check]
+Expected annual fact package, normalized facts, raw filing metadata and prior stock-research outputs were absent.
+Only stock_report/data/notes/user_stock_evaluations.md existed; it did not supply company facts.
+Decision: retrieve the official 2025 annual report and build this period's research from the filing.
+
+[sources]
+S1 Official annual report:
+https://static.cninfo.com.cn/finalpage/2026-04-28/1225205820.PDF
+title=峨眉山旅游股份有限公司2025年年度报告全文
+published=2026-04-28
+
+S2 Shenzhen Stock Exchange mirror of the same filing:
+https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-28/44d23efa-526a-49fd-9647-d93b716d8495.PDF
+
+S3 Company website business description:
+https://www.emslg.com/
+
+S4 Market snapshot supplied in config/input.json:
+source=Tencent qt.gtimg.cn
+timestamp=20260731114251
+market_cap=5148000000
+pe_ttm=23.36
+
+[filing extraction]
+Downloaded S1 to a temporary research directory.
+Extracted text from all 165 PDF pages using pypdf in a temporary virtual environment.
+Temporary files were used only for reading and were not treated as durable research outputs.
+
+[key filing facts]
+revenue=933493923.78
+cost_of_sales=467804767.79
+gross_profit=465689155.99
+parent_net_profit=220026676.42
+consolidated_net_profit=131951311.22
+minority_profit_loss=-88075365.20
+operating_cash_flow=354653728.90
+capital_expenditure=67810460.58
+operating_free_cash_flow=286843268.32
+total_assets=3248602339.62
+total_liabilities=859522233.55
+total_equity=2389080106.07
+parent_equity=2665622352.31
+minority_interest=-276542246.24
+cash_and_cash_equivalents=1636971178.18
+restricted_cash=32070102.00
+bank_debt=196989106.42
+lease_liability_total=16242123.26
+long_term_payable=7091216.09
+other_payables_current_account=346664572.40
+forecast_2025_annual_dividend=79036965.30
+
+[business facts]
+ticket_revenue=251909785.24; ticket_gross_margin=0.4627
+cableway_revenue=390001922.46; cableway_gross_margin=0.8128
+hotel_revenue=163578654.97; hotel_gross_margin=0.0885
+tea_revenue=47640154.56
+travel_agency_revenue=17538941.18
+other_revenue=62824465.37
+scenic_area_total_visitors=6746700
+scenic_area_gate_visitors=4344900
+
+[analysis model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Revenue is generated from tickets, cableways, hotels and related visitor services. Deposits, financial assets or project advances are not the core product. Debt and operating liabilities can be separately identified, so the ordinary operating-company formula is economically interpretable.
+
+[owner earnback calculations]
+gross_margin=(933493923.78-467804767.79)/933493923.78=0.49886683151003636
+net_margin=220026676.42/933493923.78=0.23570231237183126
+
+cash component:
+1636971178.18 * 0.75 = 1227728383.635
+less bank debt 196989106.42
+less lease liabilities and long-term payable 23333339.35
+less other-payable current accounts 346664572.40
+discounted_detachable_net_cash=660741365.465
+
+profit component:
+base parent net profit=220026676.42
+haircut=15%
+discounted_sustainable_cash_profit=187022674.957
+cross-check: 2025 operating free cash flow=286843268.32, above the discounted profit.
+
+valuation:
+operating_business_price=5148000000-660741365.465=4487258634.535
+owner_earnback_years=4487258634.535/187022674.957=23.993126157385486
+market_cap_to_cash_profit=5148000000/187022674.957=27.526074050558957
+discounted_net_cash_to_market_cap=660741365.465/5148000000=0.12834913859071484
+forecast_dividend_yield=79036965.30/5148000000=0.015352945862470862
+
+[judgment log]
+J1 Cash haircut: counted 75% of unrestricted cash-like balance. The 25% reserve reflects operating liquidity, pending cableway/project work and constraints on state-controlled-company cash. This is an analyst assumption.
+J2 Other payables: treated the 346.66m current-account balance as quasi-financing because it rose sharply while other shareholders paid 296.47m toward Yunshang Tourism's bank debt. Exact settlement terms were not fully disclosed, so this is deliberately conservative.
+J3 Profit haircut: used parent net profit rather than peak free cash flow, then deducted 15% for visitor cyclicality, future maintenance/update capex and continuing losses at Yunshang Tourism. This is an analyst assumption.
+J4 Minority accounting: parent net profit exceeds consolidated net profit because minority loss was -88.08m. This improves attributable accounting profit but does not eliminate cash and guarantee exposure at the loss-making subsidiary.
+J5 Dividend: forecast uses the disclosed 2025 annual board proposal, not an assumed payout ratio. Shareholder approval/implementation remains a condition.
+
+[quality and limitations]
+status=complete
+Core three-statement fields, model classification, asset/liability explanations, dividend forecast, business story and evidence are present.
+Market price date is seven months after the financial reporting date.
+Maintenance capex was not separately disclosed.
+The exact composition and repayment terms of current-account other payables were not fully disclosed.
+Industry-position wording is company-reported and was not independently ranked across all scenic-area peers.

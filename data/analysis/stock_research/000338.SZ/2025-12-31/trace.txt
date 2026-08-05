@@ -1,0 +1,131 @@
+stock-research trace
+company=潍柴动力
+code=000338.SZ
+period=2025-12-31
+report_type=annual
+generated_context_date=2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Read references/data-reuse.md because the skill routes reuse decisions there.
+4. Ran protocol init:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields only through protocol set/append commands.
+6. Ran protocol validate; result: {"status":"ok","errors":[]}.
+
+[local-input-audit]
+config/input.json existed.
+The configured raw filing, annual facts, normalized facts, and prior stock-research directories did not exist in the workspace.
+No prior result was reused.
+
+[source-acquisition]
+Official filing discovered through the issuer's regular-report page and CNInfo search.
+Downloaded:
+  https://static.cninfo.com.cn/finalpage/2026-03-27/1225037559.PDF
+Local copy:
+  stock_report/data/raw/filings/000338.SZ/2025-12-31/2025-annual-report.pdf
+Text extraction:
+  pypdf in isolated temporary virtual environment
+  stock_report/data/raw/filings/000338.SZ/2025-12-31/2025-annual-report.txt
+PDF pages=206
+
+[source-priority]
+Core financial and business facts: audited 2025 annual report.
+Market cap and PE TTM: config/input.json, source identified as Tencent qt.gtimg.cn.
+Third-party media was not used for core financial figures.
+
+[model-review]
+Input hint ordinary_operating was confirmed.
+Reason:
+  The group earns from manufacturing/selling powertrains, vehicles, parts, agricultural machinery,
+  warehouse vehicles/automation, and power-generation equipment.
+Special handling:
+  KION leasing receivables and corresponding sale-and-leaseback, securitization, and leasing borrowings
+  are operating-model financing and must not be ignored in detachable-cash analysis.
+  Consolidated minority interest requires cash-profit attribution.
+
+[core-financials-CNY]
+revenue=231809281106.82
+cost_of_sales=182027337736.02
+gross_profit=49781943370.80
+operating_profit=16073590348.78
+net_profit=13680319243.39
+parent_net_profit=10930504451.02
+operating_cash_flow=28681522296.05
+capital_expenditure=6796720341.73
+operating_free_cash_flow=21884801954.32
+total_assets=367475596673.66
+total_liabilities=236413580955.78
+total_equity=131062015717.88
+parent_equity=93190211519.02
+minority_interest=37871804198.86
+
+[formula-checks]
+gross_margin=(231809281106.82-182027337736.02)/231809281106.82
+gross_margin=0.21475388359390152
+net_margin=10930504451.02/231809281106.82
+net_margin=0.04715300612136887
+operating_free_cash_flow=28681522296.05-6796720341.73
+operating_free_cash_flow=21884801954.32
+parent_attribution_ratio=10930504451.02/13680319243.39
+parent_attribution_ratio=0.7990 approximately
+attributed_free_cash_flow=21884801954.32*parent_attribution_ratio
+attributed_free_cash_flow=17485843781.53
+discounted_sustainable_cash_profit=17485843781.53*0.70
+discounted_sustainable_cash_profit=12240090647.07
+
+[detachable-cash-test-CNY]
+cash=68712656654.45
+restricted_cash=11171182390.39
+unrestricted_cash=57541474264.06
+discounted_unrestricted_cash=57541474264.06*0.50=28770737132.03
+unrestricted_structured_deposits=14283550855.28
+discounted_structured_deposits=14283550855.28*0.80=11426840684.22
+interest_bearing_debt_company_capital_management_definition=55838066540.06
+discounted_net_amount_before_floor=28770737132.03+11426840684.22-55838066540.06
+discounted_net_amount_before_floor=-15640488723.81
+discounted_detachable_net_cash=max(0,-15640488723.81)=0
+Rationale:
+  The analysis does not add negative net cash to operating business price, but confirms no detachable cash deduction.
+  Haircuts cover working capital, finance-company deposits, minority ownership, cross-border access, and leasing finance.
+
+[earnback-CNY]
+market_cap=239593000000
+discounted_detachable_net_cash=0
+operating_business_price=239593000000-0=239593000000
+discounted_sustainable_cash_profit=12240090647.071497
+owner_earnback_years=239593000000/12240090647.071497=19.5744465387
+market_cap_to_cash_profit=19.5744465387
+
+[dividend-forecast-CNY]
+2025_interim_per_10_shares=3.58
+2025_interim_distributable_shares=8663328821
+estimated_2025_interim_cash_dividend=3101471717.918
+2025_final_proposal_cash_dividend=3239642088.25
+forecast_cash_dividend_assuming_same_total_intensity=6341113806.168
+forecast_dividend_yield=6341113806.168/239593000000
+forecast_dividend_yield=0.026466189772522568
+Buybacks excluded from forecast cash dividend.
+
+[important-evidence-locators]
+Annual report pages 10-11: headline financials and quarterly data.
+Pages 13-17: business model, industry, unit sales, segment and geography revenue.
+Pages 21-22: cash flow and major assets/liabilities.
+Page 45: interim distribution and final dividend proposal.
+Pages 75-78: audit opinion and key audit matters.
+Pages 78-87: primary financial statements.
+Page 123: cash restrictions and trading financial asset composition.
+Pages 149-155: debt, KION leasing payables, and other non-current liabilities.
+Page 180: company-defined interest-bearing debt and leverage.
+
+[limitations]
+Market quote was supplied by the task and not independently reconciled to exchange data.
+Sustainable cash profit uses one-year cash flow, not a three-to-five-year normalized series.
+Attribution uses parent-net-profit share as a proxy because consolidated cash flow is not directly split by ownership.
+Dividend forecast assumes continuation of 2025 interim plus final per-share intensity and is not guidance.
+
+[outputs]
+outputs/result.json
+outputs/report.md
+outputs/trace.txt

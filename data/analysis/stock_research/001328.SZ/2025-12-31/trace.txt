@@ -1,0 +1,67 @@
+task=stock_research
+company=001328.SZ 登康口腔
+period=2025-12-31
+generated_from=config/input.json
+
+[protocol]
+initialized=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+result_contract=.agents/skills/stock-research/references/result-contract.md
+report_contract=.agents/skills/stock-research/references/report-contract.md
+data_reuse_contract=.agents/skills/stock-research/references/data-reuse.md
+
+[reuse]
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+raw_filing_metadata=missing
+decision=no local annual fact package was available; official disclosures were read directly
+
+[official_sources]
+annual_report_summary=https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-23/8f4f8864-9b03-4501-8ac9-c847e923182d.PDF
+annual_report_full_text=https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12143734&stockid=001328
+audit_report=https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12143733&stockid=001328
+fundraising_report=https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-23/a9ecacd7-76f7-45dd-87c9-4a85d6ea15c4.PDF
+market_snapshot=config/input.json (Tencent qt.gtimg.cn, 20260731114309)
+note=core filing facts were taken from exchange/company disclosures; Sina-rendered filing text was used to recover full-report tables where the exchange search result exposed only the summary
+
+[model]
+input_hint=ordinary_operating/applicable
+verified_model=ordinary_operating/applicable
+override_input_business_tags=yes
+reason=the company manufactures and sells oral-care consumer products; it is not a medical-service chain and has no special financial-statement structure
+
+[core_formulas]
+gross_profit=1715829614.70-819734339.10=896095275.60
+gross_margin=896095275.60/1715829614.70=0.5222495349
+net_margin=181077979.98/1715829614.70=0.1055337536
+operating_free_cash_flow=214410565.55-48894573.99=165515991.56
+discounted_cash_profit=165515991.56*0.90=148964392.404
+forecast_dividend=172173800*0.85=146347730.00
+forecast_dividend_yield=146347730/5499000000=0.0266135170
+
+[cash_haircuts]
+cash_equivalents=284825825.89*1.00=284825825.89
+structured_deposits=524111111.11*0.95=497905555.55
+securities_income_certificates=321006118.06*0.85=272855200.35
+current_term_deposits=157348888.89*0.95=149481444.45
+long_term_deposits=205498611.11*0.90=184948750.00
+less_unused_restricted_fundraising_cash=179199800.00
+less_2025_proposed_dividend=146347730.00
+discounted_detachable_net_cash=1064469246.24
+restricted_cash_423218.15=excluded
+
+[earnback]
+operating_business_price=5499000000-1064469246.24=4434530753.76
+owner_earnback_years=4434530753.76/148964392.404=29.7690654941
+market_cap_to_cash_profit=5499000000/148964392.404=36.9148620771
+discounted_net_cash_to_market_cap=1064469246.24/5499000000=0.1935750584
+
+[judgment_boundaries]
+fact=financial statements, disclosed product/channel data, proposed dividend, fundraising balance and project delay
+inference=sales-expense intensity makes profit conversion dependent on marketing efficiency
+assumption=haircuts on cash-management assets and 10% sustainability haircut on free cash flow
+limitation=market cap is dated 2026-07-31 while statements are dated 2025-12-31; proposed dividend was deducted but other 2026 changes were not modeled
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok

@@ -1,0 +1,54 @@
+Stock research trace — RJF — generated 2026-08-05 Asia/Shanghai
+
+1. Read required protocol and report contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Inspected configured reusable paths. No RJF raw filing, annual facts package, normalized facts, or prior stock-research result existed locally. Only the user evaluation notes file was present; it was not needed for this company-specific task.
+
+3. Initialized outputs/result.json with the required protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Reconciled reporting period:
+   - Input directory period: 2025-12-31, report_type annual.
+   - RJF official fiscal year end: 2025-09-30.
+   - Used audited FY2025 Form 10-K filed 2025-11-25; did not substitute the unaudited 2025-12-31 10-Q for an annual report.
+
+5. Primary evidence reviewed:
+   - SEC FY2025 Form 10-K HTML: https://www.sec.gov/Archives/edgar/data/720005/000072000525000093/rjf-20250930.htm
+   - Company-hosted FY2025 Form 10-K PDF: https://www.raymondjames.com/-/media/RJ/DotCom/Files/Our-Company/Investor-Relations/Financial-Reports/2025/RJF-20250930-10-K.pdf
+   - Company dividend history: https://www.raymondjames.com/investor-relations/shareholder-information/dividend-history
+   - Federal Reserve H.10/G.5 USD/CNY series: https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.M.CH&rel=H10
+   - Market-cap and PE snapshot: config/input.json (Yahoo Finance yfinance, 2026-08-03).
+
+6. Analysis-model override:
+   - Input hint: ordinary_operating / applicable.
+   - Verified model: financial_brokerage / requires_special_model.
+   - Reason: RJF is a financial and bank holding company. Bank loans, bank deposits, client segregation assets, brokerage receivables/payables and regulatory capital are operating structure, not detachable net cash.
+   - Accordingly, all ordinary owner-earnback ranking fields remain null.
+
+7. Currency normalization:
+   - Contract requires absolute CNY yuan.
+   - Used Federal Reserve September 2025 monthly average: USD/CNY 7.1235.
+   - Converted all FY2025 statement amounts from USD millions to CNY absolute yuan by amount × 1,000,000 × 7.1235.
+   - Historical dividends use the same rate solely for comparability and are marked as estimates.
+
+8. Key formula checks:
+   - Net margin = USD 2,130m attributable net income / USD 14,065m net revenue = 0.1514397440.
+   - Forecast dividend = USD 0.54 × 4 × 198,139,594 shares × 7.1235 = CNY 3,048,726,379.38.
+   - Forecast dividend yield = CNY 3,048,726,379.38 / CNY 228,121,249,195.5996 = 0.01336449976.
+   - Minority-interest ratio = USD 1m / USD 12,504m total equity = 0.0000799744.
+   - Gross margin, operating cash flow, capex and operating free cash flow left null because ordinary-company interpretations are not economically comparable for this broker-bank model.
+
+9. Populated outputs/result.json exclusively through repeated protocol CLI set commands in populate_rjf_result.sh; the initialized complex JSON was not hand-written from scratch.
+
+10. Validation:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Result: status=ok, errors=[]
+
+11. Required deliverables created:
+    - outputs/result.json
+    - outputs/report.md
+    - outputs/trace.txt

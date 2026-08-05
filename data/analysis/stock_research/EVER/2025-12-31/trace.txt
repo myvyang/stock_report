@@ -1,0 +1,17 @@
+2026-08-04T16:21:40+08:00 START query=EVER period=2025-12-31 report_type=annual
+SKILL stock-research loaded; result-contract.md, report-contract.md and data-reuse.md read.
+LOCAL_REUSE checked stock_report paths from config/input.json; no EVER/2025-12-31 filing, annual facts, normalized facts, or prior stock-research files found.
+PROTOCOL_INIT PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+SOURCE SEC 2025 Form 10-K accession=0001193125-26-066957 filed=2026-02-24 url=https://www.sec.gov/Archives/edgar/data/1640428/000119312526066957/ever-20251231.htm
+SOURCE SEC Companyfacts CIK=0001640428 url=https://data.sec.gov/api/xbrl/companyfacts/CIK0001640428.json
+SOURCE EverQuote Q4 and full-year 2025 results published=2026-02-23 url=https://investors.everquote.com/financials/quarterly-results/default.aspx
+SOURCE config/input.json valuation date=2026-08-03 market_cap_cny=6019986157.09552 pe_ttm=8.607508 provider=Yahoo Finance yfinance
+MODEL ordinary_operating/applicable confirmed: online insurance referral marketplace; no underwriting reserves, client funds, or other special-model balance-sheet structure.
+FX financial statement USD values converted to CNY at analytical rate USD/CNY=7.20; input market cap retained as supplied.
+FINANCIALS_USD revenue=692521000 cost_of_revenue=19375000 gross_profit=673146000 operating_profit=58336000 net_income=99311000 operating_cash_flow=95381000 capex=5057000 free_cash_flow=90324000.
+BALANCE_USD assets=326913000 liabilities=88873000 equity=238040000 cash=171379000 receivables=75149000 accounts_payable=76851000 lease_liabilities=2567000.
+NORMALIZATION net_income contains deferred_tax_benefit=38400000; sustainable profit uses operating_profit*(1-21%)=46085440 USD, converted to CNY=331815168.
+OWNER_EARNBACK discounted_net_cash=(cash*80%-lease_liabilities)*7.20=968659200 CNY; operating_business_price=market_cap-discounted_net_cash=5051326957.09552 CNY; years=15.223322; market_cap_to_cash_profit=18.142589.
+DIVIDEND forecast=0 based on 10-K history and stated retention policy; buybacks treated separately.
+PROTOCOL_SET result fields populated through protocol CLI; complex JSON was not handwritten from scratch.
+VALIDATION PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json => status=ok errors=[].

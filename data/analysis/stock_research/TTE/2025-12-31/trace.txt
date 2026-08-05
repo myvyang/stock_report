@@ -1,0 +1,82 @@
+stock-research trace
+company: TotalEnergies SE (TTE)
+period: 2025-12-31 annual
+generated_at: 2026-08-05 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields only through protocol set commands (executed by update_result.sh during construction).
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: {"status":"ok","errors":[]}
+
+[reuse check]
+- Checked configured annual review, normalized facts, raw filing, and prior stock research paths.
+- No TTE annual facts package, normalized facts, raw filing metadata, or prior research output existed in the workspace.
+- Returned to primary official disclosures; no media source was used for a core financial figure.
+
+[primary sources]
+1. TotalEnergies consolidated accounts, FY2025, published 2026-02-11:
+   https://totalenergies.com/system/files/documents/totalenergies_accounts-q4-2025_2026_en.pdf
+   Used for income statement, balance sheet, cash flow, equity, capex, dividends paid, buybacks, and segment tables.
+2. TotalEnergies Fourth quarter and full-year 2025 results:
+   https://totalenergies.com/system/files/documents/totalenergies_pr-results-q4-2025_2026_en.pdf
+   Used for CFFO, organic investment, net debt, gearing, ROACE, production, reserves, segment adjusted operating income, and commodity sensitivity.
+3. TotalEnergies official dividends page:
+   https://totalenergies.com/investors/shares-and-dividends/dividends
+   Used for FY2025 dividend of EUR3.40/share and dividend history.
+4. IRS yearly average currency exchange rates:
+   https://www.irs.gov/individuals/international-taxpayers/yearly-average-currency-exchange-rates
+   Used for 2025 USD/CNY 7.129 and EUR/USD cross-rate input (USD per EUR = 1/0.886).
+5. Market snapshot supplied in config/input.json:
+   Yahoo Finance yfinance; market cap CNY1,316,363,131,517.9062 as of 2026-08-03; PE TTM 10.996245.
+
+[model decision]
+- statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- Reason: financial assets and debt are financing/treasury items rather than the product sold. The operating asset base is oil and gas reserves, LNG infrastructure, refineries, chemicals, power generation, trading and retail. Ordinary owner earnback is usable only after treating cash net of debt and deducting recurring organic investment.
+
+[currency]
+- All reported USD amounts converted to CNY at 7.129 CNY/USD.
+- The same annual average rate was used for balance-sheet and flow items for protocol consistency. This is an approximation versus a year-end spot translation and is disclosed as a limitation.
+- Dividend EUR/CNY cross rate = 7.129 / 0.886 = 8.046275395.
+
+[core calculations]
+- Revenue = USD182,344m * 7.129 = CNY1,299,930,376,000.
+- Cost of sales proxy = purchases net of inventory variation USD116,740m * 7.129 = CNY832,239,460,000.
+- Gross profit = (182,344 - 116,740)m * 7.129 = CNY467,690,916,000.
+- Gross margin = 65,604 / 182,344 = 35.978151%.
+- Parent net profit = USD13,127m * 7.129 = CNY93,582,383,000.
+- Net margin = 13,127 / 182,344 = 7.199030%.
+- Operating cash flow = USD27,343m * 7.129 = CNY194,928,247,000.
+- Capex = USD16,953m * 7.129 = CNY120,857,937,000.
+- Operating FCF = (27,343 - 16,953)m * 7.129 = CNY74,070,310,000.
+
+[owner earnback]
+- Company net-debt components excluding leases were used rather than gross balance-sheet debt.
+- Haircut net cash, USDm:
+  cash 26,202 * 100%
+  + current financial assets 3,093 * 80%
+  + non-current financial assets 1,991 * 60%
+  - debt and net held-for-sale obligations 51,501 * 100%
+  = -21,630m USD = -CNY154,200,270,000.
+- Pre-haircut cash profit = CFFO USD27,839m - organic investment USD16,812m = USD11,027m.
+- Commodity-cycle haircut = 20%, based on cyclicality and disclosed sensitivity of approximately USD2.8bn operating cash flow per USD10/b liquids-price change.
+- Discounted sustainable cash profit = 11,027m * 80% * 7.129 = CNY62,889,186,400.
+- Operating business price = market cap - discounted net cash = CNY1,470,563,401,517.9062.
+- Owner earnback years = 1,470,563,401,517.9062 / 62,889,186,400 = 23.383406.
+- Market cap / cash profit = 20.931470.
+
+[dividend]
+- Forecast basis uses the approved/implemented FY2025 dividend EUR3.40/share and year-end diluted shares 2.167bn.
+- Forecast cash dividend = 3.40 * 2.167bn * 8.046275395 = CNY59,283,347,855.53.
+- Forecast dividend yield = CNY59,283,347,855.53 / CNY1,316,363,131,517.9062 = 4.503571%.
+- Buybacks are excluded from dividend yield.
+
+[quality notes]
+- Gross profit is a protocol-compatible analytical subtotal (revenues less purchases and inventory variation). Other operating expenses remain economically important, so the margin is not directly comparable with light-asset companies.
+- The 20% cash-profit haircut is an analyst judgment, clearly separated from reported fact.
+- No recommendation, target price, ranking label, or unsupported certainty is included.

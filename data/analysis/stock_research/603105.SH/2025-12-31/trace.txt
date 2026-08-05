@@ -1,0 +1,57 @@
+stock-research trace
+company=603105.SH 芯能科技
+period=2025-12-31 annual
+generated_for=2026-08-01 Asia/Shanghai
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+write_method=protocol set commands; result JSON was initialized by CLI and not hand-built from an empty file
+validation=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse_check]
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+raw_filing_metadata=missing
+historical_stock_research=missing
+decision=read public 2025 annual report because no reusable local filing/fact package existed
+
+[sources]
+1. 浙江芯能光伏科技股份有限公司2025年年度报告，披露日2026-04-25
+   https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12188088&stockid=603105
+   used_for=business, statements, segment data, station capacity, restricted assets, debt, dividend, risks
+2. 浙江芯能光伏科技股份有限公司2025年年度报告摘要
+   https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12188077&stockid=603105
+   used_for=business model and cross-check
+3. config/input.json / Tencent qt.gtimg.cn
+   snapshot=20260731114338
+   market_cap=3590000000
+   pe_ttm=20.46
+
+[model_review]
+input_hint=ordinary_operating/applicable
+selected=utility_concession/requires_special_model
+reason=2025 photovoltaic-generation revenue 646793525.42 / main-business revenue 732988299.63 = 88.24%; self-owned distributed stations 1000.75MW; fixed assets 3515586158.36 / total assets 4521702468.78 = 77.75%; station assets and fee-collection rights support financing
+consequence=all ordinary owner-earnback ranking fields remain null
+special_model=project/station-level remaining-contract cash-flow DCF after maintenance capex and debt service
+
+[calculations]
+gross_profit=738277294.03-324485799.79=413791494.24
+gross_margin=413791494.24/738277294.03=0.5604906157
+net_margin=200757657.54/738277294.03=0.2719135808
+operating_free_cash_flow=402433441.04-285323954.37=117109486.67
+forecast_dividend_yield=100001820.40/3590000000=0.0278556603
+interest_bearing_debt_and_convertible=209145350.01+171416888.58+660014538.94+829858756.32=1877131244.28
+lease_liabilities=4714826.17+87828614.89=92543441.06
+payables_and_notes=104012180.49+68713322.96=172725503.45
+restricted_cash=36981661.48+2297040.18=39278701.66; detailed cash-note value used because the restricted-assets table is rounded in RMB 10,000
+restricted_fixed_assets_carrying_value=1535392900 (annual report table unit RMB 10,000)
+
+[quality]
+status=complete
+limitations=missing per-station commissioning dates, remaining contract life, degradation assumptions, and maintenance-vs-growth capex split; market snapshot not independently backtested; 2025 dividend is a proposal
+ordinary_owner_earnback=null by model rule, not by missing protocol work

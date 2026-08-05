@@ -1,0 +1,81 @@
+stock-research trace
+company: 山推股份 (000680.SZ)
+period: 2025-12-31 annual
+generated context date: 2026-07-31 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked configured raw filing, annual review, normalized facts and historical stock research paths.
+- No reusable files existed in the workspace; only config/input.json was present.
+- Therefore retrieved the disclosed 2025 annual report rather than fabricating missing facts.
+
+3. Primary material
+- Annual report identified: 山推工程机械股份有限公司2025年年度报告, announcement date 2026-03-16, 237 pages.
+- Download URL used for local extraction:
+  http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESZ_STOCK/2026/2026-3/2026-03-16/11996217.PDF
+- Discovery page:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=11996217&stockid=000680
+- Report itself states CNINFO is the designated disclosure medium and carries a standard unmodified audit opinion dated 2026-03-13 (上会师报字(2026)第0915号).
+- PDF text extracted locally with pypdf solely for reading; source facts remain attributed to the annual report.
+
+4. Model decision
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: company manufactures and sells construction machinery; receivables, inventory and production equipment are ordinary operating assets. There are no customer deposits, insurance reserves, regulated presale funds, concession rights, or financial balance-sheet economics that would require a special model.
+
+5. Key statement extraction (CNY)
+- Revenue: 14,620,170,066.18
+- Cost of sales: 11,479,952,567.48
+- Gross profit: 3,140,217,498.70
+- Operating profit: 1,281,092,863.69
+- Net profit: 1,214,259,274.84
+- Parent net profit: 1,210,975,183.61
+- Total assets: 19,056,605,127.05
+- Total liabilities: 12,585,624,575.35
+- Total equity: 6,470,980,551.70
+- Parent equity: 6,172,970,237.97
+- Minority interest: 298,010,313.73
+- Operating cash flow: 781,122,357.31
+- Capex cash paid: 66,821,516.14
+- Operating free cash flow: 714,300,841.17
+- Financing cash flow: -659,826,987.45
+- Cash used for dividends/profit distribution/interest: 253,840,361.59 (combined cash-flow statement line; not treated as pure dividends)
+
+6. Business and asset checks
+- Machinery main units revenue 10,950,090,088.51, margin 24.80%.
+- Overseas revenue 8,741,256,550.43, margin 28.15%; domestic revenue 4,876,440,253.66, margin 10.19%.
+- Accounts receivable 5,983,500,787.52; inventory 3,249,168,968.50.
+- Reported monetary funds 3,316,118,136.78, of which 2,239,328,577.98 restricted.
+- Cash and cash equivalents per cash-flow statement: 1,076,789,558.80.
+- Short borrowings 760,299,750.01; long borrowings 1,059,000,000.00; current portion of non-current liabilities 456,737,634.01.
+
+7. Formula and judgment audit
+- Gross margin = 3,140,217,498.70 / 14,620,170,066.18 = 0.2147866601.
+- Net margin = 1,210,975,183.61 / 14,620,170,066.18 = 0.0828290764.
+- Discounted detachable net cash = 1,076,789,558.80 + 7,697,107.16*50% - 2,276,037,384.02 = -1,195,399,271.64.
+- Market cap = 16,937,000,000 from config/input.json.
+- Operating business price = 16,937,000,000 - (-1,195,399,271.64) = 18,132,399,271.64.
+- 2025 free cash flow = 781,122,357.31 - 66,821,516.14 = 714,300,841.17.
+- Judgmental safety deduction for receivable expansion and cyclicality = 114,300,841.17.
+- Discounted sustainable distributable cash profit = 600,000,000.00.
+- Owner earnback years = 18,132,399,271.64 / 600,000,000 = 30.2206654527.
+- Market cap/cash profit = 16,937,000,000 / 600,000,000 = 28.2283333333.
+- Forecast dividend = 148,529,984 based on board proposal; yield = 148,529,984 / 16,937,000,000 = 0.0087695631.
+
+8. Protocol writes and validation
+- All structured fields were written to the CLI-initialized JSON with repeated protocol `set` commands; no complex result object was handwritten from scratch.
+- Corrected exact gross-margin and net-margin values after an independent arithmetic check.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Expected/final status: ok, errors=[]
+
+9. Limitations
+- No post-reporting-date account-by-account receivable collections were available.
+- Release terms for restricted monetary funds were not available in sufficient granularity.
+- Current portion of non-current liabilities may include a small lease component; the full amount was conservatively treated as financing debt.
+- Market cap and PE TTM are input market snapshot fields, not audited filing data.

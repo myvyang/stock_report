@@ -1,0 +1,58 @@
+task: KEY / KeyCorp
+period: 2025-12-31 annual
+generated_for_input_at: 2026-08-05T03:38:29+08:00
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse check
+   - Checked configured annual facts, normalized facts, raw filing, and prior stock-research paths.
+   - No reusable KEY 2025 files were present under stock_report; official filing retrieval was required.
+
+3. Protocol initialization
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Model verification
+   - Input hint: ordinary_operating / applicable.
+   - Verified in KeyCorp 2025 Form 10-K Item 1 that KeyCorp is a bank holding company and KeyBank is its principal subsidiary.
+   - Verified 2025 year-end deposits of USD 148.713bn, net loans of USD 105.114bn, securities of USD 48.218bn.
+   - Overrode hint with financial_bank / not_applicable.
+   - Ordinary owner-earnback fields left null as required by contract.
+
+5. Primary-source retrieval and facts
+   - SEC 2025 Form 10-K, accession 0001628280-26-010546, filed 2026-02-23:
+     https://www.sec.gov/Archives/edgar/data/91576/000162828026010546/key-20251231.htm
+   - SEC company facts API for CIK 0000091576 used to cross-check XBRL facts:
+     https://data.sec.gov/api/xbrl/companyfacts/CIK0000091576.json
+   - KeyCorp 4Q25 release and supplement, dated 2026-01-20:
+     https://investor.key.com/press-releases/news-details/2026/KEYCORP-REPORTS-FOURTH-QUARTER-2025-NET-INCOME-OF-474-MILLION-OR--43-PER-DILUTED-COMMON-SHARE/default.aspx
+   - KeyCorp 2Q26 release, dated 2026-07-21:
+     https://investor.key.com/press-releases/news-details/2026/KEYCORP-REPORTS-SECOND-QUARTER-2026-NET-INCOME-OF-472-MILLION-OR-0-44-PER-DILUTED-COMMON-SHARE-INCREASING-26-YEAR-OVER-YEAR/default.aspx
+   - KeyCorp dividend declarations, dated 2026-01-15 and 2026-05-13:
+     https://investor.key.com/press-releases/news-details/2026/KEYCORP-DECLARES-QUARTERLY-CASH-DIVIDEND-ON-COMMON-SHARES-AND-PREFERRED-STOCKS-SETS-ANNUAL-MEETING-DATE/default.aspx
+     https://investor.key.com/press-releases/news-details/2026/KEYCORP-DECLARES-QUARTERLY-CASH-DIVIDEND-ON-COMMON-SHARES-AND-PREFERRED-STOCKS-AND-ANNOUNCES-NEW-SHARE-REPURCHASE-PROGRAM/default.aspx
+   - Federal Reserve H.10 USD/CNY:
+     year-end 2025 = 7.1875; December 2025 monthly average = 7.0432.
+     https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+
+6. Currency conversion
+   - Balance-sheet facts: USD x 7.1875.
+   - 2025 income-statement and historical-dividend facts: USD x 7.0432.
+   - Forecast dividend: USD 0.82 x 1,089,647,432 shares x 7.1875 = CNY 6,422,109,552.35.
+   - Forecast dividend yield: CNY 6,422,109,552.35 / CNY 163,418,143,305.95508 = 0.0392986325.
+   - Market cap and PE retained exactly from config/input.json.
+
+7. Protocol population
+   - All result fields were populated with repeated protocol `set` and `append` commands.
+   - No complex result JSON object was handwritten from scratch.
+
+8. Validation
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   status: ok
+
+9. Data-quality decisions
+   - status = complete under the special-model minimum requirements.
+   - Bank-incomparable gross margin, ordinary operating cash flow, capex, free cash flow, detachable net cash, cash profit, operating-business price and payback ratios remain null.
+   - Main limitation: supplied CNY market cap did not include original USD market cap or its FX conversion rate.

@@ -1,0 +1,69 @@
+stock-research trace
+company: BOSS ZHIPIN-W / KANZHUN LIMITED (02076.HK)
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- /workspace/AGENTS.md (provided in task context)
+
+2. Local-data reuse check
+- Expected annual facts, normalized facts, raw filing metadata and prior stock-research paths were checked.
+- Only stock_report/data/notes/user_stock_evaluations.md existed locally; no reusable filing/fact package was present.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- The initialized financial_brokerage hint was treated as an unverified input hint.
+
+4. Primary sources obtained and reviewed
+- KANZHUN LIMITED 2025 Form 20-F, filed 2026-04-29:
+  https://ir.zhipin.com/system/files-encrypted/nasdaq_kms/assets/2026/04/29/9-36-41/KANZHUN%20LIMITED%202025%20Annual%20Report%20-%2020F.pdf
+- KANZHUN LIMITED FY2025 results announcement, dated 2026-03-18:
+  https://ir.zhipin.com/static-files/ea54044d-acb0-4fa4-9ab4-8c0e82453e7e
+- Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, timestamp 2026/08/03 09:47:09.
+
+5. Model verification
+- Business: online recruitment platform charging enterprise customers; not a brokerage.
+- Balance sheet: cash, time deposits and investments dominate; deferred revenue is the largest liability; no interest-bearing borrowings at 2025 year-end.
+- Final model: ordinary_operating; owner earnback applicability: applicable.
+
+6. Key reported facts (RMB)
+- Revenue 8,267,518,000; cost of revenue 1,235,153,000; gross profit 7,032,365,000.
+- Operating profit 2,464,101,000; net income 2,690,467,000; parent net income 2,735,340,000.
+- Total assets 24,568,014,000; liabilities 4,486,976,000; parent equity 20,030,775,000.
+- Operating cash flow 4,552,371,000; capex 119,123,000; reported operating FCF 4,433,248,000.
+- Share-based compensation 911,987,000; cash dividends paid 553,010,000; repurchases paid 142,798,000.
+- Average MAU 60.7m; paid enterprise customers 6.8m.
+
+7. Research calculations
+- Gross margin = 7,032,365,000 / 8,267,518,000 = 0.8506017163.
+- Net margin = 2,735,340,000 / 8,267,518,000 = 0.3308538306.
+- Discounted detachable net cash:
+  90% * (cash 4,104,917,000 + ST deposits 6,390,158,000 + LT deposits 782,460,000)
+  + 80% * (ST investments 9,450,244,000 + LT investments 1,898,178,000)
+  - total liabilities 4,486,976,000
+  = 14,741,543,100.
+- Discounted sustainable cash profit:
+  parent net income 2,735,340,000
+  - estimated after-tax interest/investment income 593,513,853.06
+  + depreciation and amortization 815,010,000
+  - normalized maintenance capex 500,000,000
+  = 2,456,836,146.94.
+- SBC was not added back because dilution is an owner cost.
+- Operating business price = 52,280,783,995.39 - 14,741,543,100 = 37,539,240,895.39.
+- Owner earnback years = 37,539,240,895.39 / 2,456,836,146.94 = 15.2794990674.
+- Market cap / cash profit = 21.2797108105.
+- Forecast dividend uses 2025 declared dividend 556,410,000 as a flat baseline; yield = 1.06427249%.
+
+8. Protocol population and validation
+- outputs/result.json fields were populated only through protocol set commands; no complex JSON object was handwritten into the file.
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation result: status ok; errors [].
+
+9. Limitations
+- Market cap and PE were accepted from the task input and not cross-checked against exchange first-party market data.
+- Industry leadership is company-stated, without independently standardized market-share verification.
+- Dividend forecast is a flat historical baseline, not declared 2026 guidance.
+- Cash discounts and normalized capex are analyst assumptions and drive earnback sensitivity.

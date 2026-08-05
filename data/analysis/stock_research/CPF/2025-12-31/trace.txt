@@ -1,0 +1,53 @@
+CPF stock research trace
+generated_at: 2026-08-04T21:20:41+08:00
+period: 2025-12-31
+
+1. Read protocol and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse check
+- config/input.json present.
+- No local annual facts, normalized facts, prior stock research result, report, or raw filing existed for CPF/2025-12-31.
+- Fallback to primary public filing was required.
+
+3. Primary sources obtained/read
+- SEC Form 10-K: https://www.sec.gov/Archives/edgar/data/701347/000070134726000021/cpf-20251231.htm
+  local copy: stock_report/data/raw/filings/CPF/2025-12-31/cpf-20251231.htm
+  filed: 2026-02-27; fiscal year ended 2025-12-31.
+- SEC Q4 2025 investor presentation: https://www.sec.gov/Archives/edgar/data/701347/000070134726000003/cpf_irdeck4q25final-1.htm
+- SEC Q1 2026 earnings release: https://www.sec.gov/Archives/edgar/data/701347/000070134726000025/exhibit99-1erxq12026.htm
+- CFETS/PBOC central parity on 2025-12-31: USD 100 = CNY 702.88.
+- Market cap and PE retained exactly from config/input.json.
+
+4. Model determination
+- Input hint ordinary_operating/applicable rejected.
+- Filing states CPF is a registered bank holding company, Central Pacific Bank is its principal subsidiary, and banking operations are the sole reportable segment.
+- Final model: financial_bank / requires_special_model.
+- All ordinary owner earnback sorting metrics remain null.
+
+5. Conversion and calculations
+- Financial statement amounts: USD thousands x 1,000 x 7.0288 = CNY yuan.
+- Total assets: 7,409,241 x 1,000 x 7.0288 = 52,078,073,140.8.
+- Total liabilities: 6,816,660 x 1,000 x 7.0288 = 47,912,939,808.0.
+- Total/parent equity: 592,581 x 1,000 x 7.0288 = 4,165,133,332.8.
+- Net income: 77,480 x 1,000 x 7.0288 = 544,591,424.0.
+- Book multiple inference: input market cap / converted equity = 1.6473x.
+- 2025 payout ratio: 29,356 / 77,480 = 37.89%.
+- Forecast dividend: 26,289,976 shares x USD 0.29 x 4 x 7.0288 = CNY 214,352,900.64.
+- Forecast yield: 214,352,900.64 / 6,861,183,865.53 = 3.1241%.
+
+6. Key bank metrics retained in narrative/evidence
+- 2025 NIM 3.45%; 2024 NIM 3.01%.
+- 2025 ROA 1.06%; ROE 13.62%; efficiency ratio 61.05%.
+- Nonaccrual loans USD 14.386m / loans USD 5,289.096m = 0.272%.
+- Loan ACL USD 59.621m / loans USD 5,289.096m = 1.127%.
+- Holding company CET1 12.7%; bank CET1 13.5%.
+- HTM amortized cost USD 562.391m; fair value USD 495.845m; difference USD 66.546m.
+
+7. Protocol operations
+- Initialized outputs/result.json with protocol CLI init.
+- Populated fields with protocol CLI set; complex JSON was not handwritten from scratch.
+- Final validation: `PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json`.
+- Validation outcome: status=ok, errors=[].

@@ -1,0 +1,76 @@
+CTRM stock-research trace
+generated_for_period=2025-12-31
+report_type=annual
+generated_at_input=2026-08-04T11:08:43+08:00
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated fields only through protocol set commands.
+3. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+4. Validation result: status=ok, errors=[]
+
+[source acquisition]
+- No pre-existing annual facts, normalized facts, annual review, or raw filing was present under the input paths.
+- Downloaded SEC Form 20-F from:
+  https://www.sec.gov/Archives/edgar/data/1720161/000114036126014700/ef20060658_20f.htm
+- Local raw filing:
+  stock_report/data/raw/filings/CTRM/2025-12-31/ef20060658_20f.htm
+- SEC accession: 0001140361-26-014700; filed 2026-04-15.
+- Cross-check source: SEC 6-K Exhibit 99.1 filed 2026-04-15:
+  https://www.sec.gov/Archives/edgar/data/1720161/000114036126014696/ef20070396_ex99-1.htm
+- FX: 2025-12-31 CFETS/PBOC authorized central parity, USD/CNY=7.0288:
+  https://www.ce.cn/xwzx/gnsz/gdxw/202512/t20251231_2676993.shtml
+- Market cap and PE were accepted from config/input.json as supplied: CNY 127143052.05124855, date 2026-08-03, Yahoo Finance yfinance, PE TTM 0.57863504.
+
+[model decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Revenue is earned from vessel operations and asset-management services and the three statements retain ordinary operating meaning. However, the group is mixed after consolidating MPC Capital and holds large securities/investment balances. Ordinary owner earnback is used only as a common-equity stress test, with explicit treatment of NCI, debt, and preferred liquidation priority.
+
+[USD source facts, 2025]
+cash_and_cash_equivalents=151775129
+total_assets=797358441
+total_liabilities=128400963
+total_shareholders_equity=588243403
+parent_equity=525430707
+noncontrolling_interests=62812696
+mezzanine_equity_carrying_value=80714075
+series_D_liquidation_preference=100000000
+revenue=81814405
+direct_cost_analytical=49358031
+gross_profit_analytical=32456374
+operating_loss=-18424758
+net_income=21542163
+parent_net_income=19268823
+operating_cash_flow=10046351
+capex_vessels_and_ppe=889260
+operating_free_cash_flow=9157091
+financing_cash_flow=-46316381
+cash_dividends_preferred_and_nci=7759132
+cash_dividend_from_fv_equity_method_investment=17967315
+
+[calculation]
+All financial-statement amounts converted at 7.0288 CNY/USD.
+analytical_direct_cost = voyage_expense 4078667 + vessel_operating_expense 19140916 + service_cost 22116441 + related_party_management_fees 4022007 = USD 49358031.
+analytical_gross_profit = 81814405 - 49358031 = USD 32456374.
+gross_margin = 32456374 / 81814405 = 0.3967073280.
+net_margin = parent_net_income 19268823 / revenue 81814405 = 0.2355187085.
+capex = vessel acquisitions/improvements 699164 + PPE acquisitions 190096 = USD 889260.
+operating_free_cash_flow = 10046351 - 889260 = USD 9157091.
+discounted_cash = 151775129 * 50% * 7.0288 = CNY 533398513.36.
+interest_and_financial_debt = (5637620 + 1548990 + 64992597 + 12046770) * 7.0288 = CNY 592007547.14.
+series_D_priority = USD 100000000 * 7.0288 = CNY 702880000.00.
+discounted_detachable_net_cash = 533398513.36 - 592007547.14 - 702880000.00 = CNY -761489033.78.
+operating_business_price = market_cap 127143052.05124855 - (-761489033.78) = CNY 888632085.8312486.
+sustainable_cash_profit stress test = OCF 70613791.91 - investment dividend 126282049.87 - capex 6250430.69 < 0; stored as 0 for sorting.
+owner_earnback_years=null and market_cap_to_cash_profit=null because denominator is non-positive.
+forecast_common_dividend=0; forecast_dividend_yield=0.
+
+[quality and limitations]
+- status=complete because audited three-statement facts, model decision, asset/liability explanations, dividend forecast, business story, cash discounts, profit adjustments, and evidence are all populated.
+- Analytical gross profit is not a company-reported GAAP subtotal.
+- Market cap and PE were not independently verified against exchange primary data.
+- The 50% cash haircut and exclusion of investment dividends from sustainable cash profit are conservative analyst judgments, disclosed in result and report.
+- No common-share cash dividend was identified for 2025; preferred and NCI distributions are not treated as common dividends.

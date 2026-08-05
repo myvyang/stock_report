@@ -1,0 +1,100 @@
+stock-research trace v1
+company=300871.SZ 回盛生物
+period=2025-12-31 annual
+generated_for_input=2026-07-31T22:10:40+08:00
+
+[skill/protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the skill and workspace instructions require reuse-first behavior.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields through protocol `set` commands; did not construct the full JSON object manually.
+6. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse audit]
+- Configured annual facts, normalized facts, extraction trace, prior stock research, and /root/aicode sync targets were checked.
+- None of those files existed for 300871.SZ/2025-12-31, so no prior conclusion was reused.
+- The company annual-report PDF was downloaded from the issuer filing mirror and stored at stock_report/data/raw/filings/300871.SZ/2025-12-31/annual-report-2025.pdf.
+- Text was extracted locally to annual-report-2025.txt for page-level checking. The filing identifies itself as Wuhan Hvsen Biotechnology Co., Ltd. 2025 Annual Report, announcement 2026-025, audited by Zhongshen Zhonghuan, signed 2026-04-16.
+
+[source hierarchy]
+Primary core source:
+- 武汉回盛生物科技股份有限公司2025年年度报告, disclosed 2026-04-17. Local PDF is a mirror copy of the issuer filing.
+- 回盛生物关于2025年度利润分配方案及2026年中期分红规划的公告.
+- 回盛生物2025年年度权益分派实施公告.
+Market snapshot:
+- config/input.json: Tencent qt.gtimg.cn, timestamp 20260731114327, market cap 4,193,000,000, PE TTM 14.64.
+Context source:
+- Company cites China Veterinary Drug Association's industry report for the domestic veterinary chemical preparation top-ten statement. The report itself was not independently retrieved, so the wording remains explicitly attributed to the company.
+
+[statement model review]
+- Business: veterinary chemical preparations, veterinary APIs, and a small amount of traditional Chinese veterinary medicine.
+- Balance sheet: production fixed assets, receivables, inventory, cash, ordinary bank borrowing, supplier payables.
+- No customer deposits, insurance reserves, regulated presale cash, project contract assets, concession rights, or underlying holding-company portfolio dominates the economics.
+- Determination: ordinary_operating; owner_earnback applicability=applicable.
+
+[core reported facts, CNY]
+Revenue=1,681,248,059.49
+Cost of sales=1,160,262,921.56
+Gross profit=520,985,137.93
+Operating profit=290,474,559.25
+Net profit=253,488,650.71
+Parent net profit=253,155,975.55
+Operating cash flow=238,448,397.00
+Capital expenditure (cash paid to acquire fixed/intangible/other long-term assets)=96,919,488.20
+Operating free cash flow=141,528,908.80
+Total assets=3,008,595,259.36
+Total liabilities=822,166,094.35
+Total equity=2,186,429,165.01
+Parent equity=2,173,646,119.31
+Minority interest=12,783,045.70
+
+[formula checks]
+gross_margin = 520,985,137.93 / 1,681,248,059.49 = 0.3098799936
+net_margin = 253,155,975.55 / 1,681,248,059.49 = 0.1505762187
+operating_free_cash_flow = 238,448,397.00 - 96,919,488.20 = 141,528,908.80
+
+[cash haircut]
+Unrestricted cash and cash equivalents:
+  book=206,123,263.59; factor=70%; discounted=144,286,284.51
+  Rationale: year-end cash equivalents exclude 104,073,552.21 restricted money; keep a further 30% operating buffer for manufacturing and credit sales.
+Cash-management wealth products:
+  book=96,467,321.99; factor=90%; discounted=86,820,589.79
+Equity investment:
+  book=63,864,956.93; factor=50%; discounted=31,932,478.47
+Interest-bearing debt:
+  short-term=173,854,901.24
+  current portion of long-term debt=30,025,544.44
+  long-term=24,715,078.00
+  total=228,595,523.68; factor=100%; discounted=-228,595,523.68
+Discounted detachable net cash=34,443,829.09
+
+[cash profit]
+Start from operating cash flow=238,448,397.00
+Subtract capital expenditure=96,919,488.20
+Observed operating FCF=141,528,908.80
+Subtract normalization/rounding buffer=1,528,908.80
+Discounted sustainable cash profit=140,000,000.00
+Judgment: the buffer is intentionally limited, not a claim of normalized certainty. 2025 quarterly profit was stable, but 2024 was loss-making and 2025 API gross margin expanded by 33.46 percentage points. This remains the major limitation.
+
+[owner earnback]
+Market cap=4,193,000,000.00
+Operating business price=4,193,000,000.00-34,443,829.09=4,158,556,170.91
+Owner earnback years=4,158,556,170.91/140,000,000.00=29.70397265
+Market cap/cash profit=4,193,000,000.00/140,000,000.00=29.95
+Discounted net cash/market cap=34,443,829.09/4,193,000,000.00=0.0082146027
+
+[dividend]
+2025 interim implemented=20,157,895.90
+2025 annual implemented=40,088,191.40
+Forecast/run-rate total=60,246,087.30
+Forecast dividend yield=60,246,087.30/4,193,000,000.00=0.0143682536
+2026 interim authorization exists, but no amount was known; it is excluded.
+
+[limitations]
+- No locally prebuilt annual fact pack existed; this run went back to the annual filing.
+- The market value and PE are accepted from input and were not re-queried.
+- One recovery year cannot prove through-cycle cash profit. API pricing/margin and maintenance capex can materially change the payback figure.
+- The top-ten industry position is company-attributed because the underlying association report was not independently retrieved in this run.

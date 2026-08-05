@@ -1,0 +1,70 @@
+stock-research trace
+task_created_at: 2026-08-04T19:47:33+08:00
+company: Weyco Group, Inc. (NASDAQ: WEYS)
+period: 2025-12-31 annual
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated structured fields through protocol `set` commands; did not create the complex JSON object manually.
+5. Validated with protocol `validate` command.
+
+[reuse audit]
+- config/input.json existed.
+- No raw filing, annual facts package, normalized facts, or prior stock research files for WEYS/2025-12-31 existed under stock_report in this workspace.
+- Research therefore returned to the official 2025 Form 10-K.
+
+[primary sources]
+- SEC Form 10-K: https://www.sec.gov/Archives/edgar/data/106532/000110465926027690/weys-20251231x10k.htm
+  accession: 0001104659-26-027690
+  filed: 2026-03-13
+- Weyco 2025 annual report: https://www.weycogroup.com/home/resources/pdf/2025/2025_Annual_Report.pdf
+- Federal Reserve H.10 CNY/USD history: https://www.federalreserve.gov/releases/h10/Hist/dat00_ch.htm
+  selected rate: 2026-07-31, 6.7509 CNY per USD; nearest available business day before 2026-08-03 valuation date.
+- Market snapshot: config/input.json, Yahoo Finance yfinance, market cap CNY 2,508,608,678.145172 as of 2026-08-03, PE TTM 15.725806.
+
+[model decision]
+- statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- Basis: branded footwear design, outsourced finished-goods sourcing, wholesale distribution and direct retail. No bank deposits, insurance reserves, property projects, concession rights, customer funds, or investment-holding structure. No revolver debt outstanding at year-end.
+- Special adjustments: fully deduct declared dividend payable and pension deficit; do not capitalize one-year inventory release as sustainable profit.
+
+[USD source facts, thousands unless noted]
+- Revenue 276,169; cost of sales 156,941; gross profit 119,228; operating profit 29,172; net income attributable to common shareholders 23,078.
+- Total assets 319,667; total liabilities 80,099; equity attributable to parent 239,568; minority interest zero.
+- Cash 96,006; marketable securities current 1,425 and noncurrent 3,460; receivables 38,899; inventory 65,887.
+- Operating cash flow 37,254; capex 1,751; free cash flow 35,503; financing cash flow -13,226; cash dividends 7,732; repurchases 5,268.
+- Declared dividend payable 21,385, paid January 2026; long-term pension liability 10,787; no revolving credit debt.
+- 2026 regular dividend indication: USD 0.27 quarterly; forecast excludes special dividends.
+
+[conversion]
+- All structured monetary outputs use CNY absolute yuan.
+- Conversion formula: reported USD x 6.7509 CNY/USD.
+- Margins use original USD values and are currency invariant.
+
+[owner earnback calculations]
+- Discounted cash = 96.006m x 90% = USD 86.4054m.
+- Discounted securities = 4.885m x 95% = USD 4.64075m.
+- Less dividend payable = USD 21.385m.
+- Less pension liability = USD 10.787m.
+- Discounted detachable net cash = USD 58.87415m = CNY 397,453,499.235.
+- Base cash profit = net income 23.078m - after-tax interest income 2.967m x (1-28%) + D&A 2.881m - normalized capex 2.000m = USD 21.82324m.
+- Discounted sustainable cash profit = base cash profit x 90% = USD 19.640484m = CNY 132,590,943.4356.
+- Operating business price = CNY 2,508,608,678.145172 - CNY 397,453,499.235 = CNY 2,111,155,178.910172.
+- Owner earnback years = 2,111,155,178.910172 / 132,590,943.4356 = 15.9223181026.
+- Market cap / cash profit = 2,508,608,678.145172 / 132,590,943.4356 = 18.9199097098.
+
+[dividend forecast]
+- Shares outstanding at 2026-03-01: 9,531,509.
+- Annualized regular dividend: USD 0.27 x 4 = USD 1.08/share.
+- Forecast cash dividend: USD 10,294,029.72 = CNY 69,493,965.2368.
+- Forecast yield: 69,493,965.2368 / 2,508,608,678.145172 = 0.0277021944.
+- Historical declared dividends include special dividends and are not used as recurring forecast.
+
+[limitations]
+- Market cap and PE were supplied by yfinance through task input and not independently reconstructed.
+- FX translation is for protocol comparability; original filing remains USD.
+- The 10% operating haircut is an explicit judgment, not a reported fact.
+- No forecast special dividend is assumed.

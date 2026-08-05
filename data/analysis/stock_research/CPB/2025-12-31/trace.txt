@@ -1,0 +1,33 @@
+2026-08-05 stock-research trace — CPB
+
+1. Read skill instructions and contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - references/result-contract.md
+   - references/report-contract.md
+   - references/data-reuse.md
+2. Initialized outputs/result.json using protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Checked configured raw filing, annual facts, normalized facts and prior research paths. No CPB filing/fact/research artifacts existed locally; only the user evaluation note existed.
+4. Located the company FY2025 10-K filed 2025-09-18 and company dividend page. Confirmed legal FY2025 ended 2025-08-03 (53 weeks), despite input period 2025-12-31.
+5. Model review: ordinary_operating / applicable. Campbell manufactures and markets branded food; inventory, plants, brands and distribution are operating assets. It is not a special financial-statement model.
+6. Extracted FY2025 statements in USD millions:
+   revenue 10,253; cost of sales 7,134; gross profit 3,119; EBIT 1,124; parent net income 602;
+   assets 14,896; liabilities 10,992; parent equity 3,902; NCI 2;
+   CFO 1,131; plant capex 426; operating FCF 705; financing CF -919; dividends plus treasury purchases 551;
+   cash 132; short-term borrowings 762; long-term debt 6,095.
+7. Converted statement values to CNY at research assumption USD/CNY 7.18. This is a uniform protocol-unit conversion, not a reported company figure.
+8. Owner earnback:
+   discounted detachable net cash = (132 - 762 - 6,095) USDm = -6,725 USDm = -48,285,500,000 CNY.
+   sustainable cash profit = 650 USDm = 4,667,000,000 CNY, below 705 USDm plant-capex FCF to allow for route investment, working-capital, integration and cyclical capex variability.
+   operating business price = 44,230,258,204.541016 - (-48,285,500,000) = 92,515,758,204.54102 CNY.
+   owner earnback years = 19.8233893732; market cap/cash profit = 9.4772355270.
+9. Dividend forecast: 0.39 USD quarterly × 4 × 297,992,525 shares × 7.18 = 3,337,754,674.02 CNY; yield = 7.546315146% on input market cap.
+10. Populated result fields through protocol CLI set commands; did not hand-write result.json from scratch.
+11. Validation command passed:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Result: {"status":"ok","errors":[]}
+
+Primary sources:
+- FY2025 10-K: https://investor.thecampbellscompany.com/static-files/8272cd51-57e7-46e4-a2c4-a1aa2ef3e8a4
+- Dividend history/current rate: https://investor.thecampbellscompany.com/stock-info/dividends-and-splits/
+- Market snapshot: config/input.json (Yahoo Finance yfinance supplied input)

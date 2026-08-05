@@ -1,0 +1,58 @@
+stock-research trace
+task: HFWA, annual period 2025-12-31
+generated_at: 2026-08-05 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized with stock-research-result-v1 schema.
+
+3. Reuse check
+- Checked configured raw filing, annual review and normalized fact paths.
+- No HFWA filing/fact package existed locally, so official public filings were retrieved.
+
+4. Primary evidence gathered
+- SEC Form 10-K accession 0001628280-26-012703, filed 2026-02-27.
+- SEC Companyfacts API, CIK 0001046025, used to cross-check audited XBRL facts.
+- SEC Forms 8-K dated 2026-01-16 and 2026-04-23 for $0.24 quarterly dividends.
+- SEC Form 8-K dated 2026-01-31/2026-02-02 for Olympic Bancorp merger completion and post-merger share context.
+- SEC Form 8-K dated 2026-03-20 for cybersecurity incident disclosure.
+- Market capitalization and PE retained from task input (Yahoo Finance yfinance, 2026-08-03).
+
+5. Model determination
+- Input hint ordinary_operating/applicable was rejected after filing review.
+- Company is a bank holding company with Heritage Bank as its sole reportable segment.
+- Set statement_model=financial_bank and owner_earnback_applicability=not_applicable.
+- All ordinary owner-earnback sorting metrics remain null as required.
+
+6. Currency handling
+- Source statements are USD; result contract requires CNY absolute yuan.
+- Applied a single research translation rate of USD 1 = CNY 7.00 to financial statement and dividend amounts.
+- Market capitalization was already supplied in CNY and was not retranslated.
+- Translation is disclosed as a limitation; operating ratios retain source-currency economics.
+
+7. Key calculations
+- Total assets: USD 6,967.350m x 7.00 = CNY 48,771,450,000.
+- Total liabilities: USD 6,045.846m x 7.00 = CNY 42,320,922,000.
+- Equity: USD 921.504m x 7.00 = CNY 6,450,528,000.
+- Net income: USD 67.532m x 7.00 = CNY 472,724,000.
+- Forecast annual dividend: USD 0.24 x 4 x 41,131,100 shares x 7.00 = CNY 276,401,000 (rounded).
+- Forecast dividend yield: CNY 276,401,000 / CNY 8,206,505,338.529663 = 0.03368 (rounded).
+- Static pre-merger book multiple reference: market cap / 2025-12-31 equity = approximately 1.27x; not stored as a core sorting field because of date/perimeter mismatch.
+
+8. Protocol population
+- Used repeated protocol `set` commands for analysis sources, model, metrics, financials, asset analysis, owner earnback, dividend, business, risks, evidence and data quality.
+- Did not hand-write outputs/result.json from scratch.
+
+9. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}.
+
+10. Output files
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

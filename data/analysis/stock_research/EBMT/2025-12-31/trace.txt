@@ -1,0 +1,27 @@
+2026-08-05 stock-research trace for EBMT / 2025-12-31
+
+1. Read stock-research/SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Checked configured annual-review and raw-filing locations. No reusable annual facts package was present.
+3. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Located primary filing: SEC Form 10-K, accession 0001437749-26-007330, filed 2026-03-09 for period 2025-12-31.
+5. Downloaded the filing HTML to stock_report/data/raw/filings/EBMT/2025-12-31/ebmt20251231_10k.htm and extracted audited statements and bank-specific tables.
+6. Overrode analysis_model_hint after filing review: financial_bank / requires_special_model. Reason: deposits, loans, securities, liquidity and regulatory capital are the operating balance sheet; ordinary detachable-net-cash and FCF earnback metrics are economically invalid.
+7. Key USD facts used from 10-K: assets 2,106.367m; liabilities 1,914.553m; equity 191.814m; net loans 1,501.649m; deposits 1,781.599m; net interest income 72.897m; net income 14.835m; 2025 dividends 4.578m; NIM 3.92%; NPL ratio 0.37%; CET1 13.15%.
+8. FX normalization to protocol CNY: balance-sheet amounts at 7.0063 CNY/USD (Federal Reserve H.10, 2025-12-26, nearest cited business-day rate); period income/dividends at 7.129 CNY/USD (IRS 2025 yearly average). Ratios were calculated from original USD facts where appropriate.
+9. Dividend forecast: annualized 0.145 USD quarterly dividend, based on two 2026 declarations, times 7,957,769 year-end shares and 7.129 FX = CNY 32,903,942.42; divided by input market cap = 2.6127%.
+10. Populated result fields using protocol CLI set commands. Ordinary owner-earnback fields remain null as required for the bank model.
+11. Validation command completed successfully:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Result: status=ok, errors=[]
+
+Primary sources:
+- https://www.sec.gov/Archives/edgar/data/1478454/000143774926007330/ebmt20251231_10k.htm
+- https://www.sec.gov/Archives/edgar/data/1478454/000143774926007330/0001437749-26-007330-index.htm
+- https://www.sec.gov/Archives/edgar/data/1478454/000117184326002773/exh_991.htm
+- https://ebmtinvestor.opportunitybank.com/stock-info/dividend-history/default.aspx
+- https://www.federalreserve.gov/releases/h10/20251229/
+- https://www.irs.gov/individuals/international-taxpayers/yearly-average-currency-exchange-rates
+
+Input-only market data:
+- Yahoo Finance yfinance market cap CNY 1,259,379,590.957611 as of 2026-08-03; PE TTM 11.429269.

@@ -1,0 +1,54 @@
+FSBW stock research trace
+generated_at: 2026-08-04T22:39:13+08:00
+period: 2025-12-31
+
+1. Instructions and contracts read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+- No annual facts package, normalized facts, prior research result, or raw filing existed for FSBW/2025-12-31.
+- The protocol CLI initialized outputs/result.json from config/input.json.
+
+3. Primary sources obtained and reviewed
+- SEC 2025 Form 10-K, accession 0001437749-26-008243:
+  https://www.sec.gov/Archives/edgar/data/1530249/000143774926008243/fsbw20251231_10k.htm
+- Local raw copy:
+  stock_report/data/raw/filings/FSBW/2025-12-31/fsbw20251231_10k.htm
+- FS Bancorp official annual reports page and 2025 annual report.
+- FS Bancorp official 2025 Q4, 2026 Q1, and 2026 Q2 earnings/dividend releases.
+- SEC 2026 Q1 Form 10-Q for the Pacific West Bancorp subsequent-event disclosure:
+  https://www.sec.gov/Archives/edgar/data/1530249/000143774926015942/fsbw20260331_10q.htm
+- Market cap and PE TTM were reused from config/input.json (Yahoo Finance yfinance snapshot).
+
+4. Model determination
+- Input hint ordinary_operating/applicable was rejected after verifying that FS Bancorp is the holding company of 1st Security Bank of Washington.
+- Final model: financial_bank.
+- Ordinary owner-earnback applicability: requires_special_model.
+- Ordinary discounted net cash, cash profit, operating business price, owner earnback years, and market-cap/cash-profit fields were kept null.
+
+5. Currency normalization
+- Filing values are USD; result contract requires CNY absolute yuan.
+- Research conversion assumption: USD 1.00 = CNY 6.98.
+- All balance-sheet, income-statement, asset-analysis, dividend, and distribution amounts were multiplied by 6.98.
+- Limitation is disclosed in result.json and report.md.
+
+6. Key reconciliations
+- Assets: USD 3,196.847m = CNY 22,313,992,060.
+- Liabilities: USD 2,889.153m = CNY 20,166,287,940.
+- Equity: USD 307.694m = CNY 2,147,704,120.
+- Assets = liabilities + equity.
+- Net income: USD 33.346m = CNY 232,755,080.
+- 2025 cash dividends: USD 10.262m = CNY 71,628,760.
+- 2025 average ROE calculation: 33.346 / average(295.767, 307.694) = 11.05%.
+- 2025 average ROA calculation: 33.346 / average(3,029.177, 3,196.847) = 1.07%.
+- Market cap / year-end book equity = 0.9996x.
+- Dividend forecast: USD 0.29 x 4 x 7,507,519 shares x 6.98 = CNY 60,786,879.84.
+- Forecast dividend yield: CNY 60,786,879.84 / CNY 2,146,930,122.15 = 2.8313%.
+
+7. Protocol writes and validation
+- outputs/result.json was populated using protocol CLI set/append commands in outputs/build_result.sh.
+- Initial protocol validation: status ok, errors [].
+- Final validation rerun after report and trace creation.

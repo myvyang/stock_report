@@ -1,0 +1,84 @@
+stock-research trace
+company: 沃尔核材 (002130.SZ)
+period: 2025-12-31 annual
+generated_for_input: 2026-08-01T04:29:24+08:00
+
+1. Protocol
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated scalar fields using protocol `set` and list fields using protocol `append`; did not hand-write the JSON skeleton.
+
+2. Reuse check
+- Expected raw filing, annual review, normalized facts, and prior stock-research paths did not exist in the workspace.
+- Only config/input.json, initialized outputs/result.json, and stock_report/data/notes/user_stock_evaluations.md were present.
+- Therefore retrieved the official annual report from the source below.
+
+3. Primary filing
+- 深圳市沃尔核材股份有限公司2025年年度报告全文
+- Official disclosure URL: https://static.cninfo.com.cn/finalpage/2026-04-01/1225067232.PDF
+- Published: 2026-04-01
+- Report pages used: 1, 6-15, 24-37, 64-65, 94-108, 159-160, 196, 209-217, 238-239.
+- Audit: standard unqualified opinion, signed 2026-03-31.
+
+4. Market data
+- Reused input snapshot without alteration:
+  market_cap = 23,560,000,000 CNY
+  market_cap_date = 20260731114306
+  market_cap_source = Tencent qt.gtimg.cn
+  pe_ttm = 20.95
+- Limitation: market quote not independently reconstructed; input identifies an A-share snapshot while the 2025 annual report notes the company subsequently listed H shares.
+
+5. Financial statement transcription (CNY)
+- revenue = 8,450,660,581.14
+- cost_of_sales = 5,775,763,951.14
+- gross_profit = 2,674,896,630.00
+- operating_profit = 1,425,418,960.93
+- net_profit = 1,220,654,011.24
+- parent_net_profit = 1,143,868,383.15
+- operating_cash_flow = 1,160,052,322.62
+- capital_expenditure = 1,036,227,283.89
+- operating_free_cash_flow = 123,825,038.73
+- total_assets = 12,318,944,993.13
+- total_liabilities = 5,514,456,104.57
+- total_equity = 6,804,488,888.56
+- parent_equity = 6,497,112,813.78
+- minority_interest = 307,376,074.78
+
+6. Formula checks
+- gross_margin = (8,450,660,581.14 - 5,775,763,951.14) / 8,450,660,581.14 = 0.3165310693
+- net_margin = 1,143,868,383.15 / 8,450,660,581.14 = 0.1353584577
+- reported operating FCF = 1,160,052,322.62 - 1,036,227,283.89 = 123,825,038.73
+- forecast dividend = 1,389,603,762 shares * 1.65 / 10 = 229,284,620.73
+- forecast dividend yield = 229,284,620.73 / 23,560,000,000 = 0.0097319449
+
+7. Analysis model
+- Confirmed ordinary_operating/applicable.
+- Reason: manufacturing and wind operation revenue; balance sheet contains receivables, inventory, production assets, ordinary borrowings and leases. No bank deposits/customer funds, insurance reserves, property presales, construction contract financing, concession right, or investment-holding structure dominates the economics.
+
+8. Owner earnback assumptions and calculations
+- Cash and cash equivalents: 1,288,023,798.91 at 100%.
+- Trading financial assets: 53,786,620.89 at 90% = 48,407,958.801.
+- Debt deducted at 100%:
+  short-term borrowings 591,998,591.91
+  current portion of non-current liabilities 672,467,100.99
+  long-term borrowings 806,380,705.76
+  lease liabilities 221,398,782.79
+  total 2,292,245,181.45
+- Discounted detachable net cash = 1,288,023,798.91 + 48,407,958.801 - 2,292,245,181.45 = -955,813,423.739.
+- Operating business price = 23,560,000,000 - (-955,813,423.739) = 24,515,813,423.739.
+- Sustainable cash profit assumption: 900,000,000.
+  Basis: 2025 OCF 1,160,052,322.62 less estimated maintenance capex 260,052,322.62. Maintenance estimate is anchored to reported fixed-asset depreciation of 224,222,066.87 plus a buffer. Reported total capex includes disclosed capacity expansion and is not assumed to recur in full.
+- Owner earnback years = 24,515,813,423.739 / 900,000,000 = 27.239792693.
+- Market cap / cash profit = 23,560,000,000 / 900,000,000 = 26.177777778.
+- Sensitivity warning: if all 2025 capex is recurring, cash profit falls to reported FCF 123,825,038.73 and payback becomes far longer. The filing does not split maintenance and growth capex.
+
+9. Evidence distinctions
+- Facts: all reported amounts, segment revenue/margins, dividend proposal, customer/supplier concentration, audit opinion.
+- Company statements: leadership/industry-position descriptions and product competitiveness.
+- Analyst inference: maintenance capex, sustainable cash profit, cash discounts, detachable net cash, and payback calculations.
+
+10. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result before report generation: {"status":"ok","errors":[]}

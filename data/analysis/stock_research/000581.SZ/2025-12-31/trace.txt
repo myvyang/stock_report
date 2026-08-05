@@ -1,0 +1,56 @@
+stock-research trace
+company: 000581.SZ 威孚高科
+period: 2025-12-31 annual
+generated context date: 2026-08-01 Asia/Shanghai
+
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read result-contract.md and report-contract.md in full; also read data-reuse.md because no local facts were initially found.
+3. Inspected workspace. No raw filing, annual facts, normalized facts, or prior stock-research result existed for 000581.SZ/2025-12-31.
+4. Initialized outputs/result.json using:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Located official 2025 annual report disclosed by Shenzhen Stock Exchange on 2026-04-17:
+   https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-17/fd09448b-df73-4b80-a8de-32fc7e7aa453.PDF
+6. Downloaded official PDF to stock_report/data/raw/filings/000581.SZ/2025-12-31/annual-report-2025.pdf and extracted text locally for review.
+7. Reconciled core statements:
+   assets 29,667,727,447.65
+   liabilities 8,808,861,345.77
+   equity 20,858,866,101.88
+   parent equity 19,917,552,613.16
+   revenue 12,023,879,058.27
+   cost 9,939,838,148.74
+   gross profit 2,084,040,909.53
+   parent net profit 1,068,167,498.05
+   operating cash flow 992,727,022.87
+   capex 941,942,102.19
+   operating free cash flow 50,784,920.68
+8. Confirmed ordinary_operating model from business and statements. Added special handling because investment income was 123.28% of pretax profit and associates are the main profit source.
+9. Owner earnback assumptions:
+   unrestricted cash: 2,269,683,954.70 at 100%
+   bank wealth products: 2,017,206,116.57 at 95%
+   other wealth products: 316,563,647.23 at 70%
+   listed shares: 888,391.56 at 50%
+   financing and lease liabilities: 1,356,219,464.14 deducted at 100%
+   discounted detachable net cash: 3,051,849,050.14
+10. Sustainable cash profit assumption:
+   operating FCF 50,784,920.68
+   plus cash investment income received 722,361,461.25
+   subtotal 773,146,381.93
+   90% sustainability factor -> 695,831,743.74
+   Long-term equity investments were not treated as detachable cash.
+11. Formula results:
+   operating business/investment-combination price = 17,325,000,000.00 - 3,051,849,050.14 = 14,273,150,949.86
+   owner earnback years = 14,273,150,949.86 / 695,831,743.74 = 20.511
+   market cap / cash profit = 24.899
+12. Dividend proxy:
+   2025 interim 96,678,569.30 + 2025 annual 676,749,985.10 = 773,428,554.40
+   forecast proxy yield = 773,428,554.40 / 17,325,000,000.00 = 4.46423%
+   Buyback excluded from forecast cash dividend.
+13. Populated result.json exclusively through protocol set commands after initialization; did not construct the result file manually.
+14. Validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   status: ok; errors: []
+
+Limitations:
+- Only the 2025 annual report was used for full cash-profit construction; no complete 3-5 year cash-flow series was available locally.
+- Other wealth-product haircut is an analytical assumption, not a quoted liquidation price.
+- Dividend forecast is a mechanical historical proxy, not company guidance.

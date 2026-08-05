@@ -1,0 +1,60 @@
+stock-research trace v1
+company=688612.SH 威迈斯
+period=2025-12-31 annual
+generated_at=2026-07-31T20:40:06+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md; also read data-reuse.md as routed by the skill.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields only through protocol set commands.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: {"status":"ok","errors":[]}
+
+[reused local sources]
+- stock_report/data/raw/filings/688612.SH/2025-12-31/annual-report.pdf
+  source_url=https://static.cninfo.com.cn/finalpage/2026-04-16/1225106614.PDF
+  sha256=48778c883fe7a1eff546a4e15b858f20f965d0c9621b142445f22cca363ad5c1
+- stock_report/data/analysis/annual_review/688612.SH/2025-12-31/result.json
+  purpose=verified ROIC, structured deposits, financing debt, operating cash flow, capex, necessary-cash treatment
+  official_filing_verified=true
+- stock_report/data/analysis/annual_review/688612.SH/2025-12-31/report.md
+  purpose=review of existing calculation interpretation and limitations
+
+[supplemental official-filing lookup]
+- Official filing URL above; web-readable copy used only to locate and cross-check filing rows because local PDF text extraction utilities were unavailable.
+- Consolidated balance sheet: total assets 8,150,392,628.61; total liabilities 4,522,928,837.56; equity 3,627,463,791.05; parent equity 3,627,463,790.41; minority interest 0.64.
+- Consolidated income statement: revenue 6,341,768,741.97; cost 5,013,649,157.05; operating profit 657,693,107.92; net profit 559,116,223.48; parent net profit 558,315,308.92.
+- Consolidated cash flow: OCF 831,253,304.08; long-asset purchases 422,558,529.10; financing cash flow -321,604,289.35.
+- Business tables: NEV main-business revenue 6,131,105,800; vehicle-power revenue 5,326,186,100 and margin 21.86%; e-drive revenue 804,919,700 and margin 7.93%; top-five customer share 68.19%.
+- Dividend proposal: CNY 0.66 per eligible share.
+
+[model classification]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=99.28% of revenue comes from selling NEV components. Deposits and borrowings are treasury/funding items of a manufacturer, not the business assets and liabilities of a financial, property, construction, concession, or holding model.
+
+[derived calculations]
+gross_profit = 6,341,768,741.97 - 5,013,649,157.05 = 1,328,119,584.92
+gross_margin = 1,328,119,584.92 / 6,341,768,741.97 = 0.20942415893068886
+net_margin = 558,315,308.92 / 6,341,768,741.97 = 0.08803779066004944
+operating_free_cash_flow = 831,253,304.08 - 422,558,529.10 = 408,694,774.98
+discounted_detachable_net_cash = 1,266,383,041.67 structured deposits - 462,902,192.14 financing debt = 803,480,849.53
+operating_business_price = 12,416,000,000.00 - 803,480,849.53 = 11,612,519,150.47
+owner_earnback_years = 11,612,519,150.47 / 408,694,774.98 = 28.4136716723
+market_cap_to_cash_profit = 12,416,000,000.00 / 408,694,774.98 = 30.3796396727
+discounted_net_cash_to_market_cap = 803,480,849.53 / 12,416,000,000.00 = 0.0647133416181
+forecast_dividend = (419,188,098 year-end shares - 2,643,131 repurchased shares) * 0.66 = 274,919,678.22
+forecast_dividend_yield = 274,919,678.22 / 12,416,000,000.00 = 0.0221423709907
+
+[judgment boundaries]
+- Fact: reported figures, product mix, customer concentration, dividend rate, and market snapshot.
+- Inference: structure deposits are detachable at 100%; all identified financing debt is deducted at 100%; ordinary cash has no detachable excess after the necessary-cash test.
+- Judgment: one-year operating FCF is used as sustainable cash profit without adding back growth capex. This is conservative on capex but remains sensitive to working-capital timing.
+- Forecast dividend amount is an estimate based on year-end shares and disclosed repurchased shares; actual implementation base may change.
+
+[data quality]
+status=complete
+limitations=single-year sustainable-cash-profit proxy; dividend base estimate; no ordinary cash treated as excess.

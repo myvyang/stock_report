@@ -1,0 +1,50 @@
+stock-research trace
+company: 00220.HK / U-PRESID CHINA
+period: 2025-12-31 annual
+generated_at: 2026-08-03T14:34:26+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated all result fields with repeated protocol `set` commands; result JSON was not created freehand.
+
+[reuse audit]
+- No annual facts package, normalized facts, prior research result or filing metadata existed for 00220.HK/2025-12-31.
+- Downloaded official HKEX Annual Report 2025 to stock_report/data/raw/filings/00220.HK/2025-12-31/annual-report-2025.pdf.
+- Extracted local searchable text to annual-report-2025.txt for review.
+
+[model override]
+- Input hint: financial_brokerage / requires_special_model.
+- Audited filing fact: group principally manufactures and sells beverages and food in the PRC.
+- Resolution: ordinary_operating / applicable. The input hint was rejected because it conflicts with company identity, principal activities and audited statements.
+
+[primary evidence reviewed]
+- HKEX Annual Report 2025, published 2026-04-27:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042700614.pdf
+- Pages 98-104: audited income statement, balance sheet, equity changes and cash flow statement.
+- Notes 5, 13, 20, 24, 25 and 31: segments, dividends, financial instruments, structured deposits, cash/time deposits and borrowings.
+- MD&A pages 8-34: business, revenue drivers, margins, capex, working-capital turnover and production model.
+- Valuation snapshot: config/input.json, Tencent qt.gtimg.cn, 2026/07/31 16:08:47.
+
+[calculation audit]
+- gross_margin = 10,529,208,000 / 31,714,309,000 = 0.3320018103.
+- net_margin = 2,050,234,000 / 31,714,309,000 = 0.0646469706.
+- operating_free_cash_flow = 3,284,365,000 - 1,186,033,000 = 2,098,332,000.
+- discounted_sustainable_cash_profit = 2,098,332,000 * 95% = 1,993,415,400.
+- discounted_net_cash = 435,104,000 + 4,093,178,000*95% + 6,112,317,000*85% + 1,212,113,000*75% - 1,041,504,000 - 38,194,000 = 9,348,479,300.
+- operating_business_price = 28,018,061,279.977562 - 9,348,479,300 = 18,669,581,979.977562.
+- owner_earnback_years = 18,669,581,979.977562 / 1,993,415,400 = 9.3656254386.
+- market_cap_to_cash_profit = 28,018,061,279.977562 / 1,993,415,400 = 14.0553049204.
+- forecast_dividend_yield = 2,050,234,000 / 28,018,061,279.977562 = 0.0731754414.
+
+[fact/inference separation]
+- Filing figures and disclosed business descriptions are facts.
+- Cash haircut rates, the 95% sustainability haircut and resulting payback years are analytical assumptions/calculations.
+- Industry leadership language is identified as management's statement; no independently verified market share was inferred.
+- No buy/sell recommendation or target price was produced.
+
+[validation]
+- Initial validation after population: status=ok, errors=[]
+- Final validation rerun after all outputs were written; see terminal result associated with task completion.

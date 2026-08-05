@@ -1,0 +1,108 @@
+stock-research trace
+company=鹭燕医药
+code=002788.SZ
+period=2025-12-31
+task_created_at=2026-07-31T22:39:55+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full as requested.
+3. Read references/data-reuse.md because local-data reuse boundaries govern source selection.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields only through protocol set commands; did not construct result.json manually.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   final_status=ok
+
+[local-data audit]
+Requested annual filing, annual facts and normalized facts paths did not exist at task start.
+No prior stock-research result existed for 002788.SZ/2025-12-31.
+The only existing long-term note was stock_report/data/notes/user_stock_evaluations.md and it did not supply the required annual facts.
+
+[primary source]
+title=鹭燕医药股份有限公司2025年年度报告全文
+issuer=鹭燕医药股份有限公司
+publication_date=2026-04-22
+url=https://www.luyan.com.cn/upload/file/%E9%B9%AD%E7%87%95%E5%8C%BB%E8%8D%AF%EF%BC%9A2025%E5%B9%B4%E5%B9%B4%E5%BA%A6%E6%8A%A5%E5%91%8A_20260422160512.pdf
+local_pdf=stock_report/data/raw/filings/002788.SZ/2025-12-31/annual-report-2025.pdf
+local_text=stock_report/data/raw/filings/002788.SZ/2025-12-31/annual-report-2025.txt
+pdf_pages=178
+text_extractor=pypdf in temporary venv /tmp/stock-research-pdf
+audit_opinion=standard unmodified opinion (容诚会计师事务所)
+
+[market source]
+market_cap=3959000000.0000005
+market_cap_as_of=20260731114303
+pe_ttm=14.27
+source=Tencent qt.gtimg.cn, as preserved in config/input.json
+note=Market snapshot was supplied by the task and was not refreshed.
+
+[model review]
+input_hint=ordinary_operating/applicable
+confirmed_statement_model=ordinary_operating
+confirmed_owner_earnback_applicability=applicable
+reason=The annual report describes ordinary distribution and retail sales of drugs, devices and Chinese medicine. Receivables, inventories, trade payables, notes and bank debt are working-capital and financing components of a merchandise distribution business, not customer deposits, insurance reserves, regulated presale funds or another special statement model.
+override_to_input_hint=no
+
+[core extracted facts, CNY]
+revenue=21246784960.41
+cost_of_sales=19743286782.65
+gross_profit=1503498177.76
+operating_profit=378877257.76
+net_profit=278981375.38
+parent_net_profit=280883792.05
+operating_cash_flow=688400138.52
+capital_expenditure=233736964.18
+operating_free_cash_flow=454663174.34
+financing_cash_flow=-440083463.92
+total_assets=13395732011.81
+total_liabilities=10071654530.02
+total_equity=3324077481.79
+parent_equity=3306986241.91
+minority_interest=17091239.88
+cash_and_cash_equivalents=345200364.20
+reported_cash=616963192.56
+restricted_cash=271762828.36
+accounts_receivable=6363216055.31
+inventory=3035117245.88
+short_term_borrowings=4088433434.77
+current_portion_long_term_borrowings=339110498.94
+long_term_borrowings=327230246.36
+notes_payable=2075055735.13
+accounts_payable=2635037158.87
+cash_capex=233736964.18
+proposed_2025_cash_dividend=135980857.60
+
+[formula checks]
+gross_profit = 21246784960.41 - 19743286782.65 = 1503498177.76
+gross_margin = 1503498177.76 / 21246784960.41 = 0.07076356166646049
+net_margin = 280883792.05 / 21246784960.41 = 0.013220060944438523
+operating_free_cash_flow = 688400138.52 - 233736964.18 = 454663174.34
+bank_borrowings = 4088433434.77 + 339110498.94 + 327230246.36 = 4754774180.07
+discounted_detachable_net_cash = 345200364.20 - 4754774180.07 = -4409573815.87
+discounted_sustainable_cash_profit = 280883792.05 * 0.85 = 238751223.2425
+operating_business_price = 3959000000.0000005 - (-4409573815.87) = 8368573815.870001
+owner_earnback_years = 8368573815.870001 / 238751223.2425 = 35.05143848988797
+market_cap_to_cash_profit = 3959000000.0000005 / 238751223.2425 = 16.58211399394104
+forecast_dividend_yield = 135980857.60 / 3959000000.0000005 = 0.03434727395807021
+
+[judgment log]
+1. Used cash and cash equivalents rather than reported monetary funds because RMB 271.76m was restricted or frozen.
+2. Assigned receivables and inventory a zero inclusion weight in detachable cash because both are required operating assets.
+3. Deducted all bank borrowings at 100%. Did not deduct trade payables or notes again in the net-cash formula because they fund the operating working-capital structure whose sustainable earnings are already valued as a going concern.
+4. Did not include lease liabilities in the main net-cash formula. They remain disclosed as contractual obligations; including them while applying an earnings haircut would be an additional conservatism choice.
+5. Sustainable cash profit starts from parent net profit, not 2025 free cash flow. The 15% haircut reflects the 18.74% profit decline, falling wholesale gross margin and large receivable exposure. The 0.85 factor is analyst judgment, not issuer guidance.
+6. Proposed dividend is used as the forecast because the board approved a specific amount. It was still subject to shareholder approval at the annual-report approval date.
+
+[data-quality limitations]
+- Core annual facts are from the issuer annual report, but no exchange-hosted duplicate was retained locally.
+- Market cap and PE were not refreshed beyond the supplied Tencent snapshot.
+- Sustainable cash profit is an explicit estimate and is sensitive to the selected haircut.
+- Only the annual report's readily comparable 2023-2025 summary was used to assess operating-cash-flow volatility; a longer normalized series was not rebuilt.
+- The 2025 dividend was a board proposal at the reporting cutoff.
+
+[outputs]
+outputs/result.json
+outputs/report.md
+outputs/trace.txt

@@ -1,0 +1,67 @@
+stock-research trace
+company=000333.SZ 美的集团
+period=2025-12-31 annual
+generated_for_input=2026-07-31T15:31:36+08:00
+
+[protocol]
+init: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+population: protocol set commands used for all result fields; result.json was not hand-written from scratch
+validation: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_result={"status":"ok","errors":[]}
+
+[local reuse audit]
+stock_report/data/analysis/annual_review/000333.SZ/2025-12-31: absent
+stock_report/data/raw/filings/000333.SZ/2025-12-31: absent
+stock_report/data/analysis/stock_research/000333.SZ/2025-12-31: absent
+decision: no reusable filing, fact pack, or prior research; retrieve official filing.
+
+[sources]
+1. 美的集团股份有限公司2025年年度报告全文，公司官网，2026-03-30
+   https://www.midea.com.cn/content/dam/mideacn-aem/%E6%8A%95%E8%B5%84%E8%80%85%E5%85%B3%E7%B3%BB/2025%E5%B9%B4%E5%BA%A6%E6%8A%A5%E5%91%8A.pdf.coredownload.inline.pdf
+   Used: business, segment/geography, balance sheet, income statement, cash flow, financial asset notes, restrictions, dividend plan.
+2. 美的集团股份有限公司2025年年度报告摘要，巨潮资讯，2026-03-31
+   https://static.cninfo.com.cn/finalpage/2026-03-31/1225058109.PDF
+   Used: cross-check total assets, parent equity, revenue, parent profit, operating cash flow.
+3. Tencent qt.gtimg.cn snapshot supplied in config/input.json
+   timestamp=20260731114303 market_cap=662032000000 pe_ttm=14.98
+
+[analysis model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: product manufacturing and sales dominate revenue, assets and profit. The consolidated finance subsidiary requires excluding loans/deposits tied to that business from detachable cash, but does not change the group-level ordinary operating model.
+
+[financial calculations]
+gross_profit=456451731000-335989528000=120462203000
+gross_margin=120462203000/456451731000=0.2639080215
+net_margin=43945411000/456451731000=0.0962761452
+operating_free_cash_flow=53345930000-11141889000=42204041000
+
+[cash breakdown]
+cash_and_equivalents=68508670000 at 100%=68508670000
+fixed_income_products=209650953000 at 80%=167720762400
+trading_financial_assets=710717000 at 70%=497501900
+interest_bearing_and_lease_debt=67481107000 at 100%=-67481107000
+discounted_detachable_net_cash=68508670000+167720762400+497501900-67481107000=169245827300
+Note: restricted fixed-income assets disclosed at 23690000000; the 20% haircut on all fixed-income products also covers term and operational liquidity uncertainty.
+
+[cash profit]
+operating_free_cash_flow=42204041000
+less minority profit=574785000
+subtotal=41629256000
+less 10% sustainability/cycle buffer, rounded=4163156000
+discounted_sustainable_cash_profit=37466100000
+
+[owner earnback]
+operating_business_price=662032000000-169245827300=492786172700
+owner_earnback_years=492786172700/37466100000=13.1528548
+market_cap_to_cash_profit=662032000000/37466100000=17.6701605
+discounted_net_cash_to_market_cap=169245827300/662032000000=0.2556459919
+
+[dividend]
+forecast_cash_dividend=4.3*7597145346=32667724987.8, rounded=32667724988
+forecast_dividend_yield=32667724988/662032000000=0.049345
+Limitation: actual entitled shares may differ because of treasury shares, repurchases, or cancellations.
+
+[quality]
+status=complete
+Core three-statement fields, business story, asset/liability explanations, cash and profit adjustment details, dividend estimate, evidence, model classification, and valuation snapshot are present.

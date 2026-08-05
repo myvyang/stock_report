@@ -1,0 +1,82 @@
+stock-research trace — SIG
+generated_at: 2026-08-04T20:56:43+08:00
+
+1. Read instructions and contracts
+   - /workspace/AGENTS.md
+   - /workspace/.agents/skills/stock-research/SKILL.md
+   - /workspace/.agents/skills/stock-research/references/result-contract.md
+   - /workspace/.agents/skills/stock-research/references/report-contract.md
+   - /workspace/.agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+   - No existing raw filing, annual facts package, normalized facts, or prior SIG stock-research result was present.
+   - Retained the input protocol period 2025-12-31.
+   - Signet uses a retail 52-week fiscal year; selected the latest annual filing available at task time: FY2026 ended 2026-01-31, filed 2026-03-19.
+
+3. Protocol initialization
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   result: initialized stock-research-result-v1 from config/input.json
+
+4. Primary source retrieval
+   - SEC FY2026 Form 10-K:
+     https://www.sec.gov/Archives/edgar/data/832988/000083298826000055/sig-20260131.htm
+   - SEC FY2026 earnings release / Exhibit 99.1:
+     https://www.sec.gov/Archives/edgar/data/832988/000083298826000054/fy27ex9913x19x26pressrelea.htm
+   - SEC companyfacts API used as a cross-check for XBRL facts:
+     https://data.sec.gov/api/xbrl/companyfacts/CIK0000832988.json
+   - Raw 10-K saved at stock_report/data/raw/filings/SIG/2025-12-31/sig-20260131.htm
+
+5. Model determination
+   - statement_model: ordinary_operating
+   - owner_earnback_applicability: applicable
+   - Basis: jewelry retail and services; inventory, stores, brands, marketing and service fulfillment are operating assets. No financial/developer/concession economics.
+   - FY2026 year-end interest-bearing debt: USD 0.
+   - Operating lease liabilities and deferred service revenue excluded from detachable cash logic.
+
+6. Statement facts (FY2026, USD millions)
+   - Sales 6,813.6; cost of sales 4,119.0; gross profit 2,694.6; operating income 393.1; parent net income 294.4.
+   - Assets 5,952.1; liabilities 3,985.9; parent equity 1,966.2.
+   - CFO 678.8; capex 153.5; operating FCF 525.3; financing cash flow -264.8.
+   - Cash 874.8; inventory 1,940.1; operating lease ROU assets 1,146.6; goodwill and intangibles 714.8.
+   - Deferred revenue 1,285.7; operating lease liabilities 1,217.3; no debt.
+
+7. Currency convention
+   - Result contract requires CNY absolute yuan.
+   - Input supplies CNY market cap but does not provide the FX conversion rate.
+   - Used explicit analytical convention: 1 USD = 7.00 CNY for every filing amount.
+   - Ratios and owner-earnback years are invariant when numerator and denominator use the same FX basis.
+
+8. Owner earnback calculation
+   - Reported cash: USD 874.8m × 7.00 = CNY 6,123.6m.
+   - Detachable cash haircut: 70%; discounted detachable net cash = CNY 4,286.52m.
+   - Operating FCF: (USD 678.8m - USD 153.5m) × 7.00 = CNY 3,677.1m.
+   - Normalize current-period working-capital/deferred-revenue cash benefit: subtract USD 92.5m × 7.00 = CNY 647.5m.
+     Components: inventory +23.2, other assets +16.9, accounts payable +5.4, accrued liabilities +14.7, lease assets/liabilities -9.0, deferred revenue +35.9, income tax +5.4 = net +92.5m.
+   - Normalized FCF: USD 432.8m × 7.00 = CNY 3,029.6m.
+   - Sustainability haircut: 90%; discounted sustainable cash profit = CNY 2,726.64m.
+   - Market cap: CNY 24,354.511577m.
+   - Operating business price: 24,354.511577 - 4,286.52 = CNY 20,067.991577m.
+   - Owner earnback: 20,067.991577 / 2,726.64 = 7.35997 years.
+   - Market cap / cash profit: 24,354.511577 / 2,726.64 = 8.93206x.
+
+9. Dividend forecast
+   - Announced quarterly dividend: USD 0.35/share.
+   - Shares outstanding 2026-03-13: 40,067,774.
+   - Annualized dividend: 0.35 × 4 × 40,067,774 = USD 56,094,883.6 = CNY 392,664,185.2.
+   - Forecast yield: CNY 392,664,185.2 / CNY 24,354,511,577.000244 = 1.6123%.
+
+10. Protocol population
+   - Populated result sections with repeated protocol CLI `set` commands, including metrics, financials, asset analysis, owner earnback, dividend, business, risks, evidence and data quality.
+   - Complex result JSON was not handwritten from scratch.
+
+11. Initial validation
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: status ok; errors []
+
+12. Output files
+   - outputs/result.json
+   - outputs/report.md
+   - outputs/trace.txt
+
+13. Final validation
+   - See final command output in task execution log.

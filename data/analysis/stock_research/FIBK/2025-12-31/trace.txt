@@ -1,0 +1,68 @@
+stock-research trace
+task: FIBK, annual, period 2025-12-31
+generated_at: 2026-08-04T21:36:02+08:00
+
+1. Required instructions read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- /workspace/AGENTS.md supplied in task context
+
+2. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: initialized schema stock-research-result-v1 from input.
+
+3. Reuse check
+- Checked specified annual review, normalized facts, raw filing, and prior research paths.
+- No FIBK filing/fact/research files existed locally; only stock_report/data/notes/user_stock_evaluations.md was present.
+- Therefore retrieved primary public disclosures.
+
+4. Primary evidence retrieved and inspected
+- SEC FY2025 Form 10-K, accession 0000860413-26-000011, filed 2026-02-26:
+  https://www.sec.gov/Archives/edgar/data/860413/000086041326000011/fibk-20251231.htm
+- SEC companyfacts for CIK 0000860413 used to cross-check audited XBRL facts:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0000860413.json
+- SEC Q1 2026 Form 10-Q / dividend disclosure:
+  https://www.sec.gov/Archives/edgar/data/860413/000086041326000038/fibk-20260331.htm
+- Federal Reserve H.10 daily USD/CNY series via FRED; 2025-12-31 = 6.9931 CNY per USD:
+  https://fred.stlouisfed.org/data/DEXCHUS
+- Market cap, date, PE TTM and market source taken exactly from config/input.json.
+
+5. Model decision
+- Input hint: ordinary_operating / applicable.
+- Filing fact: First Interstate is a financial and bank holding company operating through First Interstate Bank; loans and securities are earning assets and deposits are operating funding.
+- Override: statement_model=financial_bank; owner_earnback_applicability=not_applicable.
+- Consequence: discounted net cash, discounted cash profit, operating business price, owner earnback years, and market-cap/cash-profit fields remain null.
+
+6. Currency normalization
+- Contract requires absolute CNY yuan.
+- FY2025 USD statement amounts converted at 6.9931 CNY/USD (2025-12-31 spot rate).
+- Ratio and per-share source facts retained as ratios or described with conversion basis.
+- Important converted amounts:
+  total assets USD 26.6406bn -> CNY 186,269,384,860
+  total liabilities USD 23.1936bn -> CNY 162,168,716,160
+  equity USD 3.4470bn -> CNY 24,100,668,700
+  net income USD 302.1m -> CNY 2,112,615,510
+  net loans USD 15.0102bn -> CNY 104,978,233,620
+  securities USD 7.6302bn -> CNY 53,355,084,960
+  deposits USD 22.0883bn -> CNY 154,444,680,730
+
+7. Dividend forecast
+- Assumption: quarterly dividend remains USD 0.47, annualized USD 1.88 per share.
+- Shares: 101,105,745 at 2025-12-31.
+- Forecast USD cash dividend: 190,078,800.60.
+- Forecast CNY cash dividend (rounded): 1,329,240,060.
+- Input market cap CNY 24,922,877,598.55371.
+- Forecast yield: approximately 0.05334.
+- This is a mechanical continuation assumption, not a declared full-year commitment.
+
+8. Protocol population and validation
+- outputs/result.json was populated using repeated protocol CLI `set` operations in outputs/populate_result.sh; complex JSON was not authored directly as result.json.
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}
+
+9. Final output consistency checks completed
+- Required files: outputs/result.json, outputs/report.md, outputs/trace.txt.
+- Protocol validation returned status ok after all files existed.
+- data_quality.status is complete and incomplete_reasons is empty.
+- All ordinary owner-earnback sorting fields are null.

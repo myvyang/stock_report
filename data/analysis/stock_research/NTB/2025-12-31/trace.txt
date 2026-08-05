@@ -1,0 +1,60 @@
+stock-research trace — NTB — period 2025-12-31
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because local fact reuse was evaluated.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- Checked the configured raw filing, annual review and normalized facts paths.
+- No NTB filing or annual facts package existed locally; only the user evaluation notes file existed.
+- Therefore returned to primary public filings.
+
+3. Primary sources
+- SEC Form 20-F, accession 0001653242-26-000006, filed 2026-02-18, period 2025-12-31:
+  https://www.sec.gov/Archives/edgar/data/1653242/000165324226000006/ntb-20251231.htm
+- Butterfield Group 2025 Annual Report:
+  https://www.butterfieldgroup.com/sites/butterfield-corp/files/butterfield/investor-relations/financial-reports/annual/annual-report-2025.pdf
+- China Foreign Exchange Trade System central parity, 2025-12-31, reproduced by China Economic Net:
+  https://www.ce.cn/xwzx/gnsz/gdxw/202512/t20251231_2676993.shtml
+- Valuation snapshot was supplied in config/input.json: market cap CNY 16,382,339,126.96045 on 2026-08-03, PE TTM 10.790493, Yahoo Finance yfinance.
+
+4. Model decision
+- Overrode input hint ordinary_operating/applicable.
+- Confirmed financial_bank/requires_special_model because deposits, loans, securities and liquidity assets are the operating model and are subject to banking regulation.
+- Kept all ordinary owner-earnback sorting fields null, as required by the contract.
+
+5. Currency conversion
+- Used 1 USD = 7.0288 CNY, the 2025-12-31 official central parity.
+- Formula for all statement amounts: disclosed USD absolute amount × 7.0288.
+- Statement tables are in thousands of USD; multiplied table values by 1,000 before FX conversion.
+
+6. Key extracted facts (USD)
+- Total assets 14,094.894m; total liabilities 12,953.043m; shareholders' equity 1,141.851m.
+- Cash and cash equivalents 1,708.936m; resell agreements 1,096.238m; short-term investments 756.543m; securities 5,688.305m; net loans 4,382.411m.
+- Deposits 12,698.068m; other liabilities 254.975m; no year-end long-term debt or repo funding.
+- Net interest income before provision 364.082m; non-interest income 242.907m; total net revenue 606.792m; net income 231.942m.
+- NIM 2.69%; core efficiency ratio 58.5%; non-accrual loans 91.3m or 2.1% of gross loans; ACL/NACL 27.8%; net charge-off ratio 0.01%.
+- CET1 27.6% vs 10.0% minimum; total capital 27.8% vs 13.5%; leverage 7.6% vs 5.0%.
+- 2025 dividends 77.723m, USD 1.88/share. 2026-02-09 declared quarterly dividend USD 0.50/share. Year-end shares 39,948,264.
+
+7. Derived calculations
+- Approximate 2025 ROE = 231.942 / average(1,141.851, 1,020.812) = 21.45%.
+- Price/book = CNY market cap / (USD 1,141.851m × 7.0288) = 2.04x.
+- Forecast dividend = USD 0.50 × 4 × 39,948,264 × 7.0288 = CNY 561,576,716.01.
+- Forecast dividend yield = CNY 561,576,716.01 / CNY 16,382,339,126.96045 = 3.42794%.
+- Forecast is a mechanical annualization, not company guidance; no buyback was forecast.
+
+8. Protocol construction and validation
+- Populated outputs/result.json exclusively through repeated protocol `set` commands after initialization; did not hand-write the complex JSON object.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed result validation status: ok, errors: [].
+
+9. Known limitations
+- Period-end central parity is used for consistency, not average transaction-date FX.
+- Market cap and PE were accepted from the supplied yfinance snapshot rather than reconstructed.
+- Bank revenue/gross margin/ordinary operating cash flow/capex/free cash flow are intentionally null because ordinary-company interpretations are not economically comparable.
+- Dividend forecast is conditional on future board action, Bermuda law and BMA non-objection.

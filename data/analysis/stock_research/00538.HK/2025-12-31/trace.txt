@@ -1,0 +1,64 @@
+Stock research trace for 00538.HK, period 2025-12-31
+Generated at: 2026-08-03T12:01:16+08:00
+
+Protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the selected skill routes existing filing/fact-pack reuse through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields only through protocol set/append commands.
+- Validated with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+Sources reused
+- stock_report/data/analysis/annual_review/00538.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/00538.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/00538.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/00538.HK/2025-12-31/imported_from_agent_runs/74b6afd92761-ajisen_2025_annual_report.txt
+- Primary filing URL recorded in the fact pack: https://assets.ctfassets.net/ocfj64bjl2y3/3pg1SIkCcBaE10kqWWy5vb/a949b635a5e52f84fbffa8638447d186/annual_report_2025_e.pdf
+- Market data: config/input.json, source Tencent qt.gtimg.cn, timestamp 2026/07/31 16:08:47.
+
+Model decision
+- Overrode analysis_model_hint=financial_brokerage.
+- Filing evidence shows restaurant revenue RMB1,783.789m of total RMB1,831.936m, 617 restaurants, and ordinary restaurant assets/liabilities.
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Lease liabilities are paired with restaurant leases. They were not deducted from detachable cash because lease principal was deducted in the cash-profit bridge; this avoids double counting.
+
+Core conversions
+- Filing units RMB'000 were multiplied by 1,000 to protocol-required absolute CNY yuan.
+- Gross margin = 1,410,159,000 / 1,831,936,000 = 0.7697643367.
+- Net margin = 28,408,000 / 1,831,936,000 = 0.0155070920.
+- Operating free cash flow used for owner cash profit = OCF 453,149,000 - capex 82,111,000 - lease principal 257,678,000 = 113,360,000.
+- Sustainable cash-profit discount = 25%, giving 85,020,000. This is an analyst assumption based on 2023-2025 parent-profit volatility and incomplete 2023 cash-flow history.
+
+Detachable-cash bridge
+- Non-term-deposit cash: (923,963,000 - 300,000,000 operating reserve) x 80% = 499,170,400.
+- Current term deposits: 745,518,000 x 90% = 670,966,200.
+- Non-current term deposits: 30,250,000 x 80% = 24,200,000.
+- Short treasury reverse repo: 10,128,000 x 90% = 9,115,200.
+- Bank borrowings: -29,966,000 x 100% = -29,966,000.
+- Discounted detachable net cash = 1,173,485,800.
+- Investment property, unlisted equity/funds, associates and joint venture were excluded from detachable cash.
+- Restricted deposit RMB48,000 was excluded.
+
+Owner earnback formulas
+- Operating business price = 770,020,122.0119 - 1,173,485,800 = -403,465,677.9881.
+- Owner earnback years = -403,465,677.9881 / 85,020,000 = -4.7455384379.
+- Market cap / cash profit = 770,020,122.0119 / 85,020,000 = 9.0569292168.
+- Negative owner earnback years are retained because they follow the contract formula; report explicitly states that the number means discounted cash exceeds market cap, not negative-time payback.
+
+Dividend
+- Proposed 2025 final RMB0.07/share plus special RMB0.03/share, aggregate RMB109,154,000, subject to shareholder approval.
+- Forecast yield including special dividend = 109,154,000 / 770,020,122.0119 = 0.1417547372.
+- Recurring final dividend proxy excluding the anniversary special dividend = RMB76,408,000, yield about 0.09923.
+
+Known limitations
+- Input market cap was retained under the protocol CNY convention; original HKD market cap and FX conversion were not separately supplied.
+- Filing does not split cash among listed parent, Hong Kong entities and Mainland operating subsidiaries.
+- Minimum operating cash is not disclosed; RMB300m reserve and subsequent haircuts are assumptions.
+- Detailed 2023 OCF and capex were not extracted in the reused annual fact pack.
+
+Validation result
+- status: ok
+- errors: []

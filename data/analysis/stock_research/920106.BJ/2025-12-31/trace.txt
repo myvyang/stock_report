@@ -1,0 +1,65 @@
+Stock research trace: 920106.BJ 林泰新材
+Period: 2025-12-31 annual
+Run date: 2026-08-03 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- config/input.json exists and was used.
+- No local annual facts package, normalized facts, raw filing, or prior stock-research result existed for 920106.BJ/2025-12-31.
+- Therefore fetched and extracted the publicly disclosed 2025 annual report PDF dated 2026-04-07.
+- Filing retrieval URL used for extraction: https://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSEBJ_STOCK/2026/2026-4/2026-04-07/12065568.PDF
+- Official-source discovery was attempted against the Beijing Stock Exchange. Search exposed BSE historical disclosures but did not return the 2025 annual PDF directly; the fetched PDF reproduces the company annual report and audited statements. Core figures were cross-checked against the disclosed board work report and audit-report text surfaced publicly.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- The initialized schema was inspected before population.
+- Population used repeated protocol `set` CLI calls; result.json was not authored from a blank complex object.
+
+4. Model classification
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Basis: manufacturing revenue from friction plates/counter plates/clutch assemblies; balance sheet comprises distinguishable cash/wealth products, receivables, inventory and production assets; no ending short-term or long-term borrowing.
+
+5. Core extracted figures (CNY)
+- Revenue 420,222,780.58
+- Cost of sales 218,730,351.53
+- Gross profit 201,492,429.05
+- Parent net profit 141,196,068.67
+- Total assets 719,179,799.27
+- Total liabilities 140,601,428.08
+- Parent equity 578,578,371.19
+- Operating cash flow 97,072,348.81
+- Capital expenditure 43,456,178.60
+- Operating free cash flow 53,616,170.21
+- Cash 60,652,258.95; cash equivalents 56,432,561.32
+- Restricted bill deposits 4,219,697.63
+- Trading financial assets / wealth products 149,497,010.60
+- Ending interest-bearing borrowings 0
+
+6. Owner earnback judgments
+- Free cash and cash equivalents: 50% haircut, discounted amount 28,216,280.66. Reason: retain operating/tax buffer.
+- Wealth products: 90% haircut, discounted amount 134,547,309.54. Reason: high liquidity but includes raised funds and expansion-use constraints.
+- Restricted bill deposits: 0% included.
+- Discounted detachable net cash: 162,763,590.20.
+- Sustainable cash profit uses 2025 OCF less all capex, without separating maintenance and expansion capex: 53,616,170.21.
+- Operating business price: 1,937,236,409.80.
+- Owner earnback: 36.1315705 years.
+- Market cap / cash profit: 39.1672930 times.
+
+7. Dividend
+- 2025 annual proposal: CNY 0.60 per share (CNY 6 per 10 shares).
+- Year-end shares: 56,593,500.
+- Forecast cash dividend: 33,956,100.
+- Forecast yield on CNY 2.10bn market cap: 1.61695714%.
+
+8. Market data
+- Reused task input: market cap CNY 2,100,000,000; PE TTM 16.67; timestamp 2026-07-31 15:38:20; source Tencent qt.gtimg.cn.
+- Limitation: market snapshot calculation mechanics were not independently reconstructed.
+
+9. Validation
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final expected status: ok, no validation errors.

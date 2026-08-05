@@ -1,0 +1,66 @@
+stock-research trace — 01455.HK
+generated_at: 2026-08-04T12:36:08+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated fields only through protocol `set` commands (script: /tmp/fourace_set.sh).
+4. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[local reuse audit]
+- Expected annual facts, normalized facts and prior research files were absent under stock_report for 01455.HK/2025-12-31.
+- Downloaded official annual report to stock_report/data/raw/filings/01455.HK/2025-12-31/annual-report-2025.pdf.
+- Official URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2025/0708/2025070800548.pdf
+- Extracted text for review; no existing fact package was overwritten.
+
+[period resolution]
+- Input period: 2025-12-31.
+- Company statutory year end: 31 March.
+- Selected audited annual report: FY2025 ended 2025-03-31, released 2025-07-08.
+- outputs/result.json analysis.period corrected to 2025-03-31.
+
+[model resolution]
+- Input hint: financial_brokerage / requires_special_model.
+- Audited evidence: annual report notes 1 and 5 identify manufacturing and selling home electrical appliances, with one operating segment; no brokerage customer funds, proprietary financial assets or repo funding.
+- Final model: ordinary_operating / applicable.
+
+[currency]
+- Audited accounts are in HKD thousands.
+- Result contract requires CNY absolute yuan.
+- Applied explicit approximate conversion HKD/CNY = 0.93 to all filing amounts.
+- Market cap and PE were retained exactly from config/input.json and treated as protocol-standardized CNY fields.
+
+[core source mapping]
+- Income statement: annual report p.48.
+- Balance sheet and equity: pp.49-50.
+- Cash flow: pp.52-53.
+- Business and operating review: pp.6-10.
+- Segment, geography, products and customer concentration: pp.77-79.
+- Cash currency composition: p.96.
+- Receivables, payables and other liabilities: pp.94-98.
+- Property title-document uncertainty: p.77.
+- Dividend: pp.5 and 10.
+- Market cap/PE/date/source: config/input.json.
+
+[formula audit]
+- gross_margin = 91,474 / 272,312 = 0.3359135033.
+- net_margin = 41,705 / 272,312 = 0.1531515313.
+- operating_free_cash_flow = (72,074 - 7,513) * 1,000 * 0.93 = CNY 60,041,730.
+- discounted cash = 317,258 * 1,000 * 0.93 * 95% = CNY 280,297,443.
+- discounted detachable net cash = discounted cash - all liabilities CNY 39,837,480 = CNY 240,459,963.
+- sustainable cash profit assumption = HKD 30,000,000 * 0.93 = CNY 27,900,000.
+- operating business price = CNY 265,084,240.38112164 - CNY 240,459,963 = CNY 24,624,277.381121665.
+- owner earnback years = 24,624,277.381121665 / 27,900,000 = 0.8825905871.
+- market cap / cash profit = 265,084,240.38112164 / 27,900,000 = 9.5012272538.
+- FY2025 proposed dividend = 1,278.6m shares * HKD 0.035 * 0.93 = CNY 41,618,430.
+- forecast/historical-basis dividend yield = 41,618,430 / 265,084,240.38112164 = 0.1570007705.
+
+[judgment flags]
+- Fact: FY2025 free cash flow exceeded profit.
+- Inference: the excess is not fully sustainable because inventory and receivables released cash; contract liabilities and payables moved in the opposite direction.
+- Judgment: HKD 30m sustainable cash profit, 95% cash recognition and full-liability deduction.
+- Limitation: FY2025 dividend includes a special dividend and is not a recurring forecast guarantee.
+- No target price, ranking label or buy/sell recommendation was produced.

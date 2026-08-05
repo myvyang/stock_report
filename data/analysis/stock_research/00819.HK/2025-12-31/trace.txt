@@ -1,0 +1,79 @@
+stock-research trace
+company: TIANNENG POWER / 00819.HK
+period: 2025-12-31 annual
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill requires reusing existing fact packs where sufficient.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked stock_report/data/raw/filings/00819.HK/2025-12-31.
+- Checked stock_report/data/analysis/annual_review/00819.HK/2025-12-31.
+- Checked stock_report/data/normalized/facts/00819.HK/2025-12-31.
+- Checked stock_report/data/analysis/stock_research/00819.HK/2025-12-31.
+- No prior filing, facts package, normalized facts, or historical stock-research output existed in the workspace.
+
+3. Primary sources
+- HKEX annual report 2025, released 2026-03-30:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0330/2026033000329.pdf
+- HKEX 2025 annual results announcement, released 2026-03-27:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0327/2026032703522.pdf
+- Company financial highlights page used only as a cross-check:
+  https://www.tianneng.com.hk/html/ir_highlight.php
+- Market cap and PE were supplied by config/input.json from Tencent qt.gtimg.cn, dated 2026/07/31 16:08:44.
+
+4. Model override
+- Input hint said financial_brokerage/requires_special_model and also contained utility-operator tags.
+- Annual report note 1 says subsidiaries manufacture and sell lead-acid batteries, lithium-ion batteries, recycled products, and trade materials.
+- Overrode statement_model to ordinary_operating and owner_earnback_applicability to applicable.
+
+5. Core extraction (annual report, RMB'000 converted to absolute RMB)
+- Revenue 53,798,904,000; cost of sales 48,519,308,000; gross profit 5,279,596,000.
+- Operating profit derived before finance costs and tax: 2,426,710,000.
+- Net profit 1,662,952,000; parent net profit 1,436,758,000.
+- Total assets 55,139,418,000; total liabilities 34,821,311,000.
+- Total equity 20,318,107,000; parent equity 17,298,426,000; NCI 3,019,681,000.
+- OCF 5,190,935,000.
+- Capex 1,512,268,000 = PPE purchases 1,302,958,000 + PPE acquisition deposits 158,871,000 + ROU acquisition 50,439,000; cross-checked to MD&A approximately RMB1,512m.
+- Operating FCF 3,678,667,000.
+- Financing cash flow -5,439,654,000.
+- Dividend/buyback outflow 333,627,000 = parent dividends 176,424,000 + NCI dividends 132,080,000 + subsidiary share repurchase 25,123,000.
+
+6. Owner earnback calculations
+- Unrestricted cash: 7,825,395,000 at 100%.
+- Time deposits: 690,000,000 at 100%.
+- Structured bank deposits: 2,965,705,000 at 90% = 2,669,134,500.
+- Restricted/pledged deposits: 10,523,663,000 at 0%.
+- Borrowings plus lease liabilities: 13,666,815,000 deducted in full.
+- Discounted net amount is negative; detachable net cash floored at zero.
+- Sustainable cash profit = 1,436,758,000 parent profit x 85% = 1,221,244,300.
+- Operating business price = 4,902,152,882.540822 - 0 = 4,902,152,882.540822.
+- Owner earnback years = 4,902,152,882.540822 / 1,221,244,300 = 4.014064.
+- Gross margin = 5,279,596,000 / 53,798,904,000 = 0.098135754.
+- Parent net margin = 1,436,758,000 / 53,798,904,000 = 0.026706083.
+
+7. Dividend forecast
+- Proposed final dividend HKD0.36/share; annual report translates this to RMB0.3181/share.
+- Issued shares: 1,126,124,500.
+- Forecast cash dividend = 0.3181 x 1,126,124,500 = 358,220,203 RMB (rounded).
+- Forecast yield = 358,220,203 / 4,902,152,882.540822 = 0.073074058.
+- Proposal remained subject to shareholder approval at the annual report date.
+
+8. Protocol mutations and validation
+- All complex result sections were populated after init with repeated protocol set commands; result JSON was not drafted from scratch.
+- Final validation command and output are appended below after report generation.
+
+9. Known limitations
+- Historical Tencent quote response was supplied in input and was not independently archived.
+- Market leadership is based on company disclosure; no independent market-share dataset was found.
+- The 15% sustainable-profit haircut is analyst judgment, explicitly separated from reported facts.
+- PDF text extraction as returned by the source viewer reverses table column display order; figures were checked against headings, comparative values, the annual results announcement, and company highlights.
+
+10. Final validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Output: {"status":"ok","errors":[]}
+- jq parse check: passed.

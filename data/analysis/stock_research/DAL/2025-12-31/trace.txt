@@ -1,0 +1,84 @@
+DAL stock research trace
+generated_at=2026-08-05T02:27:31+08:00
+period=2025-12-31
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+populate=all result fields set or appended through stock_analysis.stock_research.protocol; helper=/tmp/populate_dal.py
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validate_status=ok
+
+[reuse_check]
+requested_annual_facts_json=stock_report/data/analysis/annual_review/DAL/2025-12-31/facts.json
+requested_annual_facts_md=stock_report/data/analysis/annual_review/DAL/2025-12-31/annual_facts.md
+requested_normalized_facts=stock_report/data/normalized/facts/DAL/2025-12-31/annual-facts.json
+result=not present in workspace; returned to official filing
+
+[primary_sources]
+1=https://www.sec.gov/Archives/edgar/data/27904/000002790426000013/dal-20251231.htm
+  use=2025 audited statements, business, revenue, debt, commitments, loyalty, partnerships, risks
+2=https://ir.delta.com/news/news-details/2026/Delta-Air-Lines-Declares-Quarterly-Dividend-f436d9f6d/default.aspx
+  use=2026-06-18 quarterly dividend declaration, USD 0.215/share
+3=https://www.federalreserve.gov/releases/g5a/current/
+  use=2025 average USD/CNY 7.1875 for income statement and cash flow translation
+4=https://www.federalreserve.gov/releases/h10/20251229/
+  use=2025 year-end-near USD/CNY 7.0063 for balance-sheet translation
+5=config/input.json
+  use=2026-08-03 market cap CNY 388027284942.97266 and PE TTM 14.500829; source identified as Yahoo Finance yfinance
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=air transport, loyalty and maintenance are ordinary operating services; ordinary FCF framework works, subject to airline-specific cash and capex treatment
+gross_margin_exception=Delta reports no conventional cost of sales or gross profit. result.cost_of_sales uses total operating expense and result.gross_profit/result.gross_margin use operating income/operating margin as an explicitly disclosed proxy.
+
+[financial_extraction_usd_millions]
+cash=4310
+total_assets=81317
+current_debt_and_finance_leases=1605
+long_term_debt_and_finance_leases=12507
+total_liabilities=60464
+stockholders_equity=20853
+revenue=63364
+operating_expense=57542
+operating_income=5822
+net_income=5005
+investment_gain=1212
+operating_cash_flow=8342
+flight_equipment_capex=3521
+ground_and_technology_capex=978
+total_capex=4499
+operating_free_cash_flow=3843
+financing_cash_flow=-3076
+cash_dividends=440
+
+[owner_earnback]
+cash_discount=0%; all cash retained as operating liquidity
+debt_discount=100%; all debt and finance leases deducted
+strategic_equity_investments_discount=0%; excluded from detachable cash because strategically tied and volatile
+discounted_net_cash_cny=-98872905600
+fcf_2023_usd_millions=1141
+fcf_2024_usd_millions=2885
+fcf_2025_usd_millions=3843
+three_year_average_fcf_usd_millions=2623
+sustainability_haircut=20%
+discounted_cash_profit_cny=15082250000
+operating_business_price_cny=486900190542.97266
+owner_earnback_years=32.2829942842
+market_cap_to_cash_profit=25.7274136779
+
+[dividend]
+latest_declared_quarterly_usd_per_share=0.215
+annualized_usd_per_share=0.86
+shares_outstanding_2025_year_end=653171237
+forecast_cash_dividend_cny=4037414708.70625
+forecast_dividend_yield=0.0104049763
+warning=mechanical annualization, not board commitment
+
+[quality]
+status=complete
+limitations=airline gross-margin proxy; market/filing date mismatch; mixed spot/average FX translation; maintenance versus growth capex unavailable; dividend is annualized

@@ -1,0 +1,69 @@
+AZZ stock research trace
+generated_at=2026-08-04T23:03:16+08:00
+
+[protocol]
+1. Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated scalar fields with protocol set; populated evidence, asset/liability rows, cash/profit breakdowns, dividend history, and risks with protocol append.
+3. Initial populated validation: status=ok, errors=[]
+
+[reuse]
+- Checked stock_report and outputs for raw filings, annual facts, normalized facts, and prior stock-research results.
+- No reusable AZZ filing package or annual fact package was present locally; research returned to primary public filings.
+
+[period decision]
+- Input period is 2025-12-31, but AZZ fiscal years end in February.
+- Selected audited FY2025 Form 10-K for fiscal year ended 2025-02-28 as the annual statement whose fiscal year ends within calendar 2025.
+- Used FY2026 Form 10-K comparative columns only to cross-check FY2025 values.
+- Used information after FY2025 only for market-date valuation context and forward dividend forecast, and labeled it accordingly.
+
+[model decision]
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Basis: operating revenue arises from industrial coating services using plants and equipment; deposits, reserves, regulated project cash, or other special-model balance-sheet items are not the business itself.
+- AVAIL 40% equity-method investment is separately treated as constrained investment/operating value and excluded from detachable cash.
+
+[sources]
+- SEC FY2025 10-K: https://www.sec.gov/Archives/edgar/data/8947/000000894725000046/azz-20250228.htm
+- AZZ FY2025 annual report PDF: https://www.azz.com/wp-content/uploads/2025/05/AZZ-Webready-2025-Annual-Report.pdf
+- SEC FY2026 10-K comparative FY2025 values: https://www.sec.gov/Archives/edgar/data/8947/000000894726000068/azz-20260228.htm
+- SEC dividend 8-K dated 2026-06-25: https://www.sec.gov/Archives/edgar/data/8947/000000894726000120/azz-20260625.htm
+- SEC FY2027 Q1 10-Q for 2026-07-01 shares outstanding: https://www.sec.gov/Archives/edgar/data/8947/000000894726000162/azz-20260531.htm
+- Federal Reserve H.10 dated 2025-03-03 for 2025-02-28 USD/CNY: https://www.federalreserve.gov/releases/h10/20250303/
+- Market cap and PE: config/input.json, attributed there to Yahoo Finance yfinance.
+
+[currency]
+- Protocol requires absolute CNY yuan.
+- Conversion rate used for all USD filing and dividend amounts: 7.2828 CNY/USD, the 2025-02-28 Federal Reserve H.10 spot rate.
+- This is a uniform comparison translation; income/cash-flow values were not translated at period-average rates.
+
+[key FY2025 source values, USD]
+- revenue=1,577,744,000; cost_of_sales=1,195,064,000; gross_profit=382,680,000
+- operating_profit=236,364,000; net_profit=128,833,000
+- total_assets=2,227,101,000; total_liabilities=1,181,606,000; equity=1,045,495,000
+- cash=1,488,000; gross_debt=900,250,000
+- operating_cash_flow=249,909,000; capex=115,883,000; operating_fcf=134,026,000
+- common_dividends_paid=19,508,000
+
+[owner earnback]
+- discounted_detachable_net_cash = cash - gross debt
+  = (1,488,000 - 900,250,000) * 7.2828
+  = -6,545,503,893.60 CNY
+- discounted_sustainable_cash_profit = operating cash flow - all capex
+  = (249,909,000 - 115,883,000) * 7.2828
+  = 976,084,552.80 CNY
+- operating_business_price = 29,347,409,788.57617 - (-6,545,503,893.60)
+  = 35,892,913,682.17617 CNY
+- owner_earnback_years = 35,892,913,682.17617 / 976,084,552.80
+  = 36.7723406535
+- market_cap_to_cash_profit = 29,347,409,788.57617 / 976,084,552.80
+  = 30.0664626895
+
+[dividend forecast]
+- Latest declared quarterly dividend before market date: USD 0.24/share.
+- Annualized dividend: 0.24 * 4 * 30,051,501 * 7.2828 = 210,104,708.623488 CNY.
+- Forecast yield: 210,104,708.623488 / 29,347,409,788.57617 = 0.00715922495842.
+- No assumption of further dividend increases.
+
+[quality]
+- status=complete
+- Main limitations: fiscal/date mismatch is explicitly disclosed; uniform spot translation is not GAAP currency translation; market cap/PE were accepted from input; industry leadership lacks independent market-share verification; forward dividend remains subject to board declarations.

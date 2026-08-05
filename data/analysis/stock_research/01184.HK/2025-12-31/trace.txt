@@ -1,0 +1,72 @@
+stock-research trace
+company=01184.HK S.A.S. DRAGON
+period=2025-12-31
+generated_for_input=2026-08-03T13:26:13+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated every result field with protocol `set` and `append`; no complex result JSON was created from scratch.
+4. Initial validation after population: status=ok, errors=[]
+
+[source discovery and reuse]
+- No pre-existing raw filing, annual facts package, normalized facts or historical stock-research result for 01184.HK/2025-12-31 was present in /workspace/stock_report.
+- Downloaded official annual report from HKEX to stock_report/data/raw/filings/01184.HK/2025-12-31/annual-report-2025.pdf.
+- Primary filing URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0415/2026041500462.pdf
+- Company results summary: https://www.sasdragon.com.hk/info-detail.php?InfoId=674
+- FX evidence: 2025-12-31 CFETS/PBOC central parity reproduced at https://finance.sina.com.cn/jjxw/2025-12-31/doc-inhervyw3857837.shtml
+- Market cap, timestamp, PE TTM and quote source were reused from config/input.json.
+
+[model audit]
+- input hint: financial_brokerage / requires_special_model
+- filing finding: principal operation is distribution of electronic components and semiconductor products; no securities brokerage, investment banking, asset management or proprietary securities operation.
+- final model: ordinary_operating / applicable
+- caveat: trade receivable factoring, invoice finance and import loans are integral working-capital tools, so cash receives a conservative detachability haircut.
+
+[currency]
+- Reporting currency in filing: HKD, amounts shown in HK$'000.
+- Result contract currency: CNY absolute yuan.
+- Translation rate: HKD 1 = CNY 0.90322 at 2025-12-31.
+- 2024 dividend history alone uses 2024-12-31 rate HKD 1 = CNY 0.92604 and is identified in its source field.
+
+[core filing extraction]
+- Revenue HKD30,536.444m; cost of sales HKD29,205.101m; gross profit HKD1,331.343m.
+- Net profit HKD711.197m; attributable profit HKD556.715m.
+- Total assets HKD10,897.047m; liabilities HKD7,338.498m; total equity HKD3,558.549m; parent equity HKD3,183.188m; NCI HKD375.361m.
+- Operating cash flow HKD809.797m; PP&E additions HKD5.885m; operating FCF defined as OCF less PP&E additions.
+- Cash equivalents HKD3,767.684m; pledged deposits HKD37.398m; current FVTPL HKD105.142m; bank borrowings HKD2,676.538m.
+- Inventories HKD1,567.638m; trade/other receivables plus FVTOCI trade receivables HKD4,361.934m.
+- Declared/recognized distribution HKD250.335m; FY2025 total DPS HKD0.40.
+
+[calculation audit]
+- gross_margin = 1,331.343 / 30,536.444 = 0.043598495
+- net_margin = 556.715 / 30,536.444 = 0.018231167
+- discounted detachable net cash in HKD:
+  cash 3,767.684m * 80%
+  + current FVTPL 105.142m * 50%
+  + pledged deposits 37.398m * 0%
+  - bank borrowings 2,676.538m * 100%
+  = HKD390.1802m = CNY352.4186m
+- adjusted parent profit in HKD:
+  556.715m
+  + investment-property FV loss 26.400m * (1-16.5%)
+  - inventory allowance reversal 79.317m * (1-16.5%)
+  - FVTPL FV gain 14.624m * (1-16.5%)
+  = HKD500.3183m
+- discounted sustainable cash profit = HKD500.3183m * 85% * 0.90322 = CNY384.1128m
+- operating business price = CNY4,108.0530m - CNY352.4186m = CNY3,755.6344m
+- owner earnback = 3,755.6344 / 384.1128 = 9.7774 years
+- market cap / cash profit = 4,108.0530 / 384.1128 = 10.6949x
+- forecast dividend = HKD250.335m * 0.90322 = CNY226.1076m
+- forecast dividend yield = 226.1076 / 4,108.0530 = 5.5040%
+
+[judgment boundaries]
+- 80% cash, 50% FVTPL and 85% sustainable-profit factors are analyst scenarios, not reported facts.
+- The 16.5% tax rate is used as an approximation for after-tax non-cash adjustments; jurisdictional tax effects may differ.
+- Gartner positioning is management's cited claim and was not independently reconstructed.
+- Report contains no recommendation, target price or ranking label.
+
+[final validation]
+Run after report and trace creation:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

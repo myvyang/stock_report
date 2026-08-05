@@ -1,0 +1,58 @@
+stock-research trace
+company: 蓝天燃气 (605368.SH)
+period: 2025-12-31 annual
+generated_at: 2026-08-01T02:11:15+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Local reuse check
+- config/input.json exists.
+- Referenced raw filing, annual facts, normalized facts, and prior stock-research files were absent in /workspace.
+- Therefore public disclosures were rechecked; no missing local facts were silently assumed.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Skeleton initialized successfully.
+
+4. Sources reviewed
+- 河南蓝天燃气股份有限公司2025年年度报告, disclosed 2026-04-22.
+  Web transcription: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12129033&stockid=605368
+- 关于公司2025年年度报告的信息披露监管问询函的回复公告, disclosed 2026-07-02.
+  Web transcription: https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12425650&stockid=605368
+- 关于2025年年度报告更正的公告, disclosed 2026-07-09.
+  Web transcription: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12435717&stockid=605368
+- 2025 annual-report summary / board resolutions published in Shanghai Securities News, 2026-04-22.
+  https://paper.cnstock.com/html/2026-04/22/content_2203218.htm
+- Market-cap snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026-07-31 11:43:21.
+
+5. Model decision
+- Confirmed statement_model=utility_concession.
+- Confirmed owner_earnback_applicability=requires_special_model.
+- Basis: gas pipelines and concessions are core operating assets; fixed assets CNY 3,064,299,419.66, construction in progress CNY 87,235,764.30, intangible assets CNY 828,058,927.85; concessions amortize over 19-27 years.
+- Ordinary detachable-net-cash and cash-profit ranking fields remain null per contract.
+
+6. Calculations
+- gross_profit = 4,055,888,602.60 - 3,398,820,859.84 = 657,067,742.76
+- gross_margin = 657,067,742.76 / 4,055,888,602.60 = 0.1619999464
+- net_margin = 282,016,257.57 / 4,055,888,602.60 = 0.0695325452
+- operating_free_cash_flow = 433,967,705.47 - 319,004,745.61 = 114,962,959.86
+- minority_interest_ratio = 65,629,643.68 / 3,350,657,250.45 = 0.0195870947
+- mechanical forecast dividend yield = 285,854,366.00 / 4,824,000,000.00 = 0.0592567102
+- Forecast dividend is explicitly a scenario based on 2025 actual cash dividend, not management guidance.
+
+7. Post-report correction treatment
+- The 2026-07-09 correction only reversed directions within two operating-working-capital reconciliation items.
+- Company stated the correction did not change operating cash flow or financial statements.
+- Final statement totals were therefore retained; the limitation is disclosed.
+
+8. Protocol population and validation
+- result.json was populated through protocol set/append commands, not hand-written as a complex object.
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[]
+
+9. Data-quality decision
+- status=complete because required special-model financials, asset/liability explanations, dividend scenario, business story, evidence, and model applicability are present.
+- Limitations: no project-level remaining concession term, maintenance capex, or cash-flow series; therefore no special-model earnback years were fabricated.

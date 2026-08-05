@@ -1,0 +1,64 @@
+stock-research trace
+company: 02566.HK / Hangzhou Jiuyuan Genetic Biopharmaceutical Co., Ltd.
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read instructions and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse audit
+- No raw filing, annual facts package, normalized facts, or prior stock-research result existed locally for 02566.HK/2025-12-31.
+- Only config/input.json market snapshot was reusable.
+
+3. Official filing retrieval
+- HKEX English Annual Report 2025, released 2026-04-23:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042300536.pdf
+- HKEX annual results announcement, released 2026-03-30, used as cross-check.
+- PDF downloaded to temporary research storage and text-extracted with pypdf installed under /tmp only; project dependencies were not changed.
+
+4. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Filing evidence: company sells medical devices, biologics, small-molecule generics, and pharmaceutical services; balance sheet contains ordinary cash, receivables, inventory, PPE, R&D intangibles, trade payables and bank debt.
+- Conclusion: input hint is incorrect. Set ordinary_operating / applicable.
+
+5. Core figures transcribed from HKEX Annual Report 2025
+- Revenue RMB1,306,301,000; cost of sales RMB252,238,000; gross profit RMB1,054,063,000.
+- Net profit and parent net profit RMB138,407,000.
+- Total assets RMB2,117,972,000; total liabilities RMB469,742,000; parent equity RMB1,648,230,000; minority interest nil.
+- Operating cash flow RMB254,839,000.
+- PPE purchases RMB49,586,000; intangible purchases RMB55,063,000; total capex RMB104,649,000.
+- Operating FCF = RMB254,839,000 - RMB104,649,000 = RMB150,190,000.
+
+6. Owner earnback assumptions and calculations
+- Cash and bank balances RMB650,858,000 x 80% = RMB520,686,400.
+- Less bank borrowings RMB102,553,000 and lease liabilities RMB59,066,000.
+- Discounted detachable net cash = RMB359,067,400.
+- Market cap from input = RMB1,108,023,390.7729387.
+- Operating business price = RMB748,955,990.7729387.
+- Cash-profit base = parent net profit RMB138,407,000 + depreciation/amortisation RMB46,862,000 - total capex RMB104,649,000 = RMB80,620,000.
+- Sustainable discount 20%; discounted cash profit = RMB64,496,000.
+- Owner earnback years = 11.6124409386.
+- Market cap / cash profit = 17.1797226304.
+- Rationale: avoids extrapolating the 2025 working-capital release embedded in reported OCF; fully deducts both tangible and capitalized-development expenditure, then applies a further prudence haircut.
+
+7. Dividend
+- Proposed/approved 2025 final dividend: RMB0.057 per share.
+- Eligible shares at board proposal: 241,516,400 excluding treasury shares.
+- Forecast cash dividend = RMB13,766,434.8.
+- Forecast dividend yield against input market cap = 1.2424317857%.
+
+8. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Updated fields through protocol CLI set commands; result was not authored from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation outcome before report drafting: status=ok, errors=[].
+
+9. Important judgment boundaries
+- Cash haircut and sustainable-profit haircut are analyst judgments, explicitly separated from reported facts.
+- Market-cap and PE snapshot were reused from input and not independently reconstructed.
+- Industry-position language is limited to company filing claims and observable product performance because an independent market-share dataset was not available.

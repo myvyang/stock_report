@@ -1,0 +1,62 @@
+2026-08-04T17:29:55+08:00 INPUT config/input.json
+  query=03968.HK period=2025-12-31 report_type=annual
+  market_cap=1110867620014.7576 CNY-equivalent as supplied
+  market_cap_timestamp=2026/08/03 09:48:14 source=Tencent qt.gtimg.cn pe_ttm=7.77
+
+2026-08-04 REFERENCE
+  Read .agents/skills/stock-research/SKILL.md in full.
+  Read references/result-contract.md, references/report-contract.md and references/data-reuse.md in full.
+
+2026-08-04 REUSE_CHECK
+  No raw filing, annual facts package, normalized facts, or prior stock-research result existed for 03968.HK/2025-12-31.
+  Only stock_report/data/notes/user_stock_evaluations.md existed; it contained no reusable company facts for this task.
+
+2026-08-04 SOURCE_DISCOVERY
+  Queried CNINFO official disclosure endpoint for SSE company 600036 / orgId gssh0600036.
+  Located 2025 annual report: announcementId=1225047590, adjunctUrl=finalpage/2026-03-28/1225047590.PDF.
+  Located 2025 annual report summary: announcementId=1225047778, adjunctUrl=finalpage/2026-03-28/1225047778.PDF.
+  Disclosure timestamp corresponds to 2026-03-28.
+
+2026-08-04 SOURCE_DOWNLOAD
+  Downloaded full annual report from https://static.cninfo.com.cn/finalpage/2026-03-28/1225047590.PDF
+  Saved as stock_report/data/raw/filings/03968.HK/2025-12-31/2025-annual-report.pdf
+  sha256=abe612a273468072b176dd51ea460c1e1596f8ca729cbc6db3fa28ba9a57ea79
+  PDF pages=350.
+  Full-report custom fonts produced partially garbled extraction, so the official summary was also downloaded and parsed for clean, page-addressable key tables.
+
+2026-08-04 MODEL_REVIEW
+  Confirmed statement_model=financial_bank from annual-report business description and statement structure.
+  Confirmed owner_earnback_applicability=not_applicable.
+  Reason: deposits, loans, securities, interbank positions and regulatory capital are the operating model, not detachable cash/debt of an ordinary operating company.
+  Ordinary earnback fields retained as null per result contract.
+
+2026-08-04 FACT_EXTRACTION unit=CNY
+  Annual report summary p.3: revenue=337532000000; operating_profit=179252000000; net_profit=151126000000; parent_net_profit=150181000000; operating_cash_flow=451457000000; ROAA=1.19%; ROAE=13.44%.
+  Summary p.4: total_assets=13070523000000; total_liabilities=11789624000000; parent_equity=1272875000000; loans_total=7258058000000; customer_deposits=9836130000000.
+  Derived total_equity=assets-liabilities=1280899000000; minority_interest=total_equity-parent_equity=8024000000; minority_interest_ratio=0.006264350272738132.
+  Summary p.5: NIM=1.87%; net_interest_spread=1.78%; NPL_ratio=0.94%; provision_coverage=391.79%; loan_provision_ratio=3.68%; credit_cost=0.60%.
+  Summary p.6: advanced-method CET1=14.16%; tier1=16.51%; total_capital=18.24%.
+  Summary p.10: net_loans=6995085000000; securities_and_other_financial_assets=4152347000000; cash_precious_metals_and_central_bank=613444000000; interbank_assets=961921000000.
+  Summary p.11: customer_deposits=9836130000000; interbank_liabilities=1255385000000; central_bank_borrowings=110679000000; bonds_payable=142403000000.
+
+2026-08-04 DIVIDEND
+  Summary p.2: board recommended FY2025 ordinary dividend=2.016 CNY/share including interim dividend; final 1.003 CNY/share remains subject to shareholder approval.
+  Common shares used=25219845601.
+  forecast_cash_dividend=25219845601*2.016=50843208731.616.
+  forecast_dividend_yield=50843208731.616/1110867620014.7576=0.04576891775002008.
+
+2026-08-04 PROTOCOL
+  Initialized outputs/result.json with:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+  Populated fields through protocol set commands; did not hand-write the result object.
+  Set data_quality.status=complete and preserved all ordinary owner-earnback fields as null.
+
+2026-08-04 VALIDATION
+  Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+  Result: status=ok, errors=[]
+
+LIMITATIONS
+  Market cap and PE are supplied input values and were not reconstructed across A/H listings or independently currency-checked.
+  Forecast dividend includes a proposed final dividend pending shareholder approval.
+  Bank operating cash flow is not treated as ordinary-company free cash flow; capex and operating FCF remain null.
+  Relative industry-position wording is based mainly on company disclosure and is not a uniform peer recomputation.

@@ -1,0 +1,97 @@
+stock-research trace
+company: 行动教育 (605098.SH)
+period: 2025-12-31 annual
+generated_at: 2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields only through protocol set/append commands.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[].
+
+[reuse audit]
+Expected annual facts, normalized facts, raw filing metadata, and prior stock-research outputs were absent from /workspace/stock_report.
+Only stock_report/data/notes/user_stock_evaluations.md existed; it contained no usable company-specific source package for this task.
+Therefore the research returned to the annual filing and official exchange disclosures.
+
+[sources]
+S1: 上海行动教育科技股份有限公司2025年年度报告, disclosed 2026-04-15, 190 pages.
+    Local copy: stock_report/data/raw/filings/605098.SH/2025-12-31/annual-report-2025.pdf
+    Retrieved from: https://cniis.aastocks.com/CNSESH_STOCK/2026/2026-4/2026-04-15/12088578.pdf
+    Filing states SSE as disclosure venue and contains an unmodified audit opinion from Ernst & Young Hua Ming.
+S2: SSE 2025 third-quarter dividend implementation announcement.
+    https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2025-11-01/605098_20251101_ZER9.pdf
+S3: Task input market snapshot, Tencent qt.gtimg.cn, 2026-07-31 11:43:21.
+    market_cap=6,783,000,000; pe_ttm=20.51.
+S4: Annual shareholders' meeting resolution announcement, used only to confirm the year-end distribution proposal later passed.
+    Search result document id 12302500; no core financial number taken from this secondary mirror.
+
+[financial extraction from S1]
+revenue=811,216,093.18
+cost_of_sales=171,500,637.70
+gross_profit=639,715,455.48
+operating_profit=371,777,042.42
+net_profit=323,162,458.17
+parent_net_profit=319,923,583.47
+deducted_nonrecurring_parent_profit=278,566,661.73
+operating_cash_flow=414,772,877.01
+capital_expenditure=3,145,995.16
+operating_free_cash_flow=411,626,881.85
+financing_cash_flow=-285,123,889.77
+dividend_and_profit_cash_out=270,789,068.07
+total_assets=2,391,312,105.18
+total_liabilities=1,373,554,431.47
+total_equity=1,017,757,673.71
+parent_equity=1,010,455,377.05
+minority_interest=7,302,296.66
+cash=1,439,649,211.59
+trading_financial_assets=677,306,085.61
+other_equity_instruments=42,237,170.10
+contract_liabilities=1,180,264,811.45
+current_lease_related_obligation_proxy=13,330,974.41
+lease_liabilities=17,231,518.63
+
+[derived metrics]
+gross_margin=(811,216,093.18-171,500,637.70)/811,216,093.18=0.7885882206
+net_margin=319,923,583.47/811,216,093.18=0.3943753017
+operating_free_cash_flow=414,772,877.01-3,145,995.16=411,626,881.85
+minority_interest_ratio=7,302,296.66/1,017,757,673.71=0.0071748848
+
+[analysis model]
+Classification: ordinary_operating; owner earnback applicable.
+Reason: the company sells training and consulting services. It has no bank/developer/project/concession balance-sheet model. However, customer prepayments are economically restricted by future delivery obligations, so contract liabilities are fully deducted in detachable-cash analysis.
+
+[owner earnback assumptions]
+cash: 1,439,649,211.59 * 90% = 1,295,684,290.43
+trading financial assets: 677,306,085.61 * 80% = 541,844,868.49
+other equity instruments: 42,237,170.10 * 50% = 21,118,585.05
+less contract liabilities: -1,180,264,811.45
+less lease obligations: -(13,330,974.41+17,231,518.63)=-30,562,493.04
+less operating liquidity buffer: -100,000,000.00
+discounted detachable net cash=547,820,439.48
+
+Sustainable cash profit starts from 2025 deducted-nonrecurring parent profit of 278,566,661.73, rather than reported FCF, because contract liabilities increased by 100,708,950.72 and lifted current-period operating cash flow. A 13,566,661.73 conservatism adjustment gives 265,000,000.00.
+
+operating_business_price=6,783,000,000.00-547,820,439.48=6,235,179,560.52
+owner_earnback_years=6,235,179,560.52/265,000,000.00=23.52897947
+market_cap_to_cash_profit=6,783,000,000.00/265,000,000.00=25.59622642
+discounted_net_cash_to_market_cap=547,820,439.48/6,783,000,000.00=0.0807648768
+
+[dividend]
+2025 interim dividend=119,251,100.00
+2025 Q3 dividend=59,625,550.00
+2025 year-end proposal=118,797,200.00
+full-year profit-attribution dividend=297,673,850.00
+payout ratio=93.05%
+forecast dividend yield=297,673,850.00/6,783,000,000.00=0.0438846882
+The year-end component was a proposal when the annual report was issued; a later annual meeting resolution indicates approval.
+
+[quality and limitations]
+status=complete because identity, market data, model, three statements, asset/liability explanations, owner-earnback bridge, dividend basis, business story, risks, and evidence are present.
+No item-level underlying details for trading financial assets or complete restricted-cash schedule were obtained.
+Cash haircuts, the CNY 100m operating buffer, and sustainable cash profit are explicit analyst assumptions.
+No buy/sell recommendation or target price is provided.

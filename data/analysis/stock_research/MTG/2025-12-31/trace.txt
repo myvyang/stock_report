@@ -1,0 +1,65 @@
+stock-research trace
+company=MTG / MGIC Investment Corporation
+period=2025-12-31
+generated_for_input=2026-08-04T12:13:57+08:00
+
+1. Protocol
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Also read references/data-reuse.md to apply the required reuse boundary.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields only through protocol set/append commands.
+
+2. Reuse check
+- No pre-existing MTG raw filing, annual facts package, normalized facts, or historical stock-research output was present under the paths supplied in config/input.json.
+- Research therefore returned to primary public filings and company disclosures.
+
+3. Primary sources
+- SEC 2025 Form 10-K, filed 2026-02-25:
+  https://www.sec.gov/Archives/edgar/data/876437/000087643726000010/mtg-20251231.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/876437/000087643726000010/0000876437-26-000010-index.htm
+- SEC 2026 Q1 Form 10-Q, filed 2026-04-29 (latest available share count used):
+  https://www.sec.gov/Archives/edgar/data/876437/000087643726000022/mtg-20260331.htm
+- MGIC investor relations press releases and 2026-07-23 quarterly dividend announcement.
+- Federal Reserve H.10 release dated 2026-01-05: 2025-12-31 rate 6.9931 CNY/USD.
+- Input valuation: Yahoo Finance yfinance market cap CNY 41,580,840,896.811035 as of 2026-08-03 and PE TTM 9.3875.
+
+4. Model override
+- Input hint ordinary_operating/applicable was rejected.
+- Filing facts show that the company principally writes private mortgage insurance and earns investment income on capital backing insurance risk.
+- Investment securities are linked to loss reserves, policy obligations, PMIERs, state capital rules, and GSE eligibility.
+- Final model: financial_insurance / requires_special_model.
+- Consequently all ordinary owner-earnback ranking fields remain null: discounted net cash, discounted cash profit, operating business price, owner earnback years, and market-cap-to-cash-profit.
+
+5. Financial extraction and conversion
+- Source filing units: USD thousands. First converted to absolute USD, then multiplied by 6.9931 CNY/USD.
+- Balance sheet: assets USD 6.639486bn; liabilities USD 1.491935bn; equity USD 5.147551bn; investments USD 5.807662bn.
+- Income: revenue USD 1.213636bn; net premiums earned USD 0.965812bn; net investment income USD 0.246258bn; net income USD 0.738347bn.
+- Cash flow: operating USD 0.852798bn; property/equipment additions USD 0.001025bn; financing USD -0.940285bn; dividends plus repurchases USD 0.921136bn.
+- Net margin = 738.347 / 1,213.636 = 0.6083759875. Gross margin is null because an insurance loss/expense structure has no comparable cost-of-sales/gross-profit measure.
+- Reported operating free cash flow = operating cash flow less property/equipment additions, but the report explicitly does not treat this as ordinary detachable cash profit.
+
+6. Insurance-specific facts
+- 2025 NIW USD 60.2bn; direct primary IIF USD 303.1bn; direct primary RIF USD 81.2bn.
+- Net incurred losses USD 48.903m = current/new-notice losses USD 204.082m less favorable prior-year reserve development USD 155.179m.
+- PMIERs available assets USD 5.7bn and excess over minimum USD 2.5bn.
+- Risk-to-capital 10.0:1; statutory policyholder position USD 5.740bn.
+- MGIC paid USD 800m to the holding company in 2025; this transfer remains subject to insurance regulation.
+
+7. Dividend forecast
+- Annualized declared run rate: USD 0.17 quarterly x 4 = USD 0.68/share.
+- Latest available filing share count: 211,490,268 shares as of 2026-04-24.
+- Translation rate used for the forecast: 6.776 CNY/USD, the latest Federal Reserve H.10 observation available in the research results before the valuation date.
+- Forecast cash dividend = 0.68 x 211,490,268 x 6.776 = CNY 974,479,478.06.
+- Forecast yield = 974,479,478.06 / 41,580,840,896.811035 = 0.0234357809.
+- This is an annualized scenario, not a company commitment; future board actions and share repurchases can change it.
+
+8. Data-quality decisions
+- Status set to complete because the special-model minimum fields, business story, asset/liability explanations, dividend forecast, and evidence are present.
+- Limitations retained for market-cap independent verification, currency translation, and dividend forecast uncertainty.
+
+9. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok; errors=[]

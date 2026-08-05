@@ -1,0 +1,92 @@
+task=stock_research
+company=Orange County Bancorp, Inc.
+ticker=OBT
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-04T20:32:17+08:00
+
+[skill_and_contract]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+
+[reuse_check]
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+prior_stock_research=missing
+decision=download and inspect primary 2025 filing
+
+[primary_sources]
+sec_10k_index=https://www.sec.gov/Archives/edgar/data/1754226/000110465926028308/0001104659-26-028308-index.htm
+sec_10k=https://www.sec.gov/Archives/edgar/data/1754226/000110465926028308/obt-20251231x10k.htm
+sec_filing_date=2026-03-16
+company_fy2025_release=https://investors.orangebanktrust.com/news-releases/news-release-details/orange-county-bancorp-inc-announces-record-earnings-fiscal-2025
+company_dividend_2026_02=https://investors.orangebanktrust.com/news-releases/news-release-details/orange-county-bancorp-inc-declares-cash-dividend-18
+company_dividend_2026_05=https://investors.orangebanktrust.com/node/11536/pdf
+market_source=config/input.json / Yahoo Finance yfinance
+
+[raw_file]
+path=stock_report/data/raw/filings/OBT/2025-12-31/obt-20251231x10k.htm
+source=SEC EDGAR
+
+[model_review]
+input_hint=ordinary_operating/applicable
+confirmed_model=financial_bank/requires_special_model
+reason=customer deposits, loans, securities and regulatory liquidity/capital are the banking operating system; detachable net cash and ordinary free-cash-flow earnback are not economically valid
+ordinary_owner_earnback_fields=null
+
+[key_usd_facts]
+total_assets=2659377000
+total_liabilities=2375013000
+total_equity=284364000
+loans_gross=1950284000
+loans_net=1921949000
+cash_and_due_from_banks=204232000
+available_for_sale_securities=419406000
+deposits=2310373000
+net_interest_income=104056000
+net_income=41614000
+cash_dividends_declared_2025=7099000
+net_interest_margin=0.0418
+nonperforming_loans=11130000
+nonperforming_loan_ratio=0.0057
+allowance_for_credit_losses=28335000
+acl_to_npl=2.5458
+net_chargeoff_ratio=0.0029
+cet1_ratio=0.1733
+tier1_ratio=0.1733
+total_capital_ratio=0.1858
+leverage_ratio=0.1267
+uninsured_deposits_approx=1300000000
+aum_approx=1900000000
+
+[conversion]
+protocol_currency=CNY
+fx_assumption_usd_cny=6.78
+fx_limitation=input did not provide the FX rate underlying market cap; 6.78 is an approximate public July 2026 USD/CNY level
+formula_cny_amount=usd_amount*6.78
+
+[derived]
+market_cap_cny=3460727529.702301
+pe_ttm=10.744382
+price_to_period_end_book=3460727529.702301/(284364000*6.78)=1.7949944052
+rough_average_roe=41614000/average(185531000,284364000)=0.1771204205
+forecast_quarterly_dividend_per_share_usd=0.18
+forecast_annual_dividend_per_share_usd=0.72
+shares_used=13368447
+forecast_dividend_cny=0.72*13368447*6.78=65259410.8752
+forecast_dividend_yield=65259410.8752/3460727529.702301=0.0188571363
+
+[protocol]
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+populate=protocol set commands used for each result section
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+validation_errors=[]
+
+[outputs]
+result=outputs/result.json
+report=outputs/report.md
+trace=outputs/trace.txt

@@ -1,0 +1,70 @@
+stock-research trace
+generated_at: 2026-08-04T23:53:35+08:00
+company: Lung Fung Group Holdings Limited (02290.HK)
+input_period: 2025-12-31
+effective_fiscal_period: 2026-03-31
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked configured raw filing, annual review, normalized facts, and prior stock research paths.
+- No filing metadata, annual fact pack, normalized facts, or prior stock research existed for 02290.HK/2025-12-31.
+- Therefore supplemented from public official disclosures.
+
+3. Primary sources reviewed
+- HKEX annual results announcement dated 2026-06-29:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0629/2026062902137.pdf
+  Used for identity, business, income statement, balance sheet, capex, store count, same-store sales, IPO proceeds, dividends, governance and risks.
+- HKEX listing/prospectus index and prospectus dated 2026-05-28:
+  https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=1000304597
+  Used as listing context and cross-check.
+- Company press release dated 2026-05-27:
+  https://www.lungfung.hk/%E6%96%B0%E8%81%9E%E7%A8%BF2026-05-27/press-release/
+  Used only as basis for the stated post-listing payout ratio of at least 50%.
+- Market valuation came unchanged from config/input.json: Tencent qt.gtimg.cn, timestamp 2026/08/03 09:47:54.
+
+4. Period decision
+- The input period 2025-12-31 is not the company's legal year-end.
+- Used FY2026 ended 2026-03-31 because it is the latest annual reporting period covering 2025-12-31 and was publicly available by the task generation date.
+- Recorded the mismatch in data_quality.incomplete_reasons.
+
+5. Model classification
+- Confirmed statement_model=ordinary_operating.
+- Business is product retail through stores/online/wholesale; inventory, leases, supplier credit and store capex are ordinary retail operating items.
+- owner_earnback_applicability=applicable.
+- IPO proceeds were a post-balance-sheet event and earmarked for growth uses; they were not treated as detachable cash.
+
+6. Currency conversion
+- Protocol requires absolute CNY yuan, while statements are in HKD.
+- Applied an approximate conversion rate of 1 HKD = 0.8635 CNY, based on a verifiable late-July 2026 historical market rate near the valuation date.
+- This is explicitly recorded as a limitation. Ratios derived wholly within the statements use original HKD and are FX invariant.
+
+7. Core calculations
+- gross_margin = 1,015,413 / 3,277,151 = 0.3098462659.
+- net_margin = 269,100 / 3,277,151 = 0.0821140070.
+- CNY core profit = HKD 300,933,000 * 0.8635 = CNY 259,855,645.50.
+- Sustainable cash-profit proxy = CNY 259,855,645.50 * 80% = CNY 207,884,516.40.
+- Discount rationale: missing full CFO statement, gross-margin dilution, expansion capex and retail cyclicality.
+- discounted_detachable_net_cash = 0 because balance-sheet cash was below bank debt/overdraft and other candidate assets were not demonstrably detachable.
+- operating_business_price = CNY 1,582,952,008.2473752 - 0 = CNY 1,582,952,008.2473752.
+- owner_earnback_years = market_cap_to_cash_profit = 1,582,952,008.2473752 / 207,884,516.40 = 7.6145738781.
+- Dividend scenario = HKD 300,933,000 * 50% * 0.8635 = CNY 129,927,822.75.
+- Forecast dividend yield = 129,927,822.75 / 1,582,952,008.2473752 = 0.0820794453.
+
+8. Missing data and status
+- The annual results announcement did not include a complete cash flow statement.
+- operating_cash_flow, financing_cash_flow and operating_free_cash_flow remain null.
+- Post-IPO capital structure cannot be reconciled exactly to the pre-IPO 2026-03-31 balance sheet.
+- Therefore data_quality.status=partial, despite protocol/formula validation passing.
+
+9. Protocol population and validation
+- Populated scalar fields using repeated protocol set commands.
+- Populated list fields using repeated protocol append commands.
+- Did not hand-write the complex result JSON.
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final protocol result: status=ok, errors=[].

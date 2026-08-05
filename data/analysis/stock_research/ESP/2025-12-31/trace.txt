@@ -1,0 +1,101 @@
+stock-research trace: ESP
+generated_at=2026-08-05T00:13:22+08:00
+input=config/input.json
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+set=all completed fields written through protocol CLI
+validate=status ok, errors=[]
+
+[reuse]
+annual_facts_json=missing
+annual_facts_md=missing
+raw_filing_metadata=missing
+decision=retrieve primary filings because no reusable annual fact package existed
+
+[identity_and_period]
+query=ESP
+issuer=Espey Mfg. & Electronics Corp.
+CIK=0000033533
+exchange=NYSE American
+fiscal_year_end=06-30
+input_observation_period=2025-12-31
+annual_statement_period=2025-06-30
+subsequent_check_period=2025-12-31 (unaudited six-month 10-Q)
+
+[primary_sources]
+SEC_10K=https://www.sec.gov/Archives/edgar/data/33533/000117494725001227/esp-20250630.htm
+SEC_10K_accession=0001174947-25-001227
+SEC_10K_filed=2025-09-16
+SEC_10Q=https://www.sec.gov/Archives/edgar/data/33533/000117494726000152/esp-20251231.htm
+Federal_Reserve_H10=https://www.federalreserve.gov/releases/h10/20250707/
+market_data=task input, Yahoo Finance yfinance, market cap date 2026-08-03
+
+[currency]
+result_currency=CNY
+FY2025_translation_rate=7.1636 CNY/USD (2025-06-30 observation in H.10 release dated 2025-07-07)
+dividend_forecast_rate=7.0432 CNY/USD (Federal Reserve December 2025 monthly average)
+method=USD statement values multiplied by applicable CNY/USD rate
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=single-segment power-electronics manufacturer; no interest-bearing borrowing; cash and fixed-income securities are not operating assets of a financial business
+special_handling=contract liabilities fund performance obligations; cash therefore discounted and not treated as wholly detachable
+
+[FY2025_USD]
+total_assets=79116564
+total_liabilities=28267564
+total_equity=50849000
+revenue=43950872
+cost_of_sales=31266241
+gross_profit=12684631
+operating_profit=8126686
+net_income=8142954
+operating_cash_flow=20991372
+capital_expenditure=4365403
+operating_free_cash_flow=16625969
+dividends_paid=2597354
+cash=18862645
+investment_securities=24717245
+accounts_receivable=7598888
+inventory=17842049
+property_plant_equipment_net=3960156
+contract_liabilities=22886404
+interest_bearing_debt=0
+
+[formulas]
+gross_margin=12684631/43950872=0.288609314
+net_margin=8142954/43950872=0.185274003
+operating_free_cash_flow=(20991372-4365403)*7.1636=119101791.53 CNY
+discounted_cash=18862645*7.1636*0.70=94587110.60 CNY
+discounted_securities=24717245*7.1636*0.95=168211233.47 CNY
+discounted_detachable_net_cash=262798344.07 CNY
+discounted_sustainable_cash_profit=7000000*7.1636=50145200.00 CNY
+operating_business_price=1196209240.2886047-262798344.07=933410896.22 CNY
+owner_earnback_years=933410896.22/50145200=18.614162
+market_cap_to_cash_profit=1196209240.2886047/50145200=23.854910
+discounted_net_cash_to_market_cap=262798344.07/1196209240.2886047=0.219693
+forecast_cash_dividend=2937343*1.00*7.0432=20688294.22 CNY
+forecast_dividend_yield=20688294.22/1196209240.2886047=0.017294879
+
+[normalization_judgment]
+FY2025 net income=8.143m USD
+less non-operating interest and related income approximately=1.3m USD pre-tax
+FY2025 OCF was boosted by contract-liability increase approximately=13.843m USD
+FY2026 H1 operating income=5.137m USD versus 3.744m USD prior-year H1
+selected sustainable cash profit=7.0m USD, balancing improved operating margin against non-repeatable working-capital inflow and capex needs
+
+[dividend]
+forecast=regular dividend 1.00 USD/share only
+special_dividend=0.75 USD/share excluded from forecast
+shares=2937343 at 2025-12-31
+
+[quality]
+status=complete
+period_limitation=annual statements end 2025-06-30, not input observation date 2025-12-31
+valuation_limitation=market cap/PE supplied by input; underlying quote snapshot not independently reproduced
+judgment_limitation=cash haircuts and sustainable cash profit are analyst estimates, not audited facts

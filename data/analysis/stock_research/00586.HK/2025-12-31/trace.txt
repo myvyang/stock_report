@@ -1,0 +1,54 @@
+stock-research trace
+company: 00586.HK / China Conch Venture Holdings Limited
+period: 2025-12-31 annual
+generated context date: 2026-08-03 Asia/Shanghai
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md in full.
+2. Ran protocol init:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated result fields using protocol set/append commands only.
+4. Final protocol validation recorded below after output construction.
+
+[reuse audit]
+- No raw filing, annual facts package, normalized facts, or prior stock-research output existed for 00586.HK/2025-12-31.
+- Downloaded official HKEX Annual Report 2025 to:
+  stock_report/data/raw/filings/00586.HK/2025-12-31/annual-report-2025.pdf
+- Extracted local text for evidence review to:
+  stock_report/data/raw/filings/00586.HK/2025-12-31/annual-report-2025.txt
+
+[primary sources]
+- HKEX Annual Report 2025, published 2026-04-21:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0421/2026042101432.pdf
+- HKEX Annual Results Announcement, published 2026-03-25:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0325/2026032501831.pdf
+- Market valuation input: config/input.json, source Tencent qt.gtimg.cn, timestamp 2026/07/31 16:08:47.
+
+[model decision]
+- Rejected input hint financial_brokerage: annual report identifies waste incineration/BOT, equipment, port logistics, building materials, new energy, and investment segments; no brokerage business model.
+- Selected platform_financial_mixed with requires_special_model.
+- Basis: interests in associates RMB39,829,502,000 (47.3% of total assets); associate profit RMB1,520,904,000 (61.9% of profit before tax); waste-incineration operating rights RMB20,589,826,000; BOT terms 16-45 years.
+- Ordinary owner-earnback fields intentionally kept null per result contract.
+
+[calculations]
+- gross_margin = 2,271,925,000 / 6,547,710,000 = 0.3469800892.
+- net_margin = 2,245,142,000 / 6,547,710,000 = 0.3428896515. Warning: numerator includes equity-accounted associate profit while revenue excludes associate revenue.
+- operating_free_cash_flow = 1,839,363,000 - 1,678,840,000 = 160,523,000.
+- minority_interest_ratio = 1,473,413,000 / 50,872,408,000 = 0.0289629105.
+- associate profit share of consolidated profit before tax = 1,520,904,000 / 2,455,622,000 = 61.94%.
+- associate dividend cash conversion proxy = 390,381,000 / 1,520,904,000 = 25.67%.
+- financing debt = bank loans 24,950,069,000 + MTN 4,000,000,000 + leases 29,623,000 = 28,979,692,000.
+- forecast dividend CNY proxy = 655,597,000, using FY2025 actual cash paid to company shareholders as a currency proxy for the announced unchanged HKD0.40/share annual dividend.
+- forecast_dividend_yield = 655,597,000 / 13,613,146,386.926174 = 0.04815910895.
+
+[limitations]
+- No project-by-project concession maturity, tariff, waste volume, maintenance capex, restricted cash, and project debt schedule was assembled; therefore no special-model earnback period is stated.
+- Dividend CNY amount is an approximation because declared dividends are in HKD and payment-date FX differs.
+- Market cap and PE TTM are accepted from the provided Tencent snapshot and are not audited filing figures.
+- PE includes equity-method earnings and is not a direct multiple of distributable cash from consolidated operations.
+
+[validation]
+Command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Result:
+{"status":"ok","errors":[]}

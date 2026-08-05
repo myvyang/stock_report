@@ -1,0 +1,76 @@
+stock-research trace
+company: 01373.HK / International Housewares Retail Company Limited
+requested_period: 2025-12-31
+annual_statement_period_used: 2025-04-30
+generated_context_date: 2026-08-03 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read result-contract.md and report-contract.md in full.
+- Read data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- No raw filing metadata, annual facts package, normalized facts, or historical stock-research result existed for 01373.HK/2025-12-31.
+- Downloaded the HKEX 2025 annual report PDF into stock_report/data/raw/filings/01373.HK/2025-12-31/annual_report_2025.pdf for source preservation.
+
+3. Model verification
+- Input hint said financial_brokerage/requires_special_model.
+- Audited annual report Note 1 says the group principally engages in retail sales and trading of housewares, trend-based items, personal care, food, and household FMCG.
+- No brokerage client money, proprietary securities portfolio, or repo-financing operating model was found.
+- Overrode hint with ordinary_operating/applicable.
+- Special accounting treatment retained: store lease principal is classified in financing cash flow and must be deducted when normalizing cash profit.
+
+4. Primary sources
+- HKEX 2025 Annual Report, published 2025-08-28:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2025/0828/2025082801864.pdf
+- HKEX interim results for six months ended 2025-10-31, published 2025-12-19:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2025/1219/2025121901093.pdf
+- PBOC 2025-04-30 central parity announcement:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/5695102/index.html
+- Market cap and PE TTM reused from config/input.json; source Tencent qt.gtimg.cn.
+
+5. Period and currency
+- Company year-end is 30 April, so the latest audited annual statements available by requested date 2025-12-31 are FY2025 ended 2025-04-30.
+- Post-year-end trend and dividend evidence taken from the interim period ended 2025-10-31.
+- Result contract requires CNY absolute yuan. Converted HKD statement values at PBOC 2025-04-30 central parity: 1 HKD = 0.92813 CNY.
+- Market cap was accepted as already supplied in contract currency.
+
+6. Core audited inputs, HKD'000
+- Revenue 2,536,822; cost of sales 1,369,930; gross profit 1,166,892.
+- Operating profit 73,929; group net profit 42,238; parent net profit 47,727.
+- Total assets 1,497,230; total liabilities 632,788; total equity 864,442; parent equity 865,451; NCI -1,009.
+- Operating cash flow 385,738.
+- PPE purchase 18,887 and intangible purchase 8,898; capex defined as 27,785.
+- Financing cash flow -418,323.
+- Lease principal repayment 337,350.
+- Cash 284,560; borrowings 15,114; NCI shareholder loan 7,449.
+
+7. Formula audit
+- Gross margin = 1,166,892 / 2,536,822 = 45.9982%.
+- Parent net margin = 47,727 / 2,536,822 = 1.88137%.
+- Discounted detachable net cash (HKD'000) = 284,560 * 80% - 15,114 - 7,449 = 205,085.
+- Discounted detachable net cash (CNY) = 205,085,000 * 0.92813 = 190,345,541.05.
+- Pre-discount normalized cash profit (HKD'000) = 47,727 + 33,972 + 315,199 + 6,272 - 27,785 - 337,350 - 1,447 government grants = 36,588.
+- Discounted sustainable cash profit uses 90% of normalized amount; rounding to disclosed thousand-unit inputs gives HKD 32.929m, or CNY 30,562,392.77.
+- Operating business price = CNY 423,388,044.205904 - 190,345,541.05 = 233,042,503.155904.
+- Owner earnback = 233,042,503.155904 / 30,562,392.77 = 7.6251 years.
+- Market cap / cash profit = 423,388,044.205904 / 30,562,392.77 = 13.8532.
+- Reported operating free cash flow = operating cash flow - capex = CNY 332,226,917.89, but this is not used as distributable cash because it excludes lease principal classified in financing cash flow.
+
+8. Dividend forecast
+- FY2026 interim dividend declared: HKD 0.03/share, total HKD 21.397m.
+- Forecast assumes final dividend HKD 0.015/share, equal to FY2025 final dividend.
+- Forecast full-year DPS HKD 0.045 * approximately 716.4m shares = HKD 32.238m = CNY 29,921,054.94.
+- Forecast yield = 29,921,054.94 / 423,388,044.205904 = 7.0671%.
+- Final dividend assumption is explicitly marked unannounced and uncertain.
+
+9. Data quality
+- Status set to complete because identity, model, market data, audited three statements, asset/liability interpretation, owner-earnback assumptions, dividend forecast, business story, risks, and evidence are populated.
+- Limitations record the non-calendar fiscal year, FX conversion, and forecast assumptions.
+
+10. Protocol operations
+- All result fields were populated using protocol set/append commands; the result object was not hand-written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

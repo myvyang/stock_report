@@ -1,0 +1,99 @@
+task=stock_research
+company=000411.SZ 英特集团
+period=2025-12-31
+generated_for=2026-08-01 Asia/Shanghai
+
+[skill_and_contract]
+read .agents/skills/stock-research/SKILL.md
+read .agents/skills/stock-research/references/result-contract.md
+read .agents/skills/stock-research/references/report-contract.md
+read .agents/skills/stock-research/references/data-reuse.md
+
+[local_reuse_check]
+config/input.json present
+annual facts package absent
+normalized facts absent
+prior stock research result absent
+raw filing absent
+decision: return to public annual-report disclosure because required core fields could not be reused locally
+
+[sources]
+1. 浙江英特集团股份有限公司2025年年度报告，公告日2026-04-23
+   disclosure mirror: https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?stockid=000411&id=12139214
+   PDF mirror referenced by disclosure page: http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESZ_STOCK/2026/2026-4/2026-04-23/12139214.PDF
+   used for business, statements, notes, dividend proposal, customer/supplier concentration, capex and risks
+2. company annual-report release page, 2026-04-22
+   https://www.intmedic.com/news/info/1170.html
+   used to verify report identity and company publication date
+3. config/input.json market snapshot
+   Tencent qt.gtimg.cn; timestamp=20260731114324
+   market_cap=5355000000; pe_ttm=11.14
+
+[model_check]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=business is pharmaceutical/device wholesale, retail and logistics; receivables, inventory, supplier payables and financing are ordinary operating-company economics. No customer deposits, insurance reserves, regulated presale cash or concession-right structure identified.
+special_caution=working-capital intensity means cash is not automatically detachable and accounting profit is not automatically distributable cash.
+
+[extracted_financials_CNY]
+total_assets=16777771146.29
+total_liabilities=10997002460.61
+total_equity=5780768685.68
+parent_equity=5104551225.10
+minority_interest=676217460.58
+revenue=33679107221.15
+cost_of_sales=31323339134.41
+gross_profit=2355768086.74
+operating_profit=857528350.72
+net_profit=604012381.77
+parent_net_profit=501237768.04
+operating_cash_flow=355669607.74
+capital_expenditure=237148859.11
+operating_free_cash_flow=118520748.63
+financing_cash_flow=555265593.86
+cash_and_cash_equivalents=1510556982.47
+restricted_cash=431236353.29
+receivables=7310276811.89
+inventory=4290041213.40
+short_term_borrowings=2923896082.50
+financing_liabilities_used=4012655624.35
+proposed_cash_dividend=199956597.68
+
+[formula_checks]
+gross_margin=(33679107221.15-31323339134.41)/33679107221.15=0.06994746242146861
+net_margin=501237768.04/33679107221.15=0.014882751040539157
+operating_free_cash_flow=355669607.74-237148859.11=118520748.63
+forecast_dividend_yield=199956597.68/5355000000=0.03734016763398693
+
+[owner_earnback_assumptions]
+cash_haircut=80%; reason: cash is needed for pharmaceutical distribution working capital and no disclosed minimum operating cash was available
+discounted_cash=1510556982.47*0.8=1208445585.976
+financing_debt_haircut=100%
+discounted_detachable_net_cash=1208445585.976-4012655624.35=-2804210038.374
+operating_business_price=5355000000-(-2804210038.374)=8159210038.374
+growth_capex_addback=103874635.38; source: disclosed 2025 investment in Shitang Pharmaceutical Industrial Park, not yet operational
+pre_haircut_cash_profit=118520748.63+103874635.38=222395384.01
+sustainability_haircut=90%; reason: working-capital volatility, capex classification uncertainty and minority cash-distribution constraints
+discounted_sustainable_cash_profit=222395384.01*0.9=200155845.609
+owner_earnback_years=8159210038.374/200155845.609=40.764285517360484
+market_cap_to_cash_profit=5355000000/200155845.609=26.754152414118714
+
+[fact_inference_judgment_separation]
+facts: statement values, segment mix, proposed dividend, restricted cash, disclosed project investment and customer/supplier concentration are annual-report facts.
+inference: ordinary operating model classification and the interpretation that receivables/inventory are distribution working capital.
+judgment: 80% cash haircut, growth-capex addback and 90% sustainability haircut. These are explicitly disclosed assumptions and are the principal sensitivity sources.
+
+[protocol]
+initialized outputs/result.json using:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+all result fields populated through protocol set commands; complex JSON was not authored as a standalone object from scratch.
+validation command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_result={"status":"ok","errors":[]}
+
+[limitations]
+No local facts package or raw filing was supplied.
+The annual-report full text was extracted from a public disclosure mirror and report identity/date were checked against the company website.
+Minimum operating cash was not disclosed.
+Maintenance and growth capex were not comprehensively separated by the company.
+Market cap and PE are a 2026-07-31 input snapshot, not 2025-12-31 values.

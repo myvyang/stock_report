@@ -1,0 +1,51 @@
+stock-research trace
+company: 01199.HK / 中远海运港口有限公司
+period: 2025-12-31 annual
+generated_at: 2026-08-03T15:39:01+08:00
+
+1. Read skill protocol and both required contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - also read data-reuse.md as directed by the skill.
+
+2. Reuse check:
+   - No annual facts package, normalized facts, raw filing metadata, or prior stock-research output existed for 01199.HK/2025-12-31.
+   - Initialized outputs/result.json with the protocol CLI; did not construct the schema manually.
+
+3. Primary sources retrieved and checked:
+   - COSCO SHIPPING Ports Limited Annual Report 2025, published 2026-03-18:
+     https://doc.irasia.com/listco/hk/coscoship/annual/2025/ar2025.pdf
+     Local copy: stock_report/data/raw/filings/01199.HK/2025-12-31/ar2025.pdf
+   - COSCO SHIPPING Ports 2025 Annual Results Presentation:
+     https://ports.coscoshipping.com/en/Investors/IRHome/CorporatePresentations/pdf/pre260318.pdf
+   - National Bureau of Statistics 2025 statistical communiqué for average USD/CNY:
+     https://www.stats.gov.cn/english/PressRelease/202602/t20260228_1962661.html
+   - Market data reused exactly from config/input.json (Tencent qt.gtimg.cn).
+
+4. Model review:
+   - Input hint financial_brokerage was rejected. Annual report confirms port terminal operations, no brokerage customer funds or securities financing business.
+   - Selected utility_concession / requires_special_model because terminal fixed assets, leases/concessions, project debt and equity-accounted terminal interests constitute the operating asset itself.
+   - Per result contract, ordinary discounted-net-cash and owner-earnback sortable metrics remain null.
+
+5. Currency conversion:
+   - Income statement and cash flow: 2025 average rate USD 1 = CNY 7.1429 (NBS).
+   - Balance sheet: period-end reference rate USD 1 = CNY 7.0288.
+   - Original financial statements are in USD; all result.json monetary values are absolute CNY yuan.
+
+6. Derived calculations:
+   - gross_margin = 415,530 / 1,669,017 = 0.2489669069.
+   - net_margin = 312,141 / 1,669,017 = 0.1870208632 (parent profit / revenue).
+   - operating_free_cash_flow = (611,634 - 198,289) USD thousand * 7.1429 = CNY 2,952,482,001.
+   - forecast dividend = parent profit CNY 2,229,591,949 * 40% = CNY 891,836,780.
+   - forecast yield = CNY 891,836,780 / CNY 18,418,223,016.961216 = 0.0484214345.
+   - Forecast is a flat-profit, unchanged-payout scenario, not company guidance.
+
+7. Key accounting caveat:
+   - Equity-accounted JV/associate profit was USD 343.404m while dividends received were USD 262.165m and classified in investing cash flow.
+   - Therefore consolidated operating cash flow less capex is not the same as distributable owner cash profit.
+
+8. Result population method:
+   - Used protocol CLI `set` and `append` commands for all structured fields and arrays.
+   - Final protocol validation: status=ok, errors=[].
+   - Confirmed all ordinary owner-earnback sorting fields remain null under requires_special_model.

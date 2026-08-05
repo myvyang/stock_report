@@ -1,0 +1,48 @@
+2026-08-04T12:11:43+08:00 INIT
+- Read stock-research SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+- Ran protocol init against config/input.json to create outputs/result.json.
+
+LOCAL_REUSE_CHECK
+- No annual facts, normalized facts, raw filing metadata, or prior stock-research output existed for TK/2025-12-31.
+- Downloaded SEC primary filing to stock_report/data/raw/filings/TK/2025-12-31/tk-20251231.htm.
+
+PRIMARY_SOURCES
+- SEC Form 20-F: https://www.sec.gov/Archives/edgar/data/911971/000091197126000015/tk-20251231.htm
+- SEC accession index: https://www.sec.gov/Archives/edgar/data/911971/000091197126000015/0000911971-26-000015-index.htm
+- Company Q1 2026 update: https://www.teekay.com/blog/2026/05/13/teekay-corporation-ltd-first-quarter-2026-update-and-declares-a-special-dividend/
+- Market cap and PE: config/input.json, sourced there to Yahoo Finance yfinance, dated 2026-08-03.
+
+MODEL_DECISION
+- Overrode ordinary_operating hint with investment_holding / requires_special_model.
+- Evidence: TK owns 30.7% economic interest but 54.8% voting power in public subsidiary TNK and consolidates it.
+- At 2025-12-31, NCI was USD 1,438.074m of USD 2,162.603m consolidated equity (66.5%).
+- Teekay Parent liquidity was USD 120.2m, had no debt, and primarily receives TNK dividends and interest.
+- Consequence: consolidated cash and cash flow are not detachable resources wholly attributable to TK shareholders. Ordinary owner earnback fields remain null.
+
+FINANCIAL_EXTRACTION (USD millions, audited 2025)
+- Revenue 949.520; voyage expense 317.373; vessel operating expense 238.856; charter hire 45.257.
+- Research-defined gross profit 348.034 = revenue minus those three direct cost groups; gross margin 36.6538%.
+- Operating income 302.814; consolidated net income 351.985; parent net income 98.111.
+- Total assets 2,360.070; liabilities 197.467; equity 2,162.603; parent equity 724.529; NCI 1,438.074.
+- Operating cash flow 301.767; disclosed segment capital expenditures 2.995; derived operating FCF 298.772.
+- Capital expenditure limitation: disclosed capex excludes vessel acquisitions presented in investing cash flows.
+
+CURRENCY
+- Result contract requires CNY absolute yuan.
+- Used a transparent research conversion assumption of USD 1 = CNY 7.00 for all filing and dividend amounts.
+- Preserved the input market cap CNY 6,840,365,043.454651 without retranslation.
+
+DIVIDEND_SCENARIO
+- 2025 actual TK cash dividends paid: USD 85.269m.
+- 2026 declared special dividend: USD 1.00/share, paid 2026-06-02.
+- Forecast field is a scenario, not guidance: 86,056,804 year-end shares * USD 1.00 * CNY 7.00 = CNY 602,397,628.
+- Scenario yield: 602,397,628 / 6,840,365,043.454651 = 8.8065%.
+
+PROTOCOL_WRITES
+- Initialized result using protocol CLI.
+- Populated result via protocol set commands; did not construct result.json manually.
+
+QUALITY_LIMITATIONS
+- No same-date TNK market capitalization and no latest parent-only net cash were supplied; special-model SOTP cannot be completed reliably.
+- Gross profit is a research definition because the issuer does not report a GAAP gross-profit subtotal.
+- Special dividend repetition is uncertain.

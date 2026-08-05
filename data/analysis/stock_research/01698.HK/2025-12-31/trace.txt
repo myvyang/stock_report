@@ -1,0 +1,63 @@
+[2026-08-04 Asia/Shanghai] stock-research trace for 01698.HK / FY2025
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+   - config/input.json present.
+   - No pre-existing annual facts, normalized facts, raw filing metadata, or prior stock-research result was available under stock_report for 01698.HK/2025-12-31.
+
+3. Company/model verification
+   - Official IR and SEC identify HKEX 1698 as Tencent Music Entertainment Group.
+   - 2025 Form 20-F describes QQ Music, Kugou Music, Kuwo Music and WeSing operations.
+   - No brokerage customer-fund/repo balance-sheet model exists.
+   - Overrode input hint financial_brokerage -> ordinary_operating; owner earnback applicability -> applicable.
+
+4. Primary sources retrieved
+   - SEC audited Form 20-F filed 2026-04-17:
+     https://www.sec.gov/Archives/edgar/data/1744676/000119312526160257/tme-20251231.htm
+     Local copy: stock_report/data/raw/filings/01698.HK/2025-12-31/tme-20251231.htm
+   - Company IR FY2025 results released 2026-03-17:
+     https://ir.tencentmusic.com/2026-03-17-Tencent-Music-Entertainment-Group-Announces-Fourth-Quarter-and-Full-Year-2025-Unaudited-Financial-Results
+   - Market snapshot reused exactly from config/input.json.
+
+5. Audited FY2025 facts used (CNY)
+   - Revenue 32,902m; cost of revenue 18,367m; gross profit 14,535m.
+   - Operating profit 13,364m; net profit 11,353m; parent net profit 11,056m.
+   - Total assets 102,522m; liabilities 19,472m; equity 83,050m; parent equity 80,287m; NCI 2,763m.
+   - Operating cash flow 10,231m.
+   - Capex = PP&E purchases 305m + intangible purchases 883m = 1,188m.
+   - Operating FCF = 10,231m - 1,188m = 9,043m.
+   - Cash 8,470m; term deposits 29,573m; notes payable 3,497m; lease liabilities 316m.
+   - FVOCI financial assets 26,231m; goodwill 20,521m; intangible assets 2,899m.
+
+6. Owner-earnback calculations
+   - Discounted cash/deposits = 8,470m + 29,573m * 95% = 36,564.35m.
+   - Discounted detachable net cash = 36,564.35m - 3,497m notes - 316m leases - 6,500m operating reserve = 26,252.35m.
+   - FVOCI listed securities excluded from detachable cash.
+   - Discounted sustainable cash profit = 9,043m FCF * 90% = 8,138.7m.
+   - Operating business price = 103,610.37729082286m market cap - 26,252.35m = 77,358.02729082286m.
+   - Owner earnback years = 77,358.02729082286m / 8,138.7m = 9.504884354392.
+   - Market cap / cash profit = 12.730580840538.
+
+7. Dividend
+   - Announced FY2025 aggregate dividend: USD368m.
+   - Converted using company announcement rate 6.9931 CNY/USD = CNY2,573.4608m.
+   - Yield on input market cap = 2.4837264857%.
+
+8. Protocol operations
+   - Initialized with:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - All structured-result updates were applied through protocol set commands.
+   - Validation command:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Validation result before report handoff: status=ok, errors=[].
+
+9. Explicit analytical assumptions
+   - 5% haircut on term deposits.
+   - CNY6.5bn operating liquidity reserve.
+   - 10% sustainability haircut on operating FCF.
+   - These are analyst scenarios, not company-reported values.

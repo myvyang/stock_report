@@ -1,0 +1,58 @@
+stock-research trace
+company: 06060.HK 众安在线财产保险股份有限公司
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated fields only through protocol `set` commands.
+4. Validated with protocol `validate`; initial populated result returned status=ok.
+
+[local reuse check]
+- Checked the input-declared raw filing, annual review, normalized facts, and historical stock research locations.
+- None of those files existed in the workspace; no prior annual facts were available to reuse.
+
+[model verification]
+- Input hint said financial_brokerage.
+- Official annual report identifies the company as an Internet-based property and casualty insurer and applies HKFRS 17.
+- Overrode model to financial_insurance / requires_special_model.
+- Ordinary owner earnback fields retained as null because investment assets support insurance liabilities, regulatory capital, and financing.
+
+[primary sources]
+1. HKEX annual report 2025, published 2026-04-28:
+   https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042803175.pdf
+   Key pages used: 3-4, 6, 9-30, 54, 77-82, 114, 139, 167-172.
+2. ZhongAn 2025 Q4 solvency report summary, published 2026-03-19:
+   https://static.zhongan.com/upload/online/material/1773908897720.pdf
+   Key page used: 12.
+3. Market snapshot from config/input.json:
+   Tencent qt.gtimg.cn; RMB 15,929,392,309.994102; PE TTM 15.18; 2026/08/03 09:47:29.
+
+[unit normalization]
+- Annual report financial statements use RMB'000. Every extracted accounting amount was multiplied by 1,000 and stored as absolute CNY yuan.
+- Percentages were stored as decimals where schema fields require ratios.
+
+[key calculations]
+- net_margin = 1,101,605,000 / 33,484,568,000 = 0.032899 (rounded).
+- forecast_dividend_yield = 0 / 15,929,392,309.994102 = 0.
+- price_to_book observation = 15,929,392,309.994102 / 25,449,264,000 = approximately 0.626.
+- market_cap / 2025 parent net profit = approximately 14.46.
+- market_cap / company-adjusted parent net profit = approximately 8.85; used only as narrative context, not an owner-earnback metric.
+- Asset analysis rows reconcile to total assets: 41,341,000,000 + 1,199,031,000 + 4,169,605,000 = 46,709,636,000.
+- Liability analysis rows reconcile to total liabilities: 7,253,668,000 + 8,547,855,000 + 5,458,849,000 = 21,260,372,000.
+
+[null policy]
+- gross_margin, cost_of_sales, gross_profit: not economically comparable under insurer HKFRS 17 presentation.
+- capital_expenditure and operating_free_cash_flow: not used as ordinary-company owner cash metrics for an insurer.
+- all ordinary owner-earnback values: null because applicability is requires_special_model.
+
+[dividend forecast]
+- 2025 final dividend: nil; 2024 comparator: nil.
+- Forecast cash dividend set to zero because no announced payout or stable payout history supports a positive forecast.
+
+[limitations]
+- The provided market quote is a third-party snapshot without its original raw response in the workspace.
+- Forecast dividend is an evidence-based extrapolation, not a board commitment.
+- ZA Bank/Peak3/ZA Life sit under an equity-accounted joint venture and are not consolidated line by line.

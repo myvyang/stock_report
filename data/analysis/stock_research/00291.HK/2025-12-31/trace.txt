@@ -1,0 +1,60 @@
+stock-research trace
+company: 00291.HK CHINA RES BEER
+period: 2025-12-31 annual
+generated_for: 2026-08-03 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- config/input.json exists.
+- The configured annual facts, normalized facts, raw filing metadata and prior stock-research outputs were absent in /workspace at research time.
+- No prior conclusion was reused.
+
+3. Primary sources retrieved
+- HKEX 2025 annual report, released 2026-04-23:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042300830.pdf
+- HKEX 2025 final results announcement, released 2026-03-23:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0323/2026032300265.pdf
+- Company results release page:
+  https://www.crbeer.com.hk/en/yf2026/2026-03-23/2370599.html
+- Market snapshot was supplied in config/input.json: Tencent qt.gtimg.cn, 2026/07/31 16:08:47.
+
+4. Model verification
+- Input hint said financial_brokerage/requires_special_model.
+- Filing shows revenue from beer and baijiu product sales, manufacturing assets, inventory, distributors, contract liabilities and ordinary bank debt.
+- No brokerage customer funds, proprietary securities portfolio or repo financing was found.
+- Model overridden to ordinary_operating/applicable.
+
+5. Core extraction (RMB)
+- Revenue 37,985m; cost of sales 21,625m; gross profit 16,360m.
+- Profit before tax 5,307m; net profit 3,174m; parent net profit 3,371m.
+- Total assets 68,633m; liabilities 32,669m; equity 35,964m; parent equity 32,262m; NCI 3,702m.
+- Operating cash flow 7,127m; purchases of fixed and right-of-use assets 1,799m; operating FCF 5,328m.
+- Financing cash flow -1,715m; dividends paid 2,764m.
+- 2025 declared dividend 3,313m / RMB1.021 per share.
+
+6. Research calculations
+- Gross margin = 16,360 / 37,985 = 43.043%.
+- Net margin = 3,371 / 37,985 = 8.874%.
+- Discounted detachable net cash:
+  cash 6,918m * 80% + bank wealth products 1,056m * 90% + relocation consideration receivable 3,099m * 60% - bank loans 2,711m - lease liabilities 93m - JV loan 600m = 4,940.2m.
+- Sustainable cash profit = OCF 7,127m - capex 1,799m - sustainability haircut 268m = 5,060m.
+- Operating business price = 66,034.245313m - 4,940.2m = 61,094.045313m.
+- Owner earnback = 61,094.045313 / 5,060 = 12.074 years.
+- Market cap / cash profit = 66,034.245313 / 5,060 = 13.050x.
+- Forecast dividend yield = 3,313 / 66,034.245313 = 5.017%, assuming 2025 dividend held flat.
+
+7. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields using repeated protocol `set` commands; complex result object was not hand-written from scratch.
+- Initial completed-result validation returned status ok with zero errors.
+
+8. Limitations
+- Market cap and PE were accepted from the task input and not independently reconstructed.
+- Cash and profit discounts are analyst assumptions, disclosed in result.json and report.md.
+- Dividend forecast is a flat-dividend baseline, not company guidance.

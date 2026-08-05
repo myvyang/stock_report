@@ -1,0 +1,62 @@
+[2026-08-04] stock-research trace — ADBE FY2025
+
+1. Input and protocol
+- Read config/input.json.
+- Read stock-research SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- The requested period is 2025-12-31, but Adobe FY2025 ended 2025-11-28. Used the FY2025 Form 10-K covering the requested annual period and disclosed this limitation.
+
+2. Reuse check
+- Checked stock_report/data/analysis/annual_review/ADBE/2025-12-31, raw filing path, normalized facts path, existing stock research path, and /root/aicode sync target.
+- No reusable ADBE facts, filing, or prior research files were present. Returned to primary public sources.
+
+3. Primary sources
+- Adobe FY2025 Form 10-K, filed 2026-01-15, accession 0000796343-26-000003:
+  https://www.sec.gov/Archives/edgar/data/796343/000079634326000003/adbe-20251128.htm
+- Adobe FY2025 annual report PDF:
+  https://www.adobe.com/cc-shared/assets/investor-relations/pdfs/adbe-2025-annual-report.pdf
+- PBOC/CFETS central parity announcement, 2025-11-28: USD 1 = CNY 7.0789:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/17105-2.html
+- Valuation snapshot was supplied by config/input.json: Yahoo Finance yfinance, market cap CNY 671,682,285,546.1875 on 2026-08-03, PE TTM 14.325516.
+
+4. Financial extraction (USD millions, FY2025 / 2025-11-28)
+- Balance sheet: assets 29,496; liabilities 17,873; stockholders' equity 11,623; cash 5,431; short-term investments 1,164; receivables 2,344; PP&E 1,873; ROU assets 312; goodwill 12,857; other intangibles 495; debt 6,210; deferred revenue 7,030.
+- Income statement: revenue 23,769; cost of revenue 2,551; gross profit 21,218; operating income 8,706; net income 7,130. Adobe reports no noncontrolling interest, so parent net income/equity equal consolidated amounts.
+- Cash flow: CFO 10,031; capex 179; operating FCF 9,852; financing cash flow -11,060; repurchase cash outflow 11,281; stock-based compensation 1,942; depreciation/amortization/accretion 818.
+- Dividend disclosure: no cash dividend anticipated in the foreseeable future.
+
+5. Currency conversion
+- All statement amounts converted to absolute CNY yuan with 7.0789 CNY/USD.
+- Formula: CNY amount = USD millions * 1,000,000 * 7.0789.
+- This period-end conversion is for normalized presentation, not an accounting average-rate translation.
+
+6. Model classification
+- statement_model = ordinary_operating.
+- owner_earnback_applicability = applicable.
+- Reason: software/cloud subscription operations; subscription is 96% of FY2025 revenue. Deferred revenue is an operating obligation, but there are no bank deposits, insurance reserves, regulated presale funds, concession assets, or other special-model balance-sheet features.
+
+7. Owner earnback calculations
+- Discounted cash = 5,431 * 80% * 7.0789 = CNY 30,756,404,720.
+- Discounted short-term investments = 1,164 * 95% * 7.0789 = CNY 7,827,847,620.
+- Debt deduction = 6,210 * 100% * 7.0789 = CNY 43,959,969,000.
+- Discounted detachable net cash = 30,756,404,720 + 7,827,847,620 - 43,959,969,000 = CNY -5,375,716,660.
+- Sustainable cash profit = (net income 7,130 + D&A/accretion 818 - capex 179) * 7.0789 = CNY 54,995,974,100.
+- SBC was not added back. Starting from GAAP net income retains SBC as an economic dilution cost.
+- FY2025 deferred-revenue cash inflow was not separately capitalized into sustainable profit.
+- Operating business price = 671,682,285,546.1875 - (-5,375,716,660) = CNY 677,058,002,206.1875.
+- Owner earnback years = 677,058,002,206.1875 / 54,995,974,100 = 12.3110466409.
+- Market cap / cash profit = 671,682,285,546.1875 / 54,995,974,100 = 12.2132991830.
+- Discounted net cash / market cap = -5,375,716,660 / 671,682,285,546.1875 = -0.0080033623.
+- Gross margin = 21,218 / 23,769 = 0.8926753334.
+- Net margin = 7,130 / 23,769 = 0.2999705499.
+
+8. Dividend forecast
+- Forecast cash dividend = CNY 0.
+- Forecast dividend yield = 0.0.
+- Basis: explicit FY2025 10-K statement that Adobe does not anticipate cash dividends in the foreseeable future. Repurchases are discussed separately and not classified as dividends.
+
+9. Output construction and validation
+- Populated the initialized protocol object using protocol `set` and `append` commands; did not hand-write result.json from scratch.
+- Wrote outputs/report.md and outputs/trace.txt.
+- Final formula audit and protocol validation performed after all outputs were written.

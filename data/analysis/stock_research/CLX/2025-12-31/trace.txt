@@ -1,0 +1,22 @@
+2026-08-05 stock-research trace — CLX
+
+1. Read the stock-research SKILL.md and the required result-contract.md and report-contract.md in full; also read data-reuse.md because the skill directly routes reuse decisions through it.
+2. Inspected config/input.json and searched the declared long-term stock_report paths. No CLX raw filing, annual fact pack, normalized fact pack, or prior stock-research output was present, so no prior facts could be reused.
+3. Initialized outputs/result.json with the protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Identified the issuer as The Clorox Company (NYSE: CLX, CIK 0000021076). Confirmed that its fiscal year ends June 30. Because input period=2025-12-31 and report_type=annual do not correspond to a Clorox fiscal year-end, used the latest complete audited annual statements, FY2025 ended 2025-06-30, and disclosed the period mismatch as a limitation.
+5. Primary sources retrieved and reviewed:
+   - SEC FY2025 Form 10-K: https://www.sec.gov/Archives/edgar/data/21076/000002107625000039/clx-20250630.htm
+   - SEC FY2025 Form 10-K Exhibit 99.1 (audited financials and MD&A): https://www.sec.gov/Archives/edgar/data/21076/000002107625000039/clx-20250630_d2.htm
+   - Clorox dividend release dated 2025-07-30: https://investors.thecloroxcompany.com/news/news-details/2025/Clorox-Increases-Quarterly-Dividend-to-1-24-Per-Share/default.aspx
+   - SEC FY2026 Q2 Form 10-Q was checked only to confirm that 2025-12-31 is an interim period, not used as an annual statement substitute: https://www.sec.gov/Archives/edgar/data/21076/000002107626000010/clx-20251231.htm
+6. Reconfirmed analysis model as ordinary_operating/applicable. Clorox's economics are branded product manufacturing and distribution, driven by receivables, inventory, plants, brands, advertising and trade promotion; no special financial-statement model applies.
+7. Extracted FY2025 USD millions: assets 5,561; liabilities 5,079; total equity 482; parent equity 321; NCI 161; revenue 7,104; COGS 3,891; gross profit 3,213; net earnings 824; parent earnings 810; CFO 981; capex 220; FCF 761; financing cash flow -924; dividends 602; buybacks 332.
+8. Currency normalization: config requires CNY absolute yuan but supplied no FX rate. Applied a uniform research assumption of CNY 7.20/USD to all filing and per-share amounts. Input market cap and PE were retained unchanged. This assumption is explicitly recorded in result limitations and report.
+9. Owner-earnback cash bridge (USD millions, then converted at 7.20): cash +167; interest-bearing debt -2,488; recognized Glad terminal obligation -501; detachable net cash = -2,822, or CNY -20,318,400,000.
+10. Sustainable cash-profit bridge (USD millions, then converted): FY2025 FCF 761; remove nonrecurring cyber insurance recovery 70; apply 90% sustainability factor to the remaining 691; result 621.9, or CNY 4,477,680,000.
+11. Formula checks: operating business price = 77,950,313,352.45703 - (-20,318,400,000) = 98,268,713,352.45703; owner earnback = 21.9463 years; market cap/cash profit = 17.4086; discounted net cash/market cap = -0.260658.
+12. Dividend forecast: annualized USD 1.24 x 4 x 122,309,414 shares x 7.20 = CNY 4,367,913,792.768; divided by input market cap = 5.60346%.
+13. Populated outputs/result.json exclusively through protocol CLI set operations after protocol initialization; did not construct the result object from scratch.
+14. Wrote outputs/report.md as a business narrative separating reported facts, inference, and judgment.
+15. Final protocol validation performed after file creation; see terminal validation result in task execution log.

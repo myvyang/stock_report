@@ -1,0 +1,55 @@
+stock-research trace
+company=000895.SZ 双汇发展
+period=2025-12-31 annual
+generated_at=2026-07-31T17:39:40+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields with protocol set commands.
+5. Validated with protocol validate; status=ok, errors=[].
+
+[reuse check]
+- Expected annual fact pack, normalized facts and prior stock-research outputs were absent in /workspace.
+- Sync target under /root/aicode also contained no usable 000895.SZ/2025-12-31 fact pack.
+- Returned to original filing and official disclosure as required by data-reuse policy.
+
+[primary sources]
+- CNINFO/SZSE annual report PDF:
+  https://static.cninfo.com.cn/finalpage/2026-03-25/1225028113.PDF
+  local copy: stock_report/data/raw/filings/000895.SZ/2025-12-31/annual-report.pdf
+- SZSE 2025 annual profit distribution announcement:
+  https://disc.static.szse.cn/disc/disk03/finalpage/2026-03-25/a6e735da-61df-4e0c-add4-67aeefbe5121.PDF
+- Input market snapshot: config/input.json, Tencent qt.gtimg.cn, timestamp 20260731114342.
+- Sina full-text mirror was used only to make the official annual-report PDF text searchable; core figures were attributed to the official filing.
+
+[model decision]
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Reason: core business is meat processing, slaughtering and related operating activities; inventory, factories and channels are ordinary operating assets.
+- Special handling: consolidated scope includes a finance company. Statutory reserves, restricted cash and customer/interbank funds were not treated as detachable cash.
+
+[core calculations]
+- gross_profit = 59,274,045,475.32 - 48,574,081,515.83 = 10,699,963,959.49
+- gross_margin = 10,699,963,959.49 / 59,274,045,475.32 = 0.180516849722
+- net_margin = 5,104,609,986.02 / 59,274,045,475.32 = 0.086118805374
+- operating_free_cash_flow = 7,352,441,262.38 - 900,176,633.66 = 6,452,264,628.72
+- unrestricted_cash = 4,969,475,416.63 - 627,755,644.65 = 4,341,719,771.98
+- discounted_short_investments = (300,097,232.88 + 30,000,000.00 + 4,334,661,805.55 + 3,255,993,742.04 - 45,000,000.00) * 0.90 = 7,061,178,611.22
+- discounted_long_cd = 905,813,611.11 * 0.80 = 724,650,888.89
+- financing_and_lease_debt = 9,720,261,935.02 + 414,225,075.90 + 9,808,690.36 + 202,290,586.81 = 10,346,586,288.09
+- discounted_detachable_net_cash = 4,341,719,771.98 + 7,061,178,611.22 + 724,650,888.89 - 10,346,586,288.09 = 1,807,961,875.20
+- discounted_sustainable_cash_profit = 4,939,376,972.88 * 0.95 = 4,692,408,124.24
+- operating_business_price = 90,358,000,000.00 - 1,807,961,875.20 = 88,550,038,124.80
+- owner_earnback_years = 88,550,038,124.80 / 4,692,408,124.24 = 18.87091570
+- market_cap_to_cash_profit = 90,358,000,000.00 / 4,692,408,124.24 = 19.25621080
+- forecast_cash_dividend baseline = 2,252,029,788.45 + 2,771,728,970.40 = 5,023,758,758.85
+- forecast_dividend_yield = 5,023,758,758.85 / 90,358,000,000.00 = 0.05559838
+
+[quality and limitations]
+- data_quality.status=complete
+- Annual dividend amount includes the annual-report distribution proposal, not a promise for 2026.
+- Cash discounts and the 5% sustainability haircut are analytical judgments, disclosed explicitly.
+- Consolidated public disclosure cannot fully reconstruct immediate parent-level transferability of every deposit and financial asset.

@@ -1,0 +1,77 @@
+task=stock_research
+company=GCT | GigaCloud Technology Inc
+period=2025-12-31
+generated_for_input=2026-08-04T19:41:28+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely as requested.
+3. Read references/data-reuse.md because the selected skill routes reuse decisions through it.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated initialized paths using protocol set/append commands; no complex JSON was authored from a blank file.
+6. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[reuse_and_source_discovery]
+- No files existed in the configured raw filing, annual review, normalized facts, or historical stock research locations for GCT/2025-12-31.
+- Attempted direct SEC PDF download; SEC returned HTTP 403 and local pdftotext was unavailable. No numbers were inferred from the failed download.
+- Used the SEC inline HTML Form 10-K, accession 0001857816-26-000018, filed 2026-02-26, as the primary audited filing source:
+  https://www.sec.gov/Archives/edgar/data/1857816/000185781626000018/gct-20251231.htm
+- Cross-checked headline statements and cash-flow rows against the company's FY2025 results release:
+  https://investors.gigacloudtech.com/news-releases/news-release-details/gigacloud-technology-inc-announces-fourth-quarter-and-year-0
+- Used config/input.json without alteration for market cap, date, source, and PE TTM.
+- Used 1 USD = 7.0288 CNY as the common 2025 year-end conversion reference. All result.json amounts are absolute CNY yuan.
+
+[model_review]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Revenue comes from third-party marketplace/logistics services and owned-inventory sales. There are no customer deposits, insurance reserves, regulated presale funds, or project finance structures. Operating leases and working capital are normal operating commitments/assets. Lease liabilities were paired with right-of-use assets rather than treated as detachable financing debt.
+
+[primary_usd_facts_thousands]
+total_assets=1,202,459
+total_liabilities=716,660
+total_equity=485,799
+minority_interest=0
+revenue=1,289,897
+cost_of_revenue=989,231
+gross_profit=300,666
+operating_income=144,976
+net_income=137,372
+operating_cash_flow=190,660
+capex=7,873
+operating_free_cash_flow=182,787
+financing_cash_flow=-67,780
+share_repurchases=67,403
+cash_and_equivalents=379,780
+restricted_cash=760
+short_term_investments=36,316
+interest_income=11,729
+depreciation_and_amortization=8,332
+
+[formula_checks]
+gross_margin = 300,666 / 1,289,897 = 0.2330930299
+net_margin = 137,372 / 1,289,897 = 0.1064984258
+operating_free_cash_flow = (190,660 - 7,873) * 1,000 * 7.0288 = CNY 1,284,773,265.60
+discounted_net_cash = (379,780 * 80% + 36,316 * 90%) * 1,000 * 7.0288 = CNY 2,365,250,241.92
+restricted_cash haircut = 100%; inventory, receivables, ROU assets haircut = 100% for detachable-cash purposes
+normalized_cash_profit_before_haircut = (137,372 - 11,729 + 8,332 - 7,873) * 1,000 * 7.0288 = CNY 886,345,737.60
+discounted_sustainable_cash_profit = CNY 886,345,737.60 * 90% = CNY 797,711,163.84
+operating_business_price = CNY 11,006,151,052.174805 - CNY 2,365,250,241.92 = CNY 8,640,900,810.254805
+owner_earnback_years = 8,640,900,810.254805 / 797,711,163.84 = 10.8321171897
+market_cap_to_cash_profit = 11,006,151,052.174805 / 797,711,163.84 = 13.7971631225
+discounted_net_cash_to_market_cap = 2,365,250,241.92 / 11,006,151,052.174805 = 0.2149025786
+forecast_cash_dividend=0; forecast_dividend_yield=0 because the 10-K says no cash dividends have ever been paid and none are anticipated for the foreseeable future.
+
+[judgment_notes]
+- FY2025 FCF was not used directly as sustainable cash profit because changes in accounts payable, accrued expenses, and other current liabilities supplied USD 52.906m of cash. The normalization avoids capitalizing that release indefinitely.
+- Interest income was removed because detachable financial assets are separately credited against market cap.
+- Actual capex was deducted; an additional 10% sustainability haircut covers uncertainty in maintenance capex, working capital, and margin cyclicality.
+- Cash received an 80% credit because owned-inventory sales, cross-border freight, and warehouse operations require material liquidity. Investments received a 90% credit; restricted cash received no credit.
+- Operating lease liabilities were not deducted as financial debt because their matched ROU assets and rent economics remain inside the operating business purchase price.
+- Buybacks are reported as shareholder cash outflow but not included in forecast dividend yield.
+
+[data_quality]
+status=complete
+limitations=No local annual fact pack; market data not independently reconstructed; common year-end FX used for both stock and flow figures; owner-earnback haircuts are analytical estimates and must be refreshed with subsequent operating data.

@@ -1,0 +1,83 @@
+task=stock_research
+query=FHI
+period=2025-12-31
+generated_at=2026-08-04T22:12:48+08:00
+
+[protocol]
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+write_method=protocol set commands; result skeleton was not hand-written
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validate_result=status ok; errors []
+
+[reuse_check]
+stock_report/data/analysis/annual_review/FHI/2025-12-31/facts.json=missing
+stock_report/data/analysis/annual_review/FHI/2025-12-31/annual_facts.md=missing
+stock_report/data/analysis/annual_review/FHI/2025-12-31/extraction_trace.txt=missing
+stock_report/data/raw/filings/FHI/2025-12-31=missing_or_empty
+decision=return to primary SEC filing and later SEC quarterly filing
+
+[primary_sources]
+1=https://www.sec.gov/Archives/edgar/data/1056288/000105628826000007/fhi-20251231.htm | Federated Hermes 2025 Form 10-K | filed 2026-02-27
+2=https://www.sec.gov/Archives/edgar/data/1056288/000105628826000018/fhi-20260331.htm | Federated Hermes Q1 2026 Form 10-Q | latest declared regular dividend
+3=https://www.federalreserve.gov/releases/h10/Hist/dat00_ch.htm | Federal Reserve H.10 daily CNY/USD
+4=https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10 | Federal Reserve H.10 annual CNY/USD
+5=config/input.json | market cap and PE from Yahoo Finance yfinance
+
+[model_classification]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+facts=principal revenue is investment advisory fees primarily based on AUM; customer AUM is not company balance-sheet property; no bank deposits, brokerage client funds, or insurance reserves
+special_handling=consolidated investment companies and seed capital distort cash-flow presentation; reserve cash for fund/VIE exposure
+
+[fx]
+balance_sheet_rate=6.9931 CNY/USD at 2025-12-31
+income_cashflow_rate=7.1875 CNY/USD 2025 annual average
+reason=period-end balance sheet translated at closing rate; annual flows translated at average rate
+
+[financial_facts_usd]
+unit=USD thousands unless stated
+total_assets=2229337
+total_liabilities=965860
+permanent_parent_equity=1196948
+redeemable_noncontrolling_interest=66529
+revenue=1800663
+operating_income=513882
+net_income_including_nci=414095
+parent_net_income=403299
+operating_cash_flow=297345
+capital_expenditure=2762
+dividends_paid=104872
+treasury_stock_purchases=262775
+cash_and_equivalents=582542
+long_term_debt=348369
+nonconsolidated_vie_maximum_loss_exposure=156800
+aum_usd_millions=902584
+money_market_aum_usd_millions=682604
+
+[owner_earnback]
+detachable_net_cash_usd=(582.542-348.369-156.800)m=77.373m
+detachable_net_cash_cny=77.373m*6.9931=541077126.30
+sustainable_profit_usd=360.000m
+sustainable_profit_bridge=403.299m parent net income - approximately 35.1m after-tax investment/securities income - approximately 8.2m cycle/model buffer
+sustainable_profit_cny=360m*7.1875=2587500000.00
+operating_business_price=30715027517.79492-541077126.30=30173950391.494923
+owner_earnback_years=30173950391.494923/2587500000=11.661430102993206
+market_cap_to_cash_profit=30715027517.79492/2587500000=11.870542035862771
+
+[dividend]
+latest_declared_quarterly_dividend_usd_per_share=0.38
+annualized_dividend_usd_per_share=1.52
+share_count_basis=76386966 Class B outstanding + 9000 Class A at 2025-12-31
+forecast_cash_dividend_cny=1.52*76395966*6.9931=812051837.348592
+forecast_dividend_yield=812051837.348592/30715027517.79492=0.026438258499951704
+
+[limitations]
+gross_margin=1.0 only because issuer reports no cost-of-sales line and classifies all costs as operating expense; not an economic cross-industry margin
+detachable_cash=analytical estimate, not a legal distributability test
+market_cap_and_pe=used as provided; not independently reconstructed
+2025 operating cash flow includes net purchases of consolidated investment companies and therefore is not used mechanically as sustainable cash profit
+
+[outputs]
+outputs/result.json=created_and_validated
+outputs/report.md=created
+outputs/trace.txt=created

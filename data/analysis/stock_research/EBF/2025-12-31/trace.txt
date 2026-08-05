@@ -1,0 +1,95 @@
+Stock research trace: EBF / Ennis, Inc.
+Research period requested: 2025-12-31
+Generated under: stock-research-result-v1
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md in full.
+- Read references/report-contract.md in full.
+- Read references/data-reuse.md because no local facts were present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- stock_report contained no EBF filing, annual-review facts, normalized facts, or prior stock-research result.
+- Therefore retrieved primary-source SEC filings rather than fabricating missing annual facts.
+
+3. Primary sources
+- FY2025 Form 10-K, fiscal year ended 2025-02-28, filed 2025-05-13:
+  https://www.sec.gov/Archives/edgar/data/33002/000095017025070268/ebf-20250228.htm
+- Results and financial information for quarter/nine months ended 2025-11-30, filed as Exhibit 99.1 on 2025-12-22:
+  https://www.sec.gov/Archives/edgar/data/33002/000119312525327862/ebf-ex99_1.htm
+- Market cap, market-cap date and PE TTM were supplied in config/input.json with source Yahoo Finance yfinance.
+
+4. Period handling
+- The requested period is calendar 2025-12-31, but Ennis has a February fiscal year-end.
+- Annual statement fields use audited FY2025 results ended 2025-02-28.
+- Later official information available within the requested research period, through 2025-11-30, updates cash, inventory, balance-sheet trend and dividend forecast.
+- The market-cap observation dated 2026-08-03 is accepted as task input but disclosed as later than the research period.
+
+5. Currency convention
+- Contract requires CNY absolute yuan; source financial statements are USD.
+- Input provided no FX rate. A consistent research translation rate of CNY 7.20/USD was used for all statement and forecast amounts.
+- This is a disclosed conversion convention, not represented as an official spot fixing.
+- Margins are calculated in source currency and are FX-neutral.
+
+6. Audited FY2025 source values and translations
+- Total assets: USD 348.935m x 7.20 = CNY 2,512,332,000.
+- Total liabilities: USD 46.955m x 7.20 = CNY 338,076,000.
+- Equity / parent equity: USD 301.980m x 7.20 = CNY 2,174,256,000.
+- Minority interest: zero; consolidated subsidiaries are wholly owned.
+- Revenue: USD 394.618m x 7.20 = CNY 2,841,249,600.
+- Cost of sales: USD 277.324m x 7.20 = CNY 1,996,732,800.
+- Gross profit: USD 117.294m x 7.20 = CNY 844,516,800.
+- Operating profit: USD 51.974m x 7.20 = CNY 374,212,800.
+- Net / parent net profit: USD 40.222m x 7.20 = CNY 289,598,400.
+- Operating cash flow: USD 65.855m x 7.20 = CNY 474,156,000.
+- Capital expenditure: USD 5.889m x 7.20 = CNY 42,400,800.
+- Operating free cash flow: (65.855 - 5.889)m x 7.20 = CNY 431,755,200.
+- Financing cash flow: USD -93.652m x 7.20 = CNY -674,294,400.
+- Dividends plus buybacks: (91.988 + 1.837)m x 7.20 = CNY 675,540,000.
+- Gross margin: 117.294 / 394.618 = 0.2972365903.
+- Net margin: 40.222 / 394.618 = 0.1019264403.
+
+7. Analysis-model decision
+- Confirmed ordinary_operating and owner-earnback applicable.
+- Evidence: one printing segment; ordinary manufacturing assets and working capital; no bank loans or bonds at FY2025 year-end; no customer deposits, insurance reserves, regulated project cash or concessions.
+
+8. Detachable cash calculation
+- Used later 2025-11-30 cash of USD 31.283m, not stale FY2025 cash plus investments of USD 72.475m.
+- Cash haircut: USD 31.283m x 80% = USD 25.0264m.
+- Quarterly release did not split lease liabilities. Used same-date ROU asset USD 10.647m as a proxy and deducted 100%.
+- Discounted detachable net cash = (25.0264 - 10.647)m x 7.20 = CNY 103,531,680.
+- Net cash / market cap = 103,531,680 / 3,721,537,843.272949 = 0.02781959675.
+
+9. Sustainable cash-profit calculation
+- Start FY2025 operating FCF: USD 59.966m.
+- Remove net working-capital release:
+  9.567 + 0.499 + 3.066 - 4.376 - 0.882 - 0.687 = USD 7.187m.
+- Remove estimated after-tax interest income: USD 4.872m x (1 - 15.232/55.454) = approximately USD 3.534m.
+- Remove stock-compensation cash-flow addback as an economic shareholder cost: USD 3.976m.
+- Normalized amount: approximately USD 45.269m.
+- Apply 10% sustainability haircut for secular volume decline and estimation error: approximately USD 40.7421m.
+- CNY discounted sustainable cash profit = 40.7421m x 7.20 = CNY 293,343,120.
+
+10. Owner earnback formulas
+- Market cap = CNY 3,721,537,843.272949.
+- Operating business price = 3,721,537,843.272949 - 103,531,680 = CNY 3,618,006,163.272949.
+- Owner earnback years = 3,618,006,163.272949 / 293,343,120 = 12.3336996146.
+- Market cap / cash profit = 3,721,537,843.272949 / 293,343,120 = 12.6866388696.
+
+11. Dividend forecast
+- Board declared another USD 0.25 quarterly dividend on 2025-12-18.
+- Forecast ordinary annual dividend = USD 1.00/share; excluded FY2025 USD 2.50 special dividend.
+- Shares proxy = 2025-11-30 nine-month basic weighted average 25,439,979.
+- Forecast cash dividend = 25,439,979 x USD 1.00 x 7.20 = CNY 183,167,848.80.
+- Forecast yield = 183,167,848.80 / 3,721,537,843.272949 = 0.04921831852.
+
+12. Protocol population and validation
+- Populated initialized outputs/result.json exclusively through repeated protocol `set` commands.
+- Initial validation result: status ok, errors [].
+- Final validation after report.md and trace.txt creation: status ok, errors [].
+
+13. Data-quality judgment
+- Set complete because the contract's required identity, valuation, model, three statements, assets/liabilities, owner-earnback breakdowns, dividend, business story and evidence are present.
+- Limitations explicitly record fiscal-period mismatch, valuation-date mismatch, FX convention, lease proxy and management-sourced market-position claim.

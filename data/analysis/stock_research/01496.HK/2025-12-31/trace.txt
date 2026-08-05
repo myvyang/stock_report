@@ -1,0 +1,79 @@
+stock-research trace
+company: 01496.HK / AP RENTALS
+requested_period: 2025-12-31
+actual_annual_report_period: 2025-03-31
+generated_at: 2026-08-04T15:20:22+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because no local annual facts package was available.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse check
+- Expected annual review, normalized facts, raw filing metadata and prior stock-research outputs were absent.
+- Only stock_report/data/notes/user_stock_evaluations.md existed and contained no required annual facts.
+- Therefore fetched the official HKEX annual report and used it as the core source.
+
+3. Core sources
+- HKEX Annual Report 2025:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2025/0730/2025073000321.pdf
+- HKEX Annual Results announcement:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2025/0626/2025062601572.pdf
+- 2025-03-31 CNY central parity, Xinhua reproducing CFETS-authorized release:
+  https://www.news.cn/20250331/936fa9fcea9f480782390983d6107051/c.html
+- Market snapshot supplied by input.json: Tencent qt.gtimg.cn, 2026/08/03 09:20:05.
+
+4. Model verification
+- Input hint financial_brokerage was rejected.
+- Annual report revenue is equipment leasing plus equipment/parts and rental-related services.
+- No brokerage client funds, proprietary securities book, repo funding, investment banking or asset-management business was found.
+- Final model: ordinary_operating; owner earnback applicability: applicable.
+- Rental fleet is core operating PPE and was not treated as detachable cash.
+
+5. Period and currency normalization
+- Company annual report is for year ended 2025-03-31; input period 2025-12-31 was corrected in result.analysis.period.
+- Financial statements are in HKD thousands.
+- Converted financial-statement amounts at 1 HKD = 0.92283 CNY, the 2025-03-31 central parity.
+- Market capitalization was retained as the input CNY amount, without reconversion.
+
+6. Key extracted HKD figures (HKD'000)
+- Revenue 160,224; cost of sales 113,774; gross profit 46,450.
+- Profit before tax 14,353; net profit attributable to owners 12,157.
+- Disposal gain on PPE 9,561; receivable ECL charge 2,847.
+- Total assets 339,125; total liabilities 105,066; equity attributable to owners 234,059.
+- Cash and equivalents 108,334; pledged deposit 360; PPE 153,584; machinery 146,174.
+- Current receivables/deposits/prepayments 42,035; inventories 21,580.
+- Borrowings 41,860; lease liabilities 7,946; deferred tax liabilities 18,545.
+- Operating cash flow 52,675; PPE purchases 44,230; PPE disposal proceeds 13,924.
+- Dividend cash paid 6,566; proposed FY2025 final dividend 6,048.
+
+7. Owner earnback assumptions and formulas
+- Operating cash reserve: HKD30.0m retained, 0% detachable.
+- Surplus cash HKD78.334m discounted at 90%.
+- Life-insurance policy deposit HKD3.112m discounted at 50%.
+- Borrowings HKD41.860m and lease liabilities HKD7.946m deducted at 100%.
+- Discounted detachable net cash = CNY20,533,521.20.
+- Normalized pre-working-capital operating cash after tax = (57.338m - 6.005m) HKD.
+- Maintenance capex proxy = FY2025 PPE depreciation HKD43.808m.
+- Discounted sustainable cash profit = (51.333m - 43.808m) * 0.92283 = CNY6,944,295.75.
+- Operating business price = market cap - discounted detachable net cash = CNY100,622,528.43.
+- Owner earnback years = operating business price / sustainable cash profit = 14.48995435.
+- Market cap / sustainable cash profit = 17.44684472.
+
+8. Dividend forecast
+- Forecast uses disclosed FY2025 proposed final dividend HKD6.048m with no growth extrapolation.
+- Forecast CNY dividend = 6.048m * 0.92283 = CNY5,581,275.84.
+- Forecast yield = CNY5,581,275.84 / CNY121,156,049.63 = 4.6067%.
+
+9. Protocol operations
+- All result fields were populated through repeated protocol `set` and `append` commands.
+- The complex result JSON was not handwritten from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[].
+
+10. Data-quality judgment
+- Status set to complete because identity, actual reporting period, market snapshot, model, three statements, asset/liability explanations, owner earnback, dividend forecast, business story and evidence are present.
+- Limitations retained in result.json: period correction, FX conversion, absent verified market share, and sensitivity to working-cash/maintenance-capex assumptions.

@@ -1,0 +1,57 @@
+task=stock-research AR 2025-12-31 annual
+generated_date=2026-08-05 Asia/Shanghai
+
+[protocol]
+init: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+populate: protocol set commands executed by outputs/populate.py for each result subtree
+validate: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[reuse]
+Checked stock_report annual_review/raw/normalized paths from config/input.json.
+No AR filing, annual facts package, normalized facts, or historical stock-research result existed in workspace.
+Supplemented from primary company/SEC sources.
+
+[primary_sources]
+SEC Form 10-K accession=0001104659-26-013386 filed=2026-02-11 url=https://www.sec.gov/Archives/edgar/data/1433270/000110465926013386/ar-20251231x10k.htm
+SEC Companyfacts CIK=0001433270 url=https://data.sec.gov/api/xbrl/companyfacts/CIK0001433270.json
+Company FY2025 results url=https://investors.anteroresources.com/sec-filings-email/content/0001104659-26-013420/tm265893d1_ex99-1.htm
+Federal Reserve G.5A url=https://www.federalreserve.gov/releases/g5a/current/
+Market cap/PE source=config/input.json (Yahoo Finance yfinance)
+
+[conversion]
+fx=7.1875 CNY per USD, Federal Reserve 2025 annual average.
+All 2025 filing USD amounts multiplied by 7.1875. Input market cap retained as supplied.
+
+[key_usd_facts]
+revenue=5,275,823,000
+costs_and_expenses=4,392,177,000
+operating_income=883,646,000
+parent_net_income=634,418,000
+noncontrolling_net_income=40,149,000
+operating_cash_flow=1,630,930,000
+oil_gas_explore_develop_cash=685,468,000
+oil_gas_property_acquisition_cash=253,128,000
+other_ppe_cash=5,407,000
+capital_expenditure_total=944,003,000
+operating_free_cash_flow=686,927,000
+noncontrolling_distributions=70,210,000
+long_term_debt=1,397,976,000
+restricted_cash=210,000,000
+free_cash=0
+
+[judgments]
+statement_model=ordinary_operating; upstream E&P is capital-intensive and cyclical but not a special financial-statement model under the contract.
+gross_profit=operating_income because the E&P statement has no manufacturing-style gross-profit subtotal; limitation disclosed.
+detachable_cash=0 because all year-end cash was restricted.
+discounted_net_cash=-long_term_debt; operating leases remain analyzed as operating obligations rather than duplicated as financing debt in this formula.
+sustainable_cash_profit=(OCF-all_capex-NCI_distributions)*75%.
+cycle_buffer=25%, reflecting commodity volatility and 2026 maintenance D&C guidance of USD 900m versus lower 2025 cash D&C.
+forecast_common_dividend=0; no common cash dividend in 2023-2025 and guidance prioritizes deleveraging/opportunistic repurchases.
+post_period_limitation=HG Energy acquisition and Ohio Utica disposition occur in 2026 and are outside 2025 audited statements.
+
+[formula_check]
+operating_business_price=74,975,986,639.73145-(-10,047,952,500)=85,023,939,139.73145
+owner_earnback_years=85,023,939,139.73145/3,324,490,078.125=25.5750317016
+market_cap_to_cash_profit=74,975,986,639.73145/3,324,490,078.125=22.5526275843
+

@@ -1,0 +1,66 @@
+stock-research trace
+generated_at: 2026-08-03T14:35:44+08:00
+query: 00306.HK
+requested_period: 2025-12-31
+report_type: annual
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Read references/data-reuse.md because SKILL.md directs reuse decisions.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields using repeated protocol `set` commands; result JSON was not composed from scratch.
+6. Validated with protocol validate; status returned ok and errors [].
+
+[reuse audit]
+- No annual facts package, normalized facts, or prior stock-research result was present at the configured 00306.HK/2025-12-31 paths.
+- Downloaded the primary annual report to stock_report/data/raw/filings/00306.HK/2025-12-31/annual-report-2024-25.pdf.
+- Primary filing: HKEX, Annual Report 2024/25, published 2025-07-29:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2025/0729/2025072901370.pdf
+- Market data reused exactly from config/input.json: CNY 1,119,766,485.8341217; PE TTM 5.37; timestamp 2026/07/31 16:08:46; source Tencent qt.gtimg.cn.
+
+[period decision]
+- Kwoon Chung Bus has a 31 March financial year end. There is no annual report ending 2025-12-31.
+- Used the latest complete annual filing ending before the requested period: FY ended 2025-03-31.
+- Market-cap date is about 16 months after the financial statements; preserved input valuation and disclosed mismatch as a limitation.
+
+[model decision]
+- Input hint financial_brokerage was rejected after primary filing review.
+- Filing shows five operating segments: non-franchised bus, limousine, franchised bus/PLB, Chinese Mainland tourism/bus, and others.
+- Final model: ordinary_operating; owner earnback applicability: applicable.
+- Main economic caveat: heavy fixed assets, passenger licences, recurring fleet capex, and material bank debt.
+
+[currency]
+- Filing presentation currency: HKD thousands.
+- Result contract currency: CNY absolute yuan.
+- Applied one analytical translation rate of HKD1 = CNY0.93 to all filing amounts for consistency and transparent reproducibility.
+- This is a simplifying analytical translation, not audited currency translation; no separate average income-statement rate was applied.
+- HKMA daily exchange-rate series methodology reference:
+  https://apidocs.hkma.gov.hk/documentation/market-data-and-statistics/monthly-statistical-bulletin/er-ir/er-eeri-daily/
+
+[core extraction: HKD thousand]
+- revenue 2,529,916; cost of services 1,868,029; gross profit 661,887.
+- operating profit 145,813; net profit 147,380; parent net profit 127,132.
+- total assets 4,872,202; total liabilities 2,715,830; total equity 2,156,372; parent equity 2,062,478; NCI 93,894.
+- operating cash flow 425,753.
+- capital expenditure 273,309, using annual-report segment definition: PPE additions including acquired subsidiary, leasehold land ROU additions, and deposits for PPE purchases.
+- operating free cash flow 152,444 (= 425,753 - 273,309).
+- cash and cash equivalents 436,955; pledged/restricted cash 65,475; bank borrowings 1,586,279; lease liabilities 171,029.
+- Evidence locations: annual report pp.16, 46, 48-53, 87-89, 102, 121, 125-128, 139-140.
+
+[formula audit]
+- gross_margin = 661,887 / 2,529,916 = 0.26162410135356273.
+- net_margin = 127,132 / 2,529,916 = 0.05025147079982102.
+- discounted investment amount = CNY 107,975,790 * 70% = CNY 75,583,053.
+- discounted detachable net cash = 406,368,150 + 75,583,053 - 1,475,239,470 = -993,288,267.
+- sustainable cash profit = CNY 100,000,000, conservatively below parent profit CNY 118,232,760 and operating FCF CNY 141,772,920.
+- operating business price = 1,119,766,485.8341217 - (-993,288,267) = 2,113,054,752.8341217.
+- owner earnback years = 2,113,054,752.8341217 / 100,000,000 = 21.130547528341218.
+- market cap / cash profit = 11.197664858341216.
+- forecast dividend = HKD0.04 * 476,776,842 shares * 0.93 = CNY17,736,098.5224.
+- forecast yield = 17,736,098.5224 / 1,119,766,485.8341217 = 0.015839104622950257.
+
+[quality]
+- result status: complete under protocol minimum requirements.
+- Important limitations are stored in result.json and discussed in report.md: period mismatch, valuation mismatch, analytical FX simplification, no verified market share, and corrected model hint.

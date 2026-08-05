@@ -1,0 +1,48 @@
+任务：01658.HK / PSBC / 2025-12-31 annual
+生成时区：Asia/Shanghai
+
+[协议]
+1. 完整读取 .agents/skills/stock-research/SKILL.md。
+2. 完整读取 references/result-contract.md 与 references/report-contract.md。
+3. 按技能复用规则补读 references/data-reuse.md。
+4. 使用协议 CLI init 从 config/input.json 初始化 outputs/result.json，未手写初始复杂 JSON。
+
+[数据复用检查]
+stock_report/data/analysis/annual_review/01658.HK/2025-12-31/ 下未发现可用 facts.json、annual_facts.md 或 extraction_trace.txt；normalized facts 亦不存在。因此回到原始官方披露。
+
+[官方来源]
+主来源：中国邮政储蓄银行 2025 年年度报告（英文），公司官网 PDF，发布日期 2026-04-15：
+https://www.psbc.com/en/investor_relations/announcement/202604/P020260415321448171211.pdf
+本地保存：stock_report/data/raw/filings/01658.HK/2025-12-31/2025-annual-report-en.pdf
+本地抽取：stock_report/data/raw/filings/01658.HK/2025-12-31/2025-annual-report-en.txt
+交叉核对：中国邮政储蓄银行发布 2025 年度业绩，2026-03-30：
+https://www.psbc.com/cn/gyyc/ycfm/ycdt/202603/t20260330_408907.html
+行情来源：config/input.json 内 Tencent qt.gtimg.cn 快照，时间 2026/08/03 09:48:09。
+
+[模型判断]
+复核结论：financial_bank；owner_earnback_applicability=not_applicable。
+理由：客户存款、客户贷款、债券投资、央行准备金与同业资产负债是银行经营结构；现金受准备金、流动性和资本监管约束，不是可剥离净现金。普通 owner earnback 数字均保持 null。
+
+[关键抽取；年报金额单位由人民币百万元换算为绝对元]
+总资产 18,682,067 百万元；总负债 17,519,722 百万元；总权益 1,162,345 百万元；归母权益 1,160,146 百万元；少数股东权益 2,199 百万元。
+营业收入 355,866 百万元；净利润 87,623 百万元；归母净利润 87,404 百万元。
+净利息收入 281,620 百万元；手续费及佣金净收入 29,365 百万元；其他非息收入 44,881 百万元。
+客户贷款总额 9,648,316 百万元；贷款净额 9,440,874 百万元；金融投资 6,358,153 百万元；客户存款 16,541,716 百万元。
+净息差 1.66%；不良贷款率 0.95%；拨备覆盖率 227.94%；CET1 10.53%；资本充足率 14.52%；加权平均 ROE 8.67%。
+2025 年普通股现金分红 26,217 百万元；每十股 2.183 元；派息率 30%。
+
+[计算]
+净利润率展示值 = 87,404,000,000 / 355,866,000,000 = 0.2456093024。该比率仅作收入到归母利润的描述，银行不使用毛利率。
+基准预测分红率 = 26,217,000,000 / 530,536,775,194.1621 = 0.0494159900。
+少数股东权益占比 = 2,199,000,000 / 1,162,345,000,000 = 0.0018918652。
+普通回本字段：按特殊模型协议全部为 null。
+
+[协议写入]
+使用 stock_analysis.stock_research.protocol set 逐字段/分支写入 analysis、analysis_model、metrics、financials、asset_analysis、owner_earnback、dividend、business、risks、evidence 与 data_quality。
+使用 stock_analysis.stock_research.protocol validate 校验 outputs/result.json；最终返回 status=ok、errors=[]。
+
+[限制]
+1. 本地原年度事实包缺失，本次以官方英文年报直接抽取。
+2. 市值和 PE 沿用输入行情快照，未独立复算。
+3. 2026 年基准分红采用 2025 年已披露全年金额且不假设增长，不是公司承诺。
+4. 银行经营现金流受存贷款变动影响，不作为普通自由现金流或可分配现金利润。

@@ -1,0 +1,56 @@
+stock-research trace
+task: PFG annual research, period 2025-12-31
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No existing PFG/2025-12-31 annual facts package or raw filing was present under the configured stock_report paths.
+- Downloaded the official 2025 Form 10-K HTML and SEC companyfacts JSON to stock_report/data/raw/filings/PFG/2025-12-31/.
+- SEC filing accession: 0001104659-26-017031.
+
+3. Protocol initialization
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All subsequent structured-result mutations used protocol set/append commands.
+
+4. Model review
+- Input hint ordinary_operating/applicable was rejected based on filing facts.
+- Confirmed model: financial_insurance.
+- Confirmed applicability: requires_special_model.
+- Key reason: USD 193.6226bn separate-account assets match USD 193.6226bn liabilities; contractholder funds and future policy benefits/claims are operating insurance obligations; investment assets and cash cannot be treated as detachable net cash.
+- Ordinary owner-earnback fields retained as null.
+
+5. Core filing facts (USD millions unless noted)
+- Total assets 341,376.5; liabilities 328,985.2; stockholders equity 11,917.0; common equity 11,883.9.
+- Revenue 15,625.5; net income 1,255.5; net income attributable to PFG 1,185.1.
+- Operating cash flow 4,536.7; common dividends paid 684.0; share repurchases 902.7.
+- General-account investments 110,901.5; cash 4,431.0; separate accounts 193,622.6.
+- Contractholder funds 45,380.3; future policy benefits and claims 51,749.7; funds withheld payable 17,783.4.
+
+6. Supplemental official facts
+- 2025 non-GAAP operating earnings USD 1,865.5m; excluding significant variances USD 1,929.7m.
+- AUM USD 781.0bn; AUA USD 1,814.6bn; annual AUM net cash flow USD -8.8bn.
+- Principal Life RBC 406%; excess and available capital USD 1.6bn.
+- Latest announced quarterly dividend as of task date: USD 0.84 on 2026-07-24.
+
+7. Currency and forecast
+- Used Federal Reserve H.10 2025 annual CNY/USD rate 7.1875 for consistent CNY reporting.
+- Forecast dividend = USD 0.84 x 4 x 217.4m year-end shares x 7.1875 = CNY 5,250,210,000.
+- Forecast yield = CNY 5,250,210,000 / CNY 164,271,273,638.00977 = 0.0319606.
+- Limitation: annual-average FX is used for both flow and balance-sheet presentation; forecast is a mechanical annualization, not company guidance.
+
+8. Sources
+- SEC 10-K: https://www.sec.gov/Archives/edgar/data/1126328/000110465926017031/pfg-20251231x10k.htm
+- SEC companyfacts: https://data.sec.gov/api/xbrl/companyfacts/CIK0001126328.json
+- PFG 2025 results/outlook: https://investors.principal.com/news-releases/news-release-details/principal-financial-group-announces-full-year-and-fourth-0
+- PFG dividend history: https://investors.principal.com/stock/dividend-history
+- Federal Reserve H.10: https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Market data: config/input.json, Yahoo Finance yfinance.
+
+9. Validation
+- Ran protocol validate after population.
+- Initial populated validation status: ok, errors: [].

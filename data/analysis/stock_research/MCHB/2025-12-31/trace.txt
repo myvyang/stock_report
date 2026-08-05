@@ -1,0 +1,68 @@
+stock-research trace: MCHB / 2025-12-31 annual
+generated_at_context: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the skill routes reuse decisions through that reference.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse check
+- Searched stock_report/data for paths containing MCHB.
+- No existing MCHB raw filing, annual fact package, normalized fact package, or prior stock-research output was present in /workspace.
+- Therefore retrieved the primary SEC filing rather than inventing or backfilling facts from third-party summaries.
+
+3. Company identity and model override
+- SEC CIK: 0001518715.
+- Primary annual filing: Mechanics Bancorp Form 10-K for year ended 2025-12-31, accession 0001518715-26-000026, filed 2026-03-16.
+- Filing URL: https://www.sec.gov/Archives/edgar/data/1518715/000151871526000026/hmst-20251231.htm
+- Filing states that Mechanics Bancorp is a financial holding company operating mainly through Mechanics Bank, a full-service bank.
+- Overrode input hint ordinary_operating/applicable with financial_bank/requires_special_model.
+- Per result contract, all ordinary owner-earnback fields remain null.
+
+4. Primary filing facts (USD, source: audited 2025 Form 10-K unless noted)
+- Total assets: 22,351,475,000.
+- Total liabilities: 19,489,100,000.
+- Total shareholders' equity: 2,862,375,000.
+- Cash and cash equivalents: 1,029,983,000.
+- Investment securities: 5,379,535,000 (AFS + HTM; trading securities are included in residual other assets in the structured grouping).
+- Net loans: 14,023,617,000; gross loans 14,176,936,000; ACL 153,319,000.
+- Deposits: 19,024,997,000; noninterest-bearing share 35%; insured deposits share 64%.
+- Long-term debt: 192,014,000.
+- Net interest income: 585,718,000; net interest margin 3.43%.
+- Net income: 265,739,000.
+- Bargain purchase gain: 145,460,000; acquisition and integration costs: 73,365,000.
+- Nonperforming assets: 51,796,000, or 0.23% of assets.
+- Company CET1: 14.09%; total risk-based capital: 16.27%; Bank CET1: 15.59%.
+- 2025 cash dividends paid: 48,561,000.
+- Merger closed 2025-09-02; 2025 includes combined company results only from that date through year-end.
+
+5. Currency conversion
+- Result contract requires absolute CNY yuan.
+- Used Federal Reserve H.10 China spot rate for 2025-12-31: 7.1875 CNY per USD.
+- URL: https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Converted all balance-sheet and income/cash-flow amounts recorded in result.json by multiplying USD by 7.1875.
+- Limitation recorded: income-statement amounts also use the period-end rate for protocol consistency, not an annual average rate.
+
+6. Dividend forecast
+- Latest declaration found in Mechanics Bancorp Form 8-K filed 2026-05-13, accession 0001518715-26-000048.
+- URL: https://www.sec.gov/Archives/edgar/data/1518715/000151871526000048/hmst-20260513.htm
+- Declared quarterly dividend: Class A USD 0.70/share; Class B USD 7.00/share.
+- Shares used: 220,190,561 Class A and 1,114,448 Class B at 2025-12-31 from Form 10-K.
+- Mechanical annualization: (220,190,561 * 0.70 + 1,114,448 * 7.00) * 4 = USD 647,738,114.80.
+- Converted forecast: CNY 4,655,617,700.125.
+- Forecast yield: 4,655,617,700.125 / 25,087,268,815.141113 = 0.1855769049405314.
+- This is explicitly characterized as a scenario, not guidance or a guaranteed dividend; it exceeds 2025 reported net income and is therefore a material limitation.
+
+7. Market data
+- Market cap CNY 25,087,268,815.141113, date 2026-08-03; PE TTM 13.432001.
+- Source exactly as supplied by task input: Yahoo Finance yfinance.
+- Market data was not reconstructed independently; limitation recorded in result.json and report.md.
+
+8. Output construction and validation
+- Complex JSON was not handwritten from scratch. It was initialized and populated using protocol CLI set/append commands.
+- report.md and trace.txt were created as human-readable outputs.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final cross-checks include JSON parsing, asset/liability component sums, required paths, null ordinary-bank earnback fields, and report/trace presence.

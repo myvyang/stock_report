@@ -1,0 +1,56 @@
+stock-research trace
+company: 江瀚新材 (603281.SH)
+period: 2025-12-31 annual
+generated_at: 2026-07-31T20:58:44+08:00
+
+1. Protocol
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields using protocol set commands; no hand-written result JSON was used.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation result: status=ok, errors=[].
+
+2. Reuse check
+- No annual facts, normalized facts, prior research result, or raw filing metadata existed for 603281.SH/2025-12-31.
+- Existing stock_report content only contained the user evaluation note, so primary disclosures had to be obtained.
+
+3. Primary sources
+- Shanghai Stock Exchange announcement API identified:
+  2025年年度报告, disclosure date 2026-04-21,
+  https://www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-21/603281_20260421_OZI7.pdf
+- Shanghai Stock Exchange announcement API identified:
+  2025年年度权益分派实施公告, disclosure date 2026-06-27,
+  https://www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-06-27/603281_20260627_5OP7.pdf
+- SSE direct PDF delivery returned an anti-bot challenge in this environment. Exact disclosures were retrieved through Eastmoney's PDF mirror using announcement IDs AN202604201821351287 and AN202606261824818430. Document title, issuer, security code, disclosure date, page count, and contents were checked against the SSE announcement index.
+- Market data was not refreshed: market cap CNY 10,321,000,000 and PE TTM 24.28 were copied from config/input.json, source Tencent qt.gtimg.cn, timestamp 20260731114322.
+
+4. Filing facts used
+- Revenue 1,858,464,234.15; cost 1,352,683,105.00; gross profit 505,781,129.15.
+- Parent net profit 418,251,182.75; operating profit 488,983,470.71.
+- OCF 433,765,051.24; capex 149,698,011.69; FCF 284,067,039.55.
+- Assets 5,240,406,268.19; liabilities 446,401,832.11; equity/parent equity 4,794,004,436.08; minority interest zero.
+- No period-end interest-bearing debt.
+- Cash-like assets: cash equivalents 1,002,828,705.66; deposits inside cash balance 2,190,112,657.53; one-year maturity deposits 218,532,054.79; long-term deposits and interest 468,590,452.05; bank acceptance guarantee 2,000,605.48.
+- Restricted-use but withdrawable IPO proceeds within cash equivalents: 451,839,611.41.
+- Implemented 2025 cash dividend: 363,258,747.00 on 2026-07-03.
+
+5. Calculations
+- gross_margin = (1,858,464,234.15 - 1,352,683,105.00) / 1,858,464,234.15 = 0.2721500473.
+- net_margin = 418,251,182.75 / 1,858,464,234.15 = 0.2250520484.
+- operating_free_cash_flow = 433,765,051.24 - 149,698,011.69 = 284,067,039.55.
+- discounted_cash_profit = 284,067,039.55 * 0.95 = 269,863,687.5725.
+- discounted_net_cash = unrestricted immediate cash 550,989,094.25 * 100% + regulated IPO proceeds 451,839,611.41 * 25% + deposits in cash balance 2,190,112,657.53 * 90% + one-year deposits 218,532,054.79 * 85% + long-term deposits 468,590,452.05 * 70% - implemented dividend 363,258,747 - estimated post-year-end remaining buyback 50,000,000 = 2,735,557,204.886.
+- operating_business_price = 10,321,000,000 - 2,735,557,204.886 = 7,585,442,795.114.
+- owner_earnback_years = 7,585,442,795.114 / 269,863,687.5725 = 28.1084.
+- market_cap_to_cash_profit = 10,321,000,000 / 269,863,687.5725 = 38.2452.
+- forecast/historical implemented dividend yield = 363,258,747 / 10,321,000,000 = 0.0351960805.
+
+6. Judgment boundaries and limitations
+- Statement model confirmed ordinary_operating based on the actual manufacturing model and statements; input hint was independently reviewed, not blindly copied.
+- Global scale leadership is issuer-reported and was not independently market-share verified.
+- CNY 50 million post-period buyback deduction is an estimate based on treasury shares rising from 8,034,587 at year-end to 10,074,587 before dividend implementation. Exact post-period cash paid was not verified in the two core documents.
+- All capex was deducted because maintenance versus growth capex could not be reliably split. This is conservative for current cash profit.
+- No target price, buy/sell recommendation, or ranking label was produced.

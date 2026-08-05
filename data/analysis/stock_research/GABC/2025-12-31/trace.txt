@@ -1,0 +1,73 @@
+Stock research trace — GABC — FY ended 2025-12-31
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Required instructions read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: initialized stock-research-result-v1 skeleton.
+
+3. Reuse audit
+- Expected annual review, normalized facts and raw filing paths for GABC/2025-12-31 were absent.
+- Only stock_report/data/notes/user_stock_evaluations.md existed under stock_report.
+- Therefore core facts were rebuilt from primary filings rather than inferred from the market-data hint.
+
+4. Primary sources acquired and checked
+- SEC Form 10-K, accession 0000714395-26-000011, filed 2026-02-27:
+  https://www.sec.gov/Archives/edgar/data/714395/000071439526000011/gabc-20251231.htm
+- SEC company facts for CIK 0000714395 used as an XBRL cross-check:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0000714395.json
+- Q4/FY2025 earnings release furnished on Form 8-K, filed 2026-01-26:
+  https://www.sec.gov/Archives/edgar/data/714395/000071439526000003/exhibit991q42025.htm
+- IRS yearly average exchange rates (2025 China yuan per USD = 7.129):
+  https://www.irs.gov/individuals/international-taxpayers/yearly-average-currency-exchange-rates
+- Market cap, date, PE TTM and market source were reused verbatim from config/input.json.
+
+5. Model override
+- Input hint: ordinary_operating / applicable.
+- Filing fact: German American Bancorp is a financial holding company whose principal subsidiary is a bank; net interest income on deposit-funded loans and securities is its primary revenue.
+- Final model: financial_bank / not_applicable.
+- Consequence: discounted net cash, discounted cash profit, operating business price, owner earnback years and market-cap-to-cash-profit remain null. Revenue, gross margin, net margin, operating cash flow, capex and ordinary free cash flow also remain null because they are not economically comparable to an ordinary operating company.
+
+6. Core USD facts from 2025 Form 10-K
+- Total assets: $8,388.780m
+- Total liabilities: $7,226.455m
+- Total shareholders' equity / parent equity: $1,162.325m
+- Loans net: $5,797.403m; gross loans: $5,884.448m
+- Allowance for credit losses: $77.694m
+- Available-for-sale securities fair value: $1,657.394m; amortized cost: $1,865.732m
+- Cash and cash equivalents: $118.382m
+- Deposits: $6,989.742m; FHLB advances and other borrowings: $182.683m
+- Goodwill plus intangibles: $409.260m
+- Net interest income: $294.132m; noninterest income: $67.312m
+- Net income attributable to shareholders: $112.635m
+- Cash dividends paid/declared in equity statement: $43.278m; $1.16/share
+- NIM 4.02%; reported ROA 1.37%; reported ROE 10.72%; efficiency ratio 52.28%
+- Nonperforming loans / loans 0.50%; ACL / loans 1.32%; net charge-offs / average loans 0.05%
+- Consolidated CET1 13.52%; Tier 1 capital 14.04%; total capital 14.93%; leverage 11.54%
+
+7. Currency conversion
+- Uniform display conversion: USD amount × 7.129 = CNY amount.
+- This is an annual-average translation for protocol comparability, not GAAP foreign-currency translation. No period-end-rate translation was mixed into the result.
+- Ratios remain dimensionless and were not translated.
+
+8. Dividend forecast
+- Latest declared quarterly dividend: $0.31/share.
+- Mechanical annualization: $0.31 × 4 × 37,495,679 year-end shares = $46,494,642.
+- CNY forecast: $46,494,642 × 7.129 = CNY331,460,302.53.
+- Forecast yield: CNY331,460,302.53 / CNY12,901,536,242.842896 = 2.5691538%.
+- This is not a board commitment and assumes no share-count change.
+
+9. Derived special-bank observations
+- Price / 2025 year-end book value = 12,901,536,242.842896 / 8,286,214,925 = 1.55699x.
+- Allowance / nonperforming loans = 77.694 / 29.411 = 264.17% (also reported by issuer).
+- Forecast annualized dividend / 2025 net income = approximately 41.28%.
+- These are narrative special-model observations, not ordinary owner-earnback ranking fields.
+
+10. Protocol population and validation
+- result.json fields were populated using repeated protocol `set` and `append` commands; the initialized object was not replaced by a handwritten JSON document.
+- Final validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report creation: {"status":"ok","errors":[]}

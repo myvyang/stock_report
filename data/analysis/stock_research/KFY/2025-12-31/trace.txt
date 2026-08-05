@@ -1,0 +1,88 @@
+KFY stock research trace
+generated_at=2026-08-04T22:23:28+08:00
+
+[protocol]
+init: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+population: all result fields populated through protocol set commands; result.json was not hand-written from scratch
+validate_initial: status=ok, errors=[]
+
+[period_mapping]
+input_period=2025-12-31
+statutory_fiscal_year_end=2025-04-30
+decision=Use Korn Ferry FY2025 Form 10-K because it was the annual filing available by the input research period. Use FY2026 Form 10-K only for dividend/share facts available before the 2026-08-03 valuation date.
+
+[source_1]
+title=Korn Ferry FY2025 Form 10-K
+url=https://www.sec.gov/Archives/edgar/data/56679/000162828025033260/kfy-20250430.htm
+filed=2025-06-27
+used_for=business model, segments, FY2025 income statement, balance sheet, cash flow, liquidity restrictions, dividends, risks
+key_locations=Item 1 Business; Item 7 MD&A; F-6 balance sheet; F-7 income statement; F-10 cash flows; Notes 11-15
+
+[source_2]
+title=Korn Ferry FY2026 Form 10-K
+url=https://www.sec.gov/Archives/edgar/data/56679/000005667926000021/kfy-20260430.htm
+filed=2026-06-26
+used_for=quarterly dividend of USD 0.55 and 50.857m shares outstanding, both known before market-cap date
+
+[source_3]
+title=Federal Reserve Foreign Exchange Rates G.5, April 2025
+url=https://fraser.stlouisfed.org/files/docs/releases/g5/g5_20250501.pdf
+used_for=USD/CNY monthly average 7.2968
+
+[source_4]
+title=Input market snapshot
+provider=Yahoo Finance yfinance
+market_cap_date=2026-08-03
+market_cap_cny=28233667156.26709
+pe_ttm=15.760536
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Revenue comes from consulting, digital talent products, executive/professional search, interim staffing and RPO. Deposits, insurance reserves, regulated project cash, concession assets or investment holdings are not the business itself.
+
+[currency]
+fx_cny_per_usd=7.2968
+method=Applied uniformly to FY2025 USD statement values and per-share dividend figures. This is a simplification; balance-sheet translation at the exact closing rate would differ.
+
+[gross_profit]
+reported_by_company=false
+formula_usd_thousands=total_revenue 2761086 - compensation_and_benefits 1758024 - reimbursed_expenses 30998 - cost_of_services 285075 = 686989
+gross_margin=686989/2761086=0.2488111562
+warning=Constructed service contribution measure; compensation includes consultants, executives and support personnel, so it is not comparable to product-company gross margin.
+
+[cash_profit]
+operating_cash_flow_usd_thousands=364362
+capital_expenditure_usd_thousands=62484
+operating_free_cash_flow_usd_thousands=301878
+stock_based_compensation_usd_thousands=47961
+sustainable_cash_profit_usd_thousands=253917
+sustainable_cash_profit_cny=1852781565.6
+formula=OCF - capex - stock-based compensation economic cost
+
+[detachable_cash]
+cash_and_marketable_securities_usd_millions=1277.0
+cash_and_securities_net_of_deferred_comp_trust_and_accrued_bonuses_usd_millions=667.3
+long_term_debt_usd_millions=397.736
+detachable_net_cash_usd_millions=269.564
+detachable_net_cash_cny=1966954595.2
+formula=667.3m - 397.736m
+
+[owner_earnback]
+operating_business_price_cny=28233667156.26709-1966954595.2=26266712561.06709
+owner_earnback_years=26266712561.06709/1852781565.6=14.1769073315
+market_cap_to_cash_profit=28233667156.26709/1852781565.6=15.2385298302
+discounted_net_cash_to_market_cap=1966954595.2/28233667156.26709=0.0696669896
+
+[dividend]
+quarterly_dividend_usd_per_share=0.55
+annualized_dividend_usd_per_share=2.20
+shares=50857000
+forecast_cash_dividend_cny=0.55*4*50857000*7.2968=816405386.72
+forecast_dividend_yield=816405386.72/28233667156.26709=0.0289160236
+warning=Board discretion; not guaranteed.
+
+[quality]
+status=complete
+known_limitations=input period differs from statutory year-end; valuation date is later than base financials; uniform monthly-average FX; constructed gross margin; third-party market snapshot; one-year cash-profit baseline
+

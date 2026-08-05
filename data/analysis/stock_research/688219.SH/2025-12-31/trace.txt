@@ -1,0 +1,81 @@
+stock-research trace
+company=688219.SH 会通股份
+period=2025-12-31 annual
+generated_at=2026-07-31T23:50:19+08:00
+
+[skill_and_contract]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+
+[reuse_check]
+local annual facts package: absent
+local normalized facts: absent
+local prior stock research: absent
+decision: obtain and parse the 2025 annual report
+
+[primary_filing]
+title=会通新材料股份有限公司2025年年度报告
+disclosure_date=2026-04-30
+source_url=https://dataclouds.cninfo.com.cn/shgonggao/hsomarket/2026/20260429/0067344538af49a8995b092738468132.PDF
+local_file=stock_report/data/raw/filings/688219.SH/2025-12-31/2025-annual-report.pdf
+pages=250
+audit_opinion=standard unqualified, 天健审〔2026〕10698号
+
+[protocol]
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+population=all result fields were written with protocol set/append commands; result JSON was not manually constructed
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validate_status=ok
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=procures resins/additives, manufactures customized modified materials, and sells directly to industrial customers; statements show ordinary manufacturing working capital, plants and financing
+
+[core_financials_cny]
+revenue=6489839256.00
+cost_of_sales=5597656025.98
+gross_profit=892183230.02
+parent_net_profit=194783295.94
+total_assets=7040622965.76
+total_liabilities=4032856031.35
+parent_equity=3001139242.19
+operating_cash_flow=521098200.49
+capital_expenditure=191995799.74
+operating_free_cash_flow=329102400.75
+gross_margin=892183230.02/6489839256.00=0.1374738564
+net_margin=194783295.94/6489839256.00=0.0300135779
+
+[discounted_net_cash_cny]
+cash_and_cash_equivalents=663314112.58 * 100%=663314112.58
+trading_financial_assets=20016027.40 * 90%=18014424.66
+restricted_cash=209878566.22 * 0%=0
+interest_bearing_and_lease_debt=1447049823.45 * 100%=-1447049823.45
+discounted_detachable_net_cash=-765721286.21
+note=restricted cash consists mainly of bank acceptance bill deposits and is excluded
+
+[sustainable_cash_profit_cny]
+operating_free_cash_flow=521098200.49-191995799.74=329102400.75
+working_capital_release=4583909.97-23479904.90+82437305.19=63541310.26
+normalized_before_haircut=329102400.75-63541310.26=265561090.49
+sustainability_haircut=20%
+discounted_sustainable_cash_profit=265561090.49*80%=212448872.392
+
+[owner_earnback]
+market_cap=5826000000.00
+operating_business_price=5826000000.00-(-765721286.21)=6591721286.21
+owner_earnback_years=6591721286.21/212448872.392=31.0273300677
+market_cap_to_cash_profit=5826000000.00/212448872.392=27.4230685925
+
+[dividend]
+forecast_cash_dividend=81802507.20
+forecast_basis=2025 board proposal, CNY 1.50 per 10 eligible shares
+forecast_dividend_yield=81802507.20/5826000000.00=0.0140409384
+status=proposal; actual amount may change with eligible shares
+
+[limitations]
+market cap and PE TTM are reused from config/input.json Tencent snapshot and were not independently reconstructed
+industry position relies mainly on company disclosure; no independently verified total market share was available
+sustainable cash profit is a transparent analytical estimate based on one annual period, not audited guidance

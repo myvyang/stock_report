@@ -1,0 +1,66 @@
+AMP stock research trace
+generated_at=2026-08-04T11:34:28+08:00
+period=2025-12-31
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- config/input.json present.
+- No existing raw filing, annual facts, normalized facts, or prior stock-research output was present for AMP/2025-12-31.
+- Therefore retrieved the official SEC filing rather than relying on third-party financial statement summaries.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized successfully from the task input.
+
+4. Primary sources
+- SEC 2025 Form 10-K, filed 2026-02-19:
+  https://www.sec.gov/Archives/edgar/data/820027/000082002726000011/amp-20251231.htm
+- Ameriprise FY2025 earnings release, dated 2026-01-29:
+  https://ir.ameriprise.com/news/news-details/2026/Ameriprise-Financial-Reports-Fourth-Quarter-and-Full-Year-2025-Results/default.aspx
+- Ameriprise dividend announcement, dated 2026-04-23:
+  https://ir.ameriprise.com/news/news-details/2026/Ameriprise-Financial-Increases-Regular-Quarterly-Dividend-6-Percent/default.aspx
+- Market capitalization and PE TTM: config/input.json, Yahoo Finance yfinance.
+
+5. Model determination
+- Input hint: ordinary_operating/applicable.
+- Overridden after filing review to platform_financial_mixed/requires_special_model.
+- Reason: consolidated statements contain wealth and asset-management fee operations plus bank deposits, investment certificates, insurance liabilities, separate accounts, derivatives, and regulated subsidiaries. Cash, investments, and GAAP operating cash flow cannot be treated as detachable cash or ordinary free cash flow.
+- Required ordinary owner-earnback fields left null.
+
+6. Core extracted USD figures (millions unless stated)
+- Revenue 18,911; pretax income 4,504; net income 3,563.
+- Total assets 190,904; total liabilities 184,355; equity 6,549.
+- Operating cash flow 8,323; capex 162; financing cash flow -5,157.
+- Dividends paid per cash-flow statement 596; repurchases 2,907.
+- AUM/AUA/advisement 1,694.2 billion; total AUM 1,297.8 billion.
+- Segment pretax adjusted operating earnings: AWM 3,411; Asset Management 1,016; RPS 846; Corporate & Other -396.
+- Adjusted operating earnings 3,858.
+- Subsidiary dividends/return of capital net of parent contributions 4,061.
+- Quarterly dividend announced April 2026: USD 1.70/share.
+
+7. Currency conversion and calculations
+- Fixed conversion used for protocol consistency: USD 1 = CNY 7.20.
+- Net margin = 3,563 / 18,911 = 18.840992%.
+- 2025 year-end shares = 338,058,287 issued - 246,794,407 treasury = 91,263,880.
+- Forecast annual dividend = 91,263,880 * USD 1.70 * 4 * 7.20 = CNY 4,468,254,365, rounded in result to CNY 4,468,254,000.
+- Forecast dividend yield = 4,468,254,000 / 325,606,259,849.8711 = 1.37227%.
+- Gross margin is null because no economically comparable gross profit exists for the mixed financial model.
+
+8. Structured-result construction
+- Used protocol set and append commands to populate initialized outputs/result.json.
+- Did not hand-write result.json from scratch.
+- Evidence records link claims to SEC/company primary sources.
+
+9. Known limitations
+- CNY translation rate is a fixed display convention, not a reporting-period average or closing accounting FX rate.
+- Market cap and PE are input-provided and their detailed per-share calculation was not reproduced.
+- GAAP operating cash flow less capex is disclosed but is not used as ordinary free cash flow because financial-contract and collateral flows materially affect it.
+
+10. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}

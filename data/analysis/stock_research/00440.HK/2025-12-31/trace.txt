@@ -1,0 +1,11 @@
+2026-08-03T14:19:00+08:00 | protocol init | PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2026-08-03 | reuse check | stock_report 下未发现 00440.HK/2025-12-31 的原始财报、年度事实包、标准化事实或历史股票研究结果，因此转向官方披露补证。
+2026-08-03 | contracts read | 已完整读取 SKILL.md、result-contract.md、report-contract.md、data-reuse.md。
+2026-08-03 | official filing | HKEX 2025 Annual Report, published 2026-04-28, https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042801102.pdf
+2026-08-03 | model verification | 年报分部与附属公司资料确认集团以银行业务为核心，兼有保险及投资；覆盖个人银行、企业银行、财资及环球市场、中国内地及澳门银行、保险及投资。覆盖输入的 financial_brokerage 提示，采用 financial_bank。
+2026-08-03 | financial extraction | 年报第125页综合收益表、第127页综合财务状况表、第256-258页分部资料、第203-205页信用风险、第342-345页保险与银行监管指标。
+2026-08-03 | FX conversion | 财报披露币种为港元；统一 JSON 按 1 HKD = 0.90486 CNY 换算，来源：中国人民银行 2025-12-26 人民币汇率中间价，https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+2026-08-03 | market data | 市值 13,708,028,874.420525 元、日期 2026/07/31 16:08:44、PE TTM 7.75，复用 config/input.json 的 Tencent qt.gtimg.cn 快照。
+2026-08-03 | analytical calculations | 净利率=归母净利润/总营运收入；预测分红采用 2025 全年每股股息对应约8.23亿港元，不假设增长；预测分红率=人民币换算股息/输入市值；P/B 仅在报告中以输入市值/换算归母权益粗算。
+2026-08-03 | special-model handling | 银行普通经营现金流、资本开支、自由现金流、毛利率及普通净现金回本字段不具可比意义，保持 null；改看资产质量、资本充足、盈利结构、账面折价和分红覆盖。
+2026-08-03 | output generation | result.json 通过 protocol set/append 填充；report.md 与 trace.txt 写入 outputs。

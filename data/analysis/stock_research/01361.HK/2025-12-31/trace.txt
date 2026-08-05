@@ -1,0 +1,71 @@
+stock-research trace
+company: 361 Degrees International Limited (01361.HK)
+period: 2025-12-31 annual
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Protocol initialization
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   result: initialized stock-research-result-v1 skeleton.
+
+2. Local reuse check
+   checked:
+   - stock_report/data/analysis/annual_review/01361.HK/2025-12-31/facts.json
+   - stock_report/data/analysis/annual_review/01361.HK/2025-12-31/annual_facts.md
+   - stock_report/data/analysis/annual_review/01361.HK/2025-12-31/extraction_trace.txt
+   - stock_report/data/analysis/stock_research/01361.HK/2025-12-31/result.json
+   finding: no existing annual facts or prior stock-research result was available.
+
+3. Official filing retrieval
+   source: HKEX Annual Report 2025
+   url: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0408/2026040800800.pdf
+   release_date: 2026-04-08
+   local_pdf: stock_report/data/raw/filings/01361.HK/2025-12-31/annual-report-2025.pdf
+   local_text: stock_report/data/raw/filings/01361.HK/2025-12-31/annual-report-2025.txt
+   note: PDF text extracted with pypdf in a temporary virtual environment because pdftotext was unavailable.
+
+4. Model verification
+   input hint: financial_brokerage / requires_special_model.
+   filing facts: designs, manufactures and distributes sports footwear/apparel through distributors and e-commerce; no brokerage customer funds, proprietary financial assets or repo financing.
+   conclusion: override hint with ordinary_operating / applicable.
+
+5. Core source locations in Annual Report 2025
+   - profit and loss: PDF pp.123-124
+   - financial position: PDF pp.125-126
+   - cash flows: PDF pp.128-129
+   - business model and stores: MD&A pp.20-24, 42-47
+   - revenue and margin breakdown: MD&A pp.59-64
+   - liquidity and working capital: MD&A pp.65-71
+   - inventory: Note 16, PDF p.174
+   - receivables and prepayments: Note 17, PDF pp.175-176
+   - cash: Note 18, PDF pp.177-179
+   - payables and loans: Notes 19-21, PDF pp.180-184
+   - dividends: Note 24, PDF pp.188-189
+
+6. Calculations (RMB yuan)
+   gross_margin = 4,628,536,000 / 11,145,829,000 = 0.4152706811
+   net_margin = 1,308,884,000 / 11,145,829,000 = 0.1174326288
+   operating_free_cash_flow = 814,615,000 - 285,219,000 = 529,396,000
+   discounted_cash = 4,093,846,000 * 70% = 2,865,692,200
+   discounted_net_cash = 2,865,692,200 - 299,001,000 - 10,471,000 = 2,556,220,200
+   discounted_cash_profit = 529,396,000 * 90% = 476,456,400
+   operating_business_price = 8,708,877,166.374325 - 2,556,220,200 = 6,152,656,966.374325
+   owner_earnback_years = 6,152,656,966.374325 / 476,456,400 = 12.9133682880
+   market_cap_to_cash_profit = 8,708,877,166.374325 / 476,456,400 = 18.2784346403
+   forecast_dividend_yield = 588,998,000 / 8,708,877,166.374325 = 0.0676319104
+
+7. Assumption notes
+   - Cash is discounted to 70% because almost all cash is in mainland China, remittance is restricted, potential withholding tax exists, and operating working capital is material.
+   - Bank and lease debt are deducted at 100%.
+   - Sustainable cash profit starts from 2025 operating free cash flow, not accounting earnings, then receives a further 10% haircut because 2024 operating free cash flow was negative.
+   - Dividend forecast holds 2025 RMB cash dividend flat; it is not management guidance.
+
+8. Market data
+   source: config/input.json supplied snapshot / Tencent qt.gtimg.cn
+   market_cap: 8,708,877,166.374325
+   date: 2026/07/31 16:08:42
+   pe_ttm: 6.99
+   limitation: not independently rechecked against an exchange closing-price series.
+
+9. Validation
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: status ok; errors [].

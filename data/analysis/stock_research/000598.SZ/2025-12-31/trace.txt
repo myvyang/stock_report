@@ -1,0 +1,44 @@
+stock-research trace
+company=000598.SZ 兴蓉环境
+period=2025-12-31
+generated_at=2026-08-01T03:56:49+08:00
+
+[protocol]
+1. Read stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because no annual facts, normalized facts, prior research, or raw filing package existed in stock_report for this company/period.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields using protocol set commands; complex result JSON was not created from a blank handwritten object.
+6. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[sources consulted]
+1. Chengdu Xingrong Environment Co., Ltd. 2025 Annual Report, disclosed 2026-04-28.
+   Search/display copy: https://pdf.dfcfw.com/pdf/H2_AN202604271821633447_1.pdf
+   Filing download mirror linked from the announcement page: https://file.finance.sina.com.cn/211.154.219.97%3A9494/MRGG/CNSESZ_STOCK/2026/2026-4/2026-04-28/12225720.PDF
+   Used for: company identity; business model and capacity; revenue composition and margins; audited statements; asset/liability details; concession model; dividend proposal; risks.
+2. 2025 audit report, Tianjian Audit [2026] No. 11-433, embedded in annual report and separately disclosed.
+   Used for: unmodified opinion; key audit matters on revenue recognition and construction in progress.
+3. config/input.json.
+   Used for: market cap CNY 21,664,000,000; timestamp 20260731114254; source Tencent qt.gtimg.cn; PE TTM 10.7.
+
+[model decision]
+Input hint ordinary_operating/applicable was overridden.
+Final model: utility_concession / requires_special_model.
+Basis: more than 50 concession projects, mainly 25-30 years, operated under BOO/BOT/TOT; fixed assets + construction in progress + intangible assets totaled CNY 38.117bn; project charging rights and receivables secure some long-term borrowings. Cash, debt, construction spending, and charging assets form one operating system.
+Consequence: discounted detachable net cash, discounted sustainable cash profit, operating business price, owner earnback years, and market-cap-to-cash-profit remain null by contract.
+
+[calculations]
+gross_profit = 9,067,634,073.35 - 5,067,557,302.51 = 4,000,076,770.84
+gross_margin = 4,000,076,770.84 / 9,067,634,073.35 = 0.4411378689
+net_margin = 2,005,011,770.27 / 9,067,634,073.35 = 0.2211174110
+operating_free_cash_flow = 3,700,670,021.70 - 3,366,477,493.60 = 334,192,528.10
+forecast_cash_dividend = 2,984,008,721 * 0.2352 = 701,838,851.18
+forecast_dividend_yield = 701,838,851.18 / 21,664,000,000 = 0.0323965496
+Note: operating free cash flow is reported as a mechanical cash-flow subtotal only. It is not treated as sustainable distributable cash profit because maintenance and expansion capex are not separable from available disclosures.
+
+[quality]
+data_quality.status=complete because the special-model minimum fields, business story, asset/liability explanations, dividend forecast, and evidence are present.
+Limitations are explicitly recorded: no project-by-project remaining concession term, maintenance capex, or debt-service schedule; dividend is a proposal; market snapshot was not independently revalidated against exchange tick data.

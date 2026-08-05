@@ -1,0 +1,65 @@
+stock-research trace
+company: 002479.SZ 富春环保
+period: 2025-12-31 annual
+generated_at: 2026-07-31 Asia/Shanghai
+
+1. Read protocol and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized result through protocol CLI
+- PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+- No local raw filing, annual facts package, normalized facts, or prior stock-research output existed for 002479.SZ/2025-12-31.
+- Therefore retrieved the official filing from CNINFO rather than inventing missing annual facts.
+
+4. Official filing lookup
+- CNINFO hisAnnouncement query returned:
+  announcementId=1225104629
+  title=2025年年度报告
+  date=2026-04-15
+  url=https://static.cninfo.com.cn/finalpage/2026-04-15/1225104629.PDF
+- PDF length: 195 pages. Text extracted locally for inspection.
+
+5. Key facts checked against annual report
+- Revenue 5,354,235,645.65
+- Cost of sales 4,389,015,490.36
+- Parent net profit 203,321,538.66
+- Deducted parent net profit 109,109,971.15
+- Operating cash flow 637,258,258.46
+- Capital expenditure 229,420,394.04
+- Total assets 8,355,067,783.42
+- Total liabilities 3,923,775,178.97
+- Parent equity 4,173,993,556.05
+- Minority interest 257,299,048.40
+- Cash and cash equivalents 647,790,571.96
+- Interest-bearing borrowings used in owner earnback 2,601,292,361.03
+- Proposed 2025 cash dividend 86,500,000.00
+
+6. Model determination
+- ordinary_operating / applicable.
+- Reason: operating revenue is earned from heat, power, and resource-recycling products. No customer deposits, insurance reserves, regulated presale cash, or look-through holding-company structure.
+- Heavy fixed assets, inventory, and restricted cash were treated as operating/encumbered assets, not detachable cash.
+
+7. Owner earnback bridge
+- discounted available cash = 647,790,571.96 * 0.80 = 518,232,457.57
+- discounted detachable net cash = 518,232,457.57 - 2,601,292,361.03 = -2,083,059,903.46
+- sustainable cash profit = 203,321,538.66 - 94,211,567.51 + 40,890,028.85 = 150,000,000.00
+- operating business price = 4,610,000,000.00 - (-2,083,059,903.46) = 6,693,059,903.46
+- owner earnback years = 6,693,059,903.46 / 150,000,000.00 = 44.620399
+- market cap / cash profit = 4,610,000,000.00 / 150,000,000.00 = 30.733333
+- forecast dividend yield = 86,500,000.00 / 4,610,000,000.00 = 0.0187635575
+
+8. Result population
+- Used protocol CLI set operations for all result.json sections; did not hand-write the initialized JSON structure.
+
+9. Validation
+- Protocol validation command executed after report and trace creation; outcome recorded in final task response.
+
+Limitations
+- Market cap and PE were supplied by config/input.json and not independently reconstructed.
+- Sustainable cash profit contains a disclosed judgment on partial normalization of unusually high 2025 impairments.
+- Company-stated industry scale was not converted into an unverified national ranking.

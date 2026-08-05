@@ -1,0 +1,82 @@
+stock-research trace
+company=601600.SH 中国铝业
+period=2025-12-31
+generated_for_input=2026-07-31T15:47:22+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the skill required prioritizing existing facts.
+4. Checked configured annual facts, normalized facts, raw filings, and prior stock-research paths. No reusable annual-review or filing files existed in the workspace.
+5. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+6. Populated the initialized result through repeated protocol set commands.
+7. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[sources]
+primary_filing=https://www.chalco.com.cn/tzzgx/thygg/202603/P020260330341392300660.pdf
+company_filing_landing=https://www.chalco.com.cn/tzzgx/thygg/202603/t20260330_166168.html
+filing_html_locator=https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12029708
+market_snapshot=config/input.json; Tencent qt.gtimg.cn; timestamp 20260731114333
+
+[financial extraction; annual report unit converted from CNY thousand to CNY yuan]
+revenue=241125217000
+cost_of_sales=197654839000
+gross_profit=43470378000
+operating_profit=25805893000
+net_profit=21524895000
+parent_net_profit=12673918000
+parent_recurring_net_profit=12464049000
+total_assets=227021733000
+total_liabilities=104450072000
+total_equity=122571661000
+parent_equity=74924822000
+minority_interest=47646839000
+operating_cash_flow=34092341000
+cash_capex=9244017000
+operating_free_cash_flow=34092341000-9244017000=24848324000
+financing_cash_flow=-15581871000
+2025_cash_dividend_plan=4631923531
+actual_parent_dividends_paid_during_2025=2024_final_2316010000+2025_interim_2110143000=4426153000
+result cash-flow field uses 4425924000 based on the annual report three-year dividend table rounded 2024 total less 2024 interim plus exact 2025 interim; immaterial 0.002% difference from the explicit component sum and does not affect owner earnback.
+
+[formula checks]
+gross_margin=(241125217000-197654839000)/241125217000=0.180278
+net_margin=12673918000/241125217000=0.052562
+minority_interest_ratio=47646839000/122571661000=0.388721
+forecast_dividend_yield=4631923531/164002000000=0.028243
+
+[cash discount]
+cash=29238071000; discount=70%; discounted=20466649700
+trading_financial_assets=4409215000; discount=90%; discounted=3968293500
+financing_like_liabilities:
+ short_borrowings=7385390000
+ current_noncurrent_liabilities=11552584000
+ long_borrowings=27214688000
+ bonds_payable=8994952000
+ lease_liabilities=8443353000
+ long_term_payables=1936230000
+ total=65527197000
+discounted_detachable_net_cash=20466649700+3968293500-65527197000=-41092253800
+
+[sustainable cash profit]
+anchor=2025 parent recurring net profit 12464049000
+cycle_and_maintenance_safety_discount=2464049000
+discounted_sustainable_cash_profit=10000000000
+rationale:
+- 2025 original-aluminium profit benefited from higher selling prices and lower input costs.
+- 2023 parent net profit was only 6684815000, showing material cyclicality.
+- management capex 15148000000 exceeded cash-flow-statement cash capex 9244017000.
+- consolidated cash flow includes economic interests belonging to minority shareholders.
+
+[owner earnback]
+operating_business_price=164002000000-(-41092253800)=205094253800
+owner_earnback_years=205094253800/10000000000=20.50942538
+market_cap_to_cash_profit=164002000000/10000000000=16.4002
+discounted_net_cash_to_market_cap=-41092253800/164002000000=-0.2505594676
+
+[quality]
+status=complete
+Core identity, valuation snapshot, financial statements, asset/liability explanations, owner-earnback breakdown, dividend assumption, business story, risks, evidence, and limitations are populated.
+The protocol validator returned status=ok with no errors.

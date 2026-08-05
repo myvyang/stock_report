@@ -1,0 +1,80 @@
+stock-research trace
+company=长江能科
+code=920158.BJ
+period=2025-12-31
+generated_for=2026-08-03 task
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md and data-reuse.md.
+2. Checked configured annual-review, normalized-facts, raw-filing and prior stock-research paths: no reusable filing/facts/research files existed locally.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated initialized paths with protocol set commands; JSON was not constructed from a blank file.
+5. Validated with protocol validate; final result recorded below.
+
+[sources]
+S1 Company 2025 annual report, disclosed 2026-04-10; verifiable PDF copy of the exchange-designated disclosure:
+   https://file.finance.sina.com.cn/211.154.219.97%3A9494/MRGG/CNSEBJ_STOCK/2026/2026-4/2026-04-10/12080280.PDF
+   Key locations: pp. 16-21 management discussion; pp. 74-83 audited statements; pp. 163-164 cash restrictions; pp. 166-170 risk notes.
+S2 Company 2025 annual dividend implementation announcement, 2026-05-08:
+   https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12305528&stockid=920158
+S3 config/input.json market snapshot: Tencent qt.gtimg.cn, 2026-07-31 15:38:20, market cap CNY 1,669,000,000, PE TTM 29.35.
+
+[model check]
+Annual report identifies the company as specialized equipment manufacturing. It designs and manufactures energy/chemical process equipment under an order-based production model. Balance sheet items are ordinary cash, receivables, inventory, plant, land, supplier payables, contract liabilities and limited bank debt. No bank/broker/insurance/developer/concession/investment-holding economics were found. statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+
+[statement extraction]
+total_assets=783030908.64
+total_liabilities=220043328.23
+total_equity=562987580.41
+parent_equity=562987580.41
+minority_interest=0
+revenue=294631189.68
+cost_of_sales=145794415.88
+gross_profit=148836773.80
+operating_profit=63684872.85
+net_profit=54431691.98
+parent_net_profit=54431691.98
+operating_cash_flow=48581634.22
+capital_expenditure=7223072.08
+operating_free_cash_flow=41358562.14
+financing_cash_flow=179612147.22
+dividend_and_buyback_cash_out=46059.01
+
+[formula checks]
+gross_margin=148836773.80/294631189.68=0.5051616302
+net_margin=54431691.98/294631189.68=0.1847445022
+forecast_cash_dividend=142580000*0.35=49903000
+forecast_dividend_yield=49903000/1669000000=0.0298999401
+
+[cash haircut]
+Cash and cash equivalents=346679203.28.
+Less IPO net proceeds with designated use=157789100.00.
+Less retained operating cash judgment=100000000.00.
+Less interest-bearing and lease liabilities=20676774.91.
+Candidate net cash=68213328.37.
+Apply 80% recognition to candidate net cash for boundary/working-capital uncertainty.
+discounted_detachable_net_cash=54570663.424.
+This is an analyst judgment, not a disclosed company number.
+
+[cash profit]
+2025 operating free cash flow=48581634.22-7223072.08=41358562.14.
+Apply 85% sustainability recognition because new orders declined, customer collection slowed, top-five customers were 55.05% of revenue and overseas/high-margin mix changed sharply.
+discounted_sustainable_cash_profit=35154777.819.
+This is an analyst judgment, not company guidance.
+
+[earnback]
+operating_business_price=1669000000-54570663.424=1614429336.576
+owner_earnback_years=1614429336.576/35154777.819=45.92348559
+market_profit_payback_years=1669000000/35154777.819=47.47576854
+discounted_net_cash_to_market_cap=54570663.424/1669000000=0.0326966228
+
+[quality]
+status=complete
+Core identity, market snapshot, model determination, three statements, asset/liability explanations, dividend basis, haircut rows, profit adjustments, business story and evidence are present.
+Limitations: market snapshot not independently reconciled to exchange ticks; operating cash reserve and haircuts are judgmental; one-year high-margin overseas mix may not persist.
+
+[validation]
+PASS: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Validator output: {"status":"ok","errors":[]}
+JSON parse check: PASS

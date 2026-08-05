@@ -1,0 +1,100 @@
+stock-research trace
+generated_at=2026-08-04T22:03:55+08:00
+company=Autoliv, Inc. (ALV)
+period=2025-12-31
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields with repeated protocol `set` commands; no complex result JSON was authored from scratch.
+5. Validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[local_reuse_check]
+Missing paths at task start:
+- stock_report/data/raw/filings/ALV/2025-12-31/metadata.json
+- stock_report/data/analysis/annual_review/ALV/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/ALV/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/ALV/2025-12-31/extraction_trace.txt
+- stock_report/data/normalized/facts/ALV/2025-12-31/annual-facts.json
+Action: rebuilt required facts from primary public sources rather than inventing or silently treating missing files as present.
+
+[primary_sources]
+- SEC 2025 Form 10-K HTML: https://www.sec.gov/Archives/edgar/data/1034670/000119312526058162/alv-20251231.htm
+- SEC filing index: https://www.sec.gov/Archives/edgar/data/1034670/000119312526058162/0001193125-26-058162-index.htm
+- SEC company facts API: https://data.sec.gov/api/xbrl/companyfacts/CIK0001034670.json
+- Autoliv 2025 annual report: https://www.autoliv.com/investors/annual-report
+- Autoliv dividend page: https://www.autoliv.com/investors/share/dividend
+- Federal Reserve/FRED annual USD/CNY: https://fred.stlouisfed.org/series/AEXCHUS
+- Market valuation: config/input.json, Yahoo Finance yfinance, market date 2026-08-03.
+
+[raw_usd_facts]
+Revenue=10,815m
+Cost of sales=8,741m
+Gross profit=2,074m
+Operating income=1,088m
+Consolidated net income=736m
+Parent net income=735m
+Total assets=8,644m
+Total equity=2,582m
+Parent equity=2,572m
+Minority interest=10m
+Total liabilities=6,062m (derived: assets minus total equity)
+Operating cash flow=1,157m
+Gross property/plant/equipment purchases=441m
+Property/plant/equipment sale proceeds=18m
+Net capital expenditure=423m
+Free operating cash flow=734m
+Cash=604m
+Interest-bearing debt=2,153m
+Net debt=1,549m
+Dividends paid=238m
+Share repurchases=351m
+
+[currency_conversion]
+All result amounts are absolute CNY yuan as required by the contract.
+Rate used: 2025 annual average USD/CNY=7.1875, Federal Reserve G.5A via FRED AEXCHUS.
+Limitation: the same average rate was used for year-end balance-sheet values instead of a distinct closing rate. This preserves a consistent transform but makes displayed CNY balance-sheet amounts approximate.
+
+[model_and_calculations]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: passive-safety manufacturing and JIT supply; no special financial-industry balance-sheet model.
+
+gross_margin=2,074/10,815=0.1917706888580675
+net_margin=735/10,815=0.06796116504854369
+
+Discounted detachable net cash:
+- Cash CNY=604m*7.1875=4,341,250,000; 50% detachable=2,170,625,000.
+- Debt CNY=2,153m*7.1875=15,474,687,500; 100% deducted.
+- Result=-13,304,062,500.
+
+Discounted sustainable cash profit:
+- Free operating cash flow=(1,157m-423m)*7.1875=5,275,625,000.
+- 85% sustainability factor=4,484,281,250.
+- Subjective basis: cyclical LVP/call-off risk, customer compensation/tariff execution, and possible capex normalization.
+
+Operating business price=60,871,198,835.680664-(-13,304,062,500)=74,175,261,335.680664.
+Owner earnback years=74,175,261,335.680664/4,484,281,250=16.54117063591421.
+Market cap/cash profit=60,871,198,835.680664/4,484,281,250=13.574349029887602.
+
+Dividend forecast:
+- Quarterly run rate=USD 0.87/share, maintained in declared Q1 and Q2 2026 dividends.
+- Annualized per share=USD 3.48.
+- Shares=74,706,513 as of 2026-02-11.
+- Forecast CNY cash dividend=3.48*74,706,513*7.1875=1,868,596,656.4125.
+- Forecast yield=1,868,596,656.4125/60,871,198,835.680664=0.03069754977976861.
+- This is a run-rate estimate, not a board commitment.
+
+[fact_inference_judgment_separation]
+Facts: audited financial statements, disclosed business mix, facilities, market-share estimates, paid/declared dividends, supplied market data.
+Inferences: competitive position interpretation, cash-conversion assessment, the operating meaning of receivables/inventory/PPE.
+Judgments: 50% cash detachability, 85% sustainable cash-profit factor, resulting earnback interpretation.
+
+[outputs]
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

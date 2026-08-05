@@ -1,0 +1,95 @@
+stock-research trace
+company: Alarm.com Holdings, Inc. (NASDAQ: ALRM)
+period: 2025-12-31 annual
+generated_at: 2026-08-05 Asia/Shanghai
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Ran protocol init against config/input.json to create outputs/result.json skeleton.
+3. Populated all fields through protocol set commands; result.json was not authored from a blank JSON object.
+4. Ran protocol validate; final status: ok, errors: [].
+
+[reuse check]
+- Expected annual fact paths and raw filing paths in config/input.json were absent.
+- No prior ALRM annual review, normalized facts, or stock research result was available locally.
+- Therefore returned to the primary filing rather than fabricating or filling from third-party summaries.
+
+[primary sources]
+- SEC filing index: https://www.sec.gov/Archives/edgar/data/1459200/000145920026000005/0001459200-26-000005-index.htm
+- SEC 10-K HTML: https://www.sec.gov/Archives/edgar/data/1459200/000145920026000005/alrm-20251231.htm
+- Accession: 0001459200-26-000005
+- Filed: 2026-02-19
+- Period: 2025-12-31
+- Alarm.com annual reports: https://investors.alarm.com/financials/annual-reports/default.aspx
+- Market snapshot: config/input.json, Yahoo Finance yfinance, market cap date 2026-08-03.
+
+[model verification]
+- 10-K Item 1 describes a cloud SaaS/software and hardware platform sold through service-provider partners.
+- Assets and liabilities are not customer deposits, insurance reserves, regulated project cash, concession assets, or project advances.
+- statement_model = ordinary_operating.
+- owner_earnback_applicability = applicable.
+
+[source facts, USD thousands]
+Income statement (10-K p.86):
+- SaaS and license revenue 689,397
+- Hardware and other revenue 321,790
+- Revenue 1,011,187
+- Cost of revenue 342,295
+- Gross profit calculated 668,892
+- Operating income 133,638
+- Net income 131,628
+- Net income attributable to common stockholders 132,574
+
+Balance sheet (10-K p.88):
+- Cash and equivalents 960,584
+- Accounts receivable 141,852
+- Inventory 94,429
+- Other current assets 75,646
+- Total assets 2,136,591
+- Convertible notes current 499,867
+- Convertible notes noncurrent 489,641
+- Total liabilities 1,245,581
+- Redeemable NCI 42,847
+- Stockholders' equity 848,163
+- Total equity including redeemable NCI calculated 891,010
+
+Cash flow (10-K pp.89-90):
+- Operating cash flow 153,330
+- Additions to PPE 16,281
+- Capitalized software development 1,307
+- Operating free cash flow calculated 135,742
+- Stock-based compensation 33,190
+- Treasury stock purchases 41,561
+- Financing cash flow -55,006
+
+[currency translation]
+- Required result currency is CNY absolute yuan.
+- Applied one transparent analytical translation rate: USD 1 = CNY 7.00.
+- This is a display assumption, not an official accounting translation rate.
+- Ratios and earnback years use internally consistent same-currency inputs and are invariant to the translation rate, except comparison with supplied CNY market cap remains dependent on the input market-cap conversion.
+
+[formula checks]
+- Gross margin = 668.892 / 1,011.187 = 0.6614918902.
+- Parent net margin = 132.574 / 1,011.187 = 0.1311073026.
+- OCF CNY = 153.330m * 7 = 1,073,310,000.
+- Capex CNY = (16.281m + 1.307m) * 7 = 123,116,000.
+- Operating FCF = 1,073,310,000 - 123,116,000 = 950,194,000.
+- Sustainable cash profit = (153.330 - 16.281 - 1.307 - 33.190)m USD * 7 = 717,864,000 CNY.
+- Discounted cash = 960.584m USD * 7 * 90% = 6,051,679,200 CNY.
+- Convertible debt = (499.867 + 489.641)m USD * 7 = 6,926,556,000 CNY.
+- Discounted detachable net cash = 6,051,679,200 - 6,926,556,000 = -874,876,800 CNY.
+- Operating business price = 18,273,361,546.59082 - (-874,876,800) = 19,148,238,346.59082 CNY.
+- Owner earnback years = 19,148,238,346.59082 / 717,864,000 = 26.6739080753.
+- Market cap / cash profit = 18,273,361,546.59082 / 717,864,000 = 25.4551858661.
+- Forecast dividend = 0; forecast yield = 0 / market cap = 0.
+
+[judgments]
+- Cash haircut 10%: operating/liquidity buffer.
+- All convertible-note carrying value deducted at 100% because it is financing debt; 2026 notes are current.
+- Investments in unconsolidated entities and restricted cash receive zero detachable value due to strategic/use restrictions and insufficient near-term realization evidence.
+- SBC deducted from OCF-based FCF because the cash-flow statement adds it back, while a no-dilution owner would bear an economic replacement cost.
+- No ordinary dividend forecast because 2023-2025 cash flows show no cash dividends and no declared future dividend evidence was identified.
+
+[data quality]
+- complete under stock-research-result-v1 minimum requirements.
+- Limitations are recorded in outputs/result.json and outputs/report.md.

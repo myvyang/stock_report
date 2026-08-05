@@ -1,0 +1,65 @@
+task=stock_research
+company=000603.SZ 盛达资源
+period=2025-12-31
+generated_at=2026-08-01T04:18:50+08:00
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[reuse_check]
+config/input.json=present
+annual_facts_json=absent
+annual_facts_md=absent
+normalized_facts_json=absent
+raw_filing_metadata=absent
+prior_stock_research=absent
+action=no local facts were reusable; public annual report was fetched and checked
+
+[sources]
+1=盛达金属资源股份有限公司2025年年度报告全文, public disclosure 2026-04-29, reproduced announcement id 12264366
+2=巨潮资讯2025年年度报告摘要, https://static.cninfo.com.cn/finalpage/2026-04-29/1225242914.PDF
+3=config/input.json market snapshot, Tencent qt.gtimg.cn, 20260731114306
+4=公司2026-06-16关于实际控制人收到中国证监会立案告知书的公告 (governance uncertainty only; no inference on outcome)
+
+[key_extraction]
+revenue=2461443145.59
+cost_of_sales=1043447750.32
+gross_profit=1417995395.27
+parent_net_profit=532455211.98
+operating_cash_flow=868179630.49
+capital_expenditure=700075214.48
+operating_free_cash_flow=168104416.01
+total_assets=7118680260.83
+total_liabilities=3165536232.37
+parent_equity=3494610588.93
+cash_and_equivalents=731295275.83
+restricted_cash=15957033.93
+forecast_dividend=82796321.52
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=mine operator with conventional operating assets, borrowings and cash flows; no special financial statement structure
+
+[owner_earnback]
+discounted_cash_assets=731295275.83 + 341979599.86*0.70 + 25767229.17*0.30 = 978411164.48
+financing_debt=2026525399.56
+discounted_detachable_net_cash=-1048114235.08
+operating_business_price=17401000000 - (-1048114235.08) = 18449114235.08
+cash_profit_2025=(868179630.49-700075214.48)*(532455211.98/624488686.53)=143330174.58
+cash_profit_2024=(730570099.98-550962153.74)*(390035399.95/474414668.69)=147662923.96
+discounted_sustainable_cash_profit=average=145496549.27
+owner_earnback_years=18449114235.08/145496549.27=126.8010
+market_cap_to_cash_profit=17401000000/145496549.27=119.5973
+limitation=all capex treated as required; maintenance versus growth capex could not be reliably split
+
+[outputs]
+outputs/result.json=created via protocol init and set commands
+outputs/report.md=created
+outputs/trace.txt=created

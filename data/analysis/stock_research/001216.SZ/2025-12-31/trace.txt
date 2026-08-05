@@ -1,0 +1,64 @@
+stock-research trace
+company: 001216.SZ 华瓷股份
+period: 2025-12-31 annual
+generated_context_date: 2026-07-31 Asia/Shanghai
+
+1. Protocol initialization
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely as requested.
+- Read references/data-reuse.md because local data reuse boundaries governed this task.
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- Expected annual-review facts, normalized facts, filing metadata, and prior stock-research outputs for 001216.SZ/2025-12-31 were absent.
+- Only stock_report/data/notes/user_stock_evaluations.md existed locally.
+- Therefore no prior financial facts or owner-earnback conclusion was reused.
+
+3. Source retrieval and hierarchy
+- Located official Shenzhen Stock Exchange annual-report summary and profit-distribution announcement dated 2026-04-29.
+- Located the full 2025 annual report via the announcement-original PDF link on Sina Finance. The annual report itself identifies Shenzhen Stock Exchange and CNINFO as designated disclosure sites.
+- Saved the full 203-page PDF at stock_report/data/raw/filings/001216.SZ/2025-12-31/2025-annual-report.pdf for reproducibility.
+- Primary core source: 湖南华联瓷业股份有限公司2025年年度报告, disclosure date 2026-04-29, PDF id 12246740.
+- Primary dividend source: 湖南华联瓷业股份有限公司关于2025年度利润分配预案的公告, announcement 2026-016, SZSE PDF d625d39b-c940-40cb-98a4-276406110630.
+- Market valuation source was not refreshed: used task input exactly, Tencent qt.gtimg.cn, timestamp 20260731114248, market cap 3976000000, PE TTM 18.59.
+
+4. Financial statement checks
+- Balance sheet: assets 2257858636.56; liabilities 413393568.47; total equity 1844465068.09; parent equity 1837534288.54; minority interest 6930779.55.
+- Income statement: revenue 1471543483.29; cost of sales 979192299.44; gross profit calculated 492351183.85; operating profit 247308959.17; net profit 216212170.00; parent net profit 220455499.01.
+- Cash flow: CFO 348816332.57; capex 257918122.00; operating FCF calculated 90898210.57; financing cash flow -97449106.00; dividends/interest cash out line 94459524.34.
+- Formula checks: gross margin = 492351183.85 / 1471543483.29 = 0.3345821523. Parent net margin = 220455499.01 / 1471543483.29 = 0.1498124443.
+
+5. Statement model review
+- Confirmed ordinary_operating/applicable.
+- Reason: business is ceramic design, manufacturing and direct sales. Financial assets are treasury assets rather than the business itself. No bank/insurance/customer-fund/property-development/concession structure. Period-end short- and long-term bank borrowings were nil.
+
+6. Owner earnback assumptions
+- Cash equivalents 654322752.54 * 85% = 556174339.66. Haircut covers operating liquidity, overseas cash movement, and project needs.
+- Trading financial assets/wealth products 150000000 * 90% = 135000000.
+- Other debt investments 30028027.40 * 80% = 24022421.92.
+- Other non-current financial assets 11581719.70 * 50% = 5790859.85.
+- Lease financing obligations 5914376.53 deducted at 100%.
+- Discounted detachable net cash = 715073244.90.
+- Operating business price = 3976000000 - 715073244.90 = 3260926755.10.
+- Sustainable cash profit starts from parent net profit 220455499.01; remove non-recurring profit 9956900.53 to reach recurring parent profit 210498598.48; apply an additional 10498598.48 prudence buffer; rounded result 200000000.
+- Did not use 2025 FCF 90898210.57 as permanent cash profit because capex 257918122 included overseas/new-capacity expansion.
+- Did not use CFO 348816332.57 as cash profit because it includes working-capital release and omits maintenance capex.
+- Owner earnback years = 3260926755.10 / 200000000 = 16.3046337755.
+- Market cap to cash profit = 3976000000 / 200000000 = 19.88.
+
+7. Dividend
+- Forecast uses disclosed 2025 distribution proposal, not an analyst extrapolation: 113340015 cash dividend.
+- Forecast yield = 113340015 / 3976000000 = 0.02850603999.
+- Proposal was subject to shareholder approval at announcement date; language in result/report preserves that status.
+
+8. Data quality and limitations
+- Marked complete because all ordinary-company minimum fields, asset/liability explanations, haircut rows, profit adjustments, dividend forecast, business story and evidence are present.
+- The full-report PDF came from the announcement-original mirror on Sina because the local filing layer was empty; core facts were cross-checked against the official SZSE annual summary/profit distribution announcement where available.
+- Industry rank is company-reported/association-attributed and was not independently verified against an association source.
+- Sustainable profit and haircuts are explicit analytical judgments, not management guidance.
+- Input market cap is later than the reporting period and may reflect later share changes; it was retained exactly as instructed.
+
+9. Protocol writes and validation
+- Populated the initialized skeleton through repeated protocol CLI set commands; did not construct outputs/result.json from scratch.
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report creation: {"status":"ok","errors":[]}.

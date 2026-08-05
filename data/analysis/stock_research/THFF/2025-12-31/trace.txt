@@ -1,0 +1,104 @@
+task=stock_research
+query=THFF
+period=2025-12-31
+report_type=annual
+created_at=2026-08-04T22:05:53+08:00
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+population=protocol set/append commands only; complex result object was not handwritten from scratch
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[local_reuse]
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+prior_stock_research=missing
+decision=no reusable annual fact package; returned to primary filing and regulator data
+
+[company_identity_and_model]
+identity=First Financial Corporation / NASDAQ THFF / CIK 0000714562
+filing=2025 Form 10-K, filed 2026-03-04, accession 0000714562-26-000014
+filing_url=https://www.sec.gov/Archives/edgar/data/714562/000071456226000014/thff-20251231x10k.htm
+business_fact=financial holding company with wholly owned First Financial Bank, N.A.; one reportable banking segment
+input_hint=ordinary_operating/applicable
+resolved_model=financial_bank/not_applicable
+reason=deposits, loans, securities, cash and wholesale funding are the banking operating structure; ordinary detachable-net-cash/free-cash-flow earnback is economically invalid
+
+[primary_sources]
+source_1=SEC 2025 Form 10-K HTML and Inline XBRL
+source_2=SEC Companyfacts API, https://data.sec.gov/api/xbrl/companyfacts/CIK0000714562.json
+source_3=SEC Form 8-K dated 2026-06-16, filed 2026-06-17, quarterly dividend $0.56/share, accession 0000714562-26-000041
+source_4=U.S. Treasury Fiscal Data rates_of_exchange API, China-Renminbi, record_date 2025-12-31, 6.998 CNY/USD
+market_source=Yahoo Finance yfinance supplied in config/input.json; market cap CNY 6463857298.2786255 as of 2026-08-03; PE TTM 11.281513
+
+[raw_filing]
+saved=stock_report/data/raw/filings/THFF/2025-12-31/thff-20251231x10k.htm
+note=downloaded only because no local filing/fact package existed
+
+[key_usd_facts_2025]
+total_assets=5756126000
+total_liabilities=5105257000
+shareholders_equity=650869000
+gross_loans=4050434000
+net_loans=4007308000
+allowance_for_credit_losses_loans=47995000
+available_for_sale_securities=1149526000
+cash_and_due_from_banks=130369000
+deposits=4551111000
+short_term_borrowings=292468000
+other_borrowings=188208000
+net_interest_income=219868000
+noninterest_income=41972000
+provision_for_credit_losses=8200000
+noninterest_expense=154926000
+net_income=79208000
+cash_dividends_paid=24164000
+
+[special_bank_metrics]
+net_interest_margin_2025=0.0429
+net_interest_margin_2024=0.0371
+roa_2025=0.0142
+roe_2025=0.1330
+nonperforming_loans_2025=28609000
+nonperforming_loans_2024=13367000
+npl_to_gross_loans_calculated=0.00706319
+acl_to_npl_calculated=1.677619
+net_chargeoffs_2025=6937000
+cet1_corporation=0.1321
+tier1_corporation=0.1321
+total_capital_corporation=0.1422
+leverage_ratio_corporation=0.1125
+
+[currency_conversion]
+rate=6.998 CNY per USD
+rate_date=2025-12-31
+method=all reported USD amounts converted at this single closing/reference rate to comply with result contract CNY absolute-yuan requirement
+limitation=income statement was not translated at an annual average rate; converted CNY values are for protocol comparability, not GAAP foreign-currency translation
+
+[dividend_forecast]
+latest_declared_quarterly_dividend_usd_per_share=0.56
+annualized_dividend_usd_per_share=2.24
+shares_used=11891896
+forecast_cash_dividend_cny=186411653.59
+forecast_dividend_yield=0.02883907317006563
+warning=mechanical annualization, not a board commitment
+
+[ordinary_owner_earnback_fields]
+discounted_detachable_net_cash=null
+discounted_sustainable_cash_profit=null
+operating_business_price=null
+owner_earnback_years=null
+market_profit_payback_years=null
+reason=bank special model; ordinary fields prohibited by result contract
+
+[final_checks]
+result_json=outputs/result.json
+report_md=outputs/report.md
+trace_txt=outputs/trace.txt
+protocol_validation=ok

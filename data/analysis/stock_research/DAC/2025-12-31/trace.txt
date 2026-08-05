@@ -1,0 +1,49 @@
+task=DAC annual stock research
+period=2025-12-31
+generated_at=2026-08-04T15:51:54+08:00
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+populate=protocol set, one field/path per call via temporary helper
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse]
+annual facts package absent; prior stock research absent.
+downloaded official filing to stock_report/data/raw/filings/DAC/2025-12-31/dac-20251231x20f.htm
+
+[sources]
+SEC 20-F filed 2026-02-27: https://www.sec.gov/Archives/edgar/data/1369241/000110465926021574/dac-20251231x20f.htm
+Danaos FY2025 release: https://www.danaos.com/news-and-media/press-release-details/2026/Danaos-Corporation-Reports-Results-for-the-Fourth-Quarter-and-Year-Ended-December-31-2025/default.aspx
+PBOC/CFETS 2025-12-26 USD/CNY=7.0358: https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+market snapshot: config/input.json, Yahoo Finance yfinance, 2026-08-03
+
+[reported USD million]
+assets=5113.930 liabilities=1318.353 equity=3795.577
+cash=1037.292 marketable_securities=120.244 debt=1155.091 ppe_net=3269.703
+revenue=1042.456 voyage_expense=63.061 vessel_operating_expense=208.779
+operating_income=498.766 net_income=494.614
+operating_cash_flow=644.753 capex=296.690 operating_fcf=348.063
+dividends_paid=63.550 buybacks_paid=75.739
+
+[formulas]
+gross_profit=(1042.456-63.061-208.779)*7.0358m CNY=5421900052.8
+gross_margin=770.616/1042.456=0.7392312002
+net_margin=494.614/1042.456=0.4744699057
+discounted_net_cash=(1037.292*50%+120.244*70%-1155.091)*7.0358m=-3885690816.36 CNY
+operating_fcf=(644.753-296.690)*7.0358m=2448901655.4 CNY
+discounted_cash_profit=operating_fcf*90%=2204011489.86 CNY
+operating_business_price=17397500926.943848-(-3885690816.36)=21283191743.30385 CNY
+owner_earnback_years=21283191743.30385/2204011489.86=9.6565702317
+market_cap_to_cash_profit=17397500926.943848/2204011489.86=7.8935618108
+forecast_dividend=0.90*4*18.3m shares*7.0358=463518504 CNY
+forecast_dividend_yield=463518504/17397500926.943848=0.0266428211
+
+[limitations]
+All financial statement amounts use one period-end-near FX rate, not average FX.
+Shipping gross profit is analytical: revenue less voyage and vessel operating expenses.
+Cash discount and 10% cycle haircut are analyst judgments, not company guidance.
+All capex, including growth newbuildings, is deducted from cash profit.

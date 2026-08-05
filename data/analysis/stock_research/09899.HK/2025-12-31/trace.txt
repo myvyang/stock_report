@@ -1,0 +1,61 @@
+stock-research trace
+company: 09899.HK NETEASE CLOUD MUSIC
+period: 2025-12-31 annual
+generated_at: 2026-08-04T15:19:38+08:00
+
+1. Read required skill and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Checked reusable local data
+   - No annual facts, normalized facts, prior research, or filing metadata existed for 09899.HK/2025-12-31.
+   - Initialized outputs/result.json with protocol CLI:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Source acquisition
+   - Located official HKEX Annual Report 2025, released 2026-04-15:
+     https://www.hkexnews.hk/listedco/listconews/sehk/2026/0415/2026041501036.pdf
+   - Saved a local PDF copy at stock_report/data/raw/filings/09899.HK/2025-12-31/annual-report-2025.pdf.
+   - Web/PDF extraction was used because no local PDF-to-text utility or Python PDF library was available.
+   - Market cap and PE were reused exactly from config/input.json (Tencent qt.gtimg.cn snapshot).
+
+4. Model verification
+   - Input hint said financial_brokerage/requires_special_model.
+   - Audited revenue notes show online music subscriptions, digital music, sublicensing, advertising, and social entertainment virtual items.
+   - Balance sheet and directors' report show no bank loans or other borrowings and no brokerage customer funds/securities financing structure.
+   - Overrode hint to ordinary_operating/applicable.
+
+5. Core extracted facts (annual report amounts converted from RMB'000 to absolute RMB)
+   - Revenue 7,759,450,000; cost of revenue 4,989,858,000; gross profit 2,769,592,000.
+   - Operating profit 1,621,952,000; net profit 2,745,828,000; parent net profit 2,748,210,000.
+   - Total assets 16,461,489,000; total liabilities 3,592,055,000; parent/total equity 12,869,434,000.
+   - Operating cash flow 1,618,081,000; capex 11,203,000; operating FCF 1,606,878,000.
+   - Cash 3,117,624,000; bank deposits 10,457,452,000; no bank loans or other borrowings.
+   - Online music revenue 5,994.4m (+12%); social entertainment and others 1,765.0m (-32%).
+   - Deferred tax credit 746,701,000; board recommended no 2025 final dividend.
+
+6. Owner earnback assumptions and calculations
+   - Cash: 3,117,624,000 x 100% = 3,117,624,000.
+   - Bank deposits: 10,457,452,000 x 95% = 9,934,579,400.
+   - Deduct all liabilities: 3,592,055,000.
+   - Discounted detachable net cash = 9,460,148,400.
+   - Market cap = 23,179,579,200.768467.
+   - Operating business price = 13,719,430,800.768467.
+   - Sustainable cash profit = 1,500,000,000, using 2025 operating FCF as starting point and a 106,878,000 conservatism adjustment.
+   - Owner earnback years = 13,719,430,800.768467 / 1,500,000,000 = 9.1462872005.
+   - Market cap / cash profit = 15.4530528005.
+   - Forecast dividend = 0 because no final dividend was recommended and no verifiable recurring cash-dividend policy was established; this is a baseline forecast, not certainty.
+
+7. Result construction
+   - Populated initialized JSON through repeated protocol CLI set commands; did not hand-write the result object from scratch.
+   - Wrote outputs/report.md and outputs/trace.txt.
+
+8. Known limitations
+   - Market snapshot not independently revalidated against exchange historical quotes.
+   - 95% bank-deposit factor and RMB1.5bn sustainable cash profit are analyst assumptions.
+   - Annual report lacks absolute MAU, paying-user count, and verifiable market share.
+
+9. Validation
+   - Final protocol validation and arithmetic checks executed after file creation; see command result in task execution log.

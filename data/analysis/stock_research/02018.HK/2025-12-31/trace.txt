@@ -1,0 +1,64 @@
+stock-research trace
+task: 02018.HK / AAC TECH / annual / 2025-12-31
+generated_at_input: 2026-08-04T23:21:45+08:00
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md and referenced data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked annual-review, normalized-facts and raw-filing paths supplied in config/input.json.
+- No existing 2025 annual facts package or prior research result was available.
+
+3. Primary-source retrieval
+- Located company-hosted audited Annual Report 2025:
+  https://sitecms.aactechnologies.com/wp-content/uploads/2026/04/1.-Annual-Report-2025.pdf
+- HKEX title search confirmed Annual Report 2025 release on 2026-04-27 and final-results announcement on 2026-03-19.
+- Downloaded the company-hosted PDF to:
+  stock_report/data/raw/filings/02018.HK/2025-12-31/annual-report-2025.pdf
+- Extracted PDF text locally with pypdf for table-level review. No third-party financial figures were used as core evidence.
+
+4. Model classification
+- Input hint: financial_brokerage / requires_special_model.
+- Audited-filing finding: product manufacturing revenue across acoustics, electromagnetic drives and precision mechanics, optics, automotive & consumer acoustics, sensors and semiconductors.
+- Conclusion: ordinary_operating / applicable. The input hint was overridden as a company-master-data misclassification.
+
+5. Core source locations (Annual Report 2025)
+- Consolidated profit or loss: p.108.
+- Consolidated financial position: pp.110-111.
+- Consolidated cash flows: pp.113-115.
+- Financial Review and disclosed total CAPEX: pp.18-20.
+- Revenue and segment information: note 5, pp.129-131.
+- Dividends: Financial Review p.19 and note 12.
+- Major customer concentration: Directors' Report p.57.
+- FVTOCI/FVTPL investments: notes 19-20, pp.147-148.
+
+6. Calculations (CNY absolute yuan)
+- gross_margin = 7,015,740,000 / 31,816,988,000 = 0.22050295898530684.
+- net_margin = 2,511,978,000 / 31,816,988,000 = 0.07895084223560069.
+- total_assets = 26,776,162,000 + 22,202,332,000 = 48,978,494,000.
+- total_liabilities = 14,853,582,000 + 9,181,545,000 = 24,035,127,000.
+- operating_free_cash_flow = 7,183,014,000 - 2,834,000,000 = 4,349,014,000.
+- debt for detachable-cash test = bank loans 5,975,091,000 + unsecured notes 3,641,747,000 = 9,616,838,000.
+- cash less above debt = 8,612,298,000 - 9,616,838,000 = -1,004,540,000; detachable net cash floored at 0.
+- after-tax PSS contingent-consideration fair-value gain estimate = 319,517,000 * (1 - 0.12) = 281,174,960.
+- unhaircut cash profit = 2,511,978,000 - 281,174,960 + 3,042,229,000 - 2,834,000,000 = 2,439,032,040.
+- discounted sustainable cash profit = 2,439,032,040 * 0.90 = 2,195,128,836.
+- operating business price = 38,679,991,516.527534 - 0 = 38,679,991,516.527534.
+- owner earnback years = 38,679,991,516.527534 / 2,195,128,836 = 17.620829758225423.
+- forecast cash dividend = 2,511,978,000 * 15% = 376,796,700.
+- forecast dividend yield = 376,796,700 / 38,679,991,516.527534 = 0.009741385280268196.
+
+7. Protocol population and validation
+- Populated initialized result through repeated protocol CLI `set` calls; the JSON was not constructed as a standalone object from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report/trace completion: {"status":"ok","errors":[]}.
+
+8. Explicit limitations
+- Market cap and PE are reused from config/input.json's Tencent snapshot and were not independently reconstructed.
+- Proposed dividend CNY amount uses the company's stated 15% payout ratio, avoiding an arbitrary HKD/CNY conversion date.
+- Maintenance CAPEX was not separately disclosed; total CAPEX is used.
+- The 10% sustainability haircut is an explicit analyst judgment, not a filing fact.

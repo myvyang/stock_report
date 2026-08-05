@@ -1,0 +1,77 @@
+Stock research trace: DGICB / Donegal Group Inc.
+Generated for period: 2025-12-31
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked the configured raw filing, annual review, normalized fact, and output locations.
+- No reusable local DGICB 2025 filing/fact package was present at the time of research.
+- Therefore retrieved and inspected the official 2025 Form 10-K through Donegal Group's investor-relations filing mirror and cross-checked SEC-indexed sources.
+
+3. Identity and model decision
+- Confirmed issuer Donegal Group Inc., CIK 0000800457, securities DGICA and DGICB.
+- Confirmed business is property and casualty insurance through subsidiaries and affiliates.
+- Overrode input hint ordinary_operating/applicable.
+- Final model: financial_insurance / requires_special_model.
+- Rationale: investment assets support claim reserves, unearned premiums and statutory capital; they are not detachable cash. Ordinary owner-earnback metrics were kept null per contract.
+
+4. Primary financial extraction (USD, 2025 Form 10-K)
+- Total assets: 2,386,629,452
+- Total liabilities: 1,746,211,373
+- Total stockholders' equity: 640,418,079
+- Total investments: 1,500,252,821
+- Cash: 26,785,845
+- Loss and loss-expense reserves: 1,100,049,937
+- Unearned premiums: 591,040,451
+- Total revenue: 978,014,322
+- Net premiums earned: 921,183,575
+- Pretax income: 97,592,977
+- Net income: 79,340,740
+- Operating cash flow: 70,199,466
+- Cash dividends paid: 25,674,053
+- GAAP underwriting income: 42,673,000 (management table, rounded thousands)
+- Net investment income: 52,626,715
+- GAAP combined ratio: 95.4%; 2024: 98.6%; 2023: 104.4%
+- 2025 net premiums written: 904,827,000; commercial 563,991,000; personal 340,836,000
+- Statutory capital and surplus of insurance subsidiaries: 585,989,170
+
+5. Currency normalization
+- Contract requires absolute CNY yuan.
+- Used USD/CNY 7.0358, the PBOC/CFETS central parity published 2025-12-26, as a convenience conversion for both balance-sheet and period figures.
+- This is not presented as an accounting translation rate; limitation recorded in result.json and report.md.
+
+6. Dividend forecast
+- Latest available declaration through research date: 2026-07-16, quarterly A dividend USD 0.1925 and B dividend USD 0.175.
+- Annualized using 2025-12-31 outstanding shares: A 31,382,541; B 5,576,775.
+- Forecast USD cash dividend = (31,382,541 * 0.1925 + 5,576,775 * 0.175) * 4 = approximately 28.07 million.
+- Converted forecast CNY = 197,482,938.60.
+- Divided by supplied market cap CNY 5,600,240,250.094666 = 3.5263%.
+- This is a mechanical annualization, not guidance; limitation recorded.
+
+7. Valuation handling
+- Market cap CNY 5,600,240,250.094666, date 2026-08-03, source Yahoo Finance yfinance: carried through exactly from input.
+- PE TTM 11.666667: carried through exactly from input.
+- Did not reconstruct market capitalization from DGICA and DGICB prices; dual-class supplier methodology is a limitation.
+- discounted_net_cash, discounted_cash_profit, operating_business_price, owner_earnback_years, and market_cap_to_cash_profit all remain null because the insurance special model applies.
+
+8. Report construction
+- Separated disclosed facts from inferences.
+- Used combined ratio, underwriting income, investment income, reserves, statutory capital and dividend constraints as the insurance-specific analytical frame.
+- Did not provide a target price, buy/sell recommendation or unsupported certainty.
+
+9. Validation
+- Populated outputs/result.json using protocol CLI set commands after protocol init; the complex result was not handwritten from scratch.
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validator status: ok; errors: [].
+
+Primary source URLs
+- https://www.sec.gov/Archives/edgar/data/800457/000114036126008268/ef20060826_10k.htm
+- https://www.sec.gov/Archives/edgar/data/800457/000117184326000917/exh_991.htm
+- https://investors.donegalgroup.com/stock-information/dividends-page
+- https://www.sec.gov/Archives/edgar/data/800457/000114036126019516/ef20070468_10q.htm
+- https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html

@@ -1,0 +1,85 @@
+stock-research trace
+company: EEKA FASHION (03709.HK)
+period: 2025-12-31 annual
+generated_for_input_at: 2026-08-04T17:02:48+08:00
+
+1. Protocol initialization
+   Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   Result: initialized stock-research-result-v1 from task input.
+
+2. Required contracts read
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+3. Reuse check
+   Expected annual facts and filing directories contained no reusable 2025 facts or filing at task start.
+   Downloaded official annual report:
+   https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042402068.pdf
+   Local evidence copy:
+   stock_report/data/raw/filings/03709.HK/2025-12-31/annual-report-2025.pdf
+   Text extraction copy:
+   stock_report/data/raw/filings/03709.HK/2025-12-31/annual-report-2025.txt
+
+4. Model audit
+   Input hint: financial_brokerage / requires_special_model.
+   Filing fact: principal activities are design, retail and wholesale of womenswear in the PRC; revenue arises from self-operated stores, e-commerce and distributors.
+   Decision: override hint with ordinary_operating / applicable.
+   Reason: no brokerage customer funds, proprietary securities book or repo financing; ordinary retail assets and liabilities can be economically separated.
+
+5. Core filing facts (annual report amounts were RMB'000 and converted to absolute CNY)
+   Revenue: 6,285,797,000
+   Cost of sales: 1,473,503,000
+   Gross profit: 4,812,294,000
+   Profit from operations: 562,582,000
+   Net profit: 405,019,000
+   Parent net profit: 397,026,000
+   Total assets: 7,139,163,000
+   Total liabilities: 2,521,543,000
+   Total equity: 4,617,620,000
+   Parent equity: 4,619,530,000
+   Operating cash flow: 1,555,479,000
+   PPE purchases: 163,962,000
+   Intangible additions: 967,000
+   Capital expenditure used: 164,929,000
+   Operating FCF (statement convention): 1,390,550,000
+   Lease principal paid: 857,112,000
+   Proposed final dividend: 212,178,000 (HKD 0.35/share)
+
+6. Formula checks
+   gross_margin = 4,812,294,000 / 6,285,797,000 = 0.7655764135
+   net_margin = 397,026,000 / 6,285,797,000 = 0.0631624007
+   forecast_dividend_yield = 212,178,000 / 3,261,638,200.9935374 = 0.0650525881
+
+7. Discounted detachable net cash
+   Cash: 437,932,000 x 50% = 218,966,000
+   Current wealth management products: 547,319,000 x 70% = 383,123,300
+   Non-current wealth management products: 61,411,000 x 50% = 30,705,500
+   Non-listed fund and other financial assets: 42,615,000 x 0% = 0
+   Bank borrowings: -420,000,000 x 100% = -420,000,000
+   Total and result value: 212,794,800.
+
+8. Sustainable cash profit
+   Starting profit before tax: 513,595,000
+   Add depreciation and amortization: 982,382,000
+   Less cash tax: 107,606,000
+   Less capex: 164,929,000
+   Less lease principal: 857,112,000
+   Pre-attribution normalized cash profit: 366,330,000
+   Apply parent attribution (397,026 / 405,019) and approximately 10% prudence haircut for declining revenue/profit and slower inventory turnover.
+   Rounded discounted sustainable cash profit: 323,200,000
+
+9. Earnback formulas
+   operating_business_price = 3,261,638,200.9935374 - 212,794,800 = 3,048,843,400.9935374
+   owner_earnback_years = 3,048,843,400.9935374 / 323,200,000 = 9.4333026021
+   market_cap_to_cash_profit = 3,261,638,200.9935374 / 323,200,000 = 10.0917023546
+
+10. Protocol population and validation
+    outputs/result.json was populated using repeated protocol `set` commands, not handwritten from scratch.
+    Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Initial completed-result validation: status=ok, errors=[]
+
+11. Limitations
+    - Market cap and PE are inherited from the supplied Tencent snapshot.
+    - No verifiable market-share source was available in the annual report.
+    - Cash haircuts and sustainable-profit discount are analyst assumptions, explicitly disclosed in result.json and report.md.

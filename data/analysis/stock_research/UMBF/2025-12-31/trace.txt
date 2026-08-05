@@ -1,0 +1,43 @@
+2026-08-05 stock-research trace for UMBF / period 2025-12-31
+
+1. Read skill and required contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check:
+   - No usable annual facts package was present under stock_report/data/analysis/annual_review/UMBF/2025-12-31.
+   - Downloaded the official 2025 Form 10-K to stock_report/data/raw/filings/UMBF/2025-12-31/umbf-20251231.htm.
+
+4. Primary sources:
+   - SEC 10-K: https://www.sec.gov/Archives/edgar/data/101382/000119312526076496/umbf-20251231.htm
+   - SEC filing date 2026-02-26; accession 0001193125-26-076496.
+   - UMB dividend release dated 2025-10-28: quarterly common dividend raised to USD 0.43.
+   - 2025-12-31 USD/CNY central parity: 7.0288, published by CFETS under PBOC authorization and carried by Xinhua.
+   - Market cap / PE: supplied input, Yahoo Finance yfinance, dated 2026-08-03.
+
+5. Model decision:
+   - Overrode input hint ordinary_operating/applicable.
+   - Confirmed financial_bank/not_applicable because deposits, loans, securities and interbank balances are operating assets/liabilities.
+   - All ordinary owner-earnback sortable fields retained as null.
+
+6. Key source figures (USD thousands unless ratios):
+   - Total assets 73,094,090; total liabilities 65,400,522; total equity 7,693,568; common equity 7,399,502.
+   - Net interest income 1,862,205; noninterest income 790,050; net income 702,398; common shareholder net income 684,617.
+   - Net loans 38,359,930; securities 20,130,315; deposits 60,656,790.
+   - NIM (FTE) 3.10%; ROE common 10.24%; NPL ratio 0.37%; ACL/NPL 2.90x; CET1 10.96%.
+   - Common dividend USD 1.63/share in 2025; forecast scenario annualizes USD 0.43 quarterly to USD 1.72/share.
+
+7. Currency conversion:
+   - All structured financial amounts converted at USD/CNY 7.0288.
+   - Forecast dividend = 75,960,675 shares x USD 1.72 x 7.0288 = CNY 918,329,315.
+   - Forecast yield = CNY 918,329,315 / CNY 74,688,200,952.65332 = 1.22955%.
+
+8. Populated result fields using protocol CLI set commands; did not hand-write result JSON.
+
+9. Validation:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Final status: ok; errors: none.

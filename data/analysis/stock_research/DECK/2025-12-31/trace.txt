@@ -1,0 +1,86 @@
+stock-research trace
+generated_at=2026-08-04T18:45:13+08:00
+query=DECK
+requested_period=2025-12-31
+requested_report_type=annual
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated fields only through protocol `set` and `append` commands.
+3. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse check]
+- Checked stock_report/data/analysis/annual_review/DECK/2025-12-31 and stock_report/data/raw/filings/DECK/2025-12-31.
+- Neither directory existed in /workspace; no annual facts package, normalized facts, raw filing, or prior research result was available for reuse.
+
+[period resolution]
+- Deckers' statutory fiscal year ends March 31, not December 31.
+- The requested directory period 2025-12-31 does not identify a DECK annual filing date.
+- Used the complete annual filing available within calendar 2025: FY2025 Form 10-K for year ended 2025-03-31, filed 2025-05-23.
+- Did not use the quarter ended 2025-12-31 as an annual report.
+
+[primary sources]
+- SEC Form 10-K: https://www.sec.gov/Archives/edgar/data/910521/000091052125000017/deck-20250331.htm
+  Used for company identity, business model, brands, channels, manufacturing, customer concentration, risks, three statements, dividends, repurchases, and leases.
+- Federal Reserve H.10: https://www.federalreserve.gov/releases/h10/20250407/
+  Used USD/CNY spot rate for 2025-03-31: 7.2567 CNY per USD.
+- config/input.json
+  Used market cap CNY 89,028,376,276.64062; valuation date 2026-08-03; source Yahoo Finance yfinance; PE TTM 13.780938.
+
+[reported USD facts]
+All filing amounts below are USD thousands unless noted.
+- cash_and_cash_equivalents=1889188
+- trade_accounts_receivable=332872
+- inventories=495226
+- total_assets=3570252
+- total_liabilities=1057239 (3570252-2513013)
+- total_stockholders_equity=2513013
+- revenue=4985612
+- cost_of_sales=2099949
+- gross_profit=2885663
+- operating_profit=1179092
+- net_income=966091
+- operating_cash_flow=1044523
+- capital_expenditure=86171
+- operating_free_cash_flow=958352
+- stock_based_compensation=37943
+- financing_cash_flow=-581334
+- common_stock_repurchases=567002
+- current_operating_lease_liability=54453
+- long_term_operating_lease_liability=222522
+- total_operating_lease_liability=276975
+- cash_dividend=0
+
+[currency conversion]
+- Formula: CNY amount = USD-thousand amount * 1000 * 7.2567.
+- Balance sheet, income statement, and cash-flow amounts all use the same 2025-03-31 spot rate for protocol consistency.
+- This is not an annual-average translation and is disclosed as a limitation.
+
+[owner earnback assumptions]
+- discounted cash = cash CNY * 85% - operating lease liabilities CNY
+  = 13,709,270,559.60 * 0.85 - 2,009,924,482.50
+  = 9,642,955,493.16 CNY.
+- operating free cash flow = operating cash flow - capital expenditure
+  = 7,579,790,054.10 - 625,317,095.70
+  = 6,954,472,958.40 CNY.
+- discounted sustainable cash profit
+  = (operating free cash flow - stock-based compensation) * 90%
+  = (6,954,472,958.40 - 275,340,968.10) * 0.90
+  = 6,011,218,791.27 CNY.
+- operating business price
+  = market cap - discounted net cash
+  = 89,028,376,276.64062 - 9,642,955,493.16
+  = 79,385,420,783.48062 CNY.
+- owner earnback years = 79,385,420,783.48062 / 6,011,218,791.27 = 13.2062105107.
+- market cap to cash profit = 89,028,376,276.64062 / 6,011,218,791.27 = 14.8103703039.
+- forecast dividend yield = 0 / market cap = 0.
+
+[fact vs judgment]
+- Facts: filing values, brand/channel revenue, manufacturing outsourcing, customer concentration, no historical cash dividends, stated current non-intention to pay dividends.
+- Judgments: 85% cash recognition, 100% lease-liability deduction, treatment of SBC as economic cost, 10% sustainable-profit haircut, interpretation of brand concentration and cash quality.
+
+[quality]
+- status=complete under result-contract minimum fields.
+- Material limitation: valuation date is roughly 16 months after the financial statement date. The result is protocol-consumable but should be refreshed with FY2026 financials before relying on the earnback numbers as a current snapshot.

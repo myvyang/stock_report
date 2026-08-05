@@ -1,0 +1,55 @@
+Stock research trace: LKFN / 2025-12-31 annual
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked annual_review, raw filing, and normalized facts paths supplied by config/input.json.
+- No reusable LKFN 2025 annual fact files were present, so research returned to primary disclosures.
+
+3. Primary sources used
+- SEC 2025 Form 10-K, filed 2026-02-25, accession 0000721994-26-000018:
+  https://www.sec.gov/Archives/edgar/data/721994/000072199426000018/lkfn-20251231.htm
+- SEC XBRL Companyfacts API, CIK 0000721994:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0000721994.json
+- Lake City Bank 2025 Q4 earnings release:
+  https://investors.lakecitybank.com/news-releases/news-release-details/lakeland-financial-reports-record-quarterly-performance-24
+- 2025 Q4 investor presentation / 8-K exhibit:
+  https://www.sec.gov/Archives/edgar/data/721994/000072199426000012/lkfn-20260126exhibit991.htm
+- Federal Reserve H.10 USD/CNY observation, 2025-12-31: 7.1875 CNY per USD.
+- Market cap and PE: config/input.json; Yahoo Finance yfinance snapshot dated 2026-08-03.
+
+4. Model decision
+- Overrode input hint ordinary_operating/applicable.
+- Confirmed financial_bank/requires_special_model because Lakeland Financial is a bank holding company whose operating assets and liabilities are loans, securities, cash, deposits, and regulated capital.
+- Kept discounted net cash, discounted cash profit, operating business price, owner earnback years, and market-cap-to-cash-profit fields null.
+
+5. Key original USD facts
+- Total assets: 6,990,022,000.
+- Total liabilities: 6,227,530,000.
+- Parent equity: 762,403,000; total equity including NCI: 762,492,000.
+- Net income: 103,361,000.
+- Total revenue: 269,000,000; net interest income: 221,000,000.
+- Loans: approximately 5,375,000,000; deposits: 5,973,350,000; investment securities: 1,185,270,000.
+- Operating cash flow: 114,887,000; property/equipment purchases: 11,122,000.
+- 2025 common and preferred dividends: 51,428,000; common repurchases: about 19,600,000 in company release (XBRL cash repurchase tag 20,391,000).
+- ROA 1.50%; ROE 14.40%; payout ratio 49.88%; efficiency ratio 48.9%.
+- NPA/assets 0.30%; ACL/loans 1.28%; total capital 15.92%; CET1 14.77%.
+
+6. Currency and calculations
+- Protocol requires CNY absolute yuan. Used one disclosed H.10 conversion rate, USD/CNY 7.1875, for all USD statement values for deterministic consistency.
+- Net margin = 103.361 / 269.0 = 0.3842416357.
+- Forecast dividend = USD 0.52 x 4 x 25,219,634 shares x 7.1875 = CNY 377,033,528.30.
+- Forecast dividend yield = 377,033,528.30 / 10,509,393,728.48 = 0.0358758591.
+- Did not separately apply an average income-statement FX rate; recorded as a limitation.
+
+7. Output construction and validation
+- Populated outputs/result.json through protocol CLI set commands; did not hand-write the initialized complex object.
+- Wrote outputs/report.md and this trace after the structured result passed validation.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

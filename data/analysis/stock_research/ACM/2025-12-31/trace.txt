@@ -1,0 +1,20 @@
+2026-08-05T02:47:26+08:00 | protocol init | PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json | success
+2026-08-05 | skill references | read SKILL.md, result-contract.md, report-contract.md, data-reuse.md | success
+2026-08-05 | local reuse check | no ACM annual facts, normalized facts, raw filing, or prior stock-research result found | source gap identified
+2026-08-05 | primary filing | downloaded SEC inline XBRL filing accession 0000868857-25-000013 to stock_report/data/raw/filings/ACM/2025-12-31/acm-20250930.htm | success
+2026-08-05 | XBRL facts | downloaded SEC Companyfacts CIK0000868857.json; extracted FY2025 three statements and balance-sheet components tied to accession | success
+2026-08-05 | period mapping | input period 2025-12-31 mapped to AECOM FY2025 10-K fiscal year ended 2025-09-30; mismatch disclosed in data_quality and report | accepted with limitation
+2026-08-05 | model review | ordinary_operating/applicable retained; project-service handling added because GMP and fixed-price contracts are 62% of FY2025 revenue and contract working capital is material | evidence: FY2025 10-K
+2026-08-05 | FX conversion | all USD financial statement amounts multiplied by 7.1875 CNY/USD, Federal Reserve G.5A 2025 annual average | consistent CNY protocol units
+2026-08-05 | gross margin | 1,216,713,000 / 16,139,622,000 = 0.0753867098002667 | verified
+2026-08-05 | net margin | parent net income (561,774,000 - 74,413,000) / 16,139,622,000 = 0.030196556028387778 | verified
+2026-08-05 | free cash flow | operating cash flow 821,602,000 - capex 136,675,000 = 684,927,000 USD; company net-capex presentation is 685.2m USD due to 0.292m disposal proceeds | result uses 4,925,011,562.5 CNY
+2026-08-05 | detachable cash | 50% x cash 11,397,499,062.5 CNY - debt 19,474,078,437.5 CNY < 0; protocol result floored at zero | conservative
+2026-08-05 | sustainable cash profit | company-reported FCF 685.2m USD x 80% x 7.1875 = 3,939,900,000 CNY | 20% judgmental safety discount
+2026-08-05 | owner earnback | 62,781,869,704.24512 / 3,939,900,000 = 15.9348891353 years | verified
+2026-08-05 | dividend forecast | 0.31 USD x 4 x 133m diluted shares x 7.1875 = 1,185,362,500 CNY; yield = 0.018880649868888016 | board discretion disclosed
+2026-08-05 | protocol population | result fields written using stock_research.protocol set commands, not by hand-building result JSON | success
+2026-08-05 | protocol validate #1 | market_profit_payback_years formula mismatch because it was initially set to market cap/FY2025 GAAP parent profit | correction required
+2026-08-05 | protocol correction | owner_earnback.market_profit_payback_years aligned to market_cap / discounted_sustainable_cash_profit = 15.9348891353 per result contract | success
+2026-08-05 | protocol validate #2 | PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json | status=ok, errors=[]
+2026-08-05 | output check | outputs/result.json, outputs/report.md, outputs/trace.txt present; result status=complete and incomplete_reasons=[] | complete

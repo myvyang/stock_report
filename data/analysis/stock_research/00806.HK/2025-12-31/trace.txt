@@ -1,0 +1,60 @@
+Stock research trace: VALUE PARTNERS 00806.HK
+Generated: 2026-08-03 Asia/Shanghai
+Report period: 2025-12-31
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated the initialized result with protocol set/append commands; no complex JSON result was handwritten from scratch.
+
+2. Reused source layers
+- Primary annual fact pack: stock_report/data/analysis/annual_review/00806.HK/2025-12-31/facts.json
+- Human-readable fact pack: stock_report/data/analysis/annual_review/00806.HK/2025-12-31/annual_facts.md
+- Extraction trace: stock_report/data/analysis/annual_review/00806.HK/2025-12-31/extraction_trace.txt
+- Primary filing text: stock_report/data/raw/filings/00806.HK/2025-12-31/imported_from_agent_runs/9cd5674c559a-value_partners_2025_annual_report.txt
+- Prior-year filing texts for cash conversion: 2024 and 2023 annual reports in the same imported_from_agent_runs directory.
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, 2026/07/31 16:08:42.
+- FX support: 2025-12-31 HKD/RMB rate 0.897878955 disclosed in an annual report hosted on the Hong Kong Monetary Authority website. Used only for protocol-unit translation.
+
+3. Model review and override
+- Input hint: financial_brokerage / requires_special_model.
+- Filing evidence: fee income is principally management fees, performance fees and front-end fees; the balance sheet is not funded by customer deposits, margin balances or repurchase liabilities.
+- Filing evidence also shows material money-market instruments, listed/unlisted securities and funds, joint ventures and investment property, plus regulated entities with capital requirements.
+- Final model: platform_financial_mixed / requires_special_model.
+- Reason: ordinary detachable-cash analysis would require granular ownership, regulatory-capital and seed-capital constraints that are not disclosed. All ordinary owner-earnback sortable numbers remain null as required by the result contract.
+
+4. Core filing extraction reused and checked
+- AUM: US$6,153m at 2025-12-31; 2024 US$5,110m; 2025 net subscriptions US$193m; investment performance US$1,203m.
+- Fee income: HK$922.130m; management fees HK$410.9m; performance fees HK$374.3m; distribution fee expense HK$313.264m.
+- Profit: operating profit after other gains/losses HK$633.734m; parent net profit HK$667.698m.
+- Volatile items: investment gains HK$370.362m; FX gains HK$28.131m; joint venture gains HK$96.252m.
+- Balance sheet: assets HK$4,661.957m; liabilities HK$426.977m; parent equity HK$4,234.980m.
+- Cash equivalents HK$1,557.925m, including money-market instruments HK$1,440.869m.
+- Investments HK$1,882.985m; joint ventures HK$420.142m; investment property HK$176.133m.
+- Operating cash flow HK$42.424m; capex proxy HK$3.005m; fee receivables increased HK$375.545m.
+- Dividend: proposed 2025 final dividend HK$0.055/share; year-end shares approximately 1.83bn.
+
+5. Calculations
+- Translation convention: HKD absolute amounts x 0.897878955 = CNY absolute yuan.
+- Gross margin = 608,866 / 922,130 = 0.6602821728.
+- Net margin = 667,698 / 922,130 = 0.7240822877. This ratio is distorted upward by investment and joint-venture gains and is not interpreted as a stable operating margin.
+- Operating free cash flow = HK$42.424m - HK$3.005m = HK$39.419m; translated CNY35,393,490.53.
+- Forecast dividend scenario = 1.83bn shares x HK$0.055 x 0.897878955 = CNY90,371,516.82.
+- Forecast dividend yield scenario = CNY90,371,516.82 / CNY3,347,332,684.44 = 0.0269980684.
+- No discounted detachable cash, sustainable cash profit, operating business price or payback formula was calculated because applicability is requires_special_model.
+
+6. Known limitations
+- No granular split of listed-parent, operating-subsidiary and regulated-entity cash ownership.
+- No fund-by-fund redemption gates or lockups for money-market instruments and seed investments.
+- Maintenance capex is not separately disclosed; purchases of PPE and intangibles are used as a proxy.
+- Income statement amounts were translated using the period-end FX rate rather than an annual average; original-currency ratios are unaffected.
+- Dividend forecast is a flat-per-share scenario based on the latest declared annual dividend, not management guidance.
+- The provided raw filing metadata.json path did not exist; primary filing identity and source locations were available in the annual fact pack and extraction trace.
+
+7. Validation
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final protocol response: {"status":"ok","errors":[]}

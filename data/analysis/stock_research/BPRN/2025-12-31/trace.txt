@@ -1,0 +1,63 @@
+stock-research trace
+task: BPRN / Princeton Bancorp, Inc.
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read instructions
+- Read /workspace/AGENTS.md.
+- Read stock-research/SKILL.md completely.
+- Read result-contract.md, report-contract.md, and data-reuse.md completely.
+
+2. Reuse audit
+- Checked configured annual-review, normalized-facts, raw-filing, and prior stock-research paths.
+- No BPRN 2025 filing or fact package existed locally; only the user evaluation note existed.
+- Initialized outputs/result.json with protocol CLI from config/input.json.
+
+3. Primary-source retrieval and identification
+- Located SEC Form 10-K for FY ended 2025-12-31, filed 2026-03-13:
+  https://www.sec.gov/Archives/edgar/data/1913971/000119312526106151/bprn-20251231.htm
+- Confirmed company is a bank holding company whose sole direct subsidiary is The Bank of Princeton.
+- Overrode input analysis_model_hint from ordinary_operating/applicable to financial_bank/requires_special_model.
+- Located 2026Q1 Form 10-Q for post-year-end cross-check:
+  https://www.sec.gov/Archives/edgar/data/1913971/000119312526214214/bprn-20260331.htm
+- Located 2026-04-21 dividend announcement:
+  https://www.sec.gov/Archives/edgar/data/1913971/000119312526166724/bprn-ex99_1.htm
+
+4. Core extraction (10-K values originally USD thousands)
+- Total assets 2,285,147; total liabilities 2,014,435; total equity 270,712.
+- Cash and equivalents 135,686; securities 182,722; net loans 1,796,091.
+- Deposits 1,976,193; no year-end borrowings.
+- Net interest income 75,816; provision for credit losses 6,654; net income 18,611.
+- Operating cash flow 21,490; premises/equipment purchases 889.
+- Cash dividends 8,665; treasury stock purchases 7,865.
+- NIM 3.58%; prior year 3.38%.
+- CRE loans 1,343,531, 73.9% of loans; New York 46.8% of CRE portfolio.
+- Nonperforming assets 16,578; ACL 20,325; 2025 net charge-offs approximately 9,700.
+- CET1 12.946%; total capital 13.994%; tier-1 leverage 11.126%.
+- Uninsured deposits 598,966.
+
+5. Currency conversion
+- Protocol requires absolute CNY yuan.
+- Used Federal Reserve H.10 rate for 2025-12-26: 1 USD = 7.0063 CNY.
+- Source: https://www.federalreserve.gov/releases/h10/20251229/
+- Converted balance sheet and income/cash-flow amounts using this single convenience rate.
+- Limitation recorded: income statement was not translated at annual-average FX.
+
+6. Dividend forecast
+- Annualized latest declared quarterly dividend: USD 0.35 x 4 = USD 1.40/share.
+- Shares: 6,765,530 outstanding at 2025-12-31.
+- Forecast USD cash dividend: 9,471,742.
+- Forecast CNY cash dividend: 66,361,865.97.
+- Input market cap: CNY 1,895,458,177.0376587.
+- Forecast yield: 0.0350109893.
+- This is a mechanical annualization; board approval is required each quarter.
+
+7. Protocol construction
+- Used `protocol set` for populated paths; did not hand-write result.json from scratch.
+- Left all ordinary owner-earnback fields null because special bank model applies.
+- Populated bank-specific interpretation in analysis_model, asset/liability explanations, risks, evidence, report, and limitations.
+
+8. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial populated result status: ok; errors: [].
+- Final validation repeated after report and trace creation.

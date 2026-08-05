@@ -1,0 +1,54 @@
+2026-07-31 stock-research trace: 002264.SZ / 新华都 / FY2025
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: initialized stock-research-result-v1 skeleton.
+
+3. Local reuse check
+- Searched annual facts, normalized facts, filing metadata, extraction trace and prior stock research paths given by config/input.json.
+- Result: none existed in /workspace; only config/input.json was present. Public official filing retrieval was therefore required.
+
+4. Core sources retrieved
+- CNINFO full annual report: https://static.cninfo.com.cn/finalpage/2026-04-28/1225202320.PDF
+- CNINFO annual report summary: https://static.cninfo.com.cn/finalpage/2026-04-28/1225202319.PDF
+- Market-cap snapshot: config/input.json; source Tencent qt.gtimg.cn; timestamp 20260731114318.
+- Downloaded the full report to a temporary directory and extracted text locally for table-level verification. Temporary files are not deliverables.
+
+5. Model verification
+- Confirmed ordinary_operating/applicable.
+- Reason: revenue and profit arise from e-commerce sales and marketing services, with ordinary customer/supplier working capital. No bank deposits, brokerage client funds, insurance reserves, property pre-sales, concession rights or other special-model balance-sheet structure.
+- Special handling: RMB 618,811,521.71 bill deposits are restricted and matched to supplier-bill settlement; excluded from detachable cash. Inventory, receivables and prepayments are operating assets.
+
+6. Key reported facts used (CNY)
+- Assets 3,614,175,275.88; liabilities 1,606,247,818.55; equity 2,007,927,457.33; parent equity 1,998,297,361.38.
+- Revenue 3,187,228,252.56; cost 2,415,059,528.93; gross profit 772,168,723.63; parent net profit 169,471,929.77; parent recurring net profit 191,970,272.70.
+- CFO 552,194,376.44; capex 3,567,859.15; operating FCF 548,626,517.29.
+- Cash and equivalents 622,073,196.93; restricted bill deposits 618,811,521.71.
+- Receivables 491,319,429.78; prepayments 409,719,066.88; inventory 1,071,384,291.43.
+- Notes payable 1,136,729,003.51; short-term debt 210,179,500.00; provision 45,266,800.00.
+
+7. Derived metrics
+- Gross margin = 772,168,723.63 / 3,187,228,252.56 = 24.2148%.
+- Net margin = 169,471,929.77 / 3,187,228,252.56 = 5.3178%.
+- Discounted detachable net cash = 622,073,196.93*50% + 5,260,038.90*30% - 210,179,500.00 - 4,185,589.68 - 6,799,825.55 = 91,449,694.90.
+- Discounted sustainable cash profit = 191,970,272.70*75% - 3,567,859.15 = 140,409,845.38.
+- Operating business price = 4,700,000,000.00 - 91,449,694.90 = 4,608,550,305.10.
+- Owner earnback = 4,608,550,305.10 / 140,409,845.38 = 32.8221 years.
+- Market cap/cash profit = 4,700,000,000.00 / 140,409,845.38 = 33.4734.
+- Forecast cash dividend = 70,813,254.70 interim + 71,198,247.20 annual plan = 142,011,501.90; yield = 3.0215%.
+
+8. Judgment flags
+- 50% cash haircut is a conservative operating-liquidity assumption, not a reported fact.
+- 25% recurring-profit haircut reflects revenue decline and customer/supplier concentration, not accounting data.
+- FY2025 CFO was not annualized because receivables, prepayments and restricted bill deposits moved materially.
+- Dividend forecast mechanically carries forward FY2025 cash distributions; it is not company guidance.
+
+9. Output construction
+- Used protocol set commands to populate initialized result.json; did not hand-write JSON from scratch.
+- Created outputs/report.md and outputs/trace.txt.
+- Final protocol validation recorded after all corrections.

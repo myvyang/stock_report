@@ -1,0 +1,54 @@
+2026-08-04T14:11:31+08:00 INIT
+- Read skill: .agents/skills/stock-research/SKILL.md
+- Read contracts: references/result-contract.md, references/report-contract.md, references/data-reuse.md
+- Initialized outputs/result.json with protocol CLI:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+SOURCE REUSE CHECK
+- No local annual facts, normalized facts, raw filing metadata, or prior stock research files existed for 02789.HK/2025-12-31.
+- Located official company investor-relations page and 2025 annual report.
+- Downloaded annual report to stock_report/data/raw/filings/02789.HK/2025-12-31/annual_report_2025.pdf
+- Official annual report URL: https://yuandacn.com/images/sehk/2026/0428/2026042802990_c.pdf
+- Official results announcement URL: https://www.yuandacn.com/images/sehk/2026/0331/2026033103336_c.pdf
+- Extracted PDF text with pypdf in a temporary virtual environment because pdftotext was unavailable.
+
+MODEL REVIEW
+- Input hint: financial_brokerage / requires_special_model.
+- Filing fact: principal activities are design, procurement, production, sale and installation of curtain wall systems; most revenue is recognized over time from construction contracts.
+- Overrode statement model to construction_project.
+- Kept owner_earnback_applicability as requires_special_model.
+- Ordinary discounted net cash, cash profit, operating-business price and payback fields remain null per contract.
+
+KEY EXTRACTION (RMB unless noted)
+- Revenue: 2,814,558,000; cost of sales: 2,080,652,000; gross profit: 733,906,000.
+- Operating profit: 431,734,000; parent/net profit: 352,529,000.
+- ECL reversal: 119,346,000 in income statement; detailed trade/bills/contract-asset impairment reversal 119,388,000.
+- Operating cash flow: 433,214,000; capex: 12,217,000; operating FCF: 420,997,000.
+- Total assets: 4,284,394,000; total liabilities: 3,586,437,000; equity: 697,957,000.
+- Cash: 573,072,000; restricted deposits: 469,061,000.
+- Contract assets: 875,233,000; net trade and bills receivables: 984,449,000.
+- Trade/bills/contract-assets loss allowance: 1,945,842,000.
+- Bank loans: 901,100,000; other borrowings: 365,268,000.
+- New awards: 5,168,300,000; backlog: 13,201,300,000.
+- Proposed post-year-end special dividend: HKD 0.05/share, HKD 310,437,000 total, annual-report RMB equivalent 274,723,000.
+
+CALCULATIONS
+- Gross margin = 733,906,000 / 2,814,558,000 = 0.2607535534886828.
+- Net margin = 352,529,000 / 2,814,558,000 = 0.1252519933858176.
+- Operating FCF = 433,214,000 - 12,217,000 = 420,997,000.
+- Forecast dividend yield = 274,723,000 / 913,371,911.7587804 = 0.3007789011937054.
+- No ordinary owner earnback calculation made because construction-project applicability is requires_special_model.
+
+PROTOCOL MUTATION
+- Populated outputs/result.json using protocol CLI set and append commands; did not hand-write the initialized JSON object.
+- Key evidence points to annual-report page numbers and the input market snapshot.
+
+LIMITATIONS
+- Market cap and PE TTM were accepted from config/input.json; FX conversion and per-share reconstruction were not independently reproduced.
+- Special dividend is a one-off proposed post-year-end distribution and is not treated as sustainable annual payout.
+- Project-level margins, cash collection and restricted-fund details are not disclosed.
+
+VALIDATION
+- Protocol validation executed after population:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[].

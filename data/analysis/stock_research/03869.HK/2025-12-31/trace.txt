@@ -1,0 +1,64 @@
+stock-research trace
+company: 03869.HK / Hospital Corporation of China Limited
+period: 2025-12-31
+generated context date: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because SKILL.md identifies it as the reuse boundary.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Expected annual facts, normalized facts, filing metadata and prior stock-research outputs were absent.
+- Downloaded the official 2025 annual report PDF to:
+  stock_report/data/raw/filings/03869.HK/2025-12-31/annual-report-2025.pdf
+- Official disclosure URL:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042701188.pdf
+- PDF publication date: 2026-04-27; audited statements authorized 2026-03-26; auditor KPMG.
+
+3. Model override
+- Input hint said financial_brokerage/requires_special_model.
+- Official annual report pp.16 and 93 says the group operates/manages hospitals, provides management/supply-chain/ancillary services, and sells pharmaceuticals.
+- No brokerage customer funds, proprietary trading book or repo financing model exists in the audited statements.
+- Overrode hint with ordinary_operating/applicable.
+
+4. Core audited facts (annual report, RMB'000 converted x1,000 to CNY yuan)
+- p.87: revenue 1,471,013; cost of revenue 1,203,394; gross profit 267,619; operating profit 121,270; total net profit 139,029; parent net profit 136,417.
+- pp.89-90: total assets 2,576,861; total liabilities 1,856,033; total equity 720,828; parent equity 502,503; NCI 218,325.
+- p.92: OCF 157,920; property/equipment/intangible purchases 22,220; financing cash flow -102,693; NCI dividends paid 32,961.
+- pp.89, 139-144: cash 665,673; term deposits 119,703; FVPL wealth products 18,971; related-party receivables 207,302; bank debt 69,000; convertible bonds 966,356; lease liabilities 21,014.
+- pp.142-143: NCI acquisition undertaking payable 239,788; NCI-holder loan 14,841.
+- pp.120-121: external revenue/EBITDA: general hospital 1,410,705/11,306; hospital management 47,469/191,742; pharmaceutical sales 9,773/739.
+- p.149: no 2025 final dividend; 2024 nil.
+
+5. Formula audit
+- gross_margin = 267,619,000 / 1,471,013,000 = 0.18192837180908666.
+- net_margin = 136,417,000 / 1,471,013,000 = 0.09273677391022377.
+- operating FCF = 157,920,000 - 22,220,000 = 135,700,000.
+- discounted liquid/recoverable assets:
+  cash 665,673,000 x 80% = 532,538,400;
+  term deposits 119,703,000 x 90% = 107,732,700;
+  FVPL wealth products 18,971,000 x 80% = 15,176,800;
+  related-party receivables 207,302,000 x 50% = 103,651,000;
+  total = 759,098,900.
+- financing/quasi-financing obligations deducted at 100%:
+  69,000,000 + 966,356,000 + 21,014,000 + 239,788,000 + 14,841,000 = 1,310,999,000.
+- discounted detachable net cash = 759,098,900 - 1,310,999,000 = -551,900,100.
+- sustainable cash profit = (135,700,000 - 20,000,000 normalized NCI claim) x 85% = 98,345,000.
+- operating business price = 404,220,560.10603905 - (-551,900,100) = 956,120,660.106039.
+- owner earnback years = 956,120,660.106039 / 98,345,000 = 9.72210747985194.
+- market cap / cash profit = 404,220,560.10603905 / 98,345,000 = 4.110229906004769.
+- forecast dividend = 0; yield = 0.
+
+6. Judgment boundaries
+- 80% cash haircut reflects PRC remittance constraints and hospital working-capital needs, not an observed liquidation discount.
+- Related-party receivables use 50% because they are unsecured and trade-nature balances over 180 days were RMB90.102m.
+- Normalized NCI deduction of RMB20m is a judgment informed by RMB32.961m actual NCI dividends and non-wholly-owned operations.
+- Final 15% profit haircut reflects declining gross margin, RMB39.068m ECL, reimbursement reform and maintenance-capex uncertainty.
+- Market cap and PE TTM were retained exactly from config/input.json and were not independently recalculated.
+
+7. Validation
+- Populated outputs/result.json only via protocol set/append commands after protocol initialization.
+- Protocol validation after population returned: {"status":"ok","errors":[]}.

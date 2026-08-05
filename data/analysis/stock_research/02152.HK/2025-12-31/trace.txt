@@ -1,0 +1,50 @@
+stock-research trace
+company: 02152.HK / 蘇新美好生活服務股份有限公司
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol initialization
+   Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   Result: initialized stock-research-result-v1.
+
+2. Input-model audit
+   Input hint: financial_brokerage / requires_special_model.
+   Finding: rejected. The issuer's audited annual report describes city services, commercial and residential property management, and property leasing. No brokerage customer funds, proprietary securities book, margin financing, or repo funding exists in the statements.
+   Applied model: ordinary_operating / applicable.
+
+3. Primary-source acquisition
+   HKEX annual report URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0430/2026043004286.pdf
+   Local source: stock_report/data/raw/filings/02152.HK/2025-12-31/annual-report-2025-en.pdf
+   Text extraction: pypdf, 248 PDF pages, stored as annual-report-2025-en.txt.
+   Note: an initial HKEX search result URL ending 2026043004356.pdf was identified as the 2025 ESG report and replaced with the audited annual report above.
+
+4. Statement facts (annual report units converted from RMB'000 to absolute RMB)
+   Revenue 972,710,000; cost of sales 802,063,000; gross profit 170,647,000.
+   Net profit 68,663,000; parent net profit 66,796,000.
+   Total assets 1,969,817,000; total liabilities 1,081,388,000; total equity 888,429,000; parent equity 854,171,000.
+   Operating cash flow 68,766,000; management-disclosed capex 17,400,000; operating FCF 51,366,000.
+   Cash and equivalents 390,605,000; time deposits 9,252,000; restricted cash 5,913,000.
+   Bank loans 105,844,000; other liabilities/government earmarked loan 180,719,000.
+
+5. Calculations
+   gross_margin = 170,647,000 / 972,710,000 = 0.1754346105.
+   net_margin = 66,796,000 / 972,710,000 = 0.0686700044.
+   discounted_net_cash = 90% * (390,605,000 + 9,252,000) - 105,844,000 - 180,719,000 = 73,308,300.
+   operating_business_price = 372,062,545.9384918 - 73,308,300 = 298,754,245.9384918.
+   operating_FCF = 68,766,000 - 17,400,000 = 51,366,000.
+   parent cash profit = 51,366,000 * (66,796,000 / 68,663,000) = 49,969,318.78886737.
+   owner_earnback_years = 298,754,245.9384918 / 49,969,318.78886737 = 5.9787536268.
+   market_cap_to_cash_profit = 372,062,545.9384918 / 49,969,318.78886737 = 7.4458198542.
+   2025 dividend = RMB0.3628/share * 101,047,000 shares = 36,659,851.6.
+   forecast_dividend_yield = 36,659,851.6 / 372,062,545.9384918 = 0.0985314217.
+
+6. Judgment controls
+   Trade/bills receivables were treated as operating working capital, not detachable cash.
+   Restricted cash was assigned a zero detachable value.
+   Bank debt and the interest-bearing government earmarked loan were deducted in full.
+   PPE and investment properties were not assigned liquidation proceeds without asset-level valuation and disposal evidence.
+   Cash profit is marked as a single-year estimate because receivables and payables moved materially.
+
+7. Protocol validation
+   Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[].

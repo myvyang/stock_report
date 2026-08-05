@@ -1,0 +1,61 @@
+task=stock_research
+query=ULTA
+input=config/input.json
+research_period=2025-12-31
+fiscal_period_used=FY2025 ended 2026-01-31
+fiscal_period_note=Ulta fiscal years end on the Saturday nearest January 31; input annual period maps to company fiscal 2025.
+
+skill_files_read:
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+reuse_check:
+- annual facts package: absent
+- normalized facts package: absent
+- raw filing package: absent
+- prior stock research result: absent
+- action: supplemented from official company 10-K and Federal Reserve FX release
+
+primary_sources:
+- Ulta Beauty FY2025 Form 10-K, filed 2026-03-26
+  https://www.ulta.com/investor/sec-filings/all-sec-filings/content/0001104659-26-035243/ulta-20260131x10k.htm
+- Federal Reserve H.10 weekly release dated 2025-12-29; 2025-12-26 USD/CNY=7.0063
+  https://www.federalreserve.gov/releases/h10/20251229/
+- config/input.json market cap, date, source and PE TTM
+
+model_check:
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- reason=beauty retail, e-commerce and salon operations use inventory, stores, equipment and leases; no financial balance-sheet business
+- lease liabilities treated as operating structure, not financing debt for detachable net cash
+
+currency_conversion:
+- all filing amounts originally USD thousands
+- CNY amount = USD_thousands * 1000 * 7.0063
+
+formula_trace:
+- gross_margin=4,845.224m/12,392.820m=0.3909702554
+- net_margin=1,153.479m/12,392.820m=0.0930763942
+- FY2025 FCF=(1,502.780m-434.829m)*7.0063=7,482,385,091.3 CNY
+- three-year FCF average=((1,502.780-434.829)+(1,338.605-374.458)+(1,476.266-435.267))m/3*7.0063=7,177,013,170.37 CNY
+- discounted cash profit=7,177,013,170.37*0.90=6,459,311,853.33 CNY
+- net financial cash=(424.243m+70.000m-62.287m)*7.0063=3,026,413,322.8 CNY
+- discounted detachable net cash=3,026,413,322.8*0.50=1,513,206,661.4 CNY
+- operating business price=148,767,828,599.68945-1,513,206,661.4=147,254,621,938.28946 CNY
+- owner earnback years=147,254,621,938.28946/6,459,311,853.33=22.7972615786
+- market cap to cash profit=148,767,828,599.68945/6,459,311,853.33=23.0315290510
+- forecast dividend=0; forecast dividend yield=0; buybacks excluded from dividend
+
+protocol_actions:
+- initialized outputs/result.json with protocol init
+- populated fields with protocol set
+- protocol validate status=ok, errors=[]
+
+limitations:
+- fiscal cutoff differs by one month from normalized input period
+- market data is input-provided Yahoo Finance yfinance, not exchange-primary
+- market-cap date is about six months after fiscal year-end
+- maintenance capex not separately disclosed
+- cash and sustainable-profit discounts are analyst judgments

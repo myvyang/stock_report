@@ -1,0 +1,83 @@
+stock-research trace
+company=上海医药
+code=601607.SH
+period=2025-12-31
+report_type=annual
+generated_at=2026-07-31T17:22:28+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields with repeated protocol set commands; result was not hand-written from scratch.
+5. Validated outputs/result.json with the protocol validator.
+
+[reuse check]
+- config/input.json: present and used.
+- stock_report/data/analysis/annual_review/601607.SH/2025-12-31: absent.
+- stock_report/data/normalized/facts/601607.SH/2025-12-31: absent.
+- stock_report/data/analysis/stock_research/601607.SH/2025-12-31: absent.
+- /root/aicode/stock_report matching 601607.SH/2025-12-31 files: absent.
+- Conclusion: no reusable annual facts or prior research package; returned to primary filing.
+
+[primary sources]
+1. 上海医药集团股份有限公司2025年年度报告
+   URL: https://www.sphchina.com/attached/files/601607_SPH_2025A-Os.pdf
+   Approved for issue: 2026-03-30
+   Audit: Deloitte Touche Tohmatsu Certified Public Accountants LLP, standard unqualified opinion
+   Used for: identity, business model, segment revenue/cost/margin, three statements, cash restrictions, dividend, non-recurring gains, risks.
+2. config/input.json / Tencent qt.gtimg.cn snapshot
+   Timestamp: 20260731114342
+   Used for: market cap CNY 61,596,000,000 and PE TTM 10.6.
+
+[key extracted facts]
+- Revenue: 283,579,600,562.98
+- Cost of sales: 253,163,120,898.92
+- Gross profit: 30,416,479,664.06
+- Operating profit: 9,942,085,632.77
+- Net profit: 6,973,717,681.49
+- Parent net profit: 5,724,557,508.41
+- Deducted non-recurring parent net profit: 2,980,440,494.17
+- Operating cash flow: 6,154,201,379.37
+- Capital expenditure: 2,325,878,841.63
+- Operating free cash flow: 3,828,322,537.74
+- Total assets: 233,148,766,767.21
+- Total liabilities: 143,361,473,043.61
+- Total equity: 89,787,293,723.60
+- Parent equity: 75,891,327,824.17
+- Minority interest: 13,895,965,899.43
+- Cash and cash equivalents/balance-sheet monetary funds: 32,721,763,351.58
+- Other monetary funds treated as restricted: 4,323,402,810.76
+- Trading financial assets: 10,360,938,931.51
+- Interest-bearing debt used in owner earnback: 51,137,295,930.09
+- Accounts receivable: 82,306,400,629.83
+- Inventory: 45,358,947,550.04
+- Goodwill: 12,665,615,569.87
+- 2025 cash dividend basis: 1,742,930,050.23
+
+[analysis model]
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Reason: drug manufacturing, distribution and retail are ordinary operating activities. Large receivables, inventory, payables and short-term borrowing are operating working capital, not a financial-sector balance sheet, but they require strict net-cash treatment.
+
+[owner earnback calculations]
+- Unrestricted cash proxy = 32,721,763,351.58 - 4,323,402,810.76 = 28,398,360,540.82
+- Discounted trading financial assets = 10,360,938,931.51 * 80% = 8,288,751,145.208
+- Interest-bearing debt = 44,091,821,016.96 + 2,809,599,313.10 + 4,235,875,600.03 = 51,137,295,930.09
+- Discounted detachable net cash = 28,398,360,540.82 + 8,288,751,145.208 - 51,137,295,930.09 = -14,450,184,244.062
+- Consolidated operating FCF = 6,154,201,379.37 - 2,325,878,841.63 = 3,828,322,537.74
+- Parent attribution ratio = 5,724,557,508.41 / 6,973,717,681.49 = 82.08%
+- Attributable FCF = 3,142,578,109.55
+- Discounted sustainable cash profit = 3,142,578,109.55 * 85% = 2,671,191,393.12
+- Operating business price = 61,596,000,000 - (-14,450,184,244.062) = 76,046,184,244.062
+- Owner earnback years = 76,046,184,244.062 / 2,671,191,393.12 = 28.4690
+- Market cap / cash profit = 61,596,000,000 / 2,671,191,393.12 = 23.0594
+- Forecast dividend yield = 1,742,930,050.23 / 61,596,000,000 = 2.8296%
+
+[judgment boundaries]
+- Fact: 2025 parent net profit includes material non-recurring gains; non-current asset disposal gain was 3,191,777,241.15.
+- Inference: PE TTM 10.6 understates the multiple on sustainable cash profit.
+- Judgment: trading financial assets discounted to 80%; consolidated FCF attributed by parent share of net profit; a further 15% sustainability haircut applied for working-capital volatility.
+- Limitation: market-cap construction was accepted from task input and not independently rebuilt across A/H share classes.
+- Limitation: annual dividend includes paid interim dividend plus the year-end proposal, which was pending shareholder approval at annual-report publication.

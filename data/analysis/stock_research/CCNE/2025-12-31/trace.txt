@@ -1,0 +1,71 @@
+stock-research trace
+task_query=CCNE
+period=2025-12-31
+report_type=annual
+run_date=2026-08-05 Asia/Shanghai
+
+1. Instructions loaded
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md in full.
+- Read references/report-contract.md in full.
+- Read references/data-reuse.md in full because no annual fact package was present.
+
+2. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: initialized stock-research-result-v1 skeleton.
+
+3. Reuse audit
+- Expected CCNE paths under stock_report/data/raw/filings, annual_review, normalized/facts, and stock_research were absent.
+- No prior CCNE 2025 fact package or research result was available for reuse.
+- outputs/result.json was newly initialized; report.md and trace.txt did not previously exist.
+
+4. Primary sources obtained and checked
+- SEC 2025 Form 10-K, accession 0000736772-26-000031, filed 2026-03-11:
+  https://www.sec.gov/Archives/edgar/data/736772/000073677226000031/ccne-20251231.htm
+- SEC/company quarterly dividend release dated 2026-05-12:
+  https://www.sec.gov/Archives/edgar/data/736772/000073677226000057/ccne5-12x2699x1xcommondivi.htm
+- PBOC/CFETS 2025-12-26 USD/CNY central parity announcement:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- Market cap, date, PE and market-data source reused exactly from config/input.json.
+
+5. Model override
+- Input hint: ordinary_operating / applicable.
+- Filing facts: CNB Financial is a financial holding company; CNB Bank accepts deposits and originates loans. Loans, securities, cash/liquidity and deposits are the operating balance sheet.
+- Final model: financial_bank / requires_special_model.
+- Consequence: all ordinary owner-earnback sorting fields remain null as required by result-contract.md.
+
+6. Key USD facts extracted from the 10-K
+- Total assets 8,396.435m; total liabilities 7,524.308m; total equity 872.127m.
+- Common equity 814.342m; tangible common equity 692.137m.
+- Gross loans 6,493.740m; allowance 67.055m; deposits 7,027.109m.
+- Cash equivalents 527.896m; debt/equity securities 837.333m.
+- Net interest income 242.036m; noninterest income 40.165m.
+- Net income 66.131m; income available to common shareholders 61.829m.
+- Common dividends 18.190m; preferred dividends 4.302m; treasury-stock tax withholding purchases 0.333m.
+- NIM 3.65%; NPA/assets 0.50%; loan allowance/loans 1.03%; CET1 11.44%.
+- Uninsured deposits 2,006.055m, calculated share of deposits 28.547%.
+- ESSA acquisition closed 2025-07-23; year-end assets grew 35.6%; merger/integration expense 13.824m pre-tax.
+
+7. Currency normalization and calculations
+- FX used: CNY 7.0358 per USD.
+- Every monetary fact in result.json is an absolute CNY amount.
+- Forecast dividend: USD 0.19 x 4 x 29,473,352 shares x 7.0358 = CNY 157,600,143.60.
+- Forecast yield: CNY 157,600,143.60 / CNY 7,016,543,774.663269 = 0.022461221459247487.
+- Common payout ratio for narrative: USD 18.190m / USD 61.829m = 29.42%.
+- Static P/common book for narrative: market cap / CNY common equity = 1.2246x.
+- Static P/tangible common book for narrative: market cap / CNY tangible common equity = 1.4408x.
+- Revenue, gross margin, net margin, consolidated OCF, capex and ordinary FCF were left null because these ordinary-company measures are not economically comparable for a bank.
+
+8. Result population
+- outputs/result.json was populated only through protocol set and append commands after protocol init.
+- No complex JSON object was handwritten from scratch.
+
+9. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[].
+- JSON syntax also checked with python3 -m json.tool.
+
+10. Output status
+- outputs/result.json: complete under special-model minimum requirements.
+- outputs/report.md: completed in Chinese with facts, inferences and judgment separated.
+- outputs/trace.txt: completed.

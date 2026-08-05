@@ -1,0 +1,67 @@
+stock-research trace
+company: 08350.HK / WELL LINK SEC
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- config/input.json exists.
+- No raw filing, annual facts, normalized facts, or prior stock-research result for 08350.HK/2025-12-31 existed in /workspace/stock_report.
+- No matching user evaluation for 08350/WELL LINK was found.
+- Therefore returned to primary public filing.
+
+3. Primary filing
+- HKEX title search identified Annual Report 2025, released 2026-04-28.
+- URL: https://www1.hkexnews.hk/listedco/listconews/gem/2026/0428/2026042800939.pdf
+- Identity/business checked at pp.3-9 and p.43.
+- Income statement checked at p.37.
+- Balance sheet checked at pp.38-39.
+- Equity movement/common-control restatement checked at p.40.
+- Cash flow checked at pp.41-42.
+- Segments checked at pp.67-70.
+- Dividend checked at p.78.
+- Brokerage/margin receivables checked at pp.83-85.
+- Money-lending receivables checked at pp.86-88.
+- FRR liquid-capital compliance checked at pp.93-94.
+- Credit loss detail checked at pp.97-101.
+
+4. Model decision
+- Confirmed financial_brokerage, matching but independently verifying input hint.
+- Brokerage and margin-financing revenue HKD76.233m / total revenue HKD77.480m = 98.39%.
+- Cash, statutory deposits, margin receivables and settlement balances support regulated brokerage operations.
+- Segregated client money is off balance sheet.
+- Ordinary detachable-net-cash owner earnback is requires_special_model.
+- All ordinary owner-earnback sorting numbers remain null.
+
+5. Currency conversion
+- Result contract requires CNY absolute yuan.
+- Used PBOC/CFETS 2025-12-26 central parity: 1 HKD = 0.90486 CNY, a near-year-end official observable rate.
+- PBOC URL: https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- Formula for filing values: HKD thousands * 1,000 * 0.90486.
+- Market cap and PE were retained from task input because protocol init treated the upstream market-cap amount as the unified result amount; no second FX conversion was applied.
+
+6. Derived metrics
+- Parent net margin = HKD52.818m / HKD77.480m = 68.1699%.
+- Average parent-equity ROE = HKD52.818m / average(HKD92.445m, HKD142.246m) = 45.0107%.
+- Ending-equity ROE = HKD52.818m / HKD142.246m = 37.1314%.
+- Indicative P/B = input market cap CNY298.326m / converted parent equity CNY128.713m = 2.3178x.
+- Operating FCF shown only as cash-flow bridge: HKD38.431m OCF - HKD0.004m property/equipment purchases = HKD38.427m. It is not used as ordinary cash profit.
+- Forecast dividend = 0; basis is two consecutive nil-dividend years and no post-year-end proposal.
+
+7. Protocol operations
+- Initialized outputs/result.json using protocol CLI init.
+- Populated scalar/array fields using protocol CLI set and append; complex JSON was not handwritten from scratch.
+- First validation: status ok, errors [].
+- Final protocol validation after report and reconciliation checks: status ok, errors [].
+- Semantic checks confirmed asset/liability analysis totals reconcile to the balance sheet, status is complete with no incomplete reasons, and all ordinary owner-earnback metrics remain null.
+
+8. Data limitations
+- 2024 comparatives were restated for a common-control combination.
+- Filing states FRR compliance but does not disclose actual excess liquid capital.
+- Brokerage operating cash flow includes movements in settlement, margin and loan receivables.
+- Market snapshot was supplied by task input and not independently reconstructed.

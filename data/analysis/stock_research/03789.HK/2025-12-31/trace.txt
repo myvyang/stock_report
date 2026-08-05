@@ -1,0 +1,57 @@
+Stock research trace: 03789.HK / ROYAL DELUXE
+Generated at: 2026-08-04T19:31:59+08:00
+
+1. Required instructions read
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+   - /workspace/AGENTS.md (provided in task context)
+
+2. Local reuse audit
+   - config/input.json existed.
+   - No annual facts, normalized facts, filing metadata, or prior stock-research output existed for 03789.HK/2025-12-31.
+   - Result: returned to primary official filing as required by the reuse protocol.
+
+3. Primary filing acquired and reviewed
+   - Royal Deluxe Holdings Limited Annual Report 2025.
+   - HKEX URL: https://www.hkexnews.hk/listedco/listconews/sehk/2025/0729/2025072900805.pdf
+   - Local copy: stock_report/data/raw/filings/03789.HK/2025-12-31/annual-report-2025.pdf
+   - Key pages: 7-9 business/MD&A; 54 profit and loss; 55-56 financial position; 58-59 cash flow; 76-78 revenue/customer concentration; 83 dividend; 86-89 receivables, contract assets, cash and payables; 92 capital commitments.
+
+4. Identity/model correction
+   - Input hint classified the company as financial_brokerage.
+   - Annual report establishes that it provides formwork erection and ancillary construction services in Hong Kong.
+   - Model overridden to construction_project / requires_special_model.
+   - Ordinary owner earnback metrics left null per result contract.
+
+5. Period handling
+   - Input directory period: 2025-12-31.
+   - Actual Annual Report 2025 financial year end: 2025-03-31.
+   - analysis.period corrected to 2025-03-31; discrepancy disclosed in data_quality and report.
+
+6. Currency normalization
+   - Filing currency: HKD, values stated in HK$'000.
+   - Result contract currency: CNY absolute yuan.
+   - Conversion rate: 1 HKD = 0.92257 CNY, PBOC/CFETS midpoint on 2025-04-01, the next trading day nearest the 2025-03-31 year end.
+   - PBOC URL: https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/5648456/index.html
+   - Ratios calculated from unrounded HKD values.
+
+7. Key calculations
+   - Gross margin = 41,542 / 730,955 = 0.0568324999.
+   - Net margin = -6,046 / 730,955 = -0.0082713710.
+   - Operating profit = loss before tax (-3,392) + finance costs (19) = -3,373 HK$'000.
+   - Total liabilities = current liabilities 155,950 + non-current liabilities 707 = 156,657 HK$'000.
+   - Operating free cash flow = operating cash flow (-39,720) - capex (719) = -40,439 HK$'000.
+   - Forecast dividend = 0; basis: FY2025 and FY2024 nil dividend, FY2025 loss, and negative operating free cash flow. This is a research assumption, not guidance.
+
+8. Protocol CLI usage
+   - Initialized: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Populated with repeated protocol set/append commands; result was not hand-written from scratch.
+   - Final validation: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Validation result: {"status":"ok","errors":[]}
+
+9. Data limitations
+   - Market-cap and PE snapshot date (2026-08-03) differs from annual-report period (2025-03-31).
+   - PE TTM cannot be reconciled to the annual-report loss and is retained only as supplied market data.
+   - No company dividend guidance was found; forecast is scenario-based.

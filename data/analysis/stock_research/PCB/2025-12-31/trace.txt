@@ -1,0 +1,58 @@
+task=PCB annual stock research period=2025-12-31
+skill=stock-research
+
+[protocol]
+initialized outputs/result.json with:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+all structured fields were populated using protocol set commands; no complex result JSON was written from scratch.
+
+[local reuse]
+checked configured annual facts, normalized facts, and raw filing paths under stock_report/.
+result: directories/files absent, so no reusable annual fact package or prior research result was available.
+
+[primary sources]
+1. SEC 2025 Form 10-K, filed 2026-03-16, accession 0001423869-26-000006:
+   https://www.sec.gov/Archives/edgar/data/1423869/000142386926000006/pcb-20251231.htm
+   used audited statements, business description, net interest margin, ROA/ROE, capital, credit quality, CRE concentration, dividends and repurchases.
+2. SEC companyfacts, CIK 0001423869:
+   https://data.sec.gov/api/xbrl/companyfacts/CIK0001423869.json
+   cross-checked assets, liabilities, equity, net income, deposits, interest income, and dividends.
+3. PCB Bancorp dividend announcement dated 2026-07-23:
+   latest quarterly common dividend $0.22/share, declared 2026-07-22.
+4. Federal Reserve H.10 release dated 2025-12-29:
+   2025-12-26 China yuan rate 7.0063 CNY per USD, the latest available business-day observation before 2025-12-31 in that release.
+5. config/input.json:
+   market cap CNY 2,642,594,161.8554077 as of 2026-08-03 and PE TTM 9.610345, source Yahoo Finance yfinance.
+
+[model decision]
+overrode input hint ordinary_operating/applicable with financial_bank/requires_special_model.
+reason: PCB Bancorp is a bank holding company whose only material operation is PCB Bank; deposits, loans, securities and liquidity are operating balance-sheet items.
+ordinary owner-earnback fields remain null as required by result contract.
+
+[currency]
+translation rate: 1 USD = 7.0063 CNY.
+balance-sheet and annual income-statement USD amounts were multiplied by 7.0063.
+translation is for common display only and does not imply the company reports in CNY.
+
+[dividend forecast]
+quarterly dividend $0.22 x 4 = $0.88/share annualized.
+shares: 14,234,723 disclosed outstanding at 2026-04-30.
+forecast cash dividend: $12,526,556.24 x 7.0063 = CNY 87,764,810.98.
+forecast yield: CNY 87,764,810.98 / CNY 2,642,594,161.8554077 = 3.321161%.
+this is a mechanical annualization, not company guidance.
+
+[bank diagnostics]
+2025 NIM=3.29%; ROA=1.15%; ROE=9.93%.
+NPA/assets=0.24%; nonaccrual loans=$7.910m; ACL loans=$33.381m; ACL/nonaccrual=422.01%.
+PCB Bancorp CET1=11.46%, total capital=15.13%, leverage=11.89%.
+PCB Bank CET1=13.49%, total capital=14.72%, leverage=11.55%.
+CRE loans/total risk-based capital=307.7%.
+
+[limitations]
+market snapshot is third-party input and was not independently reconstructed.
+bank gross margin, ordinary operating cash flow, capex, and ordinary FCF were left null because they lack ordinary-company comparability.
+net margin is common-shareholder net income divided by net interest income plus noninterest income; it is not a sales margin.
+
+[validation]
+final command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

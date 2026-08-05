@@ -1,0 +1,63 @@
+stock-research trace — MFIN — FY2025
+generated context date: 2026-08-04 Asia/Shanghai
+
+1. Read skill and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - references/result-contract.md
+   - references/report-contract.md
+   - references/data-reuse.md
+
+2. Reuse check
+   - config/input.json present.
+   - No annual facts, normalized facts, prior stock-research result, or raw filing existed for MFIN/FY2025.
+   - Therefore retrieved the primary filing and earnings exhibit from SEC.
+
+3. Protocol initialization
+   command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   result: initialized stock-research-result-v1 skeleton.
+
+4. Primary sources retrieved
+   - SEC 2025 Form 10-K, filed 2026-03-10, accession 0001193125-26-100121:
+     https://www.sec.gov/Archives/edgar/data/1000209/000119312526100121/mfin-20251231.htm
+   - SEC Exhibit 99.1 FY2025 results, furnished 2026-02-18:
+     https://www.sec.gov/Archives/edgar/data/1000209/000119312526057046/mfin-ex99_1.htm
+   - Local raw copies:
+     stock_report/data/raw/filings/MFIN/2025-12-31/mfin-20251231.htm
+     stock_report/data/raw/filings/MFIN/2025-12-31/earnings-release.htm
+   - Federal Reserve H.10/G.5A exchange-rate data; CNY display conversion: 7.1875 CNY/USD.
+   - Market cap and PE: task input, Yahoo Finance yfinance snapshot dated 2026-08-03; not independently back-tested.
+
+5. Model decision
+   - Input hint ordinary_operating/applicable rejected.
+   - Actual model set to financial_bank/requires_special_model.
+   - Evidence: net loans are approximately 82% of assets, deposits approximately 85% of liabilities, net interest income is the core revenue stream, and Medallion Bank is subject to regulatory capital rules including a 15% Tier 1 leverage maintenance requirement.
+   - Consequence: all ordinary owner-earnback metrics remain null. No detachable-net-cash or ordinary FCF payback number was manufactured.
+
+6. Key source facts (USD, as filed)
+   - Assets $2,955.464m; liabilities $2,447.418m; total equity $508.046m; parent equity $408.617m; NCI $99.429m.
+   - Net loans $2,436.916m; loans held for sale $15.144m; deposits $2,084.265m.
+   - Net interest income $216.893m; provision $89.822m; consolidated net income $55.341m; parent net income $43.044m.
+   - Equity investment gain $24.552m.
+   - Net-loan NIM 8.40%; bank Tier 1 leverage ratio 17.8%; excess over 15% requirement $71.7m.
+   - 2025 dividends paid $10.926m; repurchases $0.986m.
+   - 2026 Q1 dividend declared $0.12/share; annualized forecast uses $0.48/share x 23,311,683 shares.
+
+7. Transformations and checks
+   - Financial-statement amounts multiplied by 7.1875 and stored as absolute CNY yuan.
+   - Parent-equity P/B = 1,545,521,033.33 / 2,936,934,687.50 = 0.5262.
+   - Historical ROE = $43.044m / average($408.617m, $370.170m) = 11.05%.
+   - Forecast dividend = $0.48 x 23,311,683 x 7.1875 = CNY 80,425,306.35.
+   - Forecast yield = CNY 80,425,306.35 / CNY 1,545,521,033.33 = 5.2038%.
+   - Values were populated through protocol CLI set/append commands, not by hand-writing a replacement JSON object.
+
+8. Validation
+   command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   first completed-result validation: status ok, errors [].
+
+9. Known limitations
+   - Fixed CNY translation rate is for protocol/display consistency and is not an FX exposure analysis.
+   - Market snapshot is accepted from task input.
+   - Dividend forecast is a run-rate scenario, not management guidance.
+   - Revenue/gross margin/ordinary operating cash flow/capex/FCF are intentionally null because they are not economically comparable for this financial model.

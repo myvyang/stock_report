@@ -1,0 +1,106 @@
+MCRI stock-research trace
+generated_for_period=2025-12-31
+market_snapshot_date=2026-08-03
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields only through protocol set commands.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[local_reuse_audit]
+Expected annual facts, normalized facts, filing metadata, and historic stock-research outputs were absent under the paths in config/input.json.
+No prior conclusions were reused.
+
+[primary_sources]
+SEC filing index:
+https://www.sec.gov/Archives/edgar/data/907242/0001104659-26-018717-index.html
+SEC 2025 Form 10-K:
+https://www.sec.gov/Archives/edgar/data/907242/000110465926018717/mcri-20251231x10k.htm
+SEC Companyfacts, CIK 0000907242:
+https://data.sec.gov/api/xbrl/companyfacts/CIK0000907242.json
+Company annual reports page:
+https://monarchcasino.com/financials/annual-reports
+Market snapshot source: config/input.json, supplied as Yahoo Finance yfinance.
+
+[source_currency_and_conversion]
+The audited filing is in USD thousands. The result contract requires absolute CNY yuan.
+Analytical conversion rate used consistently: USD 1.00 = CNY 7.20.
+This is an explicit research conversion assumption, not an audited exchange rate.
+Margins are computed in USD and therefore unaffected by conversion.
+
+[financial_statement_facts_usd]
+2025 revenue=545,125,000
+2025 direct departmental expenses=113,745,000+92,490,000+26,394,000+12,443,000=245,072,000
+2025 analytical gross profit=545,125,000-245,072,000=300,053,000
+2025 operating income=127,495,000
+2025 net income attributable to parent=101,392,000
+2025 operating cash flow=164,749,000
+2025 cash acquisition of property and equipment=36,324,000
+2025 operating free cash flow=164,749,000-36,324,000=128,425,000
+2025 financing cash flow=-89,866,000
+2025 dividends plus repurchases=21,894,000+72,725,000=94,619,000
+2025 total assets=712,849,000
+2025 total liabilities=175,179,000
+2025 parent/total equity=537,670,000
+2025 cash and cash equivalents=96,468,000
+2025 net property and equipment=556,668,000
+No noncontrolling interest was reported; minority interest=0.
+
+[analytical_gross_margin]
+The company does not present a conventional gross-profit subtotal.
+For protocol comparability, cost_of_sales is defined as the sum of direct casino, food and beverage, hotel, and other departmental expenses.
+gross_margin=300,053,000/545,125,000=0.5504297179545976
+This is a departmental contribution margin and is disclosed as such in result limitations and report.md.
+
+[net_margin]
+net_margin=101,392,000/545,125,000=0.1859977069479477
+
+[owner_earnback_cash]
+Cash pool=USD 96,468,000=CNY 694,569,600.
+10-K Note 11 discloses USD 77,300,000 PCL litigation liability:
+USD 47,000,000 in construction accounts payable and USD 30,300,000 in accounts payable.
+Full litigation deduction=USD 77,300,000=CNY 556,560,000.
+Remaining USD 19,168,000=CNY 138,009,600 is retained for casino operations, chip/redemption obligations, payroll, taxes, and routine liquidity.
+discounted detachable net cash=0.
+
+[owner_earnback_profit]
+2023 FCF=173,046,000-49,005,000=124,041,000 USD
+2024 FCF=140,711,000-47,432,000=93,279,000 USD
+2025 FCF=164,749,000-36,324,000=128,425,000 USD
+Three-year average FCF=115,248,333.333333 USD=CNY 829,788,000.
+Sustainability haircut=15% due to geographic/property concentration, gaming cyclicality/hold volatility, recurring renovation needs, and litigation cash uncertainty.
+Discounted sustainable cash profit=829,788,000*0.85=CNY 705,319,800.
+
+[owner_earnback_formulas]
+market_cap=CNY 14,845,527,764.411133
+operating_business_price=14,845,527,764.411133-0=14,845,527,764.411133
+owner_earnback_years=14,845,527,764.411133/705,319,800=21.04793848749338
+market_cap_to_cash_profit=21.04793848749338
+discounted_net_cash_to_market_cap=0
+
+[dividend]
+2025 10-K states annual policy of USD 1.20/share, paid USD 0.30 quarterly.
+On 2026-02-04 the company announced another USD 0.30 quarterly dividend.
+Shares outstanding at 2026-02-16=17,886,120.
+Forecast annual dividend=17,886,120*USD 1.20*7.20=CNY 154,536,076.80.
+Forecast dividend yield=154,536,076.80/14,845,527,764.411133=0.010409604781479447.
+Historical cash dividends from cash-flow statement:
+2025 USD 21,894,000=CNY 157,636,800
+2024 USD 22,265,000=CNY 160,308,000
+2023 USD 112,819,000=CNY 812,296,800, including special USD 5/share dividend.
+
+[model_classification]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: the company directly owns and operates two casino resorts and earns service/gaming revenue. It is not a bank, insurer, broker, real-estate developer, construction contractor, concession, or investment holding platform. Casino operating cash is haircut for operational constraints rather than treating the entire balance sheet as a special financial model.
+
+[known_limitations]
+- No standardized gross profit is disclosed; analytical departmental contribution is used.
+- Maintenance capex is not separately quantified; full cash acquisition of PP&E is deducted.
+- The CNY conversion rate is an explicit analytical assumption.
+- Market cap and PE TTM are provided input values dated after the annual-report period.
+- PCL payment timing/outcome can change cash availability.

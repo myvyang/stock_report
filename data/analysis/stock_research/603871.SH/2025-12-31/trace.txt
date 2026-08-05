@@ -1,0 +1,82 @@
+[2026-07-31] task initialized
+- Input: config/input.json
+- Company: 嘉友国际 / 603871.SH
+- Period: 2025-12-31 annual
+- Market snapshot retained from input: market cap CNY 17,743,000,000; PE TTM 14.7; source Tencent qt.gtimg.cn; timestamp 20260731114329.
+
+[protocol]
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the skill routes reuse decisions through that reference.
+- Initialized outputs/result.json using:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+[reuse audit]
+- No files existed under the requested annual_review, normalized facts, raw filing, or historical stock_research paths.
+- Existing user evaluation note was not used as a source for financial facts.
+- Therefore returned to the official annual filing and public announcement materials.
+
+[sources]
+- Primary filing: 嘉友国际物流股份有限公司2025年年度报告, SSE disclosure date 2026-04-25, 260 pages.
+  Official URL: https://www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-25/603871_20260425_5P65.pdf
+- Official SSE PDF endpoint returned an anti-bot payload to curl. The filing was read through the indexed SSE document and the complete Sina announcement text/PDF mirror (announcement id 12194267); all core figures match the filing tables.
+- Dividend implementation: 嘉友国际物流股份有限公司2025年年度权益分派实施公告, 2026-06-22.
+- Market data: config/input.json snapshot; no market-data overwrite performed.
+
+[model classification]
+- Input hint ordinary_operating was tested against business and statements.
+- Result: ordinary_operating / applicable, with special handling.
+- Reason: most revenue is real logistics and supply-chain trading; the balance sheet lacks customer-money financial structures. However, international land-port operations contain 22-30 year concessions and CNY 1.927bn intangible assets. Concession assets, maintenance obligations, and project cash needs were treated as operating assets/constraints, never as detachable cash.
+
+[core statement extraction, CNY]
+- Total assets 8,091,472,467.39
+- Total liabilities 1,924,136,125.54
+- Total equity 6,167,336,341.85
+- Parent equity 6,016,034,458.66
+- Minority interest 151,301,883.19
+- Revenue 8,376,595,685.17
+- Cost of sales 6,828,284,636.49
+- Gross profit calculated 1,548,311,048.68
+- Operating profit 1,341,425,541.79
+- Net profit 1,145,003,117.07
+- Parent net profit 1,141,076,436.67
+- Operating cash flow 1,131,257,526.10
+- Capex proxy (cash paid to acquire fixed, intangible and other long-term assets) 376,187,916.49
+- Operating free cash flow calculated 755,069,609.61
+- Financing cash flow -138,589,135.26
+
+[business facts]
+- Cross-border multimodal logistics: revenue CNY 2,395.99m; gross margin 26.73%.
+- Supply-chain trading: revenue CNY 5,174.17m; gross margin 10.47%; almost entirely coking coal.
+- Land-port project services: revenue CNY 614.72m; gross margin 59.48%.
+- PPP construction accounting: revenue CNY 191.35m and equal cost; zero gross profit.
+- Overseas assets CNY 4,472.77m, 55.28% of total assets.
+
+[owner earnback calculations]
+- Cash base used: cash and cash equivalents 1,551,029,497.20, not total cash balance.
+- Cash haircut: 60%, adjusted cash 930,617,698.32.
+- Fully deducted financing-like obligations: short-term borrowing 338,033,137.36; current non-current liability 7,927,217.27; lease liability 9,922,017.45.
+- Discounted detachable net cash = 574,735,326.24.
+- Sustainable cash-profit base = OCF 1,131,257,526.10 - capex 376,187,916.49 = 755,069,609.61.
+- Sustainability haircut = 10%; discounted cash profit = 679,562,648.649.
+- Operating business price = 17,743,000,000 - 574,735,326.24 = 17,168,264,673.76.
+- Owner earnback years = 17,168,264,673.76 / 679,562,648.649 = 25.2636967436.
+- Market cap / cash profit = 17,743,000,000 / 679,562,648.649 = 26.1094397040.
+- Assumption sensitivity: annual report does not reliably separate maintenance from growth capex. Full capex deduction plus a 10% haircut is deliberately conservative, but future African construction could also make current-year capex unrepresentative on the low side.
+
+[dividend]
+- 2025 full-year cash dividend disclosed in annual report: 547,203,463.20, including interim distribution; payout ratio 47.96%.
+- 2025 final dividend actually implemented: 272,784,571.60 after excluding repurchase-account shares.
+- Baseline forecast uses the full-year CNY 547,203,463.20 level, yielding 3.0840526585% on the supplied market cap. This is a baseline assumption, not issuer guidance.
+
+[quality limitations]
+- No local annual facts package was available before research.
+- Maintenance versus growth capex is not reliably split.
+- Repatriable overseas cash, concession-level book values, and committed future project capex were not sufficiently granular for a precise sum-of-parts model.
+- Market cap and PE were accepted from the supplied Tencent snapshot.
+
+[protocol mutation and validation]
+- outputs/result.json was initialized with protocol init and populated field-by-field with protocol set commands; it was not hand-written from scratch.
+- First completed validation:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+  status=ok; errors=[]

@@ -1,0 +1,49 @@
+stock-research trace — HOG — period 2025-12-31
+
+1. Read skill and contracts:
+   .agents/skills/stock-research/SKILL.md
+   .agents/skills/stock-research/references/result-contract.md
+   .agents/skills/stock-research/references/report-contract.md
+   .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit:
+   config/input.json existed.
+   No annual facts, normalized facts, prior stock-research result, or filing metadata existed at the supplied HOG paths.
+   Returned to the primary filing.
+
+3. Primary filing acquired:
+   SEC accession 0000793952-26-000011, filed 2026-02-26.
+   URL: https://www.sec.gov/Archives/edgar/data/793952/000079395226000011/hog-20251231.htm
+   Local copy: stock_report/data/raw/filings/HOG/2025-12-31/hog-20251231.htm
+   SEC companyfacts used as an XBRL cross-check.
+
+4. Model decision:
+   Input hint ordinary_operating/applicable was overridden.
+   Selected platform_financial_mixed/requires_special_model because HDFS finance receivables, deposits, cash and debt are operating components of a lending business. 2025 HDFS earnings were distorted by the HDFS Transaction and favorable credit provision impacts. Ordinary owner earnback fields remained null per contract.
+
+5. Core USD facts from 10-K (millions):
+   assets 8,044.815; liabilities 4,887.965; total equity 3,156.850; parent equity 3,140.668.
+   revenue 4,473.175; parent net income 338.738; operating cash flow 568.922; capex 153.679.
+   HDMC gross profit 866.592; LiveWire gross loss 4.434; combined product gross profit 862.158.
+   cash 3,091.744; finance receivables 1,965.224; inventory 730.898; PP&E 750.224.
+   dividends 86.388; common-stock repurchases 353.270.
+
+6. Conversion:
+   All protocol currency amounts converted using 2025 average USD/CNY 7.1429 from China's National Bureau of Statistics statistical communiqué. This is a presentation convention; balance-sheet amounts were not translated at a period-end rate and that limitation is disclosed.
+
+7. Dividend forecast:
+   Q2 2026 declared dividend $0.1875/share annualized to $0.75/share.
+   Shares: 111,850,563 outstanding at 2026-01-30 per 10-K.
+   Forecast USD cash dividend: $83,887,922.25; CNY: 599,203,039.84.
+   Forecast yield against supplied market cap: 3.43737357%.
+
+8. Protocol operations:
+   Initialized with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   Populated fields using protocol set commands; no complex result JSON was authored from scratch.
+   Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Validation result: status ok, errors [].
+
+9. Data-quality status:
+   complete. Special-model minimum fields, asset/liability explanations, dividend forecast, business story and evidence are present. Ordinary owner-earnback sorting fields are intentionally null.

@@ -1,0 +1,64 @@
+stock-research trace
+company: Peoples Bancorp Inc. (NASDAQ: PEBO; CIK 0000318300)
+period: 2025-12-31 annual
+generated_at: 2026-08-05T04:27:11+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill defines reuse boundaries.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked the configured annual_review, normalized facts, and raw filing directories.
+- No reusable PEBO 2025 annual facts package was present at task start.
+- Downloaded the SEC-filed 2025 Form 10-K to stock_report/data/raw/filings/PEBO/2025-12-31/pebo-20251231.htm.
+- Downloaded SEC Companyfacts for CIK 0000318300 to a temporary working file for XBRL cross-checks.
+
+3. Model override
+- Input hint: ordinary_operating / applicable.
+- Filing fact: Peoples Bancorp is a financial holding company operating principally through Peoples Bank; deposits, loans, securities and borrowings are the operating model.
+- Final model: financial_bank / requires_special_model.
+- Consequence: discounted net cash, discounted cash profit, operating business price, ordinary owner earnback years, and market-cap-to-cash-profit remain null.
+
+4. Primary evidence
+- SEC 2025 Form 10-K, accession 0000318300-26-000099, filed 2026-02-26:
+  https://www.sec.gov/Archives/edgar/data/318300/000031830026000099/pebo-20251231.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/318300/000031830026000099/0000318300-26-000099-index.htm
+- Company investor relations / annual reports:
+  https://investors.peoplesbancorp.com/financials/annual-reports/default.aspx
+- Federal Reserve H.10, release dated 2025-12-29; 2025-12-26 China yuan rate 7.0063 per USD:
+  https://www.federalreserve.gov/releases/h10/20251229/
+- Market cap and PE: supplied input, source Yahoo Finance yfinance, dated 2026-08-03.
+
+5. Key extracted USD facts
+- Total assets 9,649,630,000; liabilities 8,443,028,000; parent equity 1,206,602,000.
+- Net loans and financing receivables 6,681,231,000; gross 6,756,907,000; ACL 75,676,000.
+- Deposits 7,610,224,000; noninterest-bearing deposits 1,545,428,000.
+- AFS securities fair value 984,367,000; amortized cost 1,076,980,000.
+- HTM securities net 922,837,000.
+- Short-term borrowings 530,285,000; long-term debt 204,138,000.
+- Net interest income 355,230,000; noninterest income 104,078,000; noninterest expense 282,337,000.
+- Provision for credit losses 42,162,000; parent net income 106,778,000.
+- Cash common dividends 58,136,000; declared DPS 1.63; payout 54.45%.
+- NIM 4.14%; ROA 1.13%; ROE 9.22%; tangible ROE 14.97%; efficiency ratio 58.7%.
+- NPA 43,165,000; NPL 43,042,000; net charge-offs 29,400,000 / average loans 0.45%.
+- CET1 12.29%; total capital 13.78%; tier 1 leverage 9.91%.
+
+6. Currency method
+- All structured monetary values are absolute CNY yuan.
+- Conversion factor: USD x 7.0063, using the Federal Reserve H.10 year-end last available business-day rate (2025-12-26).
+- The same spot factor was applied to balance-sheet and income-statement amounts for consistent display; this is not an accounting translation using an annual average income-statement rate.
+
+7. Dividend forecast
+- Forecast amount equals 2025 actual cash common dividends, with zero assumed growth: USD 58,136,000 x 7.0063 = CNY 407,318,256.8.
+- Forecast yield: CNY 407,318,256.8 / CNY 10,103,499,684.304321 = 4.0314571%.
+- This is an analyst convention for the task, not company guidance.
+
+8. Validation
+- Populated result fields using protocol CLI set/append commands; no complex JSON was handwritten from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report creation: status ok, errors [].

@@ -1,0 +1,73 @@
+Stock research trace — LOB — period 2025-12-31
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- Checked configured annual-review, raw-filing, and normalized-facts paths.
+- No local LOB 2025 filing metadata, annual facts JSON, annual facts Markdown, or normalized facts were present.
+- No prior research result was reused.
+
+3. Primary-source retrieval
+- SEC 2025 Form 10-K, accession 0001462120-26-000020, filed 2026-02-27:
+  https://www.sec.gov/Archives/edgar/data/1462120/000146212026000020/lob-20251231.htm
+- SEC Exhibit 99.1 for Q4/full-year 2025 results, accession 0001462120-26-000004:
+  https://www.sec.gov/Archives/edgar/data/1462120/000146212026000004/lob-20260121exx991.htm
+- SEC Company Facts API used to cross-check audited balance-sheet, income, and dividend tags:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0001462120.json
+- Federal Reserve G.5A annual exchange rate, 2025 yuan per USD = 7.1875:
+  https://www.federalreserve.gov/Releases/g5a/current/
+- Market cap and PE were retained from config/input.json (Yahoo Finance yfinance input).
+
+4. Model decision
+- Input hint: ordinary_operating / applicable.
+- Verified fact: Live Oak Bancshares is a financial holding company and parent of Live Oak Bank; deposits, loans, securities, and regulatory capital are the operating model.
+- Final classification: financial_bank / not_applicable.
+- Consequence: all ordinary owner-earnback ranking fields remain null. Bank-specific analysis uses asset quality, NIM, capital, book value, ROE, and dividends.
+
+5. Currency normalization
+- Result contract requires CNY absolute yuan.
+- All 2025 USD filing values were multiplied by 7.1875.
+- This is a uniform presentation conversion. It does not reproduce historical accounting translation and is disclosed as a limitation.
+- Input market cap was accepted as already normalized CNY per the task protocol; the input did not provide the source USD market cap or conversion rate.
+
+6. Key source values (USD)
+- Total assets: 15,134,778,000
+- Total liabilities: 13,880,672,000
+- Total equity: 1,254,106,000
+- Parent equity: 1,249,868,000
+- Noncontrolling interest: 4,238,000
+- Revenue (net interest income + noninterest income): 577,816,000
+- Net income attributable to parent: 105,871,000
+- Net income attributable to common shareholders: 102,823,000
+- Net loans and leases: 11,781,358,000
+- Cash and due from banks: 864,904,000
+- Available-for-sale securities: 1,427,401,000
+- Deposits: 13,688,659,000
+- Allowance for credit losses on loans and leases: 192,264,000
+- 2025 common dividends paid: 5,488,000
+- 2025 dividend per common share: 0.12
+- Shares outstanding at 2026-02-25: 46,219,604
+
+7. Derived calculations
+- Net margin = 102,823,000 / 577,816,000 = 0.1779511125.
+- Forecast dividend = 0.12 USD/share × 46,219,604 shares × 7.1875 = CNY 39,864,408.45.
+- Forecast dividend yield = 39,864,408.45 / 13,367,375,849.39392 = 0.0029822165.
+- Market cap / 2025 parent equity = 13,367,375,849.39392 / 8,983,426,250 ≈ 1.488.
+- Ordinary owner earnback metrics were intentionally not calculated.
+
+8. Quality and consistency decisions
+- Gross margin and gross profit are null because they are not meaningful bank measures.
+- Operating cash flow, capex, and operating free cash flow are null because deposit and loan balance movements distort ordinary-company cash-flow interpretation.
+- Dividend forecast is a mechanical continuation of 2025's quarterly rate, not management guidance.
+- Material weakness in internal control and the increase in nonperforming assets are explicitly disclosed.
+
+9. Output construction and validation
+- outputs/result.json was created with protocol init and populated only through protocol set/append commands.
+- Initial completed result validation returned status=ok with zero errors.
+- outputs/report.md and outputs/trace.txt were then created.

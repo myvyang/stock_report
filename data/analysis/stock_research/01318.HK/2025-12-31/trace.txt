@@ -1,0 +1,64 @@
+stock-research trace
+company=01318.HK MAO GEPING
+period=2025-12-31
+generated_at=2026-08-03 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields using protocol set/append commands. The JSON object was not handwritten from scratch.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[local reuse check]
+- Checked stock_report/data/analysis/annual_review/01318.HK/2025-12-31, raw filing paths, normalized facts paths and /root/aicode sync paths.
+- No filing, annual facts or prior stock-research output existed for this company/period.
+- Therefore returned to official filing rather than reusing an absent fact pack.
+
+[primary sources]
+1. Mao Geping Cosmetics Co., Ltd., Annual Report 2025, HKEX release 2026-04-01.
+   https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0401/2026040104020.pdf
+   Used for business model, channel structure, financial statements, asset/liability notes, cash flow, capex, dividend and risks.
+2. HKEX listed-company title search for stock 01318.
+   https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=1000241857
+   Used to confirm filing date, annual-results/annual-report identity and subsequent AGM/dividend disclosures.
+3. config/input.json market snapshot: Tencent qt.gtimg.cn, dated 2026/07/31 16:08:45.
+   Used without independent recomputation for market cap RMB24,775,332,473.082542 and PE TTM 21.6.
+
+[model verification]
+- Input hint stated financial_brokerage/requires_special_model.
+- Annual report Note 1 states the group conducts R&D, production and sale of beauty products and makeup-artistry training.
+- Revenue is product/training revenue; balance sheet contains inventory, trade receivables, cash, leases and ordinary payables, with no brokerage client money, proprietary financial-asset book or repo funding.
+- Overrode hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+[financial extraction: RMB absolute yuan]
+- Revenue: 5,050,455,000 (annual report pp.171, Note 5).
+- Cost of sales: 796,770,000; gross profit: 4,253,685,000.
+- Operating profit used: 1,597,850,000 = gross profit + other income/gains - selling/distribution - administrative - net impairment - other expenses. Finance costs and associate profit remain below this subtotal.
+- Net profit: 1,205,440,000; parent net profit: 1,204,094,000.
+- Total assets: 5,532,985,000; total liabilities: 863,061,000; total equity: 4,669,924,000; parent equity: 4,666,363,000; NCI: 3,561,000.
+- OCF: 1,199,426,000; capex: 187,000,000; operating FCF: 1,012,426,000.
+- Financing cash flow: -405,118,000; dividends paid in cash during 2025: 352,935,000.
+
+[calculation chain]
+- gross_margin = 4,253,685,000 / 5,050,455,000 = 0.842237 (rounded).
+- net_margin = 1,204,094,000 / 5,050,455,000 = 0.238412 (rounded).
+- detachable cash base = cash and cash equivalents 2,441,285,000 + time deposits 992,638,000. Restricted cash 2,171,000 excluded.
+- discounted detachable net cash = 2,441,285,000*0.90 + 992,638,000*0.90 = 3,090,530,700. Bank borrowings were zero. Lease liabilities treated as continuing operating commitments, not separately deducted from cash to avoid double counting ongoing lease costs.
+- operating business price = 24,775,332,473.082542 - 3,090,530,700 = 21,684,801,773.082542.
+- operating FCF = 1,199,426,000 - 187,000,000 = 1,012,426,000.
+- discounted sustainable cash profit = 1,012,426,000*0.90 = 911,183,400.
+- owner earnback = 21,684,801,773.082542 / 911,183,400 = 23.798510 years.
+- market cap/cash profit = 24,775,332,473.082542 / 911,183,400 = 27.190281.
+- discounted net cash/market cap = 3,090,530,700 / 24,775,332,473.082542 = 0.124742.
+- forecast dividend = proposed and subsequently approved FY2025 final dividend RMB1.00/share, about 490,187,000.
+- forecast dividend yield = 490,187,000 / 24,775,332,473.082542 = 0.019785.
+
+[judgment vs fact]
+- Facts: audited statements, disclosed channel/product revenue, counter counts, expense amounts, inventory, cash, dividend.
+- Inference: growth faster than disclosed industry growth indicates share gain or concentration in faster-growing segments, but does not prove audited national market share.
+- Judgment: 90% cash discount and 90% FCF sustainability factor are conservative analytical assumptions, not company guidance.
+- Limitation: market cap is inherited from input and may embed an HKD/CNY conversion; no independent FX reconstruction was made.

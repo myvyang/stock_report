@@ -1,0 +1,81 @@
+SHBI stock research trace
+generated_for_period=2025-12-31
+task_created_at=2026-08-04T23:14:32+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields using repeated protocol `set` commands; the complex result object was not handwritten from scratch.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[local_data_reuse]
+- Checked configured annual review, normalized facts, and raw filing paths.
+- No local SHBI filing, annual facts, or normalized facts files existed in the workspace.
+- Therefore retrieved the official SEC filing rather than fabricating missing facts.
+
+[primary_sources]
+- 2025 Form 10-K, accession 0001035092-26-000014, filed 2026-03-02:
+  https://www.sec.gov/Archives/edgar/data/1035092/000103509226000014/shbi-20251231.htm
+- 2026 Q1 Form 10-Q, accession 0001035092-26-000030, filed 2026-05-04:
+  https://www.sec.gov/Archives/edgar/data/1035092/000103509226000030/shbi-20260331.htm
+- Market data copied from config/input.json: Yahoo Finance yfinance, market-cap date 2026-08-03.
+
+[model_decision]
+- Input hint: ordinary_operating / applicable.
+- Filing fact: Shore Bancshares is a financial holding company whose main subsidiary is Shore United Bank; primary revenue is interest on loans and banking fees.
+- Override: financial_bank / not_applicable.
+- Reason: loans, securities, cash, deposits, borrowings, liquidity, and regulatory capital are interdependent operating items. Detachable net cash and ordinary free-cash-flow earnback would be economically misleading.
+- Required ordinary earnback metrics were retained as null.
+
+[currency]
+- SEC filing presentation currency: USD.
+- Result contract presentation currency: CNY absolute yuan.
+- Research conversion assumption: 1 USD = 7.30 CNY.
+- Input did not disclose the FX method embedded in market capitalization. This is recorded as a limitation.
+
+[core_source_values_usd]
+- total_assets=6,258,818,000
+- total_liabilities=5,668,945,000
+- stockholders_equity=589,873,000
+- net_loans=4,841,466,000
+- cash_and_cash_equivalents=355,566,000
+- total_deposits=5,533,864,000
+- total_borrowings=89,061,000
+- net_interest_income_2025=192,377,000
+- provision_for_credit_losses_2025=8,375,000
+- noninterest_income_2025=32,688,000
+- noninterest_expense_2025=138,035,000
+- net_income_2025=59,506,000
+- cash_dividends_2025=16,094,000
+
+[bank_specific_metrics]
+- NIM 2025=3.36%; NIM 2024=3.10%.
+- NIM excluding acquisition accretion 2025=3.15%; accretion contribution=21 bp.
+- ROA 2025=0.98%; ROE 2025=10.52%; ROATCE 2025=14.09% (non-GAAP).
+- NPA=43.207m USD, +74.25% YoY; NPA/assets=0.69% vs 0.40%.
+- Classified assets=60.4m USD vs 28.2m USD.
+- ACL/loans=1.20%; net charge-offs=6.6m USD or 0.14% average loans.
+- Non-owner-occupied CRE including construction=2.15bn USD; 342.55% of Bank Tier 1 capital plus ACL.
+- Estimated uninsured deposits=16.9% total deposits; excluding pledged collateral=14.2%.
+- Company CET1/Tier1/total/leverage ratios=10.52%/11.15%/13.61%/8.82%.
+- Bank classified well-capitalized.
+
+[derived_values]
+- book_value_multiple = input market cap CNY 5,524,589,230.229553 / converted equity CNY 4,306,072,900 = approximately 1.28x.
+- forecast annual dividend = 33,413,503 shares * USD 0.48 * 7.30 = CNY 117,080,914.512.
+- forecast dividend yield = CNY 117,080,914.512 / CNY 5,524,589,230.229553 = 0.021192220174726.
+- Dividend assumption is supported by USD 0.48 per share in each of 2023, 2024, and 2025 and USD 0.12 paid in 2026 Q1. It is not company guidance.
+
+[null_fields]
+- revenue, gross profit, gross margin: bank net interest and fee structure is not comparable to ordinary sales/gross-profit accounting.
+- operating cash flow, capex, operating free cash flow: deposit, loan, and securities cash movements are operating balance-sheet flows for a bank and ordinary FCF is not decision-useful.
+- discounted net cash, discounted cash profit, operating business price, owner earnback years, market-cap-to-cash-profit: prohibited by the selected financial_bank model.
+
+[fact_inference_judgment]
+- Facts: all reported financial values and ratios above are sourced from SEC filings.
+- Inference: profitability improved because asset/deposit repricing and stable costs outweighed higher credit provision; this follows management discussion and statement changes.
+- Judgment: the valuation should be read against sustainable ROE, asset quality, capital, and dividends; no buy/sell recommendation or target price is provided.

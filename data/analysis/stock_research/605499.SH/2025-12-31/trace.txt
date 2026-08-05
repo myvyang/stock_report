@@ -1,0 +1,70 @@
+stock-research trace
+company=605499.SH 东鹏饮料
+period=2025-12-31 annual
+generated_at=2026-07-31T20:19:19+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated scalar and list fields only through protocol set/append commands.
+4. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reused inputs]
+- config/input.json: identity, analysis period, market cap CNY 98,552,000,000, PE TTM 20.08, quote timestamp/source.
+- stock_report/data/raw/filings/605499.SH/2025-12-31/metadata.json: official CNINFO filing URL, local PDF SHA256.
+- stock_report/data/analysis/annual_review/605499.SH/2025-12-31/result.json and report.md: verified OCF, capex, financing debt and detachable financial-asset composition.
+- local official annual-report.pdf, 243 pages; extracted locally for page-level verification.
+
+[official filing]
+url=https://static.cninfo.com.cn/finalpage/2026-03-31/1225063447.PDF
+sha256=ac54cab1e25634bdc5654c202f6f98ccea12585348c52bea567010024725812d
+audit=standard unqualified opinion, Deloitte Touche Tohmatsu Certified Public Accountants LLP
+
+[verified pages]
+- p.5: 2025 final dividend proposal CNY 1,411,921,750; proposal pending shareholder approval at report date.
+- p.10-11: revenue, parent net profit, OCF, parent equity and total assets.
+- p.16 and operating review: NIQ market-share statements and product/channel footprint.
+- p.34-36: revenue/cost/expense changes, product, region and channel splits.
+- p.44-47: capacity, sales volume, dealer count.
+- p.71-72: dividend history, 2025 interim dividend and final proposal.
+- p.111-113: consolidated balance sheet.
+- p.116-117: consolidated income statement.
+- p.120-121: consolidated cash-flow statement.
+- p.158-174: cash, wealth-management products, CDs, debt investments and private-equity fund.
+- p.193/p.195: borrowing and lease liabilities (reused verified fact pack).
+- p.210: cash-equivalent reconciliation and >3-month time deposits.
+- p.228: committed capital expenditure and post-balance-sheet H-share issuance.
+
+[calculations]
+gross_profit=20,875,273,117.52-11,501,224,702.87=9,374,048,414.65
+gross_margin=9,374,048,414.65/20,875,273,117.52=44.9050%
+net_margin=4,415,263,147.79/20,875,273,117.52=21.1507%
+operating_fcf=6,174,239,867.75-2,269,157,969.98=3,905,081,897.77
+
+Discounted detachable assets:
+- >3 month time deposits 2,831,678,051.67 x 95%
+- trading financial assets/wealth management 6,309,441,064.81 x 90%
+- current debt investments 1,379,189,185.66 x 95%
+- current CDs 452,740,008.39 x 95%
+- debt investments 1,757,475,856.91 x 95%
+- non-current wealth management 333,231,561.64 x 80%
+- private equity fund 378,524,370.68 x 50%
+= discounted funds assets 12,234,373,340.48
+- financing debt 7,055,606,161.06
+= discounted detachable net cash 5,178,767,179.42
+
+operating_business_price=98,552,000,000.00-5,178,767,179.42=93,373,232,820.58
+owner_earnback_years=93,373,232,820.58/3,905,081,897.77=23.9107
+market_cap_to_cash_profit=98,552,000,000.00/3,905,081,897.77=25.2369
+forecast_dividend=1,300,032,500+1,411,921,750=2,711,954,250
+forecast_dividend_yield=2,711,954,250/98,552,000,000=2.7518%
+
+[judgments and limitations]
+- ordinary_operating confirmed: beverage manufacturing/brand/channel business, no special financial-statement model indicators.
+- Cash equivalents were retained as required operating cash because CNY 2.741bn is below 25% of operating cash outflow (CNY 4.781bn).
+- Financial returns were not added to sustainable operating cash profit.
+- All reported capex was deducted. This is conservative during expansion but avoids assuming growth capex is immediately distributable.
+- Tencent market-cap boundary may not cover all A/H equity after the February 2026 H-share issue; result retains the mandated input and flags this limitation.
+- No buy/sell advice or target price produced.

@@ -1,0 +1,55 @@
+stock-research trace
+company: 03315.HK GOLDPAC GROUP
+period: 2025-12-31
+generated_for_input_at: 2026-08-04T11:00:03+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- Expected local annual facts, normalized facts, raw filing metadata and prior stock-research outputs were absent under the paths supplied in config/input.json.
+- No historical conclusion was reused.
+
+3. Primary sources retrieved and reviewed
+- HKEX Annual Report 2025, released 2026-04-24:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042401692.pdf
+  Reviewed audited statements pp.209-216; business/segment, cash, inventory, receivable, payable, dividend, customer/supplier and capital expenditure disclosures.
+- HKEX Announcement of Annual Results, released 2026-03-19:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0319/2026031901368.pdf
+- HKEX Profit Warning, released 2026-05-25:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0525/2026052500153.pdf
+- Market cap, date, source and PE were taken from config/input.json as supplied; they were not substituted with a third-party estimate.
+
+4. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Filing facts: operating subsidiaries sell embedded software, secure payment products and digital equipment and provide data-processing/platform services. Balance sheet contains ordinary cash, deposits, inventory, receivables, payables and leases; no brokerage client money, proprietary securities book, repo financing or margin lending.
+- Decision: override hint with ordinary_operating / applicable.
+
+5. Core calculations (CNY absolute yuan)
+- gross margin = 252,510,000 / 930,819,000 = 0.2712772301
+- net margin = 40,116,000 / 930,819,000 = 0.0430975302
+- operating free cash flow = 160,335,000 - 24,355,000 = 135,980,000
+- discounted detachable net cash:
+  489,343,000 * 50% + 949,553,000 * 80% + 7,900,000 * 0% - 7,183,000
+  = 997,130,900
+- discounted net cash / market cap = 997,130,900 / 450,599,333.3476782 = 2.2128991905
+- sustainable cash profit = 20,000,000, a judgmental haircut from 2025 parent profit after avoiding double-counting deposit interest and considering the 2026 four-month profit warning.
+- operating business price = 450,599,333.3476782 - 997,130,900 = -546,531,566.6523218
+- owner earnback years = -546,531,566.6523218 / 20,000,000 = -27.3265783326
+- market cap / cash profit = 450,599,333.3476782 / 20,000,000 = 22.5299666674
+- forecast regular dividend = 805,802,000 shares * RMB0.035 = 28,203,070
+- forecast dividend yield = 28,203,070 / 450,599,333.3476782 = 0.0625901281
+
+6. Protocol actions
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields only through protocol set/append commands.
+- Protocol validation result: status ok, errors [].
+
+7. Judgment boundaries
+- Facts: audited statement numbers, disclosed segment revenue, deposits, dividends, customer/supplier concentration and 2026 four-month profit warning.
+- Inference: ordinary operating model, cash haircuts, sustainable cash profit and forward dividend scenario.
+- Subjective interpretation: net cash exceeds market cap, but realization depends on distribution, operating cash requirements and capital allocation; negative earnback years are a formula output rather than a time promise.

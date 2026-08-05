@@ -1,0 +1,59 @@
+stock-research trace
+company: 东北制药 000597.SZ
+period: 2025-12-31 annual
+generated for task date: 2026-07-31 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse/fallback decision
+- The input-declared local annual review and raw filing directories under /workspace/stock_report were absent.
+- No prior annual facts or stock research result for 000597.SZ was available locally.
+- Fell back to the disclosed 2025 annual report rather than filling gaps from third-party financial summaries.
+
+3. Sources used
+- Primary financial/business source: 东北制药集团股份有限公司2025年年度报告全文, disclosed 2026-04-03; PDF announcement identifier AN202604021820989692, 244 pages.
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, timestamp 20260731114254, market cap CNY 6,521,000,000, PE TTM 26.04.
+- Search was used only to locate the annual filing. Core statement values came from the annual report text.
+
+4. Model review
+- Confirmed statement_model=ordinary_operating.
+- Rationale: revenue is pharmaceutical manufacturing, pharmaceutical commerce and minor other operations; balance sheet contains ordinary cash, receivables, inventory, plant, R&D assets, payables and borrowings. No customer deposits, insurance reserves, regulated property presale cash, concession rights or similar special-model structure.
+- Confirmed owner_earnback_applicability=applicable.
+
+5. Key extracted facts (CNY absolute yuan)
+- Revenue 7,074,853,263.92; cost of sales 4,437,711,164.91; gross profit 2,637,142,099.01.
+- Operating profit 314,111,882.40; net profit 217,828,151.01; parent net profit 260,070,456.65; deducted-nonrecurring parent profit 204,048,702.62.
+- Total assets 12,888,947,855.01; liabilities 7,219,689,409.30; equity 5,669,258,445.71; parent equity 5,529,861,664.80; minority interest 139,396,780.91.
+- Operating cash flow 1,106,382,481.27; cash capex 97,784,716.48; financing cash flow -238,949,934.10.
+- Cash and cash equivalents 2,852,247,107.94; restricted monetary funds 749,507,665.83.
+- 2025 dividend proposal 78,489,854.58; prior-year dividend implemented in 2025 142,708,826.50.
+
+6. Calculations
+- gross_margin = (7,074,853,263.92 - 4,437,711,164.91) / 7,074,853,263.92 = 0.3727486635601012.
+- net_margin = 260,070,456.65 / 7,074,853,263.92 = 0.036759837546920575.
+- operating_free_cash_flow = 1,106,382,481.27 - 97,784,716.48 = 1,008,597,764.79.
+- financial obligations used in cash analysis = 2,391,987,952.74, following the annual report financing-liability movement note (short/long borrowings, lease and other financing obligations).
+- residual net cash before haircut = 2,852,247,107.94 - 2,391,987,952.74 = 460,259,155.20.
+- discounted detachable net cash = 460,259,155.20 * 50% = 230,129,577.60. The 50% retention reflects working-capital, R&D, environmental capex and foreign-currency liquidity needs; it is analyst judgment.
+- discounted sustainable cash profit = 200,000,000.00, anchored to 2025 deducted-nonrecurring parent profit 204,048,702.62 and rounded down because revenue and profit declined. The unusually high single-year FCF was not extrapolated.
+- operating business price = 6,521,000,000.00 - 230,129,577.60 = 6,290,870,422.40.
+- owner earnback years = 6,290,870,422.40 / 200,000,000.00 = 31.454352112.
+- market cap to cash profit = 6,521,000,000.00 / 200,000,000.00 = 32.605.
+- forecast dividend yield = 78,489,854.58 / 6,521,000,000.00 = 0.012036475169452538.
+
+7. JSON construction and validation
+- result.json began from the protocol-generated skeleton.
+- Populated scalar fields using protocol set and list rows using protocol append; no complex JSON result object was handwritten from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation output: {"status":"ok","errors":[]}.
+
+8. Known limitations
+- The long-term local annual facts package was missing, so this run rebuilt facts directly from the annual report.
+- Market cap and PE were accepted from the supplied Tencent snapshot and not independently recalculated.
+- Detachable-cash haircut, maintenance-capex inference and sustainable-profit selection are explicit analyst judgments, not company guidance.

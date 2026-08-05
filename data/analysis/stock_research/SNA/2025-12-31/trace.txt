@@ -1,0 +1,65 @@
+Stock research trace — SNA — 2025 fiscal year
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because local fact reuse was relevant.
+- Initialized outputs/result.json with protocol CLI from config/input.json.
+
+2. Reuse check
+- Checked configured raw filing, annual review, and normalized fact paths.
+- No pre-existing SNA annual fact package was present, so primary-source collection was required.
+
+3. Primary sources
+- SEC 2025 Form 10-K, accession 0000091440-26-000045, filed 2026-02-12, fiscal year ended 2026-01-03:
+  https://www.sec.gov/Archives/edgar/data/91440/000009144026000045/sna-20260103.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/91440/000009144026000045/0000091440-26-000045-index.htm
+- SEC company facts API was used to cross-check major XBRL facts:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0000091440.json
+- Snap-on dividend history:
+  https://www.snapon.com/EN/Investors/Stock-Information/Dividend-History
+- Market cap, market date, PE TTM, and market source were reused from config/input.json.
+
+4. Period and currency treatment
+- Input period 2025-12-31 maps to the issuer's 2025 fiscal year ended 2026-01-03.
+- Original filing currency: USD; output contract currency: CNY absolute yuan.
+- Research conversion assumption: USD/CNY 6.7352 for every filing-derived amount.
+- Input market cap was already CNY and was not converted again.
+
+5. Model classification
+- Confirmed ordinary_operating / applicable, with special handling.
+- Reason: product manufacturing/distribution is the main business, but Financial Services contributes material profit.
+- Finance and contract receivables are operating earning assets, not detachable cash.
+- Net finance receivable originations less collections are deducted in normalized cash profit.
+
+6. Core USD facts (millions unless per-share)
+- Product net sales 4,743.2; cost of goods 2,357.8; gross profit 2,385.4.
+- Financial services revenue 412.9; consolidated revenue 5,156.1.
+- Product operating earnings 1,045.9; financial services operating earnings 281.8; total operating earnings 1,327.7.
+- Net earnings 1,042.3; parent net earnings 1,016.9.
+- Assets 8,412.3; liabilities 2,455.5; total equity 5,956.8; parent equity 5,931.8; NCI 25.0.
+- CFO 1,081.7; capex 76.0; operating FCF 1,005.7.
+- Finance receivable additions 913.6; collections 888.9; net funding 24.7.
+- Cash dividends 462.2; repurchases 328.6; financing cash flow -749.9.
+
+7. Formula audit
+- Contract gross margin = gross profit / consolidated revenue = 2,385.4 / 5,156.1 = 46.263%; report separately explains product gross margin 50.291%.
+- Net margin = parent net income / consolidated revenue = 1,016.9 / 5,156.1 = 19.722%.
+- Discounted detachable net cash = cash 1,624.5 * 75% - notes payable 16.2 - long-term debt 1,186.4 = USD 15.775m = CNY 106,247,780.
+- Adjusted cash profit by year = CFO - capex - max(finance additions - collections, 0):
+  2023 = 1,154.2 - 95.0 - 195.5 = USD 863.7m.
+  2024 = 1,217.5 - 83.5 - 128.2 = USD 1,005.8m.
+  2025 = 1,081.7 - 76.0 - 24.7 = USD 981.0m.
+- Three-year average USD 950.1667m; 90% sustainability haircut = USD 855.15m = CNY 5,759,606,280.
+- Operating business price = CNY 143,255,511,012.60352 - 106,247,780 = CNY 143,149,263,232.60352.
+- Owner earnback = 143,149,263,232.60352 / 5,759,606,280 = 24.8540 years.
+- Market cap / cash profit = 24.8724.
+- Forecast dividend = 51.867055m net shares * USD 2.44 * 4 * 6.7352 = CNY 3,409,509,491.04; yield = 2.3800%.
+
+8. Output and validation
+- outputs/result.json populated using protocol CLI set commands, not handwritten from scratch.
+- Protocol validation status: ok.
+- outputs/report.md created under report contract.
+- outputs/trace.txt records sources, judgments, formulas, and limitations.

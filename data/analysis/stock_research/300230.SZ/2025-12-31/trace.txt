@@ -1,0 +1,80 @@
+task=stock_research
+company=300230.SZ 永利股份
+period=2025-12-31
+generated_for_input_created_at=2026-07-31T16:12:40+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Read references/data-reuse.md.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields through protocol `set` commands; the complex result was not handwritten from an empty file.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[data_reuse_check]
+The configured annual-review facts, normalized facts, raw filing metadata, and prior stock-research outputs were absent in the workspace.
+Because core fields could not be supported from reusable artifacts, the 2025 annual report was retrieved and examined.
+
+[primary_filing]
+title=上海永利带业股份有限公司2025年年度报告
+announcement_no=2026-005
+disclosure_date=2026-04-28
+download_source=https://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESZ_STOCK/2026/2026-4/2026-04-28/12219737.PDF
+local_pdf=stock_report/data/raw/filings/300230.SZ/2025-12-31/annual-report-2025.pdf
+local_extracted_text=stock_report/data/raw/filings/300230.SZ/2025-12-31/annual-report-2025.txt
+audit_opinion=标准无保留意见
+
+[model_review]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=收入来自轻型输送带和精密模塑产品销售，资产负债主要是制造业现金、应收、存货、固定资产、供应链负债、借款及租赁，不具备金融、地产开发、工程施工、收费权或投资控股平台的特殊报表经济实质。
+
+[reported_financials_cny]
+revenue=2380964834.92
+cost_of_sales=1628926691.52
+gross_profit=752038143.40
+operating_profit=243200333.69
+net_profit=175945344.12
+parent_net_profit=170950361.64
+deducted_parent_net_profit=166849331.17
+total_assets=4348160142.81
+total_liabilities=976543675.13
+total_equity=3371616467.68
+parent_equity=3268120567.08
+minority_interest=103495900.60
+operating_cash_flow=375523344.92
+capital_expenditure=109240555.92
+operating_free_cash_flow=266282789.00
+
+[formula_checks]
+gross_margin=(2380964834.92-1628926691.52)/2380964834.92=0.3158543681
+net_margin=170950361.64/2380964834.92=0.0717987763
+forecast_dividend_yield=150444486.58/3415000000=0.0440540224
+
+[owner_earnback_assumptions]
+unrestricted_cash_and_equivalents=1057529149.85
+cash_haircut=70%
+discounted_cash=740270404.895
+large_certificates_and_interest=339045256.41
+certificate_haircut=85%
+discounted_certificates=288188467.9485
+bank_borrowings=190963632.34+43166302.16+49961711.38=284091645.88
+borrowing_deduction=100%
+discounted_detachable_net_cash=740270404.895+288188467.9485-284091645.88=744367226.9635
+discounted_sustainable_cash_profit=160000000
+operating_business_price=3415000000-744367226.9635=2670632773.0365
+owner_earnback_years=2670632773.0365/160000000=16.6914548315
+market_cap_to_cash_profit=3415000000/160000000=21.34375
+
+[judgment_notes]
+Cash was not taken at face value because 457690933.85 was held overseas, manufacturing operations require working capital, and the Kunshan intelligent transmission base has a planned investment of CNY 300 million.
+Lease liabilities were disclosed as operating constraints but were not included in the bank-debt deduction because they are matched to right-of-use operating assets; this avoids treating ongoing operating leases as detachable financial debt while also leaving the corresponding operating assets outside detachable cash.
+Sustainable cash profit starts from disclosed deducted parent net profit of 166849331.17 and is rounded down to 160000000 for margin, inventory impairment, foreign exchange, and future capex uncertainty. The 266282789 operating free cash flow is a cash-conversion cross-check, not the forecast base.
+The forecast dividend uses the board-approved 2025 profit distribution proposal disclosed in the annual report. At filing date it still required shareholder approval; it is not assumed to recur indefinitely.
+
+[limitations]
+Market capitalization and PE TTM were reused from config/input.json and not independently recalculated.
+Owner-earnback discounts and sustainable profit are analytical judgments, not reported company figures.
+The annual report did not provide independently verifiable market share, so industry position is stated conservatively.

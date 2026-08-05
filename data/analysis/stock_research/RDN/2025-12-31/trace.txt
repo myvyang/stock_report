@@ -1,0 +1,59 @@
+stock-research execution trace
+task: RDN, annual period ended 2025-12-31
+generated: 2026-08-04 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- /workspace/AGENTS.md instructions supplied in task context
+
+2. Reuse check
+- Checked configured annual facts, normalized facts, raw filing, and prior research paths.
+- No reusable RDN filing/facts/research files were present in the workspace.
+
+3. Protocol initialization
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initialization succeeded.
+
+4. Primary-source retrieval and review
+- SEC 2025 Form 10-K: https://www.sec.gov/Archives/edgar/data/890926/000119312526061383/rdn-20251231.htm
+- SEC accession index: 0001193125-26-061383; filed 2026-02-20.
+- SEC Companyfacts API: https://data.sec.gov/api/xbrl/companyfacts/CIK0000890926.json
+- Radian 2026 Q1 Form 10-Q: https://www.sec.gov/Archives/edgar/data/890926/000119312526215018/rdn-20260331.htm
+- Federal Reserve H.10 release dated 2025-12-29: year-end-near USD/CNY observation 7.0063 on 2025-12-26.
+- Market cap and PE used exactly as supplied by config/input.json (Yahoo Finance yfinance snapshot dated 2026-08-03).
+
+5. Model decision
+- Overrode input hint ordinary_operating/applicable.
+- Selected financial_insurance/requires_special_model because Radian's 2025 sole reportable segment was Mortgage Insurance and investments, insurance reserves, regulatory capital, and PMIERs eligibility are integral to the business.
+- Kept all ordinary owner-earnback sorting fields null as required by the result contract.
+
+6. Main extracted facts (USD)
+- Total assets 8,122,397,000; total liabilities 3,340,883,000; parent equity 4,781,514,000.
+- Revenue 1,197,084,000; parent net income 582,640,000; continuing-operations net income 618,000,000.
+- Continuing-operations operating cash flow 719,987,000.
+- Investments 5,987,318,000; short-term investments 1,602,993,000; cash and equivalents 24,829,000.
+- Claims and claim-adjustment liability 399,946,000; unearned premiums 159,341,000; senior notes 1,067,908,000.
+- NIW 55.166bn; IIF 282.519bn; persistency 83.6%; loss ratio 7.1%; expense ratio 27.7%.
+- PMIERs cushion 1.6bn; risk-to-capital 10.3:1.
+- 2025 common dividends paid 145,615,000; repurchases 431,909,000.
+
+7. Currency convention
+- All USD financial statement amounts converted to CNY at 7.0063 CNY/USD for deterministic presentation.
+- This is a presentation convention; income statement values were not translated at a separate annual-average rate. Limitation disclosed in result.json and report.md.
+
+8. Dividend forecast
+- Used company 2025 Form 10-K estimate of approximately USD 138m for the next 12 months at USD 0.255 quarterly dividend.
+- Confirmed USD 0.255 remained the stated current quarterly dividend in 2026 Q1 Form 10-Q.
+- Converted forecast: CNY 966,869,400; divided by supplied market cap gives 2.76355943%.
+
+9. Protocol population and validation
+- Populated initialized outputs/result.json through repeated protocol CLI set commands; no complex JSON document was hand-written from scratch.
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: {"status":"ok","errors":[]}
+
+10. Output status
+- outputs/result.json: complete under special-model minimum requirements.
+- outputs/report.md: completed human-readable operating story and special-model valuation discussion.
+- outputs/trace.txt: completed provenance and decision trace.

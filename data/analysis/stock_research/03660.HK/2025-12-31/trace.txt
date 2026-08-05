@@ -1,0 +1,19 @@
+2026-08-04T13:01:54+08:00 INIT outputs/result.json via stock_analysis.stock_research.protocol init
+INPUT config/input.json; query=03660.HK; period=2025-12-31; report_type=annual
+REUSE_CHECK no raw filing, annual facts, normalized facts, or prior research outputs found under supplied workspace paths
+SOURCE_FETCH official SEC Form 20-F filed 2026-04-27: https://www.sec.gov/Archives/edgar/data/1741530/000110465926049501/qfin-20251231x20f.htm
+SOURCE_FETCH official company FY2025 results dated 2026-03-17: https://ir.qfin.com/zh-hant/news-releases/news-release-details/qfin-holdings-announces-fourth-quarter-and-full-year-2025/
+IDENTITY confirmed Qfin Holdings Inc / 奇富科技, HKEX 3660, AI-enabled credit-tech platform
+MODEL_OVERRIDE input hint financial_brokerage rejected; filing shows credit-tech platform with on-balance-sheet loans, consolidated trusts, and guarantee exposure
+MODEL_SET platform_financial_mixed; owner_earnback_applicability=requires_special_model
+EXTRACT audited 2025 20-F/XBRL: assets=56,949,795,000; liabilities=32,792,752,000; equity=24,157,043,000; parent_equity=24,114,915,000 CNY
+EXTRACT audited 2025 20-F/XBRL: revenue=19,205,059,000; operating_profit=6,678,419,000; net_income=5,975,643,000; parent_net_income=5,989,691,000 CNY
+EXTRACT audited 2025 20-F/XBRL: operating_cash_flow=11,083,748,000; productive_asset_purchases=240,542,000; financing_cash_flow=2,783,865,000 CNY
+EXTRACT balance sheet: net loans receivable=38,683,113,000; consolidated trust investor payables=19,852,559,000; guarantee liabilities=4,187,014,000 CNY
+CALC net_margin=5,989,691,000/19,205,059,000=0.3118798538
+DIVIDEND_FORECAST policy midpoint=25%*5,989,691,000=1,497,422,750 CNY; yield=1,497,422,750/11,291,308,513.829113=0.1326172779
+OWNER_EARNBACK ordinary discounted net cash, cash profit, operating business price, and payback metrics retained as null per special-model contract
+CLI_UPDATE all result sections written with stock_analysis.stock_research.protocol set/append; result object not handwritten from scratch
+VALIDATE stock_analysis.stock_research.protocol validate => status ok, errors=[]
+LIMITATION market cap and PE reused from Tencent snapshot in input and not independently reconciled to an exchange closing-price/share-count calculation
+LIMITATION operating free cash flow is not distributable cash because loan origination/collection is classified in investing cash flow and credit assets require continuing capital

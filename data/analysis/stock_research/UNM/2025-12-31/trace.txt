@@ -1,0 +1,72 @@
+stock-research trace
+task: UNM / Unum Group / annual / 2025-12-31
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Checked configured reusable paths
+   - config/input.json exists.
+   - Referenced raw filing, annual facts, normalized facts and prior research files for UNM/2025-12-31 were absent in this workspace.
+   - No prior facts or conclusions were reused.
+
+3. Initialized the protocol result
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   result: success
+
+4. Primary-source research
+   - SEC Form 10-K accession 0000005513-26-000008, filed 2026-02-17, period 2025-12-31.
+   - SEC Company Facts API for CIK 0000005513 used to cross-check standardized XBRL facts.
+   - Unum 2025 annual report and FY2025 results used for operating narrative, adjusted results, RBC and holding-company liquidity.
+   - Unum 2026-05-21 dividend announcement used for the latest approved annualized dividend rate.
+   - 2026-07-27 shares outstanding from subsequent SEC XBRL used only for static dividend forecasting.
+   - Market cap, market-cap date, source and PE TTM reused exactly from config/input.json.
+
+5. Model override
+   input hint: ordinary_operating / applicable
+   confirmed model: financial_insurance / requires_special_model
+   reason: investment assets support insurance contract liabilities and regulatory capital. At 2025-12-31, investments were USD 43.5208bn, future policy benefits USD 38.0170bn, and policyholder account balances USD 5.6364bn. These are operating assets and liabilities of the insurance model, not detachable net cash.
+   protocol effect: discounted net cash, discounted cash profit, operating business price, owner earnback years and market-cap-to-cash-profit remain null.
+
+6. Key extracted facts in USD
+   total assets: 63,519,400,000
+   total liabilities: 52,400,300,000
+   stockholders' equity: 11,119,100,000
+   revenue: 13,075,500,000
+   net premiums: 10,831,000,000
+   net investment income: 2,032,700,000
+   net income: 738,500,000
+   net cash from operating activities: 687,700,000
+   investments: 43,520,800,000
+   reinsurance recoverables: 11,574,600,000
+   future policy benefits: 38,017,000,000
+   policyholder account balances: 5,636,400,000
+   long-term debt: 3,767,600,000
+   dividends paid: 306,200,000
+   common-stock repurchases: 1,010,300,000
+
+7. Currency normalization
+   conversion assumption: USD 1.00 = CNY 7.00
+   purpose: comply with result contract requiring absolute CNY yuan.
+   limitation: this is a uniform research conversion assumption, not a claimed transaction-date or annual-average official FX rate.
+
+8. Dividend forecast
+   latest approved annualized dividend: USD 2.02/share
+   shares used: 158,306,798 at 2026-07-27
+   forecast: USD 319,779,731.96, calculated as 2.02 * 158,306,798; CNY 2,238,458,123.72.
+   forecast dividend yield: 2.433545%, calculated against input market cap CNY 91,983,431,132.82422.
+
+9. Protocol population
+   - Used protocol set/append commands for result fields and arrays.
+   - Did not hand-write outputs/result.json.
+
+10. Validation
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   initial completed result: status ok, errors []
+
+11. Files produced
+   - outputs/result.json
+   - outputs/report.md
+   - outputs/trace.txt

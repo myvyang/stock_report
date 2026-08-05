@@ -1,0 +1,71 @@
+stock-research trace
+task: FCCO annual research, period 2025-12-31
+generated_at: 2026-08-05 Asia/Shanghai
+
+1. Read instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: initialized stock-research-result-v1 skeleton.
+
+3. Reuse check
+- Configured annual review and raw filing directories under stock_report/ were absent.
+- No local facts package or prior annual research could be reused.
+- Returned to primary SEC filings and official/replicable sources.
+
+4. Company/model identification
+- SEC FY2025 Form 10-K identifies First Community Corporation as a bank holding company owning First Community Bank.
+- 2025 year-end: assets $2.057732bn, loans $1.311019bn, deposits $1.749544bn, equity $167.557m.
+- Decision: override input hint ordinary_operating/applicable with financial_bank/requires_special_model.
+- Reason: deposits, loans, bank balances, securities and repo funding form the regulated operating balance sheet. They cannot be treated as detachable net cash.
+- Ordinary owner earnback fields intentionally left null per result contract.
+
+5. Primary sources used
+- SEC FY2025 Form 10-K, filed 2026-03-16:
+  https://www.sec.gov/Archives/edgar/data/932781/000155278126000126/e26095_fcco-10k.htm
+- SEC merger completion Form 8-K, effective 2026-01-08:
+  https://www.sec.gov/Archives/edgar/data/932781/000155278126000009/e26018_fcco-8k.htm
+- SEC Q1 2026 earnings release, including $0.16 quarterly dividend:
+  https://www.sec.gov/Archives/edgar/data/932781/000155278126000265/e26215_ex99-1.htm
+- Federal Reserve G.5A annual USD/CNY series via FRED:
+  https://fred.stlouisfed.org/series/AEXCHUS
+- Market cap and PE: input snapshot, Yahoo Finance yfinance, dated 2026-08-03.
+
+6. Currency normalization
+- Contract requires CNY absolute yuan.
+- Financial statement USD amounts converted at 2025 annual average USD/CNY 7.1875.
+- This one consistent rate was used for balance sheet, income statement, asset/liability analysis and dividend history.
+- Input market cap was already supplied in CNY and was not reconverted.
+- Limitation recorded: annual-average FX is a presentation convention, not a 2025-12-31 spot rate; input market-cap FX method was not supplied.
+
+7. Key extracted facts (USD unless ratio)
+- Total assets $2,057.732m; liabilities $1,890.175m; equity $167.557m.
+- Net loans held for investment $1,297.213m; loans held for sale $10.737m.
+- Deposits $1,749.544m; repo funding $107.189m; junior subordinated debt $14.964m.
+- Net interest income $62.022m; noninterest income $16.945m; provision $0.770m; pretax income $24.859m; net income attributable to common $19.205m.
+- NIM 3.23%; ROAE 12.36%; ROA 0.94%; efficiency ratio 65.97%.
+- NPA/assets 0.02%; NPL/loans 0.02%; ACL/loans 1.05%; net charge-off ratio approximately 0.00%.
+- Bank CET1 13.1%; Tier 1 13.1%; total capital 14.2%; leverage 8.7%.
+- 2025 dividend $0.62/share and approximately $4.8m total.
+
+8. Dividend forecast
+- Signature merger completed 2026-01-08 and issued 1,658,339 FCCO shares.
+- Estimated post-merger shares for forecast: 7,693,215 + 1,658,339 = 9,351,554.
+- Q1 2026 dividend remained $0.16/share; mechanical annualization = $0.64/share.
+- Forecast cash dividend = $0.64 x 9,351,554 = $5,984,994.56; translated protocol value is CNY 43,017,148.4.
+- Forecast yield = CNY 43,017,148.4 / CNY 2,166,747,864.9134216 = 1.9853324467%.
+- Forecast is not board guidance; dilution, repurchases and future declarations may change it.
+
+9. Valuation comparability control
+- Market cap and PE date are post-merger; FY2025 statements are pre-merger.
+- Did not calculate a current P/B from mismatched scopes.
+- Did not infer ordinary owner-earnback years.
+
+10. Protocol updates and validation
+- Used protocol set/append commands for all result.json population; complex result object was not handwritten.
+- One attempted net-profit set contained invalid JSON and was rejected by CLI before mutation; correct value was subsequently set.
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: {"status":"ok","errors":[]}

@@ -1,0 +1,54 @@
+task=stock_research
+company=02232.HK CRYSTAL INTERNATIONAL GROUP LIMITED
+period=2025-12-31
+generated_at=2026-08-05T00:33:09+08:00
+
+[protocol]
+initialized=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+updates=all result fields populated through protocol set commands; complex result object was not hand-written
+validation=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_result=status ok; errors []
+
+[source_reuse]
+expected_annual_facts=stock_report/data/analysis/annual_review/02232.HK/2025-12-31/facts.json
+reuse_result=not found; no prior annual facts, normalized facts, or stock research result existed in workspace
+fallback=downloaded official HKEX annual report to stock_report/data/raw/filings/02232.HK/2025-12-31/annual-report-2025.pdf
+core_source=https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042300412.pdf
+
+[model_review]
+input_hint=financial_brokerage / requires_special_model
+verified_model=ordinary_operating / applicable
+reason=annual report identifies five garment product segments and ordinary manufacturing assets/liabilities; no brokerage customer money, proprietary trading assets, or repo funding appears in the statements
+
+[currency]
+reporting_currency=USD
+result_currency=CNY
+usd_cny_conversion=7.15 analytical convention applied consistently to all USD statement amounts
+hkd_cny_conversion=0.90486 for dividend scenario; PBOC central parity announcement dated 2025-12-26
+limitation=CNY amounts are analytical translations, not statutory CNY financial statements
+
+[financial_formulas]
+gross_margin=525697/2641179=0.199034
+net_margin=224835/2641179=0.085128
+operating_free_cash_flow=(266423-146235)*1000*7.15=859344200
+discounted_cash=(382310*1000*7.15)*0.80=2186813200
+lease_liabilities=(22388+13253)*1000*7.15=254833150
+discounted_detachable_net_cash=2186813200-254833150=1931980050
+discounted_sustainable_cash_profit=859344200*0.90=773409780
+operating_business_price=15940567607.052326-1931980050=14008587557.052326
+owner_earnback_years=14008587557.052326/773409780=18.11276237
+market_cap_to_cash_profit=15940567607.052326/773409780=20.61076549
+forecast_cash_dividend=2852822000*0.408*0.90486=1053213042.08736
+forecast_dividend_yield=1053213042.08736/15940567607.052326=0.0660712384
+
+[judgment_notes]
+cash_discount=20% reserve retained for working capital, expansion, and currency volatility
+profit_basis=2025 operating cash flow less cash payment for PPE; deliberately lower than parent net profit
+profit_discount=10% additional buffer for customer concentration, 81-day cash conversion cycle, and management expectation of significantly higher 2026 capex
+capex_note=management reports total capex US$183m while cash flow statement reports US$146.235m PPE cash payment; free cash flow uses the latter
+dividend_note=forecast repeats FY2025 DPS without growth; it is a scenario, not company guidance
+
+[outputs]
+result=outputs/result.json
+report=outputs/report.md
+trace=outputs/trace.txt

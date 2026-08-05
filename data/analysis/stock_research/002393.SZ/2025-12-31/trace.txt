@@ -1,74 +1,52 @@
-Stock research task trace
+stock-research trace
 company=002393.SZ 力生制药
 period=2025-12-31
-created_at=2026-07-27T04:54:24+08:00
-timezone=Asia/Shanghai
+generated_for_input=2026-07-31T13:36:54+08:00
 
-Instructions and contracts read:
-- /workspace/.agents/skills/stock-research/SKILL.md
-- /workspace/.agents/skills/stock-research/references/result-contract.md
-- /workspace/.agents/skills/stock-research/references/report-contract.md
-- /workspace/.agents/skills/stock-research/references/data-reuse.md
-
-Input read:
-- config/input.json
-
-Local evidence reused:
-- stock_report/data/normalized/facts/002393.SZ/2025-12-31/annual-facts.json
-- stock_report/data/analysis/annual_review/002393.SZ/2025-12-31/facts.json
-- stock_report/data/analysis/annual_review/002393.SZ/2025-12-31/annual_facts.md
-- stock_report/data/analysis/stock_research/002393.SZ/2025-12-31/result.json
-- stock_report/data/analysis/stock_research/002393.SZ/2025-12-31/report.md
-- stock_report/data/analysis/stock_research/002393.SZ/2025-12-31/trace.txt
-- stock_report/data/raw/filings/002393.SZ/2025-12-31/lisheng_2025_annual_report.txt
-
-Protocol CLI usage:
+Protocol:
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md and references/report-contract.md.
 - Initialized outputs/result.json with:
   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- Validated outputs/result.json with:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-- Validation status: ok
+- Populated result through protocol set commands; did not construct the initialized schema by hand.
 
-Core facts used:
-- Market cap: 4,390,000,000.00 CNY, as of 2026-07-24, from config/input.json.
-- PE TTM: 10.55, from config/input.json.
-- Revenue: 1,392,014,298.29 CNY.
-- Gross profit: 769,226,978.66 CNY.
-- Parent net profit: 416,283,339.38 CNY.
-- Deducted nonrecurring parent net profit: 168,529,342.94 CNY.
-- Operating cash flow: 247,496,650.71 CNY.
-- Capital expenditure: 37,459,304.59 CNY.
-- Operating free cash flow: 210,037,346.12 CNY.
-- Total assets: 5,584,407,998.31 CNY.
-- Total liabilities: 923,858,735.62 CNY.
-- Parent equity: 4,628,056,357.77 CNY.
+Reused evidence:
+- stock_report/data/analysis/annual_review/002393.SZ/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/002393.SZ/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/002393.SZ/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/002393.SZ/2025-12-31/lisheng_2025_annual_report.pdf
+- stock_report/data/analysis/stock_research/002393.SZ/2025-12-31/result.json
+- stock_report/data/analysis/stock_research/002393.SZ/2025-12-31/report.md
 
-Formula checks:
-- gross_margin = 769,226,978.66 / 1,392,014,298.29 = 0.5525999119441128.
-- net_margin = 416,283,339.38 / 1,392,014,298.29 = 0.2990510513371718.
-- forecast_dividend_yield = 154,132,117.80 / 4,390,000,000.00 = 0.035109821822323466.
-- operating_business_price = 4,390,000,000.00 - 2,183,182,462.10 = 2,206,817,537.90.
-- owner_earnback_years = 2,206,817,537.90 / 81,250,000.00 = 27.16083123569231.
-- market_cap_to_cash_profit = 4,390,000,000.00 / 81,250,000.00 = 54.03076923076923.
+Model decision:
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Reason: revenue comes from medicine R&D, manufacturing and sales plus CMO/CDMO; operating receivables, inventory and plant can be separated conceptually from cash, wealth-management products, investments and financing debt.
 
-Owner earnback reuse:
-- discounted_detachable_net_cash=2,183,182,462.10 CNY.
-- discounted_sustainable_cash_profit=81,250,000.00 CNY.
-- These figures were reused from existing stock_research/owner_earnback work because the prior trace showed the source annual report lines, calculations, and limitations.
-- The market cap source/date were updated to this run's input: 2026-07-24 batch snapshot.
+Market data override from current input:
+- market_cap=4365000000 CNY
+- quote_time=20260731114324
+- source=Tencent qt.gtimg.cn
+- pe_ttm=10.57
 
-Dividend:
-- 2025 annual report profit distribution proposal: every 10 shares cash dividend 6 yuan.
-- Forecast cash dividend used: 154,132,117.80 CNY.
+Recomputed values:
+- discounted_detachable_net_cash=2183182462.10
+- discounted_net_cash_to_market_cap=0.5001563487056128
+- operating_business_price=4365000000-2183182462.10=2181817537.90
+- discounted_sustainable_cash_profit=81250000
+- owner_earnback_years=2181817537.90/81250000=26.853138928
+- market_cap_to_cash_profit=4365000000/81250000=53.723076923076924
+- forecast_cash_dividend=154132117.80
+- forecast_dividend_yield=154132117.80/4365000000=0.035310909003436426
 
-Known limitations:
-- Market cap is a 2026-07-24 batch input snapshot, not report-date market cap.
-- Trading financial assets and wealth management products are not disclosed product by product for duration, issuer, principal protection, or redemption limits.
-- Other equity instrument investment disposal route, taxes, and timing are not publicly confirmable from the annual report.
-- Top receivable customers are anonymized in the annual report, so individual customer credit quality cannot be independently checked.
-- 2023 capital expenditure was not directly obtained in the 2025 annual fact package; cash conversion uses 2025/2024 free cash flow plus 2023 operating cash flow and deducted profit.
+Judgment notes:
+- Cash-profit denominator reuses the same-period prior research method: median 2023-2025 deducted non-recurring parent profit, removal of returns associated with assets already deducted from market cap, then 0.65 sustainability discount.
+- Cash breakdown retains necessary operating cash and discounts wealth-management, receivable dividend, non-current financial assets, equity investments and investment property; financing debt and disposal/distribution friction are deducted.
+- No new public-web source was needed because the annual report, extracted fact pack and current market snapshot were locally available and sufficient.
 
-Outputs written:
-- outputs/result.json
-- outputs/report.md
-- outputs/trace.txt
+Validation:
+- Initial validation exposed legacy compatibility fields: current contract required asset explanation and evidence claim.
+- Added explanation and claim through protocol set.
+- Final protocol validation returned status=ok with no errors.
+- Formula assertions passed for net-cash ratio, operating-business price, earnback years, market-cap/cash-profit and forecast dividend yield.
+- Stale-value scan found no prior market-cap/date or derived valuation values in outputs.

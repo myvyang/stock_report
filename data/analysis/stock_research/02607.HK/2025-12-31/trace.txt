@@ -1,0 +1,74 @@
+stock-research trace
+company: 02607.HK / 上海医药集团股份有限公司
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized result through protocol CLI
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+- No pre-existing annual facts, normalized facts, or stock-research output existed for 02607.HK/2025-12-31.
+- Therefore fetched official 2025 annual report disclosures.
+
+4. Primary documents
+- Company annual report: https://www.sphchina.com/attached/files/601607_SPH_2025A-Os.pdf
+- HKEX filing bundle: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0330/2026033002072_c.pdf
+- Local copies:
+  stock_report/data/raw/filings/02607.HK/2025-12-31/annual-report-2025.pdf
+  stock_report/data/raw/filings/02607.HK/2025-12-31/annual-report-2025-hkex.pdf
+- Text extraction used pypdf in temporary dependency directory /tmp/stock-research-pypdf.
+
+5. Model override
+- Input hint said financial_brokerage.
+- Annual report company description and segment note identify pharmaceutical manufacturing, distribution, and retail.
+- Final model set to ordinary_operating / applicable.
+
+6. Key reported facts used
+- Revenue 283,579,600,562.98
+- Cost of sales 253,163,120,898.92
+- Parent net profit 5,724,557,508.41
+- Deducted non-recurring parent profit 2,980,440,494.17
+- Operating cash flow 6,154,201,379.37
+- Segment capital expenditure 2,387,166,066.57
+- Total assets 233,148,766,767.21
+- Total liabilities 143,361,473,043.61
+- Parent equity 75,891,327,824.17
+- Cash and bank balances 32,721,763,351.58
+- Structured deposits 10,360,938,931.51
+- Accounts receivable net 82,306,400,629.83
+- Inventory net 45,358,947,550.04
+- Accounts payable 52,594,352,033.44
+- Bank borrowings including current maturities 50,453,071,247.44
+- Super short-term notes 5,036,081,369.86
+- 2025 cumulative dividend 1,742,930,050.23
+
+7. Calculations
+- Gross profit = revenue - cost = 30,416,479,664.06
+- Gross margin = gross profit / revenue = 10.7259%
+- Parent net margin = parent net profit / revenue = 2.0187%
+- Operating FCF = OCF - capital expenditure = 3,767,035,312.80
+- Discounted sustainable cash profit = operating FCF * 85% = 3,201,980,015.88
+- Discounted detachable net cash = cash * 70% + structured deposits * 70% - bank borrowings - super short-term notes = -25,331,261,019.14
+- Operating business price = market cap - discounted net cash = 63,455,386,893.77
+- Owner earnback years = operating business price / discounted cash profit = 19.8175
+- Market cap / cash profit = 11.9064
+- Forecast dividend yield = 2025 cumulative dividend / input market cap = 4.5717%
+
+8. Protocol population
+- All complex JSON fields were populated with stock_analysis.stock_research.protocol set commands after initialization.
+
+9. Validation
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+final status: ok, errors: []
+
+10. Limitations
+- Market cap and PE are reused from Tencent market input and were not independently reconstructed across A/H shares.
+- Cash and cash-profit discounts are analyst assumptions.
+- Capital expenditure uses the annual report segment capital expenditure disclosure.
+- Proposed final dividend was subject to shareholder approval at annual-report date.

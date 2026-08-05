@@ -1,0 +1,84 @@
+stock-research trace — OZK — period 2025-12-31
+generated_at_input: 2026-08-04T16:38:27+08:00
+
+1. Required instructions read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized with schema stock-research-result-v1.
+
+3. Reuse audit
+- Searched configured annual-review, raw-filing, normalized-facts and prior stock-research paths.
+- No OZK fact pack, filing metadata, normalized facts or prior research output existed in the workspace.
+- Public primary-source research was therefore required.
+
+4. Primary sources inspected
+- Bank OZK 2025 Annual Report on Form 10-K, official IR PDF:
+  https://ir.ozk.com/static-files/e0a9df34-ad64-4d55-9984-9a46e4a2f45f
+  Relevant pages: Business p.2; MD&A pp.33-65; audited balance sheet p.73; audited income statement p.74.
+- Bank OZK 4Q25 Management Comments, official IR page:
+  https://ir.ozk.com/4Q25_Management_Comments
+  Relevant item: capital ratios and dividend discussion p.35.
+- Bank OZK official dividend history:
+  https://ir.ozk.com/stock-information/dividends-splits/
+- Market snapshot was supplied in config/input.json and attributed to Yahoo Finance yfinance.
+
+5. Model decision
+- Input hint: ordinary_operating / applicable.
+- Filing fact: Bank OZK is an FDIC-regulated insured depository institution whose results depend primarily on net interest income.
+- Override: financial_bank / not_applicable.
+- Reason: deposits, loans, securities and cash are operating financial assets and liabilities subject to liquidity and capital constraints, not detachable net cash.
+- Consequence: discounted net cash, discounted cash profit, operating business price, owner earnback years and market-cap-to-cash-profit remain null.
+
+6. Currency convention
+- Filing currency: USD.
+- Result-contract currency: CNY absolute yuan.
+- Analysis conversion rate used consistently for filing values: USD/CNY 7.20.
+- This is a transparent analytical translation for magnitude display, not a historical FX restatement.
+- Input market cap was already denominated in CNY and was preserved without conversion.
+
+7. Key extracted facts (USD unless ratio)
+- Total assets: 40,785.840m
+- Total liabilities: 34,655.989m
+- Total stockholders' equity: 6,129.851m
+- Common stockholders' equity: 5,790.871m
+- Loans: 32,317.785m; allowance for loan losses: 475.721m; net loans: 31,842.064m
+- Deposits: 33,384.965m; time deposits: 18,283.584m
+- Net interest income: 1,592.160m
+- Provision for credit losses: 172.514m
+- Net income: 715.459m; net income available to common: 699.293m
+- Net interest margin: 4.33% (2024: 4.56%); efficiency ratio: 35.6%
+- Real-estate loans / total loans: 67.6%
+- Nonperforming loans: 341.223m; NPL ratio: 1.06% (2024: 0.44%)
+- Total ACL: 631.9m; funded-loan allowance ratio: 1.47%
+- Estimated CET1: 11.70%; Tier 1: 12.50%; total RBC: 14.80%
+- Unfunded loan commitments: approximately 18.00bn
+- 2025 dividend per share: USD 1.74
+- 2026 declared quarterly dividends through Q3: USD 0.46, 0.47, 0.48
+
+8. Derived figures
+- Common-equity multiple = CNY market cap 37,790,210,442 / (USD common equity 5,790,871,000 × 7.20) = approximately 0.91x.
+- Approximate 2025 ROACE = USD 699.293m / average(USD 5,790.871m, USD 5,366.643m) = approximately 12.5%.
+- 2025 nominal common payout ratio = USD 1.74 / USD 6.18 diluted EPS = approximately 28.2%.
+- 2026 forecast DPS = 0.46 + 0.47 + 0.48 + assumed 0.49 = USD 1.90.
+- Forecast cash dividend = USD 1.90 × 110,390,493 shares × 7.20 = CNY 1,510,221,600.
+- Forecast dividend yield = CNY 1,510,221,600 / CNY 37,790,210,442 = approximately 4.0%.
+
+9. Protocol mutations
+- outputs/result.json was populated only through protocol CLI set/append commands after protocol initialization.
+- No complex JSON result object was handwritten from scratch.
+
+10. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed-result validation: status=ok, errors=[]
+- Final validation is run after all output files are written.
+
+11. Data-quality judgment
+- status: complete
+- Special-bank minimum fields, asset/liability explanations, dividend forecast, business story and primary-source evidence are present.
+- Industrial-company revenue/margin/cash-flow fields remain null because they lack comparable economic meaning for a bank.
+- Limitations are recorded in result.json, including the analytical FX rate, supplied market snapshot and unannounced Q4 2026 dividend assumption.

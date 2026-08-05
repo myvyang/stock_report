@@ -1,0 +1,87 @@
+stock-research trace
+company=01305.HK WAI CHI HOLDINGS COMPANY LIMITED
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-03T13:07:57+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because no existing annual facts package was present.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated protocol paths with repeated `protocol set` commands; did not construct the result object from scratch.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[source discovery]
+- Existing input found: config/input.json.
+- No existing raw filing metadata, annual facts JSON/Markdown, normalized facts, or prior stock-research result was present for 01305.HK/2025-12-31.
+- HKEX title search identified the official 2025 Annual Report released 2026-04-21 and annual results released 2026-03-27.
+- Downloaded official annual report from:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0421/2026042101073.pdf
+- Local raw source:
+  stock_report/data/raw/filings/01305.HK/2025-12-31/2025-annual-report.pdf
+- Extracted text locally for deterministic searching:
+  stock_report/data/raw/filings/01305.HK/2025-12-31/2025-annual-report.txt
+- PDF SHA-256: 8966082c532193e6cd52de95d956645dd7e24fa43b9c631e2f8e2affda1a1038
+
+[model audit]
+- Input hint: financial_brokerage / requires_special_model.
+- Filing evidence: revenue from LED backlights, LED lighting services, and semiconductor memory-chip sourcing; balance sheet has inventories, trade receivables, trade/bills payables, plant and ordinary borrowings.
+- Decision: override hint with ordinary_operating / applicable.
+- Special constraint retained inside ordinary model: pledged bank deposits support bank borrowings and bills payable, so they are not detachable cash.
+
+[currency]
+- Filing presentation currency: HKD.
+- Result protocol currency: CNY absolute yuan.
+- Conversion used for all filing absolute amounts: HKD 1 = CNY 0.90486.
+- Source: PBOC/CFETS central parity announcement dated 2025-12-26.
+- Ratios were computed from original HKD figures, so the currency conversion does not affect them.
+- Market cap and PE were preserved from config/input.json as initialized by the protocol.
+
+[key filing figures, HKD'000]
+Revenue=2,530,121
+Cost of sales=2,142,618
+Gross profit=387,503
+Profit for year=49,599
+Parent net profit=50,290
+Total assets=2,938,944
+Total liabilities=1,988,334
+Total equity=950,610
+Parent equity=948,205
+Operating cash flow=243,930
+PPE purchases=67,092
+Operating free cash flow=176,838
+Unpledged bank balances and cash=261,722
+Pledged deposits=630,230
+Bank and other borrowings=310,540
+Lease liabilities=38,345
+No dividend for 2025; 2024 comparison also nil.
+
+[formulas]
+gross_margin=387503/2530121=0.1531559163
+net_margin=50290/2530121=0.0198765197
+operating_free_cash_flow=(243930-67092)*1000*0.90486=CNY160,013,633
+discounted_detachable_net_cash=(261722-310540-38345)*1000*0.90486=-CNY78,870,312
+discounted_sustainable_cash_profit=(50290+52942+10359-67092)*1000*0.90486=CNY42,075,085
+operating_business_price=139815956.7284584-(-78870312)=CNY218,686,269 rounded
+owner_earnback_years=218686268.9084584/42075085=5.1975241
+market_cap_to_cash_profit=139815956.7284584/42075085=3.3230107
+forecast_cash_dividend=0; forecast_dividend_yield=0
+
+[judgment boundaries]
+- Fact: automotive display backlights generated HKD2,285.734m and were 94.5% of LED-backlight sales.
+- Fact: largest customer was 27% of revenue; top five were 63%.
+- Fact: net impairment losses on trade receivables, other receivables and prepayments were HKD59.427m.
+- Inference: earnings and cash conversion are sensitive to customer collections and automotive demand.
+- Judgment: pledged deposits receive a 0% detachable-cash factor because release requires settlement of related facilities.
+- Judgment: current PPE capex is used as a conservative proxy for maintenance plus growth capex; expansion capex was not separated due to insufficient disclosure.
+- Judgment: next-year dividend forecast is zero because both 2024 and 2025 were nil and no explicit restoration guidance was found.
+
+[limitations]
+- No pre-existing annual fact package was available for reuse.
+- Income statement and cash-flow CNY amounts use a year-end-proximate rate rather than a full-year average rate.
+- No independent market-share evidence was found for the company's claimed industry position.
+- Sustainable cash profit is a one-year normalization and must be retested against subsequent receivable losses, capex, and working-capital movements.

@@ -1,0 +1,69 @@
+stock-research trace
+company: 02539.HK / LEMO SERVICES
+period: 2025-12-31 annual
+generated_at: 2026-08-04T14:06:18+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routed reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- stock_report/data/analysis/annual_review/02539.HK/2025-12-31 contained no facts.json, annual_facts.md, or extraction trace.
+- stock_report/data/raw/filings/02539.HK/2025-12-31 contained no reusable filing.
+- No prior stock-research result existed for this company/period.
+- Therefore returned to primary HKEX disclosure.
+
+3. Primary sources
+- HKEX title search for stock 02539 identified the 2025 annual report released 2026-04-24 and annual results released 2026-03-20.
+- Annual report URL:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042401320.pdf
+- AGM poll results and final-dividend approval URL:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0518/2026051801010.pdf
+- PDF downloaded to temporary research storage and text extracted for examination; no downloaded filing was written into the requested outputs.
+- Market cap RMB644,751,838.3592367, date 2026/08/03 09:42:54, PE TTM 7.22 and source Tencent qt.gtimg.cn were taken exactly from config/input.json.
+
+4. Model verification
+- Input hint said financial_brokerage.
+- Annual report says the company owns and operates mechanical massage chairs/cushions at POS under Direct and Partner modes.
+- No brokerage client money, proprietary securities inventory, margin financing, or repo liabilities exist in the operating model.
+- Overrode hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+5. Core reported facts (RMB absolute yuan)
+- Revenue 906,778,000; cost of sales 601,429,000; gross profit 305,349,000.
+- Operating profit 113,867,000; net profit and parent net profit 93,731,000.
+- Total assets 714,249,000; total liabilities 214,196,000; total and parent equity 500,053,000; minority interest zero.
+- Operating cash flow 240,835,000; capex 135,443,000; operating FCF 105,392,000.
+- Cash 243,868,000; FVTPL wealth products 48,291,000; bank loans 54,532,000; lease liabilities 9,971,000.
+- Proposed 2025 final dividend 28,119,000 (RMB0.506/share), subsequently approved in May 2026.
+
+6. Calculations
+- gross_margin = 305,349,000 / 906,778,000 = 0.3367406355.
+- net_margin = 93,731,000 / 906,778,000 = 0.1033670865.
+- forecast_dividend_yield = 28,119,000 / 644,751,838.3592367 = 0.0436121285.
+- discounted detachable net cash:
+  cash 243,868,000 * 50% = 121,934,000
+  wealth products 48,291,000 * 70% = 33,803,700
+  less bank loans 54,532,000
+  less lease liabilities 9,971,000
+  result = 91,234,700.
+- operating FCF = 240,835,000 - 135,443,000 = 105,392,000.
+- discounted sustainable cash profit = 105,392,000 * 85% = 89,583,200.
+- operating business price = 644,751,838.3592367 - 91,234,700 = 553,517,138.3592367.
+- owner earnback years = 553,517,138.3592367 / 89,583,200 = 6.1788051594.
+- market cap / cash profit = 644,751,838.3592367 / 89,583,200 = 7.1972405357.
+
+7. Judgment boundaries
+- 50% cash discount reflects fresh IPO proceeds, planned expansion/equipment needs and fund remittance constraints; it is an analyst assumption.
+- 70% wealth-product discount reflects liquidity with no fixed/determinable return; it is an analyst assumption.
+- 15% FCF sustainability haircut reflects declining gross margin, device lifecycle and expansion uncertainty; it is an analyst assumption.
+- No market-share rank was asserted because the annual report did not provide independently verified 2025 market share.
+- Forecast dividend uses the visible approved final dividend and does not assume a fixed payout policy.
+
+8. Protocol updates and validation
+- All result fields were populated by stock_analysis.stock_research.protocol set after initialization; the complex JSON was not hand-created from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[].

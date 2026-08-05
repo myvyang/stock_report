@@ -1,0 +1,93 @@
+stock-research trace
+company: 丽江股份 (002033.SZ)
+period: 2025-12-31 annual
+research date: 2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md completely.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields only through protocol `set` commands; the initialized JSON skeleton was not replaced by a hand-written JSON document.
+5. Validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   First completed-result validation: status=ok, errors=[]
+
+[local data reuse]
+- Input existed: config/input.json.
+- No pre-existing raw filing, annual facts package, normalized facts, or prior stock-research result existed for 002033.SZ/2025-12-31.
+- Therefore the official annual report was fetched and locally retained at:
+  stock_report/data/raw/filings/002033.SZ/2025-12-31/2025-annual-report.pdf
+- Extracted text retained at:
+  stock_report/data/raw/filings/002033.SZ/2025-12-31/2025-annual-report.txt
+
+[primary sources]
+1. 丽江玉龙旅游股份有限公司2025年年度报告全文, disclosed 2026-03-24.
+   Shenzhen Stock Exchange PDF:
+   https://disc.static.szse.cn/disc/disk03/finalpage/2026-03-24/cc785f69-d238-49ad-bf0f-050d59303681.PDF
+   Used for company identity, business model, segment revenue/margin, all three financial statements, cash composition, restricted funds, project budget/progress, risks and dividends.
+2. config/input.json market snapshot.
+   market cap CNY 4,764,000,000; timestamp 20260731114257; PE TTM 19.39; source Tencent qt.gtimg.cn.
+
+[statement model]
+- Input hint ordinary_operating was independently checked against the annual report.
+- Confirmed ordinary_operating / applicable.
+- Reason: the company earns fees from tourists for cableways, performances, hotels, catering and ancillary services. Assets are ordinary operating fixed/intangible assets; the balance sheet does not contain customer deposits, insurance reserves, regulated presale cash or financial assets/liabilities that constitute the business itself.
+
+[reported financial facts, CNY]
+- Revenue 860,365,968.61
+- Cost of sales 377,038,253.94
+- Gross profit 483,327,714.67
+- Operating profit 306,273,370.96
+- Net profit 239,129,457.81
+- Parent net profit 213,476,711.14
+- Deducted parent net profit 220,422,298.59
+- Operating cash flow 387,630,237.56
+- Capital expenditure (cash paid to acquire long-term assets) 146,694,811.18
+- Operating free cash flow 240,935,426.38
+- Total assets 3,069,030,086.33
+- Total liabilities 264,642,375.40
+- Total equity 2,804,387,710.93
+- Parent equity 2,559,030,285.42
+- Minority interest 245,357,425.51
+
+[formula checks]
+- Gross margin = (860,365,968.61 - 377,038,253.94) / 860,365,968.61 = 0.5617699122280024.
+- Parent net margin = 213,476,711.14 / 860,365,968.61 = 0.24812314634537574.
+- Operating FCF = 387,630,237.56 - 146,694,811.18 = 240,935,426.38.
+- Forecast dividend yield = 192,321,748.85 / 4,764,000,000 = 0.04036980454450042.
+
+[cash haircut and project reserve, CNY]
+- Cash and cash equivalents: 397,597,613.52 x 80% = 318,078,090.816.
+- Wealth management products: 135,640,919.50 x 95% = 128,858,873.525.
+- Term deposits/certificates: 267,459,111.12 x 95% = 254,086,155.564.
+- Treasury reverse repo: 100,476,673.90 x 98% = 98,467,140.422.
+- Restricted cash 30,006,131.88 assigned zero detachable value.
+- Lease-related liabilities 8,362,468.03 fully deducted.
+- Yak Meadow cableway budget 531,986,600.00 less year-end construction balance 84,862,657.62 = 447,123,942.38; fully reserved as future project funding.
+- Discounted detachable net cash = 344,003,849.917.
+- Conservative note: this full reserve does not offset possible future contributions by the 35% minority shareholder, so net cash may be understated.
+
+[sustainable cash profit judgment, CNY]
+- Start with parent net profit 213,476,711.14.
+- Add back net negative non-recurring impact 6,945,587.45 to reach deducted parent profit 220,422,298.59.
+- Deduct judgmental buffer 20,422,298.59 for weather/visitor cyclicality, new-hotel ramp-up and the 2026-2028 cableway construction period.
+- Discounted sustainable distributable cash profit = 200,000,000.
+- This is an analyst judgment, not company guidance.
+
+[owner earnback]
+- Operating business price = 4,764,000,000 - 344,003,849.917 = 4,419,996,150.083.
+- Owner earnback years = 4,419,996,150.083 / 200,000,000 = 22.099980750415.
+- Market cap / cash profit = 4,764,000,000 / 200,000,000 = 23.82.
+- Discounted net cash / market cap = 344,003,849.917 / 4,764,000,000 = 0.07220903650650715.
+
+[data limitations]
+- Individual maturities and redemption conditions for wealth products and deposits were not disclosed in sufficient detail; uniform haircuts were used.
+- Future funding split for the Yak Meadow project is not fully quantified; full consolidated remaining budget was reserved.
+- Sustainable cash profit includes judgmental discounts and should be refreshed with visitor volumes, hotel profitability, capex and dividends.
+- Market cap and PE TTM were reused from the input snapshot and not independently recomputed.
+
+[required outputs]
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

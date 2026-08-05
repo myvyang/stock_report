@@ -1,0 +1,63 @@
+stock-research trace — JHS
+generated for task date: 2026-08-05 Asia/Shanghai
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse check
+   - config/input.json exists and was read.
+   - No raw filing metadata, annual facts package, normalized facts, or prior JHS research outputs existed under the supplied stock_report paths.
+   - Research therefore returned to primary disclosures.
+
+3. Result initialization
+   - Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Skeleton successfully created; no complex JSON was written from scratch.
+
+4. Company/model verification
+   - Primary filing: SEC Form N-CSR, accession 0001193125-25-328177, reporting period 2025-10-31.
+   - Filing identifies JHS as a closed-end fixed-income registered investment company.
+   - Overrode input hint ordinary_operating/applicable with investment_holding/requires_special_model.
+   - Reason: securities and leverage are the business itself; ordinary detachable-cash and operating-earnback fields must remain null.
+
+5. Core extraction from audited filing (USD)
+   - Total investments: 236,631,611
+   - Total assets: 238,782,918
+   - Liquidity agreement: 91,300,000
+   - Total liabilities: 93,794,753
+   - Net assets: 144,988,165
+   - Investment income: 12,534,962
+   - Net expenses: 6,229,143
+   - Net investment income: 6,305,819
+   - Increase in net assets from operations: 11,085,955
+   - Distributions: 7,210,402
+   - Operating cash flow: 7,192,927
+   - Shares: 11,646,585; NAV/share: 12.45; market price/share: 11.54
+   - Average liquidity-agreement rate: 5.11%; period-end rate: 4.57%
+
+6. Currency normalization
+   - Protocol requires CNY absolute yuan.
+   - Used 2025-10-31 USD/CNY central parity 7.0880, announced by CFETS under PBOC authorization.
+   - All audited balance-sheet and income/cash-flow USD amounts multiplied by 7.0880.
+   - Historical 2024 distribution also uses this display rate; this is flagged as a limitation.
+
+7. Dividend forecast
+   - Latest official quarterly declaration before task date: USD 0.1535/share on 2026-06-01.
+   - Mechanical annualization: 0.1535 × 4 × 11,646,585 × 7.0880 = CNY 50,686,310.61.
+   - Yield: 50,686,310.61 / CNY 859,001,362.10 = 0.05900608875.
+   - Forecast explicitly flagged as non-guaranteed and potentially including return of capital.
+
+8. Protocol population
+   - Used repeated protocol `set` commands for model, statements, asset/liability explanations, dividend, business, risks, evidence, and data quality.
+   - Ordinary owner-earnback fields remained null as required for requires_special_model.
+
+9. Validation
+   - Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Initial completed-result validation: status ok, errors [].
+
+10. Known limitations
+   - Requested label period 2025-12-31 differs from audited fiscal year 2025-10-31.
+   - Market cap date 2026-08-03 is not aligned with the annual NAV date.
+   - Market cap and PE are supplied third-party values.
+   - No same-day official NAV was available in the provided local inputs, so no current discount/premium was asserted.

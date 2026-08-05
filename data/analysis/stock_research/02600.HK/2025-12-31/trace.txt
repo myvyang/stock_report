@@ -1,0 +1,69 @@
+stock-research trace
+company: 中国铝业股份有限公司 (02600.HK)
+period: 2025-12-31
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No raw filing metadata, annual facts package, normalized facts, or prior stock-research result existed for this company/period.
+- Downloaded official 2025 annual report from company/HKEX disclosure.
+- Local source: stock_report/data/raw/filings/02600.HK/2025-12-31/annual-report-hk-2025.pdf
+- Source URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042302304.pdf
+- Extracted text: stock_report/data/raw/filings/02600.HK/2025-12-31/annual-report-hk-2025.txt
+- An incomplete company-site PDF download was retained as annual-report-2025.pdf and was not used for figures.
+
+3. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Filing facts: bauxite and coal mining; alumina, primary aluminum and alloy production; trading, logistics and power generation.
+- Override: ordinary_operating / applicable.
+- Reason: no brokerage customer funds, proprietary securities portfolio, margin finance, or repo-funding business model exists in the filing.
+
+4. Core filing facts (annual report units converted from RMB thousand to RMB yuan)
+- Revenue: 241,125,217,000
+- Cost of sales: 199,671,213,000
+- Gross profit: 41,454,004,000
+- Operating profit: 27,478,229,000
+- Net profit: 21,524,895,000
+- Parent net profit: 12,673,918,000
+- Total assets: 227,021,733,000
+- Total liabilities: 104,450,072,000
+- Total equity: 122,571,661,000
+- Parent equity: 74,924,822,000
+- Minority interests: 47,646,839,000
+- Operating cash flow: 33,843,180,000
+- Company-disclosed capital expenditure: 15,148,000,000
+- Operating free cash flow: 18,695,180,000
+- Financing cash flow: -15,581,871,000
+- Ordinary shareholder dividends and employee-share repurchase cash out: 4,428,438,000
+
+5. Formula calculations
+- Gross margin = 41,454,004,000 / 241,125,217,000 = 0.17191899095315277
+- Net margin = 12,673,918,000 / 241,125,217,000 = 0.052561561821217566
+- Parent attribution proxy = 12,673,918,000 / 21,524,895,000 = 0.5888027792934646
+- Sustainable cash profit = (33,843,180,000 - 15,148,000,000) * 0.5888027792934646 = 11,007,773,943.391594
+- Discounted detachable net cash = 27,993,005,000 + 4,410,315,000 * 0.9 - 63,493,276,000 = -31,530,987,500
+- Operating business price = 123,454,203,445.21165 - (-31,530,987,500) = 154,985,190,945.21167
+- Owner earnback years = 154,985,190,945.21167 / 11,007,773,943.391594 = 14.07961243955736
+- Market cap / cash profit = 123,454,203,445.21165 / 11,007,773,943.391594 = 11.215183385858513
+- Forecast dividend = 2,110,000,000 interim + 2,522,000,000 proposed final = 4,632,000,000
+- Forecast dividend yield = 4,632,000,000 / 123,454,203,445.21165 = 0.03751998612226807
+
+6. Judgment notes
+- Used total company-disclosed capex, including growth items, as a conservative deduction because maintenance capex was not separately disclosed.
+- Attributed group free cash flow using the parent/group net-profit ratio because subsidiary-level distributable cash paths were not available.
+- Excluded restricted cash from detachable cash.
+- Applied a 10% haircut to FVPL financial assets because they mainly contain structured deposits but are not identical to unrestricted cash.
+- Fully deducted interest-bearing loans and borrowings.
+- Did not assign ranking labels, investment advice, or target price.
+
+7. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields through protocol set/append commands.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

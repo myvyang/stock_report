@@ -1,0 +1,57 @@
+Stock research trace — 00576.HK — period 2025-12-31
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because no annual fact package was present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields only through protocol `set` commands; did not hand-write the JSON object.
+
+2. Local reuse audit
+- Checked stock_report/data/analysis/annual_review/00576.HK/2025-12-31, normalized facts, raw filings, prior stock research, and /root/aicode sync tree.
+- No reusable 2025 filing, facts package, normalized facts, or prior research result was found.
+
+3. Primary filing acquired
+- Company official annual-report index: https://www.zjec.com.cn/en/Investor-Communications/Regular-Reports
+- Downloaded official English 2025 annual report:
+  https://www.zjec.com.cn/mtsc/uploads/undefined/E_Annual_Report_2025_-_20260415.pdf
+- Local copy: stock_report/data/raw/filings/00576.HK/2025-12-31/annual-report-2025.pdf
+- Extracted searchable text locally with pypdf to annual-report-2025.txt because pdftotext was unavailable.
+- HKEX title search independently showed the 2025 annual report release on 2026-04-15.
+
+4. Key evidence locations in annual report (printed PDF pages)
+- Company profile and nine expressways: pp. 6-7.
+- Business/revenue breakdown, traffic and causes of toll decline: pp. 23-31.
+- Capital structure, capital expenditure and commitments: pp. 34-36.
+- Dividend recommendation and payout ratio: p. 71; dividend note p. 198.
+- Consolidated profit or loss: pp. 117-118.
+- Consolidated financial position: pp. 119-120.
+- Changes in equity and minority interests: pp. 121-123.
+- Consolidated cash flows: pp. 124-127.
+- Segment revenue, profit, assets and liabilities: pp. 188-191.
+- Expressway operating-right carrying value, 25-30 year grant and nil-consideration handback: pp. 205-206.
+
+5. Model decision
+- Input hint `financial_brokerage` was overridden after filing review.
+- Selected `platform_financial_mixed`: toll operation supplied 52.6% of revenue, securities 38.2%; securities nevertheless represented 77.6% of consolidated assets and 88.6% of segment liabilities.
+- Ordinary owner earnback marked `requires_special_model`.
+- Reason: broker client money, margin loans, proprietary assets, repos and regulatory capital are operating balance-sheet items; toll concessions are finite-lived and handed back for nil consideration.
+- Consequently all ordinary earnback sorting fields remain null as required by the result contract.
+
+6. Calculations (from absolute CNY amounts)
+- Gross margin = 6,775,192,000 / 19,755,490,000 = 0.3429523641.
+- Net margin = parent profit 5,324,958,000 / revenue 19,755,490,000 = 0.2695432004.
+- Forecast dividend yield = proposed dividend 2,385,055,000 / input market cap 36,102,403,658.097984 = 0.0660636068.
+- Minority-interest ratio = 42,669,061,000 / 93,049,334,000 = 0.4585638517.
+- Accounting cash capex = PPE 1,541,391,000 + expressway construction 1,769,359,000 + leasehold land 8,796,000 + other intangibles 151,589,000 = 3,471,135,000.
+- Accounting operating FCF bridge = operating cash flow 4,203,482,000 - cash capex 3,471,135,000 = 732,347,000. This is explicitly not treated as distributable cash because securities working-capital movements dominate consolidated CFO.
+
+7. Data-quality treatment
+- Status set to complete because the special-model minimum fields, business story, asset/liability explanations, dividend forecast, evidence and model reasoning are present.
+- Limitations retained: no per-road remaining concession schedule in the cited table; no clean parent-only cash/debt bridge; consolidated cash flow is distorted for ordinary-company comparison; market data relies on supplied Tencent snapshot; proposed dividend was subject to shareholder approval at report publication.
+
+8. Validation
+- Ran:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status ok; errors [].

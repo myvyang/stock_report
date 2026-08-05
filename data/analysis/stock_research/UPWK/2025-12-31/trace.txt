@@ -1,0 +1,74 @@
+UPWK stock research trace
+generated_at=2026-08-04T15:30:54+08:00
+period=2025-12-31
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- Expected annual facts, normalized facts, and raw filing directories contained no UPWK 2025 source files.
+- Result: no reusable local facts package; official filing retrieval required.
+
+3. Primary sources
+- SEC Form 10-K, accession 0001627475-26-000012, filed 2026-02-13:
+  https://www.sec.gov/Archives/edgar/data/1627475/000162747526000012/upwk-20251231.htm
+- Local copy retrieved to stock_report/data/raw/filings/UPWK/2025-12-31/upwk-20251231.htm
+- Upwork FY2025 earnings release dated 2026-02-09:
+  https://investors.upwork.com/news-releases/news-release-details/upwork-reports-fourth-quarter-and-full-year-2025-financial
+- Federal Reserve H.10 release for 2025-12-31 USD/CNY:
+  https://www.federalreserve.gov/releases/h10/20260105/
+- Market cap and PE: config/input.json, Yahoo Finance yfinance attribution.
+
+4. Model decision
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Reason: marketplace and enterprise workforce services have conventional revenue/cost/opex/capex economics.
+- Special handling: USD180.752m customer escrow asset is legally restricted and exactly matched by escrow payable; both excluded from detachable cash.
+
+5. Currency translation
+- FX=6.9931 CNY per USD at 2025-12-31 from Federal Reserve H.10.
+- All filing USD amounts translated using this single spot rate.
+- Input market cap was already CNY and was not translated.
+
+6. Key audited inputs (USD millions)
+- assets=1299.580; liabilities=669.265; equity=630.315
+- revenue=787.784; cost_of_revenue=174.752; gross_profit=613.032
+- operating_income=129.307; net_income=115.425
+- operating_cash_flow=248.259
+- internal_use_software=19.3; property_equipment_purchases=5.8; capex=25.1
+- operating_free_cash_flow=223.159 (earnings release rounded to 223.1)
+- cash=294.356; marketable_securities=378.425; convertible_note_principal=360.998
+- escrow_asset=180.752; escrow_payable=180.752
+- stock_based_compensation=65.390; share_repurchases=136.0
+
+7. Owner earnback calculations (CNY)
+- discounted_net_cash = cash*100% + securities*95% - note_principal
+  = 2,058,460,943.60 + 2,514,045,674.13 - 2,524,495,113.80
+  = 2,048,011,503.93
+- normalized_cash_profit = operating_income*(1-25%) + D&A - capex + acquisition_cost*(1-25%)
+  = 678,192,586.28 + 179,778,601.00 - 175,526,810.00 + 23,093,422.50
+  = 705,535,607.28
+- operating_business_price = 7,634,863,135.91 - 2,048,011,503.93
+  = 5,586,851,631.99
+- owner_earnback_years = 5,586,851,631.99 / 705,535,607.28 = 7.9186
+- market_cap_to_cash_profit = 7,634,863,135.91 / 705,535,607.28 = 10.8214
+- discounted_net_cash_to_market_cap = 0.268245
+
+8. Dividend treatment
+- Historical cash dividend assumed zero based on no declared dividend disclosure and company statement that future dividends remain discretionary.
+- Forecast cash dividend=0; forecast yield=0.
+- Buybacks are disclosed separately and not treated as dividends.
+
+9. Protocol operations
+- Initialized outputs/result.json with protocol init.
+- Populated branches with protocol set commands; no hand-written full JSON file.
+- Final protocol validate status: ok, errors=[]
+
+10. Known limitations
+- Single period-end FX used for both balance sheet and income/cash-flow amounts.
+- Market data supplied by task input and not independently recomputed.
+- 25% normalized tax, 95% securities haircut, and acquisition-cost add-back are analyst assumptions.
+- Convertible note settlement outcome remains unknown; principal fully deducted conservatively.

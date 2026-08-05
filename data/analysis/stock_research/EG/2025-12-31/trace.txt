@@ -1,0 +1,61 @@
+stock-research trace
+company=Everest Group, Ltd. (NYSE: EG)
+period=2025-12-31
+generated_for_input=2026-08-04T11:55:27+08:00
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated fields only through protocol set/append commands.
+3. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+4. Validation result: status=ok, errors=[]
+
+[reuse_check]
+- No annual facts package, normalized facts, historical stock-research result, or raw filing metadata existed in the supplied stock_report paths.
+- Downloaded the official SEC inline-XBRL 10-K to stock_report/data/raw/filings/EG/2025-12-31/eg-20251231.htm for local verification.
+
+[model_decision]
+- Input hint: ordinary_operating / applicable.
+- Overridden to financial_insurance / requires_special_model.
+- Basis: company principally writes property/casualty insurance and reinsurance; invested assets fund loss reserves, unearned premium reserves and regulatory capital. Ordinary detachable-net-cash and free-cash-flow earnback calculations would misstate the economics.
+
+[primary_sources]
+- SEC Form 10-K accession 0001095073-26-000006, filed 2026-02-26:
+  https://www.sec.gov/Archives/edgar/data/1095073/000109507326000006/eg-20251231.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/1095073/000109507326000006/0001095073-26-000006-index.htm
+- USD/CNY central parity for 2025-12-31, PBOC-authorized CFETS release: 7.0288.
+  https://www.ce.cn/xwzx/gnsz/gdxw/202512/t20251231_2676993.shtml
+- Market capitalization, date and PE TTM: copied from config/input.json (Yahoo Finance yfinance).
+
+[extracted_usd_millions]
+- Gross written premiums: 17,706; net written premiums: 15,513; premiums earned: 15,560.
+- Total revenue: 17,496; net investment income: 2,124; net income: 1,591.
+- Incurred losses and LAE: 10,859; underwriting profit: 211; combined ratio: 98.6%.
+- Reinsurance underwriting profit: 972; Insurance underwriting loss: 541; Other underwriting loss: 220.
+- Total assets: 62,514; total liabilities: 47,054; shareholders' equity: 15,461.
+- Investments and cash: 45,429; loss and LAE reserves: 34,312; unearned premium reserve: 7,275; total debt: 3,589.
+- Operating cash flow: 3,068; repurchases: 797; dividends paid: 335.
+
+[conversion]
+- All structured monetary values are absolute CNY yuan.
+- Conversion rate: USD 1 = CNY 7.0288 at 2025-12-31.
+- Balance-sheet and flow figures were multiplied by 1,000,000 and 7.0288.
+- This end-date translation is a presentation convention; it is not an average-rate income-statement translation.
+
+[dividend_forecast]
+- Annualized quarterly dividend: USD 2.00 x 4 = USD 8.00/share.
+- Shares outstanding at 2026-02-01: 40,390,151.
+- Forecast cash dividend: USD 323,121,208 x 7.0288 = CNY 2,271,154,346.7904.
+- Forecast dividend yield: CNY 2,271,154,346.7904 / CNY 97,708,374,857.46973 = 2.3244%.
+- Forecast is mechanical and not a board commitment.
+
+[null_fields]
+- gross_margin, cost_of_sales, gross_profit, operating_profit: not economically comparable for an insurer.
+- capital_expenditure and operating_free_cash_flow: no useful ordinary-company meaning in the insurance model.
+- discounted_net_cash, discounted_cash_profit, operating_business_price, owner_earnback_years and market_cap_to_cash_profit: required null because ordinary owner earnback is not applicable.
+
+[quality]
+- data_quality.status=complete under the special-model minimum threshold.
+- Main limitations: mismatched market-cap/report dates; end-date FX used for all statements; dividend forecast is annualized; 2025 business disposal and 2026 segment recast reduce comparability.

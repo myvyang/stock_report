@@ -1,0 +1,58 @@
+stock-research trace
+company: AT&T Inc. (T)
+period: 2025-12-31 annual
+generated_at: 2026-08-04T22:32:23+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated fields only through protocol set commands; complex JSON was not authored as a standalone result object.
+4. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   initial completed-result validation: status=ok, errors=[]
+
+[reuse and source decision]
+- No files existed under the requested T/2025-12-31 raw filing, annual review, normalized facts, or prior stock research paths.
+- Core facts were therefore extracted from primary public sources.
+- Market cap and PE were reused unchanged from config/input.json.
+
+[primary sources]
+1. AT&T 2025 Annual Report / Form 10-K, filed 2026-02-09
+   https://investors.att.com/~/media/Files/A/ATT-IR-V2/financial-reports/annual-reports/2025/2025-annual-report-complete.pdf
+   Used for business model, income statement, balance sheet, cash flow, debt, dividend history, risks.
+2. SEC filing accession 0000732717-26-000120
+   https://www.sec.gov/Archives/edgar/data/732717/000073271726000120/t-20251231.htm
+   Used to verify filing identity and risk disclosures.
+3. AT&T 4Q25 Financial and Operational Trends
+   https://investors.att.com/~/media/Files/A/ATT-IR-V2/financial-reports/quarterly-earnings/2025/4Q-2025/T_4Q25_Trending_Schedule.pdf
+   Used for 2025 FCF excluding DIRECTV ($16.586bn) and capital investment ($22.023bn).
+4. AT&T 4Q25/full-year earnings release
+   https://investors.att.com/~/media/Files/A/ATT-IR-V2/financial-reports/quarterly-earnings/2025/4Q-2025/ATT_4Q25_Earnings_Release.pdf
+   Used to cross-check revenue, FCF and operating trends.
+5. AT&T 2026 Annual Meeting materials
+   https://investors.att.com/stockholder-services/annual-meeting-and-proxy-statement
+   Used for expected 2026 annualized common dividend of $1.11/share.
+6. Federal Reserve H.10 Data Download Program
+   https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+   Used for 2025-12-31 USD/CNY spot rate 7.1875.
+7. config/input.json / Yahoo Finance yfinance snapshot
+   Used for CNY market cap 1,075,077,663,384.7969, date 2026-08-03, PE TTM 7.6732674.
+
+[model and calculations]
+- statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+- Rationale: recurring wireless/fiber/wireline operating revenue backed by network assets and spectrum; no customer-fund or reserve structure requiring a special financial model.
+- Gross profit is an analyst-defined subtotal: revenue - equipment cost - other cost of revenue, excluding D&A. AT&T does not report standardized gross profit.
+- All filing USD amounts converted at 7.1875 CNY/USD. Market cap was already CNY and was not reconverted.
+- GAAP operating FCF = CFO $40.284bn - capex $20.842bn = $19.442bn.
+- Sustainable cash-profit base = company FCF excluding DIRECTV $16.586bn; 90% sustainability factor => $14.9274bn = CNY107.2906875bn.
+- Discounted detachable net cash = cash $18.234bn * 50% - total debt $136.100bn = -$126.983bn = CNY-912.6903125bn.
+- Operating business price = market cap - discounted net cash = CNY1,987.7679758848bn.
+- Owner earnback = operating business price / discounted sustainable cash profit = 18.52694 years.
+- Market cap / cash profit = 10.02023x.
+- Forecast common dividend = $1.11 * (7,620.748598m issued - 583.246242m treasury) * 7.1875 = CNY56.146073484bn; yield=5.2225%.
+
+[judgment boundaries]
+- Facts: filed statements, disclosed FCF, dividend expectation, market snapshot, FX observation.
+- Calculations: margins, CNY conversion, per-share dividend aggregate, formula outputs.
+- Judgment: 50% cash discount and 90% FCF sustainability factor. These are explicitly identified in result.json and report.md.

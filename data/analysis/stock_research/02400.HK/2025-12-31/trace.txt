@@ -1,0 +1,50 @@
+2026-08-04 stock-research trace — 02400.HK / XD Inc.
+
+1. Read required protocol material
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse audit
+- Checked configured raw filing, annual review, normalized facts, and historical stock-research paths.
+- No filing/facts/research artifacts existed locally for 02400.HK/2025-12-31; only the notes file existed.
+- Therefore obtained primary public disclosure rather than fabricating a local fact pack.
+
+3. Primary sources reviewed
+- HKEX title search for stock 02400.
+- XD Inc. 2025 Annual Report, released 2026-04-29:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042903788.pdf
+- XD Inc. Annual Results Announcement for year ended 2025-12-31, released 2026-03-27:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0327/2026032700387.pdf
+- Market-cap snapshot reused exactly from config/input.json: Tencent qt.gtimg.cn, 2026/08/03 09:48:09.
+
+4. Model review
+- Input hint stated financial_brokerage.
+- Filing shows reportable operations are games and TapTap online marketing; balance sheet contains no brokerage customer funds, proprietary securities book, margin financing, or repo funding.
+- Overrode hint with ordinary_operating; ordinary owner-earnback model marked applicable.
+
+5. Core audited facts (RMB)
+- Revenue 5,763,739,000; cost of revenue 1,509,184,000; gross profit 4,254,555,000.
+- Operating profit 1,679,908,000; net profit 1,656,509,000; parent profit 1,535,274,000.
+- Total assets 5,219,637,000; total liabilities 1,173,582,000; total equity 4,046,055,000; parent equity 3,811,221,000.
+- Operating cash flow 1,712,603,000.
+- PPE purchases 10,087,000 plus intangible-asset purchases 311,947,000 = capex 322,034,000.
+- Operating free cash flow = 1,390,569,000.
+
+6. Owner-earnback assumptions and formulas
+- Discounted detachable net cash = cash 3,689,375,000 × 85% + short-term investments 81,033,000 × 70% − lease liabilities 122,378,000 − operating reserve 600,000,000 = 2,470,313,850.
+- Sustainable parent cash profit = FCF 1,390,569,000 × (parent profit 1,535,274,000 / net profit 1,656,509,000) × 85% = 1,095,477,758.51.
+- Operating business price = market cap 20,281,452,163.67 − discounted cash 2,470,313,850 = 17,811,138,313.67.
+- Owner earnback years = 17,811,138,313.67 / 1,095,477,758.51 = 16.2588.
+- Market cap / cash profit = 18.5138.
+- Dividend forecast = 0 because 2025 final dividend was not recommended and management stated an intention to substitute ongoing cancelled buybacks for traditional cash dividends.
+
+7. Protocol usage
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields only through repeated protocol `set` commands; did not hand-write the JSON skeleton.
+- Final validation:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[].
+- JSON syntax independently checked with python3 -m json.tool.

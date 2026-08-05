@@ -1,0 +1,76 @@
+stock-research trace
+company: FULT / Fulton Financial Corporation
+period: 2025-12-31 annual
+generated context: 2026-08-05 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- config/input.json present.
+- No pre-existing annual facts, normalized facts, raw filing metadata, or prior stock-research outputs were found for FULT/2025-12-31.
+- Returned to primary filings because the required facts were absent.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initial input hint classified company as ordinary_operating/applicable.
+
+4. Primary evidence acquired and checked
+- SEC 2025 Form 10-K, filed 2026-02-27, accession 0000700564-26-000006.
+- SEC 2025-12-16 Form 8-K dividend announcement.
+- SEC 2026 Q1 Form 10-Q for shares outstanding as of 2026-04-30.
+- SEC 2026-04-01 Form 8-K for Blue Foundry transaction completion.
+- Federal Reserve H.10 exchange-rate data.
+- Market capitalization and PE reused exactly from config/input.json (Yahoo Finance yfinance).
+
+5. Model override
+- Verified Fulton is a financial holding company operating a bank.
+- statement_model changed to financial_bank.
+- owner_earnback_applicability changed to not_applicable.
+- Reason: customer deposits, loans, securities, and wholesale funding are operating balance-sheet items. They cannot be treated as detachable net cash, and bank cash-flow statements do not support ordinary OCF-minus-capex free cash flow.
+- All ordinary owner-earnback ranking fields retained as null.
+
+6. Key USD facts from 2025 Form 10-K
+- Total assets: $32,118.400m
+- Total liabilities: $28,627.953m
+- Total shareholders' equity: $3,490.447m
+- Cash and cash equivalents: $1,061.609m
+- AFS + HTM investment securities: $4,833.744m
+- Loans net of ACL: $23,780.422m
+- Deposits: $26,589.407m
+- Total borrowings: $1,297.375m
+- Net interest income: $1,036.347m
+- Non-interest income: $276.766m
+- Provision for credit losses: $35.698m
+- Net income: $391.609m
+- Net income available to common shareholders: $381.361m
+- NIM: 3.51%; ROA: 1.23%; common ROE: 12.09%; efficiency ratio: 57.6%
+- Non-performing assets ratio: 0.58%; ACL/non-performing loans: 198%
+- Holding-company CET1: 11.8%; total risk-based capital: 15.2%; tier 1 leverage: 9.7%
+
+7. Currency conversion
+- Protocol requires CNY absolute yuan.
+- 2025 financial-statement amounts converted at Federal Reserve H.10 December 2025 monthly average: 7.0432 CNY/USD.
+- Forecast dividend converted at H.10 2026-07-22 daily rate: 6.7725 CNY/USD, close to the input valuation date.
+- Ratios were not currency-translated.
+
+8. Dividend forecast
+- Current quarterly common dividend: $0.19/share; annualized: $0.76/share.
+- Latest disclosed post-merger shares: 191,133,586.
+- Forecast cash dividend: 191,133,586 * $0.76 * 6.7725 = CNY 983,783,680.50.
+- Forecast dividend yield: CNY 983,783,680.50 / CNY 31,433,845,654.96 = 3.1297%.
+- Mechanical forecast only; no assumption of a further increase or cut.
+
+9. Material comparability limitation
+- Blue Foundry acquisition completed 2026-04-01, after the 2025-12-31 balance sheet.
+- Forecast dividend uses post-merger shares, while core operating and balance-sheet facts remain pre-merger 2025 annual figures.
+
+10. Result construction and validation
+- outputs/result.json initialized by protocol CLI.
+- Scalar/object paths populated with protocol set commands.
+- Asset, liability, risk, and evidence records added with protocol append commands.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok; errors: [].

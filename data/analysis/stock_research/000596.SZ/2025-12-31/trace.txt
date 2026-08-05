@@ -1,0 +1,60 @@
+stock-research trace
+company: 安徽古井贡酒股份有限公司 (000596.SZ)
+period: 2025-12-31 annual
+generated for task date: 2026-08-01 Asia/Shanghai
+
+1. Instructions and protocol
+- Read /workspace/.agents/skills/stock-research/SKILL.md in full.
+- Read result-contract.md, report-contract.md, and linked data-reuse.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Expected annual facts, normalized facts, raw filing metadata, and prior stock-research artifacts under stock_report/.../000596.SZ/2025-12-31 were absent.
+- No local annual fact package could be reused; returned to the official filing source as required by data-reuse.md.
+
+3. Official filing acquisition and identity check
+- Queried the CNINFO announcement API for stock 000596 and category annual reports, date range 2026-01-01 through 2026-08-01.
+- Located announcement ID 1225237594, title “2025年年度报告”, announcement date 2026-04-29.
+- Official PDF: https://static.cninfo.com.cn/finalpage/2026-04-29/1225237594.PDF
+- Verified issuer name, stock codes 000596/200596, reporting period, audit firm, and financial statement unit.
+
+4. Extracted filing facts
+- Main financial metrics: annual report pp. 6-8.
+- Business, sales channels, product series, dealer count, production/inventory, industry discussion: pp. 9-13.
+- Expenses and restricted assets: pp. 16 and 20-21.
+- Audited consolidated balance sheet: pp. 55-57.
+- Audited consolidated income statement: pp. 59-61.
+- Audited consolidated cash flow statement: pp. 63-65.
+- Sales expense detail: pp. 140-141.
+- Dividend proposal: important notice p. 2.
+
+5. Model classification
+- Confirmed ordinary_operating / applicable.
+- Reason: the filing describes production and sale of baijiu, predominantly through distributors. Cash, inventories, plants, trade settlement assets and customer advances have ordinary consumer operating meanings. No bank, brokerage, insurance, property development, construction, concession or holding-company balance-sheet model applies.
+
+6. Key calculations (CNY absolute yuan in result.json)
+- Gross profit = 18,831,982,591.24 - 3,906,499,790.17 = 14,925,482,801.07.
+- Gross margin = 14,925,482,801.07 / 18,831,982,591.24 = 0.7925603546.
+- Net margin = parent net profit 3,549,108,530.34 / revenue = 0.1884617572.
+- Operating FCF = operating cash flow 1,947,212,977.00 - capex 1,663,125,672.79 = 284,087,304.21.
+- Unrestricted cash starting point uses year-end cash and cash equivalents 12,494,251,818.57. This equals monetary funds less restricted monetary funds to rounding.
+- Discounted detachable net cash = 12,494,251,818.57 * 80% - (184,830,263.45 + 61,253,882.81 + 260,199,589.94) = 9,489,117,718.656.
+- Discounted sustainable cash profit = parent net profit 3,549,108,530.34 * 70% = 2,484,375,971.238.
+- Operating business price = market cap 49,165,000,000 - discounted net cash = 39,675,882,281.344.
+- Owner earnback years = 39,675,882,281.344 / 2,484,375,971.238 = 15.9701602095.
+- Market cap / discounted cash profit = 19.7896777980.
+- Forecast dividend = 528,600,000 shares * CNY 3.40 = 1,797,240,000.
+- Forecast dividend yield = 1,797,240,000 / 49,165,000,000 = 0.0365552731.
+
+7. Judgment boundaries
+- 80% cash recognition is an analyst discount, retaining 20% for working capital, tax, dividend volatility and unidentified constraints.
+- 70% profit recognition is an analyst scenario, not company guidance. It responds to 2025 revenue/profit decline, Q4 loss, weak cash conversion and elevated capex.
+- Single-year reported FCF was not used directly as perpetual cash profit because reported capex includes expansion/technical-upgrade spending; full reported profit was not used because cash conversion weakened materially.
+- Market cap and PE were taken from config/input.json (Tencent qt.gtimg.cn snapshot) and were not independently reconstructed.
+
+8. Protocol operations and validation
+- Populated result.json using repeated protocol `set` and `append` commands; did not hand-write the initialized JSON structure.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]

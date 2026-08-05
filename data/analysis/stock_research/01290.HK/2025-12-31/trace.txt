@@ -1,0 +1,66 @@
+stock-research trace
+company: 01290.HK / CHINA HUIRONG
+period: 2025-12-31
+generated_at_context: 2026-08-03 Asia/Shanghai
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md and references/data-reuse.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result.json exclusively through protocol `set` and `append` commands after initialization.
+
+2. Local reuse audit
+- Checked the input-declared annual review, normalized facts and raw filing paths.
+- No pre-existing facts.json, annual_facts.md, normalized facts, filing metadata, or prior stock-research result existed for 01290.HK/2025-12-31.
+- Reused the market-cap and PE snapshot from config/input.json.
+
+3. Primary source acquisition
+- Located the official 2025 annual report on HKEXnews.
+- Source URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042905206.pdf
+- HKEX release date: 2026-04-29.
+- Saved a local source copy to stock_report/data/raw/filings/01290.HK/2025-12-31/annual-report-2025.pdf.
+- Local PDF text extraction was unavailable because pdftotext is not installed; figures were inspected against the searchable HKEX PDF representation.
+
+4. Model override
+- Input hint: financial_brokerage.
+- Filing facts: diversified SME/individual financial services integrating pawnshop, technology microfinance, commercial factoring, finance leasing, special assets and supply-chain management; no securities brokerage/investment-banking operating model.
+- Final model: platform_financial_mixed.
+- Owner earnback applicability: requires_special_model.
+- Reason: loans, lease receivables, cash and borrowings jointly form the operating balance sheet of the financing business. Cash is not detachable and lending cash flow is not ordinary distributable free cash flow.
+
+5. Core extracted figures (annual report units RMB'000; result.json converted to RMB yuan)
+- Operating income 708,581; operating cost 444,260.
+- Profit before tax 99,074; net profit 70,816; attributable profit 52,582.
+- Total assets 3,344,733; liabilities 1,124,112; total equity 2,220,621; parent equity 1,936,303; NCI 284,318.
+- Customer loans gross 3,101,604; Stage 3 gross 1,372,400; ECL allowance 631,429; net customer loans 2,470,175.
+- Past-due customer loans net 678,940; past due over one year net 511,276.
+- Finance lease receivables net 129,045.
+- Cash at bank/on hand 216,671; deposits pledged for notes payable 77,800.
+- FVPL assets 127,649, including private equity funds 107,320 and structured deposits 20,329.
+- Investment properties 143,219; related 2025 fair-value loss 26,527.
+- Borrowings 932,915, including current borrowings 743,915; no undrawn bank facilities at year end.
+- Operating cash flow 272,273; capex cash payments 13,689; financing cash flow -231,460.
+- Dividends declared/paid to owners and NCI 42,884.
+- Proposed 2025 final dividend RMB 29,544 equivalent (HKD0.03/share; HKD32.7m total).
+
+6. Derived figures
+- Protocol gross margin = (708,581 - 444,260) / 708,581 = 37.3025%. This mixes financial spread and merchandise margin and is flagged as limited-comparability.
+- Parent net margin = 52,582 / 708,581 = 7.4207%.
+- Forecast dividend yield = 29,544,000 / 487,764,293.5413122 = 6.0570%.
+- Stage 3 / gross customer loans = 1,372,400 / 3,101,604 = 44.247%.
+- ECL / gross customer loans = 631,429 / 3,101,604 = 20.358%.
+- ECL / Stage 3 gross loans = 631,429 / 1,372,400 = 46.008% (report qualitative framework uses approximately 46.0%).
+- Past due net / net customer loans = 678,940 / 2,470,175 = 27.485%.
+- Parent ROE = 52,582 / average(1,913,619, 1,936,303) = 2.7316%.
+- Market cap / parent equity = 487,764,293.5413122 / 1,936,303,000 = 25.1915%.
+- Mechanical operating FCF = 272,273 - 13,689 = 258,584 (RMB'000); explicitly not treated as sustainable distributable cash profit.
+
+7. Data-quality decisions
+- Status set to complete because the special-model minimum fields, dividend forecast, business narrative, asset/liability rows and primary-source evidence are present.
+- All ordinary owner-earnback fields remain null, as required by the contract.
+- Limitations record the market-data source, lack of loan-level collateral/recovery data, mixed gross-margin economics and non-distributable nature of mechanical FCF.
+
+8. Validation
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result after population: status ok; errors [].

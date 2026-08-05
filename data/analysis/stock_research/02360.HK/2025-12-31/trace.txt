@@ -1,0 +1,65 @@
+stock-research trace
+company: BEST MART 360 (02360.HK)
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- config/input.json existed.
+- No annual facts package, normalized facts, raw filing metadata, or prior stock-research output existed for 02360.HK/2025-12-31.
+- Therefore returned to primary public disclosure.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initial analysis_model_hint was financial_brokerage/requires_special_model.
+
+4. Primary sources obtained
+- HKEX Annual Report 2025, published 2026-04-27:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042701949.pdf
+- Local copy:
+  stock_report/data/raw/filings/02360.HK/2025-12-31/annual-report-2025.pdf
+- PBOC/CFETS RMB central parity announcement dated 2025-12-26: HKD 1 = CNY 0.90486.
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, 2026-08-03 09:47:49.
+
+5. Model verification
+- Annual report note 1 says subsidiaries retail food and beverage, household and personal care products under Best Mart 360 and FoodVille, plus wholesaling in Hong Kong.
+- Balance sheet consists mainly of PPE/right-of-use assets, inventory, cash, trade/other working capital, bank borrowings, and lease liabilities.
+- No brokerage customer money, proprietary trading book, or repo financing exists.
+- Override: statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+
+6. Core reported facts (HKD'000)
+- Revenue 2,867,695; cost of sales 1,832,621; gross profit 1,035,074.
+- Operating profit 280,990; net profit and parent net profit 219,730.
+- Total assets 1,093,349; total liabilities 550,773; parent/total equity 542,576.
+- Cash 173,131; inventory 316,841; PPE 458,631; bank borrowings 60,000; lease liabilities 282,939.
+- Operating cash flow 461,069; PPE purchases 10,688; lease-principal repayment 198,632; dividends paid 209,999.
+- 2025 attributable dividend: interim HKD110m plus proposed final HKD90m = HKD200m.
+
+7. Conversion and calculations
+- Uniform conversion: reported HKD amount x 0.90486 = CNY amount.
+- Gross margin = 1,035,074 / 2,867,695 = 0.3609428478.
+- Net margin = 219,730 / 2,867,695 = 0.0766225139.
+- Operating FCF = (461,069 - 10,688 - 198,632) x 0.90486 = CNY227,798,176.14.
+- Discounted net cash = cash x 70% - bank borrowings = CNY55,369,921.662.
+- Discounted sustainable cash profit = parent profit x 80% = CNY159,059,910.24.
+- Operating business price = market cap - discounted net cash = CNY1,355,522,085.689.
+- Owner earnback = operating business price / discounted cash profit = 8.5221 years.
+- Market cap / discounted cash profit = 8.8702 years.
+- Flat dividend scenario = HKD200m x 0.90486 = CNY180,972,000; yield = 12.8268%.
+
+8. Judgment boundaries
+- 70% cash recognition is an analyst haircut to retain operating liquidity.
+- 80% profit recognition is an analyst sustainability haircut for falling gross margin, lower average store sales, and strong retail competition.
+- Lease principal is deducted in operating FCF; lease liabilities are not deducted again in detachable net cash.
+- Flat dividend is a scenario, not company guidance.
+- Industry leadership is management's description; no independent market share was found.
+
+9. Protocol population and validation
+- outputs/result.json was populated through protocol set/append commands, not handwritten from scratch.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report finalization: status=ok, errors=[].

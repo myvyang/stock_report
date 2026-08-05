@@ -1,70 +1,57 @@
-Task: stock research outputs for 00327.HK 百富环球
-Run date: 2026-07-27 Asia/Shanghai
+Task: stock research outputs for 00327.HK PAX GLOBAL
+Run date: 2026-08-03 Asia/Shanghai
 Workspace: /workspace
 
-Protocol references read:
-- /workspace/.agents/skills/stock-research/SKILL.md
-- /workspace/.agents/skills/stock-research/references/result-contract.md
-- /workspace/.agents/skills/stock-research/references/report-contract.md
-- /workspace/.agents/skills/stock-research/references/data-reuse.md
+Protocol and contracts read:
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
 
-Inputs read:
+Inputs and reusable sources read:
 - config/input.json
 - stock_report/data/analysis/annual_review/00327.HK/2025-12-31/facts.json
 - stock_report/data/analysis/annual_review/00327.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/00327.HK/2025-12-31/extraction_trace.txt
 - stock_report/data/raw/filings/00327.HK/2025-12-31/2025-annual-report.txt
-- stock_report/data/analysis/stock_research/00327.HK/2025-12-31/result.json
-- stock_report/data/analysis/stock_research/00327.HK/2025-12-31/report.md
-- stock_report/data/analysis/stock_research/00327.HK/2025-12-31/trace.txt
+- prior stock research result/report/trace for 00327.HK, used as reusable owner-earnback logic
 
-Web/source check:
-- Searched the public web for "PAX Global 2025 annual report 00327.HK PDF".
-- Official/company result confirmed 2025 annual results summary with revenue HK$5,872.5m and net profit HK$756.2m:
-  https://www.paxglobal.com.hk/en/latest-news/pax-global-announces-2025-annual-results/
-- Official annual report PDF URL was present in search results and matches the local fact-pack source URL:
-  https://www.paxglobal.com.hk/media/4270/2025-annual-report.pdf
+Model verification:
+- Input hint said financial_brokerage.
+- Annual report identifies electronic payment terminal product sales and related services.
+- Assets consist mainly of cash, receivables, inventory and operating assets; liabilities mainly consist of operating payables; no bank borrowing was disclosed.
+- No brokerage customer funds, proprietary securities portfolio or repo financing structure was found.
+- Overrode hint with ordinary_operating; owner earnback applicability = applicable.
 
 Data reuse decision:
-- Annual facts pack was sufficient for core financial statements, asset/liability categories, cash flow, dividend note, and key gaps.
-- Existing stock_research layer was used only as reusable research and owner_earnback logic. Its old schema and label-style fields were not copied into the final result protocol.
-- No new filing download was needed.
+- Annual fact pack and local filing were sufficient for core statements, assets/liabilities, cash flow, dividend and business facts.
+- Existing research cash and profit haircuts were reused because the annual fact pack explicitly identifies necessary operating cash and cash-distribution rights as gaps.
+- No filing download or new web evidence was required.
 
 Protocol CLI actions:
-- Initialized outputs/result.json with:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- Populated fields using repeated protocol set/append commands.
-- Validated with:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-- Validation result: ok.
+- Initialized outputs/result.json with protocol init.
+- Populated and amended fields with protocol set commands; complex structures were reused from the existing research result rather than handwritten.
+- First validation found legacy asset rows used business_substance instead of required explanation; mapped those fields and revalidated.
 
-Key calculations:
-- Market cap: CNY 3,320,000,000 from config/input.json, as of 2026-07-24.
-- FX conversion reused from prior research note: 1 HKD = 0.8636 CNY.
-- Revenue: HKD 5,872,540,000 * 0.8636 = CNY 5,071,525,544.
-- Gross profit: HKD 2,560,023,000 * 0.8636 = CNY 2,210,835,862.8.
-- Parent net profit: HKD 753,587,000 * 0.8636 = CNY 650,797,733.2.
-- Gross margin: 2,210,835,862.8 / 5,071,525,544 = 43.5931%.
-- Net margin: 650,797,733.2 / 5,071,525,544 = 12.8324%.
-- Discounted detachable net cash reused: HKD 2,250,052,500 * 0.8636 = CNY 1,943,145,339.
-- Discounted sustainable cash profit reused: HKD 540,000,000 * 0.8636 = CNY 466,344,000.
-- Operating business price: CNY 3,320,000,000 - CNY 1,943,145,339 = CNY 1,376,854,661.
-- Owner earnback years: CNY 1,376,854,661 / CNY 466,344,000 = 2.9524.
-- Market cap to cash profit: CNY 3,320,000,000 / CNY 466,344,000 = 7.1192.
-- Forecast dividend: HKD 264,961,000 * 0.8636 = CNY 228,820,319.6.
-- Forecast dividend yield: CNY 228,820,319.6 / CNY 3,320,000,000 = 6.8922%.
+Key calculations (CNY):
+- Market cap = 3,599,340,364.753008; PE TTM = 5.55; snapshot = 2026-07-31 16:08:47.
+- Filing amounts converted using reused research FX note: 1 HKD = 0.8636 CNY.
+- Revenue = 5,071,525,544; gross profit = 2,210,835,862.8; parent net profit = 650,797,733.2.
+- Gross margin = 43.5931%; net margin = 12.8324%.
+- Discounted detachable net cash = 1,943,145,339.
+- Discounted sustainable cash profit = 466,344,000.
+- Operating business price = 3,599,340,364.753008 - 1,943,145,339 = 1,656,195,025.753008.
+- Owner earnback years = 1,656,195,025.753008 / 466,344,000 = 3.5514.
+- Market cap / cash profit = 7.7182.
+- Forecast dividend = 228,820,319.6; forecast dividend yield = 6.3573%.
 
-Important evidence:
-- 2025 annual report: revenue, gross profit, operating profit, parent net profit, balance sheet, cash flow, dividend note, receivables, inventories, short-term deposits, restricted cash, cash location restrictions, borrowings.
-- Annual facts pack: normalized core financials and asset/liability categorization.
-- Existing research layer: owner_earnback cash haircut and sustainable cash profit haircut logic.
+Limitations:
+- Source filing currency is HKD; output CNY conversion reuses 1 HKD = 0.8636 CNY rather than a newly fetched spot rate.
+- Market data is the supplied Tencent snapshot, not live recalculation.
+- Parent/subsidiary cash rights, distributable reserves and necessary operating cash are not fully public.
+- Cash and sustainable-profit haircuts are estimates reused from the prior research layer.
 
-Known limitations:
-- Source financials are HKD; final protocol requires CNY, so amounts use the reused FX note rather than a newly fetched live FX rate.
-- Market cap is the batch input snapshot as of 2026-07-24, not a live market recalculation.
-- Parent/subsidiary cash rights, distributable reserves, required operating cash, and North American customer procurement whitelist are not fully observable from public filings.
-- Necessary operating cash is estimated in reused owner_earnback logic, not directly disclosed by the annual report.
-
-Outputs written:
+Outputs:
 - outputs/result.json
 - outputs/report.md
 - outputs/trace.txt

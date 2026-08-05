@@ -1,0 +1,66 @@
+stock-research trace
+company=603797.SH 联泰环保
+period=2025-12-31
+report_type=annual
+generated_for_input=2026-08-01T02:37:37+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar/object/list fields using protocol set and append commands; the result was not hand-written from scratch.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   status=ok, errors=[]
+
+[reuse-check]
+- Expected annual facts, normalized facts, raw filing metadata, and prior stock-research outputs were absent from the workspace at task start.
+- Therefore the research returned to the public annual filing and profit-distribution announcement.
+
+[primary-sources]
+- Shanghai Stock Exchange, 广东联泰环保股份有限公司2025年年度报告, disclosed 2026-04-29:
+  https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-29/603797_20260429_YC5Z.pdf
+- Shanghai Stock Exchange, 2025年度利润分配预案的公告, disclosed 2026-04-29:
+  https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-29/603797_20260429_5GXT.pdf
+- Input market snapshot: Tencent qt.gtimg.cn, market cap CNY 2,255,000,000, PE TTM 17.86, timestamp 20260731114343.
+
+[retrieval-notes]
+- The SSE PDF endpoint returned a compressed anti-bot/error payload to command-line retrieval rather than a usable PDF; pdftotext was also unavailable.
+- Filing content was cross-read through the public full-text mirror page carrying the same 2025 annual report and checked against SSE announcement identifiers and search-indexed official disclosures.
+- No third-party source replaced core annual-report figures. The full-text mirror was used only as a transport fallback for the exchange-filed report.
+
+[model-decision]
+- Input hint ordinary_operating/applicable was rejected after filing review.
+- Selected statement_model=utility_concession.
+- Selected owner_earnback_applicability=requires_special_model.
+- Evidence: BOT/TOT/PPP concessions; government is the sole buyer; facilities transfer without compensation at concession expiry; CNY 3.350bn concession intangible assets, CNY 4.305bn long-term receivables, and CNY 4.490bn long-term borrowings are integral parts of the business.
+- Consequently all ordinary owner-earnback ranking fields remain null as required by the result contract.
+
+[key-extractions]
+- Revenue 1,020,622,172.63; cost of sales 398,717,723.10; gross profit 621,904,449.53.
+- Operating profit 184,486,228.41; net profit 134,126,945.22; parent net profit 128,697,829.40.
+- Total assets 9,956,124,771.30; total liabilities 6,486,720,477.84; total equity 3,469,404,293.46; parent equity 3,302,507,034.70; minority interest 166,897,258.76.
+- Operating cash flow 423,238,359.24; reported purchases of fixed/intangible/other long-term assets 15,932,609.13; mechanical operating FCF 407,305,750.11; financing cash flow -410,268,384.04.
+- Cash 105,840,373.34; accounts receivable carrying amount 1,769,396,009.43; long-term receivables 4,305,493,422.43; intangible assets 3,349,806,269.75.
+- Accounts receivable gross amount 2,117,569,291.55 and allowance 348,173,282.12; individually assessed overdue/slow-collection balance 1,117,812,710.77 with allowance 290,466,202.42.
+- Short-term borrowings 245,273,777.76; current portion of non-current liabilities 424,572,011.98; long-term borrowings 4,489,592,623.10; long-term payables 234,390,473.46.
+- 2025 proposed cash dividend 0; forecast dividend yield 0 based on the announced proposal.
+
+[calculations]
+- gross_profit = revenue - cost_of_sales = 621,904,449.53.
+- gross_margin = gross_profit / revenue = 0.6093382515.
+- net_margin = parent_net_profit / revenue = 0.1260944914.
+- operating_free_cash_flow = operating_cash_flow - capital_expenditure = 407,305,750.11.
+- minority_interest_ratio = minority_interest / total_equity = 0.0481068948.
+- forecast_dividend_yield = 0 / 2,255,000,000 = 0.
+
+[limitations]
+- No project-by-project 2025 cash receipts, remaining-concession cash-flow forecast, debt amortization schedule, or debt-service coverage ratio was available. A utility-concession-specific earnback period was therefore not fabricated.
+- The mechanical free-cash-flow figure is not treated as distributable cash because lifecycle maintenance, replacement, financing leases, project construction classification, debt service, and delayed government collections matter.
+- Market-cap and PE fields use the supplied Tencent snapshot and were not independently reconstructed.
+
+[outputs]
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

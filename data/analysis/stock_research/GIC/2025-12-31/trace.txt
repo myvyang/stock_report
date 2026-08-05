@@ -1,0 +1,62 @@
+Stock research trace — GIC — period 2025-12-31
+Generated for task timestamp: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked stock_report/data/analysis/annual_review/GIC/2025-12-31, raw/filings, and normalized/facts paths.
+- No reusable GIC annual fact package or raw filing was present in the workspace at research time.
+- Therefore returned to primary public filings.
+
+3. Primary sources reviewed
+- SEC 2025 Form 10-K, filed 2026-02-27, accession 0001628280-26-012945:
+  https://www.sec.gov/Archives/edgar/data/945114/000162828026012945/gic-20251231.htm
+- SEC 8-K announcing 2025 Q4 results and $0.28 quarterly dividend, dated 2026-02-24:
+  https://www.sec.gov/Archives/edgar/data/945114/000162828026011155/gic-20260224.htm
+- SEC exhibit for 2026 Q1 results, used only as a post-period cross-check that the $0.28 dividend continued:
+  https://www.sec.gov/Archives/edgar/data/945114/000162828026030645/gicform99103312026.htm
+- Federal Reserve G.5A annual FX release (2025 average USD/CNY 7.1875):
+  https://www.federalreserve.gov/Releases///g5a/current/
+- Market cap, date, source and PE TTM were carried from config/input.json (Yahoo Finance yfinance).
+
+4. Model determination
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: GIC is a merchandise distributor whose economic assets are inventory, receivables, distribution operations and leases. It has no customer funds, insurance reserves, project presales, concession rights or investment-holding structure that would invalidate ordinary owner earnback analysis.
+
+5. Currency and accounting extraction
+- All filing amounts were originally USD millions.
+- Converted every financial statement and forecast dividend amount using 1 USD = 7.1875 CNY, the Federal Reserve 2025 annual average.
+- This consistent-rate convention preserves ratios and statement identities, but is noted as a limitation because the balance sheet is not translated at a year-end spot rate.
+- Extracted audited 2025 values: assets 580.8; liabilities 267.6; equity 313.2; revenue 1,379.1; cost of sales 888.9; gross profit 490.2; operating income 97.6; net income 72.1; operating cash flow 77.8; capex 3.1; financing cash flow -47.5; dividends 40.3; treasury share purchases 9.1.
+
+6. Owner earnback judgments
+- Starting cash: USD 67.5m.
+- Operating cash reserve: USD 20.0m, retained for inventory, receivables and seasonal working-capital needs.
+- Remaining USD 47.5m received a 20% haircut for operating/governance/FX uncertainty.
+- Discounted detachable cash: USD 38.0m = CNY 273,125,000.
+- Starting operating free cash flow: USD 77.8m OCF - USD 3.1m capex = USD 74.7m.
+- Deducted USD 7.4m stock compensation as an economic cost to common shareholders.
+- Applied a further 10% sustainability haircut for the 53-week year, pre-tariff inventory timing benefit and working-capital volatility.
+- Discounted sustainable cash profit: USD 60.57m = CNY 435,346,875.
+- Formulas:
+  operating business price = CNY 9,227,564,782.671753 - CNY 273,125,000 = CNY 8,954,439,782.671753.
+  owner earnback years = 8,954,439,782.671753 / 435,346,875 = 20.5685174211.
+  market cap / cash profit = 9,227,564,782.671753 / 435,346,875 = 21.1958907082.
+
+7. Dividend forecast
+- Used company estimate of approximately USD 43m aggregate 2026 regular dividends based on USD 0.28 quarterly dividend and shares outstanding at 2026-02-20.
+- Converted forecast: CNY 309,062,500.
+- Forecast dividend yield: 309,062,500 / 9,227,564,782.671753 = 3.3493398%.
+- No special dividend or discretionary buyback assumed.
+
+8. Output construction and validation
+- Populated outputs/result.json using only protocol CLI set commands after protocol initialization; did not hand-write the JSON object.
+- Created outputs/report.md from the structured result and cited filing provenance in the report text.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed-result validation status: ok; errors: [].

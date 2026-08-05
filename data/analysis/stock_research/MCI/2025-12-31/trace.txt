@@ -1,0 +1,77 @@
+stock-research trace
+company=MCI / Barings Corporate Investors
+period=2025-12-31
+generated_at=2026-08-05T05:52:18+08:00
+
+1. Read required protocol materials
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+   - config/input.json present.
+   - No raw filing, annual facts package, normalized facts, or prior MCI stock-research files existed under stock_report.
+   - Therefore retrieved primary public disclosures.
+
+3. Protocol initialization
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   result: initialized schema stock-research-result-v1.
+
+4. Primary evidence used
+   - SEC Form N-CSR, filing URL:
+     https://www.sec.gov/Archives/edgar/data/275694/000162828026016022/baringscorporateinvestors1.htm
+   - Barings official MCI fund page:
+     https://www.barings.com/en-us/individual/funds/closed-end-funds/barings-corporate-investors
+   - Barings official 2025-12-11 dividend release:
+     https://www.barings.com/en-us/guest/contact/media/news/barings-corporate-investors-announces-quarterly-cash-dividend-of-0-40-per-share3
+   - Federal Reserve H.10 historical FX data:
+     https://www.federalreserve.gov/releases/h10/hist/
+   - Market cap and PE: config/input.json, sourced there to Yahoo Finance yfinance.
+
+5. Model override
+   input hint: ordinary_operating / applicable
+   verified result: investment_holding / requires_special_model
+   basis: MCI is a closed-end management investment company; investments, cash, receivables and borrowings comprise its earning model. Ordinary detachable-net-cash and cash-profit payback calculations are economically invalid.
+
+6. Currency normalization
+   reporting currency in filing: USD
+   protocol currency: CNY absolute yuan
+   FX used: 7.1875 CNY/USD at 2025-12-31, Federal Reserve H.10.
+   Formula: CNY amount = USD amount * 7.1875.
+   Limitation: income and cash-flow figures use period-end rather than average FX for uniform presentation.
+
+7. Key extracted figures (USD)
+   total investments=392,864,412
+   cash=32,111,141
+   total assets=431,215,097
+   total liabilities=89,918,279
+   net assets=341,296,818
+   NAV/share=16.63
+   total investment income=36,355,415
+   net investment income after tax=27,329,542
+   net increase from operations=28,059,289
+   operating cash flow=18,565,026 (not comparable to ordinary-company OCF)
+   cash dividends paid=34,768,269
+   distributions from net investment income=32,776,490
+   Level 3 investments=351,359,127 (89.4352% of investments)
+   non-accrual assets fair value=1,523,510 (0.4% of portfolio)
+   PIK interest=2,650,385
+   borrowings principal=75,000,000; year-end average rate=4.94%
+   delayed-draw unfunded commitment=30,397,461
+
+8. Dividend forecast
+   basis=0.40 USD quarterly * 4 * 20,525,807 year-end shares
+   forecast USD=32,841,291.20
+   forecast CNY=236,046,780.50
+   input market cap CNY=2,293,157,233.9009094
+   forecast yield=10.2935279365%
+   warning: 2025 net investment income did not cover the accounting distribution; forecast is mechanical, not a board commitment.
+
+9. Result population
+   Used protocol CLI `set` commands for all populated fields and arrays.
+   Ordinary owner-earnback metrics remain null as required for the special model.
+
+10. Validation
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: status=ok, errors=[]

@@ -1,0 +1,104 @@
+stock-research trace
+company=600938.SH 中国海油
+period=2025-12-31
+generated_for=2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Read references/data-reuse.md because the configured annual facts paths were absent.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields only through protocol set/append commands.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result={"status":"ok","errors":[]}
+
+[reuse_check]
+Configured raw filing, annual review, normalized facts, and prior stock-research files for 600938.SH/2025-12-31 were not present in /workspace/stock_report.
+Action: fetched the official 2025 annual report from the company website and extracted it locally for research. Temporary research files were kept under /tmp/cnooc-research and are not outputs.
+
+[primary_sources]
+annual_report:
+  title=CNOOC Limited Annual Report 2025
+  published=2026-04-09
+  audited_by=Ernst & Young
+  url=https://www.cnoocltd.com/english/investorrelations/reports/annualreport/material/e00883-2025AnnualResults-en.pdf
+  key_pages=PDF pages 80-85 (profit or loss, financial position, cash flows); PDF pages 116-140 (tax, dividends, PPE, related parties, cash-flow reconciliation, commitments)
+
+company_release:
+  title=中国海油2025年储量产量再创新高 盈利韧性持续增强
+  published=2026-03-26
+  url=https://www.cnoocltd.com/xwzx/gsxw/2026/202603/t20260326_120620.html
+  used_for=production, unit cost, annual dividend and payout ratio
+
+company_faq:
+  url=https://www.cnoocltd.com/gywm/cjwt/
+  accessed_context=2026-07-31
+  used_for=2026 capex budget, future capex direction, 2025-2027 dividend policy
+
+market_snapshot:
+  source=config/input.json / Tencent qt.gtimg.cn
+  timestamp=20260731114336
+  market_cap=1528088000000
+  pe_ttm=12.26
+
+[core_financials_cny]
+revenue=398220000000
+operating_profit=169593000000
+net_profit=122148000000
+parent_net_profit=122082000000
+total_assets=1098559000000
+total_liabilities=293375000000
+total_equity=805184000000
+parent_equity=802750000000
+operating_cash_flow=209042000000
+capital_expenditure_cash=111555000000
+operating_free_cash_flow=97487000000
+
+[gross_margin_note]
+IFRS statement presents expenses by nature and does not directly report cost of sales.
+gross_margin=0.51467 was cross-checked against public 2025 annual-report financial data.
+gross_profit=revenue*gross_margin=204951887400
+cost_of_sales=revenue-gross_profit=193268112600
+This limitation is explicitly disclosed in result.json and report.md.
+
+[analysis_model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Core assets are oil and gas properties and revenue comes from production/sale of commodities; no financial, real-estate, construction, concession, or investment-holding balance-sheet model applies.
+special_treatment=Reserves deplete; capex is necessary for replacement and production; dismantlement provision is a real lifecycle obligation; commodity-price cyclicality requires a cash-profit discount.
+
+[owner_earnback_cny]
+cash_and_equivalents=78679000000*0.90=70811000000 (rounded)
+time_deposits=136016000000*0.85=115614000000 (rounded)
+other_current_financial_assets=25998000000*0.80=20798000000 (rounded)
+less_loans=-60140000000
+less_lease_liabilities=-9660000000
+discounted_detachable_net_cash=137423000000
+
+operating_free_cash_flow=209042000000-111555000000=97487000000
+cyclical_and_sustaining_capex_discount=-7487000000
+discounted_sustainable_cash_profit=90000000000
+
+operating_business_price=1528088000000-137423000000=1390665000000
+owner_earnback_years=1390665000000/90000000000=15.4518
+market_cap_to_cash_profit=1528088000000/90000000000=16.9788
+discounted_net_cash_to_market_cap=137423000000/1528088000000=0.08993
+
+[dividend]
+2025_interim_cash_dividend=31664000000
+2025_proposed_final_cash_dividend=23131000000
+2025_total_cash_dividend=54795000000
+static_forecast_cash_dividend=122082000000*0.45=54936900000, rounded in result to 54937000000
+forecast_dividend_yield=54937000000/1528088000000=0.035952
+Note: dividend is declared in HKD; A-share RMB payment depends on the prescribed exchange rate.
+
+[quality]
+status=complete
+protocol_validation=ok
+material_judgments:
+- discounted sustainable cash profit is an analyst assumption, not company guidance
+- dismantlement provision is not treated as immediately due debt, but constrains detachable-cash and sustainable-profit judgments
+- market data were reused exactly from task input
+- no buy/sell advice, target price, or ranking label was produced

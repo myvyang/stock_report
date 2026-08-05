@@ -1,0 +1,42 @@
+stock-research trace
+company: 920020.BJ 泰凯英
+period: 2025-12-31 annual
+generated_at: 2026-08-03T10:37:46+08:00
+
+1. Read SKILL.md, result-contract.md, report-contract.md and data-reuse.md.
+2. Checked configured annual-facts and raw-filing paths. No local annual facts or filing metadata existed.
+3. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Located 2025 annual report through official disclosure mirror:
+   https://dataclouds.cninfo.com.cn/sjother2/bse_onmarket/2026/20260415/cff9c9a438c411f1b5f5fa163e296ac0.pdf
+   Downloaded copy: stock_report/data/raw/filings/920020.BJ/2025-12-31/2025-annual-report.pdf
+5. Cross-checked business and summary figures against the annual-report summary published for BSE disclosure.
+6. Confirmed model ordinary_operating/applicable: outsourced production, ordinary customer receivables/inventory/supplier payables, no financial or concession balance-sheet model.
+7. Calculations (CNY):
+   gross_profit = 2,580,843,470.20 - 2,101,008,621.42 = 479,834,848.78
+   gross_margin = 479,834,848.78 / 2,580,843,470.20 = 0.1859217168
+   net_margin = 173,950,497.47 / 2,580,843,470.20 = 0.0674006384
+   2025 operating FCF = 153,425,909.05 - 22,419,856.07 = 131,006,052.98
+   2024 operating FCF = 145,235,233.29 - 29,225,995.12 = 116,009,238.17
+   discounted cash profit = 120,000,000 (below two-year FCF average of 123,507,645.58)
+   forecast dividend = 221,250,000 shares * CNY 0.24 = 53,100,000
+   forecast yield = 53,100,000 / 3,532,000,000 = 0.0150339751
+8. Discounted detachable net cash:
+   unrestricted bank deposits 894,304,318.77
+   less IPO proceeds constraint 307,346,698.11
+   less operating liquidity buffer (10% revenue) 258,084,347.02
+   less proposed dividend 53,100,000.00
+   less lease liabilities 7,626,400.63
+   = 268,146,873.01
+9. Owner earnback:
+   operating business price = 3,532,000,000 - 268,146,873.01 = 3,263,853,126.99
+   earnback years = 3,263,853,126.99 / 120,000,000 = 27.1987760583
+   market cap / cash profit = 3,532,000,000 / 120,000,000 = 29.4333333333
+10. Populated result fields only through protocol CLI set commands; report.md and trace.txt were written separately.
+11. Final protocol validation executed after output review.
+
+Important judgment flags:
+- 10% of revenue operating-liquidity buffer is an analyst assumption, not a disclosed restriction.
+- IPO cash is treated as fully constrained by planned use; this is conservative.
+- Dividend is a proposal-derived forecast, not 2025 cash paid.
+- Market cap and PE are accepted from input snapshot and not independently reconciled.

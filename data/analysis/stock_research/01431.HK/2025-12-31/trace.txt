@@ -1,0 +1,71 @@
+stock-research trace
+company=01431.HK YST DAIRY / YuanShengTai Dairy Farm Limited
+period=2025-12-31
+generated_for_input=2026-08-04T14:06:30+08:00
+
+[protocol]
+2026-08-04: read SKILL.md, result-contract.md, report-contract.md and data-reuse.md.
+2026-08-04: initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2026-08-04: populated result fields through protocol set commands; complex JSON was not written from scratch.
+2026-08-04: validated with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[local-reuse-check]
+Checked the input-declared annual review, normalized facts, and raw filing directories.
+No pre-existing facts.json, annual_facts.md, normalized annual-facts.json, or prior stock-research result was present.
+
+[primary-source]
+Title: Annual Report 2025, YuanShengTai Dairy Farm Limited
+Exchange: Hong Kong Exchanges and Clearing / HKEXnews
+Release date: 2026-04-28 16:30
+URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042800536.pdf
+Local copy: stock_report/data/raw/filings/01431.HK/2025-12-31/annual-report-2025.pdf
+Key pages used: 3-14 (business and MD&A), 73 (Feihe relationship), 82-86 (three statements), 126-153 (asset, liability and financial-risk notes).
+
+[model-decision]
+Input hint said financial_brokerage/requires_special_model, while its own tags referred to transport/logistics and were internally inconsistent.
+Annual report evidence shows 11 dairy farms, 105,583 cows, production and sale of raw milk, and no brokerage client funds, proprietary securities, or repo financing.
+Override: statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+
+[financial-extraction]
+All annual-report amounts below were disclosed in RMB'000 and multiplied by 1,000 for result.json.
+Revenue=2,733,209,000
+Cost of sales=1,631,868,000
+Gross profit=1,101,341,000
+Operating profit proxy=578,107,000 (gross profit + other income/gains - administrative expenses - other expenses - biological fair-value loss; before finance cost and tax)
+Net profit=parent net profit=552,459,000; no minority interest.
+Total assets=7,992,356,000
+Total liabilities=2,376,173,000
+Total equity=parent equity=5,616,183,000
+Operating cash flow=1,042,361,000
+PPE purchases=146,699,000
+Biological asset additions=692,250,000
+Biological asset disposal proceeds=182,410,000
+Economically adjusted capital expenditure=146,699,000 + 692,250,000 - 182,410,000 = 656,539,000
+Operating free cash flow=1,042,361,000 - 656,539,000 = 385,822,000
+2024 comparable operating free cash flow=1,013,754,000 - 117,126,000 - 772,857,000 + 145,542,000 = 269,313,000
+
+[metric-formulas]
+gross_margin=1,101,341,000 / 2,733,209,000 = 0.402949404894
+net_margin=552,459,000 / 2,733,209,000 = 0.202129812255
+discounted_sustainable_cash_profit=300,000,000 (judgment, between 2024 and 2025 adjusted FCF with cycle/customer-concentration haircut)
+discounted_detachable_net_cash=0 (cash first offsets debt; time deposits treated as earmarked; restricted cash excluded)
+operating_business_price=1,291,275,894.727707 - 0 = 1,291,275,894.727707
+owner_earnback_years=1,291,275,894.727707 / 300,000,000 = 4.304252982426
+market_cap_to_cash_profit=4.304252982426
+forecast_cash_dividend=0; forecast_dividend_yield=0 because 2025 final dividend was not recommended and 2024 was nil.
+
+[market-data]
+Reused exactly from config/input.json:
+market_cap=1,291,275,894.727707 CNY
+market_cap_date=2026/08/03 09:20:05
+market_cap_source=Tencent qt.gtimg.cn
+pe_ttm=2.45
+Limitation: not independently checked against exchange tick data.
+
+[quality]
+status=complete
+Known judgment sensitivity: sustainable cash profit and detachable cash haircut.
+Known disclosure limitation: other payables/accruals were not decomposed line-by-line in this research pass; conservative net-cash treatment avoids assigning them speculative value.

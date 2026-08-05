@@ -1,0 +1,65 @@
+stock-research trace
+generated_at: 2026-08-04T13:44:54+08:00
+company: J-Long Group Limited (NASDAQ: JL)
+
+1. Read required skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Initialized protocol result
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initial state: partial template generated successfully.
+
+3. Local reuse audit
+- Checked configured annual facts, normalized facts, raw filing metadata, and prior stock research paths.
+- No local filing, fact pack, or prior research existed for JL/2025-12-31, so no financial facts were available to reuse.
+
+4. Primary-source research
+- SEC FY2025 Form 20-F filed 2025-07-28, fiscal year ended 2025-03-31:
+  https://www.sec.gov/Archives/edgar/data/1948436/000121390025068049/ea0247089-20f_jlonggroup.htm
+- SEC 2024-02-29 Form 6-K special dividend disclosure:
+  https://www.sec.gov/Archives/edgar/data/1948436/000121390024018216/ea0200192-6k_jlonggroup.htm
+- SAFE RMB central parity methodology:
+  https://www.safe.gov.cn/safe/rmbhlzjj/
+- Market snapshot reused exactly from config/input.json: market cap CNY 143,165,530.58743858 as of 2026-08-03; PE TTM 7.52; source Yahoo Finance yfinance.
+
+5. Period and currency handling
+- Input requested annual period 2025-12-31, but issuer fiscal year ends March 31.
+- Latest available annual report used: FY2025 ended 2025-03-31.
+- Financial statements are presented in USD. All structured financial amounts converted at analytical rate 7.20 CNY/USD for comparability with the CNY market cap.
+- This conversion convention is disclosed as a limitation and is not represented as the issuer's reporting exchange rate.
+
+6. Statement model decision
+- Model: ordinary_operating.
+- Applicability: applicable.
+- Reason: apparel-trim distribution and solution services use ordinary cash, receivables, inventory, PPE, trade payables, borrowings, and leases; no financial-customer funds, insurance reserves, regulated project cash, concession rights, or comparable special-model balances.
+
+7. Core calculations
+- Gross margin = USD 11,257,239 / USD 39,075,090 = 28.8092%.
+- Net margin = parent net income USD 2,593,248 / USD 39,075,090 = 6.6366%.
+- Operating FCF = USD 7,226,013 OCF - USD 1,021,495 capex = USD 6,204,518; converted CNY 44,672,529.6.
+- Discounted detachable net cash = 70% x USD 10,669,134 cash - USD 1,391,827 bank debt - USD 200,000 related-party loan = USD 5,876,566.8 = CNY 42,311,280.96.
+- Effective tax rate = USD 657,566 / USD 3,169,906 = 20.7440%.
+- Sustainable cash profit = USD 2,398,257 operating profit x (1 - effective tax rate) x 75% = CNY 10,264,115.0095.
+- Operating business price = CNY 143,165,530.5874 - CNY 42,311,280.96 = CNY 100,854,249.6274.
+- Owner earnback = CNY 100,854,249.6274 / CNY 10,264,115.0095 = 9.8259 years.
+- Market cap / cash profit = 13.9482.
+- Forecast dividend = 0 because disclosed dividends are special/historical and no stable recurring payout policy was evidenced; forecast yield = 0%.
+
+8. Judgment controls
+- FY2025 OCF was not treated as sustainable profit because accounts payable, income taxes payable, and inventory release materially boosted cash flow.
+- Cash received a 30% haircut for operating needs, cross-border holding structure, and 49% non-controlling ownership of the Vietnam subsidiary.
+- Trade payables and lease liabilities were explained as operating obligations and were not double-deducted from net cash; financing debt was deducted in full.
+- No buy/sell recommendation, target price, ranking label, or unsupported certainty was produced.
+
+9. Protocol operations and validation
+- outputs/result.json was created with protocol init, populated with protocol set/append commands, and not hand-written from scratch.
+- First completed validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status ok, errors [].
+
+10. Outputs
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

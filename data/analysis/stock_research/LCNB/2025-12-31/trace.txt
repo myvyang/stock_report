@@ -1,0 +1,77 @@
+stock-research trace
+company: LCNB Corporation (NASDAQ: LCNB)
+period: 2025-12-31
+generated_for_input: 2026-08-05T00:26:57+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Inspected stock_report/data for LCNB/2025-12-31 files.
+- No raw filing, annual facts, normalized facts, or prior research result was present in the workspace.
+- Fresh official-source retrieval was therefore required.
+
+3. Primary filing retrieval
+- Filing: LCNB Corp. Form 10-K for year ended 2025-12-31.
+- SEC accession: 0001437749-26-007758.
+- Filed: 2026-03-11.
+- Filing URL: https://www.sec.gov/Archives/edgar/data/1074902/000143774926007758/lcnb20251231_10k.htm
+- SEC Companyfacts: https://data.sec.gov/api/xbrl/companyfacts/CIK0001074902.json
+- Downloaded filing and Companyfacts to /tmp/lcnb_research for read-only extraction and cross-checking; temporary files are not deliverables.
+
+4. Model decision
+- Input hint said ordinary_operating/applicable, explicitly marked as a default inference.
+- 10-K Item 1 states LCNB is a financial holding company and substantially all assets, liabilities, and operations are attributable to LCNB National Bank.
+- Overrode hint with statement_model=financial_bank and owner_earnback_applicability=requires_special_model.
+- Ordinary detachable-net-cash and cash-profit payback fields were left null as required.
+
+5. Key USD facts extracted from 10-K
+- Total assets: 2,240,769,000.
+- Total liabilities: 1,966,840,000.
+- Total shareholders' equity / parent equity: 273,929,000.
+- Loans, net: 1,691,827,000.
+- Total deposits: 1,840,355,000 (noninterest-bearing 466,094,000; interest-bearing 1,374,261,000).
+- AFS and HTM debt securities: 232,271,000 and 16,080,000.
+- Cash and cash equivalents: 21,614,000.
+- Goodwill and core deposit/other intangibles: 90,310,000 and 9,271,000.
+- Long-term debt: 104,428,000.
+- Net interest income: 70,222,000.
+- Noninterest income: 21,775,000.
+- Provision for credit losses: 1,936,000.
+- Noninterest expense: 61,909,000.
+- Parent net income: 23,120,000.
+- Cash dividends paid: 12,472,000; declared dividends per share: USD 0.88.
+- Tax-equivalent net interest margin: 3.50% (2024: 2.91%).
+- Nonaccrual loans: 1,794,000; nonaccrual loan ratio: 0.11%.
+- Loan allowance: 13,704,000; allowance/loans: 0.80%; allowance/nonaccrual: 763.88%.
+- Bank CET1, Tier 1, total capital, leverage ratios: 11.02%, 11.02%, 11.81%, 8.94%.
+
+6. Derived calculations
+- Fixed research translation rate: USD/CNY 7.10. All result.json statement amounts use USD amount * 7.10.
+- Approximate ROA = 23.120m / average(2,307.394m, 2,240.769m) = 1.0167%.
+- Approximate ROE = 23.120m / average(253.036m, 273.929m) = 8.7747%.
+- Dividend coverage = 23.120m / 12.472m = 1.8537x.
+- Cash payout ratio = 12.472m / 23.120m = 53.94%.
+- Forecast assumes unchanged USD 0.88 per share on 14,193,577 year-end shares.
+- Forecast dividend = USD 12,490,347.76 = CNY 88,681,469.096.
+- Forecast yield = 88,681,469.096 / 1,905,456,661.860443 = 4.6542148%.
+- No ordinary owner earnback calculation was made.
+
+7. Market data
+- Market cap: CNY 1,905,456,661.860443.
+- Date: 2026-08-03.
+- PE TTM: 11.450867.
+- Source: task input, Yahoo Finance yfinance.
+- Market data was not silently replaced with a different live quote.
+
+8. Structured result construction
+- Used protocol CLI set operations to populate the initialized skeleton; did not hand-write result.json from scratch.
+- Added evidence rows covering identity/model, statements, margin, credit quality, capital, dividend, and market data.
+- Set data_quality.status=complete with no incomplete reasons; limitations disclose FX, dividend assumption, and market-data provenance.
+
+9. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result after population: {"status":"ok","errors":[]}.

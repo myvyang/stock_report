@@ -1,0 +1,76 @@
+stock-research trace
+company: 300001.SZ 特锐德
+period: 2025-12-31 annual
+generated_for_input: 2026-07-31T23:16:02+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields only through protocol set commands.
+5. Validated with protocol validate; final status: ok, errors: [].
+
+[reuse audit]
+- config/input.json present.
+- No local annual facts, normalized facts, prior stock-research output, filing metadata, or synced /root/aicode filing for 300001.SZ/2025-12-31 was present.
+- Therefore fetched the official 2025 annual report PDF from the Shenzhen Stock Exchange disclosure host.
+
+[primary source]
+- title: 青岛特锐德电气股份有限公司2025年年度报告全文
+- disclosure date: 2026-04-09
+- url: https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-09/6cbdf9ef-71c7-44fe-a2ce-da8276574db5.PDF
+- local file: stock_report/data/raw/filings/300001.SZ/2025-12-31/annual_report_2025.pdf
+- relevant report pages: 18-20 (business/model/position), 32-35 (revenue and margins), 42-43 (assets), 62-63 (dividend), 98-107 (financial statements), 158-159 (cash restrictions), 206 and 211-212 (borrowings and leases), 217-218 (revenue breakdown).
+
+[market source]
+- market cap: CNY 36,652,000,000
+- PE TTM: 29.32
+- snapshot: 2026-07-31 11:43:18
+- source: Tencent qt.gtimg.cn, supplied in config/input.json
+
+[model review]
+- final statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- reason: revenue and assets arise from manufacturing, project delivery, equipment sales, charging operations and platform services; deposits and financing are not the business itself. Ordinary model remains usable, but project receivables, charging assets and leases require conservative cash treatment.
+
+[core calculations]
+- revenue = 15,786,323,201.92
+- cost of sales = 11,466,555,523.09
+- gross profit = 4,319,767,678.83
+- gross margin = gross profit / revenue = 0.2736398858
+- parent net profit = 1,243,064,876.45
+- net margin = parent net profit / revenue = 0.0787431538
+- operating cash flow = 2,334,837,573.40
+- capital expenditure proxy = cash paid to acquire fixed, intangible and other long-term assets = 696,999,910.48
+- operating free cash flow = 1,637,837,662.92
+
+[owner earnback cash]
+- unrestricted cash = 3,501,608,526.56 - 595,035,814.31 = 2,906,572,712.25; 80% counted = 2,325,258,169.80 (stored rounded to 2,325,258,170.00 in breakdown)
+- structured deposit = 200,000,000.00; 90% counted = 180,000,000.00
+- borrowings deducted = short-term 2,776,868,728.49 + current long-term 771,180,390.04 + long-term 588,704,712.47 = 4,136,753,831.00
+- lease liabilities deducted = current 165,405,988.70 + long-term 768,336,359.09 = 933,742,347.79
+- discounted detachable net cash = -2,565,238,008.99
+
+[owner earnback profit]
+- parent net profit = 1,243,064,876.45
+- less non-recurring gains = 208,294,830.50
+- recurring parent profit = 1,034,770,045.95
+- sustainability factor = 90%
+- discounted sustainable cash profit = 931,293,041.355
+- operating business price = market cap - discounted net cash = 39,217,238,008.99
+- owner earnback years = 39,217,238,008.99 / 931,293,041.355 = 42.1105240
+- market cap / cash profit = 36,652,000,000 / 931,293,041.355 = 39.3560334
+
+[dividend]
+- 2025 proposal: CNY 2.00 per 10 shares, provisional base 1,047,332,373 shares
+- forecast cash dividend = 209,466,474.60
+- forecast dividend yield = 209,466,474.60 / 36,652,000,000 = 0.0057150080
+- final amount may change with eligible shares on record date.
+
+[quality and limitations]
+- data_quality.status: complete
+- audited annual financial statements and core business disclosures available.
+- market and reporting dates differ.
+- industry share is company annual-report disclosure citing China Charging Alliance; underlying alliance dataset not independently retrieved.
+- cash and profit discounts are analytical stress-test assumptions, not management guidance.

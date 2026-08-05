@@ -1,0 +1,75 @@
+stock-research trace
+generated_at: 2026-08-04 Asia/Shanghai
+query: 02633.HK
+input_period: 2025-12-31
+
+1. Read instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- /workspace/AGENTS.md
+
+2. Local reuse check
+- No raw filing, annual facts, normalized facts, or prior stock-research result existed under the paths supplied in config/input.json.
+- Therefore fetched primary HKEX disclosures.
+
+3. Primary sources
+- HKEX 2024/2025 Annual Report, published 2025-07-03:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2025/0703/2025070301800.pdf
+  Used pages 16-22, 59-63, 81, 89, 100-105, 113-119.
+- HKEX 2025/2026 Interim Results Announcement, published 2025-11-18:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2025/1118/2025111800833.pdf
+  Used pages 1-9 and 21-29.
+- Valuation snapshot supplied by config/input.json:
+  Tencent qt.gtimg.cn, 2026-08-03 09:20:05; market cap 1,841,248,481.593132 CNY; PE TTM 7.1.
+
+4. Model correction
+- Input hint: financial_brokerage / requires_special_model.
+- Filing fact: development, production, marketing and sale of generic drugs; revenue recognized from sale of goods.
+- Applied model: ordinary_operating / applicable.
+
+5. Period and currency normalization
+- Company audited year end: 2025-03-31.
+- Input archive period: 2025-12-31.
+- Core statements use FY2025 audited annual report; 2025-09-30 interim report is used only for subsequent observation and dividend forecast.
+- Filing currency HKD converted to CNY at simplified 1 HKD = 0.92 CNY throughout.
+
+6. Core calculations (reported HKD unless stated)
+- Gross margin = 692,939 / 1,576,897 = 43.9433%.
+- Parent net margin = 300,833 / 1,576,897 = 19.0774%.
+- Operating FCF = operating cash flow 526,777,000 - capex 248,383,000 = 278,394,000 HKD = 256,122,480 CNY.
+- Discounted sustainable cash profit = 278,394,000 HKD * 90% * 0.92 = 230,510,232 CNY.
+
+7. Discounted detachable net cash
+- Cash: 509,045,000 HKD * 100%.
+- Listed strategic equity: 202,026,000 HKD * 70%.
+- Unlisted strategic equity: 176,981,000 HKD * 30%.
+- Other financial assets: 19,551,000 HKD * 50%.
+- Associates: 50,825,000 HKD * 30%.
+- Investment property: 163,880,000 HKD * 50%.
+- Bank loans: -713,700,000 HKD * 100%.
+- Lease liabilities: -59,511,000 HKD * 100%.
+- Total: 37,309,500 HKD * 0.92 = 34,324,740 CNY.
+
+8. Earnback calculations
+- Operating business price = 1,841,248,481.593132 - 34,324,740 = 1,806,923,741.593132 CNY.
+- Owner earnback years = 1,806,923,741.593132 / 230,510,232 = 7.8388006 years.
+- Market cap / cash profit = 1,841,248,481.593132 / 230,510,232 = 7.9877082 times.
+- Discounted net cash / market cap = 34,324,740 / 1,841,248,481.593132 = 1.86421%.
+
+9. Dividend forecast
+- Assumption: 4.25 HK cents FY2026 interim + 5.50 HK cents FY2025 recurring final, approximately 2.0 billion shares.
+- Forecast: 195,000,000 HKD * 0.92 = 179,400,000 CNY; result stores 179,394,800 CNY using disclosed/estimated share count.
+- Yield = 179,394,800 / 1,841,248,481.593132 = 9.7431%.
+- FY2025 special dividend of 6 HK cents/share excluded from forecast.
+
+10. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields via repeated protocol `set` commands; complex JSON was not hand-written from scratch.
+- First completed validation result: status ok, errors [].
+
+11. Known limitations
+- Simplified constant FX rate rather than statement-specific average/closing rates.
+- Market cap and PE were not independently reconstructed.
+- Haircuts and sustainable-profit discount are analyst judgments.

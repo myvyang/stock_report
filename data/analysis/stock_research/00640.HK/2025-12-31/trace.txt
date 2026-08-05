@@ -1,0 +1,95 @@
+stock-research trace
+company: INFINITY DEV / Infinity Development Holdings Company Limited / 00640.HK
+task period: 2025-12-31
+actual annual reporting period used: year ended 2025-09-30
+generated timezone: Asia/Shanghai
+
+[1] Protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields using repeated protocol set commands; JSON was not constructed by bypassing the protocol initializer.
+
+[2] Local reuse check
+- No annual facts, normalized facts, raw filing metadata, or prior stock-research outputs existed for 00640.HK/2025-12-31.
+- Downloaded the official annual report to stock_report/data/raw/filings/00640.HK/2025-12-31/annual-report-2025.pdf.
+- Local pdftotext and Python PDF libraries were unavailable, so table extraction was performed against the indexed official HKEX PDF text and checked page-by-page.
+
+[3] Model identity correction
+- Input hint said financial_brokerage and source tags said automobile/EV manufacturer.
+- Official 2025 annual report, MD&A p.12: principal business is manufacture and sale of adhesives, primers, hardeners, and related products mainly used by footwear manufacturers.
+- Balance sheet contains ordinary manufacturing assets and liabilities, not client money, brokerage financial assets, or repo funding.
+- Override: statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+
+[4] Primary financial source
+HKEX annual report URL:
+https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0105/2026010501676.pdf
+
+Audited HKD'000 figures, year ended / at 2025-09-30:
+- Revenue 835,153; cost of sales 518,319; gross profit 316,834; operating profit 150,673; parent net profit 122,193. Source: p.123.
+- Total assets 846,146; liabilities 217,878; equity and parent equity 628,268; minority interest nil. Source: pp.125-126.
+- OCF 138,256; purchases of PPE 61,690; financing CF -102,305; dividends paid 59,152. Source: pp.128-129.
+- Bank/cash 296,029; restricted deposits 19,175; cash equivalents 254,203; time deposits over 3 months 41,826. Source: notes 28, pp.175-176.
+- Receivables 233,111; inventories 72,293; PPE 157,989; ROU assets 38,279. Source: p.125 and notes.
+- Trade/bills/other payables 163,119; leases 7,556; bank loans nil; current tax 40,098; deferred tax 7,105. Source: pp.125-126.
+- Capital commitments 17,504. Source: note 39, p.185.
+- Largest/five customers: 20%/45% revenue. Source: directors' report p.109.
+- Largest/five customers: 21%/44% trade and bills receivables. Source: financial risk note p.150.
+
+[5] Currency conversion
+- Required JSON currency is CNY absolute yuan; annual report currency is HKD.
+- Used 2025-09-29 (last trading day before reporting date) PBOC/CFETS central parity: 1 HKD = 0.91368 CNY.
+- Official source: https://xining.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025100917214281884/index.html
+- Conversion formula for statements: HKD'000 * 1000 * 0.91368.
+
+[6] Derived operating metrics
+- Gross margin = 316,834 / 835,153 = 0.3793724024.
+- Net margin = 122,193 / 835,153 = 0.1463121129.
+- Operating FCF = (138,256 - 61,690) * 1000 * 0.91368 = CNY 69,956,822.88.
+
+[7] Discounted detachable net cash
+All components in HKD million before CNY conversion:
+- Unrestricted bank/cash: 296.029 * 80% = 236.8232.
+- Certificates of deposit: 3.852 * 90% = 3.4668.
+- FVTOCI listed debt/equity: 7.623 * 70% = 5.3361.
+- Investment property: 2.700 * 50% = 1.3500.
+- Less lease liabilities: 7.556 * 100%.
+- Less contracted capex commitments: 17.504 * 100%.
+- Total = HKD 221.9161m = CNY 202,760,302.248.
+- Restricted deposits, receivables, inventory, PPE, ROU assets, associates and club debentures were not added as detachable cash.
+
+[8] Discounted sustainable distributable cash profit
+All components in HKD million:
+- Start parent profit: 122.193.
+- Remove net other gains (mainly FX): -5.714.
+- Remove estimated after-tax interest related to cash assets already deducted from price: -6.100.
+- Maintenance capex allowance above D&A: -4.000.
+- Apply 10% cycle/customer-concentration buffer to HKD 106.379m: -10.6379.
+- Result HKD 95.7411m = CNY 87,476,728.248.
+
+[9] Earnback formulas
+- Input market cap = CNY 645,904,640.365243 at 2026-07-31 16:08:46; PE TTM=6.14; source Tencent qt.gtimg.cn.
+- Operating business price = 645,904,640.365243 - 202,760,302.248 = CNY 443,144,338.117243.
+- Owner earnback years = 443,144,338.117243 / 87,476,728.248 = 5.0658540505.
+- Market cap / cash profit = 645,904,640.365243 / 87,476,728.248 = 7.3837311169.
+- Discounted net cash / market cap = 0.3139167759.
+
+[10] Dividend forecast
+- FY2025 dividend paid in equity statement: HKD 59.152m; full-year adjusted DPS disclosed: HKD 0.205.
+- Latest known 1H FY2026 dividend: HKD 0.079/share, total HKD 24.509m, paid 2026-06-18.
+- HKEX interim report URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0615/2026061501003_c.pdf
+- Forecast scenario annualizes latest interim amount: 24.509 * 2 = HKD 49.018m.
+- CNY forecast = 49.018m * 0.91368 = CNY 44,786,766.24.
+- Yield = 44,786,766.24 / 645,904,640.365243 = 0.0693395951.
+- This is a scenario, not company guidance.
+
+[11] Quality limitations
+- Directory period 2025-12-31 differs from statutory FY end 2025-09-30.
+- Market cap is dated 2026-07-31, while complete annual statements are dated 2025-09-30; interim information only updates dividend context.
+- Owner-earnback haircuts are transparent analyst judgments, not audited values.
+- Market cap and PE were reused from input and not independently reconstructed.
+
+[12] Validation
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

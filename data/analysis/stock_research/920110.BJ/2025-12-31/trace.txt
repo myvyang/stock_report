@@ -1,0 +1,62 @@
+stock-research trace
+company=920110.BJ 雷特科技
+period=2025-12-31 annual
+generated_at=2026-08-03T10:53:58+08:00
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+populate=protocol set commands by field/path; complex JSON was not handwritten from a blank file
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validate_result={"status":"ok","errors":[]}
+
+[reuse_check]
+local annual facts package: absent
+local raw filing metadata: absent
+local prior stock research: absent
+action: supplemented from the company's disclosed 2025 annual report and annual report summary
+
+[primary_sources]
+1. 珠海雷特科技股份有限公司2025年年度报告，公告编号2026-008，2026-04-10披露；致同审字（2026）第442A009848号，标准无保留意见。
+   web text: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12079672&stockid=920110
+   note: mirror used for searchable full text; document content is the company's formal annual report.
+2. 珠海雷特科技股份有限公司2025年年度报告摘要，2026-04-10披露。
+   pdf: https://dataclouds.cninfo.com.cn/sjother2/bse_onmarket/2026/20260410/305db6d0a0c3459bbf99af5c60b634ed.pdf
+3. config/input.json: Tencent qt.gtimg.cn market-cap snapshot at 2026-07-31 15:37:59.
+
+[key_calculations]
+gross_profit=201304773.61-103032093.07=98272680.54
+gross_margin=98272680.54/201304773.61=0.4881785899940439
+net_margin=45220727.85/201304773.61=0.22463812973262556
+operating_free_cash_flow=44799551.44-7077826.38=37721725.06
+forecast_cash_dividend=39000000 shares*0.50 yuan=19500000
+forecast_dividend_yield=19500000/1017000000=0.019174041297935103
+
+[owner_earnback_assumptions]
+available_cash_and_equivalents=154715333.72
+operating_cash_buffer=40000000.00
+cash_discount=90%
+discounted_cash=(154715333.72-40000000)*0.9=103243800.348
+term_deposit_and_interest=32340863.03
+term_deposit_discount=90%
+discounted_term_deposit=29106776.727
+frozen_cash=125000 excluded
+interest_bearing_debt=0
+discounted_detachable_net_cash=132350577.075
+discounted_sustainable_cash_profit=35000000
+operating_business_price=1017000000-132350577.075=884649422.925
+owner_earnback_years=884649422.925/35000000=25.27569779785714
+market_cap_to_cash_profit=1017000000/35000000=29.057142857142857
+
+[judgment_notes]
+statement_model=ordinary_operating; product-sale manufacturer with no special financial statement economics.
+cash_profit=35000000 is deliberately below 2025 parent net profit and 2025 free cash flow. It absorbs maintenance capex, inventory funding, and the one-off net recovery of frozen deposits.
+industry_position is limited to disclosed product/protocol/channel facts because no verifiable market share was disclosed.
+
+[outputs]
+outputs/result.json
+outputs/report.md
+outputs/trace.txt

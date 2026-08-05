@@ -1,0 +1,70 @@
+stock-research trace
+company: 03320.HK / China Resources Pharmaceutical Group Limited
+period: 2025-12-31 annual
+generated_at: 2026-08-05T01:08:02+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md and references/data-reuse.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Expected annual filing, annual facts and prior stock-research paths from config/input.json were absent in /workspace.
+- Only stock_report/data/notes/user_stock_evaluations.md existed; it did not provide company facts for this task.
+- Therefore fetched the original HKEX annual report and used the HKEX annual-results announcement for cross-checking.
+
+3. Primary sources
+- 2025 Annual Report, HKEX release 2026-04-28:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042800131.pdf
+- 2025 Annual Results Announcement, HKEX release 2026-03-25:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0325/2026032500007.pdf
+- Market cap and PE: Tencent qt.gtimg.cn snapshot embedded in config/input.json; snapshot timestamp 2026/08/03 09:48:09.
+
+4. Model verification
+- Input hint said financial_brokerage/requires_special_model.
+- Annual report Note 1 states the group manufactures, distributes and retails pharmaceutical and healthcare products.
+- Segment disclosure identifies manufacturing, distribution, retail and others; no brokerage customer funds, proprietary securities trading or repo financing model.
+- Overrode hint with ordinary_operating/applicable.
+- Important ownership constraint retained: minority interest RMB66,047,458,000 / total equity RMB117,455,933,000 = 56.2317%; minority profit RMB5,607,540,000 / net profit RMB9,653,008,000 = 58.0929%.
+
+5. Extracted financial facts (RMB absolute yuan)
+- Revenue 269,574,326,000; cost of sales 225,066,480,000; gross profit 44,507,846,000.
+- Operating profit 13,076,407,000, calculated before net finance cost, share of associates/JVs and tax from disclosed income-statement lines.
+- Net profit 9,653,008,000; parent net profit 4,045,468,000.
+- Total assets 285,811,172,000; total equity 117,455,933,000; total liabilities derived as 168,355,239,000.
+- Parent equity 51,408,475,000; minority interest 66,047,458,000.
+- Operating cash flow 20,476,332,000.
+- Capital expenditure definition used: PPE purchases 2,330,581,000 + intangible purchases 885,300,000 = 3,215,881,000. Right-of-use purchases excluded from this capex definition and disclosed separately in the filing.
+- Operating free cash flow = 20,476,332,000 - 3,215,881,000 = 17,260,451,000.
+- Financing cash flow -10,957,407,000.
+- Parent dividend cash paid 779,031,000 plus subsidiary share repurchase 79,993,000 = dividend_and_buyback_cash_out 859,024,000.
+
+6. Derived metrics
+- Gross margin = 44,507,846,000 / 269,574,326,000 = 0.1651041724.
+- Parent net margin = 4,045,468,000 / 269,574,326,000 = 0.0150068742.
+- 2025 dividend per share = 0.072 interim + 0.122 final = RMB0.194.
+- Forecast/static dividend cash = 0.194 * 6,282,510,461 weighted-average shares = 1,218,807,029.434.
+- Forecast/static dividend yield = 1,218,807,029.434 / 26,240,518,013.71634 = 0.0464475217.
+
+7. Owner earnback judgments
+- Cash and equivalents 15,843,809,000 plus pledged and term deposits 11,635,245,000 = 27,479,054,000.
+- Borrowings 58,820,243,000 plus bonds payable 12,362,829,000 = 71,183,072,000.
+- Because debt exceeds funds and cash is held across non-wholly-owned operating subsidiaries, discounted detachable net cash set to zero; no cash deduction from market cap.
+- Sustainable cash profit starts from parent net profit, not consolidated FCF.
+- 15% analytical discount: 4,045,468,000 * 0.85 = 3,438,647,800.
+- Operating business price = market cap - zero = 26,240,518,013.71634.
+- Owner earnback years = 26,240,518,013.71634 / 3,438,647,800 = 7.6310572 years.
+- This is an analytical estimate, not a dividend promise, target price or recommendation.
+
+8. Data-quality limitations
+- Market snapshot accepted from task input and not independently refreshed.
+- Filing does not disclose exact parent-attributable consolidated operating FCF; parent profit with a 15% discount is used as proxy.
+- Dividend total uses weighted-average shares, so it may differ slightly from actual record-date shares.
+- Industry rankings are quoted from the company annual report and not independently reconstructed from the originating association tables.
+
+9. Protocol validation
+- All result fields were populated using the protocol CLI set command after protocol initialization.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].

@@ -1,0 +1,56 @@
+stock-research trace
+generated_for: FIZZ
+task_period: 2025-12-31
+actual_annual_filing_period_end: 2025-05-03
+
+1. Read skill and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse check
+   - stock_report/data/analysis/annual_review/FIZZ/2025-12-31/facts.json: absent
+   - stock_report/data/analysis/annual_review/FIZZ/2025-12-31/annual_facts.md: absent
+   - stock_report/data/raw/filings/FIZZ/2025-12-31/metadata.json: absent
+   - No prior FIZZ research result was available under the supplied workspace paths.
+
+3. Protocol initialization
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Primary evidence recovered
+   - SEC Form 10-K, accession 0001437749-25-022007, filed 2025-07-02:
+     https://www.sec.gov/Archives/edgar/data/69891/000143774925022007/fizz20250503_10k.htm
+   - National Beverage annual report index:
+     https://ir.nationalbeverage.com/financial-information/annual-reports
+   - Market snapshot: config/input.json; Yahoo Finance yfinance, dated 2026-08-03.
+
+5. Source figures (USD thousands unless stated)
+   balance sheet: assets 672,860; liabilities 228,861; equity 443,999; cash 193,835; debt 0
+   income: revenue 1,201,354; cost of sales 757,413; gross profit 443,941; operating income 235,459; net income 186,821
+   cash flow: CFO 206,696; capex 36,281; FCF 170,415; financing CF -303,633; dividends 304,148
+   operating facts: sales +0.8%; average selling price/case +1.7%; case volume -0.9%; gross margin 37.0%
+
+6. Currency normalization
+   - Research conversion assumption: USD/CNY 7.15.
+   - All financial statement absolute amounts in result.json are CNY yuan.
+   - Input market capitalization was accepted as already normalized CNY, consistent with the protocol payload.
+
+7. Formula audit
+   gross_margin = 443,941 / 1,201,354 = 0.3695338759
+   net_margin = 186,821 / 1,201,354 = 0.1555087010
+   operating_FCF = (206,696 - 36,281) * 1,000 * 7.15 = 1,218,467,250
+   discounted_net_cash = 193,835 * 1,000 * 7.15 * 80% = 1,108,736,200
+   discounted_cash_profit = 1,218,467,250 * 90% = 1,096,620,525
+   operating_business_price = 19,986,813,743.39868 - 1,108,736,200 = 18,878,077,543.39868
+   owner_earnback_years = 18,878,077,543.39868 / 1,096,620,525 = 17.2147767738
+   market_cap_to_cash_profit = 19,986,813,743.39868 / 1,096,620,525 = 18.2258249666
+   forecast_dividend_yield scenario = 2,174,658,200 / 19,986,813,743.39868 = 0.1088046463
+
+8. Protocol mutations
+   - result.json initialized by protocol CLI.
+   - Sections populated using repeated protocol `set` commands; no complex result object was authored from scratch.
+
+9. Validation
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   status: ok
+   errors: []

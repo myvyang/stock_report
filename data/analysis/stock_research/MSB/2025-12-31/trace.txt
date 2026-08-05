@@ -1,0 +1,54 @@
+Stock research trace — MSB / Mesabi Trust
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes source reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- Checked the raw filing, annual review, normalized facts, and prior stock research paths from config/input.json.
+- No MSB filing or fact package existed locally, so no historical conclusion was reused.
+
+3. Primary-source retrieval
+- SEC FY2026 10-K / Annual Report, filed 2026-04-22:
+  https://www.sec.gov/Archives/edgar/data/65172/000110465926046875/msb-20260131xars.htm
+- Mesabi Trust official press-release index:
+  https://mesabi-trust.com/press-releases-2/
+- Official 2026-04-14 distribution release ($0.24/unit):
+  https://mesabi-trust.com/wp-content/uploads/press-releases/2026/2026-04-14-announcement-of-mesabi-trust-distribution.pdf
+- Official 2026-05-04 quarterly royalty report ($1.6253m total payment; zero bonus royalty):
+  https://mesabi-trust.com/wp-content/uploads/press-releases/2026/mesabi-trust-press-release.pdf
+- SEC 2026-07-14 distribution filing ($0.05/unit):
+  https://www.sec.gov/Archives/edgar/data/65172/000110465926083538/msb-20260714xex99d1.htm
+- Federal Reserve H.10, 2026-01-30 USD/CNY = 6.951:
+  https://www.federalreserve.gov/releases/h10/20260202/
+- Market capitalization and PE TTM were taken unchanged from config/input.json (Yahoo Finance yfinance, dated 2026-08-03).
+
+4. Period and currency treatment
+- Input analysis period is 2025-12-31, while Mesabi Trust's fiscal year runs February 1–January 31.
+- Used the nearest audited annual statements: FY2026 ended 2026-01-31.
+- Converted all USD statement and distribution amounts to CNY at 6.951 CNY/USD, the Federal Reserve H.10 rate for 2026-01-30.
+- Kept the input market cap as supplied because it is already a CNY absolute amount under the result contract.
+
+5. Model determination
+- Overrode analysis_model_hint ordinary_operating.
+- Selected utility_concession / requires_special_model.
+- Basis: the Trust Agreement prohibits business operations; the Trust has no employees; it owns mineral lease/land trust royalty interests recorded at nominal value; Northshore/Cliffs controls production and supplies pricing/royalty data.
+- Ordinary discounted-net-cash, operating-business-price, cash-profit, and payback fields were intentionally left null under the result contract.
+
+6. Key calculations
+- Net margin = USD 13,868,768 / USD 17,523,781 = 0.7914255491.
+- FY2026 operating free cash flow set equal to operating cash flow because the cash flow statement reports no capital expenditure and the Trust does not operate the mine.
+- Forecast distribution = average of latest two declared quarters ($0.24 and $0.05) x 4 x 13,120,010 units = USD 7,609,605.80.
+- Forecast distribution in CNY = USD 7,609,605.80 x 6.951 = CNY 52,894,369.92.
+- Forecast yield = CNY 52,894,369.92 / CNY 1,946,858,935.7738342 = 0.02716908192.
+- Forecast is a mechanical run rate, not guidance.
+
+7. Output construction and validation
+- Populated outputs/result.json only through protocol set/append commands after initialization; did not hand-write the result object.
+- Created outputs/report.md and outputs/trace.txt.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

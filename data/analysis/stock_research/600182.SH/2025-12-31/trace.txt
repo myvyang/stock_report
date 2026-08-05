@@ -1,0 +1,76 @@
+stock-research trace
+company: S佳通 (600182.SH)
+period: 2025-12-31 annual
+generated_for_input: 2026-07-31T20:15:43+08:00
+
+[1] Protocol initialization
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+status: success
+note: result.json was initialized from the supplied input; the complex object was not handwritten from scratch.
+
+[2] Required contracts read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+[3] Reuse audit
+- Input-referenced annual facts, normalized facts, raw filing metadata, and prior stock-research files were absent in /workspace.
+- stock_report/data/notes/user_stock_evaluations.md existed but contained no task-specific annual fact package used here.
+- Therefore the 2025 annual report was fetched from an official/company-linked disclosure source and parsed for this task.
+
+[4] Primary sources
+A. 佳通轮胎股份有限公司2025年年度报告, dated 2026-04-22
+   PDF: https://dataclouds.cninfo.com.cn/shgonggao/hsomarket/2026/20260422/1bed568caf954d97b0297288fab019c3.PDF
+   Company index: https://giti-corp.com/investorRelations/financialReports
+   Used for: business model, industry context, all statement numbers, segment data, ownership, related-party transactions, dividends, risks.
+B. config/input.json
+   Used for: company identity, period, market cap CNY 4,383,000,000, PE TTM 19.84, quote timestamp 20260731114341 and source Tencent qt.gtimg.cn.
+
+[5] Key extracted facts (CNY absolute yuan)
+revenue=4,844,755,463.93
+cost_of_sales=3,911,487,618.70
+gross_profit=933,267,845.23
+operating_profit=525,503,538.69
+net_profit=395,930,130.96
+parent_net_profit=197,086,606.49
+operating_cash_flow=498,048,592.89
+capital_expenditure=210,016,001.67
+operating_free_cash_flow=288,032,591.22
+total_assets=4,492,496,743.88
+total_liabilities=2,535,119,442.88
+parent_equity=1,107,548,592.38
+minority_interest=849,828,708.62
+cash=596,619,009.10
+long_term_borrowings=568,200,000.00
+current_noncurrent_liabilities=232,857,515.55
+accounts_receivable=1,875,649,533.59
+inventory=602,030,989.57
+2025_total_cash_dividend=193,800,000.00
+
+[6] Deterministic calculations
+gross_margin=(4,844,755,463.93-3,911,487,618.70)/4,844,755,463.93=0.1926346649
+net_margin=197,086,606.49/4,844,755,463.93=0.0406804034
+minority_interest_ratio=849,828,708.62/1,957,377,301.00=0.4341670398
+operating_free_cash_flow=498,048,592.89-210,016,001.67=288,032,591.22
+attributable_fcf_proxy=288,032,591.22*51%=146,896,621.52
+discounted_cash_profit=146,896,621.52*90%=132,206,959.37
+discounted_detachable_net_cash=0 (cash 596,619,009.10 is below interest-bearing/current noncurrent liabilities 801,057,515.55; operating working capital also material)
+operating_business_price=4,383,000,000-0=4,383,000,000
+owner_earnback_years=4,383,000,000/132,206,959.37=33.1525559
+forecast_dividend_yield=193,800,000/4,383,000,000=0.0442162902
+
+[7] Judgment log
+- statement_model=ordinary_operating: tire manufacturing assets and liabilities are conventional operating statements, not a financial/real-estate/concession special model.
+- The ordinary owner-earnback method remains applicable, but consolidated cash flow was not assigned wholly to listed shareholders because Fujian Giti is only 51% owned.
+- A 10% haircut was applied after minority attribution for related-party sales/network/technology dependence and unresolved share-reform governance uncertainty. This is subjective and explicitly disclosed.
+- Forecast dividend uses the 2025 distribution as a flat baseline, not management guidance.
+
+[8] Protocol mutations
+All result fields were populated with repeated protocol CLI `set` operations. Arrays and objects were supplied as path values through the protocol CLI rather than composing result.json manually.
+
+[9] Validation
+intermediate command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+intermediate result: {"status":"ok","errors":[]}
+final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+final result: {"status":"ok","errors":[]}

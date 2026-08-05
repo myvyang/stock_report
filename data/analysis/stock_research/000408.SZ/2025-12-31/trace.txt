@@ -1,0 +1,67 @@
+stock-research trace
+company=000408.SZ 藏格矿业
+period=2025-12-31 annual
+generated_for_input=2026-08-01T03:10:54+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- references/result-contract.md
+- references/report-contract.md
+- references/data-reuse.md
+
+2. Protocol initialization
+- command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- outcome: initialized stock-research-result-v1 structure
+
+3. Reuse audit
+- expected annual facts, normalized facts, raw filing metadata and prior stock-research result were absent locally.
+- therefore returned to public disclosures as required by data-reuse boundary.
+
+4. Sources examined
+- 藏格矿业2025年年度报告，公告日2026-03-14，新浪公告镜像 id=11995908（完整年报文本；核心三张表、附注、业务数据）
+- 藏格矿业2025年年度报告摘要，公告编号2026-010，PDF mirror AN202603131820554995（公司业务、主要数据、产销量、巨龙铜业、分红预案）
+- 巨潮资讯2025年度股东会会议资料（交叉确认年报披露与议案背景）
+- config/input.json Tencent qt.gtimg.cn market-cap snapshot, 2026-07-31 11:43:21
+
+5. Statement model review
+- classified ordinary_operating/applicable.
+- reason: salt-lake potash/lithium manufacturing plus equity-method mining investment; no special-model customer funds or matched financial liabilities.
+- special analytical caution: 巨龙铜业 equity-method income is not operating cash; used actual dividend received for cash-profit bridge.
+
+6. Key reported facts (CNY)
+- total_assets=17692154203.25
+- total_liabilities=1476812292.25
+- total_equity=16215341911.00
+- parent_equity=16243552634.19
+- revenue=3576752605.97
+- cost_of_sales=1457916888.13
+- gross_profit=2118835717.84
+- parent_net_profit=3852353240.98
+- operating_cash_flow=2100261818.88
+- capital_expenditure=82335365.05
+- operating_free_cash_flow=2017926453.83
+- dividends_received_from_associates=1539000000.00
+
+7. Owner earnback assumptions and formulas
+- unrestricted cash=1971890185.74-5118767.82=1966771417.92; included at 50%=983385708.96
+- trading financial assets=314498978.06; included at 50%=157249489.03
+- borrowings and lease liabilities deducted=241150354.14
+- discounted detachable net cash=899484843.85
+- base cash profit=2100261818.88+1539000000.00-82335365.05=3556926453.83
+- sustainability factor=80%; discounted cash profit=2845541163.064
+- operating business price=125905000000.00-899484843.85=125005515156.15
+- owner earnback years=125005515156.15/2845541163.064=43.93
+- market cap/cash profit=125905000000.00/2845541163.064=44.25
+- forecast dividend=1568914754 shares*1.50=2353372131.00; yield=1.8691%
+
+8. Protocol population
+- result fields populated using protocol CLI set and append commands; JSON was not manually constructed from scratch.
+
+9. Validation
+- command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- outcome before report completion: status=ok, errors=[]
+
+10. Important limitations
+- market cap and PE are supplied snapshot values and were not recomputed.
+- haircuts are analytical assumptions, not reported facts.
+- future commodity prices, 巨龙铜业 distributions and project capital needs can materially change cash profit and earnback years.

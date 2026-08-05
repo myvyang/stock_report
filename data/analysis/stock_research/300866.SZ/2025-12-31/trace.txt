@@ -1,0 +1,79 @@
+stock-research trace
+company: 300866.SZ 安克创新
+period: 2025-12-31 annual
+generated_at: 2026-08-01 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked paths declared by config/input.json under /workspace and /root/aicode.
+- No raw filing, annual facts package, normalized facts, or prior stock-research result for 300866.SZ/2025-12-31 was present.
+- Therefore fetched official annual-report disclosures rather than fabricating missing facts.
+
+3. Primary sources
+- 2025 annual report, CNINFO official disclosure PDF:
+  https://static.cninfo.com.cn/finalpage/2026-04-10/1225090973.PDF
+- 2024 annual report, CNINFO official disclosure PDF, used only to obtain the 2023 comparative CFO and capex:
+  https://static.cninfo.com.cn/finalpage/2025-04-29/1223379891.PDF
+- Market cap 71,570,000,000 CNY, PE TTM 28.39, timestamp 20260731114324: config/input.json, source Tencent qt.gtimg.cn.
+- PDFs were parsed in a temporary isolated Python virtual environment using pypdf because no system PDF text extractor was available. Temporary files were kept outside outputs and are not research deliverables.
+
+4. Model confirmation
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Basis: self-developed product design, outsourced manufacturing/procurement, warehousing/logistics, and global online/offline product sales. Cash, inventory, receivables, payables, and borrowings have ordinary operating-company economic meaning.
+
+5. Core calculations (CNY absolute yuan)
+- revenue = 30,514,403,376.92
+- cost_of_sales = 16,762,975,546.47
+- gross_profit = 13,751,427,830.45
+- gross_margin = gross_profit / revenue = 0.4506536687147253
+- parent_net_profit = 2,545,131,880.40
+- net_margin = parent_net_profit / revenue = 0.08340755835734434
+- 2025 OCF = 480,806,645.21
+- 2025 capex = 365,120,160.05
+- 2025 operating FCF = 115,686,485.16
+
+6. Discounted detachable net cash
+- unrestricted cash = 3,656,509,315.28 - 306,918,793.70 = 3,349,590,521.58; factor 100%
+- bank time deposits = 1,663,955,379.72; factor 95%; discounted 1,580,756,110.734
+- trading financial assets = 2,466,995,658.45; factor 70%; discounted 1,726,896,960.915
+- financing debt deducted at 100%:
+  short-term borrowing 567,318,259.44
+  current portion of long-term borrowing 143,319,923.70
+  current portion of bonds 1,201,793.53
+  long-term borrowing 781,332,000.16
+  bonds payable 1,097,399,801.76
+  total financing debt = 2,590,571,778.59
+- discounted detachable net cash = 4,066,673,314.639
+- Long-term equity investments and other non-current financial assets excluded from detachable cash due to realization/governance uncertainty.
+
+7. Sustainable distributable cash profit
+- CFO 2023/2024/2025 = 1,429,913,364.18 / 2,745,458,716.91 / 480,806,645.21
+- average CFO = 1,552,059,575.4333334
+- capex 2023/2024/2025 = 70,296,555.81 / 428,881,972.81 / 365,120,160.05
+- average capex = 288,099,562.89000005
+- normalized operating FCF = 1,263,960,012.5433333
+- additional sustainability factor = 90%
+- discounted sustainable cash profit = 1,137,564,011.289
+- Reason: 2025 inventory build distorted single-year cash conversion; three-year average smooths the working-capital cycle, while the extra 10% haircut recognizes inventory, tariff, FX, and product-cycle uncertainty.
+
+8. Owner earnback
+- operating_business_price = 71,570,000,000 - 4,066,673,314.639 = 67,503,326,685.361
+- owner_earnback_years = 67,503,326,685.361 / 1,137,564,011.289 = 59.34024460643003
+- market_cap_to_cash_profit = 71,570,000,000 / 1,137,564,011.289 = 62.9151408533946
+- discounted_net_cash_to_market_cap = 4,066,673,314.639 / 71,570,000,000 = approximately 0.05682
+
+9. Dividend forecast
+- 2025 annual proposal: 1.70 CNY per share on 536,158,873 shares.
+- forecast cash dividend = 911,470,084.10
+- forecast dividend yield = 911,470,084.10 / 71,570,000,000 = 0.0127353651543943
+
+10. Protocol population and validation
+- Populated every result field using protocol `set` and `append`; the complex JSON object was not handwritten from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].

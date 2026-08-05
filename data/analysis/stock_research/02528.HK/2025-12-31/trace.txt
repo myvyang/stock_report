@@ -1,0 +1,58 @@
+stock-research trace
+company: 02528.HK / 尚晋（国际）控股有限公司
+period: 2025-12-31 annual
+generated_at: 2026-08-04T15:37:23+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No existing annual facts, normalized facts, or prior stock-research result existed for 02528.HK/2025-12-31.
+- Downloaded HKEX Annual Report 2025 to stock_report/data/raw/filings/02528.HK/2025-12-31/annual_report_2025.pdf.
+- Core source URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0430/2026043000938.pdf
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized with schema stock-research-result-v1.
+
+4. Company/model verification
+- HKEX Annual Report 2025 pp.4 and 66 identifies international-brand fashion retail, wholesale, store-management and Macau catering operations.
+- No brokerage client money, proprietary financial assets, margin financing, or repo liabilities found.
+- Overrode input hint financial_brokerage -> ordinary_operating; owner_earnback_applicability -> applicable.
+
+5. Financial extraction (HKD'000, audited)
+- Income statement pp.58-59: revenue 870175; cost of sales 456269; gross profit 413906; operating profit 79081; net profit 59951; parent net profit 57673.
+- Balance sheet pp.60-61: assets 673317; liabilities 476064; equity 197253; parent equity 212770; NCI -15517.
+- Cash flow pp.64-65: CFO 191758; PPE purchases 31537; intangible purchases 227; financing cash flow -180600; lease principal repayment 79151.
+- Translation used in outputs/result.json: HKD x 0.918 = CNY. Narrative report retains HKD for auditability.
+
+6. Operating facts
+- Annual report pp.4-6: 119 self-operated stores; 105 mono-brand and 14 multi-brand; 248-brand portfolio, 245 third-party brands.
+- Revenue mix: retail 589612, store management 238149, catering 40916, wholesale 1498 (HKD'000).
+- Geography: Macau 63.0%, Mainland 32.8%, HK and others 4.2%.
+- 2025 openings 24 and closures 60; overall same-store sales -6.6%; Mainland same-store -13.5%.
+
+7. Owner earnback calculations
+- Counted detachable cash: cash 76440 + term deposits 1312 = 77752 HKD'000.
+- Excluded pledged deposits 18108 HKD'000.
+- Deducted bank borrowings 45354 and related-party interest-bearing loans 65812 HKD'000.
+- Detachable net cash = 77752 - 45354 - 65812 = -33414 HKD'000 = -30674052 CNY.
+- Sustainable cash-profit scenario = 30000 HKD'000 = 27540000 CNY. Basis: starts from parent profit, removes disposal and early lease-termination gains, and applies conservatism for three preceding loss years, inventory/store impairments, shrinking Mainland same-store sales, and lease cash costs.
+- Operating business price = 289060801.5060425 - (-30674052) = 319734853.5060425 CNY.
+- Owner earnback = 319734853.5060425 / 27540000 = 11.60983564 years.
+- Market cap / cash profit = 289060801.5060425 / 27540000 = 10.49530870.
+
+8. Dividend
+- Annual report pp.30 and 102: no paid, declared, proposed interim or final dividend for 2025; 2024 final dividend also nil.
+- Base forecast: zero cash dividend and 0% yield until evidence of a restored payout policy.
+
+9. Data-quality judgments
+- complete: identity, period, market data, model, three statements, asset/liability explanations, earnback breakdown, dividend forecast, business story and evidence are present.
+- Limitations recorded: assumed HKD/CNY translation rate; sustainable profit is a scenario; Tencent market snapshot not independently reconstructed from exchange ticks.
+
+10. Validation
+- First protocol validation after population: status ok, errors [].
+- Final validation rerun after report and trace creation.

@@ -1,0 +1,76 @@
+stock-research trace: VRRM / 2025-12-31 annual
+generated for task created_at: 2026-08-04T20:11:54+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the task required deciding whether existing annual facts could be reused.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked the paths declared in config/input.json.
+- No annual facts, normalized facts, extraction trace, or raw filing existed for VRRM/2025-12-31.
+- Therefore returned to the primary filing rather than relying on a prior research conclusion.
+
+3. Primary sources obtained and used
+- SEC Form 10-K, accession 0001193125-26-067293, filed 2026-02-24:
+  https://www.sec.gov/Archives/edgar/data/1682745/000119312526067293/vrrm-20251231.htm
+- Local copy saved as stock_report/data/raw/filings/VRRM/2025-12-31/vrrm-20251231.htm.
+- SEC Company Facts API was used only as a structured cross-check for filing-tagged financial values.
+- Company FY2025 results and FY2026 guidance:
+  https://ir.verramobility.com/news-releases/news-release-details/verra-mobility-announces-fourth-quarter-and-full-year-2025
+- Company dividend FAQ:
+  https://ir.verramobility.com/investor-resources/investor-faqs
+- Federal Reserve H.10 reference:
+  https://www.federalreserve.gov/releases/h10/default.htm
+
+4. Analysis model decision
+- Confirmed ordinary_operating / applicable.
+- Reason: revenue arises from fleet transaction processing, government enforcement systems, parking software/services and product sales. Debt is corporate financing; customer-related liabilities are ordinary operating liabilities. The company does not hold bank deposits, brokerage client funds, insurance reserves, regulated real-estate presale cash, concession cash flows, or an investment-holding portfolio.
+
+5. Core reported USD facts (2025)
+- Revenue 979,079,000; service revenue 918,137,000; product sales 60,942,000.
+- Cost of service revenue 30,318,000; cost of product sales 45,517,000.
+- Protocol gross profit constructed as 979,079,000 - 30,318,000 - 45,517,000 = 903,244,000.
+- Important interpretation: reported operating expenses of 333,241,000 include significant delivery costs; constructed gross margin is not a full contribution margin.
+- Operating income 238,414,000; net income attributable to common stockholders 136,633,000.
+- Operating cash flow 255,802,000; capex (installation/service parts and PP&E) 119,094,000; operating FCF 136,708,000.
+- Total assets 1,645,662,000; total liabilities 1,352,702,000; equity 292,960,000; no noncontrolling interest.
+- Cash 65,272,000; current debt 6,888,000; long-term debt 1,021,157,000.
+- Share repurchases 133,447,000; stock compensation 25,176,000.
+
+6. Currency normalization
+- Result contract requires CNY absolute yuan.
+- Used research conversion 1 USD = 6.77 CNY for all filing and market-cap amounts.
+- Input market cap 5,422,599,632.134644 was interpreted as USD because the company and quote are US-listed and the magnitude is consistent with a USD equity capitalization. Converted market cap: 36,710,999,509.55 CNY.
+- Limitation: input did not declare native market-cap currency and 6.77 is a recent H.10-based approximation, not a verified 2026-08-03 closing FX rate.
+
+7. Owner earnback formula
+- Discounted detachable net cash = cash x 50% - current debt - long-term debt.
+- USD: 65.272m x 50% - 6.888m - 1,021.157m = -995.409m.
+- CNY: -6,738,918,930.
+- Operating business price = market cap - discounted net cash = 43,449,918,439.55 CNY.
+- Sustainable cash profit starts with FY2026 company FCF guidance midpoint: USD 155m.
+- Deduct 2025 stock compensation USD 25.176m, then apply 90% execution/distributability factor.
+- USD sustainable cash profit = (155m - 25.176m) x 90% = 116.8416m.
+- CNY sustainable cash profit = 791,017,632.
+- Owner earnback years = 43,449,918,439.55 / 791,017,632 = 54.9291.
+- Market cap / cash profit = 36,710,999,509.55 / 791,017,632 = 46.4098.
+- No growth, terminal value, acquisitions, refinancing benefit, or future buyback accretion was assumed.
+
+8. Dividend
+- Company FAQ states it does not currently pay a cash dividend.
+- Forecast cash dividend = 0; forecast dividend yield = 0.
+- Buybacks were discussed separately and were not labeled dividends.
+
+9. Data conflict retained as limitation
+- Input PE TTM = 6.4512196.
+- Input market cap / FY2025 net income implies approximately 39.7x, so the PE field cannot be reconciled to the annual filing and input market cap.
+- The protocol result preserves the input PE for provenance, flags the inconsistency, and does not use PE in the owner-earnback computation.
+
+10. Protocol writes and validation
+- outputs/result.json was initialized and updated through protocol init/set commands; it was not authored as a complex JSON object from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status before report/trace handoff: ok, no errors.

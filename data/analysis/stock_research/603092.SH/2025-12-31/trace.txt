@@ -1,0 +1,126 @@
+stock-research trace
+company: 德力佳传动科技（江苏）股份有限公司
+code: 603092.SH
+period: 2025-12-31
+report_type: annual
+task_created_at: 2026-08-03T11:36:00+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar and list fields through protocol set/append commands; did not construct the result object from scratch.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[local reuse audit]
+- stock_report/data/raw/filings/603092.SH/2025-12-31: absent
+- stock_report/data/analysis/annual_review/603092.SH/2025-12-31: absent
+- stock_report/data/normalized/facts/603092.SH/2025-12-31: absent
+- stock_report/data/analysis/stock_research/603092.SH/2025-12-31: absent
+- outputs/: initially empty
+Conclusion: no local filing, fact pack, normalized facts, or previous research result was available for reuse.
+
+[sources]
+S1. 德力佳传动科技（江苏）股份有限公司2025年年度报告, dated 2026-04-15, 228 pages. Company filing text downloaded from https://stockmc.xueqiu.com/202604/603092_20260415_UCTA.pdf; the report identifies Shanghai Stock Exchange (http://www.sse.com.cn/) as the designated disclosure website. Audit report 苏公W[2026]A1265号, standard unqualified opinion, dated 2026-04-13.
+S2. 德力佳2025年年度权益分派实施公告, 公告编号2026-034, dated 2026-06-17. Search-verifiable filing mirror: https://stockmc.xueqiu.com/202606/603092_20260617_WM8Y.pdf. Cash dividend date 2026-06-25.
+S3. 上海证券交易所《关于德力佳传动科技（江苏）股份有限公司人民币普通股股票上市交易的公告》, dated 2025-11-06: https://www.sse.com.cn/disclosure/announcement/listing/ipo/c/c_20251106_10797178.shtml
+S4. config/input.json market snapshot: market cap CNY 19,896,000,000; timestamp 20260731161439; source Tencent qt.gtimg.cn; PE TTM 22.18.
+
+[identity and model]
+- S1 pages 6-7: company name, code 603092, Shanghai Stock Exchange listing.
+- S1 pages 10-13: business is R&D, manufacturing and sale of wind turbine main gearboxes, plus related support and maintenance.
+- Balance sheet consists of ordinary manufacturing assets, working-capital liabilities, bank debt and product-warranty provisions. No customer deposits, insurance reserves, regulated presale cash, concession rights, or investment-holding structure.
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Special handling: IPO proceeds have committed expansion uses and are excluded from detachable cash.
+
+[financial extraction]
+Source: S1 pages 105-115 and notes unless stated otherwise.
+Balance sheet, CNY:
+- total_assets = 10,727,413,972.54
+- total_liabilities = 5,211,689,131.18
+- total_equity = 5,515,724,841.36
+- parent_equity = 5,515,724,841.36
+- minority_interest = 0
+- cash = 1,175,782,452.69
+- trading_financial_assets = 1,561,129,240.94
+- receivable_notes = 703,578,483.72
+- accounts_receivable = 2,137,578,214.47
+- receivables_financing = 714,727,550.48
+- contract_assets = 214,184,392.85
+- inventories = 1,792,313,756.42
+- fixed_assets = 1,686,833,540.88
+- construction_in_progress = 38,267,616.97
+- right_of_use_assets = 2,190,528.16
+- intangible_assets = 191,708,652.41
+- other_noncurrent_assets = 270,203,470.54
+- notes_payable = 1,062,903,363.31
+- accounts_payable = 1,863,225,179.86
+- other_current_liabilities = 683,280,896.81
+- current_portion_noncurrent_liabilities = 241,467,421.08
+- long_term_borrowings = 284,187,210.25
+- lease_liabilities = 276,174.16
+- warranty_provision = 793,420,400.54
+
+Income statement, CNY:
+- revenue = 5,420,187,684.53
+- cost_of_sales = 4,045,626,449.94
+- gross_profit = 1,374,561,234.59 (calculated revenue minus cost)
+- operating_profit = 974,408,290.27
+- net_profit = parent_net_profit = 827,372,269.97
+- credit_impairment + asset_impairment = 37,712,778.71 + 138,336,671.69 = 176,049,450.40 loss
+
+Cash flow, CNY:
+- operating_cash_flow = 739,396,209.80
+- capital_expenditure = 370,478,078.98 (cash paid to acquire fixed, intangible and other long-term assets)
+- operating_free_cash_flow = 739,396,209.80 - 370,478,078.98 = 368,918,130.82
+- financing_cash_flow = 1,658,362,740.28
+- dividend_and_buyback_cash_out = 0 for 2025 (no dividend paid or buyback during reporting year; 13,118,054.55 financing cash line was dividend/profit or interest, with no minority dividend; annual dividend was implemented after period end)
+
+[formula calculations]
+gross_margin = 1,374,561,234.59 / 5,420,187,684.53 = 0.2536003021654022
+net_margin = 827,372,269.97 / 5,420,187,684.53 = 0.152646424464496
+
+Cash haircut:
+1. cash + trading financial assets = 1,175,782,452.69 + 1,561,129,240.94 = 2,736,911,693.63
+2. subtract committed IPO net proceeds = 2,736,911,693.63 - 1,774,257,429.05 = 962,654,264.58
+   Basis: S1 pages 87-90 and 123; all adjusted net proceeds are committed to two capacity projects; CNY 1.2bn was in cash management at year-end.
+3. haircut uncommitted liquidity by 50% = 481,327,132.29
+4. interest-bearing and lease debt = 239,500,000.00 current long-term borrowings + 1,616,071.57 current lease liabilities + 284,187,210.25 long-term borrowings + 276,174.16 long-term lease liabilities = 525,579,455.98
+5. 481,327,132.29 - 525,579,455.98 = -44,252,323.69; detachable net cash floored at 0.
+
+Cash profit:
+1. operating free cash flow = 368,918,130.82
+2. sustainability haircut = 20%, reflecting single-year basis, customer/receivable concentration, inventory growth, warranty exposure and wind-cycle uncertainty.
+3. discounted sustainable cash profit = 368,918,130.82 * 0.80 = 295,134,504.656
+
+Earnback:
+- operating_business_price = 19,896,000,000 - 0 = 19,896,000,000
+- owner_earnback_years = 19,896,000,000 / 295,134,504.656 = 67.41333082416165
+- market_cap_to_cash_profit = same 67.41333082416165 because discounted detachable net cash is zero.
+
+Dividend:
+- 2025 cash dividend = 248,400,062.10; CNY 0.621 per share; implemented 2026-06-25.
+- payout ratio per annual report = 30.02%; exact amount / parent profit = about 30.0226%.
+- baseline forecast uses same implemented amount, not a company promise.
+- forecast_dividend_yield = 248,400,062.10 / 19,896,000,000 = 0.012484924713510252.
+
+[business evidence]
+- S1 pages 10-13: 1.5MW-26MW product range; custom design, prototype/customer acceptance, order-based batch manufacturing; direct sales.
+- S1 pages 13 and 30: company self-description as globally leading/domestically among the front ranks; 18MW offshore gearbox batch delivery. No independently verifiable numeric share disclosed.
+- S1 pages 19-22: wind gearbox main-business revenue 5,371,606,442.39; main-business gross margin 24.89%; top-five customer sales 94.16%; related-party top-five customer sales 21.49%.
+- S1 page 155 note: top-five receivable and contract-asset balances account for 89.56%.
+- S1 pages 188-189: warranty provision CNY 793,420,400.54, based on historical experience and product characteristics.
+
+[judgment boundaries]
+- Facts: reported numbers, disclosed business model, customers, committed use of IPO proceeds, implemented dividend.
+- Calculations: margins, free cash flow, grouped asset/liability totals, valuation ratios.
+- Analyst judgments: 50% haircut to liquidity remaining after IPO proceeds, zero floor on negative detachable net cash, 20% cash-profit haircut, and use of latest implemented dividend as the baseline forecast.
+- No buy/sell recommendation, target price, ranking label, or unsupported market-share number was produced.
+
+[limitations]
+- No local filing/fact package was supplied; extraction used the formal company annual-report document from a public filing mirror.
+- Specific market share and third-party industry rank were unavailable from an independently verifiable primary source.
+- Sustainable cash profit is based on one reporting year rather than a full wind-power cycle; 67.4 years is a conservative stress-test measure.
+- Market cap and PE are accepted from the input Tencent snapshot and were not independently recomputed.

@@ -1,0 +1,72 @@
+stock-research trace
+company: 01425.HK / JUSTIN ALLEN H
+period: 2025-12-31
+generated_at: 2026-08-04T12:20:28+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reused source materials
+- config/input.json
+- stock_report/data/analysis/annual_review/01425.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/01425.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/01425.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/01425.HK/2025-12-31/metadata.json
+- stock_report/data/raw/filings/01425.HK/2025-12-31/imported_from_agent_runs/137e19c9e546-justin_allen_annual_report_2025.txt
+- stock_report/data/raw/filings/01425.HK/2025-12-31/imported_from_agent_runs/22d5f8a0b87e-justin_allen_annual_report_2024.txt
+
+3. Identity and model check
+- Annual Report 2025 MD&A p.3 states the Group is an ODM garment manufacturer specializing in sleepwear and loungewear.
+- Input hint financial_brokerage was rejected as inconsistent with primary filing facts.
+- Final model: ordinary_operating; ordinary owner earnback applicable.
+
+4. Currency normalization
+- Filing currency/unit: HKD / HK$'000.
+- Conversion used: 1 HKD = 0.90322 CNY, China Foreign Exchange Trade System central parity on 2025-12-31, published under SAFE/PBOC framework.
+- All filing amounts multiplied by 1,000 and then 0.90322.
+- Limitation: annual income and cash-flow amounts use the closing rate rather than an annual average rate.
+
+5. Core calculations
+- gross_margin = 335,947 / 1,098,569 = 0.3058041871.
+- net_margin = 166,749 / 1,098,569 = 0.1517874617.
+- 2023-2025 FCF (HK$'000): 265,361; 127,733; 147,347.
+- average FCF = HK$180.147m = CNY162.711m.
+- after-tax non-operating/funds-income removal estimate = CNY16.258m.
+- 15% prudence adjustment after removal = CNY22.080m.
+- discounted sustainable cash profit = HK$137.700m = CNY124.373m.
+
+6. Detachable cash discounts
+- bank balances and cash: CNY213.433m x 50% = CNY106.716m.
+- listed bonds: CNY15.909m x 90% = CNY14.318m.
+- bond funds: CNY23.001m x 80% = CNY18.401m.
+- investment funds: CNY67.129m x 60% = CNY40.277m.
+- structured products: CNY231.086m x 70% = CNY161.760m.
+- total discounted detachable net cash = CNY341.473m.
+- No bank debt at year-end. Lease liabilities treated as ongoing operating-use obligations; conservatism is reflected through retaining 50% of cash rather than separately netting leases from the detachable pool.
+
+7. Owner earnback
+- market cap = CNY645.225m (input, Tencent qt.gtimg.cn, 2026/08/03 09:20:05).
+- operating business price = 645.225 - 341.473 = CNY303.752m.
+- owner earnback years = 303.752 / 124.373 = 2.4423.
+- market cap / cash profit = 645.225 / 124.373 = 5.1878.
+
+8. Dividend
+- proposed FY2025 final dividend = HK$0.048/share x 1.25bn shares = HK$60m.
+- converted forecast cash dividend = CNY54.193m.
+- forecast dividend yield = 54.193 / 645.225 = 0.083991.
+- Proposal remains subject to approval; future dividend is discretionary.
+
+9. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields using repeated protocol set commands; complex JSON was not written from scratch.
+- Validated with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok; errors: [].
+
+10. Data quality
+- status: complete.
+- Material judgment limitations are recorded in result.json and report.md: structured-product terms, cash location/distribution constraints, maintenance versus growth capex, customer concentration, and use of closing FX for annual flows.

@@ -1,0 +1,64 @@
+stock-research trace
+company: 江南水务 (601199.SH)
+period: 2025-12-31 annual
+generated_at_input: 2026-07-31T23:09:16+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+- Checked input-declared raw filing, annual review, normalized facts and historical research paths.
+- None of the declared 601199.SH/2025-12-31 source or fact files existed in /workspace.
+- Therefore returned to public filings for primary facts.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result JSON was initialized by the protocol CLI; it was not hand-written from scratch.
+
+4. Sources used
+- Shanghai Stock Exchange filing: 江苏江南水务股份有限公司2025年年度报告, disclosed 2026-04-24.
+  Official PDF locator: https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-24/601199_20260424_NI7K.pdf
+  Accessible text cross-check: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12157815&stockid=601199
+- Shanghai Stock Exchange filing: 2025年年度权益分派实施公告, disclosed 2026-06-16.
+  Locator: https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-06-16/601199_20260616_834X.pdf
+- Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, market cap CNY 5,190,000,000, PE TTM 14.39, timestamp 20260731114330.
+
+5. Model decision
+- Confirmed statement_model=utility_concession and owner_earnback_applicability=requires_special_model.
+- Evidence: 30-year Jiangyin urban-rural water supply concession; water plants and networks are core operating assets; engineering activities create material contract assets, receivables and operating liabilities.
+- Consequence: all ordinary detachable-net-cash and ordinary owner-earnback ranking fields remain null per result contract.
+- Special model should use remaining concession term, volume, tariff, non-revenue water, maintenance capex, engineering collections, affiliate dividends and debt service.
+
+6. Key extracted facts and calculations
+- Revenue: 1,458,403,170.04
+- Cost of sales: 893,814,887.93
+- Gross profit: 564,588,282.11 = revenue - cost of sales
+- Gross margin: 0.3871318284643428 = gross profit / revenue
+- Parent net profit: 369,634,893.19
+- Net margin: 0.2534559266435786 = parent net profit / revenue
+- Operating cash flow: 316,927,377.50
+- Capex proxy: 160,239,192.63, cash paid to acquire fixed, intangible and other long-term assets
+- Operating free cash flow: 156,688,184.87 = operating cash flow - capex proxy
+- Total assets: 7,226,489,078.16
+- Total liabilities: 2,610,598,723.08
+- Total/parent equity: 4,615,890,355.08
+- Balance check: assets = liabilities + equity exactly at reported precision
+- 2025 annual dividend implemented: 84,168,926.28 = 935,210,292 shares * CNY 0.09/share
+- Forecast/mechanical dividend yield: 0.01621751951445087 = 84,168,926.28 / 5,190,000,000
+- Ordinary owner earnback fields: null because special model is required
+
+7. Important interpretation checks
+- Engineering installation represented 41.38% of main business revenue and was a key audit matter.
+- Receivables plus contract assets: 941,491,631.32.
+- Fixed assets mainly comprise buildings and hidden water networks and were a key audit matter.
+- Equity-method income from associates/JVs: 132,518,429.38, about 35.85% of parent net profit; accounting profit and distributable parent cash are therefore not identical.
+- Capex proxy includes maintenance and growth spending; no reliable split was available.
+- Full concession agreement and terminal/renewal compensation terms were not obtained, so no special-model DCF or payback years were fabricated.
+
+8. Protocol updates and validation
+- All result.json mutations after initialization used protocol set/append commands.
+- Final validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status before report handoff: ok, errors=[]

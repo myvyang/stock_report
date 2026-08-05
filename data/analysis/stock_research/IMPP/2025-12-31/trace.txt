@@ -1,0 +1,105 @@
+stock-research trace
+company=IMPP
+period=2025-12-31
+generated_at=2026-08-04T12:15:42+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated result fields through protocol set commands, section by section.
+4. Validated with protocol validate; status=ok, errors=[].
+
+[reuse check]
+No IMPP/2025-12-31 raw filing, annual facts, normalized facts, or historical stock-research files existed under stock_report/data when the task began. Research therefore returned to the audited annual filing and official company release.
+
+[primary sources]
+- SEC Form 20-F, filed 2026-04-29, accession 0001193125-26-192203:
+  https://www.sec.gov/Archives/edgar/data/1876581/000119312526192203/d60380d20f.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/1876581/000119312526192203/0001193125-26-192203-index.htm
+- Imperial Petroleum FY2025 results release:
+  https://www.imperialpetro.com/index.php/investor-relations/press-releases/138-imperial-petroleum-announces-management-estimate-of-net-asset-value-per-share
+- 2025-12-31 CFETS/PBOC authorized USD/CNY central parity: 7.0288.
+- Market snapshot supplied in config/input.json: market cap CNY 1,433,978,210.4522858; date 2026-08-03; PE TTM 2.9936304; source Yahoo Finance yfinance.
+
+[model decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: revenue is earned by deploying owned vessels under voyage and time charters. Vessels are operating fixed assets; the balance sheet is not built around customer financial claims, regulated project cash, deposits, insurance reserves, or concession rights. Shipping-specific adjustments are nevertheless necessary for vessel replacement, rate cyclicality, committed acquisitions, and preferred equity.
+
+[currency]
+All filing amounts were reported in USD and multiplied by 7.0288 CNY/USD. Input market capitalization was already in CNY and was not reconverted.
+
+[reported 2025 USD facts]
+revenue=161004306
+voyage_expense=47426686
+voyage_expense_related=1973331
+vessel_operating_expense=37198535
+vessel_operating_expense_related=523000
+dry_docking=1744525
+management_fee_related=2574440
+operating_income=39903302
+net_income=49978247
+operating_cash_flow=80781402
+payments_for_vessel_acquisition_and_capitalized_expenses=1707320
+repayment_of_seller_and_capex_financing=164705000
+cash=5771505
+time_deposits=173282440
+total_assets=547407779
+total_liabilities=16593682
+total_equity=530814097
+vessels_net=335406781
+committed_vessel_acquisition_payments=129510000
+series_A_preferred_shares=795878
+series_A_liquidation_preference_per_share=25
+series_A_cash_dividends_paid=1736415
+
+[reconstructed metrics]
+Cost of sales is an analytical, non-GAAP subtotal:
+47426686 + 1973331 + 37198535 + 523000 + 1744525 + 2574440 = USD 91440517.
+Gross profit = 161004306 - 91440517 = USD 69563789.
+Gross margin = 69563789 / 161004306 = 0.43206166796557605.
+Net margin = 49978247 / 161004306 = 0.3104155922388809.
+
+Capital expenditure cash scope = reported vessel acquisition/capitalized expense payments 1707320 + repayment of seller and capex financing 164705000 = USD 166412320.
+Operating free cash flow = 80781402 - 166412320 = USD -85630918 = CNY -601882596.44.
+This contains growth vessel acquisitions and is not used directly as maintenance cash profit.
+
+[detachable net cash]
+USD 5771505 cash
++ USD 173282440 time deposits
+- USD 16593682 all balance-sheet liabilities
+- USD 129510000 committed vessel acquisitions
+- USD 19896950 Series A liquidation preference (795878 x 25)
+= USD 13053313
+x 7.0288 = CNY 91749126.4144.
+Related-party investment was assigned zero detachable value.
+
+[sustainable cash profit]
+USD 80781402 operating cash flow
+- USD 25930557 vessel replacement reserve, set equal to depreciation
+- USD 7258348 interest income
+- USD 760417 related-party dividend income
+- USD 3187650 stock-based compensation
+- USD 1736415 Series A preferred dividends
+= USD 41908015 base cash profit
+x 75% shipping-cycle haircut
+= USD 31431011.25
+x 7.0288
+= CNY 220922291.874.
+
+[earnback formulas]
+operating_business_price = 1433978210.4522858 - 91749126.4144 = 1342229084.0378857 CNY.
+owner_earnback_years = 1342229084.0378857 / 220922291.874 = 6.075571064614012.
+market_cap_to_cash_profit = 1433978210.4522858 / 220922291.874 = 6.490871510920842.
+discounted_net_cash_to_market_cap = 91749126.4144 / 1433978210.4522858 = 0.06398223190955026.
+
+[dividend]
+Common-share cash dividends in 2024 and 2025 were zero. Preferred dividends are a senior claim, not common dividends. A 2026 common-share repurchase authorization is not treated as a committed cash dividend. Forecast common cash dividend=0; forecast yield=0.
+
+[limitations]
+- Gross profit is reconstructed because the issuer does not present a statutory gross-profit subtotal.
+- The vessel replacement reserve and 25% cycle haircut are analyst judgments, not company guidance.
+- Post-balance-sheet vessel delivery, dry-docking, charter rates, financing, repurchases, warrant exercises, and equity issuance can materially change the result.
+- Market capitalization and PE are consumed from the supplied snapshot and were not independently rebuilt from share count and price.

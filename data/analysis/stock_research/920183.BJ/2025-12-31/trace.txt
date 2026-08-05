@@ -1,0 +1,65 @@
+stock-research trace
+company=海菲曼
+code=920183.BJ
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-03T10:55:03+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md as requested.
+3. Read references/data-reuse.md because no local annual fact package was present.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields exclusively through protocol set commands.
+6. Validated outputs/result.json with protocol validate; result: status=ok, errors=[].
+
+[local reuse]
+No files existed under the requested raw filing, annual_review, normalized_facts, or prior stock_research paths at task start. No historical result was reused.
+
+[primary sources]
+- 2025 annual report, announcement 2026-079, 157 pages, downloaded from CNINFO data cloud:
+  https://dataclouds.cninfo.com.cn/sjother2/bse_onmarket/2026/20260413/68bd14ca0f9a4926963f3c7245868785.pdf
+  Local copy: stock_report/data/raw/filings/920183.BJ/2025-12-31/2025-annual-report.pdf
+- 2026 Q1 report, published 2026-04-28:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12260060&stockid=920183
+- 2025 annual dividend implementation announcement 2026-106:
+  https://notice.10jqka.com.cn/api/pdf/f923f05ca9493026_1778239698/%E6%B5%B7%E8%8F%B2%E6%9B%BC%3A2025%E5%B9%B4%E5%B9%B4%E5%BA%A6%E6%9D%83%E7%9B%8A%E5%88%86%E6%B4%BE%E5%AE%9E%E6%96%BD%E5%85%AC%E5%91%8A.pdf
+- Market cap and PE TTM: config/input.json, Tencent qt.gtimg.cn snapshot at 2026-07-31 15:38:02.
+
+[model decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=The company earns from branded audio product R&D, manufacturing and global sales. Its balance sheet contains ordinary cash, receivables, inventory, production assets and operating liabilities; no financial, property-development, construction-project, concession or holding-company structure was identified.
+
+[core calculations]
+gross_profit = 239419027.05 - 78696959.06 = 160722067.99
+gross_margin = 160722067.99 / 239419027.05 = 0.6713003138
+net_margin = 74820519.30 / 239419027.05 = 0.3125086599
+operating_free_cash_flow = 81050411.16 - 22512337.47 = 58538073.69
+
+Q1_2026_cash = 361872110.24
+implemented_dividend_after_Q1 = 48952000.00
+cash_recognition_discount = 0.80
+Q1_2026_lease_liabilities = 2376572.33 + 3097399.96 = 5473972.29
+discounted_detachable_net_cash = (361872110.24 - 48952000.00) * 0.80 - 5473972.29 = 244862115.902
+
+discounted_sustainable_cash_profit = 60000000.00
+Rationale: 2025 FCF was 58538073.69; 2025 recurring parent profit was 70982232.40; annualized Q1 2026 recurring parent profit was 70438558.08. Rounded normalized cash profit of 60m is slightly above single-year FCF and materially below recurring accounting profit.
+
+operating_business_price = 1446000000.00 - 244862115.902 = 1201137884.098
+owner_earnback_years = 1201137884.098 / 60000000.00 = 20.018964735
+market_cap_to_cash_profit = 1446000000.00 / 60000000.00 = 24.10
+forecast_dividend_yield = 48952000.00 / 1446000000.00 = 0.0338533887
+
+[limitations]
+- The 2026 Q1 report is unaudited; the 2025 annual report is audited.
+- Valuation date is later than the Q1 balance sheet. The calculation bridges the known May dividend but does not know full Q2 operating cash flow or project spending.
+- The 80% cash recognition factor is an analytical haircut for earmarked IPO funds, operating liquidity, and stale-date uncertainty.
+- Sustainable cash profit of 60m is an analytical normalization, not company guidance.
+- No authoritative global market-share figure was found; industry position remains qualitative.
+
+[final files]
+outputs/result.json
+outputs/report.md
+outputs/trace.txt

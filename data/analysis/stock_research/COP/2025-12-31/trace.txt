@@ -1,0 +1,56 @@
+stock-research trace
+task: COP / ConocoPhillips
+period: 2025-12-31 annual
+generated_at: 2026-08-05T06:02:12+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- No COP raw filing, annual facts package, normalized facts, or prior research result existed under stock_report.
+- Initialized outputs/result.json with protocol CLI from config/input.json.
+
+3. Primary sources used
+- SEC filing index, accession 0001163165-26-000009, filed 2026-02-17:
+  https://www.sec.gov/Archives/edgar/data/1163165/0001163165-26-000009-index.htm
+- ConocoPhillips 2025 Annual Report / Form 10-K:
+  https://static.conocophillips.com/files/resources/2025-conocophillips-annual-report.pdf
+- ConocoPhillips FY2025 results and 2026 guidance:
+  https://www.conocophillips.com/news-media/story/conocophillips-reports-fourth-quarter-and-full-year-2025-results-announces-2026-guidance-and-quarterly-dividend/
+- ConocoPhillips dividend history:
+  https://www.conocophillips.com/investor-relations/stock-information/dividend-history/
+- Federal Reserve H.10, 2025-12-31 CNY per USD = 7.1875:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Market cap and PE: config/input.json, source labeled Yahoo Finance yfinance.
+
+4. Model decision
+- statement_model = ordinary_operating.
+- owner_earnback_applicability = applicable.
+- Rationale: global upstream E&P operating company; no customer-fund or special financial balance-sheet model. Oil and gas PP&E, reserves, and ARO are treated as operating assets/obligations, not detachable cash.
+
+5. Translation and derived metrics
+- All filing USD amounts translated at 7.1875 CNY/USD for protocol consistency.
+- Gross-profit proxy = sales and other operating revenue 58,944 - purchased commodities 22,325 - production and operating expense 10,331 = USD 26,288 million.
+- Gross-margin proxy = 26,288 / 58,944 = 44.5983%.
+- Net margin = 7,988 / 58,944 = 13.5518%.
+- Operating free cash flow = CFO 19,796 - capex and investments 12,553 = USD 7,243 million.
+- Discounted sustainable cash profit = FCF x 85% = USD 6,156.55 million = CNY 44,250,203,125.
+- Discounted detachable net cash = cash 6,497 x100% + short-term investments 484 x90% + disclosed long-term debt securities 1,100 x70% - total debt 23,444 x100% = USD -15,741.4 million = CNY -113,141,312,500.
+- Operating business price = market cap - discounted net cash = CNY 1,103,613,190,101.625.
+- Owner earnback = operating business price / discounted cash profit = 24.9403 years.
+- Market cap / discounted cash profit = 22.3834 years.
+- Forecast dividend = 2025 year-end shares 1,225,168,096 x annualized USD 3.36 x 7.1875 = CNY 29,587,809,518.4; yield = 2.9872%.
+
+6. Judgment flags
+- 15% cash-profit haircut is an analyst judgment, not company guidance.
+- Gross margin is a defined proxy because COP does not report GAAP gross profit.
+- No project/reserve-level DCF was performed.
+- Market snapshot was retained exactly as supplied; underlying yfinance price/share/FX components were unavailable.
+
+7. Protocol operations
+- result initialized via: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- fields populated via protocol set commands; complex result object was not handwritten from scratch.
+- protocol validation status: ok; errors: [].

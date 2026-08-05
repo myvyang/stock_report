@@ -1,0 +1,59 @@
+stock-research trace
+company: 01252.HK / China Tianrui Group Cement Company Limited
+requested_period: 2025-12-31 annual
+generated_for_input_at: 2026-08-03T17:21:36+08:00
+
+1. Read skill and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+   - No raw filing, annual facts package, normalized facts, or prior stock-research result existed for 01252.HK / 2025-12-31.
+   - Public first-party disclosures were therefore required.
+
+3. Sources retrieved / checked
+   - HKEX 2025 interim results, released 2025-08-29:
+     https://www1.hkexnews.hk/listedco/listconews/sehk/2025/0829/2025082903310.pdf
+     Used for company identity, business model, 2025H1 income statement, 2025-06-30 balance sheet, capex, dividend, debt, pledges and guarantees.
+   - HKEX 2024 annual report, released 2025-08-01:
+     https://www.hkexnews.hk/listedco/listconews/sehk/2025/0801/2025080103413.pdf
+     Used for audited historical comparison, qualified audit opinion and 2024 dividend history.
+   - HKEX supplemental delay announcement, released 2026-06-23:
+     https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0623/2026062301147.pdf
+     Used to establish that 2025 annual results remained unpublished and trading remained suspended.
+   - Tencent qt.gtimg.cn snapshot supplied in config/input.json:
+     Market cap CNY 636,613,400.3168344; PE TTM 2.45; timestamp 2026/07/31 16:08:47.
+
+4. Model decision
+   - Input hint financial_brokerage rejected.
+   - Filing states principal activities are manufacture and sale of cement, clinker and limestone aggregate.
+   - Model set to ordinary_operating; owner earnback framework is applicable in principle.
+
+5. Period handling
+   - Requested 2025 annual report was unavailable as of the latest issuer announcement checked.
+   - Result is deliberately partial.
+   - Income statement and balance sheet fields use 2025H1 / 2025-06-30 unaudited numbers and are explicitly limited as such.
+   - Operating cash flow, free cash flow, 2025 year-end balances and ordinary owner-earnback metrics remain null.
+
+6. Calculations (CNY absolute yuan)
+   - total assets = 11,056,489,000 non-current + 25,294,884,000 current = 36,351,373,000
+   - total liabilities = 17,404,656,000 current + 2,863,710,000 non-current = 20,268,366,000
+   - gross margin = 679,071,000 / 2,962,658,000 = 0.2292114136
+   - net margin = 73,903,000 parent profit / 2,962,658,000 revenue = 0.0249448299
+   - cash and pledged balances = 467,664,000 + 2,775,882,000 + 7,136,000 = 3,250,682,000
+   - production/mining assets = 7,693,454,000 PPE + 818,809,000 ROU assets + 1,542,370,000 mining rights = 10,054,633,000
+   - borrowings and financing-like liabilities = 8,828,858,000 current borrowings + 2,174,748,000 non-current borrowings + 800,000,000 associate loan + 955,368,000 other financial liabilities = 12,758,974,000
+   - forecast dividend = 0, based on nil 2024 and nil 2025H1 declarations; this is a baseline assumption, not issuer guidance.
+
+7. Protocol use
+   - Initialized outputs/result.json with:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Populated fields with protocol set/append commands; no complex JSON object was handwritten from scratch.
+   - Final protocol validation result recorded after report creation.
+
+8. Validation
+   - Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Result: status=ok, errors=[]
+   - JSON syntax also checked with python3 -m json.tool.

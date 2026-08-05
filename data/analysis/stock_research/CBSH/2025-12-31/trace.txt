@@ -1,0 +1,84 @@
+Stock research trace: CBSH / 2025-12-31
+Generated for task input created_at 2026-08-04T22:52:42+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because no local annual facts package was present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Searched stock_report/data/analysis/annual_review/CBSH/2025-12-31,
+  stock_report/data/raw/filings/CBSH/2025-12-31,
+  stock_report/data/normalized/facts/CBSH/2025-12-31, and
+  stock_report/data/analysis/stock_research/CBSH/2025-12-31.
+- No reusable CBSH filing, fact pack, or historical stock-research output existed in the workspace.
+
+3. Primary sources retrieved and used
+- SEC 2025 Form 10-K, accession 0000022356-26-000069, filed 2026-02-24:
+  https://www.sec.gov/Archives/edgar/data/22356/000002235626000069/cbsh-20251231.htm
+- Commerce Bancshares dividend declaration, dated 2026-02-06:
+  https://investor.commercebank.com/news-info/financial-news-releases/press-release/2026/Commerce-Bancshares-Inc--Declares-Cash-Dividend-on-Common-Stock/default.aspx
+- 2026-07-01 CFETS central parity (PBOC-authorized; Guangdong Tax Service repost):
+  https://guangdong.chinatax.gov.cn/gdsw/lvxx/2026-07/01/content_ba81c8e3923f4642920eee26c09b592e.shtml
+- Market capitalization and PE TTM were reused exactly from config/input.json; underlying source named there is Yahoo Finance yfinance.
+
+4. Model override
+- Input hint: ordinary_operating / applicable.
+- Filing fact: Commerce Bancshares is a bank holding company; customer deposits fund loans, securities, and liquidity assets.
+- Final model: financial_bank / requires_special_model.
+- Consequence: all ordinary owner-earnback values remain null, including discounted net cash, cash profit, operating business price, owner earnback years, and market-cap-to-cash-profit.
+
+5. Currency conversion
+- Protocol requires absolute CNY yuan.
+- FX used for all USD filing and dividend values: USD/CNY 6.8067.
+- Source date is 2026-07-01, not the market-cap date; this is explicitly recorded as a limitation.
+- Conversion: CNY amount = reported USD amount × 6.8067.
+
+6. Key audited 2025 inputs (USD)
+- Total assets: 32,915,089,000
+- Total liabilities: 29,100,317,000
+- Total equity: 3,814,772,000
+- Parent equity: 3,791,371,000
+- Net loans: 17,591,795,000
+- Investment securities: 9,423,406,000
+- Deposits: 25,639,576,000
+- Net interest income: 1,111,858,000
+- Non-interest income: 652,281,000
+- Net income: 570,699,000
+- Parent net income: 566,251,000
+- Common dividends paid: 146,596,000
+- Treasury stock purchases (cash-flow statement): 207,567,000
+
+7. Special bank metrics
+- NIM, FTE: 3.63%
+- ROAA: 1.79%
+- ROACE: 15.76%
+- Efficiency ratio: 55.47%
+- Loans/deposits: 69.80%
+- Nonperforming assets/loans: 0.10%
+- Net charge-offs/average loans: 0.23%
+- Tier 1 common risk-based capital ratio: 17.34%
+- Total risk-based capital ratio: 18.16%
+- Tier 1 leverage ratio: 12.65%
+
+8. Dividend forecast calculation
+- Declared quarterly dividend: USD 0.275/share.
+- Annualized rate: USD 1.10/share.
+- Shares outstanding at 2026-02-20: 146,879,273.
+- Forecast USD cash dividend: 0.275 × 4 × 146,879,273 = 161,567,200.30.
+- Forecast CNY cash dividend: 161,567,200.30 × 6.8067 = 1,099,739,462.28.
+- Forecast yield: 1,099,739,462.28 / 57,551,029,017.92578 = 1.9108945%.
+- This is an annualized run-rate estimate, not a board commitment for four future quarters.
+
+9. Comparability limitation
+- FineMark acquisition closed 2026-01-01, after the 2025 balance sheet date.
+- The 2026-08-03 market capitalization reflects post-acquisition shares and expectations.
+- Therefore the 2025 financial statements and valuation snapshot are not on an identical perimeter; no mechanically recomputed PE was used.
+
+10. JSON population and validation
+- Populated the initialized skeleton exclusively through protocol `set` and `append` commands.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report/trace final audit: status=ok, errors=[].

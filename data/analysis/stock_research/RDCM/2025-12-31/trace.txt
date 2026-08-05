@@ -1,0 +1,59 @@
+RDCM stock research trace
+period: 2025-12-31
+generated for task date: 2026-08-04 Asia/Shanghai
+
+1. Read protocol and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Initialized structured result with protocol CLI
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse audit
+- No RDCM raw filing, annual facts, normalized facts, or prior stock-research result existed in the workspace.
+- Research therefore used the official 2025 annual filing and company materials directly.
+
+4. Primary evidence consulted
+- SEC Form 20-F, accession 0001213900-26-036862, filed 2026-03-31, period 2025-12-31:
+  https://www.sec.gov/Archives/edgar/data/1016838/000121390026036862/ea0282925-20f_radcom.htm
+  Used Items 3-5, 8 and 2025 audited financial statements/notes, especially F-6 to F-12 and Notes 2 and 13.
+- RADCOM FY2025 results release, 2026-02-11:
+  https://radcom.com/latest-news/radcom-delivers-17-2-full-year-revenue-growth-record-revenue-and-operating-margins-in-2025/
+- SAFE RMB central parity archive (underlying source: China Foreign Exchange Trade System):
+  https://www.safe.gov.cn/safe/rmbhlzjj/
+  Applied 2025-12-31 USD/CNY central parity 7.0288.
+- Market snapshot was supplied by config/input.json: Yahoo Finance yfinance, market cap date 2026-08-03.
+
+5. Model determination
+- Confirmed ordinary_operating / applicable.
+- Basis: cloud-native telecom assurance software and services; no customer deposits, insurance reserves, regulated project cash, concession assets, development inventory, or other special-model balance-sheet structure.
+
+6. Core audited USD facts used
+- Total assets 144.974m; liabilities 30.869m; equity attributable to parent 114.105m; minority interest nil.
+- Revenue 71.494m; cost of revenue 17.193m; gross profit 54.301m; operating income 8.303m; net income attributable to parent 11.991m.
+- Operating cash flow 14.607m; capex 0.384m; operating free cash flow 14.223m; financing cash flow 0.335m; dividends/buybacks nil.
+- Cash 30.486m; short-term deposits 79.437m; trade receivables 20.245m; lease liabilities 3.234m; accrued severance 4.790m; severance fund 3.431m.
+
+7. Owner earnback assumptions
+- Cash/deposits haircut: 90% of USD 109.923m.
+- Deducted all lease liabilities and net severance obligation: USD 4.593m.
+- Discounted detachable net cash: USD 94.3377m = CNY 663,080,825.76.
+- Sustainable cash profit starts from USD 14.223m FCF, excludes USD 4.283m financial income tied to detachable cash, then normalizes working-capital timing and charges recurring share compensation as owner dilution. Final conservative amount: USD 7.2m = CNY 50,607,360.
+- Market cap CNY 1,156,613,810.8940277; operating business price CNY 493,532,985.1340277; earnback 9.7521978055 years; market cap/cash profit 22.8546561388.
+- These are analyst assumptions, not management guidance or a forecast of an actual cash distribution.
+
+8. Dividend forecast
+- Forecast cash dividend and yield set to zero.
+- Basis: 20-F Item 8.A says the company has never declared or paid cash dividends and does not expect to do so in the foreseeable future.
+
+9. Protocol writes and validation
+- Complex result was not handwritten from scratch. Skeleton was initialized with protocol CLI, and result fields/lists were populated using protocol set commands.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].
+
+10. Data limitations
+- A single period-end FX rate is used for all USD statement translations to ensure deterministic CNY comparability; it is not the historical average transaction rate.
+- Market cap and PE are input-supplied yfinance figures and were not independently exchange-verified.
+- No 2025 annual facts package was available locally; all core filing facts were re-extracted from the SEC filing.

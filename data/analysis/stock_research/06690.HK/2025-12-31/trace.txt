@@ -1,0 +1,61 @@
+stock-research trace
+company: 06690.HK HAIER SMARTHOME
+period: 2025-12-31 annual
+generated context date: 2026-08-04 Asia/Shanghai
+
+1. Read instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- config/input.json exists.
+- No annual facts package, normalized facts, prior stock-research result, or filing metadata existed for 06690.HK/2025-12-31.
+- Downloaded official HKEX annual report to stock_report/data/raw/filings/06690.HK/2025-12-31/annual-report-2025.pdf.
+- Official source URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042702192.pdf
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initialization copied the input analysis_model_hint (financial_brokerage), which was treated only as a hint.
+
+4. Model verification and override
+- Annual report pages 67-70 and 163 show revenue from household appliances and ordinary product sales economics.
+- Balance sheet pages 165-166 shows inventory, trade receivables/payables, PPE, borrowings, cash, goodwill, and normal operating liabilities.
+- No broker customer funds, proprietary trading balance-sheet model, or securities repo funding dominates the statements.
+- Set analysis_model.statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+5. Core extracted facts (RMB million in annual report; stored as absolute RMB yuan)
+- Revenue 302,329; cost of sales 223,374; gross profit 78,955.
+- Profit for year 20,163; parent net profit 19,553; adjusted operating profit 20,504.
+- Total assets 295,795; total liabilities 169,818; total equity 125,977; parent equity 118,698; NCI 7,279.
+- Operating cash flow 26,003; purchase of non-current assets 8,851; financing cash flow -17,671.
+- Cash and equivalents 46,268; short-term wealth management products 1,486; interest-bearing borrowings 36,382.
+- Inventory 46,847; trade and bills receivables 33,548; PPE 45,708; goodwill 27,300.
+- Sources: annual report pp.14, 67-75, 80, 163-171, 246-247, 269-270, 276-277.
+
+6. Calculations
+- gross_margin = 78,955 / 302,329 = 0.2611558931.
+- net_margin = 19,553 / 302,329 = 0.0646745764.
+- operating_free_cash_flow = 26,003 - 8,851 = 17,152 million.
+- discounted detachable net cash = 46,268*90% + 1,486*80% - 36,382 = 6,448 million.
+- discounted sustainable cash profit = 17,152*90% = 15,436.8 million.
+- operating business price = 174,420,965,213.75476 - 6,448,000,000 = 167,972,965,213.75476.
+- owner earnback years = 167,972,965,213.75476 / 15,436,800,000 = 10.8813332565.
+- market cap / cash profit = 174,420,965,213.75476 / 15,436,800,000 = 11.2990364074.
+- forecast 2026 dividend = 19,553 million * 58% = 11,340.74 million.
+- forecast dividend yield = 11,340,740,000 / 174,420,965,213.75476 = 0.0650193627.
+
+7. Judgment boundaries
+- Cash discount reflects global working-capital needs and currency dispersion.
+- Short-term wealth management products discounted more heavily than cash.
+- Borrowings deducted at 100%.
+- Inventories, receivables, associates, long-term amortized-cost financial assets, equity investments, goodwill, and intangibles excluded from detachable cash.
+- Lease liabilities treated as matched operating obligations, not separately deducted from the cash pool.
+- Cash profit applies a 10% sustainability haircut to single-year operating FCF.
+- Dividend forecast assumes flat profit and applies the announced minimum 2026 payout ratio; it is not a declared dividend.
+
+8. Protocol population and validation
+- Populated outputs/result.json only after protocol initialization, using repeated protocol `set` commands.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before final file review: status=ok, errors=[].

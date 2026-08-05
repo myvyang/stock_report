@@ -1,0 +1,56 @@
+Stock research trace — NAGE — period 2025-12-31
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Searched the paths supplied in config/input.json.
+- No cached raw filing, annual facts, normalized facts, or prior stock research result existed in the workspace.
+- Research therefore used primary public filings and official company materials.
+
+3. Primary sources
+- SEC Form 10-K for fiscal year ended 2025-12-31, filed 2026-03-04, accession 0001386570-26-000013:
+  https://www.sec.gov/Archives/edgar/data/1386570/000138657026000013/cdxc-20251231.htm
+- Niagen Bioscience FY2025 earnings release dated 2026-03-04:
+  https://investors.niagenbioscience.com/news/news-details/2026/Niagen-Bioscience-Reports-30-Year-Over-Year-Net-Sales-Increase-to-129-4-million-103-Net-Income-Increase-to-17-4-million-or-0-22-Basic-EPS-in-2025/
+- USD/CNY central parity for 2025-12-31: 7.0288, as authorized by China Foreign Exchange Trade System and reproduced by China Economic Net:
+  https://www.ce.cn/xwzx/gnsz/gdxw/202512/t20251231_2676993.shtml
+- Market cap, date and PE TTM were reused exactly from config/input.json (Yahoo Finance yfinance snapshot).
+
+4. Model decision
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: revenue comes from consumer products and proprietary ingredients; the balance sheet contains ordinary cash, receivables, inventory and operating liabilities; no borrowings were outstanding. No bank, insurance, real-estate, construction, concession, or investment-holding characteristics were found.
+
+5. Currency conversion
+- All USD filing amounts were multiplied by 7.0288 and written as absolute CNY yuan.
+- The same period-end rate was used for balance-sheet, income-statement and cash-flow values for deterministic comparability.
+- Limitation recorded: flow statements were not translated at an annual average rate.
+
+6. Core calculations
+- Gross margin = 83.189 / 129.423 = 0.6427682869.
+- Net margin = 17.382 / 129.423 = 0.1343037945.
+- Operating free cash flow = (13.504 - 0.292) million USD = CNY 92,864,505.60.
+- Detachable net cash before haircut = (64.788 - 0.152 restricted cash - 2.817 lease obligations - 5.465 deferred patent consideration) million USD = CNY 396,100,995.20.
+- Discounted detachable net cash = CNY 396,100,995.20 * 0.90 = CNY 356,490,895.68.
+- Discounted sustainable cash profit = CNY 92,864,505.60 * 0.80 = CNY 74,291,604.48.
+- Operating business price = CNY 1,827,295,817.8134155 - CNY 356,490,895.68 = CNY 1,470,804,922.1334155.
+- Owner earnback years = CNY 1,470,804,922.1334155 / CNY 74,291,604.48 = 19.7977272456.
+- Market cap / discounted cash profit = 24.5962626679.
+- Forecast cash dividend = 0; forecast yield = 0, based on no dividend history and explicit 10-K statement that cash dividends are not anticipated in the foreseeable future.
+
+7. Judgment separation
+- Facts: filed financial figures, segment figures, cash balance, no borrowings, dividend history, supplier concentration, regulatory disclosures.
+- Inference: ordinary operating model is applicable; consumer products and ingredients supply substantially all gross profit; inventory growth reduced cash conversion.
+- Subjective assumptions: 10% net-cash haircut and 20% sustainable-cash-profit haircut. Neither is company guidance.
+
+8. Protocol population and validation
+- Populated scalar fields with repeated protocol `set` commands.
+- Populated asset, liability, cash breakdown, profit adjustment, dividend history, risks, and evidence entries with protocol `append` commands.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+

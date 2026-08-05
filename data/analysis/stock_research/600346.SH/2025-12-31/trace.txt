@@ -1,0 +1,70 @@
+stock-research trace
+company: 恒力石化 (600346.SH)
+period: 2025-12-31 annual
+generated_for_input: 2026-07-31T23:59:33+08:00
+
+1. Required instructions read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Protocol initialization
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+- No existing annual facts package, normalized facts, raw filing metadata, or prior stock-research output for 600346.SH/2025-12-31 was present in the workspace or supplied sync location.
+- Public filing retrieval was therefore required.
+
+4. Primary sources
+- 恒力石化股份有限公司2025年年度报告, disclosed 2026-04-15.
+  Public copy: https://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESH_STOCK/2026/2026-4/2026-04-15/12087185.PDF
+  Local cache: stock_report/data/raw/filings/600346.SH/2025-12-31/annual_report_2025.pdf
+  Audit opinion: standard unqualified opinion, report dated 2026-04-13.
+- 恒力石化关于重要子公司被美国财政部列入SDN清单的公告, announcement 2026-023, disclosed 2026-04-27.
+  https://static.cninfo.com.cn/finalpage/2026-04-27/1225198043.PDF
+- 恒力石化2025年年度权益分派实施公告, announcement 2026-026; confirms shareholder approval on 2026-05-08.
+- Market snapshot was reused exactly from config/input.json: Tencent qt.gtimg.cn, market cap CNY 117,483,000,000, timestamp 20260731114326, PE TTM 13.15.
+
+5. Core extraction (CNY yuan)
+- revenue 200,986,035,474.16
+- cost_of_sales 174,568,467,326.08
+- gross_profit 26,417,568,148.08
+- operating_profit 9,307,569,178.39
+- parent_net_profit 7,074,582,387.53
+- total_assets 262,258,989,534.38
+- total_liabilities 195,467,718,334.42
+- total_equity 66,791,271,199.96
+- parent_equity 66,773,313,601.27
+- operating_cash_flow 31,121,788,543.43
+- capital_expenditure 7,111,242,107.71
+- operating_free_cash_flow 24,010,546,435.72
+
+6. Owner earnback judgments
+- Cash asset base uses cash and cash equivalents (23,117,469,543.17), not full monetary funds (29,452,553,398.05), to exclude restricted/non-equivalent balances.
+- Trading financial assets 1,738,501,539.93 receive a 20% haircut.
+- Financing debt includes short-term borrowings, current maturities, long-term borrowings, bonds payable, lease liabilities, and long-term payables: 153,095,892,220.47.
+- Discounted detachable net cash = 23,117,469,543.17 + 1,738,501,539.93 * 0.8 - 153,095,892,220.47 = -128,587,621,445.36.
+- 2024 operating free cash flow = 22,732,565,255.93 - 21,814,133,827.51 = 918,431,428.42.
+- Two-year average operating free cash flow is approximately 12.465 billion. A further approximately 20% prudence haircut for cycle, customer-margin-deposit effects, and maintenance-capex uncertainty produces a rounded sustainable cash profit estimate of 10.0 billion.
+- Operating business price = market cap - discounted detachable net cash = 246,070,621,445.36.
+- Owner earnback years = 246,070,621,445.36 / 10,000,000,000 = 24.6071.
+- Market cap / cash profit = 11.7483.
+
+7. Dividend basis
+- 2025 attributable dividend: CNY 2,604,466,920.82, including CNY 563,127,982.88 interim dividend already paid and CNY 2,041,338,937.94 final dividend.
+- Forecast yield uses this amount as a baseline scenario: 2,604,466,920.82 / 117,483,000,000 = 2.2169%.
+
+8. Result construction
+- outputs/result.json was initialized by the protocol CLI.
+- Fields were populated through repeated protocol `set` operations; the complex JSON result was not handwritten from scratch.
+
+9. Validation
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Expected final status: ok, errors: []
+
+10. Known limitations
+- No pre-existing normalized 2025 facts package was available; extraction used the public annual-report text and was manually cross-checked against report tables.
+- Sustainable cash profit is an analyst estimate based on only two annual cash-flow observations.
+- The post-balance-sheet SDN event cannot yet be quantified from the 2025 statements.
+- No files were copied to /root/aicode sync targets because the requested deliverables were explicitly outputs/result.json, outputs/report.md, and outputs/trace.txt.

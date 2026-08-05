@@ -1,0 +1,67 @@
+stock-research trace
+company=000049.SZ 德赛电池
+period=2025-12-31
+generated_at=2026-08-01T02:05:26+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields with protocol set/append commands; no complex JSON object was handwritten from scratch.
+5. Validated result with protocol validate; status=ok, errors=[].
+
+[reuse check]
+- Checked configured annual facts, normalized facts, prior stock research, and raw filing paths.
+- No existing 2025 annual facts or prior research files were present, so official filing retrieval was necessary.
+
+[primary sources]
+1. Shenzhen Stock Exchange official filing: 德赛电池2025年年度报告全文, published 2026-04-23.
+   https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-23/262ee139-e059-4704-8501-654892e27e40.PDF
+   Local copy: stock_report/data/raw/filings/000049.SZ/2025-12-31/annual_report.pdf
+2. Shenzhen Stock Exchange official filing: 关于2025年度利润分配预案的公告, announcement 2026-005.
+   https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-23/5d198956-3684-4cbf-96ef-2f1691acd065.PDF
+3. Valuation snapshot supplied by config/input.json: Tencent qt.gtimg.cn, timestamp 20260731114306.
+
+[model classification]
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Basis: company manufactures and sells battery management systems, pack integration, energy-storage cells/systems, and related products. Cash, working capital, factories, equipment, and debt have ordinary manufacturing-company economic meanings.
+
+[key extracted facts, CNY]
+- total_assets=16,894,127,397.34
+- total_liabilities=10,235,701,048.64
+- total_equity=6,658,426,348.70
+- parent_equity=6,726,381,525.47
+- minority_interest=-67,955,176.77
+- revenue=22,399,427,302.94
+- cost_of_sales=20,379,412,302.96
+- gross_profit=2,020,014,999.98
+- parent_net_profit=292,270,104.15
+- operating_cash_flow=1,226,211,658.15
+- capital_expenditure=998,760,587.23
+- operating_free_cash_flow=227,451,070.92
+- cash=1,489,532,298.89; restricted_cash=103,818,018.83
+- trading_financial_assets=1,295,776,502.56
+- interest_bearing_debt=4,057,348,684.92
+
+[owner earnback calculation]
+- available cash=(1,489,532,298.89-103,818,018.83)=1,385,714,280.06; 90%=1,247,142,852.054
+- trading financial assets=1,295,776,502.56; 90%=1,166,198,852.304
+- other equity instruments + other non-current financial assets=180,791,947.80; 50%=90,395,973.90
+- long-term equity investment excluded as operating-related investment.
+- interest-bearing debt deducted at 100%=-4,057,348,684.92
+- discounted detachable net cash=-1,553,611,006.662
+- operating business price=9,416,000,000-(-1,553,611,006.662)=10,969,611,006.662
+- sustainable cash profit proxy=1,226,211,658.15-998,760,587.23=227,451,070.92
+- owner earnback years=10,969,611,006.662/227,451,070.92=48.2284
+- market cap/cash profit=9,416,000,000/227,451,070.92=41.3979
+
+[dividend]
+- 2025 proposal: 0.23 yuan/share x 384,638,534 shares=88,466,862.82 yuan.
+- forecast dividend yield=88,466,862.82/9,416,000,000=0.0093953763.
+
+[limitations]
+- Market-cap date (2026-07-31) differs from fiscal year-end (2025-12-31), as specified by task input.
+- Filing does not split maintenance and growth capex; all capex is deducted, making cash-profit estimate conservative.
+- 2025 operating cash flow benefited from collection of peak-season receivables and may not represent a steady run rate.
+- 2025 dividend was a board proposal at filing date.

@@ -1,0 +1,74 @@
+stock-research trace
+company: 中国中免 (601888.SH)
+period: 2025-12-31 annual
+research date: 2026-07-31 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read .agents/skills/stock-research/references/result-contract.md completely.
+- Read .agents/skills/stock-research/references/report-contract.md completely.
+- Read .agents/skills/stock-research/references/data-reuse.md completely because the skill requires reuse checks.
+
+2. Reuse audit
+- Checked stock_report/data/raw/filings/601888.SH/2025-12-31: absent.
+- Checked stock_report/data/analysis/annual_review/601888.SH/2025-12-31: absent.
+- Checked stock_report/data/normalized/facts/601888.SH/2025-12-31: absent.
+- Checked stock_report/data/analysis/stock_research/601888.SH/2025-12-31: absent.
+- No annual fact pack or prior research result was available, so official disclosure research was required.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: stock-research-result-v1 skeleton created from task input.
+
+4. Primary sources
+- China Tourism Group Duty Free Corporation Limited 2025 Annual Report, disclosed 2026-03-31 on SSE.
+  SSE official URL: https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-03-31/601888_20260331_WYR6.pdf
+  Company parent mirror used for text extraction because the SSE endpoint returned an anti-bot challenge to curl:
+  https://www.ctg.cn/2026-05-14/7d91ab85-fddc-439e-be4c-0f1e0695a2851778746032064.pdf
+- 2025 annual profit distribution plan and 2026 interim dividend plan announcement, disclosed 2026-03-31 on SSE.
+  SSE official URL identified from disclosure index: https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-03-31/601888_20260331_S6BO.pdf
+- Market-cap snapshot supplied by config/input.json: Tencent qt.gtimg.cn, 2026-07-31 11:43:28, market cap CNY 120,076,000,000, PE TTM 29.34.
+
+5. Annual-report evidence locations
+- Business model and industry: annual report pages 10-14.
+- Revenue, product and regional mix: annual report pages 15-16 and note page 147.
+- Balance sheet: annual report pages 69-71.
+- Income statement: annual report pages 73-75.
+- Cash flow statement: annual report pages 76-78.
+- Cash: note page 107 and cash-flow note pages 155-156.
+- Inventory: note pages 119-120; audit key matter pages 65-66.
+- Restricted assets and debt: note pages 136 onward; financing-liability movement note page 154.
+- Dividend plan: annual report important notice and profit-distribution section.
+
+6. Model decision
+- statement_model = ordinary_operating.
+- owner_earnback_applicability = applicable.
+- Reason: the company earns from ordinary tourism retail using licenses, purchasing, inventory and stores. It does not contain customer deposits, insurance reserves, regulated presale funds or comparable special-model balance-sheet items.
+- Special caution: inventory is required operating capital; overseas and finance-company cash, construction needs and store leases limit immediate cash detachability.
+
+7. Formula audit
+- Gross profit = 53,693,579,201.52 - 36,108,717,474.33 = 17,584,861,727.19.
+- Gross margin = 17,584,861,727.19 / 53,693,579,201.52 = 0.32750399561168.
+- Net margin = 3,586,177,592.36 / 53,693,579,201.52 = 0.06678969153649716.
+- Operating free cash flow = 6,058,560,224.26 - 1,273,061,670.55 = 4,785,498,553.71.
+- Discounted cash = 33,781,245,387.60 * 0.80 = 27,024,996,310.08.
+- Discounted other current assets = 4,368,871,281.04 * 0.50 = 2,184,435,640.52.
+- Discounted detachable net cash = 27,024,996,310.08 + 2,184,435,640.52 - 3,505,279,620.94 - 1,672,711,572.74 - 5,000,000,000 = 19,031,440,756.92.
+- Discounted sustainable cash profit = 3,586,177,592.36 - 386,177,592.36 = 3,200,000,000.00.
+- Operating business price = 120,076,000,000 - 19,031,440,756.92 = 101,044,559,243.08.
+- Owner earnback years = 101,044,559,243.08 / 3,200,000,000 = 31.5764247634625.
+- Market cap / cash profit = 120,076,000,000 / 3,200,000,000 = 37.52375.
+- Forecast dividend = 517,214,761.00 + 935,008,489.80 = 1,452,223,250.80.
+- Forecast dividend yield = 1,452,223,250.80 / 120,076,000,000 = 0.012094200762850194.
+
+8. Judgment audit
+- 80% cash recognition reflects overseas cash, finance-company deposits and operating liquidity needs.
+- 50% recognition of other current assets reflects incomplete maturity/detachability detail despite the annual report identifying increased debt investments.
+- CNY 5.0bn additional operating buffer is a conservative research assumption for procurement, taxes, deposits and construction volatility.
+- Sustainable cash profit uses parent net profit rather than headline FCF and applies a CNY 386.18m resilience discount because revenue, profit and OCF declined and asset impairment remained material. Inventory release was not extrapolated.
+- These assumptions are judgments, not company guidance, and are disclosed in result.json and report.md.
+
+9. Protocol population and validation
+- Populated outputs/result.json exclusively through protocol `set` commands after protocol initialization; the complex result object was not handwritten from scratch.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report finalization: status ok, errors [].

@@ -1,0 +1,64 @@
+stock-research trace
+task: L / Loews Corporation / FY ended 2025-12-31
+generated_at: 2026-08-04T22:13:13+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md (107 lines, complete)
+- .agents/skills/stock-research/references/report-contract.md (69 lines, complete)
+- .agents/skills/stock-research/references/data-reuse.md (required by skill workflow)
+
+2. Initialized result through protocol CLI
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+- No pre-existing annual facts, normalized facts, filing metadata, or prior stock-research output existed for L/2025-12-31.
+- Downloaded official SEC inline-XBRL filing to stock_report/data/raw/filings/L/2025-12-31/l-20251231.htm.
+- Primary filing: https://www.sec.gov/Archives/edgar/data/60086/000006008626000008/l-20251231.htm
+- SEC accession: 0000060086-26-000008, filed 2026-02-10.
+- SEC Companyfacts used as a cross-check for headline XBRL facts.
+
+4. Model decision
+- Input hint ordinary_operating/applicable was rejected after financial-statement review.
+- Confirmed model: platform_financial_mixed.
+- Ordinary owner earnback applicability: requires_special_model.
+- Evidence: Loews is a holding company; CNA (approximately 92% owned) contributed USD 1,173m of USD 1,667m 2025 parent net income. Consolidated investments were USD 55,376m and insurance reserves USD 47,682m.
+- Consequence: discounted net cash, discounted cash profit, operating business price, owner earnback years, and market-cap/cash-profit metrics intentionally remain null.
+
+5. Core extracted facts (USD millions)
+- Assets 86,348; liabilities 66,707; total equity 19,641; parent equity 18,686; NCI 955.
+- Revenue 18,454; pretax income 2,283; net income 1,772; parent net income 1,667.
+- Operating cash flow 3,279; PP&E purchases 579; mechanical OCF less capex 2,700.
+- Financing cash flow -513; Loews share repurchases 806; common dividends 52.
+- Investments 55,376; cash 495; receivables 10,983; PP&E 10,695.
+- Insurance reserves 47,682; short-term debt 1,052; long-term debt 8,437.
+- Segment parent net income: CNA 1,173; Boardwalk 444; Hotels 31; Corporate 19.
+- Parent cash and investments net of receivables/payables 3,900; 2025 subsidiary cash dividends received 1,500, including CNA 954 (special 497) and Boardwalk 500.
+
+6. Currency conversion
+- Protocol requires CNY absolute yuan.
+- Applied Federal Reserve H.10 2025 annual China spot exchange rate: CNY 7.1875 per USD.
+- Same rate applied to balance-sheet and flow amounts for protocol consistency; disclosed as a limitation because it is not transaction-date translation.
+- Source: Federal Reserve H.10 Data Download Program, series RXI_N.A.CH.
+
+7. Dividend forecast
+- Loews announced USD 0.0625 quarterly common dividend on 2026-05-12.
+- Annualized USD 0.25 x approximately 206.0m shares = USD 51.5m = CNY 370,156,250.
+- Forecast dividend yield = 370,156,250 / 161,083,187,555.57227 = 0.002297919824018254.
+- Repurchases excluded from dividend yield.
+
+8. Market data
+- Reused input market cap CNY 161,083,187,555.57227 as of 2026-08-03 and PE TTM 14.740788.
+- Source specified by input: Yahoo Finance yfinance.
+- Not independently re-queried; recorded in limitations.
+
+9. Result construction and validation
+- All complex result sections were populated through repeated protocol CLI `set` commands, after CLI initialization.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation response: {"status":"ok","errors":[]}
+
+10. Output files
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

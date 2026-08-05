@@ -1,0 +1,91 @@
+task=stock_research
+query=BCX
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-04T16:53:12+08:00
+
+[protocol]
+initialized=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+mutation=all result fields populated with protocol set/append commands
+validation=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[local_reuse]
+checked=stock_report/data/raw/filings/BCX/2025-12-31
+checked=stock_report/data/analysis/annual_review/BCX/2025-12-31
+checked=stock_report/data/normalized/facts/BCX/2025-12-31/annual-facts.json
+result=no filing or annual fact package existed; official sources were retrieved
+
+[identity_and_model]
+input_hint=ordinary_operating/applicable
+verified_identity=BlackRock Resources & Commodities Strategy Trust; NYSE ticker BCX; registered closed-end management investment company under the Investment Company Act of 1940; non-diversified
+selected_model=investment_holding
+owner_earnback_applicability=not_applicable
+reason=portfolio securities are the operating assets and reported earnings include realized and unrealized investment gains; ordinary detachable-cash/cash-profit formula would double count portfolio value
+
+[primary_sources]
+1=https://www.sec.gov/Archives/edgar/data/1506289/000119312526093552/d26961dncsr.htm
+  type=SEC Form N-CSR, accession 0001193125-26-093552
+  used_for=identity; accounting model; statements; portfolio; financial highlights; distributions; risks
+2=https://www.blackrock.com/us/individual/literature/annual-report/ar-retail-equity-trust.pdf
+  type=issuer annual report
+  used_for=annual-report cross-check and investment-policy change
+3=https://www.blackrock.com/us/individual/products/256576/blackrock-resources-and-commodities-strategy-trust-aggregate-fund
+  type=issuer product page
+  used_for=investment objective; 2026-07-24 NAV 12.72 USD; market price 11.79 USD; discount 7.31%
+4=https://www.blackrock.com/us/individual/literature/press-release/6-5-2026-pr-div-release.pdf
+  type=issuer distribution announcement
+  used_for=2026 July-September monthly distribution 0.0697 USD/share
+5=https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.M.CH&rel=H10
+  type=official FX series
+  used_for=2025-12 monthly average 7.0432 CNY/USD
+6=config/input.json
+  type=task input sourced from Yahoo Finance yfinance
+  used_for=market cap 6199178491.1848755 CNY as of 2026-08-03; PE TTM 4.3035717
+
+[key_usd_facts_from_2025_annual_report]
+total_assets=885667567
+total_liabilities=5651630
+net_assets=880015937
+shares_outstanding=76238090
+nav_per_share=11.54
+unaffiliated_investments=846711069
+affiliated_money_market_funds=35562807
+net_investment_income=17471400
+net_realized_gain=61532731
+net_unrealized_appreciation=135783754
+increase_in_net_assets_from_operations=214787885
+distributions_2025=64726283
+return_of_capital_2025=42509217
+share_repurchase_outflow_2025=38612680
+expense_ratio_after_waivers=1.19%
+portfolio_turnover=98%
+
+[conversion]
+structured_currency=CNY
+fx=7.0432 CNY/USD
+convention=all annual-report USD amounts converted at Federal Reserve H.10 December 2025 monthly average for consistent presentation; not transaction-date translation
+
+[calculation_checks]
+total_assets_cny=885667567*7.0432=6237933807.89
+total_liabilities_cny=5651630*7.0432=39805560.42
+equity_cny=880015937*7.0432=6198128247.48
+forecast_distribution_cny=0.0697*12*76238090*7.0432=449113440.59
+forecast_distribution_yield=449113440.59/6199178491.1848755=0.0724472511
+net_investment_income_coverage=17471400/64726283=0.26992744
+net_investment_income_plus_realized_gain_coverage=(17471400+61532731)/64726283=1.22058810
+
+[null_policy]
+gross_margin=null because an investment company has no comparable sales/gross profit
+net_margin=null because revenue denominator is not economically meaningful
+cash_flow_fields=null because the annual investment-company statements do not present operating-company cash-flow metrics with comparable meaning
+discounted_net_cash=null
+discounted_cash_profit=null
+operating_business_price=null
+owner_earnback_years=null
+market_cap_to_cash_profit=null
+reason=ordinary owner earnback is not applicable to an investment holding/closed-end fund model
+
+[quality]
+status=complete
+incomplete_reasons=[]
+limitations=FX translation convention; PE lacks ordinary-company comparability; forecast share count fixed at 2025 year-end; market cap and cited NAV/discount are not same-date

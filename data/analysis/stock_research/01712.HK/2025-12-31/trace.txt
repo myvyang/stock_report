@@ -1,0 +1,59 @@
+stock-research trace
+task: 01712.HK / annual / 2025-12-31
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- No annual facts, normalized facts, prior stock-research result, or raw filing existed in the workspace for this issuer/period.
+- Downloaded official HKEX Annual Report 2025 to stock_report/data/raw/filings/01712.HK/2025-12-31/annual-report-2025.pdf.
+- Official filing URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032600466.pdf
+
+3. Model verification
+- Input hint said financial_brokerage / requires_special_model.
+- Annual report pp.11 and 56 says the group mines and processes gold in Finland and Sweden and explores/develops Nordic gold projects.
+- No brokerage customer funds, proprietary trading book, margin financing, or repo funding exists.
+- Overrode hint to ordinary_operating / applicable, with mining-specific caveats for depletion, rehabilitation, permits, gold price and grade cycles.
+
+4. Source facts (reported in AUD'000)
+- Income statement p.90: revenue 143,763; cost of sales 57,560; gross profit 86,203; PBT 75,263; tax 15,023; parent/net profit 60,240.
+- Balance sheet p.92: assets 245,886; liabilities 63,075; equity/parent equity 182,811; cash 107,212; inventory 25,945; PPE 60,306; current tax liability 9,723; interest-bearing liabilities 340.
+- Cash flow p.94: OCF 73,460; PPE 8,091; development 2,225; capitalized exploration/evaluation 1,074; rehabilitation bond paid 29,459 and returned 2,461; financing cash flow 33,523.
+- Cash note p.138: bank/on-hand 75,379; restricted cash 31,833.
+- Auditor report p.84: rehabilitation provisions total 43,057.
+- Directors report pp.63-64: largest customer 100% of sales; no dividend paid, declared or recommended for 2025 (2024 nil).
+- Operations pp.15, 20-23: 26,922 oz produced, 25,245 oz sold, achieved gold price US$3,543/oz; revenue improvement driven by price, production, grade/recovery and toll treatment.
+
+5. Currency normalization
+- Used 2025-12-31 reference rate 1 AUD = 4.6661 CNY.
+- Source: https://www.exchange-rates.org/exchange-rate-history/aud-cny-2025
+- All structured monetary amounts are absolute CNY yuan.
+- Limitation: full-year flows use closing, not average, FX for deterministic comparability.
+
+6. Calculations
+- gross_margin = 86.203 / 143.763 = 0.599619.
+- net_margin = 60.240 / 143.763 = 0.419023.
+- capex = (8.091 + 2.225 + 1.074)m AUD = 11.390m AUD = CNY 53,146,879.
+- operating FCF = 73.460 - 11.390 = 62.070m AUD = CNY 289,624,827.
+- unrestricted cash = 75.379m AUD = CNY 351,725,952.
+- restricted cash = 31.833m AUD = CNY 148,535,961; assigned zero detachable value.
+- discounted detachable net cash = (75.379 - 0.340 - 9.723) * 50% * FX = CNY 152,385,494.
+- discounted sustainable cash profit = 62.070 * 50% * FX = CNY 144,812,414.
+- operating business price = 786,684,133 - 152,385,494 = CNY 634,298,639.
+- owner earnback years = 634,298,639 / 144,812,414 = 4.3801.
+- market cap / cash profit = 786,684,133 / 144,812,414 = 5.4324.
+- forecast dividend = 0; forecast yield = 0 based on two consecutive nil-dividend years and no new commitment.
+
+7. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields using protocol set commands; JSON was not authored from scratch.
+- Initial completed-result validation: status ok, errors [].
+
+8. Output scope
+- Required outputs: outputs/result.json, outputs/report.md, outputs/trace.txt.
+- No user evaluation was added because the task requested company research, not a user-authored evaluation.

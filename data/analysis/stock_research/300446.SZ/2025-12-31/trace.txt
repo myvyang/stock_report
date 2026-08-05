@@ -1,0 +1,59 @@
+stock-research trace
+company: 航天智造 (300446.SZ)
+period: 2025-12-31 annual
+generated_for_input: 2026-08-01T01:33:24+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+- /workspace/AGENTS.md (provided task instructions)
+
+2. Reuse check
+- config/input.json existed.
+- No raw filing, annual facts, normalized facts, or prior stock-research result existed for 300446.SZ/2025-12-31.
+- Therefore returned to official public filings rather than inventing missing facts.
+
+3. Sources retrieved and checked
+- Shenzhen Stock Exchange, 航天智造2025年年度财务报告, published 2026-03-31:
+  https://disc.static.szse.cn/disc/disk03/finalpage/2026-03-31/08ae4df5-f548-4067-a3d9-40d34453784f.PDF
+  Checked audit opinion, consolidated statements, cash restrictions, revenue breakdown, receivables, inventory impairment, debt, lease liabilities, non-recurring items, dividend proposal and post-balance-sheet events.
+- Shenzhen Stock Exchange annual report/summary disclosure, announcement 2026-008/009. Summary:
+  https://static.cninfo.com.cn/finalpage/2026-03-31/1225057080.PDF
+  Checked main business description, operating development and dividend proposal.
+- Market data was not re-fetched; reused input snapshot: Tencent qt.gtimg.cn, market cap CNY 11,591,000,000, PE TTM 13.92, timestamp 20260731114345.
+
+4. Model decision
+- statement_model = ordinary_operating.
+- owner_earnback_applicability = applicable.
+- Reason: assets and liabilities reflect manufacturing operations, receivable/inventory working capital, productive assets, supplier credit and modest borrowing; no special financial, property development, concession or investment-holding structure dominates.
+
+5. Core calculations (CNY absolute yuan in result.json)
+- gross profit = 9,003,495,927.08 - 7,129,610,921.77 = 1,873,885,005.31.
+- gross margin = 1,873,885,005.31 / 9,003,495,927.08 = 0.2081286003.
+- parent net margin = 881,085,235.55 / 9,003,495,927.08 = 0.0978603470.
+- 2025 operating FCF = 665,785,776.24 - 466,873,037.63 = 198,912,738.61.
+- discounted cash base = (2,764,363,890.09 - 531,129,489.03 restricted cash - 730,312,797.23 restricted-purpose fund balance) * 50% + 26,521,036.14 * 80%.
+- debt deducted = 80,100,383.33 loan principal/current portion + 43,622,837.82 long-term lease liability + 31,630,330.96 current lease liability.
+- discounted detachable net cash = 617,324,078.717.
+- sustainable cash profit = average(2025 CFO 665,785,776.24, 2024 CFO 1,048,730,941.25) - average(2025 capex 466,873,037.63, 2024 capex 445,458,392.41) = 401,092,643.725.
+- operating business price = 11,591,000,000 - 617,324,078.717 = 10,973,675,921.283.
+- owner earnback years = 10,973,675,921.283 / 401,092,643.725 = 27.35945446.
+- market cap / cash profit = 11,591,000,000 / 401,092,643.725 = 28.89856042.
+- forecast dividend = 845,410,111 shares * CNY 0.32 = 270,531,235.52.
+- forecast dividend yield = 270,531,235.52 / 11,591,000,000 = 0.0233397667.
+
+6. Judgment boundaries
+- 50% working-capital reserve, 80% structured-deposit recovery and two-year average FCF are analyst assumptions, separately identified from reported facts.
+- Restricted-purpose fund balance is excluded in addition to cash classified as non-cash-equivalent because it cannot be freely distributed; disclosure does not provide a full account-by-account overlap map, so this is conservative.
+- Company statements about product progress and customer relationships are treated as company-reported facts, not independently verified market share.
+- 2024 dividend history in result.json is approximate and explicitly marked; it is not used for forecast dividend or owner earnback calculations.
+
+7. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields using protocol `set` commands in populate_result.sh; the complex JSON result was not handwritten from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before final file review: status ok, errors [].

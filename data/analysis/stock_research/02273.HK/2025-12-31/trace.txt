@@ -1,0 +1,77 @@
+stock-research trace
+company: 02273.HK 固生堂控股有限公司
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md and references/report-contract.md.
+- Read references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Expected annual facts, normalized facts and prior stock-research outputs did not exist locally.
+- Downloaded official HKEX 2025 annual report to:
+  stock_report/data/raw/filings/02273.HK/2025-12-31/2025-annual-report-cn.pdf
+- Extracted text locally to the same directory as 2025-annual-report-cn.txt for field verification.
+
+3. Primary sources
+- HKEX annual results announcement, released 2026-03-31:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0331/2026033102676_c.pdf
+- HKEX 2025 annual report, released 2026-04-29:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042903572_c.pdf
+- Market-cap snapshot supplied in config/input.json:
+  Tencent qt.gtimg.cn, 2026/08/03 09:47:28.
+
+4. Model override
+- Input hint: financial_brokerage / requires_special_model.
+- Filing facts: 99.1% of revenue came from healthcare solutions; balance sheet contains clinics, goodwill, working capital, cash, bank loans and lease liabilities, with no brokerage client money, proprietary trading book or repo-financing structure.
+- Final model: ordinary_operating / applicable.
+
+5. Financial extraction (RMB)
+- Revenue 3,249,070,000; cost of sales 2,236,659,000; gross profit 1,012,411,000.
+- Net profit 352,069,000; parent net profit 352,765,000.
+- Total assets 3,992,490,000; total liabilities 1,808,101,000.
+- Total equity 2,184,389,000; parent equity 2,169,981,000; NCI 14,408,000.
+- Operating cash flow 612,424,000.
+- Cash capex = PP&E purchases 102,578,000 + intangible additions 15,877,000 = 118,455,000.
+- Operating free cash flow = 612,424,000 - 118,455,000 = 493,969,000.
+- Financing cash flow -464,457,000.
+- Dividend and buyback cash out = dividends 163,465,000 + cancellation repurchase 121,836,000 + treasury-share repurchase 310,089,000 = 595,390,000.
+
+6. Derived ratios
+- Gross margin = 1,012,411,000 / 3,249,070,000 = 0.311602.
+- Net margin = 352,765,000 / 3,249,070,000 = 0.108574.
+- Forecast/base dividend = 75,356,000 interim + 137,650,000 proposed final = 213,006,000.
+- Forecast/base dividend yield = 213,006,000 / 5,591,218,774.13094 = 0.0380965.
+
+7. Owner earnback assumptions
+- Cash equivalents 882,333,000 at 80% = 705,866,400.
+- Unrestricted time deposits 194,409,000 at 80% = 155,527,200.
+- FVTPL financial assets 66,530,000 at 50% = 33,265,000.
+- Restricted cash 31,091,000 at 0% = 0.
+- Bank loans 306,709,000 deducted at 100%.
+- Discounted detachable net cash = 607,940,600.
+- Discounted sustainable cash profit = operating FCF 493,969,000 * 80% = 395,175,200.
+- Operating business price = 5,591,218,774.13094 - 607,940,600 = 4,983,278,174.13094.
+- Owner earnback years = 4,983,278,174.13094 / 395,175,200 = 12.6103.
+- Market cap / discounted cash profit = 14.1487.
+- These discounts are research judgments, not filing facts.
+
+8. Operating evidence
+- 101 medical institutions at year-end: 86 in China and 15 in Singapore.
+- 6.008 million visits; 5.394 million accumulated customers.
+- Average spending per visit RMB541 versus RMB559 in 2024.
+- Customer return rate 66.1% versus 67.1%; member return rate 84.9% versus 85.4%.
+- Goodwill RMB1.327 billion, 33.2% of assets, primarily tied to acquired clinics.
+
+9. Protocol writes and validation
+- All JSON mutations were made with protocol `set`; result was not hand-written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status after structured population: ok, errors: [].
+
+10. Data quality
+- Marked complete under result-contract minimum fields.
+- Limitations recorded: supplied market snapshot not independently recomputed; dividend forecast is a flat-base scenario; cash/profit haircuts are judgmental; no comparable industry-wide market-share dataset obtained.

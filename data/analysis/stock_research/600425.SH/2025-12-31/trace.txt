@@ -1,0 +1,92 @@
+task: stock research 600425.SH / 2025 annual
+generated_at_input: 2026-07-31T18:44:07+08:00
+timezone: Asia/Shanghai
+
+[protocol]
+read: .agents/skills/stock-research/SKILL.md
+read: .agents/skills/stock-research/references/result-contract.md
+read: .agents/skills/stock-research/references/report-contract.md
+read: .agents/skills/stock-research/references/data-reuse.md
+init: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+mutation: outputs/result.json populated only through protocol set commands after initialization
+
+[reuse check]
+requested annual facts path absent at task start:
+  stock_report/data/analysis/annual_review/600425.SH/2025-12-31/facts.json
+requested normalized facts path absent at task start:
+  stock_report/data/normalized/facts/600425.SH/2025-12-31/annual-facts.json
+requested prior stock research result absent at task start
+decision: fetch and read the official 2025 annual filing; no prior conclusions reused
+
+[primary filing]
+title: 新疆青松建材化工集团股份有限公司2025年年度报告
+announcement_date: 2026-03-27
+official_sse_url: https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-03-27/600425_20260327_M3Y3.pdf
+cninfo_mirror_url: https://static.cninfo.com.cn/finalpage/2026-03-27/1225033474.PDF
+local_pdf: stock_report/data/raw/filings/600425.SH/2025-12-31/annual_report_2025.pdf
+local_extracted_text: stock_report/data/raw/filings/600425.SH/2025-12-31/annual_report_2025.txt
+pages: 199
+audit_opinion: standard unqualified opinion
+
+[model decision]
+statement_model: ordinary_operating
+owner_earnback_applicability: applicable
+reason: the company manufactures and directly sells cement, cement products and chemicals. Balance sheet assets are production facilities, inventory, normal receivables, cash and investments; no special financial, property-development, concession, or project-construction structure overrides the ordinary model.
+
+[reported facts: CNY]
+total_assets: 9284836054.46
+total_liabilities: 2505723114.67
+total_equity: 6779112939.79
+parent_equity: 6472492076.53
+minority_interest: 306620863.26
+revenue: 3883124943.21
+cost_of_sales: 2973383986.23
+gross_profit: 909740956.98
+operating_profit: 388816722.51
+net_profit: 292781142.23
+parent_net_profit: 276383650.50
+operating_cash_flow: 484158825.71
+capital_expenditure: 205475979.24
+financing_cash_flow: -488636309.54
+cash_and_cash_equivalents_bs: 1149704879.68
+bank_deposits: 1140476943.03
+restricted_and_guarantee_cash: 9227936.65
+short_term_borrowings: 315141838.90
+current_portion_long_term_borrowings: 417751577.56
+long_term_borrowings: 479889232.74
+forecast_cash_dividend: 160470370.70
+
+[derived formulas]
+gross_profit = revenue - cost_of_sales = 909740956.98
+gross_margin = gross_profit / revenue = 0.2342824216
+net_margin = parent_net_profit / revenue = 0.0711755593
+operating_free_cash_flow = operating_cash_flow - capital_expenditure = 278682846.47
+interest_bearing_debt = 315141838.90 + 417751577.56 + 479889232.74 = 1212782649.20
+included_detachable_cash = bank_deposits * 50% = 570238471.515
+discounted_net_cash = 570238471.515 - 1212782649.20 = -642544177.685
+discounted_cash_profit = 250000000.00
+  basis: 2025 FCF 278682846.47 and parent net profit 276383650.50 cross-check; approximately 9.5% haircut from parent earnings for cyclicality, chemical losses, inventory impairment and maintenance-capex uncertainty
+operating_business_price = market_cap - discounted_net_cash = 6194544177.685
+owner_earnback_years = operating_business_price / discounted_cash_profit = 24.77817671074
+market_cap_to_cash_profit = market_cap / discounted_cash_profit = 22.208
+forecast_dividend_yield = 160470370.70 / 5552000000 = 0.0289024436
+
+[fact / inference separation]
+facts: audited statement figures, segment revenue and margins, dividend plan, capacity and disclosed business description
+derived: margins, free cash flow, payback formulas, dividend yield
+judgment: 50% detachable-cash haircut and CNY 250m sustainable cash profit
+uncertainty: owner earnback is sensitive to cement demand/pricing, chemical profitability, maintenance capex, inventory impairment and actual required operating cash
+
+[market snapshot]
+market_cap: 5552000000.0
+pe_ttm: 18.19
+as_of: 20260731114318
+source: Tencent qt.gtimg.cn (provided in config/input.json; not independently refreshed)
+
+[output checks]
+outputs/result.json: initialized and populated with protocol CLI
+outputs/report.md: written from validated facts and explicit assumptions
+outputs/trace.txt: this trace
+final protocol validation: status ok; errors []
+JSON parse check: passed
+report and trace presence/size check: passed

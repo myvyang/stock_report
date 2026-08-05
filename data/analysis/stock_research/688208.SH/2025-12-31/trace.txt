@@ -1,0 +1,68 @@
+stock-research trace
+company: 688208.SH 道通科技
+period: 2025-12-31 annual
+generated_at: 2026-08-01 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No annual facts, normalized facts, prior stock-research result, or raw filing metadata existed under the paths supplied in config/input.json.
+- Downloaded the official 2025 annual report from the company investor-relations site:
+  https://www.auteltech.cn/u/cms/wwwcn/202603/23140549ibtn.pdf
+- Extracted text locally from the 270-page PDF for table and note inspection.
+- Used the official 2025 profit-distribution announcement:
+  https://www.auteltech.cn/u/cms/wwwcn/202603/2314053804ha.pdf
+
+3. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated all fields through repeated protocol `set` commands; no complex result object was handwritten from scratch.
+- Final validation command recorded in step 7.
+
+4. Financial extraction (CNY absolute yuan)
+- Revenue: 4,832,751,860.91
+- Cost of sales: 2,123,193,935.28
+- Gross profit: 2,709,557,925.63
+- Operating profit: 1,056,656,914.17
+- Net profit: 890,481,495.73
+- Parent net profit: 935,875,122.31
+- Total assets: 7,259,186,823.69
+- Total liabilities: 3,569,028,492.88
+- Total equity: 3,690,158,330.81
+- Parent equity: 3,870,168,751.39
+- Minority interest: -180,010,420.58
+- Operating cash flow: 595,597,662.21
+- Capital expenditure: 132,026,059.17
+- Operating free cash flow: 463,571,603.04
+
+5. Model and owner-earnback judgments
+- Confirmed ordinary_operating / applicable based on the actual revenue model and statement structure.
+- Cash and cash equivalents: 1,570,698,166.78; recognized at 75% because of global working-capital needs and overseas balances.
+- Restricted/non-cash-equivalent funds: 111,143,662.06; recognized at 0%.
+- Convertible bond liability: 1,204,602,738.43; deducted at 100%.
+- Current and long-term lease-related liabilities: 264,548,545.74; deducted at 100%.
+- Discounted detachable net cash: -291,127,659.085.
+- Sustainable cash profit: 2025 OCF less capex = 463,571,603.04. No upward normalization for inventory/receivable growth and no add-back of share-based compensation.
+- Operating business price: 19,559,127,659.085.
+- Owner earnback: 42.19224717566945 years.
+- Market cap / cash profit: 41.564237053444856 years.
+
+6. Dividend forecast
+- 2025 total cash dividends, including interim and proposed annual dividend: 716,198,627.48.
+- Used this as the next-year base-case forecast because no explicit 2026 amount guidance was identified.
+- Forecast dividend yield on market cap 19,268,000,000: 0.03717036679883745.
+- Excluded the 100,166,174.24 treasury-share repurchase from cash dividend because it was not a cancellation repurchase.
+
+7. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- See final command output in task execution; result must report successful validation before handoff.
+
+8. Known limitations
+- Market cap and PE are supplied Tencent snapshot data and were not reconstructed from exchange tick data.
+- Dividend forecast is a baseline scenario, not management guidance.
+- Sustainable cash profit uses one audited year; working-capital volatility materially affects the result.
+- Industry rankings are Frost & Sullivan figures quoted by the company annual report.

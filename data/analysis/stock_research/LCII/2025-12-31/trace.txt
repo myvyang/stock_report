@@ -1,0 +1,65 @@
+Stock research trace — LCII — period 2025-12-31
+Generated for task created 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Expected annual facts, annual review, normalized facts, raw filing metadata, and prior stock research files for LCII/2025-12-31 were absent.
+- Therefore retrieved official filings and company releases rather than substituting third-party financial statement data.
+
+3. Principal sources
+- SEC Form 10-K: https://www.sec.gov/Archives/edgar/data/763744/000076374426000011/lcii-20251231.htm
+  Filed 2026-02-26; fiscal year ended 2025-12-31.
+- FY2025 results: https://investors.lci1.com/news/news-details/2026/LCI-Industries-Reports-Fourth-Quarter-and-Full-Year-Financial-Results/default.aspx
+- Q1 2026 results: https://investors.lci1.com/news/news-details/2026/LCI-Industries-Reports-First-Quarter-Financial-Results/default.aspx
+- Federal Reserve H.10: https://www.federalreserve.gov/releases/h10/Hist/dat00_ch.htm
+  2025-12-31 USD/CNY = 6.9931 yuan per USD.
+- Merger filing: https://www.sec.gov/Archives/edgar/data/763744/000076374426000040/lcii-20260630.htm
+- Market cap and PE: config/input.json, Yahoo Finance yfinance snapshot dated 2026-08-03.
+
+4. Model decision
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Basis: engineered-component manufacturer with ordinary inventory, receivables, fixed assets, goodwill, trade liabilities, leases and corporate borrowings; no customer funds, insurance reserves, regulated project cash or concession model.
+
+5. Currency convention
+- All USD statement amounts multiplied by 6.9931 and stored as absolute CNY yuan.
+- Ratios were calculated from original USD values where applicable.
+- Limitation: income and cash-flow statements use the period-end rate rather than average rate for unified display.
+
+6. Core source figures (USD thousands unless stated)
+- Revenue 4,122,017; cost of sales 3,141,722; gross profit 980,295; operating profit 279,922; net income 188,250.
+- Assets 3,175,987; liabilities 1,815,154; equity 1,360,833; cash 222,615; total indebtedness 945,185.
+- OCF/capex/FCF: 2025 330,976 / 52,644 / 278,332; 2024 370,284 / 42,333 / 327,951; 2023 527,229 / 62,209 / 465,020.
+- 2025 dividends 114,043; repurchases 128,571; dividend per share USD 4.60.
+
+7. Formula checks
+- Gross margin = 980,295 / 4,122,017 = 0.2378192521.
+- Net margin = 188,250 / 4,122,017 = 0.0456693895.
+- Detachable net cash = (222,615 - 945,185) * 1,000 * 6.9931 = CNY -5,053,004,267.
+- Three-year FCF median = USD 327,951,000.
+- Discounted sustainable cash profit = 327,951,000 * 85% * 6.9931 = CNY 1,949,385,017.385.
+- Operating business price = 16,792,574,348.573 - (-5,053,004,267) = CNY 21,845,578,615.573.
+- Owner earnback years = 21,845,578,615.573 / 1,949,385,017.385 = 11.2063950532.
+- Market-cap/cash-profit = 16,792,574,348.573 / 1,949,385,017.385 = 8.6142933278.
+- Forecast dividend = USD 4.60 * 24,284,477 shares * 6.9931 = CNY 781,189,370.10.
+- Forecast yield = 781,189,370.10 / 16,792,574,348.573 = 0.0465199292.
+
+8. Judgment boundaries
+- Facts: reported statements, segment/customer data, dividend records, declared/paid quarterly dividend, merger agreement.
+- Inference: leading competitive position is supported by company disclosure and content-per-unit trend but is not an independently audited market-share percentage.
+- Estimate: 15% sustainability haircut, forecast dividend held flat, and all owner-earnback outputs.
+- Acquisition cash outlays are excluded from maintenance capex; this is favorable to cash profit and explicitly disclosed.
+
+9. Output procedure
+- outputs/result.json was created by protocol init and populated through protocol set/append commands, not handwritten as a complex JSON object.
+- Final validation command and result are appended below after validation.
+
+10. Final validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[]
+- JSON syntax check: jq -e . outputs/result.json passed.

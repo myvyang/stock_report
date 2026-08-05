@@ -1,0 +1,62 @@
+stock-research trace
+task_created_at=2026-08-05T01:41:00+08:00
+company=Canadian Natural Resources Limited (CNQ)
+period=2025-12-31
+
+1. Protocol
+- Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields with protocol `set` commands.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+2. Reuse check
+- No CNQ raw filing, annual facts package, normalized facts, or prior stock-research result existed in the workspace.
+- Returned to official filings and company disclosures.
+
+3. Primary sources
+- Canadian Natural 2025 Annual Report and audited consolidated statements, filed on SEC EDGAR as Form 40-F, accession 0001017413-26-000018, filed 2026-03-05; statements approved 2026-03-04.
+- Canadian Natural 2025 Annual Information Form and MD&A.
+- Canadian Natural official Dividends page and March 4, 2026 dividend approval.
+- Bank of Canada annual average exchange rates for 2025.
+- Market snapshot supplied by config/input.json: Yahoo Finance yfinance, date 2026-08-03.
+
+4. Currency conversion
+- Bank of Canada reports 1 CNY = 0.1944 CAD for 2025 annual average.
+- Derived 1 CAD = 5.1440329218107 CNY.
+- All CAD financial statement amounts were multiplied by this rate.
+- Limitation: balance-sheet values also use the annual average for protocol consistency; year-end spot conversion would differ.
+
+5. Key extracted CAD facts (CAD millions unless stated)
+- Product sales 44,167; royalties 5,405; revenue 38,762.
+- Production 9,155; blending/feedstock 8,071; transportation 2,751; DD&A 9,384.
+- Net earnings 10,820; adjusted net earnings from operations 7,444.
+- Gain on acquisitions, disposition and remeasurement 5,069 pre-tax.
+- Operating cash flow 15,106; net PP&E expenditure 6,676; net E&E expenditure 115.
+- Adjusted funds flow 15,460; net capital expenditures 6,579; abandonment expenditures 771.
+- Assets 91,830; liabilities 47,464; equity 44,366; cash 673; borrowings 16,617.
+- Shares outstanding: 2,081.578m at 2025-12-31 and 2,085.972m at 2026-03-03.
+- 2025 production 1,570,757 BOE/d, up 15% year over year.
+
+6. Analytical calculations
+- Analytical cash gross profit = revenue - production - blending/feedstock - transportation
+  = 38,762 - 9,155 - 8,071 - 2,751 = 18,785m CAD.
+- Gross margin = 18,785 / 38,762 = 48.4624%. This is not an IFRS line item and excludes DD&A.
+- Analytical operating profit = revenue less production, blending/feedstock, transportation, DD&A, administration, share compensation and ARO accretion
+  = 8,226m CAD.
+- Operating free cash flow = 15,106 - 6,676 - 115 = 8,315m CAD.
+- Detachable net cash = cash 673 - borrowings 16,617 = -15,944m CAD.
+- Pre-discount sustainable cash profit = adjusted funds flow 15,460 - net capex 6,579 - abandonment 771 = 8,110m CAD.
+- Judgmental cycle discount = 20%; discounted sustainable cash profit = 6,488m CAD = CNY 33.3745bn.
+- Operating business price = CNY market cap 671.0660bn - discounted net cash (-82.0165bn) = CNY 753.0825bn.
+- Owner earnback = 753.0825 / 33.3745 = 22.5646 years.
+- Market cap / discounted cash profit = 20.1072x.
+- Forecast dividend = CAD 0.625 x 4 x 2,085.972m shares = CAD 5,214.93m = CNY 26.8258bn.
+- Forecast dividend yield = 26.8258 / 671.0660 = 3.9975%.
+
+7. Model and quality decisions
+- statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+- Oil and gas PP&E and working capital are operating assets, not detachable cash.
+- Net debt is included at 100%; operating and deferred-tax liabilities are explained separately.
+- data_quality=complete. Main limitations are FX convention, analytical gross-profit definition, judgmental 20% cycle discount, and lack of the input market-cap calculation workpaper.

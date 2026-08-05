@@ -1,0 +1,111 @@
+stock-research trace
+company=东方电缆
+code=603606.SH
+period=2025-12-31
+report_type=annual
+generated_for_input=2026-07-31T21:43:03+08:00
+
+[protocol]
+1. Read stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated initialized fields through repeated protocol `set` calls; result.json was not created as a hand-written object.
+5. Validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse assessment]
+- No raw filing, annual facts package, normalized facts, or prior stock-research output existed for 603606.SH/2025-12-31.
+- Public filing retrieval was therefore necessary.
+- The official SSE announcement URL was identified as:
+  https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-03-28/603606_20260328_SFQ6.pdf
+- Direct download from the SSE URL returned a compressed interception page in this environment. The identical 231-page public annual report was downloaded from the Xueqiu filing mirror and retained at:
+  stock_report/data/raw/filings/603606.SH/2025-12-31/annual-report-2025.pdf
+- PDF text extraction was retained at:
+  stock_report/data/raw/filings/603606.SH/2025-12-31/annual-report-2025.txt
+- Filing mirror URL:
+  https://stockmc.xueqiu.com/202603/603606_20260328_DUN0.pdf
+
+[model determination]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=The company earns revenue from manufacturing and project delivery of land/submarine cables and marine engineering services. Inventory, receivables, plants, equipment, payables, and contract liabilities are ordinary operating/project balances, not the balance-sheet-as-business structure of a bank, insurer, developer, concession, or holding platform.
+special_handling=Project working capital and expansion needs require a cash haircut; hedging derivatives and customer advances are not detachable cash.
+
+[financial statement extraction]
+source=2025 annual report, consolidated statements, PDF pages 92-101
+total_assets=15536056290.11
+total_liabilities=7253273554.72
+total_equity=8282782735.39
+parent_equity=8282782735.39
+minority_interest=0
+revenue=10843482833.21
+cost_of_sales=8446475607.11
+gross_profit=2397007226.10
+gross_margin=2397007226.10/10843482833.21=0.22105510406294548
+operating_profit=1545711944.53
+net_profit=1271408899.19
+parent_net_profit=1271408899.19
+net_margin=1271408899.19/10843482833.21=0.11725097173539994
+operating_cash_flow=1964747569.20
+capital_expenditure=791068729.34
+operating_free_cash_flow=1964747569.20-791068729.34=1173678839.86
+financing_cash_flow=-660582442.89
+dividend_and_buyback_cash_out=337369827.73
+dividend_and_buyback_cash_out_note=2025 financing cash flow line for dividends/profit/interest 330332711.18 less disclosed 2025 interest expense 10952062.64, plus share repurchase cash 17989179.00. This is a derived approximation because the cash-flow statement combines dividends and interest.
+
+[owner earnback: cash]
+cash_and_cash_equivalents=2981114765.62
+source=annual report PDF page 195
+excluded_restricted_cash=66498852.40
+excluded_hedging_derivative_asset=247849650.00
+short_term_borrowing=2005577.48
+current_noncurrent_liabilities=345780241.61
+long_term_borrowing=463227696.41
+lease_liability=776642.53
+interest_and_lease_debt=811790158.03
+net_cash_before_haircut=2981114765.62-811790158.03=2169324607.59
+judgment_haircut=50%
+haircut_reason=Inventory and contract liabilities rose sharply, projects require delivery funding, and the company is still investing in production bases.
+discounted_detachable_net_cash=2169324607.59*0.50=1084662303.795
+
+[owner earnback: profit]
+2025_parent_net_profit=1271408899.19
+2025_deducted_nonrecurring_parent_profit=1254175191.93
+2023_2025_average_parent_profit=1093201888.59
+2025_operating_free_cash_flow=1173678839.86
+cash_flow_caution=2025 inventory increase consumed 2141348067.12 while operating payables increase contributed 1918930159.05; cash flow also benefited from larger contract liabilities.
+judgment_discounted_sustainable_cash_profit=1000000000
+judgment_reason=Rounded below the three-year earnings average and below 2025 free cash flow to avoid treating the strong 2025 project cash cycle as permanent.
+
+[valuation formulas]
+market_cap=33479000000.000004
+market_cap_date=20260731114326
+market_cap_source=Tencent qt.gtimg.cn
+pe_ttm=24.58
+operating_business_price=33479000000.000004-1084662303.795=32394337696.205
+owner_earnback_years=32394337696.205/1000000000=32.394337696205
+market_cap_to_cash_profit=33479000000.000004/1000000000=33.479000000000006
+discounted_net_cash_to_market_cap=1084662303.795/33479000000.000004=0.0323982885926999
+
+[dividend]
+source=annual report PDF pages 2 and 64
+forecast_cash_dividend=383860737.12
+forecast_basis=2025 board proposal, CNY 5.60 per 10 eligible shares
+forecast_dividend_yield=383860737.12/33479000000.000004=0.01146571693061322
+buyback_counted_as_dividend=17989179.00
+capitalization_transfer=2 shares per 10; excluded because it is non-cash.
+
+[business and risk evidence]
+- PDF pages 9-10: products, project/batch production, channel model, industry classification.
+- PDF pages 19-24: segment revenue, cost, margin, customer concentration, R&D.
+- PDF page 19: order backlog of CNY 19.312 billion as of 2026-03-25.
+- PDF pages 48-50: company-disclosed raw-material, policy, macro, management, competition, and offshore-wind risks.
+- PDF pages 136 and 195: cash composition, restricted deposits, hedging derivatives.
+- PDF page 194: reconciliation of earnings to operating cash flow.
+
+[limitations]
+- Market cap and PE were accepted from config/input.json and not independently recomputed.
+- The 50% net-cash haircut and CNY 1.0 billion sustainable cash profit are analyst judgments, not reported facts or management forecasts.
+- The dividend yield uses a board proposal rather than a future recurring dividend forecast.
+- No buy/sell recommendation or target price was produced.

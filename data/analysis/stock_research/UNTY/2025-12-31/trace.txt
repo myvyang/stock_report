@@ -1,0 +1,63 @@
+Stock research trace: UNTY / 2025-12-31 annual
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked paths named in config/input.json.
+- No UNTY raw filing, annual-review facts, normalized facts, or prior stock-research output existed locally.
+- Existing user evaluation note was not used because it contained no identified reusable UNTY fact package.
+
+3. Primary sources retrieved and used
+- SEC 2025 Form 10-K, accession 0000920427-26-000012:
+  https://www.sec.gov/Archives/edgar/data/920427/000092042726000012/unty-20251231x10k.htm
+- SEC/issuer annual report presentation:
+  https://www.sec.gov/Archives/edgar/data/920427/000092042726000022/unty-20251231xars.htm
+- SEC Companyfacts API, CIK 0000920427, used to verify statement and regulatory-capital XBRL facts:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0000920427.json
+- Official issuer dividend history:
+  https://unitybancorp.q4ir.com/stock-information/stock-splits/default.aspx
+- SEC 8-K dated 2026-05-21, second-quarter 2026 dividend:
+  https://www.sec.gov/Archives/edgar/data/920427/000092042726000040/unty-20260521x8k.htm
+- Federal Reserve H.10 DDP, USD/CNY spot exchange rate:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+
+4. Model determination
+- Input hint said ordinary_operating/applicable.
+- Overridden to financial_bank/requires_special_model because Unity Bancorp is a financial holding company and Unity Bank's deposits, loans, securities, liquidity and borrowings are operating assets/liabilities subject to banking capital rules.
+- Required ordinary owner-earnback fields remained null. No detachable-net-cash or cash-profit payback number was fabricated.
+
+5. Key source facts in USD
+- Assets 2,966,652,000; liabilities 2,621,021,000; shareholders' equity 345,631,000.
+- Loans 2,544,713,000 gross; ACL 32,342,000; deposits 2,324,061,000.
+- Cash/cash equivalents/federal funds sold 216,519,000; securities 124,015,000.
+- FHLB advances 255,774,000; subordinated debt 10,310,000.
+- Net income 57,951,000; net interest income 117,033,000; interest income 173,628,000.
+- NIM 4.52%; ROA 2.17%; ROE 18.07%; efficiency ratio 41.48%.
+- Nonaccrual loans 29,836,000; ACL/loans 1.27%; net charge-offs 1,145,000.
+- CET1 ratio 14.45%; tier-1 risk based 14.87%; total risk based 16.12%; leverage 12.72%.
+- 2025 dividend per share 0.58; latest 2026 quarterly dividend 0.16.
+
+6. Conversion and calculations
+- Used 7.1875 CNY/USD, Federal Reserve H.10 value for 2025-12-31.
+- All financial-statement absolute amounts in result.json converted by USD amount × 7.1875.
+- Forecast annual dividend = 0.16 USD/share × 4 × 9,982,000 shares × 7.1875 = CNY 45,933,200.
+- Forecast dividend yield = 45,933,200 / 3,990,151,436.243225 = 0.01150408574819275.
+- Price/book reference in report = 3,990,151,436.243225 / 2,484,121,812.5 = about 1.61x.
+- Input market cap and PE TTM were retained exactly as supplied; underlying price/share-count/FX decomposition was unavailable.
+
+7. Protocol mutations and validation
+- Populated initialized result using protocol CLI set and append operations; did not construct result.json from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- First completed validation result: status=ok, errors=[]
+
+8. Known limitations
+- Balance-sheet and income-statement values both use the year-end spot rate rather than an annual-average rate.
+- Market value date (2026-08-03) differs from financial statement date (2025-12-31).
+- Bank revenue/gross margin/ordinary OCF/capex/free cash flow are null because they are not economically comparable to ordinary operating companies.
+- Dividend forecast is a simple annualization, not issuer guidance.

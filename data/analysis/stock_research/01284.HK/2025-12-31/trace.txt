@@ -1,0 +1,78 @@
+Stock research trace — 01284.HK — period 2025-12-31
+Generated for task created_at: 2026-08-03T14:49:00+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill directs reuse of existing materials.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local material check
+- No annual-review facts, normalized facts, raw filing metadata, or prior stock-research result existed for 01284.HK/2025-12-31.
+- Downloaded the official 2025 annual report to:
+  stock_report/data/raw/filings/01284.HK/2025-12-31/annual-report-2025.pdf
+
+3. Primary sources
+- 2025 Annual Report, company investor-relations hosted PDF:
+  https://imgs.newmedialab.com.hk/wp-content/uploads/2023/07/202604100954178502.pdf
+  Key pages used: pp.4-10 business/results; pp.55-61 audit report; pp.62-67 financial statements; notes for revenue, dividends, receivables, cash, leases, related parties and IPO proceeds.
+- 2025 Annual Results Announcement, HKEX, 19 Mar 2026:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0319/2026031901330.pdf
+- PBOC/CFETS RMB central parity announcement, 26 Dec 2025:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+  Applied 1 HKD = 0.90486 CNY as a consistent period-end proxy.
+- Market snapshot supplied in config/input.json:
+  Tencent qt.gtimg.cn; 2026/07/31 16:08:47; market cap CNY 216,795,601.12953186; PE TTM 19.78.
+
+4. Analysis-model override
+- Input hint stated financial_brokerage/requires_special_model.
+- Annual report says the group provides integrated advertising solutions through digital media platforms; 96.6% of revenue was digital advertising.
+- Balance sheet contains ordinary cash, receivables, PP&E, right-of-use assets, payables and lease liabilities, with no brokerage client money, proprietary financial assets or repo funding.
+- Overrode hint to ordinary_operating/applicable.
+
+5. Financial reconstruction and conversion
+- Reported currency: HKD thousands. All result.json amounts converted to absolute CNY yuan at 0.90486.
+- Revenue HKD 189.787m; production costs HKD 49.312m; printing costs HKD 2.890m.
+- Reconstructed gross profit = revenue - production costs - printing costs = HKD 137.585m.
+- Gross margin = 137.585 / 189.787 = 72.4944%.
+- Parent net profit HKD 12.743m; net margin = 6.7144%.
+- Operating profit recorded as profit before tax plus finance cost = HKD 16.574m. Bank interest remains in this number; report explicitly discusses its contribution.
+- Total assets HKD 257.641m; liabilities HKD 72.959m; equity and parent equity HKD 184.682m; minority interest nil.
+- Operating cash flow HKD 31.903m.
+- Capex = PP&E purchases HKD 0.216m + intangible additions HKD 0.929m = HKD 1.145m.
+- Operating free cash flow = 31.903 - 1.145 = HKD 30.758m.
+
+6. Owner earnback calculation
+- Cash HKD 147.624m × 80% = HKD 118.0992m.
+- Pledged deposit HKD 0.8m × 0% = nil.
+- Less lease liabilities HKD 40.793m.
+- Discounted detachable net cash = HKD 77.3062m = CNY 69,951,288.13.
+- Sustainable cash-profit bridge (HKD):
+  operating cash flow 31.903m
+  less working-capital release 5.510m
+  less capex 1.145m
+  less lease principal 9.761m
+  = pre-haircut cash profit 15.487m
+  × 80% = discounted sustainable cash profit 12.39192m = CNY 11,212,952.73.
+- Operating business price = market cap - discounted net cash = CNY 146,844,312.9995.
+- Owner earnback years = operating business price / discounted cash profit = 13.09595.
+- Market cap / discounted cash profit = 19.33439.
+
+7. Dividend
+- 2025 interim HKD 0.0167/share plus final HKD 0.025/share = HKD 0.0417/share.
+- 600m shares => HKD 25.020m = CNY 22,639,597.20.
+- Forecast/static dividend yield = CNY 22,639,597.20 / CNY 216,795,601.13 = 10.4428%.
+- Basis is the latest declared annual distribution, not an unconditional perpetual forecast; payout exceeded annual profit.
+
+8. Protocol population and validation
+- Populated initialized JSON exclusively with protocol set/append commands in outputs/populate_result.sh; did not hand-write result.json.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok; errors: [].
+
+9. Known limitations
+- Gross profit is reconstructed because the income statement uses expense-by-nature presentation.
+- A single period-end proxy FX rate was used for both balance-sheet and flow amounts.
+- Market cap and PE TTM were not independently cross-checked beyond the supplied Tencent snapshot.
+- Sustainable cash profit and haircuts are analyst estimates based on one annual period, not management guidance.

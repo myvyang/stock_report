@@ -1,0 +1,69 @@
+SKY stock research trace
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse audit
+- No SKY files were present under stock_report/data for period 2025-12-31.
+- No prior annual facts or stock-research output was reused.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result skeleton created successfully.
+
+4. Primary filings retrieved and reviewed
+- FY2025 Form 10-K, fiscal year ended 2025-03-29:
+  https://www.sec.gov/Archives/edgar/data/90896/000095017025077746/sky-20250329.htm
+- FY2026 Q3 Form 10-Q, period ended 2025-12-27:
+  https://www.sec.gov/Archives/edgar/data/90896/000119312526037613/sky-20251227.htm
+- SEC Companyfacts, CIK 0000090896:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0000090896.json
+
+5. Period resolution
+- Input requested annual / 2025-12-31, but Champion Homes has no fiscal year ending on that date.
+- Balance sheet uses the nearest disclosed date, 2025-12-27.
+- TTM income and cash flow use: FY2025 + FY2026 nine months - FY2025 prior-year nine months.
+
+6. TTM bridge (USD thousands)
+- Revenue: 2,483,448 + 2,042,361 - 1,889,581 = 2,636,228
+- Cost of sales: 1,819,425 + 1,492,406 - 1,378,011 = 1,933,820
+- Gross profit: 664,023 + 549,955 - 511,570 = 702,408
+- Operating profit: 237,032 + 215,802 - 194,874 = 257,960
+- Net income: 201,640 + 182,091 - 163,939 = 219,792
+- Parent net income: 198,413 + 177,222 - 162,065 = 213,570
+- Operating cash flow: 240,857 + 251,165 - 194,852 = 297,170
+- Capital expenditure: 50,532 + 24,914 - 37,971 = 37,475
+- Operating free cash flow: 297,170 - 37,475 = 259,695
+- Financing cash flow: -73,038 - 162,079 + 65,854 = -169,263
+- Share repurchases: 79,999 + 150,000 - 59,999 = 170,000
+
+7. Currency conversion
+- All filing amounts converted at USD/CNY 6.7666, manual snapshot dated 2026-07-21 found in the repository's owner-earnback aggregation settings.
+- Market cap was already supplied in CNY and was not reconverted.
+
+8. Analysis model
+- Confirmed ordinary_operating / applicable.
+- Manufacturing, retail, installation and transportation dominate the economics.
+- Floor-plan finance items are operating-linked but floor plan payable is deducted in full in detachable cash.
+
+9. Owner earnback assumptions
+- Cash and equivalents: 80% credited.
+- Floor plan payable: 100% deducted.
+- Long-term debt: 100% deducted.
+- ECN investment, goodwill and intangibles: no detachable cash credit.
+- Cash profit starts from TTM FCF, subtracts USD 20m rounded stock-compensation cost, then applies a 10% housing-cycle reserve.
+- Forecast cash dividend: zero because disclosed capital returns were buybacks, not ordinary dividends.
+
+10. Protocol population and validation
+- outputs/result.json was populated through protocol set commands after protocol initialization.
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok; errors: none.
+
+11. Important limitations
+- Balance date differs by four days from input period.
+- FX snapshot is not the filing-date spot rate.
+- Cash and profit discounts are analytical judgments, not company guidance.

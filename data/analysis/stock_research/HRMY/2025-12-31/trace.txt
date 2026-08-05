@@ -1,0 +1,137 @@
+HRMY stock-research trace
+generated_at=2026-08-04T17:03:22+08:00
+period=2025-12-31
+report_type=annual
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Initialized result with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result exclusively through repeated protocol `set` commands (outputs/populate_result.sh), rather than constructing result.json manually.
+5. Validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Initial populated validation result: status=ok, errors=[]
+
+[reuse audit]
+Expected paths under stock_report/data/analysis/annual_review/HRMY/2025-12-31,
+stock_report/data/raw/filings/HRMY/2025-12-31, and
+stock_report/data/normalized/facts/HRMY/2025-12-31 were checked.
+No annual facts package, normalized facts, metadata, or cached filing was present.
+Research therefore rebuilt facts from official SEC/company sources.
+
+[primary sources]
+SEC 2025 Form 10-K HTML:
+https://www.sec.gov/Archives/edgar/data/1802665/000110465926018859/hrmy-20251231x10k.htm
+Accession: 0001104659-26-018859; filed 2026-02-24; period 2025-12-31.
+
+SEC Companyfacts API:
+https://data.sec.gov/api/xbrl/companyfacts/CIK0001802665.json
+Used to reproduce standardized US-GAAP facts; values selected for FY=2025, form=10-K,
+filed=2026-02-24, and matching instant/duration. 2024 comparative cash-flow facts were
+selected from the 2025-02-25 10-K to avoid duplicate contexts.
+
+Harmony 2025 official results release (cross-check):
+https://ir.harmonybiosciences.com/news-releases/news-release-details/harmony-biosciences-reports-strong-2025-financial-results-and
+Published 2026-02-24.
+
+Federal Reserve H.10 USD/CNY annual series:
+https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+2025 annual rate: 7.1875 CNY per USD.
+
+Market-cap snapshot:
+config/input.json: CNY 13,766,851,411.767334 as of 2026-08-03; PE TTM 14.209678;
+source field supplied by input: Yahoo Finance yfinance.
+
+[reported USD facts]
+Assets=1,271,631,000
+Liabilities=401,413,000
+StockholdersEquity=870,218,000
+Revenue=868,453,000
+CostOfGoodsAndServicesSold=198,342,000
+GrossProfit=670,111,000
+OperatingIncomeLoss=208,469,000
+NetIncomeLoss=158,687,000
+NetCashProvidedByUsedInOperatingActivities=348,199,000
+PaymentsToAcquirePropertyPlantAndEquipment=310,000
+NetCashProvidedByUsedInFinancingActivities=-9,049,000
+CashAndCashEquivalentsAtCarryingValue=752,502,000
+ShortTermInvestments=22,838,000
+LongTermInvestments=107,127,000
+LongTermDebtCurrent=20,000,000
+LongTermDebtNoncurrent=143,663,000
+AccountsReceivableNetCurrent=96,787,000
+InventoryNet=5,357,000
+IntangibleAssetsNetExcludingGoodwill=89,418,000
+DeferredIncomeTaxAssetsNet=149,699,000
+ResearchAndDevelopmentExpense=189,594,000
+SellingAndMarketingExpense=119,512,000
+GeneralAndAdministrativeExpense=152,536,000
+ShareBasedCompensation=44,895,000
+
+2024 comparative inputs for sustainable cash profit:
+Operating cash flow=219,821,000
+Capital expenditure=1,153,000
+Share-based compensation=42,602,000
+
+[business evidence from 10-K]
+- WAKIX generated all 2025 net product revenue; Q4 average patients approximately 8,500.
+- Caremark, Accredo, and PANTHERx generated 38%, 36%, and 26% of gross product revenue,
+  respectively; together they also represented 100% of gross receivables.
+- Bioprojet 2017 LCA requires tiered royalties of 13%-24% of annual net sales plus a 3%
+  trademark royalty. 2025 sales-based/trademark/tiered royalties were USD 188,482,000.
+- Company depends on two API suppliers for WAKIX; manufacturing, packaging, and logistics
+  are outsourced.
+- Company states it has never declared or paid common dividends and does not intend to pay
+  dividends for the foreseeable future.
+- Key patent facts include expected 2029/2030 expiries for established protection and
+  newer polymorph/formulation protection or applications extending into 2044, subject to
+  enforceability, approval, and commercial uncertainty.
+
+[currency conversion]
+All reported USD facts in result.json multiplied by 7.1875.
+This is a unified annual-average translation convention. It is not a 2025-12-31 spot-rate
+translation for balance-sheet items and is disclosed as a limitation.
+
+[formulas]
+gross_margin = 670,111,000 / 868,453,000 = 0.7721915413
+net_margin = 158,687,000 / 868,453,000 = 0.1827249189
+
+Discounted detachable net cash (USD):
+cash: 752,502,000 * 70% = 526,751,400
+investments: (22,838,000 + 107,127,000) * 90% = 116,968,500
+debt: (20,000,000 + 143,663,000) * 100% = -163,663,000
+total = 480,056,900 USD
+translated result = 480,056,900 * 7.1875 = 3,450,408,968.75 CNY
+
+Sustainable cash profit:
+2025 FCF = 348,199,000 - 310,000 = 347,889,000 USD
+2024 FCF = 219,821,000 - 1,153,000 = 218,668,000 USD
+two-year average FCF = 283,278,500 USD
+two-year average SBC = (44,895,000 + 42,602,000) / 2 = 43,748,500 USD
+pre-haircut cash profit = 239,530,000 USD
+10% sustainability haircut = 23,953,000 USD
+discounted sustainable cash profit = 215,577,000 USD
+translated result = 215,577,000 * 7.1875 = 1,549,459,687.50 CNY
+
+operating_business_price = 13,766,851,411.767334 - 3,450,408,968.75
+                         = 10,316,442,443.017334 CNY
+owner_earnback_years = 10,316,442,443.017334 / 1,549,459,687.50
+                     = 6.658090253
+market_cap_to_cash_profit = 13,766,851,411.767334 / 1,549,459,687.50
+                          = 8.884936809
+discounted_net_cash_to_market_cap = 3,450,408,968.75 / 13,766,851,411.767334
+                                  = 0.250631671
+
+[dividend]
+Forecast cash dividend=0 CNY; forecast yield=0.
+Basis: explicit no-dividend history and foreseeable-future policy in the 2025 10-K.
+
+[judgment boundaries]
+- 70% cash and 90% investment recognition are analyst haircuts, not reported facts.
+- The 10% cash-profit sustainability haircut is an analyst judgment.
+- R&D is not added back because maintaining/expanding the drug franchise is part of the
+  operating model.
+- Potential milestone payments are not booked as current debt because they are contingent,
+  but they support the cash haircut.
+- No recommendation, target price, or deterministic patent/pipeline outcome is asserted.

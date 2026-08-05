@@ -1,0 +1,51 @@
+stock-research trace
+company=01433.HK CIRTEK HLDGS
+requested_period=2025-12-31
+generated_for=2026-08-04 task input
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reused existing evidence
+- stock_report/data/analysis/annual_review/01433.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/01433.HK/2025-12-31/annual_facts.md
+- stock_report/data/normalized/facts/01433.HK/2025-12-31/annual-facts.json
+- stock_report/data/raw/filings/01433.HK/2025-12-31/metadata.json
+- Local text extractions of the 2024 annual report and 2025 interim report were checked for dividend disclosures.
+
+3. Model verification
+- Input hint said financial_brokerage.
+- Filing evidence says the only reportable segment is manufacture and sale of printing products.
+- Overrode model to ordinary_operating; owner-earnback formula is conceptually applicable.
+
+4. Period and quality decision
+- No 2025 audited annual results or annual report was available in the supplied filing set.
+- Latest statement figures are 2025-06-30 interim figures.
+- Full-year 2025 evidence is limited to a profit-before-tax floor and later audit/delay announcements.
+- Auditor concerns and internal investigation concern overseas subsidiary payments recorded in PPE and other expenses.
+- Result status set to partial; ordinary owner-earnback sorting fields left null.
+
+5. Currency normalization
+- Source statements: HKD thousands.
+- Conversion: 1 HKD = 0.8638 CNY, project manual snapshot dated 2026-07-21.
+- Formula: HKD_thousand * 1000 * 0.8638.
+
+6. Key derived figures
+- 2025H1 gross margin = 121611 / 258178 = 0.4710354871.
+- 2025H1 net margin = 24340 / 258178 = 0.0942760421.
+- 2025H1 operating free cash flow = 33908 - 15849 = HKD 18059 thousand = CNY 15599364.2.
+- Forecast dividend = 0 because no 2025 interim dividend and no year-end proposal was available by cutoff; not a long-term dividend conclusion.
+
+7. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields using repeated protocol set commands.
+- Validated using protocol validate; status returned ok with no errors.
+
+8. Output scope
+- outputs/result.json: structured partial result.
+- outputs/report.md: human-readable operating story and limitations.
+- outputs/trace.txt: this provenance and calculation trace.

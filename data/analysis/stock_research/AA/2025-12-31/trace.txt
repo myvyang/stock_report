@@ -1,0 +1,93 @@
+stock-research trace
+company: Alcoa Corporation (NYSE: AA)
+period: 2025-12-31
+generated_at: 2026-08-05T05:29:21+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- Expected annual facts, normalized facts, filing metadata and raw filing directory were checked.
+- No reusable AA/2025-12-31 annual fact package or raw filing was present in the workspace.
+- Result: returned to primary official disclosure.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Complex JSON was not authored from scratch. The initialized contract object was populated through repeated protocol set commands.
+
+4. Primary sources
+- SEC Form 10-K: https://www.sec.gov/Archives/edgar/data/1675149/000119312526077167/aa-20251231.htm
+  accession: 0001193125-26-077167
+  filed: 2026-02-26
+  used for: identity, business model, segment data, financial statements, asset/liability facts, closure and environmental obligations.
+- SEC Companyfacts API: https://data.sec.gov/api/xbrl/companyfacts/CIK0001675149.json
+  used to cross-check statement values and XBRL tags.
+- Alcoa FY2025 results release: https://investors.alcoa.com/press-releases/press-release-details/2026/Alcoa-Corporation-Reports-Fourth-Quarter-and-Full-Year-2025-Results/default.aspx
+  used for adjusted results, FCF, operating narrative and 2026 outlook.
+- Alcoa dividend history: https://investors.alcoa.com/stock-information/dividend-history/default.aspx
+  used for quarterly dividend cadence.
+- Alcoa South32 acquisition announcement: https://investors.alcoa.com/press-releases/press-release-details/2026/Alcoa-Announces-Strategic-Acquisition-of-South32s-Bauxite-Alumina-and-Aluminum-Assets-for-4-1-billion/default.aspx
+  used for material post-balance-sheet transaction context.
+- PBOC/CFETS parity announcement: https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+  used for USD/CNY = 7.0358 conversion.
+- Market cap and PE: config/input.json, Yahoo Finance yfinance, market date 2026-08-03.
+
+5. Model decision
+- statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- rationale: company earns product revenue from directly operated mines, refineries, smelters and casting/energy assets. Ordinary statements have economic meaning, but commodity cyclicality, capital intensity, pension and closure/environment liabilities require conservative adjustments.
+
+6. Core calculations (USD millions unless noted)
+- revenue = 12,831
+- cost of goods sold = 10,658
+- gross profit = 2,173
+- gross margin = 2,173 / 12,831 = 0.1693554672
+- parent net profit = 1,157
+- net margin = 1,157 / 12,831 = 0.0901722383
+- operating profit = 12,831 - 10,658 - 299 - 24 - 623 - 144 - 918 = 165
+- operating cash flow = 1,185
+- capex = 618
+- operating FCF = 567
+- parent equity = 6,118; mezzanine NCI = 76; NCI ratio = 76 / (6,118 + 76) = 0.0122702235
+
+7. Discounted detachable net cash (USD millions)
+- cash: 1,597 * 100% = 1,597
+- Ma'aden shares: 1,397 * 65% = 908.05
+- interest-bearing debt: -2,448
+- pension and postretirement benefits: -(257 + 427) = -684
+- ARO and environmental remediation: -(1,405 + 282) = -1,687
+- total = -2,313.95
+- CNY = -2,313.95 * 7.0358 million = -16,282,185,030 yuan
+
+8. Discounted sustainable cash profit (USD millions)
+- 2025 FCF base: 567
+- add back 2025 Kwinana closure cash: +212
+- deduct disclosed 2026 Kwinana closure cash: -120
+- commodity-cycle/maintenance/estimation reserve: -209
+- selected sustainable cash profit: 450
+- CNY = 450 * 7.0358 million = 3,166,110,000 yuan
+
+9. Owner earnback
+- market cap = 80,601,765,641.09473 yuan
+- operating business price = market cap - discounted net cash = 96,883,950,671.09473 yuan
+- owner earnback years = 96,883,950,671.09473 / 3,166,110,000 = 30.6003375357
+- market cap / cash profit = 80,601,765,641.09473 / 3,166,110,000 = 25.4576717554
+- discounted net cash / market cap = -0.2020080007
+
+10. Dividend forecast
+- base: maintain $0.10 quarterly / $0.40 annual per-share cadence.
+- aggregate proxy: 2025 common dividend cash payment $104 million.
+- CNY forecast = 104 * 7.0358 million = 731,723,200 yuan
+- yield = 731,723,200 / 80,601,765,641.09473 = 0.00907898455
+
+11. Material limitation
+- The announced South32 asset acquisition is not reflected in 2025 statements or the owner earnback arithmetic.
+- Proposed consideration includes $3.1bn cash, about 17m new AA shares and up to $750m CVR; expected close is H1 2027 subject to conditions.
+- Thus owner earnback is explicitly a pre-transaction static baseline.
+
+12. Validation
+- Initial populated result validation: status ok, errors [].
+- Final validation executed after report and trace creation; see command outcome in completion handoff.

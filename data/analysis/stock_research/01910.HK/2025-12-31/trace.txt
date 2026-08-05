@@ -1,0 +1,68 @@
+stock-research trace
+company: 01910.HK / SAMSONITE
+period: 2025-12-31 annual
+generated_at: 2026-08-04T21:30:09+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the task required checking reusable annual facts.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked the paths declared in config/input.json.
+- No raw filing, annual review facts, normalized facts, or prior stock-research result existed for 01910.HK/2025-12-31.
+- Research therefore returned to official public filings.
+
+3. Primary sources used
+- HKEX final results announcement, published 2026-03-20:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0320/2026032000151.pdf
+  Used for business description, 2025/2024 income statement, balance sheet, cash flow, brand/product/channel splits, debt, lease liabilities, capital expenditure, adjusted free cash flow, dividend and buyback history, and management explanations.
+- HKEX cash dividend announcement, published 2026-03-20:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0320/2026032001542.pdf
+  Used for USD 0.1009 per share, 2025 financial-year attribution, payment timetable and 15% Luxembourg withholding-tax disclosure.
+- HKEX AGM poll result, published 2026-06-05:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0605/2026060500113.pdf
+  Used to confirm shareholder approval of aggregate USD 140.0m dividend.
+- Company 2025 annual-results presentation, dated 2026-03-19:
+  https://corporate.samsonite.com/on/demandware.static/-/Sites-InvestorRelations-Library/default/dw31d20e57/PDF/presentation-and-webcast/2025/E%20Samsonite%20FY2025%20Results%20Presentation%20%28FINAL%202026-03-19%29.pdf
+  Used as cross-check for channel, margin, sales trend and outlook context.
+- Company about-us page:
+  https://corporate.samsonite.com/en/about-us.html
+  Used for company market-position wording.
+- SAFE currency conversion table for 2025-12-31:
+  https://www.safe.gov.cn/safe/2025/1231/26980.html
+  Attachment reports 1 CNY = 0.14227179603915319 USD, equivalent to 1 USD = 7.0288 CNY.
+- Market data supplied in config/input.json: Tencent qt.gtimg.cn, timestamp 2026/08/03 09:48:05, market cap CNY 16,754,342,587.292194 and PE TTM 8.66. This market snapshot was not independently re-fetched.
+
+4. Model decision
+- Input hint: financial_brokerage / requires_special_model.
+- Filing evidence: global branded luggage and bags company with wholesale and DTC product sales; balance sheet contains inventory, receivables, brand intangibles, ordinary borrowings and leases, not brokerage client money or proprietary securities operations.
+- Override: statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+
+5. Currency and formulas
+- All USD filing amounts converted to CNY absolute yuan at 7.0288. This period-end rate is also used for income statement and cash-flow display, so converted CNY figures are comparative presentation values rather than IAS 21 translations.
+- Gross margin = 2,084.7 / 3,497.6 = 59.6% (company reported).
+- Parent net margin = 289.0 / 3,497.6 = 8.2628%.
+- Operating FCF = operating cash flow 506.3m - capex 93.8m = USD 412.5m = CNY 2,899,380,000.
+- Company adjusted FCF = operating cash flow 506.3m - capex 93.8m - lease principal 166.2m = USD 246.3m = CNY 1,731,193,440.
+- Detachable net cash = cash 649.3m - loans and borrowings 1,729.1m = USD -1,079.8m = CNY -7,589,698,240. Lease liabilities are not deducted here because lease principal is already reflected in sustainable cash profit.
+- Discounted sustainable cash profit = adjusted FCF CNY 1,731,193,440 x 90% = CNY 1,558,074,096. The 10% haircut is an analyst judgment for cyclicality, not a reported metric.
+- Operating business price = market cap - discounted net cash = CNY 24,344,040,827.292194.
+- Owner earnback = operating business price / discounted cash profit = 15.6244 years.
+- Market cap / discounted cash profit = 10.7532 times.
+- Forecast dividend = USD 140m x 7.0288 = CNY 984,032,000.
+- Forecast gross dividend yield = CNY 984,032,000 / market cap = 5.8733%. Withholding tax is excluded.
+
+6. Protocol population and validation
+- Populated initialized fields through repeated protocol `set` commands; result.json was not authored from a blank complex object.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report/trace completion: status=ok, errors=[].
+
+7. Known limitations
+- No pre-existing annual facts package was available.
+- Market cap and PE are inherited from the task input.
+- A single period-end FX rate is used for all CNY display amounts.
+- Sustainable cash-profit haircut is subjective and should be revisited with multi-year lease-adjusted free cash flow.

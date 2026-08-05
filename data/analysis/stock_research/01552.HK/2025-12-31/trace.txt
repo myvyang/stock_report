@@ -1,0 +1,61 @@
+stock-research trace
+task: 01552.HK / BHCC HOLDING / annual / 2025-12-31
+generated_at: 2026-08-04T13:15:01+08:00
+
+1. Protocol initialization
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initialized schema stock-research-result-v1 from the supplied task input.
+
+2. Required contracts read
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+3. Local reuse check
+- Checked the configured raw filing, annual review and normalized fact paths under /workspace and /root/aicode.
+- No 01552.HK 2025 filing or annual fact package was present; only config/input.json and the initialized output existed.
+
+4. Primary filing retrieved and reviewed
+- HKEX filing: BHCC Holding Limited, 2025 Annual Report, released 2026-04-28.
+- URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042802770.pdf
+- Reviewed business/financial review (pp.8-11), dividends and customer concentration (pp.15,25), audited primary statements (pp.66-71), accounting model and notes, financial instruments, commitments and five-year summary (pp.123-136).
+
+5. Model correction
+- Input hint stated financial_brokerage. This was rejected because the annual report says 98.6% of revenue came from building and construction works; the group also holds investment properties and development properties and participates in property development JVs.
+- Final statement_model: construction_project.
+- Final owner_earnback_applicability: requires_special_model.
+- Ordinary detachable-net-cash and cash-profit ranking fields remain null per result contract.
+
+6. Currency conversion
+- Filing currency: SGD; result protocol currency: CNY absolute yuan.
+- Translation rate: 1 SGD = CNY 5.4655.
+- Source: PBOC/CFETS central parity announcement dated 2025-12-26, the nearest official rate located near the reporting date.
+- The same rate was applied to balance sheet, income statement and cash-flow values for a consistent research display; this is not an audited translation.
+
+7. Key extracted source figures (SGD)
+- Revenue 202,339,451; cost of services 187,044,363; gross profit 15,295,088.
+- Profit attributable to owners 8,694,411; total profit 8,622,566.
+- Total assets 245,980,040; total liabilities 173,701,760; total equity 72,278,280; parent equity 56,843,402; NCI 15,434,878.
+- Operating cash flow 22,124,845; PPE purchases 1,208,420; derived operating FCF 20,916,425; financing cash flow -7,146,719.
+- Cash and bank balances 76,331,212; development properties 106,557,008; contract assets 14,975,206; trade and other payables 74,997,331; contract liabilities 23,088,502; bank borrowings 72,692,207.
+- No dividend paid or proposed for 2025 or 2024.
+
+8. Derived metrics
+- Gross margin = 15,295,088 / 202,339,451 = 0.0755912301.
+- Net margin = 8,694,411 / 202,339,451 = 0.0429694306.
+- Minority interest ratio = 15,434,878 / 72,278,280 = 0.2135479428.
+- Operating free cash flow = operating cash flow - PPE purchases = SGD 20,916,425.
+- Operating profit field = profit before tax + finance costs = SGD 11,384,501, since the filing does not present a separately labelled operating-profit subtotal.
+- Forecast dividend and yield = 0, based on two zero-dividend years and no post-year-end proposal.
+
+9. Valuation source
+- Used supplied config snapshot without independent recomputation: market cap CNY 175,501,200.91438293; PE TTM 3.88; timestamp 2026/08/03 09:20:05; source Tencent qt.gtimg.cn.
+
+10. Protocol population and validation
+- Populated initialized result through repeated protocol CLI `set` operations; did not hand-write result.json.
+- Validation run: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed-result validation status: ok, errors: [].
+
+11. Material limitations
+- No local pre-extracted annual facts were available.
+- Market snapshot was accepted as supplied and not independently rebuilt.
+- Public annual-report data lacks project-by-project remaining cost, restricted cash, net realizable value and guarantee-loss estimates needed for a reliable project liquidation/owner earnback model.

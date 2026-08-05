@@ -1,0 +1,58 @@
+stock-research trace
+company: 02517.HK / 锅圈食品（上海）股份有限公司
+period: 2025-12-31 annual
+generated_at: 2026-08-04T16:13:17+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields only with protocol set/append commands.
+
+2. Reuse check
+- Expected local annual-review, normalized-facts, and raw-filing directories contained no files.
+- Only stock_report/data/notes/user_stock_evaluations.md existed and contained no task-specific annual facts used here.
+- Rebuilt core facts from the official HKEX annual report rather than inventing missing facts.
+
+3. Sources
+- Primary: HKEX, 2025 Annual Report, published 2026-04-07:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0407/2026040700077.pdf
+- Primary cross-check: HKEX, Announcement of Annual Results, published 2026-03-12:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0312/2026031200954.pdf
+- Valuation: config/input.json snapshot attributed to Tencent qt.gtimg.cn, timestamp 2026/08/03 09:48:13.
+
+4. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Annual report evidence: company sells home-meal products, derives substantially all revenue from product sales to franchisees, does not rely on franchise fees, and operated 11,566 stores (11,554 franchised).
+- Conclusion: ordinary_operating / applicable. The input hint was overridden as a company-master-data classification error.
+
+5. Core extraction (annual report page numbers)
+- P124 income statement, RMB'000: revenue 7,809,992; cost 6,123,424; gross profit 1,686,568; net profit 453,860; parent profit 432,886.
+- P126 balance sheet, RMB'000: assets 5,238,418; liabilities 2,059,076 (derived as assets-equity and reconciled to listed liabilities); total equity 3,179,342; parent equity 3,036,841; NCI 142,501.
+- P129-131 cash flow, RMB'000: OCF 588,420; PP&E purchases 149,537; land-use rights 45,861; intangible purchases 538; financing cash flow -543,275; dividends 388,097; buybacks 183,919.
+- P126/P207-P208 liquidity: cash and bank 1,121,150; long-term deposits 118,750; restricted cash 109,110; FVTPL assets 654,144; interest-bearing debt 139,043; lease liabilities 77,491.
+- P2/P16-P17 operations: revenue comes mainly from sales to franchisees; 11,566 stores, 11,554 franchised.
+
+6. Calculations
+- gross_margin = 1,686,568,000 / 7,809,992,000 = 0.215949.
+- net_margin = 432,886,000 / 7,809,992,000 = 0.055427.
+- capex = 149,537,000 + 45,861,000 + 538,000 = 195,936,000.
+- operating_free_cash_flow = 588,420,000 - 195,936,000 = 392,484,000.
+- discounted cash = (1,239,900,000 * 80%) + (618,144,000 * 80%) + (36,000,000 * 50%) - 139,043,000 - 77,491,000 = 1,287,901,200.
+- restricted cash 109,110,000 is excluded because annual report says it is mainly reserved for prepaid-card receipts under regulation.
+- discounted sustainable cash profit = 392,484,000 * 90% = 353,235,600. The 10% haircut is analyst judgment for rising inventory, receivables and prepayments.
+- operating business price = 4,578,955,376.856923 - 1,287,901,200 = 3,291,054,176.856923.
+- owner earnback years = 3,291,054,176.856923 / 353,235,600 = 9.316884.
+- market cap / cash profit = 4,578,955,376.856923 / 353,235,600 = 12.963892.
+- dividend baseline = 190,067,000 interim + about 100,200,000 final = 290,267,000; yield = 0.063397 on input market cap.
+
+7. Fact / inference / judgment separation
+- Facts: audited statement values, store count/model, dividend declarations, restricted-cash purpose.
+- Inference: franchise model is capital-light at retail level but growth still consumes headquarters working capital; 2024 fair-value loss non-recurrence helped profit growth.
+- Judgment: 80% cash/liquid-investment discounts, 50% non-current fund discount, 10% cash-profit sustainability haircut, and flat-dividend forecast.
+
+8. Validation
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final status: ok; errors: [].

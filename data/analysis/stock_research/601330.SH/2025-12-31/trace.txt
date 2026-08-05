@@ -1,0 +1,46 @@
+[2026-07-31 23:50:16+08:00] protocol init
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+result: initialized stock-research-result-v1 skeleton from task input.
+
+[source availability]
+Checked configured paths under stock_report/data/analysis/annual_review, raw/filings, normalized/facts and prior stock_research.
+Result: no reusable 2025 annual facts package, extraction trace, normalized facts or prior research existed in workspace at task start.
+
+[primary filing acquisition]
+Document: 绿色动力环保集团股份有限公司2025年年度报告, disclosed 2026-03-28, 230 pages.
+Public PDF used for extraction: https://stockmc.xueqiu.com/202603/601330_20260328_2ZP7.pdf
+Official cross-check listing: HKEX 2025 Annual Report, https://www.hkexnews.hk/listedco/listconews/sehk/2026/0413/2026041300390.pdf
+Local retained copy: stock_report/data/raw/filings/601330.SH/2025-12-31/annual_report_2025.pdf
+
+[model determination]
+Annual report p.16: waste-to-energy projects generally use exclusive concession arrangements lasting 25-30 years; industry is capital intensive and typical recovery period is 8-12 years.
+Annual report pp.28-30, 118-119: intangible assets RMB10,195,237,883.09, mainly concession rights; large PPP contract assets; financing debt RMB11,338,851,513.71; RMB10,598,846,286.60 of assets restricted, principally pledged for borrowings.
+Decision: override input hint ordinary_operating/applicable with utility_concession/requires_special_model. Ordinary discounted-net-cash, cash-profit and earnback ranking fields remain null.
+
+[financial extraction]
+Annual report pp.118-119: total assets 21,926,733,761.94; total liabilities 13,254,405,508.93; total equity 8,672,328,253.01; parent equity 8,266,083,685.76; minority interest 406,244,567.25.
+Annual report p.122: revenue 3,533,559,874.91; cost of sales 1,884,532,911.03; operating profit 788,943,015.85; net profit 604,534,073.14; parent net profit 617,500,625.79.
+Derived: gross profit = revenue - cost = 1,649,026,963.88; gross margin = 0.46667; parent net margin = 0.174752.
+Annual report p.124: operating cash flow 1,845,911,667.47; purchases of fixed/intangible/other long-term assets 261,284,433.20; financing cash flow -912,470,448.89.
+Derived: operating free cash flow = 1,584,627,234.27. This is reported but not treated as distributable owner cash because the annual report does not split maintenance capex from growth/project investment and PPP cash-flow classification requires care.
+
+[operating evidence]
+Annual report pp.17-18: waste processed 14.7296 million tonnes (+2.41%); grid electricity 4.3592829 billion kWh (+2.31%); steam supplied 1.1205 million tonnes (+98.81%); 13 operating projects supply heat/steam and 13 projects co-process sludge.
+Annual report pp.23-24: all 2025 product revenue classified as solid-waste treatment; gross margin 46.67%; key cost components include intangible amortization RMB492,308,827.04 and major repair/other maintenance RMB218,205,123.44.
+Annual report pp.26-28: finance costs fell due to lower average borrowing and rates; government subsidy and waste-fee collections improved, but waste-fee receivable settlement lengthened for multiple projects.
+
+[dividend]
+Annual report pp.65-67: 2025 dividend RMB0.32/share in total, consisting of RMB0.10/share interim already implemented and proposed RMB0.22/share final; total RMB454,073,970.00, 73.53% of parent net profit. Three-year cumulative cash dividends RMB1,081,127,579.80.
+Derived forecast yield = 454,073,970 / 10,386,000,000 = 0.04372082. Final dividend was subject to shareholder approval at annual-report date.
+
+[valuation]
+Task input: market capitalization RMB10,386,000,000; timestamp 20260731114318; source Tencent qt.gtimg.cn; PE TTM 16.25. Not independently reconstructed in this run.
+
+[protocol population and validation]
+All complex JSON population performed with protocol set/append commands via outputs/populate.sh, not by hand-writing the JSON object.
+Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Validation result: {"status":"ok","errors":[]}
+
+[limitations]
+No project-by-project remaining concession lives, subsidy-expiry schedule, project debt-amortization table, or maintenance-versus-growth capex split was available in the consolidated annual report. Therefore no concession DCF or ordinary owner earnback number was produced.
+Cash flow statement combines dividends/profit distributions and interest paid; the exact shareholder dividend cash paid during 2025 cannot be isolated from the primary statement, so dividend_and_buyback_cash_out is null.

@@ -1,0 +1,93 @@
+Stock research trace — HBCP — 2025-12-31
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because local fact reuse was part of the research workflow.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local data reuse check
+- Searched the annual-review, normalized-facts, raw-filing, and prior stock-research paths supplied in config/input.json.
+- None of the HBCP 2025 fact packages or raw filings existed locally; only config/input.json was present.
+- Therefore obtained official public filing facts rather than fabricating missing local inputs.
+
+3. Company and filing identification
+- SEC CIK: 0001436425, HOME BANCORP, INC., ticker HBCP.
+- Annual filing: Form 10-K, period 2025-12-31, filed 2026-03-06, accession 0001628280-26-015669.
+- Latest interim filing used only for dividend run-rate/share count: Form 10-Q, period 2026-06-30, filed 2026-08-03, accession 0001628280-26-051688.
+- Primary annual filing URL: https://www.sec.gov/Archives/edgar/data/1436425/000162828026015669/hbcp-20251231.htm
+- SEC Companyfacts URL: https://data.sec.gov/api/xbrl/companyfacts/CIK0001436425.json
+
+4. Analysis-model override
+- Input hint said ordinary_operating/applicable, but the 10-K identifies Home Bancorp as the holding company for Home Bank, N.A.
+- The bank attracts public deposits and invests them in loans and securities; interest spread is the main profit engine.
+- Overrode the hint to statement_model=financial_bank and owner_earnback_applicability=requires_special_model.
+- Kept every ordinary owner-earnback metric null, as required by the result contract.
+
+5. Core annual facts (USD source values)
+- Assets: 3,492,626,000.
+- Liabilities: 3,057,532,000.
+- Parent stockholders' equity: 435,094,000; minority interest: zero.
+- Net loans after allowance: 2,710,881,000; loans before allowance: 2,744,023,000.
+- Allowance for loan losses: 33,142,000.
+- Deposits: 2,972,806,000; noninterest-bearing 792,951,000; interest-bearing 2,179,855,000.
+- Available-for-sale debt securities: 391,448,000.
+- Cash and due from banks: 141,605,000.
+- Subordinated debt: 54,675,000.
+- Goodwill: 81,517,000; bank-owned life insurance: 49,557,000; property/equipment net: 48,995,000.
+- Net interest income: 133,254,000; noninterest income: 15,461,000; noninterest expense: 89,563,000.
+- Credit loss provision inferred directly from 10-K XBRL: net interest income 133,254,000 less net interest income after provision 132,120,000 = 1,134,000.
+- Income tax: 11,956,000; parent net income: 46,062,000.
+- Common dividends paid: 8,988,000; common-stock repurchases: 14,355,000.
+
+6. Bank-specific operating and quality facts
+- 2025 net interest margin: 4.03% (2024: 3.71%; 2023: 3.89%).
+- Nonperforming assets: USD 36.1m / 1.03% of assets, versus USD 15.6m / 0.45% in 2024.
+- Nonaccrual loans: USD 34.111m.
+- Allowance/nonaccrual coverage calculation: 33.142 / 34.111 = 97.16%.
+- Net charge-offs: USD 0.908m, corroborated by charge-offs USD 1.363m less recoveries USD 0.455m.
+- Commercial real estate: 43.4% of loan portfolio; construction and land: USD 329.2m / 12.0%.
+- Energy loans: USD 67.1m / 2.4% of loans.
+- Municipal deposits: USD 185.1m.
+- Regulatory capital: CET1 14.09%, Tier 1 leverage 11.84%, total risk-based capital 15.29%.
+- Approximate ROA: 46.062 / average(3,492.626, 3,443.668) = 1.328%.
+- Approximate ROE: 46.062 / average(435.094, 396.088) = 11.083%.
+
+7. Currency conversion
+- Contract requires CNY absolute yuan.
+- Used Federal Reserve H.10 rate of CNY 7.0063 per USD for 2025-12-26, the closest available year-end observation in the release dated 2025-12-29.
+- Applied one transparent rate to balance sheet, income statement, dividends, and asset-analysis amounts for comparability.
+- Limitation recorded: this is not transaction-date or annual-average translation.
+
+8. Dividend forecast
+- Latest declared quarterly dividend from 2026 Q2 filing: USD 0.31/share.
+- Shares outstanding at 2026-07-31: 7,870,750.
+- Forecast annual dividend = 0.31 * 4 * 7,870,750 = USD 9,759,730.
+- CNY forecast = 9,759,730 * 7.0063 = CNY 68,379,596.30.
+- Forecast yield = 68,379,596.30 / input market cap 3,787,740,367.319092 = 1.805287%.
+- This is a mechanical run-rate assumption, not management guidance or a board commitment.
+
+9. Valuation interpretation
+- Market cap and PE TTM were preserved exactly from config/input.json: CNY 3,787,740,367.319092, dated 2026-08-03, PE 11.929766, source Yahoo Finance yfinance.
+- Price/book = 3,787,740,367.319092 / (435,094,000 * 7.0063) = 1.2425x.
+- No ordinary owner-earnback years calculated because bank cash, securities, loans, deposits, and capital are operating/regulatory balances.
+
+10. Null-field rationale
+- gross_margin and net_margin: null; banking net-interest economics have no comparable sales/gross-profit denominator.
+- revenue, cost_of_sales, gross_profit: null for the same reason.
+- operating_cash_flow, capital_expenditure, operating_free_cash_flow, financing_cash_flow: null because bank cash-flow classification is dominated by changes in loans, deposits, and securities and is not comparable with ordinary operating-company FCF.
+- all discounted cash, cash-profit, operating-business-price, and earnback-year fields: null because requires_special_model.
+
+11. Protocol construction and validation
+- outputs/result.json was not handwritten from a blank object. It was initialized through the protocol CLI, then populated through repeated protocol `set` operations.
+- Initial completed validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed validation result: {"status":"ok","errors":[]}.
+- A final validation is run after report and trace creation; its status is appended below if output files remain valid.
+
+12. Final validation
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final result: {"status":"ok","errors":[]}.
+- Confirmed outputs/result.json, outputs/report.md, and outputs/trace.txt are present and non-empty.

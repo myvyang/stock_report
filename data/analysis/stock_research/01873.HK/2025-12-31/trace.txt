@@ -1,0 +1,59 @@
+stock-research trace
+company: VIVA BIOTECH (01873.HK)
+period: 2025-12-31
+generated_at_input: 2026-08-05T05:55:31+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md and references/report-contract.md as requested.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked configured annual facts, normalized facts, raw filing metadata and historical stock research paths.
+- No 01873.HK/2025-12-31 filing package or annual facts existed in the workspace.
+- Therefore fetched and examined the official 2025 Annual Report released on HKEX on 2026-04-22.
+
+3. Primary sources
+- HKEX annual report: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0422/2026042200404.pdf
+- Company annual-results release: https://www.vivabiotech.com/news/1049.html
+- Market data: config/input.json, Tencent qt.gtimg.cn snapshot dated 2026/08/03 09:46:10.
+
+4. Model review
+- Input hint said financial_brokerage/requires_special_model.
+- Annual report note 1 and principal activities identify drug-discovery CRO, small-molecule CDMO/commercialisation, and biotech startup investments.
+- No brokerage customer funds, proprietary securities business or repo-financing structure was found.
+- Overrode hint with ordinary_operating/applicable.
+
+5. Core statement extraction (annual report RMB'000 converted to CNY yuan)
+- Revenue 1,729,446,000; cost of sales 1,073,885,000; gross profit 655,561,000.
+- Net profit 269,267,000; parent net profit 219,761,000.
+- Total assets 7,199,217,000; total liabilities 3,192,856,000; total equity 4,006,361,000; parent equity 3,996,578,000.
+- Operating cash flow 232,225,000.
+- Capital expenditure 85,800,000 from MD&A; operating FCF 146,425,000.
+- Cross-check limitation: cash-flow statement PPE plus intangible purchase cash outflow was 122,547,000.
+
+6. Owner earnback calculations
+- Gross margin = 655,561,000 / 1,729,446,000 = 0.3790583805.
+- Parent net margin = 219,761,000 / 1,729,446,000 = 0.1270701716.
+- Cash and cash equivalents 1,088,766,000; pledged deposits 42,628,000.
+- Bank borrowings 1,300,745,000; put-option-related equity purchase payable 1,321,705,000.
+- Because cash does not cover bank debt and the put obligation is material, discounted detachable net cash was floored at zero.
+- Base operating FCF = 232,225,000 - 85,800,000 = 146,425,000.
+- Parent attribution ratio = 219,761,000 / 269,267,000 = 0.8161453130.
+- Parent-attributed FCF = 119,504,077.46.
+- 20% safety haircut for cycle/working-capital/exit volatility gives discounted sustainable cash profit = 95,603,261.97.
+- Operating business price = market cap 2,314,396,278.06 - zero net cash = 2,314,396,278.06.
+- Owner earnback years = market cap / discounted cash profit = 24.20834008.
+
+7. Dividend
+- Annual report states no 2025 interim dividend and no recommended final dividend.
+- Forecast cash dividend set to zero and forecast yield to zero absent a stated restoration policy.
+
+8. Output construction and validation
+- Populated outputs/result.json exclusively through protocol set/append commands after initialization.
+- Created outputs/report.md and outputs/trace.txt.
+- Protocol validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial populated result validation status: ok; errors: [].

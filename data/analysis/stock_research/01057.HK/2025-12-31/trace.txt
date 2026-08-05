@@ -1,0 +1,69 @@
+stock-research trace
+company: 01057.HK / 浙江世宝股份有限公司
+period: 2025-12-31 annual
+generated timezone: Asia/Shanghai
+
+1. Read required protocol material
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- config/input.json exists.
+- No annual facts, normalized facts, raw filing metadata, or prior stock-research result existed under the input-declared stock_report paths in this workspace.
+- Therefore fetched and read the primary 2025 annual report.
+
+3. Primary sources
+- Zhejiang Shibao Company Limited 2025 Annual Report, disclosed 2026-03-31, CNINFO:
+  https://static.cninfo.com.cn/finalpage/2026-03-31/1225050367.PDF
+- Audited annual results announcement for year ended 2025-12-31, HKEX, disclosed 2026-03-30:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0330/2026033003118_c.pdf
+- Market-cap snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026/07/31 16:08:45.
+
+4. Model classification
+- Input hint: financial_brokerage / requires_special_model.
+- Filing facts: automotive steering systems and components manufacturer; manufacturing balance sheet with receivables, inventory, plant, equipment, trade payables, and limited bank debt.
+- Override: ordinary_operating / applicable.
+- Reason: input hint conflicts with the audited filing and appears to be master-data contamination.
+
+5. Core extracted facts (CNY)
+- Revenue: 3,548,952,008.20
+- Cost of sales: 2,891,151,060.13
+- Gross profit: 657,800,948.07
+- Parent net profit: 180,516,932.51
+- Deducted non-recurring parent profit: 154,553,517.42
+- Operating cash flow: 234,239,928.18
+- Capital expenditure: 214,169,842.21
+- Operating free cash flow: 20,070,085.97
+- Total assets: 3,834,729,716.54
+- Total liabilities: 1,732,059,532.34
+- Parent equity: 2,074,238,721.83
+- Cash and cash equivalents: 304,145,318.69
+- Cash balance: 488,868,474.45
+- Trading financial assets: 1,846,700.00
+- Interest-bearing and lease liabilities used in owner calculation: 116,794,236.82
+- Proposed cash dividend: 49,357,943.04
+
+6. Derived formulas
+- Gross margin = 657,800,948.07 / 3,548,952,008.20 = 0.1853507589.
+- Net margin = 180,516,932.51 / 3,548,952,008.20 = 0.0508648559.
+- Operating FCF = 234,239,928.18 - 214,169,842.21 = 20,070,085.97.
+- Discounted detachable net cash = 304,145,318.69 + 1,846,700.00 * 0.80 - 116,794,236.82 = 188,828,441.87.
+- Discounted sustainable cash profit = 154,553,517.42 - 54,553,517.42 prudence reserve = 100,000,000.00.
+- Operating business price = 2,781,306,899.490953 - 188,828,441.87 = 2,592,478,457.620953.
+- Owner earnback years = 2,592,478,457.620953 / 100,000,000 = 25.9247845762.
+- Market cap / cash profit = 2,781,306,899.490953 / 100,000,000 = 27.8130689949.
+- Forecast dividend yield = 49,357,943.04 / 2,781,306,899.490953 = 0.0177463131.
+
+7. Judgment notes
+- Non-cash-equivalent cash balance was assigned a zero detachable value because it mainly represents bill guarantees and similar restricted funds.
+- Investment property was excluded from detachable cash because the filing evidence reviewed does not establish disposal availability or realizable market value.
+- Sustainable cash profit is an analyst haircut, not management guidance. It reflects high 2025 capex, weak operating cash conversion in 2023-2024, and 70% top-five customer concentration.
+- The supplied HK market-cap snapshot was used as instructed. Zhejiang Shibao is dual-listed; no independent A/H cross-market total-equity market-cap reconstruction was performed, so this is a material valuation limitation.
+
+8. Protocol
+- outputs/result.json was initialized using `PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init`.
+- All structured fields and list rows were populated with protocol `set` and `append` commands.
+- Final validation command: `PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json`.
+- Final validation result: `{"status":"ok","errors":[]}`.

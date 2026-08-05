@@ -1,0 +1,71 @@
+task=stock-research JLL annual 2025-12-31
+generated_at=2026-08-05T05:54:26+08:00
+
+[protocol]
+initialized outputs/result.json with:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+all JSON fields and array entries were populated through protocol set/append commands; JSON was not authored from scratch.
+
+[reuse_check]
+checked stock_report/data/raw/filings/JLL/2025-12-31
+checked stock_report/data/analysis/annual_review/JLL/2025-12-31
+checked stock_report/data/normalized/facts/JLL/2025-12-31
+checked stock_report/data/analysis/stock_research/JLL/2025-12-31
+result: no existing JLL filing, annual facts, normalized facts, or prior stock-research outputs were present in workspace; official sources were fetched.
+
+[primary_sources]
+1. SEC Form 10-K, accession 0001037976-26-000037, filed 2026-02-19
+   https://www.sec.gov/Archives/edgar/data/1037976/000103797626000037/jll-20251231.htm
+   used for business model, balance sheet, income statement, cash flow, segments, dividends, repurchases, warehouse receivables/facilities, and risks.
+2. JLL FY2025 earnings release, dated 2026-02-18
+   https://ir.jll.com/news-releases/press-release-details/2026/JLL-Reports-2025-Financial-Results-for-Fourth-Quarter-and-Full-Year/default.aspx
+   used as company-source cross-check for FY2025 revenue, earnings, operating cash flow, free cash flow, and segment narrative.
+3. Federal Reserve H.10 daily USD/CNY series
+   https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+   2025-12-31 rate: 7.1875 CNY per USD.
+4. config/input.json
+   market cap CNY 110222609146.13672; date 2026-08-03; source Yahoo Finance yfinance; PE TTM 17.035988.
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=JLL is a fee and commission commercial-real-estate services company, not a developer holding property inventory. Mortgage warehouse receivables/facilities are matched operating financing and excluded from detachable cash. Client cash held as agent is off balance sheet and excluded.
+
+[conversion]
+all filing amounts were USD millions; converted to absolute CNY using amount_usd_millions * 1,000,000 * 7.1875.
+market cap was already supplied in CNY and was not reconverted.
+
+[gross_margin]
+JLL does not report conventional GAAP gross profit. Display cost_of_sales equals aggregate gross contract costs: 17102.0 + 11.6 + 5.7 + 36.1 + 2.8 = USD 17158.2m.
+display gross profit=26115.6-17158.2=USD 8957.4m.
+display gross margin=8957.4/26115.6=0.3429903965.
+
+[free_cash_flow]
+2025 FCF=1194.1-215.6=USD 978.5m.
+2024 FCF=785.3-185.5=USD 599.8m.
+2023 FCF=575.8-186.9=USD 388.9m.
+three-year mean=USD 655.733333m.
+sustainability haircut=10%.
+discounted sustainable cash profit=USD 590.16m=CNY 4241775000.
+
+[detachable_cash]
+cash=USD 599.1m.
+company debt=short-term borrowings USD 92.7m + long-term debt USD 805.9m=USD 898.6m.
+warehouse receivable USD 751.2m and warehouse facility USD 759.1m treated as matched operating financing and assigned zero detachable value.
+investments and deferred-compensation assets assigned zero detachable value due business/employee-liability linkage.
+discounted detachable net cash=599.1-898.6=-USD 299.5m=-CNY 2152656250.
+
+[valuation_math]
+operating business price=110222609146.13672-(-2152656250)=112375265396.13672 CNY.
+owner earnback years=112375265396.13672/4241775000=26.492509715.
+market cap to cash profit=110222609146.13672/4241775000=25.985020221.
+forecast dividend=0 because no dividends were declared or paid in 2024 or 2025 and no announced policy supports a positive forecast.
+
+[quality]
+status=complete
+limitations recorded in result.json: input market-cap decomposition unavailable; gross margin is a display construct; unified period-end FX is a translation convention; sustainable cash profit is an analyst normalization, not company guidance.
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

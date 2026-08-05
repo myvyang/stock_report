@@ -1,0 +1,81 @@
+stock-research trace
+company: 我武生物 (300357.SZ)
+period: 2025-12-31 annual
+generated_at: 2026-08-01T00:23:27+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely as requested.
+- Read references/data-reuse.md because the input supplied reusable-fact paths.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields only through protocol set commands; the complex JSON object was not authored from scratch.
+
+2. Reuse audit
+- Missing: stock_report/data/raw/filings/300357.SZ/2025-12-31/
+- Missing: stock_report/data/analysis/annual_review/300357.SZ/2025-12-31/
+- Missing: stock_report/data/normalized/facts/300357.SZ/2025-12-31/annual-facts.json
+- Missing: stock_report/data/analysis/stock_research/300357.SZ/2025-12-31/
+- Also checked /root/aicode/stock_report sync targets; no 300357.SZ files were present.
+- Consequence: no local facts or historic conclusion was reused. Public annual-report disclosures were used instead.
+
+3. Sources actually used
+- Shenzhen Stock Exchange, 2025 annual report summary, disclosed 2026-04-24:
+  https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-24/056f5b61-217d-4f04-b12f-f6efa0244c81.PDF
+- Full 2025 annual-report disclosure content (announcement 2026-008), accessible mirror of the filed report:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12166431&stockid=300357
+- Input valuation snapshot: config/input.json, Tencent qt.gtimg.cn, 2026-07-31 11:43:30.
+- A PDF copy was downloaded only for attempted local extraction; pdftotext was unavailable, so no figures were sourced from that failed extraction path.
+
+4. Statement-model review
+- Business facts: allergen diagnostic and therapeutic drug R&D, manufacture and sales; customers are pharmaceutical distributors and promotion targets hospitals.
+- No customer deposits, client money, insurance reserves, regulated presale cash, construction contract assets, concession rights, or holding-company look-through structure.
+- Result: ordinary_operating; owner_earnback_applicability=applicable.
+
+5. Core reported figures (CNY)
+- total_assets = 2,897,394,281.68
+- total_liabilities = 185,670,826.72
+- total_equity = 2,711,723,454.96
+- parent_equity = 2,619,452,220.07
+- minority_interest = 92,271,234.89
+- revenue = 1,062,404,471.43
+- cost_of_sales = 50,582,171.21
+- gross_profit = 1,011,822,300.22
+- operating_profit = 438,417,461.01
+- net_profit = 368,089,245.89
+- parent_net_profit = 380,940,984.34
+- operating_cash_flow = 423,195,746.61
+- capital_expenditure = 119,347,815.69
+- operating_free_cash_flow = 303,847,930.92
+- financing_cash_flow = -129,109,173.84
+- dividend/profit/interest cash out = 115,298,368.90
+
+6. Formula checks
+- gross_margin = (1,062,404,471.43 - 50,582,171.21) / 1,062,404,471.43 = 0.9523889699542433
+- net_margin = 380,940,984.34 / 1,062,404,471.43 = 0.3585649294446701
+- operating_free_cash_flow = 423,195,746.61 - 119,347,815.69 = 303,847,930.92
+- forecast_cash_dividend = 523,584,000 / 10 * 1.50 = 78,537,600.00
+- forecast_dividend_yield = 78,537,600 / 12,487,000,000 = 0.006289549131096341
+
+7. Discounted detachable net cash
+- currency cash: 797,222,807.56 * 90% = 717,500,526.804
+- bank wealth-management products: 560,226,151.32 * 85% = 476,192,228.622
+- current-maturity large deposits: 74,579,246.57 * 90% = 67,121,321.913
+- other debt investments / large deposits: 31,404,602.74 * 90% = 28,264,142.466
+- less short-term borrowing and lease-related debt: 18,405,709.75 * 100% = 18,405,709.75
+- discounted_detachable_net_cash = 1,270,672,510.055
+- Judgment note: cash-equivalent ending balance was only 120,062,978.78, so cash and deposits were not accepted at full face value. Bank products received a larger liquidity/valuation discount.
+
+8. Sustainable cash profit and earnback
+- 2025 operating FCF anchor = 303,847,930.92.
+- Rounded downward to discounted_sustainable_cash_profit = 300,000,000 because maintenance versus expansion capex is not disclosed and product concentration warrants a small buffer.
+- operating_business_price = 12,487,000,000 - 1,270,672,510.055 = 11,216,327,489.945
+- owner_earnback_years = 11,216,327,489.945 / 300,000,000 = 37.38775829981667
+- market_cap_to_cash_profit = 12,487,000,000 / 300,000,000 = 41.623333333333335
+- discounted_net_cash_to_market_cap = 1,270,672,510.055 / 12,487,000,000 = 0.10175963082045329
+
+9. Quality and validation
+- result data_quality.status = complete.
+- Known limitations are recorded in result.json and report.md: missing local fact package, report/valuation date mismatch, incomplete deposit restriction/maturity split, and maintenance/expansion capex not separated.
+- Initial protocol validation after population: status=ok, errors=[].
+- Final protocol validation is run after all output files are written; see final command output in task handoff.

@@ -1,0 +1,68 @@
+stock-research trace
+company=NVS / Novartis AG
+period=2025-12-31
+generated_for=2026-08-05 task input
+
+1. Skill and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because local annual facts were absent.
+
+2. Protocol
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated structured fields through protocol `set`; the complex result was not authored from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok, errors=[]
+
+3. Reuse audit
+- Checked input-listed raw filing, annual review, normalized facts, and stock research paths.
+- No NVS filing package, annual facts, normalized facts, or prior research result existed locally.
+- Therefore researched from official annual report and company disclosures.
+
+4. Principal sources
+- Novartis Annual Report 2025 / Form 20-F:
+  https://www.novartis.com/sites/novartis_com/files/novartis-annual-report-2025.pdf
+  Used audited income statement F-1, balance sheet F-3, cash flow F-5, product and geographic disclosures, business model, customer concentration, dividend and risk disclosures.
+- Novartis annual results 2025:
+  https://www.novartis.com/Investors/financial-data/annual-results
+- Novartis 2026 AGM dividend approval:
+  https://www.novartis.com/index.php/news/media-releases/novartis-shareholders-approve-all-resolutions-proposed-board-directors-2026-annual-general-meeting
+- Federal Reserve H.10 monthly USD/CNY:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.M.CH&rel=H10
+- Market cap and PE: config/input.json Yahoo Finance yfinance snapshot dated 2026-08-03.
+
+5. Currency convention
+- All USD financial statement amounts converted to CNY absolute yuan at 1 USD = 7.0432 CNY, the Federal Reserve H.10 December 2025 monthly average.
+- This is a uniform presentation convention, not transaction-date historical conversion.
+
+6. Key extracted USD facts (millions)
+- Net sales 54,532; cost of goods sold 13,699; gross profit 42,975.
+- Operating income 17,644; net income 13,967; attributable net income 13,984.
+- Total assets 110,949; liabilities 64,400; equity 46,549; parent equity 46,130; NCI 419.
+- Cash 11,435; current securities/deposits/derivatives 155.
+- Non-current financial debt 27,935; current financial debt/derivatives 5,602; lease liabilities 1,920.
+- Operating cash flow 19,144; PP&E purchases 1,548; intangible purchases 2,352.
+- Company-defined FCF 17,596; financing cash outflow 14,867.
+- Dividends paid 7,818; treasury shares purchased 9,212.
+
+7. Model decisions
+- statement_model=ordinary_operating: innovative-medicine R&D, manufacturing and sales are ordinary operating activities; no bank/insurance/property-project balance-sheet model.
+- Discounted detachable net cash:
+  cash 11,435 * 90% + current securities 155 * 80% - financial debt 33,537 - lease liabilities 1,920
+  = -25,041.5 USD million = -176,372,292,800 CNY.
+- Discounted sustainable cash profit:
+  OCF 19,144 - PP&E 1,548 - intangible purchases 2,352 = 15,244 USD million;
+  less 10% risk buffer 1,524.4 = 13,719.6 USD million = 96,629,886,720 CNY.
+- Operating business price = market cap - discounted net cash
+  = 2,179,155,919,161.6875 CNY.
+- Owner earnback years = operating business price / discounted cash profit = 22.5516.
+- Market cap / cash profit = 20.7263.
+- Dividend forecast uses approved CHF 3.70/share, annual-report illustrative USD 4.67/share, and 1,908,151,679 year-end shares; estimated CNY 62,762,436,538.84 and yield 3.1338%.
+
+8. Judgment boundaries
+- The 10% cash buffer and 10% profit buffer are analytical haircuts, not reported facts.
+- Intangible purchases are deducted because recurring external pipeline/product rights are economically relevant reinvestment for an innovative pharmaceutical company.
+- No growth is assumed in owner earnback years.
+- No buy/sell recommendation or target price produced.

@@ -1,0 +1,57 @@
+stock-research trace
+company=03339.HK 中国龙工控股有限公司
+period=2025-12-31 annual
+generated_at=2026-08-04T13:59:02+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md and linked data-reuse.md.
+3. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields with protocol CLI set commands; complex JSON was not authored from an empty file.
+
+[reuse check]
+Checked stock_report/data/analysis/annual_review/03339.HK/2025-12-31 and stock_report/data/raw/filings/03339.HK/2025-12-31.
+No existing annual facts package or filing metadata was available for reuse at task start.
+
+[primary sources]
+S1 HKEX, Lonking Holdings Limited Annual Report 2025, released 2026-04-30:
+https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0430/2026043004262.pdf
+- pp. 9-11: product revenue and business discussion.
+- pp. 26: proposed HKD0.20 final dividend.
+- pp. 68-74: audited income statement, balance sheet and cash flow statement.
+- pp. 106-109: operating segments and geography.
+- pp. 119-131: PPE, receivables, financial assets, cash and deposits.
+- pp. 140-156: borrowings and financial risk information.
+S2 HKEX title-search records and AGM result/dividend disclosures for stock code 03339, including 2026-05-28 approval of final dividend.
+S3 config/input.json market snapshot: market cap RMB11,580,420,933.335424, PE TTM 9.35, Tencent qt.gtimg.cn, timestamp 2026/08/03 09:47:27.
+
+[model decision]
+Input hint said financial_brokerage/requires_special_model. Rejected after filing review.
+Annual report segment note states all RMB11.215bn external revenue came from sale of construction machinery; finance lease and financial investment are auxiliary segments. Final model=ordinary_operating, owner_earnback_applicability=applicable.
+
+[calculations]
+gross_margin=2,396,701,000 / 11,215,184,000 = 0.2137014426
+net_margin=1,300,528,000 / 11,215,184,000 = 0.1159613610
+operating_free_cash_flow=1,244,557,000 - 61,538,000 = 1,183,019,000
+total_assets=3,802,699,000 + 13,112,788,000 = 16,915,487,000
+total_liabilities=16,915,487,000 - 11,482,006,000 = 5,433,481,000
+discounted_net_cash:
+  cash 4,364,812,000 * 100% = 4,364,812,000
+  time deposits 2,473,656,000 * 95% = 2,349,973,200
+  pledged deposits 255,849,000 * 80% = 204,679,200
+  FVTPL financial assets 919,394,000 * 80% = 735,515,200
+  bank borrowings -20,000,000 * 100% = -20,000,000
+  total=7,634,979,600
+operating_business_price=11,580,420,933.335424 - 7,634,979,600 = 3,945,441,333.335424
+discounted_sustainable_cash_profit=1,050,000,000 (judgment; below 2025 parent profit RMB1.301bn and FCF RMB1.183bn)
+owner_earnback_years=3,945,441,333.335424 / 1,050,000,000 = 3.7575631746
+market_cap_to_cash_profit=11,580,420,933.335424 / 1,050,000,000 = 11.0289723175
+forecast_dividend_yield=756,000,000 / 11,580,420,933.335424 = 0.0652826011
+
+[quality and limitations]
+Core filing numbers are audited and traceable to the annual report. Market cap and PE were supplied by task input and not independently reconstructed. Dividend RMB amount and yield are approximate because declared dividend is in HKD. Detachable-cash discounts and sustainable cash profit are disclosed analytical judgments, not reported accounting facts.
+
+[validation]
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok, errors=[]

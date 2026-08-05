@@ -1,0 +1,51 @@
+stock-research trace
+company=002083.SZ 孚日股份
+period=2025-12-31 annual
+generated_at=2026-07-31T21:25:05+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated scalar fields with protocol set and array rows with protocol append; no hand-written result JSON.
+4. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[local-reuse]
+- No pre-existing raw filing, annual facts, normalized facts, or stock research result was present for 002083.SZ/2025-12-31.
+- Downloaded annual report mirror to stock_report/data/raw/filings/002083.SZ/2025-12-31/2025-annual-report.pdf.
+- Official filing identity resolved via CNINFO query: orgId=9900001342, annual report announcementId=1225082676, summary announcementId=1225082675, disclosure date=2026-04-08.
+- Full PDF is image/scanned; direct pypdf extraction yielded no substantive text. Core fields were therefore taken from the CNINFO annual-report summary and cross-checked against structured tables sourced from the same annual filing.
+
+[sources]
+- CNINFO 2025 annual report: https://static.cninfo.com.cn/finalpage/2026-04-08/1225082676.PDF
+- CNINFO 2025 annual report summary: https://static.cninfo.com.cn/finalpage/2026-04-08/1225082675.PDF
+- Eastmoney securities data API reports used for cross-check: RPT_F10_FINANCE_GBALANCE, RPT_F10_FINANCE_GINCOME, RPT_F10_FINANCE_GCASHFLOW, RPT_F10_FN_MAINOP; filter SECUCODE=002083.SZ, REPORT_DATE=2025-12-31.
+- Input valuation: Tencent qt.gtimg.cn, 2026-07-31 11:43:36.
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Revenue comes from manufacturing and selling home-textile/new-material products; operating assets are plants, equipment, inventory and receivables, and liabilities are ordinary borrowings/payables. No special financial-statement model applies.
+
+[formula-checks]
+gross_profit=5210034725.84-4120772521.00=1089262204.84
+gross_margin=1089262204.84/5210034725.84=0.20907004697
+net_margin=428428645.99/5210034725.84=0.08223143770
+operating_free_cash_flow=833264444.59-228474872.54=604789572.05
+discounted_net_cash=118181037.61+199628329.93*0.90+61269733.85*0.50-1027101677.08-505765424.43=-1204385700.038
+operating_business_price=10318000000-(-1204385700.038)=11522385700.038
+discounted_sustainable_cash_profit=400000000
+owner_earnback_years=11522385700.038/400000000=28.80596425
+market_cap_to_cash_profit=10318000000/400000000=25.795
+forecast_dividend_yield=278000000/10318000000=0.02694320605
+
+[judgment-boundaries]
+- 2025 FCF is not treated as fully sustainable because D&A materially exceeded cash capex and working-capital timing can move OCF.
+- Standardized cash profit before safety haircut: 604789572.05-160360926.61=444428645.44; additional 10%/rounding haircut gives 400000000.
+- Only cash equivalents are counted at 100%; trading financial assets at 90%; other non-current financial assets at 50%; interest-bearing debt at 100% negative.
+- Dividend is a board proposal and may differ with eligible shares on record date.
+
+[quality]
+status=complete
+limitations=Scanned PDF prevented page-level extraction of every restricted-cash footnote; structured statements and official summary support all required core fields. The cash discount is deliberately conservative.

@@ -1,0 +1,66 @@
+stock-research trace
+task: GUT / annual / 2025-12-31
+generated for input created_at: 2026-08-04T19:40:19+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse check
+- Searched stock_report/data for GUT/2025-12-31.
+- No raw filing, filing metadata, annual facts, normalized facts, or prior research result was present.
+- Therefore sourced the missing annual report from the SEC and current distribution information from Gabelli.
+
+3. Primary sources used
+- SEC Form N-CSR, accession 0001829126-26-002082:
+  https://www.sec.gov/Archives/edgar/data/1080720/000182912626002082/gut_ncsr.htm
+  Annual report for the year ended 2025-12-31; audited by PwC, report dated 2026-02-27.
+- Gabelli official GUT fund page:
+  https://gabelli.com/ticker/gut/
+- Gabelli official closed-end distributions page:
+  https://gabelli.com/funds/closed-end-funds/distributions/
+- Gabelli Jan-Mar 2026 distribution announcement:
+  https://gabelli.com/wp-content/uploads/2025/11/Jan-Mar-2026-Div_GUT.pdf
+- Federal Reserve H.10 DDP, China spot exchange rate, 2025-12-31: 7.1875 CNY/USD.
+- Market capitalization, date and PE TTM were accepted from config/input.json (Yahoo Finance yfinance).
+
+4. Model determination
+- Input hint ordinary_operating/applicable was rejected.
+- Filing identifies GUT as a diversified closed-end management investment company registered under the Investment Company Act of 1940.
+- Selected statement_model=investment_holding and owner_earnback_applicability=requires_special_model.
+- All ordinary owner-earnback sortable fields remain null as required by the contract.
+
+5. Key USD facts extracted from SEC filing
+- Investments: $319,140,215; total assets: $319,934,805.
+- Total liabilities: $550,476.
+- Series C preferred liquidation amount: $47,319,475.
+- Net assets attributable to common: $272,064,854.
+- Common shares: 89,385,762; NAV/share: $3.04; year-end market price: $6.03.
+- Total investment income: $11,368,209; net expenses: $4,186,858.
+- Net investment income: $7,181,351.
+- Realized gain net of FX: $6,826,507; unrealized appreciation: $33,898,361.
+- Net increase attributable to common from operations: $45,340,579.
+- Common distributions: $53,182,719, of which $48,121,495 was return of capital.
+- Cash paid for common distributions in cash-flow statement: $45,624,694; difference includes reinvestment mechanics.
+
+6. Conversion and calculations
+- All filing amounts in result.json multiplied by 7.1875 CNY/USD.
+- Forecast distribution = 89,385,762 shares * $0.60/share * 7.1875 = CNY 385,476,098.625.
+- Forecast distribution yield = CNY 385,476,098.625 / CNY 3,839,325,319.467224 = 0.100402041.
+- Year-end price/NAV = $6.03 / $3.04 = 1.9836, or approximately 98.4% premium.
+- Net investment income/common distribution = $7,181,351 / $53,182,719 = approximately 13.5%.
+
+7. Result construction and validation
+- Used protocol `set` and `append` commands to populate the initialized skeleton; did not hand-write result.json.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+
+8. Known limitations
+- The supplied market cap and PE are third-party inputs and have a later date than the annual report.
+- Market-cap input lacks its underlying share price/share count/FX decomposition.
+- 2026 distribution is annualized from the fixed monthly policy, not a forecast of earned income.
+- Fund PE includes unrealized portfolio valuation changes and is not comparable to an ordinary operating-company PE.

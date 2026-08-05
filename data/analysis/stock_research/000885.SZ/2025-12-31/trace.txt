@@ -1,0 +1,51 @@
+stock-research trace — 000885.SZ — period 2025-12-31
+
+1. Read instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Protocol initialization
+   Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   Result: initialized stock-research-result-v1 skeleton.
+
+3. Local reuse audit
+   Input referenced stock_report/data/raw/filings/000885.SZ/2025-12-31 and annual_review facts files.
+   Actual workspace contained none of those paths/files; only stock_report/data/notes/user_stock_evaluations.md existed.
+   Decision: no local facts were fabricated or silently substituted; fetched the official annual report.
+
+4. Official sources read
+   - 2025 annual report PDF: https://static.cninfo.com.cn/finalpage/2026-04-15/1225103177.PDF
+     Downloaded to /tmp/stock-research-000885/annual.pdf.
+     Extracted 214 pages to temporary text with pypdf.
+   - 2025 profit distribution proposal: https://static.cninfo.com.cn/finalpage/2026-04-15/1225103185.PDF
+   - Market snapshot was supplied in config/input.json: Tencent qt.gtimg.cn, 2026-07-31 11:43:06.
+
+5. Key reconciliations
+   Revenue 6,563,347,987.56 - cost 3,969,481,216.43 = gross profit 2,593,866,771.13.
+   Gross margin = 2,593,866,771.13 / 6,563,347,987.56 = 0.3952048217.
+   Net margin = parent net profit 1,236,126,318.73 / revenue = 0.1883377692.
+   Assets 32,565,250,882.02 - liabilities 21,972,794,076.55 = equity 10,592,456,805.47.
+   Parent equity 9,487,216,979.01 + minority interest 1,105,239,826.46 = equity 10,592,456,805.47.
+   Operating cash flow 2,081,555,217.79 - capex 1,142,546,643.85 = simple operating FCF 939,008,573.94.
+   Proposed dividend yield = 247,842,206.43 / 8,276,000,000.00 = 0.0299471008.
+
+6. Model override
+   Input hint: ordinary_operating / applicable.
+   Filing facts: BOT concession periods usually 20–30 years; concession-right carrying value 16,864,270,438.45; pledged long-term loans 11,620,938,212.04, mainly secured by project charging rights/revenue.
+   Conclusion: utility_concession / requires_special_model.
+   Consequence: all ordinary detachable-net-cash, discounted-cash-profit, operating-business-price and payback fields remain null.
+
+7. Result population
+   Used protocol CLI `set` operations after initialization; did not replace the initialized file with a hand-written JSON document.
+   Temporary helper populate_result.sh only encoded deterministic protocol calls and was removed after execution.
+
+8. Data limitations
+   - No local annual facts package was available.
+   - Consolidated reporting does not provide a complete project-by-project remaining concession term, debt amortization schedule, maintenance capex split, or shareholder cash waterfall.
+   - Therefore no project DCF or ordinary owner earnback years were calculated.
+   - Market data was accepted from task input and not independently reconciled to exchange historical data.
+
+9. Validation
+   Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Expected/final result: {"status":"ok","errors":[]}

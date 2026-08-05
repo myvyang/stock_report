@@ -1,0 +1,35 @@
+[2026-07-31 16:02:08+08:00] 读取 config/input.json；确认公司 002034.SZ 旺能环境，报告期 2025-12-31，输入市值 7,394,000,000 元，PE TTM 10.25。
+[2026-07-31] 完整读取 .agents/skills/stock-research/SKILL.md。
+[2026-07-31] 完整读取 references/result-contract.md、references/report-contract.md，并按技能路由补读 references/data-reuse.md。
+[2026-07-31] 盘点本地长期目录：未发现 2025 年年度事实包、规范化事实或历史研究结果，仅有 config/input.json。
+[2026-07-31] 从深圳证券交易所官方静态披露地址取得《旺能环境股份有限公司2025年年度报告全文》PDF：
+https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-18/f4737ee3-cdb9-47cd-969b-80968d00c860.PDF
+[2026-07-31] 原始 PDF 保存至 stock_report/data/raw/filings/002034.SZ/2025-12-31/2025-annual-report.pdf。
+[2026-07-31] 环境缺少 pdftotext；建立临时 venv /tmp/stockresearch-pdf 并安装 pypdf，仅用于提取本地 PDF 文本。提取 184 页到同目录 2025-annual-report.txt。
+[2026-07-31] 使用协议 CLI init 初始化 outputs/result.json，未手写初始复杂 JSON。
+[2026-07-31] 核对公司业务：垃圾焚烧发电、餐厨垃圾处理以 BOT/BOO 特许经营为主，收入来自电费、处置费、供热及资源化产品。
+[2026-07-31] 覆盖输入 analysis_model_hint：statement_model 从 ordinary_operating 改为 utility_concession；owner_earnback_applicability 从 applicable 改为 requires_special_model。
+[2026-07-31] 模型依据：固定资产 4,989,891,396.58 元、在建工程 90,482,551.50 元、无形资产 6,186,085,743.53 元，合计 11,266,459,691.61 元，占总资产 80.37%；无形资产含按合同期限摊销的特许经营权，PPP 项目存在到期移交。
+[2026-07-31] 核对三张表：
+  total_assets=14,018,753,786.92
+  total_liabilities=6,665,373,356.42
+  total_equity=7,353,380,430.50
+  parent_equity=7,208,555,296.38
+  revenue=3,243,660,222.77
+  cost_of_sales=1,888,351,401.35
+  gross_profit=1,355,308,821.42
+  parent_net_profit=721,188,109.54
+  operating_cash_flow=1,764,695,258.51
+  capital_expenditure=598,802,576.14
+  operating_free_cash_flow=1,165,892,682.37
+[2026-07-31] 公式复核：
+  gross_margin=1,355,308,821.42 / 3,243,660,222.77 = 0.4178312614
+  net_margin=721,188,109.54 / 3,243,660,222.77 = 0.2223365098
+  operating_free_cash_flow=1,764,695,258.51 - 598,802,576.14 = 1,165,892,682.37
+[2026-07-31] 特殊模型处理：按结果协议将 discounted_net_cash、discounted_cash_profit、operating_business_price、owner_earnback_years、market_cap_to_cash_profit 及对应 owner_earnback 数字保持 null。
+[2026-07-31] 分红预测：采用 2025 年半年度实际现金分红 84,904,216.40 元为下一年度保守基准；2025 年末不再派息；forecast_dividend_yield=84,904,216.40 / 7,394,000,000 = 0.0114823127。不把股份回购计入预测现金分红。
+[2026-07-31] 使用协议 CLI set 逐字段写入 result.json，包括模型、三张表、资产负债解释、分红、业务、风险、证据和数据质量。
+[2026-07-31] 第一次 CLI 批量包装命令因 shell 将 “PYTHONPATH=src” 误作命令而退出；未改写初始化文件。改用 shell 函数重新执行，所有字段成功写入。
+[2026-07-31] 执行 PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json。
+[2026-07-31] 协议验证结果：status=ok，errors=[]。
+[2026-07-31] 生成 outputs/report.md 与 outputs/trace.txt。

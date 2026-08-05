@@ -1,0 +1,88 @@
+stock-research trace
+company=301119.SZ 正强股份
+period=2025-12-31 annual
+generated_date=2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated initialized fields using protocol `set`; JSON was not authored from an empty object.
+6. Final validation command and outcome recorded below.
+
+[local reuse audit]
+- config/input.json present.
+- No raw filing, annual facts package, normalized facts, or prior stock-research result existed under the paths supplied by input.
+- stock_report/data/notes/user_stock_evaluations.md existed but did not supply a 2025 facts package.
+- Therefore returned to the primary annual filing.
+
+[primary source]
+- Shenzhen Stock Exchange static disclosure PDF:
+  https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-23/646c189c-4f75-4baa-a1a3-2cc30508cbac.PDF
+- Title: 杭州正强传动股份有限公司2025年年度报告全文
+- Published: 2026-04-23
+- PDF downloaded to a temporary directory and extracted read-only with pypdf because no local PDF text extractor was installed.
+
+[market source]
+- Input snapshot: Tencent qt.gtimg.cn
+- market_cap=2819000000 CNY
+- market_cap_date=20260731114254
+- pe_ttm=28.1
+
+[key filing facts]
+- revenue=459224100.04
+- cost_of_sales=314588560.63
+- gross_profit=144635539.41 (calculated)
+- parent_net_profit=112733708.33
+- deducted_nonrecurring_parent_profit=105416099.57
+- operating_cash_flow=148784468.25
+- capital_expenditure=75093099.84
+- operating_free_cash_flow=73691368.41 (calculated)
+- total_assets=1386780531.68
+- total_liabilities=344945735.01
+- parent_equity=1041834796.67
+- cash=790045690.35
+- restricted_cash=24614643.84
+- unused_ipo_proceeds=156241300 (annual report discloses 15624.13万元, including net interest)
+- trading_financial_assets=30078000.00
+- other_debt_investments=50768493.15
+- short_term_borrowings=104111096.20
+- lease_liability_total=729547.38
+- interest_income=35397855.23
+- 2025 proposal cash dividend=12480000.00
+- cash dividend paid for 2024=95680000.00
+
+[derived formulas]
+- gross_margin=(459224100.04-314588560.63)/459224100.04=0.31495633482084623
+- net_margin=112733708.33/459224100.04=0.24548735207969377
+- operating_free_cash_flow=148784468.25-75093099.84=73691368.41
+- discounted_net_cash:
+  (790045690.35-24614643.84-156241300)*0.95
+  +30078000*0.90
+  +50768493.15*0.90
+  -104111096.20
+  -729547.38
+  =546651459.4395
+- discounted_cash_profit=75000000; judgment value derived from 105416099.57 deducted-nonrecurring profit less approximately 30416099.57 after-tax/rounded detachable-cash interest contribution; cross-checked against 73691368.41 reported-year FCF.
+- operating_business_price=2819000000-546651459.4395=2272348540.5605
+- owner_earnback_years=2272348540.5605/75000000=30.29798054080667
+- market_cap_to_cash_profit=2819000000/75000000=37.586666666666666
+- forecast_dividend_yield=12480000/2819000000=0.004427101809152182
+
+[fact/inference/judgment separation]
+- Facts: all filing line items, business mix, customer concentration, proposed dividend and market snapshot.
+- Calculations: margins, FCF, ratios, business price and payback years.
+- Judgments: cash discounts, exclusion of unused IPO proceeds, and 75m sustainable cash profit. Reasons are recorded in result.json and report.md.
+
+[limitations]
+- No independently verified industry market share was available; company positioning is described conservatively.
+- Market data is a point-in-time third-party quote snapshot.
+- Sustainable cash profit is an analytical estimate, not company guidance.
+
+[validation]
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Outcome: {"status":"ok","errors":[]}
+- data_quality.status=complete
+- data_quality.incomplete_reasons=[]

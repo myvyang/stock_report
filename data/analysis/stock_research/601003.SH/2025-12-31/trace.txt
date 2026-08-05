@@ -1,0 +1,50 @@
+stock-research trace
+company=601003.SH 柳钢股份
+period=2025-12-31
+generated_at=2026-08-01 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Read references/data-reuse.md because local fact reuse was the preferred route.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields with repeated protocol `set` commands; did not hand-write the full JSON object.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: {"status":"ok","errors":[]}
+
+[local-data-check]
+- Expected paths under stock_report/data/raw/filings/601003.SH/2025-12-31 and stock_report/data/analysis/annual_review/601003.SH/2025-12-31 were absent.
+- No prior annual facts package, normalized facts, raw filing metadata, or stock-research result was available for reuse.
+- config/input.json and stock_report/data/notes/user_stock_evaluations.md were present.
+
+[public-sources]
+- Official SSE annual report URL:
+  https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-30/601003_20260430_2OEB.pdf
+- Searchable annual-report text used to inspect tables:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12283515&stockid=601003
+- Searchable annual operating data announcement:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12283502&stockid=601003
+- Market cap and PE were retained from config/input.json: Tencent qt.gtimg.cn snapshot at 20260731114323.
+
+[key-extractions]
+- Revenue 68,891,055,214.72; cost 64,955,025,162.85; parent net profit 671,016,701.56; deducted parent net profit 614,506,783.58.
+- Total assets 61,375,498,405.20; liabilities 38,945,416,265.96; equity 22,430,082,139.24; parent equity 9,036,553,085.03; minority interest 13,393,529,054.21.
+- Operating cash flow 4,470,311,999.25; capital expenditure proxy 1,229,649,776.75; operating FCF 3,240,662,222.50.
+- Cash 3,204,328,850.44; restricted cash 75,240,157.43; usable cash 3,129,088,693.01.
+- Financing liabilities 27,035,248,735.14, including borrowing, bonds, current maturities, long-term payable, lease and supply-chain finance.
+
+[judgment-and-formulas]
+- statement_model=ordinary_operating; applicable with adjustments for steel cyclicality, capital intensity, debt and minority ownership.
+- discounted net cash = 3,129,088,693.01 - 27,035,248,735.14 = -23,906,160,042.13.
+- sustainable cash profit scenario = 614,506,783.58 * 65% = 399,429,409.327. The 35% haircut reflects two loss years, single-year recovery and weak Q4; this is an inference, not a reported fact.
+- operating business price = 10,537,000,000 - (-23,906,160,042.13) = 34,443,160,042.13.
+- owner earnback = 34,443,160,042.13 / 399,429,409.327 = 86.2309 years.
+- market cap/cash profit = 26.3801; dividend yield = 263,422,177.10 / 10,537,000,000 = 2.49997%.
+
+[limitations]
+- Local filing and annual-facts artifacts named by the input were unavailable.
+- The official PDF endpoint returned an access-response file in the shell environment, so table extraction used the searchable annual-report rendering while retaining the official SSE URL as the primary filing identity.
+- Consolidated FCF is not treated as fully attributable to parent shareholders due to large minority interests.
+- Cash-flow disclosure did not isolate dividend cash from interest cash; result field remains null.

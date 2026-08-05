@@ -1,0 +1,66 @@
+stock-research trace: 02352.HK / 2025-12-31 annual
+generated_at: 2026-08-04T11:31:26+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill directs reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- The configured raw filing, annual review, normalized facts and prior stock research files were absent from the workspace.
+- No prior annual facts or research conclusions were reused.
+
+3. Identity and model verification
+- Located HKEX issuer disclosure page for stock code 02352 and the 2025 annual report published 2026-04-24.
+- Annual report states the group primarily provides property management and related value-added services in the PRC.
+- Business lines are City Operations, Lifestyle, Comprehensive Health and Other Comprehensive Services.
+- No brokerage client money, proprietary trading portfolio or repo financing was present.
+- Overrode input hint financial_brokerage/requires_special_model with ordinary_operating/applicable.
+
+4. Primary sources
+- HKEX Annual Report 2025:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042401141_c.pdf
+- HKEX issuer title search / annual results announcement index:
+  https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=1000149164
+- Market cap and PE: config/input.json snapshot from Tencent qt.gtimg.cn at 2026/08/03 09:20:05.
+
+5. Extracted core facts (RMB)
+- Revenue 1,524,935,000; cost of sales 1,320,982,000; gross profit 203,953,000.
+- Operating profit 40,048,000; net profit 35,430,000; parent net profit 27,817,000.
+- Total assets 1,520,742,000; total liabilities 1,083,865,000; equity 436,877,000; parent equity 412,967,000.
+- Cash equivalents 299,074,000; restricted cash 6,269,000; lease liabilities 42,952,000; no borrowings.
+- Operating cash flow 127,868,000; PPE purchases 18,986,000; intangible purchases 5,036,000; operating FCF 103,846,000.
+- Financing cash flow -18,738,000; shareholder dividends paid 2,010,000.
+- Trade and bills receivables gross 709,344,000; impairment allowance 120,784,000.
+- 2025 final dividend recommendation: nil; 2025 interim dividend: nil.
+
+6. Calculations and judgments
+- Gross margin = 203,953,000 / 1,524,935,000 = 13.3744%.
+- Net margin = 27,817,000 / 1,524,935,000 = 1.8241%.
+- Discounted detachable cash:
+  299,074,000 x 50% + 6,269,000 x 0% - 42,952,000 = 106,585,000.
+- Cash discount rationale: current assets 1,034,457,000 versus current liabilities 1,033,494,000; cash supports working capital and performance obligations, so only 50% is treated as detachable.
+- Sustainable cash profit:
+  cash generated before working-capital changes 71,076,000
+  - cash tax 4,878,000
+  - PPE and intangible capex 24,022,000
+  = 42,176,000
+  x 80% receivable/quality safety factor
+  = 33,740,800.
+- Operating business price = 179,811,303.9368391 - 106,585,000 = 73,226,303.9368391.
+- Owner earnback = 73,226,303.9368391 / 33,740,800 = 2.1703 years.
+- Market cap / cash profit = 179,811,303.9368391 / 33,740,800 = 5.3292.
+- Forecast dividend = 0 based on no 2025 interim or recommended final dividend.
+
+7. Protocol writes and validation
+- All result fields were populated through repeated protocol `set` commands; the complex JSON result was not hand-written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+
+8. Known limitations
+- Market cap and PE were accepted from the supplied Tencent snapshot; FX/share-count derivation was not independently verified.
+- The 50% cash discount and 20% profit safety discount are disclosed analytical judgments and materially affect earnback results.
+- Dividend forecast is a baseline from disclosed 2025 distributions, not a board commitment about future periods.

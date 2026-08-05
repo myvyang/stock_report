@@ -1,0 +1,72 @@
+stock-research trace
+task: 00169.HK / WANDA HOTEL DEV
+period: 2025-12-31 annual
+generated: 2026-08-03 Asia/Shanghai
+
+1. Read instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized structured result using protocol CLI
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+   - No local files were present under the configured raw filing, annual review, normalized facts, or prior stock research paths for 00169.HK/2025-12-31.
+   - Public primary disclosure therefore had to be retrieved.
+
+4. Sources examined
+   - HKEX annual results announcement, published 2026-03-26:
+     https://www.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032602028.pdf
+   - Wanda Hotel Development Annual Report 2025, published 2026-04-27; public PDF mirror used for full annual-report text, with core figures cross-checked against HKEX results announcement:
+     https://stockn.xueqiu.com/00169/20260427013413.pdf
+   - Company financial report index:
+     https://www.wanda-hotel.com.hk/html/financial.html
+   - PBOC RMB central parity announcement, 2025-12-26:
+     https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+   - Tencent qt.gtimg.cn market-cap snapshot supplied in config/input.json.
+
+5. Company and model verification
+   - Input hint said financial_brokerage and also contained automobile tags; both conflict with the issuer's audited disclosure.
+   - Hotel-management subsidiary was disposed on 2025-10-16 and classified as discontinued operations.
+   - Year-end continuing assets/businesses were investment-property leasing, overseas property trading/leasing, and a 49% IP-management associate.
+   - Model overridden to investment_holding; owner_earnback_applicability set to requires_special_model.
+   - Ordinary discounted-net-cash and cash-profit sorting fields deliberately left null under the result contract.
+
+6. Financial extraction (HKD'000 before translation)
+   - Revenue 117,607; cost of sales 53,562; gross profit 64,045.
+   - Net profit 1,760,569; parent net profit 1,777,467.
+   - Total assets 2,776,136; total liabilities 858,488; total equity 1,917,648; parent equity 1,797,212; NCI 120,436.
+   - Operating cash flow 299,725.
+   - Capex defined as PP&E purchases 4,456 plus intangible additions 7,509 = 11,965.
+   - Operating free cash flow = 299,725 - 11,965 = 287,760.
+   - Financing cash flow -2,202,945; shareholder dividends paid 2,170,176.
+   - Disposal gain 2,042,582; discontinued-operation profit after tax 1,824,617.
+   - Continuing-operation parent loss 47,150; this is the economically relevant contrast to reported parent profit.
+
+7. Currency translation
+   - Protocol requires absolute CNY yuan.
+   - Applied 1 HKD = CNY 0.90486, the PBOC central parity published near period end on 2025-12-26.
+   - Balance-sheet and flow figures use the same rate for consistent protocol display; no average income-statement rate was applied.
+   - This approximation is recorded in data_quality.limitations.
+
+8. Metrics and dividends
+   - Gross margin = 64,045 / 117,607 = 0.5445679254.
+   - Protocol net margin = parent net profit 1,777,467 / continuing revenue 117,607 = 15.1136156861; report warns it is distorted by the disposal gain.
+   - 2025 special dividend HKD 0.462/share, approximately HKD 2.170bn, treated as non-recurring asset-sale distribution.
+   - Board recommended no 2025 final dividend; base forecast cash dividend and yield set to zero.
+
+9. Structured-result construction
+   - All complex sections were populated into the initialized schema using repeated protocol CLI `set` commands, not by hand-writing a new JSON object.
+   - Evidence, limitations, asset and liability explanations were added before validation.
+
+10. Validation
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    status: ok
+    errors: []
+
+11. Output files
+    - outputs/result.json
+    - outputs/report.md
+    - outputs/trace.txt

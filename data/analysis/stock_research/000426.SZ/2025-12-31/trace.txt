@@ -1,0 +1,63 @@
+stock-research trace
+company: 000426.SZ 兴业银锡
+period: 2025-12-31 annual
+generated_at: 2026-08-01T00:21:02+08:00
+
+1. Protocol initialization
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Required contracts read
+   .agents/skills/stock-research/SKILL.md
+   .agents/skills/stock-research/references/result-contract.md
+   .agents/skills/stock-research/references/report-contract.md
+   .agents/skills/stock-research/references/data-reuse.md
+
+3. Reuse audit
+   Checked configured raw filing, annual review, normalized facts, and prior stock research paths.
+   Result: none existed in /workspace; only config/input.json was present.
+
+4. Sources
+   - 2025 annual report full text, disclosed 2026-04-22:
+     https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12131356&stockid=000426
+     Used for audited financial statements, business model, revenue mix, production/sales, resource quantities, debt notes, restricted assets, audit matters, acquisitions, and post-balance-sheet dividend proposal.
+   - 2025 annual report summary:
+     https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12131339&stockid=000426
+     Used as a cross-check for business description and headline financials.
+   - config/input.json / Tencent qt.gtimg.cn snapshot
+     Used for market cap CNY 56,501,000,000, timestamp 20260731114321, PE TTM 21.18.
+
+5. Model classification
+   ordinary_operating / applicable.
+   Reason: 99.64% of revenue is mining; no customer deposits, insurance reserves, regulated presale cash, or other special statement-model items. Mineral rights and mine infrastructure are treated as operating assets, not detachable cash.
+
+6. Key calculations (CNY)
+   gross_profit = 5,555,253,610.07 - 2,355,958,527.89 = 3,199,295,082.18
+   gross_margin = 3,199,295,082.18 / 5,555,253,610.07 = 0.5759044153
+   net_margin = 1,704,239,280.88 / 5,555,253,610.07 = 0.3067797441
+   2025 operating FCF = 2,488,264,347.50 - 528,032,643.46 = 1,960,231,704.04
+   2024 operating FCF = 1,815,202,654.66 - 663,199,801.05 = 1,152,002,853.61
+   two-year average FCF = 1,556,117,278.83
+   discounted sustainable cash profit = average FCF * 0.85 = 1,322,699,687.00
+
+   unrestricted cash = 1,293,473,077.33 - 34,271,474.53 = 1,259,201,602.80
+   discounted cash = unrestricted cash * 0.90 = 1,133,281,442.52
+   financing and financing-like debt = 4,668,049,548.06
+   discounted detachable net cash = 1,133,281,442.52 - 4,668,049,548.06 = -3,534,768,105.54
+   operating business price = 56,501,000,000 - (-3,534,768,105.54) = 60,035,768,105.54
+   owner earnback years = 60,035,768,105.54 / 1,322,699,687.00 = 45.3888
+   market cap / cash profit = 56,501,000,000 / 1,322,699,687.00 = 42.7164
+   forecast dividend yield = 195,319,931.29 / 56,501,000,000 = 0.00345693
+
+7. Judgment flags
+   - The 85% sustainable-profit retention is an analyst judgment, not company guidance.
+   - Acquisition cash outflow is excluded from operating FCF, but acquisition-related debt is fully included in net debt.
+   - Dividend was a proposal at annual-report publication; no later implementation announcement was verified.
+   - Historical performance-compensation trust interests are assigned zero detachable value.
+
+8. Result population
+   All result.json updates were made with the stock-research protocol `set` command after protocol initialization; the complex JSON object was not hand-written from scratch.
+
+9. Validation
+   Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Outcome: {"status":"ok","errors":[]}
+   Additional check: python3 -m json.tool outputs/result.json completed successfully.

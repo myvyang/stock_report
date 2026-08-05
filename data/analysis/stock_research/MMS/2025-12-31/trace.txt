@@ -1,0 +1,74 @@
+stock-research trace — MMS — generated 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely as requested.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked the input-declared annual review, normalized facts, raw filing and prior stock research paths.
+- No pre-existing MMS annual facts, normalized facts, raw filing metadata, or prior research output was present.
+- Therefore returned to primary disclosures rather than fabricating a complete result.
+
+3. Primary records obtained
+- SEC Form 10-K: https://www.sec.gov/Archives/edgar/data/1032220/000103222025000053/mms-20250930.htm
+- SEC XBRL instance: https://www.sec.gov/Archives/edgar/data/1032220/000103222025000053/mms-20250930_htm.xml
+- Local copies:
+  stock_report/data/raw/filings/MMS/2025-12-31/mms-20250930.htm
+  stock_report/data/raw/filings/MMS/2025-12-31/mms-20250930_htm.xml
+- Filing identity: Maximus, Inc.; accession 0001032220-25-000053; filed 2025-11-20; fiscal year ended 2025-09-30.
+- Supplemental primary records: Maximus FY2025 earnings release/FY2026 outlook and Form 10-Q filed 2026-05-07.
+- FX record: Federal Reserve G.5 release dated 2025-10-01; September 2025 average CNY per USD = 7.1235.
+- Market data was taken unchanged from config/input.json: CNY 21,361,179,040.89038 market cap on 2026-08-03 and PE TTM 9.046547, source Yahoo Finance yfinance.
+
+4. Model classification
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: Maximus delivers labor/process/technology services under government contracts. Deposits, customer funds, insurance reserves, regulated presale cash, concession rights, or investment holdings are not the balance-sheet business model.
+- Government receivables are treated as required operating assets; no receivable amount is counted as detachable cash.
+
+5. USD facts extracted from FY2025 XBRL / filing
+- Revenue 5,431,276,000; cost of revenue 4,097,833,000; gross profit 1,333,443,000.
+- Operating income 528,289,000; net income attributable to common shareholders 319,034,000.
+- Total assets 4,069,639,000; liabilities 2,395,604,000; equity 1,674,035,000; no NCI reported.
+- Cash 222,351,000; receivables 898,095,000; goodwill 1,782,095,000; finite-lived intangibles 538,266,000.
+- Current debt 52,680,000; non-current debt 1,281,593,000; total interest-bearing debt 1,334,273,000.
+- Operating cash flow 429,372,000; productive asset purchases/capex 63,213,000; operating FCF 366,159,000.
+- Financing cash flow -343,877,000; dividends 68,710,000; repurchases 447,482,000.
+- Segment revenue: U.S. Federal 3,067,691,000; U.S. Services 1,763,691,000; Outside U.S. 599,894,000.
+- Backlog 15,327,000,000; weighted remaining life about 5 years, including option periods.
+
+6. Currency conversion
+- All financial statement amounts in result.json are USD fact × 7.1235 CNY/USD.
+- Ratios are calculated from same-currency inputs, so conversion does not alter margins or payback multiples.
+- Gross margin = 1,333,443 / 5,431,276 = 0.2455119202.
+- Net margin = 319,034 / 5,431,276 = 0.0587401561.
+
+7. Owner earnback calculation
+- Detachable net cash = (USD 222,351,000 cash − USD 1,334,273,000 debt) × 7.1235 = CNY -7,920,776,367.00.
+- Receivables receive a 0% detachable-cash weighting because they are contract working capital.
+- FY2025 FCF = (429,372,000 − 63,213,000) × 7.1235 = CNY 2,608,333,636.50.
+- Sustainable cash profit applies a 10% prudence discount: 2,608,333,636.50 × 90% = CNY 2,347,500,272.85.
+- Operating business price = 21,361,179,040.89038 − (-7,920,776,367.00) = CNY 29,281,955,407.89038.
+- Owner earnback = 29,281,955,407.89038 / 2,347,500,272.85 = 12.4736749753 years.
+- Market cap / cash profit = 21,361,179,040.89038 / 2,347,500,272.85 = 9.0995427297 years.
+- The 10% discount is an analyst judgment, not a reported fact. It reflects contract volume/margin, government collection timing, and policy risk. FY2026 FCF guidance of USD 450m–500m is supporting context, not substituted for actual FY2025 cash flow.
+
+8. Dividend forecast
+- Latest disclosed quarterly dividend through the research date: USD 0.33/share; expected quarterly cash payment approximately USD 17.5m.
+- Annualized forecast cash dividend = USD 70m × 7.1235 = CNY 498,645,000.
+- Forecast yield = 498,645,000 / 21,361,179,040.89038 = 0.0233435148.
+- This is a run-rate assumption, not a board commitment.
+
+9. Protocol updates and validation
+- Populated each result branch through repeated protocol `set` commands; the initialized complex object was not hand-written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final protocol response: {"status":"ok","errors":[]}.
+
+10. Known limitations
+- Input period 2025-12-31 is an archive/research period; underlying annual report is FY ended 2025-09-30.
+- CNY values depend on the selected September 2025 average FX rate.
+- Supplied yfinance valuation data was not independently reconstructed tick-by-tick.
+- Sustainable cash profit is based on one actual fiscal year with a 10% haircut; government-contract cash flows can vary materially by quarter and year.

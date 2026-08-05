@@ -1,0 +1,57 @@
+stock-research trace
+company: 01513.HK / Livzon Pharmaceutical Group Inc.
+period: 2025-12-31 annual
+generated context: 2026-08-04 Asia/Shanghai
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md in full.
+- Initialized outputs/result.json using:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked stock_report/data/analysis/annual_review/01513.HK/2025-12-31 and configured sync target.
+- No local annual facts package, normalized facts, prior research result, or raw filing existed for this period.
+- Therefore retrieved the official HKEX Annual Report 2025 PDF rather than reusing unsupported historical conclusions.
+
+3. Primary source acquired
+- HKEX Annual Report 2025, published 2026-03-24:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0324/2026032401308.pdf
+- Local copy:
+  stock_report/data/raw/filings/01513.HK/2025-12-31/annual_report_2025.pdf
+- A local text extraction was generated for deterministic searching:
+  stock_report/data/raw/filings/01513.HK/2025-12-31/annual_report_2025.txt
+- Relevant annual report locations: business pp.21-38; revenue/cost pp.38-46; risks pp.66-68; dividend p.123; audited statements pp.165-170; cash and financial asset notes pp.229-230.
+- Dividend approval/final update checked through HKEX issuer title search and 2026-05-29 AGM/final-dividend disclosures.
+- Valuation source was not replaced: config/input.json provides Tencent qt.gtimg.cn snapshot at 2026-08-03 09:47:41.
+
+4. Model classification
+- Input hint claimed financial_brokerage.
+- Audited report states the company is a comprehensive pharmaceutical manufacturer and reports 100% of operating income under pharmaceutical manufacturing.
+- Balance sheet contains ordinary pharmaceutical operating assets and bank debt, not brokerage client funds or repo-financed securities books.
+- Overrode hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+5. Core calculations (CNY absolute yuan)
+- gross_profit = 12,020,349,219.61 - 4,099,300,682.14 = 7,921,048,537.47
+- gross_margin = 7,921,048,537.47 / 12,020,349,219.61 = 0.6589699178
+- net_margin = 2,023,249,327.79 / 12,020,349,219.61 = 0.1683186812
+- operating_free_cash_flow = 3,145,038,968.09 - 574,136,191.60 = 2,570,902,776.49
+- discounted detachable net cash:
+  7,440,362,084.37 cash equivalents
+  + 1,344,668,279.76 * 0.80 trading financial assets
+  - 3,027,250,000.00 bank loans
+  - 2,500,000,000.00 minimum operating cash
+  = 2,988,846,708.178
+- Restricted guarantee deposit of 1,865,019,539.69 was excluded via use of cash equivalents rather than total monetary funds.
+- sustainable cash profit = 1,800,000,000, versus reported recurring parent profit about 2,009,164,430 and operating FCF 2,570,902,776.49.
+- operating business price = 20,074,412,364.590168 - 2,988,846,708.178 = 17,085,565,656.412169
+- owner earnback years = 17,085,565,656.412169 / 1,800,000,000 = 9.4919809202
+- market cap / cash profit = 20,074,412,364.590168 / 1,800,000,000 = 11.1524513137
+- forecast dividend yield = 1,269,707,254.53 / 20,074,412,364.590168 = 0.0632500335
+
+6. Output construction and validation
+- Populated outputs/result.json exclusively through protocol set/append commands after protocol init; it was not handwritten as a complex JSON object.
+- Wrote outputs/report.md from the same facts, calculations, assumptions, and limitations.
+- Protocol validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].

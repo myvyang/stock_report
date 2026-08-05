@@ -1,0 +1,76 @@
+stock-research trace
+company: 01579.HK / 颐海国际控股有限公司
+period: 2025-12-31
+generated_for_input: 2026-08-05T00:40:26+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No raw filing metadata, annual facts package, normalized facts, or historical stock-research output existed under the configured 01579.HK/2025-12-31 paths.
+- Result: fetched and inspected first-party disclosure.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: initialized stock-research-result-v1 skeleton.
+
+4. Official sources inspected
+- HKEX 2025 Annual Report, released 2026-04-24:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042402468.pdf
+- HKEX 2025 Annual Results Announcement, released 2026-03-24:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0324/2026032400916.pdf
+- Market-cap and PE snapshot: config/input.json / Tencent qt.gtimg.cn, timestamp 2026/08/03 09:47:30.
+
+5. Model verification
+- Input hint said financial_brokerage/requires_special_model.
+- Annual report Note 1 and business disclosures identify production and sales of hot pot condiments, compound condiments, and convenient ready-to-eat food products.
+- Balance sheet contains ordinary manufacturing/consumer-business assets and liabilities; no brokerage client money, repo financing, or securities operating structure.
+- Override: statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+
+6. Core financial extraction (annual report pages 269-273; RMB)
+- Revenue 6,612,566,000
+- Cost of sales 4,447,524,000
+- Gross profit 2,165,042,000
+- Operating profit 1,237,709,000
+- Net profit 903,485,000
+- Parent net profit 853,964,000
+- Total assets 5,939,710,000
+- Total liabilities 994,787,000
+- Total equity 4,944,923,000
+- Parent equity 4,771,869,000
+- Non-controlling interests 173,054,000
+- Operating cash flow 986,438,000
+- Capital expenditure 322,759,000 = PPE 319,944,000 + intangibles 1,779,000 + purchased right-of-use assets 1,036,000
+- Operating free cash flow 663,679,000
+- Financing cash flow -730,277,000
+- Dividend cash out 695,545,000 = company shareholders 655,545,000 + NCI 40,000,000
+
+7. Owner earnback assumptions and formulas
+- Starting cash pool 2,139,007,000 = cash equivalents 2,084,546,000 + within-one-year term deposits 54,461,000.
+- Deduct lease liabilities 116,570,000.
+- Deduct operating cash buffer 500,000,000.
+- Apply 90% recognition to residual 1,522,437,000.
+- Discounted detachable net cash = 1,370,193,300.
+- FVPL financial assets 354,999,000 excluded completely.
+- Parent-share FCF approximately 627.3m using parent profit / group profit; conservatively rounded down to sustainable cash profit 600,000,000.
+- Operating business price = 13,734,844,425.560236 - 1,370,193,300 = 12,364,651,125.560236.
+- Owner earnback years = 12,364,651,125.560236 / 600,000,000 = 20.607752.
+- Market cap / cash profit = 22.891407.
+
+8. Dividend forecast
+- 2025-attributable interim dividend 274,766,000 plus proposed final dividend 509,513,000 = 784,279,000.
+- Forecast assumes flat nominal dividend, no growth.
+- Yield = 784,279,000 / 13,734,844,425.560236 = 0.057101.
+
+9. Protocol population and validation
+- Populated result exclusively with protocol CLI set operations after init.
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation result: status=ok, errors=[]
+
+10. Known limitations
+- Market cap and PE were not independently recomputed.
+- Annual report provides no verifiable industry market share.
+- Cash buffer, residual-cash haircut, and sustainable cash profit are analytical assumptions, explicitly disclosed in result.json and report.md.

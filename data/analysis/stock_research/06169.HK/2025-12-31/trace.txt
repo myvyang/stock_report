@@ -1,0 +1,66 @@
+stock-research trace
+generated_at: 2026-08-04T12:05:48+08:00
+query: 06169.HK
+
+1. Read required protocol and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse audit
+- config/input.json existed.
+- Expected raw filing metadata, annual facts, normalized facts, and prior stock-research outputs did not exist in the workspace.
+- Therefore fetched the official annual report instead of reusing a fact pack.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized successfully.
+
+4. Official source acquired
+- HKEX annual report URL: https://www.hkexnews.hk/listedco/listconews/sehk/2025/1219/2025121900529.pdf
+- Publication date: 2025-12-19
+- Local copy: stock_report/data/raw/filings/06169.HK/2025-12-31/annual-report-2025.pdf
+- Company fiscal year end: 2025-08-31. Corrected analysis.period from task target 2025-12-31 to actual annual reporting period 2025-08-31.
+
+5. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Annual report facts: private formal education from high school through university and vocational college; customers are students and parents; operating assets are campuses and education infrastructure.
+- Conclusion: hint is wrong. Set statement_model=ordinary_operating and owner_earnback_applicability=applicable, with explicit VIE/cross-border cash constraints.
+
+6. Extracted audited facts (RMB, absolute yuan after x1,000 conversion)
+- Revenue 2,496,819,000; cost 1,351,170,000; gross profit 1,145,649,000.
+- Operating profit 913,518,000; total net profit 934,620,000; parent net profit 929,876,000.
+- Total assets 12,308,613,000; total liabilities 3,468,674,000; total equity 8,839,939,000; parent equity 8,789,272,000; NCI 50,667,000.
+- Operating cash flow 1,632,038,000.
+- PPE purchases 857,077,000; intangible purchases 5,114,000; capex 862,191,000; operating FCF 769,847,000.
+- Cash 1,730,448,000; term deposits 46,640,000; restricted cash 2,190,000.
+- Borrowings 636,940,000; lease liabilities 5,071,000; contract liabilities 840,589,000.
+- No final dividend recommended for FY2025; FY2024 comparator nil.
+- PwC issued an unmodified opinion dated 2025-11-28.
+
+7. Calculations
+- gross_margin = 1,145,649,000 / 2,496,819,000 = 0.4588426321.
+- net_margin = 929,876,000 / 2,496,819,000 = 0.3724282780.
+- nominal net funds excluding restricted cash = 1,730,448,000 + 46,640,000 - 636,940,000 - 5,071,000 = 1,135,077,000.
+- discounted detachable net cash = 1,135,077,000 * 50% = 567,538,500.
+- operating FCF = 1,632,038,000 - 862,191,000 = 769,847,000.
+- discounted sustainable cash profit = 769,847,000 * 70% = 538,892,900.
+- operating business price = 1,352,924,993.0489063 - 567,538,500 = 785,386,493.0489063.
+- owner earnback years = 785,386,493.0489063 / 538,892,900 = 1.4574074.
+- market cap / cash profit = 1,352,924,993.0489063 / 538,892,900 = 2.5105638.
+- forecast dividend = 0; forecast dividend yield = 0.
+
+8. Judgment flags
+- 50% cash discount is an analyst scenario for VIE control, cross-border remittance, prepaid tuition obligations, and operating liquidity; not company guidance.
+- 70% FCF retention is an analyst scenario for maintenance/growth capex uncertainty and discontinued Thailand operations; not company guidance.
+- Input market cap and PE were retained. The input source does not explicitly identify original currency; protocol requires CNY, so this is recorded as a limitation.
+- Forecast dividend of zero is a baseline based on FY2025 and FY2024 nil final dividends, not a promise about future policy.
+
+9. Protocol writes
+- Used protocol set commands for analysis, analysis_model, metrics, financials, asset_analysis, owner_earnback, dividend, business, risks, evidence, and data_quality.
+- Complex result JSON was not hand-written from scratch.
+
+10. Validation
+- Final validation command and result appended after report construction.
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[]

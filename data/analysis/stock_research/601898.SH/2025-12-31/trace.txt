@@ -1,0 +1,93 @@
+task=stock_research
+company=601898.SH 中煤能源
+period=2025-12-31
+generated_at=2026-07-31T18:55:31+08:00
+
+[protocol]
+skill=.agents/skills/stock-research/SKILL.md
+result_contract=.agents/skills/stock-research/references/result-contract.md
+report_contract=.agents/skills/stock-research/references/report-contract.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+mutation=all result fields populated through protocol set commands
+validation=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[source_reuse]
+requested_annual_facts=stock_report/data/analysis/annual_review/601898.SH/2025-12-31/facts.json
+requested_existing_research=stock_report/data/analysis/stock_research/601898.SH/2025-12-31/result.json
+reuse_result=no local annual facts, normalized facts, raw filing, or prior research existed
+action=downloaded official 2025 annual report and extracted searchable text
+
+[primary_source]
+title=中国中煤能源股份有限公司2025年年度报告
+publisher=中国中煤能源股份有限公司
+publication_date=2026-03-27
+landing_page=https://www.chinacoalenergy.com/col/col171/art/2026/art_cecd502eded546d3aa0736543e575ebb.html
+local_pdf=stock_report/data/raw/filings/601898.SH/2025-12-31/annual-report-2025.pdf
+local_text=stock_report/data/raw/filings/601898.SH/2025-12-31/annual-report-2025.txt
+audit_opinion=standard unqualified opinion, Ernst & Young Hua Ming
+
+[market_source]
+market_cap=182572000000
+market_cap_date=20260731114333
+pe_ttm=10.28
+source=Tencent qt.gtimg.cn, supplied in config/input.json
+
+[reported_financials_cny]
+total_assets=370254237000
+total_liabilities=169638408000
+total_equity=200615829000
+parent_equity=160133083000
+minority_interest=40482746000
+revenue=148056698000
+cost_of_sales=107357222000
+gross_profit=40699476000
+operating_profit=26582320000
+net_profit=21839384000
+parent_net_profit_prc_gaap=17883577000
+parent_net_profit_ifrs=14497092000
+operating_cash_flow=29791934000
+production_sales_cash_flow=23496000000
+external_deposit_increase_in_ocf=6296000000
+cash_capex=21787133000
+financing_cash_flow=-4046107000
+
+[model_check]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=core assets and profits arise from coal mining, coal chemicals, equipment and power; finance company is a small embedded special-model segment
+special_handling=external member deposits and matching finance-company assets are operating financial items, not detachable cash
+
+[cash_calculation_cny]
+cash=88717371000
+restricted_cash=-11482439000
+external_member_deposits=-39340301000
+candidate_cash_before_discount=37894631000
+candidate_cash_discount=0.70
+discounted_candidate_cash=26526241700
+interest_bearing_debt=-70762000000
+discounted_detachable_net_cash=-44235758300
+formula=(cash-restricted_cash-external_member_deposits)*0.70-interest_bearing_debt
+
+[cash_profit_calculation_cny]
+starting_point=IFRS parent profit 14497092000
+reason_for_ifrs=company dividend policy uses lower of PRC GAAP and IFRS distributable profit; IFRS difference mainly reflects actual special-reserve spending
+cycle_and_reinvestment_factor=0.85
+discounted_sustainable_cash_profit=12322528200
+cross_check_1=production sales cash flow 23496000000 versus cash capex 21787133000
+cross_check_2=2025 cash capex increased 4290000000 and construction in progress increased 8063000000
+limitation=annual report does not disclose a reliable maintenance-versus-growth capex split
+
+[owner_earnback]
+operating_business_price=182572000000-(-44235758300)=226807758300
+owner_earnback_years=226807758300/12322528200=18.4059435384
+market_cap_to_cash_profit=182572000000/12322528200=14.8161154137
+
+[dividend]
+forecast_cash_dividend=5073982200
+forecast_basis=2025 board proposal, including interim dividend already paid; 35% of IFRS parent profit
+forecast_dividend_yield=5073982200/182572000000=0.0277916778
+status_at_annual_report_date=final dividend subject to shareholder approval
+
+[quality]
+status=complete
+limitations=market data supplied by input; owner-earnback discounts are analyst judgments; finance-company matching is complex; maintenance capex not separately disclosed

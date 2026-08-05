@@ -1,0 +1,54 @@
+task: stock research 603153.SH 上海建科
+period: 2025-12-31
+generated_for_date: 2026-07-31 Asia/Shanghai
+
+protocol:
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md in full.
+- Read references/report-contract.md in full.
+- Read references/data-reuse.md because the local annual fact pack was reused.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields with protocol `set` commands; no complex JSON object was handwritten from scratch.
+- Validated result with the protocol validator.
+
+reused_local_sources:
+- config/input.json
+- stock_report/data/analysis/annual_review/603153.SH/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/603153.SH/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/603153.SH/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/603153.SH/2025-12-31/metadata.json
+- stock_report/data/raw/filings/603153.SH/2025-12-31/603153_2025_annual_report.txt
+- stock_report/data/raw/filings/603153.SH/2025-12-31/603153_2025_annual_report.pdf
+
+model_review:
+- Input hint was construction_project / requires_special_model.
+- Annual report identifies the company as professional technical services.
+- 2025 main revenue: decision and engineering consulting CNY 2,853,227,081.80; testing/certification CNY 1,513,026,642.76; environment/low-carbon CNY 486,147,354.45; special engineering/intelligent manufacturing CNY 123,088,848.28.
+- Contract assets were only CNY 6,541,047.68 and inventories CNY 39,685,309.28.
+- Conclusion: ordinary_operating / applicable, with receivables and minimum operating cash treated conservatively. The input hint was overridden based on filing facts.
+
+core_calculations:
+- gross_margin = 1,847,107,926.38 / 5,000,181,423.19 = 0.369407.
+- net_margin = 368,119,301.76 / 5,000,181,423.19 = 0.073621.
+- operating_free_cash_flow_2025 = 458,315,022.13 - 113,862,427.78 = 344,452,594.35.
+- average_2024_2025_deducted_parent_profit = (275,614,307.21 + 281,324,990.34) / 2 = 278,469,648.78.
+- average_2024_2025_operating_fcf = (231,560,734.43 + 344,452,594.35) / 2 = 288,006,664.39.
+- sustainable_cash_profit scenario = CNY 270,000,000, below both historical cross-checks to recognize receivable and credit impairment risk.
+- financing_and_lease_debt = 45,029,012.50 + 288,198,000.00 + 68,428,394.17 = 401,655,406.67.
+- detachable_cash_before_rounding = 2,193,924,062.67 - 401,655,406.67 - 1,000,000,000 = 792,268,656.00.
+- discounted_detachable_net_cash = CNY 790,000,000 after conservative rounding.
+- operating_business_price = 5,496,000,000 - 790,000,000 = 4,706,000,000.
+- owner_earnback_years = 4,706,000,000 / 270,000,000 = 17.42963.
+- market_cap_to_cash_profit = 5,496,000,000 / 270,000,000 = 20.355556.
+- forecast_dividend_yield = 110,650,625.91 / 5,496,000,000 = 0.020133.
+
+judgment_limits:
+- CNY 1.0 billion minimum operating cash is an analyst scenario, not a directly disclosed company number.
+- 2023 capital expenditure was not extracted; the cash-profit assessment uses 2024-2025 FCF and 2023-2025 deducted profit.
+- Market cap and PE were reused from the task input Tencent snapshot and were not refreshed.
+- 2025 cash dividend is a board proposal and remains subject to actual implementation.
+
+final_validation:
+- Run after all output edits:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

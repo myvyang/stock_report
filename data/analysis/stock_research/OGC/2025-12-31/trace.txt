@@ -1,0 +1,73 @@
+stock-research trace
+task: OGC / OceanaGold Corporation / annual / 2025-12-31
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields only through protocol set commands.
+
+2. Reuse audit
+- Expected files under stock_report/data/raw/filings/OGC/2025-12-31 and stock_report/data/analysis/annual_review/OGC/2025-12-31 were absent.
+- No facts.json, annual_facts.md, extraction_trace.txt, normalized annual-facts.json, or prior research result was available in /workspace or the supplied /root/aicode target.
+- Rebuilt facts from primary SEC/company disclosures.
+
+3. Identity and model check
+- SEC CIK: 0001487326; registrant: OceanaGold Corp; current exchange/ticker: NYSE OGC.
+- 2025 MD&A: four controlled operating mines—Haile (100%), Macraes (100%), Waihi (100%), Didipio (80%).
+- Classified ordinary_operating / applicable. Mining-specific treatment retained for sustaining capital, depletion, closure obligations, and commodity cyclicality.
+- Listing timing caveat: NYSE listing occurred in April 2026; during FY2025 shares traded as TSX:OGC and OTCQX:OCANF.
+
+4. Primary sources
+- Audited FY2025 consolidated financial statements, SEC Exhibit 99.12:
+  https://www.sec.gov/Archives/edgar/data/1487326/000162828026021651/oceanagold-ex9912xfinancia.htm
+- FY2025 MD&A dated 2026-02-18, SEC Exhibit 99.11:
+  https://www.sec.gov/Archives/edgar/data/1487326/000162828026021651/oceanagold-ex9911xmdafy202.htm
+- FY2025 results release dated 2026-02-18:
+  https://oceanagold.com/news/oceanagold-achieves-2025-guidance-delivers-record-free-cash-flow
+- 2025 Annual Information Form:
+  https://assets.oceanagold.com/documents/Reports/Annual-Information/2025/OceanaGold-Annual-Information-Form-2025.pdf
+- Market cap and PE: config/input.json, Yahoo Finance yfinance supplied data dated 2026-08-03.
+
+5. Extracted original facts (USD millions unless noted)
+- Cash 476.5; inventories 360.3; mineral properties, plant and equipment 2,297.1.
+- Total assets 3,255.4; liabilities 884.2; parent equity 2,267.1; NCI 104.1.
+- Revenue 1,893.2; cost excluding D&A 763.7; D&A 252.0; operating profit 740.3.
+- Net profit 645.7; attributable parent profit 628.7; adjusted attributable profit 511.8.
+- CFO 984.2; PP&E payment 102.0; mining asset payment 340.8; investing cash outflow net 441.5; FCF 542.7.
+- Parent dividends 27.7; buybacks 175.1; financing cash flow -255.1.
+- Lease liabilities 50.1; debt 0; asset retirement obligations 188.4.
+- Gold production 497.6 koz; gold sales 497.8 koz; average realized gold price USD3,509/oz; AISC USD1,966/oz.
+- 2026 quarterly dividend approved at USD0.09/share; 2026 buyback authorization up to USD350m.
+
+6. Currency normalization
+- Contract requires CNY absolute yuan.
+- Applied explicit research conversion 1 USD = 7.20 CNY consistently to all filing and forecast monetary amounts.
+- This is a normalization assumption, not an audited reporting exchange rate. Original USD facts remain in report and evidence.
+
+7. Calculations
+- Gross profit = 1,893.2 - 763.7 - 252.0 = USD877.5m = CNY6,318,000,000.
+- Gross margin = 877.5 / 1,893.2 = 0.4635009508.
+- Net margin = 628.7 / 1,893.2 = 0.3320811325.
+- Operating FCF = 984.2 - 102.0 - 340.8 = USD541.4m by gross capex definition; result uses audited net investing outflow method 984.2 - 441.5 = USD542.7m, consistent with company FCF reconciliation. Capital expenditure field uses gross PP&E + mining asset payments = USD442.8m.
+- Discounted detachable net cash = (476.5 - 50.1) * 60% * 7.2m = CNY1,842,048,000.
+- Sustainable cash profit base = adjusted parent profit USD511.8m; 15% commodity/depletion/execution haircut.
+- Discounted sustainable cash profit = 511.8 * 85% * 7.2m = CNY3,132,216,000.
+- Operating business price = 36,220,960,309.0957 - 1,842,048,000 = CNY34,378,912,309.0957.
+- Owner earnback years = 34,378,912,309.0957 / 3,132,216,000 = 10.975907252.
+- Market cap / cash profit = 36,220,960,309.0957 / 3,132,216,000 = 11.564004625.
+- Forecast dividend = USD0.09 * 4 * 224m shares * 7.2 = CNY580,608,000.
+- Forecast dividend yield = 580,608,000 / 36,220,960,309.0957 = 0.0160295655.
+
+8. Judgment boundaries
+- Facts: audited statements, production/cost tables, declared Q1 2026 dividend, and supplied market data.
+- Inference: ordinary-operating model is applicable because mine assets and operating liabilities are identifiable and no special financial balance-sheet model exists.
+- Subjective conservative assumptions: 60% recognition of post-lease net cash; 15% haircut to adjusted profit; USD/CNY normalization at 7.20; four-quarter annualization of USD0.09 dividend.
+- Static owner earnback is not a mine-by-mine reserve DCF and does not establish normalized through-cycle value.
+
+9. Validation
+- Protocol validation was run after population and returned status=ok, errors=[].
+- A final validation and JSON parse check are run after report/trace creation.

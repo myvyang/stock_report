@@ -1,0 +1,99 @@
+[2026-08-04 12:19 Asia/Shanghai] task initialized
+- input: config/input.json
+- requested query: OMSE
+- requested period: 2025-12-31
+- requested report type: annual
+
+[protocol]
+- read .agents/skills/stock-research/SKILL.md
+- read references/result-contract.md
+- read references/report-contract.md
+- read references/data-reuse.md
+- initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+[reuse check]
+- stock_report/data/raw/filings/OMSE/2025-12-31/metadata.json: absent
+- stock_report/data/analysis/annual_review/OMSE/2025-12-31/facts.json: absent
+- stock_report/data/analysis/annual_review/OMSE/2025-12-31/annual_facts.md: absent
+- no existing annual fact package or prior stock-research output available for reuse
+
+[company and period resolution]
+- SEC CIK: 0002012219
+- company fiscal year end: March 31
+- latest annual filing available as of task date: FY2026 Form 20-F, report date 2026-03-31, filed 2026-06-25
+- SEC accession: 0001193125-26-282941
+- primary document: omse-20260331.htm
+- decision: override input period 2025-12-31 with actual latest annual period 2026-03-31; record mismatch in data_quality.limitations
+
+[primary sources]
+1. SEC FY2026 Form 20-F
+   https://www.sec.gov/Archives/edgar/data/2012219/000119312526282941/omse-20260331.htm
+2. Company IR FY2026 results release
+   https://ir.omsos.com/news-releases/news-release-details/oms-energy-technologies-inc-announces-fiscal-year-2026-financial
+3. SEC 2026-02-02 Form 6-K tax update
+   https://www.sec.gov/Archives/edgar/data/2012219/000121390026010531/ea0273592-6k_omsenergy.htm
+4. Input market snapshot: Yahoo Finance yfinance, market date 2026-08-03
+
+[model determination]
+- statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- basis: manufacturing and sale of oilfield equipment plus machining/repair services; balance sheet consists of cash, receivables, inventory, PP&E, leases and ordinary operating liabilities; no special financial, property development, concession or investment-holding economics
+
+[currency]
+- source financial statement currency: USD
+- output currency required by protocol: CNY
+- research conversion assumption: USD 1 = CNY 6.80
+- limitation: single approximate rate used for all balance sheet, income statement and cash flow values
+
+[FY2026 audited facts, USD thousands]
+- total assets 237,140; total liabilities 39,749; total equity 197,391
+- parent equity 189,643; non-controlling interest 7,748
+- revenue 155,910; cost of revenue 108,680; gross profit 47,230
+- operating profit 34,857; net profit 33,878; parent net profit 32,208
+- operating cash flow 54,118
+- PP&E purchases 1,114; intangible purchases 523; total capex 1,637
+- operating free cash flow 52,481
+- financing cash flow 26,980; dividend/buyback cash out 0
+
+[operating facts]
+- Saudi Aramco: 57% of FY2026 revenue
+- top ten customers: 88% of FY2026 revenue
+- Saudi Arabia segment: revenue USD 91.761m; profit USD 25.665m
+- backlog: USD 60.7m at 2026-03-31 vs USD 102.0m at 2025-03-31
+- working capital contributions to CFO: inventory decrease USD 16.165m; payables increase USD 12.576m
+- cash and cash equivalents USD 151.985m; restricted cash USD 2.317m
+- explicit dividend policy: retain funds and future earnings; no cash dividends expected in foreseeable future
+
+[formulas]
+- gross margin = 47.230 / 155.910 = 0.3029311782
+- parent net margin = 32.208 / 155.910 = 0.2065807196
+- capex = (1.114 + 0.523) * 6.80 = CNY 11,131,600
+- operating FCF = (54.118 - 1.637) * 6.80 = CNY 356,870,800
+- discounted detachable net cash USD m:
+  151.985*90% + 2.317*50% + 1.984*50% - 39.749 = 99.188
+- discounted detachable net cash CNY = 99.188m * 6.80 = 674,478,400
+- normalized cash profit uses CNY adjustments:
+  parent net profit 219,014,400
+  - after-tax net finance income 18,727,200
+  + D&A 43,220,800
+  - normalized capex 27,200,000
+  = 216,308,000 before concentration haircut
+  - customer/order concentration haircut 44,268,000 (about 20%)
+  = CNY 172,040,000 (USD 25.3m)
+- operating business price = 1,208,793,018.93 - 674,478,400 = CNY 534,314,618.93
+- owner earnback years = 534,314,618.93 / 172,040,000 = 3.1058
+- market cap / cash profit = 1,208,793,018.93 / 172,040,000 = 7.0262
+- forecast dividend = 0; forecast dividend yield = 0
+
+[judgment flags]
+- 10% haircut to unrestricted cash for operational/cross-border buffer
+- 50% recognition for restricted cash and related-party loan
+- all liabilities deducted at 100%
+- normalized capex set at USD 4.0m, above FY2026 actual USD 1.637m
+- 20% concentration/order-volatility haircut to adjusted cash profit
+- these assumptions are analytical estimates, not company guidance
+
+[validation]
+- command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- result: status=ok, errors=[]

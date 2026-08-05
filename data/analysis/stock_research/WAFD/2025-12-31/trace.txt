@@ -1,0 +1,50 @@
+Stock research trace — WAFD
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse check
+- Checked stock_report/data/analysis/annual_review/WAFD/2025-12-31 and stock_report/data/raw/filings/WAFD/2025-12-31.
+- No reusable annual facts or raw filing files were present, so primary-source retrieval was required.
+
+3. Primary sources consulted
+- SEC 2025 Form 10-K, fiscal year ended 2025-09-30:
+  https://www.sec.gov/Archives/edgar/data/936528/000093652825000117/wfsl-20250930.htm
+- SEC filing index / identity and filing date:
+  https://www.sec.gov/Archives/edgar/data/936528/000093652825000117/0000936528-25-000117-index-headers.html
+- WaFd Q4 2025 Fact Sheet, SEC Exhibit 99.2:
+  https://www.sec.gov/Archives/edgar/data/936528/000093652825000104/exhibit992_sep2025factsheet.htm
+- Form 10-Q for quarter ended 2025-12-31:
+  https://www.sec.gov/Archives/edgar/data/936528/000093652826000020/wfsl-20251231.htm
+- Federal Reserve H.10 USD/CNY reference data:
+  https://www.federalreserve.gov/releases/h10/20250929/
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.M.CH&rel=H10
+- Market snapshot: config/input.json, sourced there to Yahoo Finance yfinance, market-cap date 2026-08-03.
+
+4. Model decision
+- Form 10-K identifies WaFd, Inc. as the holding company of WaFd Bank and describes lending and deposit services.
+- Overrode input hint ordinary_operating/applicable with financial_bank/not_applicable.
+- Kept discounted net cash, discounted cash profit, operating business price, owner earnback years, and market-cap-to-cash-profit fields null as required for banks.
+
+5. Extraction and transformations
+- Parsed SEC inline XBRL facts for FY context 2024-10-01 through 2025-09-30 and instant 2025-09-30.
+- Extracted balance sheet (USD): assets 26,699,699,000; liabilities 23,660,124,000; equity 3,039,575,000; net loans 20,088,618,000; deposits 21,437,636,000; borrowings 1,765,604,000; cash 657,310,000; AFS securities 3,533,201,000; HTM securities 645,802,000.
+- Extracted income statement (USD): NII 654,235,000; provision 7,750,000; noninterest income 71,247,000; noninterest expense 427,463,000; net income 226,068,000; common shareholder income 211,443,000.
+- Extracted specialty metrics: FY NIM 2.58%; Q4 NIM 2.71%; NPA 143,022,000 and 0.54% of assets; allowance 199,720,000; company CET1 11.77%; company total risk-based capital 14.80%.
+- Converted all financial statement amounts at USD 1 = CNY 7.12. This is an approximate reporting conversion, not a transaction-date translation.
+- Forecast dividend: 78,186,520 shares x USD 0.27 x 4 x CNY 7.12 = CNY 601,223,064.19. Yield = forecast dividend / supplied market cap = 3.2765%.
+- FY2025 payout reference: USD 84,639,000 common dividends / USD 211,443,000 common income = 40.03%.
+
+6. Output construction
+- Populated outputs/result.json exclusively through protocol set commands after protocol initialization.
+- Wrote outputs/report.md as the human-readable operating story under the special bank model.
+- Recorded sources, model override, formulas, limitations, and extraction path in this trace.
+
+7. Validation
+- Ran:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]

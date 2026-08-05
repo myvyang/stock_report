@@ -1,0 +1,21 @@
+2026-08-05 research trace
+
+1. Read stock-research/SKILL.md, result-contract.md, report-contract.md and data-reuse.md.
+2. Inspected configured local paths. No annual facts package, normalized facts, raw filing metadata, or prior stock-research output existed.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Located and downloaded the issuer's official 2025 annual report from HKEX:
+   https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042703012.pdf
+5. Reviewed official filing sections: financial summary pp.6-7; chairman's statement and operating KPIs pp.8-14; MD&A/dividend pp.30-31; audited statements pp.193-199; cash note pp.264-266; capital/dividend note pp.283-284; auditor KAM pp.186-188.
+6. Overrode input analysis_model_hint. Filing evidence shows a restaurant chain, not a brokerage. Selected ordinary_operating/applicable.
+7. Gross margin convention: revenue less raw materials and consumables only, because the filing presents expenses by nature and does not report gross profit. Flagged non-comparability in limitations and report.
+8. Owner earnback judgement:
+   - discounted detachable cash = RMB676.542m cash x 50% = RMB338.271m;
+   - restricted deposits RMB56.210m excluded;
+   - cash profit = RMB448.034m CFO - RMB125.997m tangible/intangible capex - RMB225.734m lease principal - RMB30.441m lease interest = RMB65.862m;
+   - lease liabilities were not subtracted again from net cash to avoid double counting.
+9. Dividend forecast uses proposed 2025 final dividend RMB21.045m only; historical 2025 attributed dividends include RMB34.365m interim plus RMB21.045m proposed final.
+10. Populated result fields through protocol CLI set commands; did not construct result.json manually.
+11. Final validation:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Result: {"status":"ok","errors":[]}; exit code 0.

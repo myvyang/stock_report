@@ -1,0 +1,50 @@
+task: stock research 00687.HK, year ended 2025-12-31
+generated_at: 2026-08-03T12:44:29+08:00
+
+protocol:
+- initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- populated fields using protocol set and append commands only
+- final validation command recorded after report completion
+
+reuse_check:
+- expected annual facts, normalized facts, raw filing metadata and prior stock-research files were absent in /workspace
+- therefore used the issuer's official 2025 annual-report pages and PDFs
+
+model_check:
+- input hint: financial_brokerage / requires_special_model
+- issuer annual report note 1: principal activities are foundation piling/site investigation and property development/investment
+- 2025 segment note: all external revenue was foundation piling in Hong Kong
+- overridden model: construction_project / requires_special_model
+- ordinary owner-earnback fields intentionally null because project cash, contract assets, supplier balances and performance bonds are economically linked
+
+primary_sources:
+- https://www.tysan.com/annual_report2025_e.htm
+- https://www.tysan.com/Annual_Report/2025annual_report_e/01Chairman.pdf
+- https://www.tysan.com/Annual_Report/2025annual_report_e/06ConIncomestatement.pdf
+- https://www.tysan.com/Annual_Report/2025annual_report_e/08ConFinancialPosition.pdf
+- https://www.tysan.com/Annual_Report/2025annual_report_e/10CashFlows.pdf
+- https://www.tysan.com/Annual_Report/2025annual_report_e/11NotestoFinancialStatements.pdf
+
+market_source:
+- config/input.json: Tencent qt.gtimg.cn, market cap CNY 984570340.1297331 at 2026/07/31 16:08:47, PE TTM 18.66
+
+currency_conversion:
+- reporting currency in annual report: HKD, figures generally HK$'000
+- output currency required by protocol: CNY absolute yuan
+- conversion: 1 HKD = 0.8988 CNY at 2025-12-31
+- source: PBOC/CFETS central parity public republication, https://www.china.org.cn/china/Off_the_Wire/2025-12/31/content_118255014.shtml
+- limitation: period-end rate used for all statement values; not an average-rate translation
+
+key_calculations:
+- gross_margin = 104410 / 2070531 = 0.050426677987434144
+- net_margin = 61317 / 2070531 = 0.029614142459108317
+- operating_free_cash_flow = (326744 - 5694) * 1000 * 0.8988 = CNY 288559740.0
+- forecast dividend = (0.02 + 0.03) HKD/share * 3366035709 shares * 0.8988 = approximately CNY 151269837.6 (rounded from annual-report aggregate HK$168.302m)
+- forecast_dividend_yield = 151269837.6 / 984570340.1297331 = 0.15364045760312842
+- largest_customer_share = 606061 / 2070531 = approximately 29.3%
+
+quality_notes:
+- core financial statements, model classification, asset/liability explanations, dividend basis and evidence are complete
+- market snapshot was supplied by task input and not independently reconciled to HKEX
+- dividend forecast is a carry-forward of FY2025 declared/proposed distribution, not company FY2026 guidance

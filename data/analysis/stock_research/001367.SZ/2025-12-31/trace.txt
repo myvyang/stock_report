@@ -1,0 +1,50 @@
+stock-research trace
+company: 001367.SZ 海森药业
+period: 2025-12-31 annual
+generated_at: 2026-08-01 Asia/Shanghai
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated result sections using protocol set commands (not handwritten from an empty JSON object).
+4. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: status=ok, errors=[]
+
+[reuse audit]
+- Expected annual facts, normalized facts, raw filing metadata and prior stock research paths did not exist under /workspace/stock_report.
+- No prior 001367.SZ files were found in the configured /root/aicode sync target.
+- User evaluation notes contained no entry for 001367.SZ.
+- Therefore the 2025 annual filing was retrieved and read.
+
+[primary source]
+- Zhejiang Haisen Pharmaceutical Co., Ltd. 2025 Annual Report, disclosed 2026-03-26.
+- Official disclosure URL: https://static.cninfo.com.cn/finalpage/2026-03-26/1225030930.PDF
+- Key locations: annual report pp. 8-15 (business and headline metrics), pp. 23-34 (operations, cash flow explanation and risks), pp. 52-53 (dividend), pp. 66-75 (fundraising), pp. 91-100 (statements), pp. 141 onward (notes).
+
+[model determination]
+- Confirmed ordinary_operating/applicable.
+- Basis: chemical API/intermediate/formulation manufacturing and sales; receivables, inventory and plant are ordinary operating assets. No customer deposits, insurance reserves, regulated presale cash or other special-statement structure.
+- Special handling: committed fundraising proceeds excluded from detachable cash; expansion capex not treated as perpetual maintenance capex.
+
+[core calculations, CNY]
+- gross_profit = 532,259,379.46 - 289,549,165.67 = 242,710,213.79
+- gross_margin = 242,710,213.79 / 532,259,379.46 = 45.59998812%
+- net_margin = 135,879,665.78 / 532,259,379.46 = 25.52884384%
+- operating_free_cash_flow = 177,453,591.02 - 152,263,155.87 = 25,190,435.15
+- forecast_dividend = 152,351,200 shares * CNY 0.116 = 17,672,739.20
+- forecast_dividend_yield = 17,672,739.20 / 2,686,000,000 = 0.65795753%
+
+[owner earnback assumptions]
+- Funding assets: cash 909,485,294.67 + trading financial assets 151,695,000.00 = 1,061,180,294.67.
+- Excluded: restricted bill margin 9,476,000; unused committed fundraising 498,465,000; operating cash buffer 100,000,000.
+- Residual 453,239,294.67 discounted at 80% = detachable net cash 362,591,435.74.
+- Sustainable cash profit: recurring parent profit 128,101,268.76 less 8,101,268.76 safety buffer = 120,000,000.
+- Operating business price = 2,686,000,000 - 362,591,435.74 = 2,323,408,564.26.
+- Owner earnback years = 2,323,408,564.26 / 120,000,000 = 19.36173804.
+- Market cap / cash profit = 2,686,000,000 / 120,000,000 = 22.38333333.
+
+[quality]
+- status: complete
+- limitations: market quote reused from input; market share is company-stated; maintenance capex is not separately disclosed; dividend amount depends on implementation-date share count.

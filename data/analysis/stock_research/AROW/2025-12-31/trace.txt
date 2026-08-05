@@ -1,0 +1,64 @@
+AROW stock research trace
+generated_for_period=2025-12-31
+report_type=annual
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the input-declared raw filing, annual review, normalized facts, and historical stock research paths.
+- No AROW filing package, annual facts package, normalized facts, or prior research result existed in the workspace.
+- Therefore fetched primary public sources rather than fabricating missing fields.
+
+3. Primary sources
+- SEC 2025 Form 10-K, accession 0000717538-26-000037, filed 2026-03-06:
+  https://www.sec.gov/Archives/edgar/data/717538/000071753826000037/arow-20251231.htm
+- SEC Companyfacts, CIK 0000717538, used to cross-check consolidated totals.
+- Federal Reserve H.10 release dated 2025-12-29; 2025-12-31 China yuan observation = 7.0063 CNY per USD:
+  https://www.federalreserve.gov/releases/h10/20251229/
+- Market cap and PE TTM were reused exactly from config/input.json; source stated there as Yahoo Finance yfinance, dated 2026-08-03.
+
+4. Model decision
+- Input hint ordinary_operating/applicable was overridden.
+- The 10-K identifies Arrow as a bank holding company whose business is primarily ownership and control of Arrow Bank.
+- Loans and securities are operating earning assets; customer deposits are operating funding.
+- Classified as financial_bank / requires_special_model.
+- All ordinary owner-earnback numbers remain null, as required by the result contract.
+
+5. Currency conversion
+- All USD statement amounts were multiplied by 7.0063 and stored as absolute CNY yuan.
+- Balance sheet source figures (USD): assets 4,445,862,000; liabilities 4,014,010,000; equity 431,852,000.
+- Income source figures (USD): net interest income 133,164,000; provision 7,274,000; noninterest income 32,432,000; net income 43,953,000.
+- This uses the year-end rate for income statement figures as a uniform display convention; the limitation is disclosed.
+
+6. Bank-specific checks
+- NIM: 3.17% (2024: 2.72%).
+- ROA: 1.00%; ROE: 10.66%.
+- NPL / loans: 0.24%; NPA / assets: 0.20%.
+- Allowance / NPL: 405.94%; net charge-offs / average loans: 0.19%.
+- CET1: 13.01%; total risk-based capital: 14.76%.
+- 2025 dividends paid: USD 18.897m; payout against net income = 42.99%.
+
+7. Dividend forecast
+- 2026 Q1 declared/paid dividend in 10-K: USD 0.30/share.
+- Annualized assumption: USD 1.20/share.
+- Shares used: 16,445,342 outstanding at 2025-12-31.
+- Forecast cash dividend = 0.30 * 4 * 16,445,342 * 7.0063 = CNY 138,265,199.586.
+- Forecast yield = 138,265,199.586 / 4,443,666,711.265503 = 0.0311151147395894.
+- This is an explicit mechanical forecast, not company guidance.
+
+8. Subsequent event
+- 10-K discloses the 2026-02-25 announced Adirondack Bancorp merger.
+- Adirondack reported unaudited 2025-12-31 assets of approximately USD 942m.
+- Treated as a material post-period uncertainty affecting future capital, asset quality, and comparability.
+
+9. Result construction and validation
+- Populated scalar fields with repeated protocol `set` commands.
+- Populated asset, liability, dividend history, risk, and evidence rows with protocol `append` commands.
+- Did not hand-write the JSON object.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

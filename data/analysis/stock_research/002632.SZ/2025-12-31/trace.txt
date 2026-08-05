@@ -1,0 +1,49 @@
+2026-07-31T18:03:49+08:00 INIT
+- 按 stock-research 技能要求读取 SKILL.md、result-contract.md、report-contract.md 和 data-reuse.md。
+- 使用协议 CLI 从 config/input.json 初始化 outputs/result.json；未手写 JSON 骨架。
+
+2026-07-31 REUSE CHECK
+- 检查 input 指向的 raw filing、annual review、normalized facts 和 historical stock research 目录。
+- 本工作区没有 002632.SZ/2025-12-31 的既有事实包或历史研究结果，因此回到年报原文。
+
+2026-07-31 SOURCE ACQUISITION
+- 获取道明光学股份有限公司 2025 年年度报告全文：
+  https://pdf.dfcfw.com/pdf/H2_AN202603301820866772_1.pdf
+- 本地留存：stock_report/data/raw/filings/002632.SZ/2025-12-31/annual-report-2025.pdf
+- 查阅 2025 年利润分配预案及权益分派实施信息：
+  https://pdf.dfcfw.com/pdf/H2_AN202603301820866636_1.pdf
+- 行情沿用 config/input.json：市值 4,972,000,000 元，时间 20260731114345，来源 Tencent qt.gtimg.cn，PE TTM 23.54。
+
+2026-07-31 MODEL REVIEW
+- 年报显示收入全部归于制造业，主业为反光材料、光学显示材料和新材料。
+- 资产负债主要由现金/理财、应收存货、生产性长期资产、短期借款和经营应付款构成。
+- 判定 statement_model=ordinary_operating，owner_earnback_applicability=applicable；覆盖并确认输入 hint，无特殊模型处理。
+
+2026-07-31 FINANCIAL EXTRACTION
+- 营收 1,491,457,140.22；营业成本 984,983,058.68；毛利 506,474,081.54。
+- 营业利润 262,751,956.53；净利润 221,059,155.54；归母净利润 221,643,652.20；扣非归母 192,022,585.57。
+- 经营现金流 448,592,407.30；资本开支 41,980,063.20；经营自由现金流 406,612,344.10。
+- 总资产 2,851,652,387.63；总负债 668,837,392.69；总权益 2,182,814,994.94；归母权益 2,184,889,081.39。
+- 公式：gross_margin=(revenue-cost_of_sales)/revenue=0.339581；net_margin=parent_net_profit/revenue=0.148610。
+
+2026-07-31 OWNER EARNBACK ASSUMPTIONS
+- 非受限货币资金采用年报现金及现金等价物 250,664,317.89，折扣率 100%。
+- 交易性金融资产 531,231,600.00，按短期理财/结构性存款性质折扣率 90%，计 478,108,440.00。
+- 其他非流动金融资产 164,654,400.00，因非上市/私募投资流动性弱，折扣率 30%，计 49,396,320.00。
+- 短期借款 308,706,146.41 全额扣除。
+- 折后可剥离净现金=250,664,317.89+478,108,440.00+49,396,320.00-308,706,146.41=469,567,824.37。
+- 可持续现金利润以扣非归母净利润 192,022,585.57 为锚，考虑反光收入下滑、新材料负毛利及经营波动，审慎取整为 190,000,000.00。
+- 未采用当年 FCF 406,612,344.10 作为长期现金利润，原因是存货同比减少约 101,018,073.67，存在营运资金释放。
+- 经营业务价格=4,972,000,000.00-469,567,824.37=4,502,432,175.63。
+- owner_earnback_years=4,502,432,175.63/190,000,000.00=23.69701145。
+- market_cap_to_cash_profit=4,972,000,000.00/190,000,000.00=26.16842105。
+
+2026-07-31 DIVIDEND
+- 2025 中期现金分红 81,197,881.70；末期现金分红 106,181,845.30；全年合计 187,379,727.00。
+- 静态预测/基准分红率=187,379,727.00/4,972,000,000.00=0.03768779626。
+- 该字段复用已实施 2025 年度分红作为基准，不代表 2026 年承诺。
+
+2026-07-31 PROTOCOL WRITES AND VALIDATION
+- 所有复杂结构在 protocol init 生成的骨架上，通过 protocol set 写入；未绕过协议自行生成复杂 JSON。
+- 执行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- 最终状态：ok，errors=[]。

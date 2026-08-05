@@ -1,0 +1,68 @@
+Stock research trace: FVCB / 2025-12-31
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because no local FVCB annual fact pack was present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked stock_report/data paths for FVCB/2025-12-31.
+- No raw filing, annual facts, normalized facts, or prior stock-research result was available locally.
+- Therefore returned to primary public filings.
+
+3. Primary research sources
+- SEC Form 10-K for fiscal year ended 2025-12-31, filed 2026-03-06:
+  https://www.sec.gov/Archives/edgar/data/1675644/000167564426000017/fvcb-20251231.htm
+- SEC Form 10-K/A filing index, filed 2026-03-25:
+  https://www.sec.gov/Archives/edgar/data/1675644/000167564426000023/0001675644-26-000023-index.htm
+- 2025-12-31 RMB central parity, PBOC-authorized CFETS release reproduced by China Economic Net:
+  https://www.ce.cn/xwzx/gnsz/gdxw/202512/t20251231_2676993.shtml
+- Market cap, date, source, and PE were reused exactly from config/input.json.
+
+4. Model decision
+- Input hint ordinary_operating/applicable was rejected after filing review.
+- FVCBankcorp is a bank holding company whose principal subsidiary accepts deposits and originates loans.
+- Final model: financial_bank.
+- Ordinary owner earnback: not_applicable.
+- Customer deposits are operating funding; loans, securities, and liquidity are operating assets subject to regulatory constraints. Ordinary detachable-net-cash and free-cash-flow payback fields remain null.
+
+5. Currency conversion
+- Filing amounts are USD; result contract requires CNY absolute yuan.
+- Conversion rate: 1 USD = 7.0288 CNY at 2025-12-31.
+- Balance-sheet and 2025 flow amounts were multiplied by 7.0288.
+- Supplied market cap was treated as already denominated in CNY and was not retranslated.
+
+6. Key extracted filing facts (USD)
+- Total assets: 2,292.256 million.
+- Total liabilities: 2,038.656 million.
+- Total shareholders' equity / parent equity: 253.600 million.
+- Net loans: 1,922.397 million; gross loans net of fees approximately 1,941.283 million.
+- Deposits: 1,997.277 million; subordinated notes: 18.750 million.
+- Net interest income: 63.769 million; noninterest income: 3.637 million.
+- Provision for credit losses: 1.589 million; net income: 22.057 million.
+- Net interest margin: 2.92%; ROA: 0.99%; ROE: 8.99%.
+- Nonperforming loans: 10.713 million; NPL/loans approximately 0.55%; ACL/NPL 172.86%; ACL/loans 0.97%.
+- CET1: 14.37%; total risk-based capital: 15.38%; leverage capital: 12.23%.
+- 2025 cash dividends paid: 2.167 million; buybacks: 6.700 million.
+- Quarterly dividend initiated in Q3 2025 at USD 0.06 per share.
+
+7. Forecast dividend convention
+- Year-end shares: 17,917,504.
+- Baseline annual dividend: USD 0.06 x 4 x 17,917,504 = USD 4,300,200.96.
+- CNY forecast dividend: 30,225,252.51.
+- Forecast yield: 30,225,252.51 / 2,257,613,303.79 = 1.33881442%.
+- This is a simple annualization scenario, not management guidance or a board commitment.
+
+8. JSON construction and validation
+- Populated the initialized JSON only through protocol CLI set/append commands in outputs/populate_result.sh.
+- Did not hand-write outputs/result.json from scratch.
+- First protocol validation completed with status ok and zero errors.
+- Final validation repeated after report and trace creation; see terminal validation output in task execution.
+
+9. Data-quality decision
+- Status: complete.
+- Special-model minimum fields, asset and liability explanations, dividend forecast, business story, risks, and primary evidence are present.
+- Ordinary owner-earnback fields are null by design, with the required special-model explanation.

@@ -1,0 +1,59 @@
+stock-research trace
+company=601512.SH 中新集团
+period=2025-12-31
+generated_for=2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Read references/data-reuse.md because the skill requires reuse-first handling.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields with protocol `set` and `append`; no complex result JSON was authored from scratch.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result={"status":"ok","errors":[]}
+
+[local-data-audit]
+- config/input.json: present.
+- requested annual facts, normalized facts, raw filing metadata and prior stock-research outputs: absent from /workspace at start.
+- stock_report/data/notes/user_stock_evaluations.md: present but contained no task-specific annual facts used here.
+- Consequence: reused input identity and valuation, then returned to the public 2025 annual report for core facts.
+
+[sources]
+- Primary filing PDF mirror:
+  https://dataclouds.cninfo.com.cn/shgonggao/hsomarket/2026/20260420/bc1a8b786c21481f8877d31c4f7474f6.PDF
+  Title: 中新苏州工业园区开发集团股份有限公司2025年年度报告
+  Disclosure date: 2026-04-21
+- Searchable announcement mirror used to locate and cross-check tables:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12123859&stockid=601512
+- Market snapshot: config/input.json; Tencent qt.gtimg.cn; 20260731114329.
+
+[key-extractions]
+- Revenue 3,214,397,172.29; cost 1,792,381,886.12; gross profit calculated 1,422,015,286.17.
+- Parent net profit 1,056,007,737.44; operating cash flow 1,406,780,223.82.
+- Capital expenditure proxy: cash paid to acquire/build fixed, intangible and other long-term assets 580,685,475.24.
+- Operating free cash flow calculated as OCF minus capex = 826,094,748.58.
+- Total assets 36,486,233,483.28; total equity 20,244,310,428.60; liabilities calculated as assets minus equity = 16,241,923,054.68.
+- Parent equity 15,306,359,341.98; minority interest calculated as total less parent equity = 4,937,951,086.62.
+- 2025 dividend proposal 317,764,680.00; yield calculated against 11,946,000,000 market cap = 2.66001%.
+
+[model-review]
+- Input hint ordinary_operating/applicable was reviewed and overridden.
+- Final model: platform_financial_mixed; owner_earnback_applicability=requires_special_model.
+- Basis: park-development inventory 10.601bn, investment property 4.867bn, equity/non-current financial investments 9.056bn, contract liabilities 1.804bn, and material project financing coexist.
+- Ordinary discounted-net-cash and cash-profit fields remain null as required by result-contract.md.
+- Appropriate special analysis: park project liquidation, underlying investment realizable value/exit discounts, and green-utility post-maintenance-capex/post-debt-service cash flow.
+
+[calculations]
+- gross_margin=(3,214,397,172.29-1,792,381,886.12)/3,214,397,172.29=0.442392 (rounded).
+- net_margin=1,056,007,737.44/3,214,397,172.29=0.328522 (rounded).
+- forecast_dividend_yield=317,764,680/11,946,000,000=0.0266001.
+- No owner earnback or detachable net cash calculation was made.
+
+[limitations]
+- No pre-existing local annual facts package was available.
+- Filing PDF text extraction utilities were unavailable locally; tables were checked through the searchable full-announcement mirror against the filing identity.
+- Project-level restricted cash, remaining development costs, inventory realizable value and underlying investment exit values were not disclosed at sufficient granularity.
+- Dividend is a board proposal, not assumed to be final implementation.
+- Market cap and PE were accepted from the supplied input snapshot and not independently reconstructed.

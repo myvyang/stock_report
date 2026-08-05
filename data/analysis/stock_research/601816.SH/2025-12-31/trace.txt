@@ -1,0 +1,44 @@
+2026-07-31 stock research trace: 601816.SH / 2025 annual
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - references/result-contract.md
+   - references/report-contract.md
+   - references/data-reuse.md
+
+2. Initialized protocol result
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse audit
+   - No annual facts, normalized facts, raw filing, or prior stock-research result existed under the paths supplied in config/input.json.
+   - Therefore retrieved the public 2025 annual filing and dividend disclosure.
+
+4. Primary/core sources
+   - Annual report PDF: https://static.cninfo.com.cn/finalpage/2026-04-21/1225132016.PDF
+   - Annual report readable mirror used for text extraction: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12124321&stockid=601816
+   - Dividend plan: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12124323&stockid=601816
+   - Market cap/PE: config/input.json, Tencent qt.gtimg.cn snapshot at 20260731114345
+
+5. Model review
+   - Overrode ordinary_operating/applicable hint.
+   - Selected utility_concession/requires_special_model because fixed and intangible railway infrastructure is inseparable from revenue, maintenance obligations, unified dispatch, associated operating services, and debt service.
+   - Kept all ordinary owner-earnback sorting metrics null as required by contract.
+
+6. Key calculations (CNY absolute yuan in result.json)
+   - Gross profit = 43,062,041,486.98 - 22,873,982,833.54 = 20,188,058,653.44
+   - Gross margin = 20,188,058,653.44 / 43,062,041,486.98 = 0.4688412414
+   - Net margin = 13,171,912,357.24 / 43,062,041,486.98 = 0.3058831388
+   - Total equity = 287,938,421,202.66 - 57,947,879,216.59 = 229,990,541,986.07
+   - Operating FCF = 21,204,669,893.36 - 754,759,968.31 = 20,449,909,925.05
+   - Cash dividend = 1,883,638,656.31 + 4,667,509,811.90 = 6,551,148,468.21
+   - Dividend yield = 6,551,148,468.21 / 249,032,000,000.00003 = 0.0263063341
+   - Buyback 955,077,280.29 excluded from cash dividend yield.
+
+7. Data caveats
+   - Annual report does not provide a simple concession expiry date or a normalized full-cycle maintenance capex estimate.
+   - One-year capex is not treated as perpetual maintenance capex.
+   - Tencent market snapshot was accepted from task input and not independently exchange-verified.
+
+8. Validation
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Status: ok; errors: []

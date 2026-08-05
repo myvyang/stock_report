@@ -1,0 +1,59 @@
+stock-research trace
+company: 00098.HK XINGFA ALUM
+period: 2025-12-31 annual
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Read protocol and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No local annual facts package, normalized facts, metadata, or prior stock-research result existed for this company/period.
+- Downloaded HKEX 2025 annual report PDF to stock_report/data/raw/filings/00098.HK/2025-12-31/annual-report-2025.pdf.
+- Local pdftotext was unavailable; evidence was extracted from the indexed HKEX PDF and checked against the audited statement pages.
+
+3. Primary sources
+- HKEX annual report: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0430/2026043003558.pdf
+- HKEX 2025 final results: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032603352.pdf
+- HKEX dividend announcement: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0408/2026040802718.pdf
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, 2026/07/31 16:08:44.
+
+4. Analysis-model override
+- Input hint said financial_brokerage/requires_special_model.
+- Annual report page 112 states principal activities are manufacturing and sale of aluminium products and sale of completed properties.
+- Balance sheet and segment facts show an ordinary manufacturing business, not brokerage customer funds or proprietary financial assets.
+- Final model: ordinary_operating; owner earnback applicable.
+
+5. Core extraction (annual report page references)
+- P105: revenue RMB20,700.535m; cost of sales RMB19,399.383m; gross profit RMB1,301.152m; parent profit RMB632.219m.
+- P107-108: assets RMB14,993.957m; liabilities RMB8,706.777m; equity RMB6,287.180m; parent equity RMB6,284.358m.
+- P110-111: OCF RMB980.400m; capex RMB671.178m; financing CF -RMB253.236m; dividends paid RMB245.511m.
+- P147: non-construction/construction/other segment revenue RMB3,471.529m/RMB16,883.754m/RMB345.252m; gross profit RMB113.768m/RMB970.440m/RMB216.944m.
+- P181: proposed 2025 final dividend HKD0.50/share, RMB189.666m equivalent.
+
+6. Calculations
+- gross_margin = 1,301,152,000 / 20,700,535,000 = 0.06285693.
+- net_margin = 632,219,000 / 20,700,535,000 = 0.03054119.
+- operating_free_cash_flow = 980,400,000 - 671,178,000 = 309,222,000.
+- discounted detachable cash = cash 1,647,878,000*70% + fixed deposits 1,089,102,000*80% + pledged deposits 326,115,000*0% - borrowings 2,965,192,000 - lease liabilities 51,014,000 = -991,409,800.
+- discounted sustainable cash profit = RMB400,000,000, judgmental haircut from parent profit, cross-checked against RMB309.222m current-year FCF and expansion/working-capital needs.
+- operating business price = 2,297,964,547.972679 - (-991,409,800) = 3,289,374,347.972679.
+- owner earnback = 3,289,374,347.972679 / 400,000,000 = 8.22343587 years.
+- market cap / cash profit = 2,297,964,547.972679 / 400,000,000 = 5.74491137 years.
+- forecast dividend yield = 189,666,000 / 2,297,964,547.972679 = 0.08253653.
+
+7. Protocol actions
+- Initialized outputs/result.json with protocol CLI using config/input.json.
+- Populated paths using protocol CLI set commands; result was not handwritten from a blank object.
+- Validation command and outcome recorded after final validation below.
+
+8. Limitations
+- Market cap and PE were accepted from the provided Tencent snapshot without exchange-close cross-check.
+- Sustainable cash profit is a conservative analytical estimate based on one annual period, not company guidance.
+- No authoritative market-share series was obtained; industry position remains qualitative.
+
+9. Final validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Outcome: status=ok; errors=[]

@@ -1,0 +1,52 @@
+Stock research trace — CBK — period 2025-12-31
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+   - Searched stock_report/data paths for CBK/2025-12-31.
+   - No raw filing, annual facts package, normalized facts, or prior research result existed.
+   - Returned to primary public filing sources.
+
+3. Primary sources reviewed
+   - SEC 2025 Form 10-K, filed 2026-03-24, accession 0001213900-26-033659:
+     https://www.sec.gov/Archives/edgar/data/1981546/000121390026033659/ea0282863-10k_commercial.htm
+   - SEC-filed first quarterly dividend release dated 2026-01-27:
+     https://www.sec.gov/Archives/edgar/data/1981546/000121390026008822/ea027445001ex99-1_commercial.htm
+   - 2025-12-31 USD/CNY central parity, PBOC-authorized CFETS announcement: 7.0288 CNY/USD.
+   - Market cap and PE were reused exactly from config/input.json (Yahoo Finance yfinance snapshot).
+
+4. Model decision
+   - Input hint ordinary_operating/applicable was rejected.
+   - 10-K identifies Commercial Bancgroup as a bank holding company operating through Commercial Bank.
+   - Selected statement_model=financial_bank and owner_earnback_applicability=not_applicable.
+   - Ordinary detachable-cash and cash-profit payback fields were left null per contract.
+
+5. Key extracted USD facts
+   - Total assets 2,291,454,981; liabilities 2,006,111,149; equity 285,343,832.
+   - Cash equivalents 144,318,929; securities 140,864,793; net loans 1,855,437,066.
+   - Deposits 1,815,734,105; short-term borrowings 88,251,290; long-term debt 78,587,361.
+   - Net interest income 80,430,544; noninterest income 9,930,159; parent net income 37,196,198.
+   - NIM 3.87%; NPL ratio 0.33%; ACL/loans 0.97%; ACL/NPL 290%.
+   - Total capital 13.5%; Tier 1 12.5%; CET1 12.5%; leverage ratio 10.8%.
+   - 2026 first quarterly dividend declared at USD 0.10/share.
+
+6. Currency and derived calculations
+   - All filing amounts in result.json converted at 7.0288 CNY/USD.
+   - Approximate price/book = CNY market cap / converted 2025 equity = 1.5784x.
+   - Forecast dividend = 13,697,987 year-end shares × USD 0.10 × 4 × 7.0288 = CNY 38,512,164.41.
+   - Forecast yield = CNY 38,512,164.41 / CNY 3,165,699,564.96 = 1.2165%.
+   - Forecast is an annualization, not a declared annual amount.
+
+7. Protocol operations
+   - Initialized outputs/result.json with protocol init.
+   - Populated fields with protocol set commands; no complex result object was authored from scratch.
+   - Validated with protocol validate: status ok, errors [].
+
+8. Data-quality decision
+   - status=complete under the special-bank minimum: identity, period, market data, model, balance sheet, profit, dividend forecast, assets/liabilities, business story, bank-specific metrics, and evidence are present.
+   - Revenue, gross margin, operating cash flow, capex, ordinary free cash flow, and all ordinary owner-earnback metrics remain null because they lack comparable economic meaning for a bank.

@@ -1,0 +1,80 @@
+Stock research trace — ZTS — period 2025-12-31
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill requires reuse of sufficient local facts.
+- Initialized outputs/result.json using:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the input-declared raw filing, annual review, normalized facts and prior stock research paths.
+- No ZTS filing, facts package, normalized facts or prior result existed in the workspace.
+- Therefore retrieved the official SEC Form 10-K rather than fabricating missing annual facts.
+
+3. Primary sources
+- SEC Form 10-K, accession 0001555280-26-000011, period 2025-12-31, filed 2026-02-12:
+  https://www.sec.gov/Archives/edgar/data/1555280/000155528026000011/zts-20251231.htm
+  Local copy: stock_report/data/raw/filings/ZTS/2025-12-31/zts-20251231.htm
+- Zoetis FY2025 results and FY2026 guidance, dated 2026-02-12:
+  https://investor.zoetis.com/news/news-details/2026/Zoetis-Reports-Fourth-Quarter-and-Full-Year-2025-Results/default.aspx
+- Zoetis dividend history:
+  https://investor.zoetis.com/stock-information/dividend-history/default.aspx
+- Zoetis Q3 2026 dividend SEC 8-K:
+  https://www.sec.gov/Archives/edgar/data/1555280/000155528026000026/zts-20260520.htm
+- Valuation snapshot: config/input.json, sourced there to Yahoo Finance yfinance.
+
+4. Model classification
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Basis: Zoetis discovers, manufactures and sells animal medicines, vaccines and diagnostics. Its balance sheet contains ordinary cash, receivables, inventory, PP&E, acquired intangibles, corporate debt and operating liabilities. No customer funds, insurance reserves, regulated presale cash, concession right or similar special-model balance-sheet structure was identified.
+
+5. Currency convention
+- Contract requires CNY absolute yuan; filing reports USD millions.
+- Used a uniform analytical translation rate of USD 1 = CNY 7.00 for all filing and dividend amounts.
+- This is a simplifying translation assumption, not a claim of an audited FX rate.
+- Treated market_cap.amount=218,649,667,226.50195 as already denominated in CNY because protocol initialization sets analysis.currency=CNY and copies this amount directly. No second FX conversion applied.
+
+6. Extracted 2025 USD facts (millions unless stated)
+- Revenue 9,467; cost of sales 2,666; gross profit computed 6,801.
+- Operating profit computed as 9,467 - 2,666 - 2,378 SG&A - 698 R&D - 128 intangible amortization - 51 restructuring/acquisition/divestiture costs = 3,546.
+- Net income attributable to Zoetis 2,673.
+- Total assets 15,467; total liabilities 12,136; parent/total equity 3,331; NCI zero.
+- Cash and cash equivalents 2,312; receivables 1,590; inventory 2,430; PP&E 3,681; goodwill 2,767; identifiable intangibles 998.
+- Long-term debt 9,042; no current portion of long-term debt reported at 2025 year-end.
+- Operating cash flow 2,904; capex 621; operating FCF computed 2,283.
+- Financing cash flow -1,870; share repurchases 3,235; cash dividends 889.
+- Shares outstanding at 2025-12-31: 424,927,535.
+
+7. Derived metrics
+- gross_margin = (9,467 - 2,666) / 9,467 = 0.7183901975.
+- net_margin = 2,673 / 9,467 = 0.2823492120.
+- CNY OCF = 2,904m * 7 = 20,328,000,000.
+- CNY capex = 621m * 7 = 4,347,000,000.
+- CNY operating FCF = 2,283m * 7 = 15,981,000,000.
+- Cash = 2,312m * 7 = 16,184,000,000.
+- Debt = 9,042m * 7 = 63,294,000,000.
+- Discounted detachable net cash = cash at 100% - debt at 100% = -47,110,000,000.
+- Sustainable cash profit = 15,981,000,000 * 90% = 14,382,900,000. The 10% discount is analyst judgment for product-cycle, FX and working-capital volatility.
+- Operating business price = 218,649,667,226.50195 - (-47,110,000,000) = 265,759,667,226.50195.
+- Owner earnback years = 265,759,667,226.50195 / 14,382,900,000 = 18.4774670341.
+- Market cap / cash profit = 218,649,667,226.50195 / 14,382,900,000 = 15.2020572237.
+- Discounted net cash / market cap = -0.2154597330.
+
+8. Dividend forecast
+- Quarterly dividend observed/declared for each of 2026 Q1-Q3: USD 0.53/share.
+- Annualized without an assumed Q4 increase: USD 2.12/share.
+- Forecast cash dividend = 2.12 * 424,927,535 * 7 = CNY 6,305,924,669.60.
+- Forecast yield = 6,305,924,669.60 / 218,649,667,226.50195 = 0.0288397326.
+
+9. Protocol population and validation
+- Populated scalar/object fields with repeated protocol `set` commands.
+- Populated asset, liability, cash breakdown, profit adjustment, dividend history, risk and evidence arrays with protocol `append` commands.
+- Did not hand-write outputs/result.json from scratch.
+- Initial completed validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial validation result: {"status":"ok","errors":[]}.
+
+10. Data-quality notes
+- Status set to complete because company identity, model, valuation, three statements, asset/liability explanations, owner-earnback components, dividend forecast, business story and evidence are present.
+- Limitations retained in result.json: simplified FX translation; market snapshot lacks original link/conversion trail; sustainable-profit haircut is judgment; dividend annualization is not a board commitment.

@@ -1,0 +1,69 @@
+stock-research trace
+company=北京嘉曼服饰股份有限公司 (301276.SZ)
+period=2025-12-31 annual
+generated_for_input=2026-07-31T19:39:38+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the skill requires prioritizing reusable annual facts.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated the initialized result using repeated protocol `set` commands; the result object was not authored from a blank JSON document.
+6. Validated with the protocol CLI. Final validation status is recorded below.
+
+[reuse-audit]
+- No raw filing, annual facts package, normalized facts, or prior stock-research output existed for 301276.SZ/2025-12-31.
+- stock_report/data/notes/user_stock_evaluations.md contained no reusable company evaluation.
+- Therefore official disclosures had to be acquired and reviewed.
+
+[sources]
+- Full 2025 annual report, disclosed 2026-04-28. Local copy:
+  stock_report/data/raw/filings/301276.SZ/2025-12-31/2025-annual-report-full.pdf
+  Retrieval URL: https://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESZ_STOCK/2026/2026-4/2026-04-28/12232566.PDF
+  The same filing text is publicly indexed as the company's annual report; core statement figures were cross-checked against the official SZSE-hosted audited financial report below.
+- Audited 2025 financial statements, SZSE official static disclosure, disclosed 2026-04-28. Local copy:
+  stock_report/data/raw/filings/301276.SZ/2025-12-31/2025-annual-report.pdf
+  URL: https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-28/cd5ccbf6-8e9b-48af-9a14-da48ca38e8cc.PDF
+- 2025 dividend implementation announcement, CNINFO official static disclosure, disclosed 2026-05-22. Local copy:
+  stock_report/data/raw/filings/301276.SZ/2025-12-31/2025-dividend-implementation.pdf
+  URL: https://static.cninfo.com.cn/finalpage/2026-05-22/1225326134.PDF
+- Valuation snapshot from config/input.json: Tencent qt.gtimg.cn, 2026-07-31 11:43:36, market cap CNY 2,374,000,000, PE TTM 21.35.
+
+[model-review]
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Evidence: the company outsources production and operates brands, procurement, e-commerce, direct stores and franchises. No customer deposits, insurance reserves, development presales, contract-project financing, concession rights or investment-holding structure makes the balance sheet itself the regulated business model.
+- Special cash handling was still necessary: unused IPO proceeds and pledged/restricted assets were excluded from detachable cash.
+
+[core-calculations]
+- gross_profit = 1,118,285,103.94 - 411,930,814.09 = 706,354,289.85
+- gross_margin = 706,354,289.85 / 1,118,285,103.94 = 0.6316406142
+- net_margin = 105,536,231.03 / 1,118,285,103.94 = 0.0943732780
+- 2025 operating_free_cash_flow = 79,486,295.43 - 28,405,789.74 = 51,080,505.69
+- 2024 operating_free_cash_flow = 135,085,636.02 - 28,396,364.67 = 106,689,271.35
+- two-year average operating FCF = 78,884,888.52
+- discounted sustainable cash profit = 78,884,888.52 * 0.85 = 67,052,155.24
+
+[cash-calculations]
+- freely usable cash = 122,981,873.19 - 21,771,128.11 restricted cash - 13,929,400.00 fundraising-account cash = 87,281,345.08
+- discounted non-fundraising cash-management products = (1,184,359,653.56 - 502,500,000.00 fundraising products) * 0.95 = 647,766,670.88
+- discounted unpledged time deposits = (69,447,273.98 - 35,000,000.00 pledged deposits) * 0.95 = 32,724,910.28
+- discounted detachable net cash = 767,772,926.24
+- operating business price = 2,374,000,000.00 - 767,772,926.24 = 1,606,227,073.76
+- owner earnback years = 1,606,227,073.76 / 67,052,155.24 = 23.9549
+- market cap / cash profit = 2,374,000,000.00 / 67,052,155.24 = 35.4053
+- discounted net cash / market cap = 0.323409
+
+[judgment-boundaries]
+- The 15% sustainable-profit haircut is an analyst judgment, not a reported fact. It reflects the 2025 profit decline, higher inventory impairment and heavier store/channel expense.
+- Inventory impairment was not fully added back because apparel obsolescence is a real economic cost and management classified the item as sustainable.
+- Lease liabilities remain in the operating business alongside right-of-use assets; they were not isolated as detachable financial debt.
+- Unused fundraising proceeds were excluded because they remain in dedicated accounts or cash-management products and require compliant procedures/use decisions before distribution.
+
+[data-quality]
+- status=complete
+- limitations: cash-management products lack instrument-by-instrument maturity and underlying-asset disclosure; sustainable cash profit uses only two annual FCF observations; the supplied market snapshot was not independently exchange-verified.
+
+[validation]
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Expected final response: {"status":"ok","errors":[]}

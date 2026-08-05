@@ -1,0 +1,61 @@
+stock-research trace
+company=688569.SH 铁科轨道
+period=2025-12-31 annual
+generated_at=2026-07-31T22:36:06+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result.json only through protocol set commands.
+5. Final validation command recorded below.
+
+[reuse check]
+- No raw filing, annual-review facts, normalized facts, or prior stock-research result for 688569.SH/2025-12-31 existed under stock_report.
+- Therefore researched the disclosed 2025 annual report and annual-report summary.
+
+[primary research sources]
+- 2025 annual report text mirror of the company disclosure: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12027501&stockid=688569
+- 2025 annual report summary PDF: https://pdf.dfcfw.com/pdf/H2_AN202603271820801845_1.pdf
+- Company official page listing the 2025 annual-report infographic: https://www.rails.cn/tkgd/
+- Valuation snapshot: config/input.json, Tencent qt.gtimg.cn, timestamp 20260731114348.
+
+[model classification]
+- Confirmed ordinary_operating/applicable.
+- Reason: annual report shows industrial manufacturing revenue from rail fasteners, bridge bearings, engineering materials, prestressed wire/anchor plates and processing services. No transport-operation network, customer deposits, concession right or project-construction balance-sheet model.
+- Overrode misleading source tags in analysis_model_hint that described transport/logistics/network operations.
+
+[core calculations]
+gross_profit = 1,275,221,900.38 - 738,976,132.14 = 536,245,768.24
+gross_margin = 536,245,768.24 / 1,275,221,900.38 = 0.42051565
+net_margin = 171,272,437.74 / 1,275,221,900.38 = 0.13430801
+operating_free_cash_flow = 164,796,095.14 - 98,433,977.52 = 66,362,117.62
+
+discounted_detachable_net_cash:
+- ordinary bank deposits/cash equivalents: 1,447,777,089.59 * 75% = 1,085,832,817.19
+- related-party finance-company deposit: 140,000,000.00 * 50% = 70,000,000.00
+- accrued interest: 5,263,138.89 * 0% = 0
+- lease-related liabilities: -10,567,116.32
+- total = 1,145,265,700.87
+
+discounted_sustainable_cash_profit = 100,000,000.00
+- Starting reference: parent net profit 171,272,437.74.
+- Cross-check: consolidated OCF 164,796,095.14 and consolidated FCF 66,362,117.62.
+- Haircut reflects lower collection, growing receivables, capital expenditure and minority ownership; precise parent-attributable cash flow is not disclosed.
+
+operating_business_price = 3,468,000,000.00 - 1,145,265,700.87 = 2,322,734,299.13
+owner_earnback_years = 2,322,734,299.13 / 100,000,000.00 = 23.22734299
+market_cap_to_cash_profit = 3,468,000,000.00 / 100,000,000.00 = 34.68
+discounted_net_cash_to_market_cap = 1,145,265,700.87 / 3,468,000,000.00 = 0.33023809
+forecast_dividend_yield = 56,880,009.00 / 3,468,000,000.00 = 0.01640139
+
+[judgment boundaries]
+- Cash haircuts and sustainable cash profit are analyst scenarios, not reported facts or company guidance.
+- Receivables, inventory, long-term equity investment and operating fixed/intangible assets excluded from detachable cash.
+- No buy/sell recommendation, target price, ranking label, or certainty claim included.
+
+[validation]
+Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Result: {"status":"ok","errors":[]}
+Additional checks: python3 -m json.tool parsed result.json successfully; result.json, report.md and trace.txt are all non-empty.

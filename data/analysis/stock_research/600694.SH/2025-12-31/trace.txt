@@ -1,19 +1,16 @@
 task: stock research for 600694.SH 大商股份, annual period 2025-12-31
-created_at_input: 2026-07-28T15:11:52+08:00
+created_at_input: 2026-07-31T13:54:06+08:00
 
 protocol:
-- Read /workspace/.agents/skills/stock-research/SKILL.md.
-- Read /workspace/.agents/skills/stock-research/references/result-contract.md.
-- Read /workspace/.agents/skills/stock-research/references/report-contract.md.
+- Read /workspace/.agents/skills/stock-research/SKILL.md completely.
+- Read /workspace/.agents/skills/stock-research/references/result-contract.md completely.
+- Read /workspace/.agents/skills/stock-research/references/report-contract.md completely.
+- Read /workspace/.agents/skills/stock-research/references/data-reuse.md completely.
 - Initialized outputs/result.json with:
   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Reused the existing complete stock-research result as a fact-rich base, then updated it exclusively through protocol set commands for the current input and current formulas.
 - Validated final outputs/result.json with:
   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-- Final validation status: ok.
-- Repair run for PE TTM:
-  searched local stock_report/config/outputs for 600694, pe_ttm, 市盈率 and PE; config/input.json and local fact packs did not contain a finite PE TTM.
-  used public market data from Moomoo 大商股份(600694-SH)行情页/search snapshot: delayed quote closed 2026-07-23 15:00 Beijing, close RMB 14.39, market cap RMB 5.451bn, PE TTM 10.90.
-  updated valuation.pe_ttm and metrics.pe_ttm to 10.90 and revalidated.
 
 reused_sources:
 - config/input.json
@@ -22,49 +19,48 @@ reused_sources:
 - stock_report/data/analysis/annual_review/600694.SH/2025-12-31/extraction_trace.txt
 - stock_report/data/raw/filings/600694.SH/2025-12-31/metadata.json
 - stock_report/data/raw/filings/600694.SH/2025-12-31/600694_2025_annual_report.txt
-- public market source: Moomoo 大商股份(600694-SH)行情页/search snapshot, URL https://www.moomoo.com/hans/stock/600694-SH/company
+- stock_report/data/analysis/stock_research/600694.SH/2025-12-31/result.json
+- stock_report/data/analysis/stock_research/600694.SH/2025-12-31/report.md
 
-key_source_checks:
-- Confirmed report identity from metadata.json: 大商股份有限公司2025年年度报告, source_url https://stockmc.xueqiu.com/202604/600694_20260424_PQ2Z.pdf, announcement date noted as 2026-04-24.
-- Used annual fact pack for core balance sheet, income statement, cash flow, business segments, asset/liability categories and known gaps.
-- Checked annual report text for profit distribution lines. 2025 profit distribution proposal: cash dividend RMB 344,357,828.00, cash dividend ratio 70.19%, RMB 10 per 10 shares, 1 bonus share per 10 shares.
-- Checked annual report text for consolidated net profit: RMB 546,805,406.23; parent net profit: RMB 490,600,162.44.
+source_checks:
+- Report identity confirmed from metadata.json: 大商股份有限公司2025年年度报告, announcement date 2026-04-24.
+- Annual fact pack supplies the three statements, business segments, asset/liability categories, dividend proposal and known disclosure gaps.
+- Current valuation is taken directly from config/input.json: market cap RMB 5,546,000,000, PE TTM 11.09, timestamp 2026-07-31 11:43:35, source Tencent qt.gtimg.cn.
+- Statement model independently confirmed as ordinary_operating: the company sells through department-store, supermarket and appliance formats; inventory, stores and leased premises are operating assets, while supplier payables, contract liabilities and lease liabilities are operating obligations. No special financial-statement model was found.
 
-core_numbers:
-- market_cap: 5,451,000,000.00, date 2026-07-23, source stock_report owner_earnback snapshot.
-- pe_ttm: 10.90, date 2026-07-23, source Moomoo quote page/search snapshot.
-- revenue: 6,202,252,802.26.
-- cost_of_sales: 3,681,957,869.81.
-- gross_profit: 2,520,294,932.45.
-- operating_profit: 854,473,052.19.
-- net_profit: 546,805,406.23.
-- parent_net_profit: 490,600,162.44.
-- total_assets: 17,212,388,471.23.
-- total_liabilities: 8,008,866,446.81.
-- total_equity: 9,203,522,024.42.
-- parent_equity: 8,870,974,853.31.
-- operating_cash_flow: 460,594,278.23.
-- capital_expenditure: 89,321,026.51.
-- operating_free_cash_flow: 371,273,251.72.
+core_financials:
+- revenue: 6,202,252,802.26
+- cost_of_sales: 3,681,957,869.81
+- gross_profit: 2,520,294,932.45
+- parent_net_profit: 490,600,162.44
+- total_assets: 17,212,388,471.23
+- total_liabilities: 8,008,866,446.81
+- total_equity: 9,203,522,024.42
+- parent_equity: 8,870,974,853.31
+- operating_cash_flow: 460,594,278.23
+- capital_expenditure: 89,321,026.51
+- operating_free_cash_flow: 371,273,251.72
 
 formulas:
-- gross_margin = gross_profit / revenue = 0.406351532709477.
-- net_margin = parent_net_profit / revenue = 0.07910031694632526.
-- forecast_dividend_yield = 344,357,828.00 / 5,451,000,000.00 = 0.0631733311319024.
-- discounted_detachable_net_cash = (3,495,514,227.40 - 813,561,323.22 - 800,000,000.00) + 941,212,568.81 * 0.65 + 45,180,577.73 * 0.50 + 116,314,434.58 * 0 = 2,516,331,362.7715.
-- operating_business_price = 5,451,000,000.00 - 2,516,331,362.7715 = 2,934,668,637.2285.
-- discounted_sustainable_cash_profit = 457,074,100.00 * 0.75 = 342,805,575.00.
-- owner_earnback_years = 2,934,668,637.2285 / 342,805,575.00 = 8.560737780383239.
-- market_cap_to_cash_profit = 5,451,000,000.00 / 342,805,575.00 = 15.90114163108345.
+- gross_margin = 2,520,294,932.45 / 6,202,252,802.26 = 0.406351532709477
+- net_margin = 490,600,162.44 / 6,202,252,802.26 = 0.07910031694632526
+- forecast_dividend_yield = 344,357,828 / 5,546,000,000 = 0.06209120591417237
+- discounted_detachable_net_cash = (3,495,514,227.40 - 813,561,323.22 - 800,000,000) + 941,212,568.81 * 0.65 + 45,180,577.73 * 0.50 = 2,516,331,362.7715
+- discounted_net_cash_to_market_cap = 2,516,331,362.7715 / 5,546,000,000 = 0.4537200437741616
+- discounted_sustainable_cash_profit = 457,074,100 * 0.75 = 342,805,575
+- operating_business_price = 5,546,000,000 - 2,516,331,362.7715 = 3,029,668,637.2285
+- owner_earnback_years = 3,029,668,637.2285 / 342,805,575 = 8.837862795050809
+- market_cap_to_cash_profit = 5,546,000,000 / 342,805,575 = 16.17826664575102
 
-main_assumptions:
-- Necessary operating cash retained at RMB 800,000,000 because the annual report does not disclose a management-defined minimum cash level.
-- Restricted cash haircut is 0 because it includes prepaid card guarantee, wealth management subscription frozen funds and frozen bank deposits.
-- Bank wealth management haircut is 0.65 because detailed term, underlying assets and principal protection were not disclosed.
-- Equity instruments haircut is 0.50 due to market value volatility.
-- Non-performing debt investment haircut is 0 because it was acquired through bidding, has recovery uncertainty and part is frozen.
-- Profit denominator uses the 2023-2025 deducted non-recurring parent net profit median, then applies a 0.75 cash conversion haircut due to 2025 working-capital pressure.
+research_assumptions:
+- Necessary operating cash is retained at RMB 800,000,000 because management does not disclose a minimum operating cash requirement.
+- Restricted cash receives a zero haircut factor because prepaid-card guarantees, frozen wealth-management subscription funds and frozen bank deposits are not freely detachable.
+- Bank wealth-management products receive a 0.65 factor because individual maturities, underlying assets and principal protection are not disclosed.
+- Equity instruments receive a 0.50 factor for market-value volatility.
+- The non-performing debt investment receives a zero factor due to recovery and freezing uncertainty.
+- Sustainable cash profit uses the 2023-2025 median deducted non-recurring parent profit and a 0.75 cash-conversion factor because 2025 working-capital movements weakened operating cash flow.
 
 data_quality:
-- status: complete.
-- limitations recorded in result.json: wealth management product detail missing; necessary operating cash is estimated; maintenance capex split unavailable; PE TTM comes from a public quote page/search snapshot and may refresh with the market data source.
+- status: complete
+- incomplete_reasons: empty
+- limitations: wealth-management detail is missing; necessary operating cash and cash-conversion factors are research assumptions; maintenance capex is not separately disclosed; the valuation snapshot is an intraday quote and will change with price.

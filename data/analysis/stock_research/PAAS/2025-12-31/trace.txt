@@ -1,0 +1,62 @@
+stock-research trace — PAAS — period 2025-12-31
+generated_at: 2026-08-05T01:44:13+08:00
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse audit
+   - config/input.json present.
+   - No raw filing, annual facts package, normalized facts, or prior PAAS stock-research result existed under stock_report/.
+   - Therefore fetched primary public disclosures rather than fabricating/reconstructing absent facts.
+
+3. Protocol initialization
+   - Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Result schema: stock-research-result-v1.
+
+4. Primary evidence used
+   - SEC Form 40-F filing index, accession 0000771992-26-000019, filed 2026-02-18.
+   - Audited consolidated financial statements, Exhibit 1.3:
+     https://www.sec.gov/Archives/edgar/data/771992/000077199226000019/paas-20251231_d2.htm
+   - FY2025 MD&A, Exhibit 1.2:
+     https://www.sec.gov/Archives/edgar/data/771992/000077199226000019/paas12-31x2025mda.htm
+   - FY2025 results release:
+     https://panamericansilver.com/news/pan-american-silver-reports-record-fourth-quarter-and-full-year-2025-financial-results-record-cash-flow-from-operations-of-554-million-in-the-fourth-quarter-dividend-increased-by-29/
+   - China NBS 2025 average USD/CNY 7.1429:
+     https://www.stats.gov.cn/english/PressRelease/202602/t20260228_1962661.html
+   - CFETS/PBOC 2025-12-31 USD/CNY central parity 7.0288, Xinhua relay:
+     https://www.china.org.cn/china/Off_the_Wire/2025-12/31/content_118255014.shtml
+   - Market cap and PE TTM: supplied input snapshot, Yahoo Finance yfinance, dated 2026-08-03.
+
+5. Currency method
+   - Income statement and cash flow: USD amounts × 7.1429 CNY/USD (2025 annual average).
+   - Balance sheet: USD amounts × 7.0288 CNY/USD (2025-12-31 central parity).
+   - Input market capitalization treated as already denominated in CNY per task protocol.
+
+6. Model decision
+   - statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+   - Reason: operating mines generate sales and cash flow; cash and financing can be separated from operating assets.
+   - Special care: commodity cyclicality, reserve depletion, sustaining/project capital, reclamation, and equity-accounted Juanicipio.
+
+7. Owner earnback construction
+   - Cash: 8,539,992,000 CNY × 90%.
+   - Short-term investments: 730,995,200 CNY × 80%.
+   - Debt: 5,018,563,200 CNY deducted at 100%.
+   - Lease obligations: 969,974,400 CNY deducted at 100%.
+   - Discounted detachable net cash: 2,282,251,360 CNY.
+   - 2025 consolidated operating FCF: CFO 9,521,485,700 − capex 2,242,870,600 = 7,278,615,100 CNY.
+   - Sustainable cash profit set to 5,000,030,000 CNY after cyclicality/mine-life/reclamation haircut; attributable FCF used only as cross-check.
+   - Operating business price: 120,291,123,336.83 CNY.
+   - Owner earnback: 24.0581 years; market cap/cash profit: 24.5145×.
+
+8. Dividend forecast
+   - Latest declared quarterly dividend: USD 0.18/share.
+   - Annualized at 4 payments and 421,847,046 year-end shares.
+   - Forecast cash dividend: 2,169,512,110.71 CNY; yield: 1.76997%.
+   - This is a run-rate estimate, not company guidance or a board commitment.
+
+9. Protocol mutation and validation
+   - outputs/result.json populated only through protocol CLI set operations after init.
+   - Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Validation result before final cross-check: status=ok, errors=[].

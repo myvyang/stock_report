@@ -1,0 +1,88 @@
+stock-research trace
+company: KANZHUN LIMITED (NASDAQ: BZ; HKEX: 2076)
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the task required deciding whether existing facts could be reused.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the configured raw filing, annual review, normalized facts, and prior stock research paths.
+- No BZ/2025-12-31 filing or annual facts package existed locally, so no prior conclusions were reused.
+
+3. Primary sources retrieved and checked
+- SEC Form 20-F for fiscal year 2025, filed 2026-04-29:
+  https://www.sec.gov/Archives/edgar/data/1842827/000110465926050959/bz-20251231x20f.htm
+- Company annual report index / 2025 annual report:
+  https://ir.zhipin.com/financial-reports/annual-reports
+- Market capitalization and PE were preserved from config/input.json: Yahoo Finance yfinance, market date 2026-08-03.
+
+4. Model classification
+- Confirmed ordinary_operating / applicable.
+- Reason: revenue comes from online recruitment services; no bank deposits, insurance reserves, development inventory, project advances, concession rights, or consolidated investment-holding structure dominate the statements.
+- Special handling retained for VIE/cross-border cash restrictions and recurring share-based compensation.
+
+5. Audited financial extraction (RMB yuan; source tables present RMB thousands)
+- Total assets 24,568,014,000
+- Total liabilities 4,486,976,000
+- Total equity 20,081,038,000
+- Parent equity 20,030,775,000
+- Minority interest 50,263,000
+- Revenue 8,267,518,000
+- Cost of revenue 1,235,153,000
+- Gross profit 7,032,365,000
+- Operating profit 2,464,101,000
+- Net income 2,690,467,000
+- Parent net income 2,735,340,000
+- Operating cash flow 4,552,371,000
+- Reported capex 119,123,000
+- Operating free cash flow 4,433,248,000
+- Financing cash flow 1,654,508,000
+- Dividends plus repurchases paid 695,808,000
+
+6. Derived metrics
+- Gross margin = 7,032,365,000 / 8,267,518,000 = 0.8506017163.
+- Net margin = 2,735,340,000 / 8,267,518,000 = 0.3308538306.
+- Forecast dividend yield = 553,010,000 / 49,090,694,360.91943 = 0.0112650678.
+
+7. Discounted detachable cash
+- Cash 4,104,917,000 x 95% = 3,899,671,150.
+- Short- and long-term deposits 7,172,618,000 x 90% = 6,455,356,200.
+- Short-term investments 9,450,244,000 x 80% = 7,560,195,200.
+- Long-term investments 1,898,178,000 x 50% = 949,089,000.
+- Lease liabilities deducted at 100% = (158,043,000).
+- Total = 18,706,268,550.
+- Deferred revenue and ordinary payables were treated as operating liabilities, not financing debt; their service obligations are described separately.
+
+8. Sustainable cash profit judgment
+- Starting 2025 operating cash flow: 4,552,371,000.
+- Normalized capex: (600,000,000), rather than the unusually low reported 119,123,000; 2023/2024 capex was 955,511,000/856,047,000.
+- Recurring share-based compensation economic cost: (911,987,000).
+- Interest/investment income, working-capital normalization, and safety margin: (590,384,000).
+- Rounded discounted sustainable cash profit: 2,450,000,000.
+- This is an analytical estimate, not a reported company measure.
+
+9. Owner earnback
+- Market cap: 49,090,694,360.91943.
+- Operating business price: 49,090,694,360.91943 - 18,706,268,550 = 30,384,425,810.919434.
+- Owner earnback years: 30,384,425,810.919434 / 2,450,000,000 = 12.4018064534.
+- Market cap / cash profit: 49,090,694,360.91943 / 2,450,000,000 = 20.0370181065.
+
+10. Dividend forecast
+- Used 2025 actual cash dividend paid, 553,010,000, as the forecast baseline.
+- Did not interpret the stated 50% of adjusted net income allocation as a dividend floor because the policy explicitly combines dividends and share repurchases and remains subject to board discretion.
+
+11. Protocol writes and validation
+- All structured fields were populated through protocol set commands; the complex result object was not hand-written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Expected/final status: ok, errors: [].
+
+12. Data-quality boundaries
+- Independent same-definition market-share data was not available; industry position is identified as company-reported.
+- Market snapshot was supplied by task input and not reconstructed from exchange share counts.
+- Discount rates, normalized capex, and sustainable cash profit are explicit judgment calls and sensitivity drivers.

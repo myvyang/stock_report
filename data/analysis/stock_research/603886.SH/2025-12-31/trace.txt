@@ -1,64 +1,83 @@
-元祖股份股票研究 trace
-生成时间：2026-07-27 Asia/Shanghai
+元祖股份（603886.SH）股票研究 trace
+生成基准：2026-07-31 Asia/Shanghai
 
-一、协议与初始化
-- 已读取 stock-research skill: /workspace/.agents/skills/stock-research/SKILL.md
-- 已读取 result contract: /workspace/.agents/skills/stock-research/references/result-contract.md
-- 已读取 report contract: /workspace/.agents/skills/stock-research/references/report-contract.md
-- 已读取 data reuse: /workspace/.agents/skills/stock-research/references/data-reuse.md
-- 使用协议 CLI 初始化：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- 使用协议 CLI set 写入核心字段、财务数字、资产负债分析、控股回本、分红、业务、风险、证据和数据质量。
-- 使用协议 CLI validate 校验 outputs/result.json，结果为 status=ok。
+一、协议执行
+- 已完整读取 .agents/skills/stock-research/SKILL.md。
+- 已完整读取 references/result-contract.md、report-contract.md，并读取 data-reuse.md。
+- 已执行协议 CLI init：
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- 使用协议 CLI set/append 写入结构化字段，没有手写复杂 JSON 文件。
 
-二、输入和本地复用文件
-- input: config/input.json
-- annual facts json: stock_report/data/analysis/annual_review/603886.SH/2025-12-31/facts.json
-- annual facts md: stock_report/data/analysis/annual_review/603886.SH/2025-12-31/annual_facts.md
-- normalized facts json: stock_report/data/normalized/facts/603886.SH/2025-12-31/annual-facts.json
-- prior stock research result: stock_report/data/analysis/stock_research/603886.SH/2025-12-31/result.json
-- prior stock research report: stock_report/data/analysis/stock_research/603886.SH/2025-12-31/report.md
-- prior stock research trace: stock_report/data/analysis/stock_research/603886.SH/2025-12-31/trace.txt
-- raw annual report: stock_report/data/raw/filings/603886.SH/2025-12-31/603886_2025_annual_report.pdf
-- raw annual report text exists: stock_report/data/raw/filings/603886.SH/2025-12-31/603886_2025_annual_report.txt
+二、复用来源
+- config/input.json：公司身份、市值、PE TTM、行情时间和来源。
+- stock_report/data/analysis/annual_review/603886.SH/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/603886.SH/2025-12-31/annual_facts.md
+- stock_report/data/normalized/facts/603886.SH/2025-12-31/annual-facts.json
+- stock_report/data/raw/filings/603886.SH/2025-12-31/603886_2025_annual_report.pdf 及 txt
+- 2024 年报辅助文件：仅用于 2023 年资本开支和租赁付款。
+- 历史 stock_research 结果：仅复用有年报事实支持的资产分类、经营解释、风险线索和回本假设；旧市值及其派生数字未沿用。
 
-三、外部核查
-- 搜索并核对上海证券交易所/搜狐证券公告索引，确认 2026-03-28 有元祖股份2025年度报告，2026-05-16 有2025年度权益分派实施公告，分红为10派6元。
-- 搜索并核对艾媒咨询页面，确认2025年中国烘焙食品零售市场规模6621.5亿元、2021-2025年年均增长率8.69%。
-- 搜索并核对国家统计局2025年12月社零数据，确认2025年全国网上零售额增长8.6%，实物商品网上零售中吃类商品增长14.5%。
-- 搜索并核对新华网烘焙品类发展报告2025，确认截至2025年5月全国烘焙门店数33.8万家、2025年烘焙专门店市场规模或达1160亿元。
+三、模型判断
+- statement_model=ordinary_operating。
+- owner_earnback_applicability=applicable。
+- 理由：公司实质是烘焙食品生产零售，不属于银行、券商、保险、地产、工程、收费权或投资控股模型。
+- 特殊处理：卡券预收是未来履约义务；门店租赁付款列在筹资现金流，但估算可分配现金利润时扣除。
 
-四、核心数字口径
-- market_cap=2362000000.0，来自 config/input.json，日期2026-07-24。
-- pe_ttm=16.92，来自 config/input.json。
-- revenue=2080544769.13，cost_of_sales=790292783.18，gross_profit=1290251985.95，parent_net_profit=139594221.37，来自年度事实包和2025年报。
+四、财报核心数字（人民币元）
+- total_assets=2902395277.33
+- total_liabilities=1345937398.41
+- total_equity=1556457878.92
+- parent_equity=1555895016.50
+- revenue=2080544769.13
+- cost_of_sales=790292783.18
+- gross_profit=1290251985.95
+- parent_net_profit=139594221.37
+- operating_cash_flow=380369321.41
+- capital_expenditure=71841790.97
+- operating_free_cash_flow=308527530.44
+- lease_cash_payment=156650121.31（在 owner_earnback.profit_adjustments 中单列）
+- adjusted_cash_after_capex_and_lease=151877409.13
+
+五、比率与行情
+- market_cap=2496000000.00，来自 config/input.json。
+- market_cap_date=20260731114334。
+- market_cap_source=Tencent qt.gtimg.cn。
+- pe_ttm=26.45。
 - gross_margin=1290251985.95 / 2080544769.13 = 0.6201510321。
 - net_margin=139594221.37 / 2080544769.13 = 0.0670950337。
-- operating_cash_flow=380369321.41，capital_expenditure=71841790.97，operating_free_cash_flow=308527530.44。
-- lease_cash_payment=156650121.31，未在 result.financials 固定字段列示，但在 owner_earnback.profit_adjustments 和报告中说明。
-- adjusted_free_cash_flow_after_lease=380369321.41 - 71841790.97 - 156650121.31 = 151877409.13。
 
-五、控股回本口径
-- discounted_detachable_net_cash=901466385.9，复用历史 stock_research/owner_earnback 口径。
-- discounted_sustainable_cash_profit=112500000.0，复用历史 stock_research/owner_earnback 口径。
-- operating_business_price=2362000000.0 - 901466385.9 = 1460533614.1。
-- owner_earnback_years=1460533614.1 / 112500000.0 = 12.9825210142。
-- market_profit_payback_years=2362000000.0 / 112500000.0 = 20.9955555556。
-- discounted_net_cash_to_market_cap=901466385.9 / 2362000000.0 = 0.3816538467。
+六、折后净现金
+- 现金及现金等价物：136718565.81，保留必要经营现金100000000.00，计入36718565.81。
+- 超过6个月定存：537597430.94 × 90% = 483837687.846。
+- 结构性理财：849998625.90 × 65% = 552499106.835。
+- 受限冻结资金：扣除1037246.46。
+- 卡券履约与额外执行安全垫：扣除170551728.131。
+- 合计 discounted_detachable_net_cash=901466385.90。
+- 必要经营现金、折扣率和安全垫均为分析估算，不是公司披露值。
 
-六、分红口径
-- 2025年度权益分派为每10股派发现金红利6.00元。
-- 按总股本约240000000股估算 forecast_cash_dividend=144000000.0。
-- forecast_dividend_yield=144000000.0 / 2362000000.0 = 0.0609652837。
-- 该字段作为已实施年度分红基准，不作为未来承诺。
+七、现金利润与回本
+- 2025 调整现金=380369321.41-71841790.97-156650121.31=151877409.13。
+- 三年中位数约151877409.13；考虑2025年经营下滑及履约安全垫，折后现金利润取112500000.00。
+- operating_business_price=2496000000.00-901466385.90=1594533614.10。
+- owner_earnback_years=1594533614.10/112500000.00=14.1736321253。
+- market_cap_to_cash_profit=2496000000.00/112500000.00=22.1866666667。
+- discounted_net_cash_to_market_cap=901466385.90/2496000000.00=0.3611644174。
 
-七、主要限制
-- 市值来自输入快照，未独立重拉实时行情。
-- 结构性理财未逐项披露期限、底层挂钩和提前赎回条款，折扣依赖历史 owner_earnback 保守口径。
-- 必要经营现金不是公司披露值，沿用按经营现金支出、卡券履约和执行摩擦估算的保守口径。
-- 资本开支未区分维持性和增长性，回本口径全额扣除购建长期资产现金支出。
-- 报告未输出买卖建议、目标价或榜单标签。
+八、分红
+- 2025年度权益分派：每10股派6.00元，按约240000000股估算现金分红144000000.00。
+- forecast_dividend_yield=144000000.00/2496000000.00=0.0576923077。
+- 这是已实施年度分红基准，不是未来承诺。
 
-八、最终输出
-- outputs/result.json
-- outputs/report.md
-- outputs/trace.txt
+九、数据限制
+- 市值和PE使用任务输入快照，未另行重拉。
+- 结构性理财期限、底层挂钩和提前赎回条款未逐项披露。
+- 必要经营现金、资金折扣和卡券履约安全垫为分析假设。
+- 资本开支未区分维持性和增长性，全部扣除。
+- 外部行业资料只作背景，不替代核心财报数字。
+
+十、最终校验
+- 已执行：
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- 校验结果：status=ok，errors=[]。
+- 已扫描旧行情及派生值（23.62亿元、PE 16.92、12.98年等），最终输出无残留。
+- 输出文件：outputs/result.json、outputs/report.md、outputs/trace.txt。

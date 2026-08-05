@@ -1,0 +1,91 @@
+stock-research trace
+company: China Petroleum & Chemical Corporation / SINOPEC CORP / 00386.HK
+period: 2025-12-31 annual
+generated for input created_at: 2026-08-03T16:51:30+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read .agents/skills/stock-research/references/result-contract.md in full.
+- Read .agents/skills/stock-research/references/report-contract.md in full.
+- Read .agents/skills/stock-research/references/data-reuse.md because SKILL.md routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the input-declared raw filing, annual review, normalized facts, and prior stock research paths.
+- No filing metadata, annual facts package, extraction trace, normalized facts, or prior research output existed in the workspace for 00386.HK/2025-12-31.
+- Therefore retrieved the primary annual filing rather than inventing missing facts.
+
+3. Primary sources
+- HKEX annual results / full 2025 annual report, published 2026-03-22:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0322/2026032200047.pdf
+- Sinopec official announcement index and annual report release summary:
+  https://www.sinopec.com/listco/en/Announcements2026/index.shtml
+  https://www.sinopec.com/listco/en/000/000/070/70805.shtml
+- Market-cap snapshot supplied in config/input.json:
+  amount CNY 460862738210.1518; date 2026/07/31 16:08:44; source Tencent qt.gtimg.cn; PE TTM 14.9.
+
+4. Source extraction
+- Downloaded the HKEX PDF to a temporary directory and extracted its 221 pages with pypdf in a temporary virtual environment.
+- Key report locations (printed annual-report page numbering):
+  * IFRS consolidated income statement: p.156.
+  * IFRS consolidated statement of financial position: p.158 (PDF section labelled report p.157).
+  * IFRS consolidated cash-flow statement: p.161.
+  * Cash-flow reconciliation: p.162.
+  * Principal activities: p.163.
+  * Segment definition/results/assets/liabilities/capex: pp.199-201.
+  * CAS balance sheet: p.84.
+  * CAS gross-margin table: p.27.
+  * Dividend history: p.68; IFRS dividend note: p.181.
+
+5. Model correction
+- Input hint classified the company as financial_brokerage and referred to client funds, proprietary financial assets and repo liabilities.
+- Annual report principal activities and segment note identify oil and gas exploration/production, refining, marketing/distribution and chemicals.
+- Overrode hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+6. Core facts and calculations (RMB absolute yuan)
+- Revenue: 2,783,583,000,000.
+- CAS operating cost: 2,341,383,000,000.
+- Taxes and surcharges used in company gross-margin definition: 252,435,000,000.
+- Gross profit: revenue - operating cost - taxes/surcharges = 189,765,000,000.
+- Gross margin: 189,765 / 2,783,583 = 0.0681745587.
+- IFRS parent net profit: 32,476,000,000.
+- Net margin: 32,476 / 2,783,583 = 0.0116669847.
+- IFRS total assets / liabilities / equity / parent equity / NCI:
+  2,153,485,000,000 / 1,166,609,000,000 / 986,876,000,000 /
+  827,463,000,000 / 159,413,000,000.
+- Operating cash flow: 162,496,000,000.
+- Cash capex plus exploratory-well cash expenditure:
+  115,497,000,000 + 18,128,000,000 = 133,625,000,000.
+- Operating free cash flow: 162,496,000,000 - 133,625,000,000 = 28,871,000,000.
+- Cash and cash equivalents plus time deposits: 81,053,000,000 + 69,820,000,000 = 150,873,000,000.
+- Interest-bearing borrowing included in net-cash test:
+  short-term debt 108,335,000,000
+  + current Sinopec Group/fellow-subsidiary loans 11,921,000,000
+  + long-term debt 215,148,000,000
+  + non-current Sinopec Group/fellow-subsidiary loans 20,116,000,000
+  = 355,520,000,000.
+- Discounted detachable net cash:
+  150,873,000,000 * 0.80 - 355,520,000,000 = -234,821,600,000.
+- Discounted sustainable cash profit:
+  28,871,000,000 * 0.80 = 23,096,800,000.
+- Operating-business price:
+  460,862,738,210.1518 - (-234,821,600,000) = 695,684,338,210.1519.
+- Owner earnback years:
+  695,684,338,210.1519 / 23,096,800,000 = 30.1203776.
+- Market cap / discounted cash profit:
+  460,862,738,210.1518 / 23,096,800,000 = 19.9535320.
+- Forecast cash dividend: interim 10,662,000,000 + proposed final 13,544,000,000 = 24,206,000,000.
+- Forecast dividend yield: 24,206,000,000 / 460,862,738,210.1518 = 0.0525232309.
+
+7. Judgment flags
+- The 80% cash recognition is an analytical discount because cash supports working capital, net-current-liability funding and capital-intensive operations.
+- The 20% free-cash-flow haircut is an analytical allowance for commodity/product-margin cycles, inventory release in 2025, and unavailable maintenance/growth capex split.
+- Lease liabilities are disclosed in asset analysis but not added to interest-bearing debt in the owner-net-cash calculation to avoid mixing lease economics with the borrowing convention; this is a limitation, not a claim that leases are costless.
+- The forecast dividend is based on the disclosed full-year 2025 cash dividend and excludes repurchases.
+
+8. Protocol writes and validation
+- All complex result structures were populated using protocol `set` and `append`; result.json was not manually authored.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: {"status":"ok","errors":[]}

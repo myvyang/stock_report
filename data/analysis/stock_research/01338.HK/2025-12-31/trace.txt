@@ -1,0 +1,67 @@
+stock-research trace
+task: 01338.HK / BAWANG GROUP
+period: 2025-12-31
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+- No files for 01338.HK existed under the configured raw filing, annual review, normalized facts, or prior stock research paths.
+- Therefore fetched official HKEX disclosures rather than relying on third-party summaries.
+
+3. Primary sources
+- HKEX Annual Report 2025, released 2026-04-24:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042400041.pdf
+- HKEX Annual Results Announcement for year ended 2025-12-31, released 2026-03-26:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032602536.pdf
+- HKEX clarification announcement, released 2026-03-27, checked for announcement correction context:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0327/2026032702854.pdf
+- Market cap CNY 84,343,812.43944168, PE TTM 22.79, timestamp 2026/07/31 16:08:47: reused from config/input.json, source Tencent qt.gtimg.cn.
+
+4. Model verification
+- Input hint said financial_brokerage.
+- Annual report describes manufacturing and sale of hair-care, skincare, and other household/personal-care products, with inventory, receivables, PP&E, ordinary trade payables, and operating cash flow.
+- No brokerage customer funds, proprietary securities portfolio, margin financing, or repo liabilities were present.
+- Overrode hint to ordinary_operating; ordinary owner earnback model marked applicable.
+
+5. Financial extraction (annual report units RMB'000, converted to absolute CNY)
+- Revenue 273,094,000; cost of sales 134,245,000; gross profit 138,849,000.
+- Operating profit 4,457,000; net profit and parent net profit 3,885,000.
+- Total assets 226,438,000 = non-current assets 58,462,000 + current assets 167,976,000.
+- Total liabilities 76,938,000 = current liabilities 76,689,000 + non-current lease liability 249,000.
+- Equity and parent equity 149,500,000; minority interest 0.
+- Operating cash flow 18,660,000; PP&E purchases 17,361,000; operating FCF 1,299,000.
+- Financing cash flow -7,695,000; dividend/buyback cash out 0.
+- Gross margin 138,849,000 / 273,094,000 = 0.5084302767.
+- Net margin 3,885,000 / 273,094,000 = 0.0142258753.
+
+6. Owner earnback judgments
+- Bank cash 70,553,000 x 50% = 35,276,500. The 50% haircut preserves operating/safety liquidity and reflects governance/currency constraints.
+- One-year time deposit 45,000,000 x 90% = 40,500,000. The 10% haircut reflects access and governance constraints.
+- Lease liabilities 4,420,000 deducted at 100%.
+- Discounted detachable net cash = 71,406,500.
+- Operating business price = 84,343,812.43944168 - 71,406,500 = 12,937,312.43944168.
+- Discounted sustainable cash profit = 3,885,000, using 2025 parent profit with no depreciation add-back and no working-capital release uplift.
+- Owner earnback years = 12,937,312.43944168 / 3,885,000 = 3.3300675526.
+- Market cap / cash profit = 84,343,812.43944168 / 3,885,000 = 21.7101190320.
+- Cross-check warning: 2025 FCF was only 1,299,000 after PP&E purchases, so the accounting-profit denominator is not proven distributable cash.
+
+7. Dividend forecast
+- 2025 final dividend not recommended; no interim dividend or dividend/buyback cash out identified.
+- Forecast cash dividend set to 0 and forecast yield set to 0 pending explicit 2026 commitment.
+
+8. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated sections using protocol set commands; did not hand-write result JSON from scratch.
+- First completed validation: status ok, errors [].
+
+9. Data limitations
+- Market cap and PE were not independently reconstructed from price, shares, and FX.
+- Cash haircuts are analyst judgments, not reported facts.
+- Sustainable cash profit uses one weak-profit year plus a two-year comparison; 2025 capex and FCF sustainability remain uncertain.
+- No authoritative market-share dataset was obtained.

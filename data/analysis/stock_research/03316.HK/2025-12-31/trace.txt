@@ -1,0 +1,62 @@
+stock-research trace
+company: 滨江服务集团有限公司 (03316.HK)
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- Checked stock_report/data/analysis/annual_review/03316.HK/2025-12-31 and raw filing directory.
+- No reusable annual facts package or prior research result was present at task start.
+
+3. Primary sources obtained
+- HKEX annual results announcement, released 2026-03-25:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0325/2026032500899.pdf
+- HKEX Annual Report 2025, released 2026-04-24:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042403061.pdf
+- Local copies and extracted text are under stock_report/data/raw/filings/03316.HK/2025-12-31/.
+- Market snapshot reused exactly from config/input.json: Tencent qt.gtimg.cn, 2026/08/03 09:32:29, market cap CNY 5,664,223,832.511307, PE TTM 9.99.
+
+4. Model verification
+- Input hint classified the issuer as financial_brokerage.
+- Annual report identifies the issuer as a property service group with property management, non-property-owner value-added services and 5S owner value-added services.
+- The group had no bank loans or other borrowings at 2025-12-31.
+- Override: statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+- Constraint retained: contract liabilities and operating payables are service/working-capital obligations and are not treated as detachable cash.
+
+5. Core extracted facts (RMB)
+- revenue 4,101,253,000; gross profit 909,952,000; parent net profit 595,508,000
+- total assets 4,909,116,000; total liabilities 3,163,651,000; parent equity 1,672,406,000
+- operating cash flow 828,737,000; capex 34,837,000; operating FCF 793,900,000
+- cash 890,521,000; time deposits 2,106,273,000; FVPL 432,769,000
+- restricted bank balances 263,340,000, of which 57,998,000 was held for owners' associations and excluded from company cash
+- contract liabilities 1,768,657,000; trade and other payables 1,285,042,000
+- current tax 85,874,000; deferred tax liabilities 21,700,000; lease liabilities 2,378,000
+- 2025-attributable cash dividends 446,561,000
+
+6. Owner earnback calculations
+- own fund assets = 890,521,000 + 2,106,273,000 + 432,769,000 + (263,340,000 - 57,998,000) = 3,634,905,000
+- obligations deducted = 1,768,657,000 + 1,285,042,000 + 85,874,000 + 21,700,000 + 2,378,000 = 3,163,651,000
+- discounted detachable net cash = 492,954,000
+- sustainable cash profit = 595,508,000 - 71,195,000 * (1 - 25%) = 542,111,750
+- operating business price = 5,664,223,832.511307 - 492,954,000 = 5,171,269,832.511307
+- owner earnback years = operating business price / sustainable cash profit = 9.5391
+- market cap / cash profit = 10.4484
+- forecast dividend yield = 446,561,000 / 5,664,223,832.511307 = 7.8839%
+
+7. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated scalar fields using protocol set commands.
+- Populated asset, liability, haircut, profit adjustment, dividend, risk and evidence rows using protocol append commands.
+- No complex JSON object was hand-written from scratch.
+- Final protocol validation: status=ok, errors=[].
+
+8. Limitations
+- Market cap was not independently reconstructed from price and share count.
+- Full deduction of contract liabilities and operating payables is deliberately conservative; actual fulfillment cost may be lower than their carrying value.
+- Sustainable profit is a normalized static 2025 measure, not a forecast.

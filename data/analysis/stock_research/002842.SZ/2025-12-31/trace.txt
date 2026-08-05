@@ -1,0 +1,43 @@
+stock-research trace
+company: 002842.SZ 翔鹭钨业
+period: 2025-12-31 annual
+generated_at: 2026-08-01 Asia/Shanghai
+
+[protocol]
+1. Read stock-research SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Read references/data-reuse.md because the task required reuse-boundary decisions.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields only through protocol set commands.
+6. Validated with the protocol validate command after report creation.
+
+[reuse decision]
+- No annual facts, normalized facts, prior stock-research outputs, or raw filing metadata existed for 002842.SZ/2025-12-31.
+- Downloaded the official annual-report PDF to stock_report/data/raw/filings/002842.SZ/2025-12-31/annual-report-2025.pdf.
+- Core extraction used the indexed text of the same official CNINFO PDF because pdftotext was unavailable in the environment.
+
+[primary sources]
+- Guangdong Xianglu Tungsten Co., Ltd. 2025 Annual Report, announced 2026-04-01:
+  https://static.cninfo.com.cn/finalpage/2026-04-01/1225066810.PDF
+- Market-cap/PE snapshot supplied by config/input.json: Tencent qt.gtimg.cn, 2026-07-31 11:43:27.
+
+[key calculations]
+- gross_profit = 2,408,547,936.24 - 2,062,629,255.22 = 345,918,681.02
+- gross_margin = 345,918,681.02 / 2,408,547,936.24 = 14.3615%
+- net_margin = 143,704,071.81 / 2,408,547,936.24 = 5.9663%
+- operating_free_cash_flow = 110,315,567.94 - 104,757,837.00 = 5,557,730.94
+- unrestricted_cash = cash_and_cash_equivalents = 287,320,653.89
+- financing_debt = annual-report financing-liability reconciliation ending balance = 897,609,175.19
+- discounted_detachable_net_cash = 287,320,653.89 - 897,609,175.19 = -610,288,521.30
+- discounted_sustainable_cash_profit = 134,841,907.96 * 60% = 80,905,144.78
+- operating_business_price = 9,782,000,000.00 - (-610,288,521.30) = 10,392,288,521.30
+- owner_earnback_years = 10,392,288,521.30 / 80,905,144.78 = 128.45
+- market_cap_to_cash_profit = 9,782,000,000.00 / 80,905,144.78 = 120.91
+- forecast_dividend_yield = 45,149,794.24 / 9,782,000,000.00 = 0.4616%
+
+[judgment boundary]
+- Ordinary operating model confirmed from manufacturing business facts.
+- The 40% haircut to adjusted profit is an explicit conservative judgment, motivated by two prior loss years, the 2025 tungsten-price upswing, inventory cash absorption, and low post-capex free cash flow. It is not company guidance.
+- Restricted cash, operating receivables, inventory, fixed assets, trade payables, and contract liabilities were not treated as detachable cash.
+- No ranking label, buy/sell advice, or target price was produced.

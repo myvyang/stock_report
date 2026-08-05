@@ -1,0 +1,71 @@
+stock-research trace
+company=600267.SH 海正药业
+period=2025-12-31 annual
+generated_at=2026-07-31T22:40:07+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Read references/data-reuse.md because no local annual facts existed.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated scalar/object-list fields using protocol set/append commands; did not construct result.json by hand.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: {"status":"ok","errors":[]}
+
+[local reuse audit]
+- stock_report contained only data/notes/user_stock_evaluations.md.
+- No raw filing, annual facts, normalized facts, or prior stock research existed for 600267.SH/2025-12-31 in /workspace or the supplied /root/aicode sync paths.
+- Therefore the 2025 annual report had to be supplemented from public disclosure.
+
+[source acquisition]
+- Annual report title: 浙江海正药业股份有限公司2025年年度报告.
+- Official disclosure location stated in the report: Shanghai Stock Exchange, published 2026-04-08.
+- Searchable/download mirror used for extraction:
+  https://pdf.dfcfw.com/pdf/H2_AN202604071821046653_1.pdf
+- Downloaded PDF: 280 pages.
+- SHA256: 5c507ad7517f455387995885f64521dd933711accd16a2d2d81dc61f7f85ab24
+- Audit report: 容诚审字[2026]230Z1257号, standard unmodified opinion.
+- Market data reused exactly from config/input.json: market cap CNY 13,679,000,000; timestamp 20260731114327; source Tencent qt.gtimg.cn; PE TTM 19.48.
+
+[key extraction locations]
+- Annual report pp. 2, 72-74: dividend proposal and payout history.
+- Annual report pp. 7-10: headline financials, quarterly data, non-recurring items.
+- Annual report pp. 11-25: business model, product/channel descriptions, segment and product revenue/margins.
+- Annual report pp. 29-42: asset changes, R&D, industry and operating discussion.
+- Annual report pp. 107-116: consolidated balance sheet, income statement, cash flow statement.
+- Annual report pp. 210, 215-217: restricted assets and debt composition.
+- Annual report p. 230: cash flow reconciliation, depreciation/amortization and working-capital effects.
+- Annual report pp. 261-264: contingencies, subsequent events, Zhejiang Pharmaceutical disposal, Dao Ming settlement and related matters.
+
+[model determination]
+- Confirmed ordinary_operating / applicable.
+- Reason: drug R&D, manufacturing and distribution use ordinary inventory, receivables, production assets, payables and borrowings. No bank deposits, insurance reserves, real-estate presale funds, concession rights or other special-model balance-sheet structure was identified.
+
+[formula checks]
+- gross_profit = 10,549,640,956.88 - 5,819,865,024.29 = 4,729,775,932.59.
+- gross_margin = 4,729,775,932.59 / 10,549,640,956.88 = 0.4483314729.
+- net_margin = 540,707,781.22 / 10,549,640,956.88 = 0.0512536669.
+- operating_free_cash_flow = 2,031,676,015.42 - 376,395,257.64 = 1,655,280,757.78.
+- discounted cash = 1,218,184,997.46 * 90% + 2,370,134.69 * 50% = 1,097,551,565.06.
+- debt deduction = short-term borrowing 1,979,788,723.38 + current long-term borrowing 740,843,752.78 + long-term borrowing 155,000,000.00 + current other non-current liability 131,696,082.27 = 3,007,328,558.43.
+- discounted detachable net cash = 1,097,551,565.06 - 3,007,328,558.43 = -1,909,776,993.37.
+- sustainable cash profit = 600,000,000.00, judgment anchored to 2025 recurring parent profit 585,676,238.11; intentionally not equal to one-year FCF.
+- operating business price = 13,679,000,000 - (-1,909,776,993.37) = 15,588,776,993.37.
+- owner earnback years = 15,588,776,993.37 / 600,000,000 = 25.98129499.
+- market cap to cash profit = 13,679,000,000 / 600,000,000 = 22.79833333.
+- forecast dividend yield = 243,261,962.16 / 13,679,000,000 = 0.0177838996.
+
+[judgment boundaries]
+- The CNY 600m sustainable cash profit is an analyst estimate, not management guidance.
+- 2025 FCF was not annualized because maintenance capex is not separately disclosed, current capex was below depreciation/amortization, and working-capital movements supported CFO.
+- Restricted cash was excluded before the 90% cash haircut.
+- Long-term equity investments were excluded from detachable cash due to governance, strategic and valuation constraints.
+- The CNY 500.5m post-period Zhejiang Pharmaceutical sale proceeds were not mechanically added to 2025 net cash because operating assets/equity were disposed in exchange and the transaction changes consolidation scope.
+- Dividend yield excludes buybacks because buybacks are not cash directly distributed to all current shareholders.
+
+[outputs]
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

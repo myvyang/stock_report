@@ -1,0 +1,54 @@
+stock-research trace
+task_created_at=2026-08-05T05:14:31+08:00
+company=08425.HK HING MING HLDGS
+requested_period=2025-12-31
+resolved_filing_period=2025-03-31
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No annual facts, normalized facts, extraction trace, prior stock research output, or raw filing metadata existed at the configured paths.
+- Downloaded official HKEX annual report to stock_report/data/raw/filings/08425.HK/2025-12-31/annual_report_2025.pdf.
+- Local pdftotext was unavailable; research used HKEX's indexed PDF text and page references.
+
+3. Protocol
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields with repeated protocol set commands; result.json was not composed directly from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+
+4. Model verification
+- Input hint financial_brokerage rejected.
+- Annual report pp.4-5 and note 3 identify construction-equipment rental, related installation/dismantling/inspection services, and equipment/spare-parts trading.
+- Resolved model: ordinary_operating; owner earnback applicability: applicable.
+- Heavy-asset rental economics handled by deducting capital expenditure and refusing to infer a positive sustainable cash profit without a reliable maintenance/growth capex split.
+
+5. Core source extraction (HKD'000 unless stated)
+- Revenue 106,063; cost of sales 83,139; gross profit 22,924; operating loss 22,974; net/parent loss 24,701 (annual report p.66).
+- Total assets 183,685; total liabilities 91,494; total/parent equity 92,191 (pp.67, 116).
+- Cash 12,372; trade receivables 26,155; PPE 139,080; bank and other borrowings 42,402; lease liabilities 10,167 (p.67 and notes).
+- Operating cash flow 24,786; cash PPE purchases 54,061; operating free cash flow -29,275; financing cash flow 18,694 (pp.69-70).
+- FY2025 capex disclosed about 60,300, of which 95.8% was additional tower cranes (MD&A p.6).
+- No FY2025 dividend; FY2024 comparator nil (p.100).
+- Largest customer 37.1% revenue; top five 85.3%; top five receivables 79% (pp.23, 101-102).
+
+6. Currency and calculations
+- Conversion rate: 1 HKD = 0.92283 CNY, CFETS-authorized central parity on 2025-03-31.
+- All result.json financial statement amounts converted to absolute CNY yuan.
+- Gross margin = 22,924 / 106,063 = 0.2161356929.
+- Net margin = -24,701 / 106,063 = -0.2328898862.
+- Discounted detachable net cash = cash - bank/other borrowings - lease liabilities = HKD -40.197m = CNY -37,094,997.51.
+- Operating business price = market cap - discounted detachable net cash = CNY 66,207,549.66.
+- Sustainable cash profit = 0 because reported FCF is negative and maintenance/growth capex cannot be reliably separated.
+- Owner earnback years and market-cap-to-cash-profit are null because the denominator is not positive.
+
+7. Data quality
+- status=complete under the result contract: identity, model, statements, asset/liability explanations, dividend basis, business story, evidence, valuation and formulas are present.
+- Period mismatch is explicitly disclosed; analysis.period overwritten to the actual audited filing date 2025-03-31.
+- Market snapshot is about 16 months later than the filing date; PE TTM is retained but not used to infer cash profit.

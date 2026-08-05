@@ -1,0 +1,60 @@
+stock-research trace
+company: 00179.HK / 德昌电机控股有限公司
+research_anchor: 2025-12-31
+generated_at: 2026-08-03T14:03:04+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No raw filing, annual facts, normalized facts, or prior stock-research result existed for 00179.HK in the workspace.
+- Downloaded official FY2024/25 annual report from Johnson Electric's investor website to temporary workspace for extraction.
+
+3. Period decision
+- Johnson Electric fiscal year ends 31 March.
+- No annual report exists for 2025-12-31; selected FY2024/25 (year ended 2025-03-31), the latest complete audited annual report public before the research anchor.
+- Did not use FY2025/26 annual results because they were published after the research anchor.
+
+4. Model decision
+- Input hint: financial_brokerage / requires_special_model.
+- Audited fact: group manufactures and sells motion systems; APG and IPG are operating segments.
+- Override: ordinary_operating / applicable.
+
+5. Currency conversion
+- Reporting currency: USD; output contract: CNY yuan.
+- Rate: USD/CNY 7.1775, PBOC central parity announced 2025-04-01, nearest trading day after fiscal year-end.
+- Input market cap was retained as the protocol-supplied CNY amount: 14,944,030,493.860245.
+
+6. Key source facts (USD thousands unless noted)
+- Revenue 3,647,606; cost of sales 2,804,271; gross profit 843,335; operating profit 305,872; parent net profit 262,803.
+- Total assets 4,064,283; total liabilities 1,356,386; total equity 2,707,897; parent equity 2,666,040.
+- OCF 448,087; PPE purchase 195,504; capitalized development 1,749; conservative operating FCF 250,834.
+- Cash 790,633; borrowings 359,335; lease liabilities 64,206.
+- FY2024/25 dividend 61 HK cents/share, total USD 72,230 thousand.
+
+7. Owner earnback formulas
+- discounted net cash = cash * 90% - borrowings - lease liabilities
+  = USD 287.029m = CNY 2.060151bn.
+- operating FCF = OCF - PPE purchases - capitalized development
+  = USD 250.834m = CNY 1.800361bn.
+- discounted sustainable cash profit = operating FCF * 90%
+  = CNY 1.620325bn.
+- operating business price = market cap - discounted net cash
+  = CNY 12.883880bn.
+- owner earnback years = operating business price / discounted sustainable cash profit
+  = 7.9514 years.
+- market cap / cash profit = 9.2229 times.
+
+8. Protocol usage
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields using repeated protocol set commands.
+- Validated after population; protocol returned status=ok and errors=[].
+
+9. Known limitations
+- Market-cap date is 16 months after the annual-report date.
+- Tencent source snapshot and its HKD/CNY treatment were supplied by input but unavailable for independent reconstruction.
+- Sustainable cash profit is based on one fiscal year with a 10% safety discount, not a full-cycle average.

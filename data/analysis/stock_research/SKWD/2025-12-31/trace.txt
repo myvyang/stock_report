@@ -1,0 +1,74 @@
+stock-research trace: SKWD / 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+   - config/input.json existed.
+   - No raw filing, annual facts package, normalized facts, or prior SKWD research result existed under the paths supplied by input.json.
+   - Research therefore returned to primary public filings.
+
+3. Protocol initialization
+   - Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Result skeleton created successfully.
+
+4. Primary sources
+   - SEC 2025 Form 10-K filing index:
+     https://www.sec.gov/Archives/edgar/data/1519449/000151944926000015/0001519449-26-000015-index.html
+   - SEC 2025 Form 10-K inline XBRL document:
+     https://www.sec.gov/Archives/edgar/data/1519449/000151944926000015/skwd-20251231.htm
+   - SEC company facts endpoint used to cross-check XBRL values:
+     https://data.sec.gov/api/xbrl/companyfacts/CIK0001519449.json
+   - Company FY2025 results release:
+     https://investors.skywardinsurance.com/news-releases/news-release-details/skyward-specialty-insurance-group-reports-fourth-quarter-2025
+   - Market cap and PE: config/input.json; source recorded there as Yahoo Finance yfinance, dated 2026-08-03.
+
+5. Model determination
+   - Input hint said ordinary_operating/applicable.
+   - 10-K identifies the company as a specialty commercial property and casualty insurer.
+   - Investments, loss reserves, unearned premiums, reinsurance recoverables and operating cash flow are integral to insurance operations.
+   - Overrode hint to financial_insurance/requires_special_model.
+   - Kept all ordinary owner-earnback fields null as required by contract.
+
+6. Key source facts (USD)
+   - Total assets: 4,791,852,000
+   - Total liabilities: 3,782,287,000
+   - Parent stockholders' equity: 1,009,565,000
+   - Revenue: 1,416,541,000
+   - Net earned premium: 1,304,505,000
+   - Net income attributable to parent: 170,028,000
+   - Net operating cash flow: 408,076,000
+   - Total investments: 2,300,515,000
+   - Loss and LAE reserves: 2,318,894,000
+   - Unearned premium: 774,035,000
+   - Reinsurance recoverables, net: 1,119,880,000
+   - Gross written premium: 2,166,236,000; growth 24.3%
+   - Combined ratio: 89.3%; ROE: 18.9%; book value per share: 24.92
+   - Insurance subsidiaries paid no dividends to holding company in 2025 or 2024; company states it does not intend common cash dividends in foreseeable future.
+
+7. Currency conversion
+   - Result contract requires absolute CNY yuan.
+   - Input did not supply an FX rate.
+   - Research conversion assumption: USD/CNY = 7.20 for all 2025 filing amounts.
+   - Market capitalization was reused directly from input and was not reconverted.
+   - This assumption is disclosed in evidence, report, and data-quality limitations.
+
+8. Important temporal limitation
+   - Apollo acquisition closed 2026-01-01.
+   - Annual financial statements end 2025-12-31 and do not consolidate the acquired business.
+   - Market-cap date is 2026-08-03 and therefore reflects post-acquisition information.
+   - Input PE TTM is retained but not recomputed from 2025 annual net income.
+
+9. Protocol population and validation
+   - All result fields were populated through protocol `set` calls after protocol initialization.
+   - Final validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Final validation status: ok; errors: []
+
+10. Output files
+   - outputs/result.json
+   - outputs/report.md
+   - outputs/trace.txt

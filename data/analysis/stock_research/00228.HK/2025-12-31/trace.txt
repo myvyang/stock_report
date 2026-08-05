@@ -1,0 +1,120 @@
+task=stock_research
+company=China Energy Development Holdings Limited
+code=00228.HK
+period=2025-12-31
+generated_at=2026-08-03T15:56:57+08:00
+
+[protocol]
+initialized_with=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+updated_with=stock_analysis.stock_research.protocol set/append
+validated_with=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[source_reuse]
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+historical_stock_research=missing
+decision=no reusable fact pack; returned to official annual filing
+
+[primary_sources]
+1. HKEX annual report URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042902276.pdf
+   downloaded_to=stock_report/data/raw/filings/00228.HK/2025-12-31/annual_report_2025.pdf
+   published=2026-04-29
+2. HKEX title search / annual results announcement
+   https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=409
+   annual_results_published=2026-03-27
+3. PBOC RMB central parity announcement, 2025-12-26
+   rate=1 HKD = 0.90486 CNY
+   https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+4. Market snapshot supplied in config/input.json
+   source=Tencent qt.gtimg.cn
+   timestamp=2026/07/31 16:08:46
+   market_cap_cny=459185127.3924113
+   pe_ttm=20.63
+
+[identity_and_model_check]
+input_hint=financial_brokerage / requires_special_model
+annual_report_facts=one operating segment: exploration, development, production and distribution of natural gas
+brokerage_balance_sheet_features=absent
+final_statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+override_reason=input hint contradicted audited business and segment disclosures
+
+[reported_HKD_thousand]
+revenue=234258
+direct_cost=47679
+gross_profit=186579
+profit_before_tax=32279
+net_profit=22469
+parent_net_profit=25874
+total_assets=2603885
+total_liabilities=467946
+total_equity=2135939
+parent_equity=2129835
+non_controlling_interest=6104
+operating_cash_flow=89907
+ppe_acquisition=2870
+leasehold_property_acquisition=18662
+renovation_prepayment=3517
+capital_expenditure_research_basis=25049
+operating_free_cash_flow=64858
+cash=295158
+financial_assets_fvtpl=12475
+accounts_receivable_net=125179
+other_borrowings=246295
+amount_due_shareholder=33769
+lease_liabilities=6271
+convertible_note_liability=50383
+other_payables_and_accruals=68727
+
+[currency_conversion]
+protocol_currency=CNY
+conversion_rate=0.90486 CNY/HKD
+method=all HKD annual-report values multiplied by 1000 and 0.90486
+limitation=closing central parity used for income statement and cash-flow values as a consistent display convention; annual-average translation would differ slightly
+
+[ratios]
+gross_margin=186579/234258=0.7964679968240146
+net_margin=25874/234258=0.11045087040784093
+minority_interest_ratio=6104/2135939=0.002857760888253236
+major_customer_share=230770/234258=0.9851104303793305
+
+[owner_earnback]
+cash_cny=295158000*0.90486=267076667.88
+listed_securities_cny=12475000*0.90486=11288128.50
+discounted_listed_securities=11288128.50*0.8=9030502.80
+financing_obligations_cny=(246295+33769+6271+50383)*1000*0.90486=304682649.48
+raw_discounted_net_cash=267076667.88+9030502.80-304682649.48=-28575478.80
+discounted_detachable_net_cash=max(0,raw_discounted_net_cash)=0
+operating_business_price=459185127.3924113-0=459185127.3924113
+operating_free_cash_flow_cny=(89907-2870-18662-3517)*1000*0.90486=58687409.88
+sustainability_haircut=20%
+haircut_basis=production -17.6%; revenue -21.9%; major customer ~98.5%; receivables increased and impairment recognized
+discounted_sustainable_cash_profit=58687409.88*0.8=46949927.904
+owner_earnback_years=459185127.3924113/46949927.904=9.780315921492393
+market_cap_to_cash_profit=9.780315921492393
+
+[dividend]
+2024_cash_dividend=0
+2025_cash_dividend=0
+post_balance_sheet_proposed_dividend=0
+forecast_cash_dividend=0
+forecast_dividend_yield=0
+basis=no current dividend evidence; no assumption of payout from accounting profit
+
+[judgement_flags]
+FACT: company is a natural-gas operator, not a brokerage.
+FACT: 2025 gas production fell 17.6% due to technical problems including water and slurry blockage in certain wells.
+FACT: year-end cash rose mainly alongside HKD236.697m net rights-issue proceeds.
+INFERENCE: year-end cash is not detachable because discounted liquid assets do not cover financing obligations.
+JUDGEMENT: apply a 20% haircut to 2025 operating free cash flow for sustainability.
+JUDGEMENT: forecast dividend is zero absent evidence of a payout plan.
+
+[data_quality]
+status=complete
+core_audited_fields=present
+model_verified=yes
+owner_earnback_fields=present
+dividend_forecast=present
+evidence_entries=8
+known_limitations=FX convention; market snapshot not independently re-queried; cash-profit haircut is analyst judgement

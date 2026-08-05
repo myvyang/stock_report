@@ -1,0 +1,54 @@
+stock-research trace
+company: 劲旅环境 001230.SZ
+period: 2025-12-31 annual
+generated: 2026-08-01 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- references/result-contract.md
+- references/report-contract.md
+- references/data-reuse.md
+
+2. Initialized protocol result
+- PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse audit
+- No annual facts, normalized facts, raw filing metadata, or prior stock-research result existed locally for 001230.SZ/2025-12-31.
+- Only stock_report/data/notes/user_stock_evaluations.md existed; it supplied no company facts used here.
+
+4. Primary filing acquired and checked
+- Shenzhen Stock Exchange 2025 annual report, disclosed 2026-04-24:
+  https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-24/7464401c-ec3e-4bc2-a697-f00b17b8152e.PDF
+- Identity and headline metrics: page 6.
+- Business description and segment revenue/margins: pages 9-16.
+- Consolidated balance sheet, income statement, cash flow: pages 76-85.
+- Dividend proposal: page 44.
+- Restricted assets and borrowing details: pages 164-171.
+- Contracted remaining performance obligations: page 177.
+- Audit opinion: unmodified opinion, report dated 2026-04-22.
+
+5. Market snapshot
+- Reused config/input.json exactly: market cap CNY 3,211,000,000; PE TTM 18.58; timestamp 2026-07-31 11:42:54; source Tencent qt.gtimg.cn.
+
+6. Model decision
+- ordinary_operating / applicable.
+- Concession rights, project vehicles, receivables, and working cash treated as operating assets, not detachable cash.
+
+7. Calculations
+- gross profit = 1,670,157,533.59 - 1,213,529,885.42 = 456,627,648.17.
+- operating FCF = 100,440,996.77 - 89,162,599.93 = 11,278,396.84.
+- discounted detachable cash = 367,417,354.06*50% + 332,809,506.45*90% - 393,027,612.60 = 90,209,620.24.
+- discounted sustainable cash profit = CNY 60,000,000 (analyst estimate based on 2023-2025 OCF, 2024-2025 capex, receivables growth; not company guidance).
+- operating business price = 3,211,000,000 - 90,209,620.24 = 3,120,790,379.76.
+- owner earnback = 3,120,790,379.76 / 60,000,000 = 52.0132 years.
+- forecast dividend yield = 50,967,901.66 / 3,211,000,000 = 1.5872%.
+
+8. Protocol population and validation
+- All result sections populated through protocol CLI set commands after initialization.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].
+
+9. Output files
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

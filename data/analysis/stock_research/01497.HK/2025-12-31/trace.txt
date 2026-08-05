@@ -1,0 +1,65 @@
+stock-research trace
+company: YAN PALACE / 01497.HK
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Required protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read result-contract.md and report-contract.md completely as requested.
+- Read data-reuse.md because local source reuse was relevant.
+
+2. Local source audit
+- config/input.json present.
+- No annual facts package, normalized facts, raw filing metadata, or prior stock-research result existed for this company/period.
+- stock_report/data/notes/user_stock_evaluations.md existed but contained no task-specific source package used in this result.
+
+3. Official sources acquired and reviewed
+- HKEX issuer title search for stock 01497.
+- 2025 Annual Report, released 2026-04-17:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0417/2026041700714.pdf
+- 2025 Annual Results Announcement, released 2026-03-17:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0317/2026031701614.pdf
+- The annual report PDF was saved to:
+  stock_report/data/raw/filings/01497.HK/2025-12-31/2025-annual-report.pdf
+- Key reviewed annual-report locations: pp. 23-28 (financial review), pp. 196-203 (primary statements), pp. 236-241 (revenue/segments), pp. 270-275 (cash and payables), pp. 285-287 (dividends), pp. 299 onward (financial risks).
+
+4. Model verification
+- Input hint stated financial_brokerage/requires_special_model.
+- Annual report note 3 states the group develops, produces and sells edible bird's nest products.
+- Balance sheet contains ordinary operating-company assets and liabilities; no brokerage client money, proprietary securities book, or repo funding was identified.
+- Overrode hint to ordinary_operating/applicable.
+
+5. Core audited inputs (RMB)
+- Revenue 2,000,569,000; cost of sales 929,665,000; gross profit 1,070,904,000.
+- Operating profit 281,965,000; net profit 191,393,000; parent net profit 188,561,000.
+- Assets 1,552,189,000; liabilities 715,997,000; equity 836,192,000; parent equity 810,362,000; NCI 25,830,000.
+- CFO 421,737,000; capex 28,178,000; operating FCF 393,559,000.
+- Financing cash flow -159,807,000; shareholder dividends plus buyback cash out 124,210,000.
+- Cash and cash equivalents 636,067,000; restricted deposits 20,000,000; lease liabilities 111,645,000.
+- Proposed 2025 final dividend after incentive shares 122,211,000; RMB0.266/share.
+
+6. Formula and judgment trace
+- Gross margin = 1,070,904,000 / 2,000,569,000 = 0.5352997072.
+- Net margin = 188,561,000 / 2,000,569,000 = 0.0942536848.
+- Post-dividend cash = 636,067,000 - 122,211,000 = 513,856,000.
+- Discounted detachable net cash = 513,856,000 * 0.80 - 111,645,000 = 299,439,800.
+- 2024 parent net profit 156,295,000; 2025 parent net profit 188,561,000; two-year mean 172,428,000.
+- Discounted sustainable cash profit rounded down to 170,000,000.
+- Reason CFO/FCF was not used directly: inventory decrease 81,309,000 + receivable/prepayment decrease 48,710,000 + payable increase 31,412,000 = 161,431,000 working-capital release.
+- Operating business price = 2,025,696,802.5541306 - 299,439,800 = 1,726,257,002.5541306.
+- Owner earnback years = 1,726,257,002.5541306 / 170,000,000 = 10.1544529562.
+- Market cap / cash profit = 11.9158635444.
+- Forecast dividend yield = 122,211,000 / 2,025,696,802.5541306 = 0.0603303514.
+
+7. Protocol actions
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated scalar/object fields with protocol set and list fields with protocol append; result was not handwritten from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status before final file consistency check: ok, no errors.
+
+8. Data quality
+- status: complete
+- Core annual figures are audited and official; valuation is supplied by the task.
+- Limitations retained in result.json: no archived raw Tencent quote response, dividend forecast is a flat baseline rather than guidance, industry share is not independently verified, and cash/profit discounts include disclosed judgment.

@@ -1,0 +1,75 @@
+stock-research trace
+task_created_at=2026-08-05T01:54:12+08:00
+period=2025-12-31
+query=QCRH
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+population=protocol set/append commands; initialized schema was not replaced by a hand-written JSON object
+
+[reuse-check]
+requested annual facts, normalized facts, filing metadata and prior research paths were absent locally.
+decision=download and inspect primary filing; no usable prior conclusion was reused.
+
+[primary-sources]
+SEC Form 10-K=https://www.sec.gov/Archives/edgar/data/906465/000110465926021531/qcrh-20251231x10k.htm
+SEC accession=0001104659-26-021531
+SEC filing date=2026-02-27
+local filing=stock_report/data/raw/filings/QCRH/2025-12-31/qcrh-20251231x10k.htm
+SEC Companyfacts=https://data.sec.gov/api/xbrl/companyfacts/CIK0000906465.json
+local companyfacts=stock_report/data/raw/filings/QCRH/2025-12-31/companyfacts.json
+company FY2025 release=https://qcrh.com/news/news-details/2026/QCR-Holdings-Inc--Announces-Fourth-Quarter-Results-and-Record-Net-Income-for-the-Full-Year-2025/default.aspx
+FX=2025-12-31 China Foreign Exchange Trade System authorized central parity announcement, USD/CNY 7.0288
+market snapshot=config/input.json; Yahoo Finance yfinance; date 2026-08-03
+
+[model-review]
+input_hint=ordinary_operating/applicable
+observed=bank holding company with four commercial bank subsidiaries; deposits fund loans and securities; net interest income is the main earnings stream.
+override=financial_bank/not_applicable
+reason=deposits, loans, cash, securities and wholesale funding are the regulated operating balance sheet and cannot support detachable-net-cash or ordinary free-cash-flow formulas.
+
+[key-usd-facts]
+total_assets=9575470000
+total_liabilities=8463159000
+parent_equity=1112311000
+parent_net_income=127194000
+loans_and_leases_held_for_investment=7165526000
+allowance_for_credit_losses=90127000
+deposits=7414198000
+cash_and_due_from_banks=76494000
+AFS_debt_securities_fair_value=279777000
+FHLB_long_term_advances=245383000
+other_borrowings=107395000
+net_interest_income=255221000
+noninterest_income=114323000
+provision_for_credit_losses=18081000
+nonperforming_assets=43337000
+capital_markets_revenue=64660000
+
+[conversion]
+all monetary fields in result.json are absolute CNY yuan.
+USD_CNY=7.0288
+balance-sheet and income-statement amounts use the same period-end rate for deterministic display.
+limitation=income statement was not translated at a full-year average FX rate.
+
+[special-model-output]
+revenue=null; gross_profit=null; gross_margin=null; net_margin=null
+operating_cash_flow=null; capital_expenditure=null; operating_free_cash_flow=null
+discounted_net_cash=null; discounted_cash_profit=null; operating_business_price=null
+owner_earnback_years=null; market_cap_to_cash_profit=null
+reason=these ordinary-company fields lack comparable economic meaning for a deposit-taking bank under the result contract.
+
+[dividend]
+historical annual dividend per share=USD 0.24 in 2025 and 2024
+forecast shares=16730722 (outstanding at 2026-02-12 per Form 10-K)
+forecast annual DPS=USD 0.24 (no-growth assumption)
+forecast dividend CNY=28222293.739776
+forecast yield=0.0024812 using input market cap
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

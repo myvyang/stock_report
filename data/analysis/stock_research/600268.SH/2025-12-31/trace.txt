@@ -1,0 +1,89 @@
+stock-research trace
+company=600268.SH 国电南自
+period=2025-12-31
+generated_for=2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json using:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar and list fields using protocol set/append commands, orchestrated through subprocess calls; result.json was not handwritten from a blank object.
+
+[local reuse check]
+- Paths declared by config/input.json under stock_report/data/raw/filings, annual_review, normalized facts, and historical stock research did not exist.
+- stock_report/data/notes/user_stock_evaluations.md existed but contained no company-specific annual facts used in this result.
+- Because the local fact package was absent, retrieved the official annual report rather than inventing or substituting third-party fundamentals.
+
+[official filing]
+- Source: Shanghai Stock Exchange, 国电南京自动化股份有限公司2025年年度报告.
+- URL: https://static.sse.com.cn/disclosure/bond/announcement/company/c/new/2026-03-30/115405_20260330_VPLM.pdf
+- Local copy: stock_report/data/raw/filings/600268.SH/2025-12-31/annual-report-2025.pdf
+- PDF pages: 262.
+- PDF extraction: pypdf installed in temporary virtual environment /tmp/stockresearch-venv because pdftotext and PDF libraries were initially unavailable. Extracted text was used only for analysis; official PDF remains the source of record.
+- Audit opinion: standard unmodified opinion, Tianzhi International, 天职业字[2026]8279号.
+
+[model review]
+- Input relation tags said EV manufacturing/car sales/software value-add; rejected as inconsistent with the official filing.
+- Filing shows industrial electric-power automation equipment as the single disclosed industry, with grid automation, plant automation, IT, rail automation, power electronics and system integration.
+- System integration revenue=1,372,275,207.30, 14.23% of total revenue, and is recognized by progress; this creates construction-like estimation and working-capital risks.
+- Remaining business is predominantly products and technical services. Final statement_model=ordinary_operating; owner_earnback_applicability=applicable, with project-business haircuts.
+
+[core figures from filing, CNY]
+revenue=9,644,379,243.75
+cost_of_sales=7,108,615,766.96
+gross_profit=2,535,763,476.79
+operating_profit=820,905,289.81
+net_profit=745,812,472.03
+parent_net_profit=480,103,736.10
+deducted_nonrecurring_parent_profit=452,689,854.62
+operating_cash_flow=897,030,617.47
+capital_expenditure=52,596,785.95
+operating_free_cash_flow=844,433,831.52
+total_assets=12,137,676,470.00
+total_liabilities=7,383,050,669.99
+total_equity=4,754,625,800.01
+parent_equity=3,736,250,188.21
+minority_interest=1,018,375,611.80
+cash_and_cash_equivalents=2,899,926,869.19
+restricted_monetary_funds=32,641,080.05
+interest_bearing_and_lease_debt=368,896,678.54
+accounts_receivable=4,965,270,953.57
+contract_assets=259,640,835.52
+inventory=1,198,575,944.06
+accounts_and_notes_payable=5,182,716,900.34
+contract_liabilities=1,319,321,566.36
+
+[derived formulas]
+gross_margin=(9,644,379,243.75-7,108,615,766.96)/9,644,379,243.75=0.2629265619592148
+net_margin=480,103,736.10/9,644,379,243.75=0.04978067784001021
+operating_free_cash_flow=897,030,617.47-52,596,785.95=844,433,831.52
+minority_interest_ratio=1,018,375,611.80/4,754,625,800.01=0.21418627976945273
+
+[owner earnback assumptions]
+- Market cap=11,385,000,000 from config/input.json; timestamp=20260731114331; source=Tencent qt.gtimg.cn.
+- Include 50% of cash and cash equivalents: 2,899,926,869.19*0.50=1,449,963,434.595.
+- Deduct 100% of interest-bearing and lease debt: 368,896,678.54.
+- Exclude large certificates of deposit, long-term equity investments and other equity instruments from detachable cash.
+- discounted_detachable_net_cash=1,449,963,434.595-368,896,678.54=1,081,066,756.055.
+- operating_business_price=11,385,000,000-1,081,066,756.055=10,303,933,243.945.
+- Base sustainable profit on deducted-nonrecurring parent profit, not consolidated FCF, because consolidated FCF includes minority owners and working-capital timing.
+- Apply 10% discount for receivables, customer concentration, progress-accounting estimates and unusually rapid 2025 profit growth.
+- discounted_sustainable_cash_profit=452,689,854.62*0.90=407,420,869.158.
+- owner_earnback_years=10,303,933,243.945/407,420,869.158=25.290636842535132.
+- market_cap_to_cash_profit=11,385,000,000/407,420,869.158=27.94407665844146.
+
+[dividend]
+- 2025 proposal: CNY 2.00 per 10 shares; forecast cash dividend=203,174,155.60.
+- forecast_dividend_yield=203,174,155.60/11,385,000,000=0.017845775634606938.
+- Proposal status and possible share-count adjustment are disclosed in result and report.
+
+[quality limitations]
+- No local annual fact package or prior research result was available.
+- Market cap and PE TTM were reused from the task input and were not independently matched to an exchange quote at the same timestamp.
+- Detachable cash and sustainable profit are estimates. The filing does not quantify subsidiary-level distributable cash, minimum project working capital, or future order quality.
+
+[validation]
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

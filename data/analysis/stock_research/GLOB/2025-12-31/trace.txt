@@ -1,0 +1,71 @@
+stock-research trace — GLOB — period 2025-12-31
+generated: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the selected skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Searched stock_report/data for GLOB/2025-12-31 artifacts.
+- No pre-existing filing metadata, annual facts package, normalized facts, or stock-research result was present.
+- Downloaded official filing to stock_report/data/raw/filings/GLOB/2025-12-31/glob-20251231.htm.
+
+3. Primary sources
+- SEC Form 20-F: https://www.sec.gov/Archives/edgar/data/1557860/000162828026012910/glob-20251231.htm
+  Filed 2026-02-27; fiscal year ended 2025-12-31; audited consolidated financial statements.
+- Company FY2025 release: https://investors.globant.com/2026-02-26-Globant-Reports-2025-Fourth-Quarter-Financial-Results
+- Company annual report filing notice: https://investors.globant.com/2026-02-27-Globant-Files-Annual-Report-for-2025
+- Banque de France daily parities: https://www.banque-france.fr/en/statistics/rates-and-prices/exchange-rates-daily-parities-2025-12-31
+- Market snapshot: config/input.json; source supplied as Yahoo Finance yfinance, dated 2026-08-03.
+
+4. Statement-model decision
+- Confirmed ordinary_operating / applicable.
+- Globant sells digital engineering, design and AI services. Its deposits, reserves, regulated project cash, concession rights, or customer financial balances are not the business itself.
+- Receivables, staff delivery, acquired goodwill/intangibles and offices are ordinary operating/acquisition assets, so the normal detachable-net-cash and sustainable-cash-profit model is meaningful.
+
+5. Currency conversion
+- Banque de France 2025-12-31 parities: EUR/USD 1.1750 and EUR/CNY 8.2262.
+- Cross rate: 1 USD = 8.2262 / 1.1750 = 7.001021276595745 CNY.
+- All reported USD statement values were converted at this rate to satisfy the result contract's CNY absolute-yuan rule.
+- Limitation: income and cash-flow items are not translated at an annual average rate.
+
+6. Audited 2025 statement inputs (USD thousands)
+- Revenue 2,454,877; cost of sales 1,595,586; gross profit 859,291.
+- Operating profit 171,732; net profit 103,956; parent net profit 102,918.
+- Total assets 3,318,235; liabilities 1,156,599; total equity 2,161,636; parent equity 2,093,601; NCI 68,035.
+- Operating cash flow 301,176.
+- PPE purchases 19,223; intangible purchases 70,262; total capex 89,485.
+- Operating free cash flow 211,691.
+- Financing cash flow -64,570.
+- Treasury share purchases 106,126; NCI dividends 3,254; combined cash-out field 109,380. NCI dividends are not treated as common-share dividends.
+- Cash 243,742; explicitly presented short-term investments 6,594; borrowings 366,706; lease liabilities 106,939.
+- Trade receivables 577,673; goodwill 1,601,523; other intangible assets 345,951.
+- Share-based-payment cash-flow adjustment 75,679.
+
+7. Formula audit
+- Gross margin = 859,291 / 2,454,877 = 0.35003423796793076.
+- Net margin = 102,918 / 2,454,877 = 0.041923892724564205.
+- Discounted detachable net cash USD = 243,742*90% + 6,594*80% - 366,706 = -142,064.8 thousand.
+- Discounted detachable net cash CNY = -994,586,085.6170211.
+- Operating FCF USD = 301,176 - 19,223 - 70,262 = 211,691 thousand.
+- Sustainable cash profit USD = 211,691 - 75,679 SBC = 136,012 thousand.
+- Sustainable cash profit CNY = 952,222,905.8723404.
+- No add-back was made for USD 51,990 thousand of 2025 business-optimization costs.
+- Operating business price = 10,664,348,541.664307 - (-994,586,085.6170211) = 11,658,934,627.281328 CNY.
+- Owner earnback = 11,658,934,627.281328 / 952,222,905.8723404 = 12.243913221768665 years.
+- Market cap / cash profit = 10,664,348,541.664307 / 952,222,905.8723404 = 11.199424500185275.
+- Forecast common cash dividend = 0; forecast yield = 0 because no declared dividend or established common-dividend history was found. Repurchases are discussed separately.
+
+8. Protocol writes and validation
+- Populated outputs/result.json using repeated protocol `set` commands; the complex result was not handwritten from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed-result validation status: ok; errors: [].
+
+9. Final checks
+- Verify report.md and trace.txt are non-empty.
+- Re-run protocol validation after all files are written.
+- Cross-check core formulas independently and ensure JSON parses.

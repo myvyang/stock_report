@@ -1,0 +1,73 @@
+stock-research trace
+generated_at=2026-08-04T23:18:45+08:00
+company=09989.HK HEPALINK
+period=2025-12-31 annual
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields only through repeated protocol set commands.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   validation result: status=ok, errors=[]
+
+[reuse-and-source-check]
+- No pre-existing filing, annual facts package, normalized facts, or prior stock-research result existed for 09989.HK/2025-12-31.
+- Located the formal 2025 annual report through HKEX title search and the company investor-relations site.
+- Downloaded company-hosted annual report PDF to stock_report/data/raw/filings/09989.HK/2025-12-31/2025-annual-report.pdf.
+- Extracted searchable text locally to stock_report/data/raw/filings/09989.HK/2025-12-31/2025-annual-report.txt.
+
+[sources]
+- Annual report: https://www.hepalink.com/uploadfiles/2026/04/20260429182842389.pdf
+- Company annual-results summary: https://www.hepalink.com/News/info.aspx?itemid=13518
+- HKEX disclosure index: https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=1000044671
+- Market data: config/input.json, Tencent qt.gtimg.cn, timestamp 2026/08/03 09:42:53.
+
+[model-review]
+- Input hint: financial_brokerage / requires_special_model.
+- Annual-report evidence: operating segments are finished dose pharmaceutical products, APIs, CDMO, and others; revenue is product and service revenue.
+- Override: ordinary_operating / applicable.
+- Reason: no brokerage customer funds, repurchase financing, or securities dealing balance-sheet structure exists.
+
+[core-financials-rmb]
+revenue=5438256000
+cost_of_sales=3760613000
+gross_profit=1677643000
+parent_net_profit=349486000
+operating_cash_flow=1712951000
+cash_capex=121102000 (PPE 116121000 + intangibles 4981000)
+operating_free_cash_flow=1591849000
+total_assets=16631763000
+total_liabilities=4551597000
+total_equity=12080166000
+parent_equity=12030940000
+
+[formulas]
+gross_margin=1677643000/5438256000=0.3084891553
+net_margin=349486000/5438256000=0.0642643524
+forecast_dividend_yield=212758000/5415330438.2145405=0.0392880919
+
+discounted_cash_components:
+- cash and time deposits excluding pledged: 1610593000 * 100% = 1610593000
+- bank wealth management products: 1479894000 * 90% = 1331904600
+- listed equities: 209021000 * 70% = 146314700
+- non-current FVTPL investments: 920165000 * 40% = 368066000
+- Curemark unlisted FVOCI equity: 414699000 * 20% = 82939800
+- associates: 223669000 * 0% = 0
+- interest-bearing debt and lease liabilities: -2973531000 * 100% = -2973531000
+discounted_detachable_net_cash=566287100
+discounted_net_cash_to_market_cap=566287100/5415330438.2145405=0.1045711072
+
+sustainable_cash_profit=421000000
+basis=company-disclosed 2025 adjusted parent net profit rounded to RMB421m; current FCF rejected as sustainable proxy because inventory decrease released RMB947.299m.
+operating_business_price=5415330438.2145405-566287100=4849043338.2145405
+owner_earnback_years=4849043338.2145405/421000000=11.5179176680
+market_cap_to_cash_profit=5415330438.2145405/421000000=12.8630176680
+
+[limitations]
+- Market cap and PE were accepted from task input and not independently reconstructed across A and H shares.
+- Investment haircuts are analytical assumptions; unlisted exits may differ materially.
+- Sustainable cash profit is an analyst normalization, not management guidance.
+- Proposed final dividend was subject to shareholder approval at annual-report date.

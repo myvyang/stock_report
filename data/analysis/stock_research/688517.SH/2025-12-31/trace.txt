@@ -1,0 +1,60 @@
+stock-research trace
+company=688517.SH 金冠电气
+period=2025-12-31 annual
+generated_for_input=2026-07-31T20:08:02+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result.json exclusively through protocol set commands.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   status=ok, errors=[]
+
+[reuse audit]
+- Expected raw filing, annual facts, normalized facts and prior stock-research paths listed in config/input.json did not exist in the workspace.
+- Only stock_report/data/notes/user_stock_evaluations.md existed; it contained no reusable company facts for this task.
+- Therefore returned to public filing material rather than fabricating a local fact package.
+
+[sources]
+- 金冠电气股份有限公司2025年年度报告, disclosed 2026-04-24, audit report 致同审字（2026）第410A015655号, standard unqualified opinion.
+  Public text mirror: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12171123&stockid=688517
+  PDF mirror: http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESH_STOCK/2026/2026-4/2026-04-24/12171123.PDF
+- 金冠电气股份有限公司2025年度利润分配方案, contained in annual report and annual shareholders' meeting material.
+- config/input.json valuation snapshot: market cap CNY 2,021,000,000 at 20260731114347, Tencent qt.gtimg.cn, PE TTM 26.57.
+
+[model decision]
+- Confirmed ordinary_operating / applicable.
+- Basis: physical-product manufacturing and sales; balance sheet consists of own cash, receivables, inventory, fixed assets, supplier payables and ordinary bank debt. No customer funds, insurance reserves, regulated project cash, concession rights or investment-holding structure.
+
+[key financial facts]
+- Revenue 730,484,144.74; cost of sales 523,065,758.24; gross profit 207,418,386.50.
+- Operating profit 92,385,426.84; parent net profit 80,845,008.78.
+- Total assets 1,352,497,480.98; total liabilities 533,145,657.78; parent equity 819,351,823.20; minority interest 0.
+- Operating cash flow 143,086,427.45; capex 72,704,693.85; operating FCF 70,381,733.60.
+- Cash 445,508,659.02; restricted cash 74,739,987.42; interest-bearing debt 71,755,516.45.
+- Receivables and contract assets 442,862,043.23; inventory 77,848,917.57; fixed assets plus construction in progress 268,163,753.05.
+
+[calculations]
+- gross_margin=(730,484,144.74-523,065,758.24)/730,484,144.74=0.2839464593.
+- net_margin=80,845,008.78/730,484,144.74=0.1106731876.
+- discounted_detachable_net_cash=445,508,659.02-74,739,987.42-71,755,516.45=299,013,155.15.
+- operating_business_price=2,021,000,000.00-299,013,155.15=1,721,986,844.85.
+- operating_FCF=143,086,427.45-72,704,693.85=70,381,733.60.
+- discounted_sustainable_cash_profit=70,381,733.60*0.90=63,343,560.24.
+- owner_earnback_years=1,721,986,844.85/63,343,560.24=27.1848762262.
+- market_cap_to_cash_profit=2,021,000,000.00/63,343,560.24=31.9053743165.
+- discounted_net_cash_to_market_cap=299,013,155.15/2,021,000,000.00=0.1479530703.
+- forecast_dividend_yield=65,882,490.38/2,021,000,000.00=0.0325989562.
+
+[judgment vs fact]
+- Fact: all statement values, product segment revenue/margins, proposed dividend, customer concentration and restricted-fund amounts.
+- Judgment: 100% deduction of restricted cash and debt; no residual value for receivables/inventory/fixed assets; 10% sustainability haircut on 2025 operating FCF.
+- Limitation: annual filing does not split maintenance versus growth capex. The calculation deducts all capex and uses one year rather than a cycle average.
+
+[output status]
+- outputs/result.json: protocol validated complete.
+- outputs/report.md: human-readable operating story and owner earnback explanation.
+- outputs/trace.txt: provenance, formulas, judgments and validation trail.

@@ -1,0 +1,50 @@
+Stock research trace — 00815.HK — period 2025-12-31
+
+Protocol
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields through protocol set commands; did not construct result.json manually.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validator response: {"status":"ok","errors":[]}
+
+Reused inputs
+- config/input.json: company identity, requested period, Tencent market-cap snapshot and initial model hint.
+- stock_report/data/analysis/annual_review/00815.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/00815.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/00815.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/00815.HK/2025-12-31/imported_from_agent_runs/13b5910d5070-china_silver_2025_annual_report.pdf
+- stock_report/data/raw/filings/00815.HK/2025-12-31/imported_from_agent_runs/89a065532c8f-china_silver_2025_annual_report.txt
+
+Model review
+- Rejected input hint financial_brokerage: the annual report says continuing revenue is sales of silver ingots and identifies manufacturing, sale and trading of silver ingots, palladium and other non-ferrous metals as the business.
+- Selected investment_holding / requires_special_model because investments in associates were RMB1,105.751m (about 59% of assets), chiefly the retained Everest Gold interest, while reported profit was dominated by a RMB537.218m deemed-disposal gain.
+- Kept all ordinary owner-earnback ranking fields null as required by the result contract.
+
+Main calculations (all result amounts converted from RMB'000 to absolute RMB)
+- Gross margin = 72,169 / 3,063,300 = 0.0235592335.
+- Reported parent net margin = 586,329 / 3,063,300 = 0.1914050155; report flags distortion by disposal accounting.
+- Operating free cash flow arithmetic = 461,410 - 7,791 = RMB453.619m; not treated as sustainable cash profit.
+- Associate investments / total assets = 1,105,751 / 1,862,793 ≈ 59.36%.
+- Forecast dividend = zero; basis: no 2025 interim dividend, no proposed 2025 final dividend, and 2024 final dividend nil.
+
+Evidence locations
+- Business and revenue: annual report pp.18-19.
+- Profit and loss: pp.64-65.
+- Financial position: pp.66-67.
+- Cash flow: pp.69-70.
+- Investments in associates: note 19 p.122.
+- Deemed disposal and discontinued operations: note 25 pp.128-134.
+- Cash and pledged deposits: note 24 p.140.
+- Trade, bills and other payables: note 26 pp.140-141.
+- Related-party amounts: note 27 p.141.
+- Borrowings: note 30 p.143.
+- Dividend statements: annual report MDA p.22 and Directors' Report.
+
+Known limitations
+- Primary official source URL was not retained in local filing metadata.
+- 2023 full cash-flow details were not extracted.
+- Cash distribution across legal entities/jurisdictions and maintenance/growth capex split were not disclosed.
+- Tencent market snapshot supplied by the task was not independently rechecked.

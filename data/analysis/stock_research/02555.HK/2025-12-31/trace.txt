@@ -1,0 +1,72 @@
+stock-research trace
+generated_at=2026-08-04T14:22:26+08:00
+query=02555.HK
+period=2025-12-31
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- Checked stock_report/data paths for 02555.HK.
+- No raw filing, annual facts, normalized facts, or prior stock-research result existed locally.
+
+3. Protocol initialization
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+status=ok
+
+4. Primary filing acquired
+source=https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042402745.pdf
+title=Sichuan Baicha Baidao Industrial Co., Ltd. Annual Report 2025
+published=2026-04-24
+local_pdf=stock_report/data/raw/filings/02555.HK/2025-12-31/annual_report_2025.pdf
+local_text=stock_report/data/raw/filings/02555.HK/2025-12-31/annual_report_2025.txt
+pages=150
+
+5. Model override
+input_hint=financial_brokerage/requires_special_model
+verified_model=ordinary_operating/applicable
+reason=2025 annual report identifies a fresh tea franchise supply-chain company; 94.9% of revenue is sale of goods and equipment to franchisees, with no brokerage customer funds, proprietary securities financing, repo liabilities, or bank borrowings.
+
+6. Core extracted facts (RMB)
+revenue=5395068000
+cost_of_sales=3641229000
+gross_profit=1753839000
+parent_net_profit=804897000
+total_assets=4829587000
+total_liabilities=810763000
+total_equity=4018824000
+parent_equity=3975696000
+cash_and_cash_equivalents=3071435000
+operating_cash_flow=680407000
+capex_ppe=23957000
+capex_intangibles=61063000
+capital_expenditure=85020000
+operating_free_cash_flow=595387000
+
+7. Calculations
+gross_margin=1753839000/5395068000=0.3250819081427704
+net_margin=804897000/5395068000=0.14919126135203487
+discounted_net_cash=3071435000*0.75+28634000*0.70-81040000=2242580050
+discounted_cash_profit=600000000 (rounded from 595387000 operating FCF; checked below reported parent profit and adjusted net profit)
+operating_business_price=6019175011.360644-2242580050=3776594961.3606443
+owner_earnback_years=3776594961.3606443/600000000=6.2943249356010735
+market_cap_to_cash_profit=6019175011.360644/600000000=10.03195835226774
+forecast_cash_dividend=1477634250*(0.18+0.18)=531948330, recorded as 531948000 consistent with annual-report rounded aggregate
+forecast_dividend_yield=531948000/6019175011.360644=0.08837556625218516
+
+8. Result population
+method=stock-research protocol CLI set commands by top-level section
+temporary_driver=outputs/populate_result.sh (removed after successful population)
+
+9. Protocol validation
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]
+
+10. Output consistency checks
+- result.json metrics formulas checked by protocol validator.
+- report.md figures cross-checked against result.json and annual report.
+- data_quality.status=complete; incomplete_reasons=[]

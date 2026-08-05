@@ -1,0 +1,45 @@
+2026-08-05 stock-research trace
+
+1. Read skill instructions and both required contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   Also read data-reuse.md.
+
+2. Checked configured long-term filing, annual-review, normalized-facts and prior stock-research directories. No reusable 2025 filing/facts/research files existed.
+
+3. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Located and downloaded the official 2025 annual report from HKEX:
+   https://www.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042700360_c.pdf
+   Saved to stock_report/data/raw/filings/06811.HK/2025-12-31/annual-report-2025.pdf.
+   Extracted text locally with pypdf for research only.
+
+5. Overrode input analysis_model_hint after filing verification. Annual report note 1 says the group operates restaurants and sells food products. Classified as ordinary_operating/applicable, not financial_brokerage.
+
+6. Extracted core figures (HK$000 unless stated):
+   revenue 3,538,495; cost of materials 935,939; gross profit 2,602,556;
+   parent net profit 108,101; total assets 2,432,725; liabilities 1,535,020;
+   parent equity 897,705; cash 380,442; operating cash flow 736,048;
+   PPE purchases 95,987; purchased ROU assets 7,384; lease cash payment 436,347.
+
+7. Converted filing amounts to CNY at 1 HKD = 0.90322 CNY, based on SAFE's 2025-12-31 central parity (100 HKD = 90.322 CNY).
+
+8. Owner-earnback assumptions:
+   - Detachable cash: 50% of reported cash; no bank debt deduction because none was reported.
+   - 2025 post-lease cash profit: OCF - lease cash payment - PPE/ROU capex = HKD196.330m.
+   - 2024 comparable cash profit: HKD98.556m.
+   - Sustainable discounted cash profit: two-year average * 80% = HKD117.9544m = CNY106.5388m.
+   - Operating business price = market cap - discounted detachable cash.
+   - Owner earnback years = operating business price / discounted sustainable cash profit.
+
+9. Dividend forecast uses disclosed FY2025 interim HK3.5 cents plus proposed final HK5.0 cents, total HK8.5 cents and HKD82.571m. Proposed final dividend remains subject to shareholder approval.
+
+10. Populated outputs/result.json exclusively through repeated protocol CLI set commands (helper script only orchestrated CLI calls; it did not write result.json directly).
+
+11. Validation command:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Result: status ok, errors [].
+
+Limitations recorded in result.json: market quote is the supplied Tencent snapshot; sustainable cash profit haircuts are analytical assumptions; final dividend approval and exchange-rate choice introduce uncertainty.

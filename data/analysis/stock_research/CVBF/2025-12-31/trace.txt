@@ -1,0 +1,71 @@
+stock-research trace
+task: CVBF, annual period 2025-12-31
+generated for input timestamp: 2026-08-05T05:02:40+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Also read references/data-reuse.md because the skill directs reuse of existing annual facts where sufficient.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result.json exclusively through repeated protocol `set` commands; did not hand-write the JSON document.
+
+2. Local-data reuse audit
+- config/input.json exists and was read.
+- The input-referenced raw filing, annual facts, normalized facts and extraction trace paths under stock_report/data/.../CVBF/2025-12-31 were absent in this workspace.
+- No prior stock-research result was available to reuse.
+- Therefore core facts were obtained from primary public filings and company disclosures.
+
+3. Model decision
+- Input hint: ordinary_operating / applicable.
+- Override: financial_bank / not_applicable.
+- Evidence: CVBF is the holding company of Citizens Business Bank; 2025 assets are mainly loans and securities, funded mainly by customer deposits.
+- Reason: deposits, loans, securities and liquidity are the operating balance sheet and are constrained by depositor claims and regulatory capital. They cannot be treated as detachable net cash.
+- Consequence: all ordinary owner-earnback numeric fields remain null. Bank-specific analysis uses NIM, deposit mix/cost, credit quality, capital, ROA/ROATCE, payout and dividend yield.
+
+4. Primary sources used
+- SEC 2025 Form 10-K, accession 0001193125-26-083221:
+  https://www.sec.gov/Archives/edgar/data/354647/000119312526083221/cvbf-20251231.htm
+- CVB Financial full-year 2025 earnings release, dated 2026-01-21:
+  https://investors.cbbank.com/news-releases/news-release-details/cvb-financial-corp-reports-earnings-fourth-quarter-and-year-6/
+- CVB Financial Q1 2026 dividend announcement, dated 2026-03-18:
+  https://investors.cbbank.com/news-releases/news-release-details/cvb-financial-corp-announces-146th-consecutive-quarterly-cash
+- CVB Financial press release index containing Q2 2026 dividend announcement, dated 2026-06-24:
+  https://investors.cbbank.com/news-market-data/press-releases
+- CVB Financial Q2 2026 earnings release, dated 2026-07-22:
+  https://investors.cbbank.com/news-releases/news-release-details/cvb-financial-corp-reports-earnings-second-quarter-2026
+- SAFE/PBOC exchange-rate resources consulted for CNY translation context:
+  https://www.safe.gov.cn/safe/rmbhlzjj/
+  https://www.safe.gov.cn/safe/tjsj1/index_2.html
+- Market cap, date and PE TTM were supplied by config/input.json with source Yahoo Finance yfinance.
+
+5. Key source facts in USD
+- Total assets 15,631.054m; liabilities 13,335.830m; equity 2,295.224m.
+- Net loans 8,622.032m; investment securities 4,953.461m; goodwill 765.822m.
+- Deposits 12,071.982m; customer repurchase agreements 490.601m; FHLB borrowings 500.000m.
+- Net interest income 460.287m; noninterest income 55.171m; pretax earnings 281.693m; net earnings 209.298m.
+- NIM 3.36%; ROA 1.36%; ROATCE 14.28%; efficiency ratio 46.03%.
+- ACL 77.161m, 0.89% of loans; nonperforming assets 4.848m, 0.03% of assets.
+- CET1 15.9%; total risk-based capital 16.7%; tangible common equity ratio 10.3%.
+- 2025 dividends declared 110.284m, $0.80/share, payout ratio 52.69%.
+- Q2 2026 shares outstanding 176,247,135; Q1 and Q2 2026 dividends each $0.20/share.
+
+6. Translation and calculations
+- Protocol requires absolute CNY amounts. Applied 7.0288 CNY/USD consistently to USD financial statement and dividend amounts.
+- Net revenue proxy for bank = net interest income + noninterest income = USD 515.458m = CNY 3,623,051,190.40.
+- Net margin proxy = 209.298 / 515.458 = 40.6043%. Gross margin remains null because it has no comparable banking meaning.
+- Forecast annual dividend = 176,247,135 shares * USD 0.80 * 7.0288 = CNY 991,044,689.99.
+- Forecast dividend yield = 991,044,689.99 / 26,604,993,162.36841 = 3.7250%.
+- Static price/book reference = market cap / 2025 closing equity translated to CNY = 1.649x.
+- Static market cap / 2025 net income = 18.085x. This is not placed in owner-earnback fields and is explicitly described as cross-period reference only.
+- 2025 dividend plus buyback cash out = (USD 110.284m + USD 80.4m) * 7.0288 = CNY 1,340,222,827.20.
+
+7. Data-quality judgments
+- status complete under the special-financial-model thresholds in result-contract.md.
+- Bank-inapplicable fields left null: gross profit/margin, ordinary operating cash flow, capex, free cash flow, discounted net cash, discounted cash profit, operating business price and both owner-earnback ratios.
+- 2026 Heritage acquisition creates a material period mismatch: the current market cap and dividend forecast reflect enlarged share count, while core operating statements are 2025 pre-merger. This is disclosed in limitations and the report.
+- Market data were not independently reconstructed from exchange trades; source attribution retained exactly as input.
+
+8. Validation
+- First populated-result validation command returned status ok with no errors.
+- Final validation is rerun after report and trace creation; final command output is reported to the user.

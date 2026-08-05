@@ -1,0 +1,74 @@
+stock-research trace
+company: 蓝焰控股 (000968.SZ)
+period: 2025-12-31 annual
+generated_at: 2026-07-31T21:20:04+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized result through protocol CLI
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse audit
+- Input-declared raw filing, annual review and normalized fact paths were absent from the workspace.
+- No prior stock-research result existed.
+- Therefore fetched public 2025 annual-report disclosure and used the task-input market snapshot.
+
+4. Primary research sources
+- 山西蓝焰控股股份有限公司2025年年度报告, 2026-04-28, 公告编号2026-009.
+  Public full-text mirror: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12230390&stockid=000968
+  The report identifies 巨潮资讯网 as its designated disclosure site.
+- 山西蓝焰控股股份有限公司2025年年度报告摘要:
+  https://pdf.dfcfw.com/pdf/H2_AN202604271821638983_1.pdf
+- Market cap / PE: config/input.json, Tencent qt.gtimg.cn snapshot at 20260731114303.
+
+5. Model classification
+- Confirmed ordinary_operating / applicable.
+- Reason: revenue is generated from coalbed-methane extraction and sale plus engineering services. Core assets are wells, gathering facilities, projects under construction and mineral rights. They are operating assets rather than a financial balance sheet or a fixed-term concession toll right.
+
+6. Key extracted facts (CNY yuan)
+- total assets 11,044,903,231.51
+- total liabilities 4,793,307,320.83
+- parent equity 6,245,372,657.02
+- revenue 2,110,257,922.49
+- cost of sales 1,447,486,621.74
+- gross profit 662,771,300.75
+- parent net profit 334,928,221.30
+- operating cash flow 1,214,784,111.95
+- capex cash out 762,762,508.52
+- operating FCF 452,021,603.43
+- restricted cash 323,412,295.89
+- cash and cash equivalents 1,030,531,521.24
+- other income 202,522,407.98, mainly clean-energy development subsidy
+- proposed dividend 48,375,133.00
+
+7. Owner earnback calculations
+- financing debt = short-term borrowings 100,071,805.56
+  + current non-current liabilities 1,029,854,946.87
+  + long-term borrowings 1,438,920,000.00
+  + bonds payable 798,562,953.84
+  + lease liabilities 50,207,074.16
+  = 3,417,616,780.43
+- discounted detachable net cash = 1,030,531,521.24 - 3,417,616,780.43
+  = -2,387,085,259.19
+- discounted sustainable cash profit = 350,000,000.00
+  Based on 452,021,603.43 reported FCF, discounted for subsidy dependence, development-capex cyclicality and missing maintenance-capex split.
+- operating business price = 6,724,000,000.00 - (-2,387,085,259.19)
+  = 9,111,085,259.19
+- owner earnback years = 9,111,085,259.19 / 350,000,000.00 = 26.03167217
+- market cap / cash profit = 6,724,000,000.00 / 350,000,000.00 = 19.21142857
+- forecast dividend yield = 48,375,133.00 / 6,724,000,000.00 = 0.0071943981
+
+8. Protocol population and validation
+- All result fields were populated with repeated protocol CLI `set` commands; result.json was not hand-authored from scratch.
+- First completed validation: status ok, errors [].
+- Final validation is run after report and trace creation.
+
+9. Limitations
+- Workspace lacked the prebuilt annual fact package and original filing archive.
+- Full annual-report content was checked via a public disclosure mirror; core figures are from the audited annual report.
+- Sustainable cash profit is an analyst scenario based primarily on one reporting year because maintenance capex is not separately disclosed.
+- Dividend is a board proposal until final approval and implementation.

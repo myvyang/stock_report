@@ -1,0 +1,70 @@
+stock-research trace
+company=688093.SH 世华科技
+period=2025-12-31 annual
+generated_at=2026-08-01T03:38:07+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read result-contract.md, report-contract.md, and data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields only through protocol set/append commands.
+5. Final validation command recorded below.
+
+[reuse audit]
+- Expected local annual facts, normalized facts, raw filing metadata, and prior stock-research outputs were absent under the paths declared in config/input.json.
+- The mirrored /root/aicode stock_report paths also contained no 688093.SH/2025-12-31 files.
+- Therefore research returned to the original public annual filing.
+
+[source acquisition]
+- Queried the Shanghai Stock Exchange company-bulletin API for productId=688093, 2026-01-01 through 2026-08-01.
+- API identified the 2025 annual report disclosed 2026-04-18:
+  https://www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-18/688093_20260418_ZX3B.pdf
+- SSE static download presented an anti-bot HTML challenge in the shell. The same official filing was obtained from the CNINFO disclosure mirror:
+  https://dataclouds.cninfo.com.cn/shgonggao/hsomarket/2026/20260417/4abbd4d6a8714ae9a6b973c1d6605abc.PDF
+- PDF: 231 pages, 1,795,307 bytes. Text extracted locally for line-level checking.
+- Market cap, PE TTM and quote timestamp were retained exactly from config/input.json; no later quote was substituted.
+
+[model decision]
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Basis: revenue comes from direct sale of self-developed and self-manufactured functional electronic and optical materials. Balance sheet consists of ordinary manufacturer cash/deposits, receivables, inventory, plant, construction in progress and operating payables; it has no special bank/insurance/property/concession structure.
+
+[reported facts]
+- revenue=1,086,732,490.92
+- cost_of_sales=455,185,854.97
+- gross_profit=631,546,635.95
+- parent_net_profit=398,914,397.45
+- operating_cash_flow=455,401,554.73
+- capital_expenditure=369,473,581.11
+- operating_free_cash_flow=85,927,973.62
+- total_assets=2,957,472,697.72
+- total_liabilities=166,780,463.39
+- parent_equity=2,790,692,234.33
+- cash=373,084,861.17
+- transferable_large_CDs=740,344,476.44+225,040,332.13=965,384,808.57
+- short_term_borrowings=0; long_term_borrowings=0
+- financing_cash_in_from_equity_issue=592,599,990.29
+- 2025 full-year-attribution dividends=111,489,260.00 paid interim + 83,616,945.00 proposed annual = 195,106,205.00
+
+[formula checks]
+- gross_margin=(1,086,732,490.92-455,185,854.97)/1,086,732,490.92=0.5811426834356896
+- net_margin=398,914,397.45/1,086,732,490.92=0.36707690327017756
+- operating_free_cash_flow=455,401,554.73-369,473,581.11=85,927,973.62
+- discounted_net_cash=373,084,861.17*0.80+965,384,808.57*0.80-166,780,463.39=903,995,272.402
+- normalized_cash_profit_base=350,000,000.00; sustainability_discount=15%
+- discounted_cash_profit=350,000,000.00*0.85=297,500,000.00
+- operating_business_price=7,360,000,000.00-903,995,272.402=6,456,004,727.598
+- owner_earnback_years=6,456,004,727.598/297,500,000.00=21.7008562272
+- market_cap_to_cash_profit=7,360,000,000.00/297,500,000.00=24.7394957983
+- forecast_dividend_yield=195,106,205.00/7,360,000,000.00=0.0265089952
+
+[judgment notes]
+- Both cash and transferable CDs receive a 20% haircut because the company raised RMB592.6m equity in 2025 and is still building multiple capacity projects. This is an analytical judgment, not a reported restriction ratio.
+- All liabilities are deducted at 100% for conservatism.
+- Normalized cash profit does not use reported free cash flow mechanically because 2025 capex includes material growth projects. It also does not use peak-year net income mechanically. RMB350m bridges 2024 and 2025 earnings/cash conversion, followed by a 15% sustainability haircut for customer, cycle, mix and ramp-up risks.
+- Dividend forecast is a baseline extrapolation of the complete 2025-attribution payout, not 2026 company guidance.
+
+[validation]
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+expected={"status":"ok","errors":[]}

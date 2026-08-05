@@ -1,0 +1,63 @@
+VNT stock research trace
+generated_at=2026-08-04T22:26:19+08:00
+period=2025-12-31
+report_type=annual
+
+[1] Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+[2] Reuse audit
+- Checked configured raw filing, annual review, normalized facts, and outputs paths.
+- No existing VNT annual facts package or prior stock-research result was present.
+- Downloaded SEC 2025 Form 10-K HTML to stock_report/data/raw/filings/VNT/2025-12-31/vnt-20251231.htm.
+- Primary filing: https://www.sec.gov/Archives/edgar/data/1786842/000162828026007648/vnt-20251231.htm
+- Filing accession: 0001628280-26-007648; filed 2026-02-12.
+
+[3] Model decision
+- Confirmed ordinary_operating / applicable.
+- Basis: three industrial technology operating segments selling equipment, software, services and repair tools.
+- Special treatment: Repair Solutions financing receivables support the franchise distribution channel and are operating assets, not detachable cash.
+
+[4] Financial extraction (USD millions)
+- Revenue 3,075.6; cost of sales 1,624.8; gross profit calculated 1,450.8.
+- Operating profit 561.6; net earnings 406.1.
+- Total assets 4,368.8; liabilities 3,117.6; total equity 1,251.2; parent equity 1,244.2; NCI 7.0.
+- Cash 492.2; current debt 502.2; long-term debt 1,594.2.
+- Operating cash flow 511.0; capex 69.9; operating FCF calculated 441.1.
+- Financing cash flow used 371.3; dividends 14.7; repurchases 300.2.
+- Extraction source: audited 10-K statements, MD&A and notes. Gross profit is revenue minus stated cost of sales; cost of sales excludes acquisition-related intangible amortization in the company's presentation.
+
+[5] Currency conversion
+- U.S. Treasury Reporting Rates of Exchange API returned China-Renminbi exchange_rate=6.998 for 2025-12-31.
+- Applied 1 USD = CNY 6.998 to every financial statement and dividend amount.
+- API: https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange?filter=record_date:eq:2025-12-31,country:eq:China
+
+[6] Owner earnback assumptions
+- Cash haircut: 80%; discounted cash = USD 393.76m = CNY 2,755,532,480.
+- Debt deduction: 100%; USD 2,096.4m = CNY 14,670,607,200.
+- Discounted detachable net cash = CNY -11,915,074,720.
+- Sustainable cash profit = OCF - capex - stock compensation economic cost.
+- USD 511.0m - 69.9m - 30.1m = USD 411.0m = CNY 2,876,178,000.
+- Operating business price = market cap - discounted net cash = CNY 42,442,379,567.77832.
+- Owner earnback = 14.7565204823 years.
+- Market cap / cash profit = 10.6138440833.
+
+[7] Dividend forecast
+- 2026-05-19 company release maintained quarterly dividend at USD 0.025/share.
+- Annualized USD 0.10 x 141.6m shares outstanding as of 2026-02-09 = USD 14.16m.
+- Converted forecast dividend = CNY 99,091,680; yield on input market cap = 0.0032460016.
+- Subsequent declarations remain at board discretion.
+
+[8] Protocol population and validation
+- Populated scalar fields using protocol `set` and list entries using protocol `append`; complex result JSON was not handwritten.
+- Initial populated-result validation: status=ok, errors=[].
+- Final validation completed successfully: status=ok, errors=[].
+
+[9] Known limitations
+- Input market cap and PE are retained from Yahoo Finance yfinance without a supplied reproducible snapshot URL.
+- One year-end FX rate is used for both balance-sheet and flow amounts.
+- Sustainable cash profit is a conservative single-year baseline, not a full-cycle average.

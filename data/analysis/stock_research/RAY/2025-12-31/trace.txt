@@ -1,0 +1,53 @@
+[2026-08-04] 输入读取
+- 读取 config/input.json：RAY / US / annual / requested period 2025-12-31。
+- 行情输入：market cap CNY 109,414,038.01839924，date 2026-08-03，source Yahoo Finance yfinance，PE TTM 3.7297297。
+
+[2026-08-04] 协议读取
+- 完整读取 .agents/skills/stock-research/SKILL.md。
+- 完整读取 references/result-contract.md 与 references/report-contract.md。
+- 使用命令初始化：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json。
+
+[2026-08-04] 本地复用检查
+- stock_report/data/raw/filings/RAY/2025-12-31、annual_review、normalized facts 和既有 stock_research 结果均不存在。
+- 因无可复用事实包，补取官方 SEC 披露。
+
+[2026-08-04] 主要来源
+1. SEC Form 20-F, fiscal year ended 2025-03-31, filed 2025-07-24:
+   https://www.sec.gov/Archives/edgar/data/1948443/000121390025067464/ea0247975-20f_raytech.htm
+2. SEC Form 6-K, 2025 offering closing:
+   https://www.sec.gov/Archives/edgar/data/1948443/000121390025061207/ea0247722-6k_raytech.htm
+3. SEC Form 6-K, 2026 registered direct offering:
+   https://www.sec.gov/Archives/edgar/data/1948443/000121390026073330/ea0295435-6k_raytech.htm
+4. config/input.json market snapshot.
+
+[2026-08-04] 模型判断
+- confirmed statement_model=ordinary_operating。
+- 公司业务为采购和批发个人护理电器；现金、应收、存货、应付均为普通经营公司项目，不属于银行、保险、地产、收费权或投资控股特殊模型。
+- owner_earnback_applicability=applicable（原则适用），但本次计算因期间/资本结构错配不可完成。
+
+[2026-08-04] 财报抽取（原币 HKD，FY ended 2025-03-31）
+- total assets 94,890,937; total liabilities 17,928,920; equity/parent equity 76,962,017。
+- revenue 78,739,564; cost 60,931,870; gross profit 17,807,694; operating income 7,648,749; net/parent net income 8,268,367。
+- operating cash flow 6,220,534; capex 0; operating free cash flow 6,220,534。
+- cash 84,850,995; AR 8,144,307; inventory 1,879,435; related-party AP 14,984,393。
+- no minority interest; no dividend in FY2024/FY2025。
+
+[2026-08-04] 汇率与计算
+- 20-F convenience rate: USD/HKD 7.7799。
+- 2025-03-31 USD/CNY used: 7.1782。
+- Cross rate CNY/HKD = 7.1782 / 7.7799 = 0.9226596743。
+- gross margin = 17,807,694 / 78,739,564 = 0.2261594184。
+- net margin = 8,268,367 / 78,739,564 = 0.1050090524。
+- CNY financial values written as absolute yuan; rounding to 2 decimals.
+
+[2026-08-04] 控股回本拒算原因
+- Requested period 2025-12-31 does not match issuer fiscal year; latest audited balance sheet is 2025-03-31.
+- Post-balance-sheet offerings: approximately USD 5.197m in 2025 and 3,149,832 shares at USD 1.97 in 2026.
+- Current market cap date 2026-08-03 cannot be paired with 2025-03-31 cash.
+- Therefore discounted net cash, discounted cash profit, operating business price, owner earnback years, and market-cap-to-cash-profit remain null.
+- Data quality set to partial; forecast dividend set to zero based on explicit retention/no-dividend policy.
+
+[2026-08-04] 协议写入与验证
+- 所有 result.json 字段均通过 protocol set 命令写入；未手写完整 JSON。
+- 验证命令：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json。
+- 验证结果：status=ok, errors=[]。

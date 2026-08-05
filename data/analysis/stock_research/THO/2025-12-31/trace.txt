@@ -1,0 +1,95 @@
+THO stock research trace
+generated_at=2026-08-04T23:48:35+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read result-contract.md and report-contract.md in full.
+- Read data-reuse.md because the skill routes reuse decisions through this reference.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked the input-declared raw filing, annual review and normalized-facts paths.
+- No THO filing metadata, annual facts, normalized facts or historical stock-research outputs existed locally.
+- Returned to primary public sources rather than manufacturing missing facts.
+
+3. Period and model decision
+- Input period: 2025-12-31.
+- THOR fiscal year end: July 31.
+- Latest annual report available by the input period: FY2025 Form 10-K for year ended 2025-07-31, filed 2025-09-24.
+- Set analysis.period to 2025-07-31 and documented the mismatch in data_quality.limitations.
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable because THOR is an RV and component manufacturer with ordinary inventory, receivables, factories, trade liabilities and financing debt.
+
+4. Primary sources
+- SEC FY2025 Form 10-K:
+  https://www.sec.gov/Archives/edgar/data/730263/000073026325000019/tho-20250731.htm
+- THOR official 2025-10-08 dividend release:
+  https://ir.thorindustries.com/investor-resources/press-releases/press-release-details/2025/THOR-Industries-Announces-Regular-Quarterly-Dividend-e2130cfbc/default.aspx
+- SEC 2025-12-16 dividend Form 8-K:
+  https://www.sec.gov/Archives/edgar/data/730263/000073026325000032/tho-20251216.htm
+- Federal Reserve H.10 USD/CNY series:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Market cap and PE: config/input.json, sourced there to Yahoo Finance yfinance.
+
+5. Currency conversion
+- Protocol requires absolute CNY yuan.
+- Used 2025-12-31 Federal Reserve H.10 spot rate: 1 USD = 7.1875 CNY.
+- All filing values below were reported in USD thousands, multiplied by 1,000 and then by 7.1875.
+
+6. FY2025 audited financial facts (USD millions before conversion)
+- Total assets 7,065.284; total liabilities 2,775.732; total equity 4,289.552; parent equity 4,288.498; NCI 1.054.
+- Revenue 9,579.490; cost of products sold 8,238.849; gross profit 1,340.641.
+- Operating profit derived as gross profit 1,340.641 - SG&A 922.554 - intangible amortization 119.027 = 299.060.
+- Net income 256.591; parent net income 258.559.
+- Operating cash flow 577.923; capex 122.987; operating FCF 454.936.
+- Financing cash flow -426.306.
+- Dividend cash out 106.130 plus buybacks 52.647 = 158.777.
+
+7. Core ratios
+- gross_margin = 1,340.641 / 9,579.490 = 0.1399490996.
+- net_margin = 258.559 / 9,579.490 = 0.0269908941.
+- Market cap = CNY 26,335,698,507.239502.
+- PE TTM = 15.176113.
+
+8. Owner-earnback cash bridge
+- Cash and equivalents: USD 586.596m = CNY 4,216,158,750.
+- Applied 90% detachable discount due to operating-liquidity needs and USD 174.508m being held mainly in Europe with possible withholding tax on repatriation.
+- Discounted cash = CNY 3,794,542,875.
+- Current debt 3.367 + short-term financial obligations 60.112 + long-term debt 919.612 = USD 983.091m = CNY 7,065,966,562.50.
+- Debt deducted at 100%.
+- Discounted detachable net cash = CNY -3,271,423,687.50.
+
+9. Sustainable cash-profit bridge
+- FY2025 operating FCF: USD 454.936m = CNY 3,269,852,500.
+- Working-capital contribution calculated from cash-flow statement:
+  accounts receivable +6.690; inventories +29.122; prepaids -12.048; accounts payable +90.409; accrued liabilities -63.535; long-term liabilities and other +15.239 = USD +65.877m.
+- Deducted the non-repeatable working-capital release: CNY -473,458,437.50.
+- Deducted ongoing stock compensation USD 30.872m: CNY -221,925,000.
+- Discounted sustainable cash profit = CNY 2,574,469,062.50.
+
+10. Owner-earnback formulas
+- Operating business price = market cap - discounted net cash
+  = 26,335,698,507.239502 - (-3,271,423,687.50)
+  = CNY 29,607,122,194.739502.
+- Owner earnback years = 29,607,122,194.739502 / 2,574,469,062.50 = 11.5002827674.
+- Market cap / cash profit = 26,335,698,507.239502 / 2,574,469,062.50 = 10.2295649580.
+- Discounted net cash / market cap = -0.1242201222.
+
+11. Dividend forecast
+- FY2025 ending shares outstanding = issued 67,282,807 - treasury 14,649,597 = 52,633,210 shares.
+- Announced regular quarterly dividend after FY2025 = USD 0.52/share.
+- Mechanical annualization = USD 2.08/share.
+- Forecast cash dividend = 52,633,210 * 2.08 * 7.1875 = CNY 786,866,489.50.
+- Forecast dividend yield = 786,866,489.50 / 26,335,698,507.239502 = 0.0298783224.
+
+12. Material operating and risk evidence
+- Segment FY2025 revenue: North American Towable USD 3,784.666m; North American Motorized USD 2,175.604m; European USD 3,023.961m.
+- Cited market shares: North American towables 39.1%; motorhomes 48.3%; European motorcaravan/campervan 26.1%; caravans 17.3%.
+- Dealer inventory financing repurchase commitments: USD 3,484.235m; treated as a contingent risk, not added to booked liabilities.
+- Goodwill plus amortizable intangible assets: USD 2,599.876m; discussed as acquisition capital, not detachable cash.
+
+13. Protocol completion
+- Populated result fields through stock_analysis.stock_research.protocol set commands.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[].

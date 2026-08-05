@@ -1,0 +1,102 @@
+stock-research trace
+company: Genie Energy Ltd. (NYSE: GNE)
+period: 2025-12-31 annual
+generated context date: 2026-08-04 Asia/Shanghai
+
+[skill/protocol]
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as explicitly requested.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields only through protocol set/append commands, not by directly constructing result.json.
+
+[local reuse check]
+- Checked stock_report/data/analysis/annual_review/GNE/2025-12-31, normalized facts, and stock research paths.
+- No annual facts package, normalized facts, raw filing metadata, or prior research output was present in /workspace.
+- Therefore retrieved the primary 2025 filing and SEC company facts for source completion.
+
+[primary sources]
+1. SEC 2025 Form 10-K, filed 2026-05-01, accession 0001437749-26-014294:
+   https://www.sec.gov/Archives/edgar/data/1528356/000143774926014294/gne20251231_10k.htm
+   Used for business model, segments, audited/restated 2025 financial statements, assets and liabilities, capex, debt, dividends, customer meters, purchase commitments, restatement and control weakness.
+2. SEC 2026 Q1 Form 10-Q, filed 2026-05-15, accession 0001437749-26-017292:
+   https://www.sec.gov/Archives/edgar/data/1528356/000143774926017292/gne20260331_10q.htm
+   Used for May 2026 share count, continuation of $0.075 quarterly dividend, and post-period operating check.
+3. Federal Reserve G.5A 2025 average FX:
+   https://www.federalreserve.gov/Releases/g5a/current/
+   USD/CNY average = 7.1875 CNY per USD.
+4. PBOC 2025-12-26 central parity announcement:
+   https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+   USD/CNY = 7.0358 CNY per USD. This is the nearest year-end official rate verified in this run.
+5. config/input.json:
+   market cap CNY 2,478,374,830.3276978; date 2026-08-03; source Yahoo Finance yfinance; PE TTM 18.064936.
+
+[model classification]
+- Confirmed statement_model = ordinary_operating.
+- Confirmed owner_earnback_applicability = applicable.
+- Reason: GNE buys and resells energy and owns small renewable operating assets. Its balance sheet is not dominated by customer deposits, insurance reserves, regulated project prepayments, or financial assets matched to financial liabilities.
+- Special handling retained: restricted collateral and a substantial operating liquidity reserve are not detachable; solar assets and project debt remain operating items.
+
+[source USD facts: 2025 unless stated otherwise]
+- Balance sheet, USD thousands: assets 389,380; liabilities 144,934; equity 244,446; parent equity 250,902; NCI -6,456.
+- Cash and equivalents 203,516; short-term restricted cash 7,936; AR 70,062; inventory 12,370; PPE 28,303.
+- Debt current 2,139 and noncurrent 6,529; income taxes payable 28,851.
+- Discontinued operations assets 1,419 and liabilities 2,996.
+- Income statement, USD thousands: revenue 501,971; cost 377,286; gross profit 124,685; operating profit 27,717; net income 23,715; parent net income 24,006.
+- Segment facts, USD thousands: GRE revenue 478,452 and operating income 44,222; GREW revenue 23,519 and operating loss 7,075; corporate operating loss 9,430.
+- Continuing operating cash flow 44,061; capex 8,174; continuing operating FCF 35,887.
+- Total financing cash flow -19,144. Dividends 8,023; market buybacks 8,663; employee-share repurchases 2,125.
+- 2025 year-end meters decreased 76,000 or 18.0% year over year.
+- BP collateral included restricted cash about 0.8m and receivables 76.1m against payable 33.5m.
+- Purchase commitments 144.4m, including electricity 140.7m.
+- 2026 expected capex 5m-10m, mainly GREW solar.
+
+[currency conversion]
+- Balance-sheet point-in-time items: USD x 7.0358.
+- Income, cash flow and annual dividend items: USD x 7.1875.
+- This intentionally creates small cross-statement translation differences; formulas within each metric use consistently translated components.
+
+[owner earnback cash calculation, USD millions]
+- Unrestricted cash 203.516 x 90% = 183.1644 included.
+- Less total debt 8.668.
+- Less income taxes payable 28.851.
+- Less discontinued operations net liability: 2.996 - 1.419 = 1.577.
+- Less minimum operating liquidity reserve 50.000.
+- Discounted detachable net cash = 94.0684m USD.
+- Converted at 7.0358 = CNY 661,846,448.72.
+- Restricted cash, AR, inventory, PPE, investments, goodwill and intangibles were excluded from detachable cash.
+- The 10% haircut on unrestricted cash reflects the restatement/control weakness and uncertainty around operating liquidity; the separate 50m reserve reflects procurement collateral, seasonality, commitments and customer-base volatility.
+
+[sustainable cash profit calculation, USD millions]
+- Continuing operating cash flow 44.061.
+- Less capex 8.174 = reported continuing operating FCF 35.887.
+- Less 11.887 normalization/cycle allowance = 24.000.
+- The allowance broadly removes the roughly 11.9m working-capital benefit disclosed for 2025 and recognizes lower margins, meter decline, GREW losses and weak Q1 2026.
+- Discounted sustainable cash profit = 24.000m x 7.1875 = CNY 172,500,000.
+
+[formula checks]
+- market cap = CNY 2,478,374,830.3276978.
+- operating business price = market cap - discounted net cash = CNY 1,816,528,381.6076977.
+- owner earnback years = 1,816,528,381.6076977 / 172,500,000 = 10.5305993137.
+- market cap / cash profit = 2,478,374,830.3276978 / 172,500,000 = 14.3673903207.
+- discounted net cash / market cap = 0.2670485677.
+- gross margin = 124.685 / 501.971 = 0.2483908433.
+- net margin = 24.006 / 501.971 = 0.0478234798.
+
+[dividend forecast]
+- Annualized dividend per share: 0.075 x 4 = USD 0.30.
+- Shares at 2026-05-13: Class A 1,574,326 + Class B 24,829,375 = 26,403,701.
+- Forecast cash dividend = 0.30 x 26,403,701 x 7.1875 = CNY 56,932,980.28125.
+- Forecast yield = 56,932,980.28125 / 2,478,374,830.3276978 = 0.0229719006.
+- Dividend remains board-discretionary.
+
+[data quality]
+- Set complete because identity, period, market data, model, three statements, asset/liability explanations, owner-earnback components, dividend forecast, business story and primary evidence are all present.
+- Limitations recorded in result.json: market-cap FX construction not supplied beyond input designation; use of two FX rates; owner-earnback haircuts are judgmental; material control weakness remains.
+
+[validation]
+- First full validation after protocol population:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+  Result: status ok, errors [].
+- Final validation and file checks are performed after report/trace creation.

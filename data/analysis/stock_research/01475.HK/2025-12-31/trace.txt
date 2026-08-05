@@ -1,0 +1,70 @@
+Stock research trace — 01475.HK — period 2025-12-31
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+   - config/input.json existed.
+   - No raw filing, annual facts package, normalized facts, or prior stock-research result existed under the supplied stock_report paths.
+   - Therefore primary public filings had to be retrieved.
+
+3. Primary sources reviewed
+   - Nissin Foods Company Limited 2025 Annual Report, published on HKEX 2026-04-27:
+     https://www.nissingroup.com.hk/media/bdmdmsur/e01475_ar_hi.pdf
+   - HKEX final dividend announcement dated 2026-03-26:
+     https://www.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032600319.pdf
+   - PBOC RMB central parity announcement dated 2025-12-26:
+     https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+   - Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, as of 2026/08/03 09:20:05.
+
+4. Model review
+   - Rejected input hint financial_brokerage.
+   - Audited note 6 describes manufacturing and sale of noodles, frozen foods and other products, plus food distribution and limited services.
+   - Balance sheet contains ordinary operating assets and no external borrowings; there are no brokerage client funds, proprietary securities book, or repo financing.
+   - Selected statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+5. Currency treatment
+   - Audited filing is in HKD thousands.
+   - Converted financial-statement and dividend amounts at HKD 1 = CNY 0.90486, the PBOC central parity published 2025-12-26 (nearest cited year-end business-date source located).
+   - Market cap from input was retained as the protocol's normalized CNY amount; this assumption is explicitly disclosed as a limitation.
+
+6. Core audited HKD figures used
+   - Revenue 4,001.102m; cost of sales 2,616.032m; gross profit 1,385.070m.
+   - Segment results / operating profit measure 450.977m.
+   - Net profit 339.527m; parent net profit 331.422m.
+   - Total assets 4,924.386m; total equity 3,876.447m; parent equity 3,820.170m; NCI 56.277m.
+   - Total liabilities calculated as assets less equity: 1,047.939m.
+   - Operating cash flow 535.711m.
+   - Cash capex: PPE purchases 144.012m plus ROU asset purchases 23.974m = 167.986m.
+   - Operating free cash flow 367.725m.
+   - Proposed FY2025 final dividend 165.738m, HKD 0.1588/share, payout ratio 50%.
+
+7. Owner earnback assumptions
+   - Cash and equivalents: 80% inclusion.
+   - 3–12 month time deposits: 90% inclusion.
+   - FVTPL financial assets: 50% inclusion.
+   - Restricted deposit: 0% inclusion because earmarked for ABC Pastry consideration.
+   - Lease liabilities and acquisition consideration payable: 100% deduction.
+   - Discounted detachable net cash: CNY 1,200,787,857.52.
+   - Sustainable cash profit: 90% of FY2025 parent net profit translated to CNY = CNY 269,901,459.83.
+   - Rationale for 10% haircut: 2025 profit growth partly reflects absence of FY2024 impairment charges; working-capital and future capex remain variable. FY2025 cash FCF exceeds the selected sustainable profit, so no upward adjustment was made.
+   - Operating business price: CNY 4,815,057,792.82.
+   - Owner earnback: 17.8401 years; market cap/cash profit: 22.2890x.
+
+8. Protocol operations
+   - Initialized outputs/result.json with:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Populated fields only through protocol set/append commands.
+   - Final protocol validation result is recorded below after validation.
+
+9. Known limitations
+   - No reliable quantitative market-share source was found in the reviewed primary material.
+   - Historical Tencent market response was not independently archived; market cap and PE TTM are input facts.
+   - Sustainable cash profit and detachable cash discounts are analytical estimates, not company guidance.
+
+10. Final validation
+   - Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Result: {"status":"ok","errors":[]}

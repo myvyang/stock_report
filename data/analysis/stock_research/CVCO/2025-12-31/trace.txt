@@ -1,0 +1,66 @@
+task=stock-research CVCO
+research_period=2025-12-31
+annual_filing_period=2025-03-29
+generated_context_date=2026-08-05 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar fields with protocol set and list fields with protocol append; no complex result JSON was handwritten.
+5. Final validation command and result are recorded below.
+
+[reuse_check]
+No CVCO raw filing, annual facts package, normalized facts, or prior stock-research output existed under stock_report at task start.
+Therefore the FY2025 SEC filing was retrieved and checked directly.
+
+[primary_sources]
+SEC FY2025 10-K, filed 2025-05-23:
+https://www.sec.gov/Archives/edgar/data/278166/000027816625000057/cvco-20250329.htm
+Company annual-report index:
+https://investor.cavco.com/annual-reports/annual-report-2025/
+Market snapshot: Yahoo Finance yfinance, supplied in config/input.json; market cap date 2026-08-03.
+
+[period_and_currency]
+The task period is 2025-12-31, while Cavco's audited FY2025 ended 2025-03-29. Annual financial fields use the audited FY2025 10-K.
+All USD filing values were converted at research rate CNY 7.20/USD so outputs use absolute CNY yuan as required by the contract. Ratios are unaffected.
+
+[source_numbers_usd_thousands]
+total_assets=1406645
+total_liabilities=342063
+stockholders_equity=1064582
+revenue=2015458
+cost_of_sales=1549867
+gross_profit=465591
+operating_profit=190276
+net_income_parent=171036
+operating_cash_flow=178496
+capital_expenditure=21427
+operating_free_cash_flow=157069
+financing_cash_flow=-147949
+common_stock_repurchases=148680
+cash_and_equivalents=356225
+short_term_investments=19842
+long_term_investments=18067
+operating_lease_liability=31538
+
+[formula_checks]
+gross_margin=465591/2015458=0.2310100235
+net_margin=171036/2015458=0.0848621008
+operating_free_cash_flow=(178496-21427)*1000*7.2=1130896800
+discounted_cash=(356225*0.80+(19842+18067)*0.70-31538)*1000*7.2=2015843760
+discounted_cash_profit=157069*0.90*1000*7.2=1017807120
+operating_business_price=28451261549.421387-2015843760=26435417789.421387
+owner_earnback_years=26435417789.421387/1017807120=25.9729149757
+market_cap_to_cash_profit=28451261549.421387/1017807120=27.9534903916
+discounted_net_cash_to_market_cap=2015843760/28451261549.421387=0.0708525264
+
+[judgment_notes]
+Statement model confirmed ordinary_operating because factory-built housing generated 95.9% of revenue and 99.3% of pre-tax income. Financial-services loans, insurance assets and restricted cash were excluded from detachable cash.
+Forecast cash dividend is zero because no common dividend was paid in FY2024 or FY2025 and no declared dividend was supplied; buybacks are discussed separately.
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

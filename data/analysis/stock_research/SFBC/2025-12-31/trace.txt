@@ -1,0 +1,28 @@
+2026-08-05 stock-research trace for SFBC
+
+1. Read required skill and contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+2. Checked configured local filing, annual facts, normalized facts, and prior research paths. None existed for SFBC/2025-12-31.
+3. Located and reviewed primary filing: SEC Form 10-K accession 0001541119-26-000008, fiscal year ended 2025-12-31.
+4. Overrode input analysis_model_hint after business/filing review:
+   statement_model=financial_bank; owner_earnback_applicability=requires_special_model.
+5. Extracted balance sheet, income statement, loan mix, asset quality, capital, deposit, concentration and dividend facts from the 10-K.
+6. Used Federal Reserve annual 2025 USD/CNY rate of 7.188 for protocol-required CNY presentation. Reused market cap and PE from config/input.json.
+7. Initialized outputs/result.json with protocol CLI.
+8. Populated result branches with protocol CLI set commands via populate_sfbc.sh.
+9. Validated outputs/result.json with protocol CLI: status=ok, errors=[].
+
+Key judgment notes:
+- Bank cash, securities, loans and deposits are operating financial assets/liabilities, not detachable net cash.
+- Ordinary owner earnback metrics remain null by contract.
+- Bank cash-flow/free-cash-flow fields remain null because ordinary-company interpretation is not economically comparable.
+- Dividend forecast is mechanical annualization of $0.21 quarterly dividend, not management guidance.
+- data_quality=complete under the special-model minimum threshold.
+
+Primary sources:
+- https://www.sec.gov/Archives/edgar/data/1541119/000154111926000008/sfbc-20251231.htm
+- https://www.federalreserve.gov/releases/g5a/current/
+- config/input.json

@@ -1,0 +1,74 @@
+stock-research trace
+company: 03399.HK / 广东粤运交通股份有限公司
+period: 2025-12-31 annual
+generated context date: 2026-08-04 Asia/Shanghai
+
+1. Read protocol and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No annual facts package, normalized facts, historical research result, or raw filing metadata existed for 03399.HK/2025-12-31.
+- Downloaded official 2025 annual report from HKEX:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042901038.pdf
+- Local copy: stock_report/data/raw/filings/03399.HK/2025-12-31/annual-report-2025.pdf
+- PDF text was extracted read-only with pypdf installed under /tmp because pdftotext was unavailable.
+
+3. Model verification
+- Input hint said financial_brokerage.
+- Annual report business and segment notes show expressway service-zone operation, energy retail, convenience stores, commercial development, road transport, and Taiping Interchange operation.
+- No brokerage customer funds, proprietary financial assets, or repo funding structure was found.
+- Overrode model to ordinary_operating / applicable.
+- Special caveat: long-term service-zone leases produce RMB2.320bn lease liabilities and move lease principal to financing cash flow.
+
+4. Core facts used (RMB)
+- revenue 7,457,852,117.08
+- cost of sales 6,772,264,169.34
+- gross profit 685,587,947.74
+- parent net profit 235,400,418.66
+- total assets 6,917,156,258.13
+- total liabilities 4,230,558,269.99
+- parent equity 2,278,775,934.49
+- minority interest 407,822,053.65
+- operating cash flow 858,907,335.36
+- capex 315,299,073.98
+- operating FCF before lease adjustment 543,608,261.38
+- financing cash flow other payments 360,458,335.54
+- cash and cash equivalents available on demand 1,131,066,532.44
+- restricted monetary funds excluded 14,306,476.86
+- bank and other financial-institution borrowings 124,818,000 (management table, rounded)
+- approved 2025 final dividend 71,986,302
+
+5. Owner earnback assumptions
+- Discounted detachable net cash = 1,131,066,532.44 * 60% - 124,818,000 = 553,821,919.46.
+- 40% cash haircut covers operating working capital, cash held in subsidiaries, minority interests, and unverified upstreaming restrictions.
+- Lease-adjusted cash anchor = 858,907,335.36 - 315,299,073.98 - 360,458,335.54 = 183,149,925.84.
+- Discounted sustainable cash profit rounded down to 180,000,000.
+- Market cap 942,708,141.91 from input Tencent snapshot.
+- Operating business price = 388,886,222.45.
+- Owner earnback = 2.1605 years; market cap / cash profit = 5.2373 years.
+- Dividend yield = 71,986,302 / 942,708,141.91 = 7.6361%.
+
+6. Evidence locations in annual report
+- financial highlights: pp. 5-6
+- operating review and segment margins: pp. 28-35
+- consolidated balance sheet: pp. 98-100
+- consolidated income statement: pp. 103-104
+- consolidated cash flow statement: pp. 106-107
+- cash and restrictions: notes pp. 165, 217-218
+- operating income breakdown: note p. 209
+- government grants: note p. 218
+- segment information: pp. 262-263
+
+7. Protocol usage
+- Initialized with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All result fields were populated using protocol set commands; complex JSON was not hand-written directly into outputs/result.json.
+- Validation performed with protocol validate.
+
+8. Known limitations
+- Market cap was accepted from the supplied snapshot and not independently reconstructed from H-share price, FX, and share count.
+- Annual report does not itemize every component of financing cash flow “other payments”; treating the full line as lease/operating-right cash cost is conservative.
+- The 60% cash recognition factor is an explicit judgment, not an audited fact.

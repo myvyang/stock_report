@@ -1,0 +1,84 @@
+stock-research trace
+generated_at: 2026-08-05T04:02:31+08:00
+query: LGCY
+input: config/input.json
+
+1. Read protocol and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+   - No existing LGCY raw filing, annual facts package, normalized facts, or prior research result was present under stock_report.
+   - Used the latest complete annual filing available by the input cutoff: FY ended 2025-06-30, filed 2025-09-25.
+   - Input period 2025-12-31 is not the company's fiscal year-end; no synthetic annualization was performed.
+
+3. Primary filing acquired
+   - SEC filing: https://www.sec.gov/Archives/edgar/data/1836754/000149315225014945/form10-k.htm
+   - Local copy: stock_report/data/raw/filings/LGCY/2025-12-31/form10-k.htm
+   - Accession: 0001493152-25-014945
+   - Form: 10-K
+
+4. Audited USD facts extracted from FY2025 10-K
+   balance sheet:
+   - cash and cash equivalents: 20,316,357
+   - accounts receivable current, net: 15,050,841
+   - accounts receivable long-term: 1,966,137
+   - total assets: 69,205,138
+   - total liabilities: 28,161,618
+   - total stockholders' equity: 41,043,520
+   - interest-bearing debt: 1,406,614
+   - finance lease liabilities: 215,409
+   - operating lease liabilities: 16,054,222
+
+   income statement:
+   - revenue: 64,168,025
+   - educational services: 34,246,953
+   - derived operating gross profit: 29,921,072
+   - operating income: 9,986,326
+   - net income: 7,534,232
+
+   cash flow:
+   - operating cash flow: 7,768,239
+   - property and equipment purchases: 844,320
+   - operating free cash flow: 6,923,919
+   - financing cash flow: 9,149,376
+   - stock-based compensation: 552,800
+   - dividends and buybacks: 0
+
+5. Currency conversion
+   - rate: USD 1 = CNY 7.1586
+   - rate date/description: 2025-06 month-end central parity
+   - source: PBOC Monetary Policy Report, 2025 Q2
+   - all statement amounts in outputs/result.json are CNY absolute yuan.
+
+6. Analysis model
+   - confirmed ordinary_operating / applicable.
+   - rationale: tuition revenue and ordinary teaching, recruiting, campus, receivable and lease operating structure; no special financial-statement balance-sheet model.
+
+7. Owner earnback calculation
+   - discounted detachable net cash = cash * 70% - debt - finance leases
+   - USD result: 12,599,226.9
+   - CNY result: 90,194,257.41
+   - sustainable cash profit = (OCF - capex - stock compensation) * 80%
+   - USD result: 5,096,895.20; CNY protocol value: 36,486,633.98
+   - operating business price = 1,006,582,446.58 - 90,194,257.41 = 916,388,189.18 CNY (rounding difference under 1 yuan)
+   - owner earnback years = 25.1157
+   - market cap / cash profit = 27.5877
+
+8. Dividend forecast
+   - forecast cash dividend: 0
+   - basis: 10-K states no intent to pay cash dividends in the foreseeable future and plans to retain earnings for development.
+
+9. Protocol operations
+   - initialized via: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - populated through repeated protocol set CLI commands; complex JSON was not handwritten from scratch.
+   - validated via: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - validation result: status=ok, errors=[]
+
+10. Secondary cross-check
+   - company FY2025 results release: https://ir.legacyed.com/news-events/press-releases/detail/24/legacy-education-reports-strong-fiscal-2025-results-with-40-revenue-growth-and-record-enrollment
+   - checked revenue growth (39.5%), FY2025 net income ($7.5m), and ending enrollment (3,101).
+
+Known limitations are recorded in outputs/result.json data_quality.limitations and outputs/report.md.

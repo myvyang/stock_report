@@ -1,0 +1,54 @@
+stock-research trace
+task_input=config/input.json
+output_result=outputs/result.json
+output_report=outputs/report.md
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- Expected annual facts, normalized facts and raw filing paths were absent in /workspace/stock_report.
+- No prior stock-research result existed for 01161.HK/2025-12-31.
+- Returned to primary public filing as required by data-reuse rules.
+
+3. Primary sources
+- HKEX Annual Report 2025, published 2025-12-18:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2025/1218/2025121801035.pdf
+- HKEX Interim Results for six months ended 2026-03-31, published 2026-05-26:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0526/2026052601190.pdf
+- Market cap and PE: Tencent qt.gtimg.cn snapshot supplied in config/input.json, timestamp 2026-07-31 16:08:47.
+- Currency conversion: 1 HKD = 0.9148 CNY at 2025-09-30.
+
+4. Identity and model correction
+- Input hint said financial_brokerage and also carried utility tags.
+- Annual report segment note shows skincare product sales and treatment services in beauty salons, spas and medical beauty centres.
+- Overrode hint with ordinary_operating / applicable.
+
+5. Reporting-period reconciliation
+- Input key: 2025-12-31.
+- Company's audited fiscal year end: 2025-09-30.
+- Kept protocol input period unchanged but disclosed the mismatch in data_quality and report.
+
+6. Key audited HKD figures (HK$000)
+- Revenue 981,334; parent net profit 81,258.
+- Total assets 1,431,098; total liabilities 1,077,235; parent equity 353,632.
+- Bank cash 746,480; contract liabilities 669,168; lease liabilities 170,217.
+- Operating cash flow 403,158; property/equipment capex 14,770.
+- Lease principal 95,086; lease interest 7,927; dividends paid 37,430.
+- Service revenue 886,620; product revenue 94,714.
+
+7. Derived judgments
+- Gross margin 46.78% uses standardized cost classification; statutory HKFRS face statement does not separately present gross profit.
+- Detachable net cash set to zero because cash is supported by large prepaid-treatment obligations and other operating liabilities; group had net current liabilities.
+- Sustainable cash profit benchmark normalizes the working-capital inflows, subtracts lease cash payments and maintenance capex, then applies a 20% haircut: CNY 99,713,200.
+- Operating business price = market cap - discounted detachable net cash = CNY 772,833,303.03.
+- Owner earnback = 772,833,303.03 / 99,713,200 = 7.7506 years.
+- Dividend forecast: FY2026 interim 5.0 HK cents already declared plus assumed final 2.5 HK cents (same as FY2025 final); 7.5 HK cents x 680,552,764 shares x 0.9148 = CNY 46,692,307; yield 6.0417%.
+
+8. Protocol actions
+- Initialized outputs/result.json with protocol init.
+- Populated fields with protocol set commands; did not construct the result file manually.
+- Protocol validation executed after population.

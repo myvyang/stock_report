@@ -1,0 +1,133 @@
+PRADA 01913.HK stock-research trace
+generated_at=2026-08-05T01:48:32+08:00
+period=2025-12-31
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields through repeated protocol `set` commands; result.json was not hand-written from scratch.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse_check]
+No existing 01913.HK/2025-12-31 annual facts, normalized facts, raw filing, or prior stock-research output was present under stock_report/data when checked. Fresh official filings were therefore required.
+
+[source_acquisition]
+- Downloaded official PRADA Annual Report 2025 from:
+  https://www.pradagroup.com/content/dam/pradagroup/documents/Shareholderinformation/2026/inglese/e_Annual_Report_2025.pdf
+- Stored at:
+  stock_report/data/raw/filings/01913.HK/2025-12-31/e_Annual_Report_2025.pdf
+- Extracted a local text copy for line-level checking:
+  stock_report/data/raw/filings/01913.HK/2025-12-31/e_Annual_Report_2025.txt
+- Checked the latest information available before the supplied market-cap date using HKEX 2026H1 results:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0730/2026073001523.pdf
+- ECB API series queried:
+  EXR.A.CNY.EUR.SP00.A, 2025 observation = 8.1185043137255 CNY/EUR
+  EXR.A.CNY.EUR.SP00.E, 2025 observation = 8.2262 CNY/EUR
+
+[model_review]
+Input hint: financial_brokerage / requires_special_model.
+Finding: contradicted by official filing. PRADA designs, produces, markets, and distributes luxury goods, with 89.2% of 2025 revenue from directly operated stores and e-commerce. There are no brokerage client funds, proprietary trading books, or repo-funded securities operations.
+Final model: ordinary_operating / applicable.
+
+[currency_policy]
+- Income statement and cash-flow items: EUR x 8.1185043137255 (ECB 2025 annual average).
+- Balance-sheet items: EUR x 8.2262 (ECB 2025 year end).
+- Market capitalization: used supplied CNY amount without conversion.
+- All result.json monetary amounts are absolute CNY yuan.
+
+[core_filing_checks]
+Annual Report PDF p.112:
+- total assets EUR 11,012,937,000
+- total liabilities EUR 6,347,170,000
+- total equity EUR 4,665,767,000
+- parent equity EUR 4,644,229,000
+- cash EUR 1,261,676,000
+- inventory EUR 1,059,042,000
+- financial liabilities EUR 1,732,366,000 (current plus non-current)
+- lease liabilities EUR 3,091,879,000
+
+Annual Report PDF p.113:
+- revenue EUR 5,717,521,000
+- cost of goods sold EUR 1,125,444,000
+- gross profit EUR 4,592,077,000
+- EBIT EUR 1,299,040,000
+- net profit EUR 854,922,000
+- parent net profit EUR 851,936,000
+
+Annual Report PDF pp.50, 137:
+- retail revenue EUR 5,101,790,000, 89.2% of net revenue
+- Prada retail constant-FX change -1.0%
+- Miu Miu retail constant-FX change +34.8%
+- Versace consolidated from 2025-12-02
+
+Annual Report PDF pp.55-56, 115:
+- IFRS operating cash flow EUR 1,654,258,000
+- lease principal paid EUR 452,376,000
+- lease-adjusted net operating cash flow EUR 1,201,882,000
+- cash purchases of PPE and intangibles EUR 610,972,000
+- acquisition of subsidiaries/equity, net of cash acquired EUR 1,222,837,000
+- dividends paid to owners EUR 419,647,000
+- year-end net financial debt EUR 465,810,000
+
+Annual Report PDF pp.50, 134:
+- Versace cash purchase price USD 1,395,000,000
+- Versace full-year 2025 revenue EUR 684,400,000 if acquired from 1 January
+- Versace incurred operating losses in 2025; management expected a not-dissimilar loss magnitude in 2026
+- provisional acquisition goodwill EUR 1,002,400,000
+
+Annual Report PDF pp.168-169 and 2026 AGM/dividend disclosure:
+- 2025 final dividend EUR 0.166/share
+- total dividend EUR 424,764,784
+- 2024 dividend EUR 0.164/share, EUR 419,647,136 paid in 2025
+
+HKEX 2026H1 update:
+- revenue EUR 3,048,014,000
+- adjusted EBIT margin 17.4%
+- parent net profit EUR 326,857,000, -15.3% reported
+- organic retail growth +3%; Prada +3%, Miu Miu +3%
+- net financial debt EUR 692,748,000 at 2026-06-30
+
+[formula_checks]
+gross_margin = 4,592,077 / 5,717,521 = 0.8031587466
+net_margin = 851,936 / 5,717,521 = 0.1490044374
+
+lease_adjusted_operating_cash_flow_eur = 1,654,258,000 - 452,376,000 = 1,201,882,000
+base_operating_free_cash_flow_eur = 1,201,882,000 - 610,972,000 = 590,910,000
+base_operating_free_cash_flow_cny = 590,910,000 x 8.1185043137255 = 4,797,305,384.02
+
+Versace/integration haircut = 20% of base operating free cash flow.
+Reason: 2025 contains only one month of loss-making Versace, while 2026H1 shows consolidated adjusted EBIT margin dilution to 17.4% and higher net debt. This is an analyst judgement, not company guidance.
+discounted_sustainable_cash_profit_eur = 590,910,000 x 80% = 472,728,000
+discounted_sustainable_cash_profit_cny = 472,728,000 x 8.1185043137255 = 3,837,844,307.22
+
+cash_eur = 1,261,676,000
+financial_debt_eur = 1,732,366,000
+net_cash_eur = -470,690,000 before small related-party financial assets; company-reported net financial debt is EUR 465,810,000.
+discounted_detachable_net_cash_cny = max(0, net cash) = 0
+Lease debt is reflected through lease-principal-adjusted cash flow rather than subtracted again from market cap.
+
+operating_business_price = 95,494,840,434.53992 - 0 = 95,494,840,434.53992
+owner_earnback_years = 95,494,840,434.53992 / 3,837,844,307.218828 = 24.8824164792
+market_cap_to_cash_profit = same, because detachable net cash is zero
+
+forecast_dividend_cny = EUR 424,764,784 x 8.1185043137255 = CNY 3,448,454,731.22
+forecast_dividend_yield = 3,448,454,731.22 / 95,494,840,434.53992 = 0.0361114246
+
+[limitations]
+- PE TTM was supplied by Tencent and was not independently rebuilt from quarterly EPS.
+- The 20% sustainable-cash-profit haircut is judgemental because management did not disclose a numerical 2026 Versace loss forecast.
+- Dividend yield is gross of Italian withholding and investor-specific taxes.
+- EUR-to-CNY conversion is a comparison convention; the company reports in EUR and operates across many currencies.
+
+[validation]
+Final command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Result: {"status":"ok","errors":[]}
+
+Existence/non-empty checks passed:
+- outputs/result.json: 14,804 bytes
+- outputs/report.md: 9,208 bytes
+- outputs/trace.txt: non-empty (size changed after this validation note)

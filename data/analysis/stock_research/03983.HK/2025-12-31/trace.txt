@@ -1,0 +1,69 @@
+stock-research trace
+company: 03983.HK CHINA BLUECHEM / 中海石油化学股份有限公司
+period: 2025-12-31 annual
+generated_at: 2026-08-04T11:27:17+08:00
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated every section using repeated protocol set commands; no complex JSON was written from scratch.
+3. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: {"status":"ok","errors":[]}
+
+[source acquisition]
+- No annual facts package, normalized facts, historical research result, or filing metadata existed in the configured local paths.
+- Downloaded the official 2025 Annual Report PDF from:
+  https://www.chinabluechem.com.cn/xwzxyg/announcements/2026/202604/P020260428603688366029.pdf
+- Local evidence copy:
+  stock_report/data/raw/filings/03983.HK/2025-12-31/annual-report-2025.pdf
+- Official company profile:
+  https://www.chinabluechem.com.cn/ywbsy/aboutus/companyprofile/
+- HKEX issuer filing index used to cross-check publication and AGM approval:
+  https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=12047
+- Market cap, date, source and PE TTM reused verbatim from config/input.json.
+
+[model verification]
+- Input hint said financial_brokerage/requires_special_model.
+- Audited annual report note 1 says the group manufactures and sells urea, methanol, phosphorus fertilizers, compound fertilizers and acrylonitrile.
+- Segment notes show product manufacturing segments and ordinary manufacturing assets/liabilities; there are no brokerage client funds, proprietary securities portfolios, or repo financing.
+- Final classification: ordinary_operating; owner earnback applicability: applicable.
+
+[financial extraction; RMB]
+- revenue = 12,034,437,000
+- cost_of_sales = 10,463,894,000
+- gross_profit = 1,570,543,000
+- net_profit = 1,116,038,000
+- parent_net_profit = 974,441,000
+- total_assets = 24,837,674,000
+- total_liabilities = 4,869,932,000
+- total_equity = 19,967,742,000
+- parent_equity = 18,831,961,000
+- minority_interest = 1,135,781,000
+- operating_cash_flow = 1,378,729,000
+- capital_expenditure = 475,484,000 (annual report MDA/segment additions basis)
+- operating_free_cash_flow = 1,378,729,000 - 475,484,000 = 903,245,000
+- gross_margin = 1,570,543,000 / 12,034,437,000 = 0.1305039279
+- net_margin = 974,441,000 / 12,034,437,000 = 0.0809702197
+
+[owner earnback assumptions; RMB]
+- bank and financial institution balances: 12,867,268,000 × 90% = 11,580,541,200
+- FVTPL financial assets: 1,166,305,000 × 80% = 933,044,000
+- interest receivable plus loan receivable: (618,393,000 + 208,252,000) × 70% = 578,651,500
+- interest-bearing borrowings plus lease liabilities: -(2,050,022,000 + 61,982,000) = -2,112,004,000
+- discounted detachable net cash = 11,580,541,200 + 933,044,000 + 578,651,500 - 2,112,004,000 = 10,980,232,700
+- sustainable cash profit = 800,000,000, from FCF 903,245,000 less 103,245,000 cyclical, one-off, NCI and maintenance buffer
+- operating business price = 8,388,054,088.702798 - 10,980,232,700 = -2,592,178,611.297202
+- owner earnback years = -2,592,178,611.297202 / 800,000,000 = -3.2402232641
+- market cap / cash profit = 8,388,054,088.702798 / 800,000,000 = 10.4850676109
+- Interpretation warning: negative owner earnback years is a mechanical formula result meaning discounted net cash exceeds market cap, not a literal time-to-payback or liquidation promise.
+
+[dividend]
+- 2025 proposed/approved final dividend = RMB0.112 per share × 4.61bn shares = 516,320,000
+- forecast/reference dividend yield = 516,320,000 / 8,388,054,088.702798 = 0.0615541980
+- This is the latest verifiable distribution basis, not a forecast guarantee for FY2026.
+
+[quality]
+- data_quality.status = complete
+- protocol validation passed.
+- Limitations recorded in result.json: market snapshot not independently reconstructed; owner-earnback discounts are judgmental; dividend basis is historical/latest approved rather than guaranteed forward distribution.

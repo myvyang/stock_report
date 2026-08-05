@@ -1,0 +1,65 @@
+stock-research trace
+company: 000900.SZ 现代投资
+period: 2025-12-31 annual
+generated_at: 2026-08-01T03:05:45+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, report-contract.md, and data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields using protocol set commands only.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: {"status":"ok","errors":[]}
+
+[reuse check]
+- No pre-existing raw filing, annual facts package, normalized facts, or stock research result was found for 000900.SZ/2025-12-31.
+- Downloaded official annual report PDF to stock_report/data/raw/filings/000900.SZ/2025-12-31/2025-annual-report.pdf.
+- Extracted PDF text locally for line/table review; original PDF retained unchanged.
+
+[primary sources]
+- Modern Investment Co., Ltd. 2025 Annual Report, Shenzhen Stock Exchange disclosure, published 2026-04-03:
+  https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-03/59995736-5137-4d3e-a294-4c73b76bb3d0.PDF
+- Company dividend history / 2025 implementation facts:
+  https://www.xdtz.net/index.php?a=lists&c=index&catid=25&m=content
+- Market snapshot: config/input.json; Tencent qt.gtimg.cn; 2026-07-31 11:43:09.
+
+[model decision]
+- Input hint ordinary_operating/applicable was overridden.
+- Selected platform_financial_mixed/requires_special_model because consolidated statements contain toll-road concessions, a rural commercial bank, and futures operations.
+- Cash, customer deposits, central-bank funding, loans, bond investments, and futures customer margins are mutually linked operating assets/liabilities.
+- Toll-road concessions are finite-lived assets and heavily pledged against borrowings.
+- Therefore all ordinary owner-earnback sorting values remain null.
+
+[key facts, CNY]
+- total assets 59,669,975,820.73
+- total liabilities 45,385,130,385.55
+- total equity 14,284,845,435.18
+- parent equity 12,529,881,382.82
+- revenue 5,933,805,889.14
+- cost of sales 4,299,209,687.23
+- parent net profit 404,538,649.07
+- operating cash flow 3,012,085,109.80
+- capex cash paid 187,346,827.07
+- intangible assets 30,846,527,202.55
+- cash 4,358,529,453.61
+- loans and advances 8,246,625,292.34
+- customer deposits 12,963,778,715.27
+- long-term borrowings 19,203,935,936.96
+- 2025 cash dividend 242,852,533.44
+
+[calculations]
+- gross profit = 5,933,805,889.14 - 4,299,209,687.23 = 1,634,596,201.91
+- gross margin = 1,634,596,201.91 / 5,933,805,889.14 = 0.275458
+- parent net margin = 404,538,649.07 / 5,933,805,889.14 = 0.0681769
+- forecast/implemented dividend yield = 242,852,533.44 / 5,707,000,000 = 0.0425533
+- interest-bearing debt approximation = short-term borrowings + long-term borrowings + bonds + current non-current liabilities
+  = 3,210,867,404.90 + 19,203,935,936.96 + 1,500,000,000 + 1,440,524,107.14
+  = 25,355,327,449.00
+- operating free cash flow intentionally null: consolidated OCF contains banking deposit/funding and loan movements, so OCF minus capex is not distributable owner cash.
+
+[limitations]
+- Full road-by-road remaining concession terms, traffic forecasts, maintenance capex, and debt amortization schedules were not assembled in the annual report.
+- Full bank-specific NIM, NPL ratio, provision coverage, and capital adequacy set was not available for a complete bank model.
+- Market cap and PE are the supplied Tencent snapshot, not an exchange official close.

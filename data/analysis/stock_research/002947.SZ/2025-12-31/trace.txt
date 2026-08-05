@@ -1,0 +1,74 @@
+stock-research trace
+company: 恒铭达 (002947.SZ)
+period: 2025-12-31 annual
+generated_at: 2026-07-31T20:11:09+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because local-data reuse was relevant.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- No annual facts, normalized facts, raw filing, or prior stock-research result existed under the input paths.
+- No matching long-term artifacts existed under /root/aicode/stock_report.
+- Therefore fetched the disclosed 2025 annual report and extracted its text locally.
+
+3. Sources
+- Primary: 苏州恒铭达电子科技股份有限公司2025年年度报告全文, 公告编号2026-015, disclosed 2026-03-21.
+  Full filing copy used for page-level extraction: http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESZ_STOCK/2026/2026-3/2026-03-21/12009624.PDF
+- Primary: 2025年审计报告 (official CNINFO disclosure):
+  https://static.cninfo.com.cn/finalpage/2026-03-21/1225023426.PDF
+- Primary: 2025年年度报告摘要, 公告编号2026-014:
+  https://static.cninfo.com.cn/finalpage/2026-03-21/1225023411.PDF
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, 2026-07-31 11:43:27.
+- Local extracted filing: stock_report/data/raw/filings/002947.SZ/2025-12-31/annual-report-2025-full.txt
+
+4. Statement-model review
+- Manufacturing generated 98.72% of revenue.
+- Main assets and liabilities are cash, receivables, inventory, production fixed assets, supplier payables, borrowings, and lease liabilities.
+- Classified as ordinary_operating; ordinary owner-earnback model applicable.
+
+5. Core reported facts (CNY)
+- Revenue: 2,857,714,112.47
+- Cost of sales: 1,943,937,898.24
+- Gross profit: 913,776,214.23
+- Parent net profit: 531,919,355.42
+- Deducted-nonrecurring parent net profit: 517,450,659.40
+- Operating cash flow: 686,654,970.95
+- Capital expenditure: 72,186,697.12
+- Operating free cash flow: 614,468,273.83
+- Total assets: 4,443,639,197.41
+- Total liabilities: 1,315,642,629.27
+- Parent equity: 3,115,386,707.83
+- Cash: 1,342,091,159.07; restricted cash: 136,709.46; disclosed cash-equivalent fundraising funds: 637,573,143.83
+- Trading financial assets: 722,781,300.14
+- Interest-bearing borrowings: 419,618,000.01
+- Lease liabilities including current portion: 84,236,981.93
+
+6. Research calculations
+- Gross margin = 913,776,214.23 / 2,857,714,112.47 = 31.9758%.
+- Parent net margin = 531,919,355.42 / 2,857,714,112.47 = 18.6135%.
+- Discounted detachable net cash:
+  (1,342,091,159.07 - 136,709.46 - 637,573,143.83)
+  + 722,781,300.14 * 90%
+  - 419,618,000.01
+  - 84,236,981.93
+  = 851,029,493.966.
+- Discounted sustainable cash profit = 517,450,659.40 * 90% = 465,705,593.46.
+- Operating business price = 13,784,000,000 - 851,029,493.966 = 12,932,970,506.034.
+- Owner earnback = 12,932,970,506.034 / 465,705,593.46 = 27.7707 years.
+- Market-cap/cash-profit = 13,784,000,000 / 465,705,593.46 = 29.5981.
+- Forecast dividend yield = 121,879,621 / 13,784,000,000 = 0.8842%.
+
+7. Judgment flags
+- The 90% haircut on trading financial assets is an analyst assumption for liquidity/valuation risk.
+- The 10% sustainable-profit haircut is an analyst assumption for customer concentration, expansion, and manufacturing cyclicality.
+- Product profit source is inferred from disclosed product revenue and gross margin because segment operating profit was not disclosed.
+- Proposed 2025 dividend was pending shareholder approval as of annual-report authorization.
+
+8. Validation
+- outputs/result.json was populated using protocol CLI set commands, not handwritten from scratch.
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].

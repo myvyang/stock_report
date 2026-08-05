@@ -1,0 +1,95 @@
+stock-research trace
+company: 精达股份 (600577.SH)
+period: 2025-12-31
+generated_for: 2026-07-31 task
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill's reuse boundary was relevant.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- No annual facts, normalized facts, raw filing, or prior stock-research result existed for 600577.SH/2025-12-31.
+- Only stock_report/data/notes/user_stock_evaluations.md existed; it did not supply the required financial facts.
+- Therefore the research returned to public filings.
+
+3. Source acquisition
+- Primary filing identity: 铜陵精达特种电磁线股份有限公司2025年年度报告, disclosed by SSE on 2026-03-31.
+- Attempted official SSE PDF URL:
+  https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-03-31/600577_20260331_EB8P.pdf
+- The response was a gzip-compressed HTML anti-bot challenge, not a PDF. It was rejected as a filing source.
+- Read the same filing through the accessible full-text announcement mirror:
+  https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12041595
+- Cross-checks:
+  * 2025 annual report summary: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12041582&stockid=600577
+  * 2025 annual dividend implementation: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12277111&stockid=600577
+- Market snapshot reused exactly from config/input.json: Tencent qt.gtimg.cn, timestamp 20260731114346, market cap CNY 16,889,000,000, PE TTM 27.66.
+
+4. Statement-model decision
+- ordinary_operating / applicable.
+- Reason: products are magnet wire and specialty conductor materials; assets are receivables, bills, inventory, plant and ordinary investments; liabilities are bank financing, supplier bills and payables. No customer deposits, insurance reserves, regulated presale funds, concession rights or similar special-model balance-sheet structure was found.
+
+5. Extracted financial facts (CNY)
+- revenue: 24,673,670,269.16
+- cost of sales: 23,257,268,433.52
+- gross profit: 1,416,401,835.64
+- operating profit: 808,978,679.37
+- net profit: 622,525,281.91
+- parent net profit: 599,143,119.39
+- parent net profit excluding non-recurring items: 569,634,073.52
+- total assets: 14,467,092,270.19
+- total liabilities: 8,158,717,778.65
+- total equity: 6,308,374,491.54
+- parent equity: 6,149,606,753.81
+- minority interest: 158,767,737.73
+- operating cash flow: 2,475,082,817.33
+- capital expenditure (cash paid to acquire long-term assets): 165,485,402.56
+- financing cash flow: -1,938,684,532.41
+- 2025 dividend cash paid to ordinary shareholders during the year: 107,457,893.30 + 64,475,479.02 = 171,933,372.32 (used for financials.cash_flow.dividend_and_buyback_cash_out; interest and minority dividends excluded)
+
+6. Formula calculations
+- gross margin = 1,416,401,835.64 / 24,673,670,269.16 = 0.0574064
+- net margin = 599,143,119.39 / 24,673,670,269.16 = 0.0242830
+- operating free cash flow = 2,475,082,817.33 - 165,485,402.56 = 2,309,597,414.77
+- minority interest ratio = 158,767,737.73 / 6,308,374,491.54 = 0.0251678
+
+7. Detachable-cash analysis
+- cash and cash equivalents: 1,104,758,265.58; 70% candidate value = 773,330,785.91
+- non-withdrawable time deposits: 349,451,600.07; 50% candidate value = 174,725,800.04
+- trading plus other non-current financial assets: 2,575,806.90 + 187,822,064.38 = 190,397,871.28; 30% candidate value = 57,119,361.38
+- financing liabilities from the filing's financing-liability roll-forward: 3,164,243,377.85; deducted at 100%
+- candidate assets after debt are negative. Discounted detachable net cash is floored at 0.
+- Important constraint: monetary funds of 2,069,148,661.10 include restricted cash of 964,390,395.52. Supplier bills payable of 3,597,399,612.51 also require operating liquidity and guarantee deposits.
+
+8. Sustainable cash-profit analysis
+- starting point: parent net profit excluding non-recurring items = 569,634,073.52
+- cash conversion / working-capital adjustment = -39,634,073.52
+- thin-margin and raw-material-cycle safety adjustment = -30,000,000.00
+- discounted sustainable distributable cash profit = 500,000,000.00
+- Judgment basis: 2025 OCF was boosted by year-end collections and increased use of bills payable; 2024 OCF was -589,153,155.66. Therefore 2025 reported FCF was not extrapolated.
+
+9. Owner earnback
+- discounted detachable net cash = 0
+- operating business price = 16,889,000,000 - 0 = 16,889,000,000
+- owner earnback years = 16,889,000,000 / 500,000,000 = 33.778
+- market cap / cash profit = 33.778
+
+10. Dividend
+- 2025 interim dividend: CNY 0.03/share, cash CNY 64,475,479.02.
+- 2025 year-end dividend: CNY 0.06/share; using 2,149,266,059 period-end shares gives CNY 128,955,963.54, consistent with the implementation announcement's per-share amount.
+- 2025 earnings-linked cash dividend estimate = 193,431,442.56.
+- forecast dividend yield = 193,431,442.56 / 16,889,000,000 = 0.0114537.
+
+11. Data-quality judgments
+- status: complete.
+- Limitation: SSE PDF direct access was blocked; an announcement full-text mirror was used, with summary and implementation cross-checks.
+- Limitation: company industry-leader statement was not independently verified with a 2025 association market-share dataset.
+- Limitation: CNY 500,000,000 sustainable cash profit is analyst judgment, not company guidance or an audited number.
+
+12. Validation
+- Filled result fields only through stock_analysis.stock_research.protocol set/append commands after protocol initialization.
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final protocol response: {"status":"ok","errors":[]}

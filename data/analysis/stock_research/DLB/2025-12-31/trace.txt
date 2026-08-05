@@ -1,0 +1,59 @@
+stock-research trace
+generated_at=2026-08-05T02:18:28+08:00
+query=DLB
+input=config/input.json
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No DLB FY2025 raw filing, annual facts package, normalized facts, or prior stock-research result existed in the workspace.
+- Returned to primary official filing and issuer release.
+
+3. Initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized with stock-research-result-v1 schema.
+
+4. Primary evidence
+- SEC FY2025 Form 10-K, fiscal year ended 2025-09-26, filed 2025-11-18:
+  https://www.sec.gov/Archives/edgar/data/1308547/000130854725000007/dlb-20250926.htm
+- Dolby FY2025 results release / FY2026 outlook, 2025-11-18:
+  https://investor.dolby.com/news-events/financial-news/news-details/2025/Dolby-Laboratories-Reports-Fourth-Quarter-and-Fiscal-Year-2025-Financial-Results/default.aspx
+- Federal Reserve H.10 USD/CNY, 2025-09-26 rate 7.1328:
+  https://www.federalreserve.gov/releases/h10/20250929/
+- Market cap and PE TTM: config/input.json, Yahoo Finance yfinance, dated 2026-08-03.
+
+5. Period and conversion
+- Input task period is 2025-12-31; Dolby FY2025 statutory year ended 2025-09-26.
+- All USD filing amounts converted to CNY at 7.1328 CNY/USD to satisfy the result contract.
+- No separate average P&L exchange rate was used; disclosed as a limitation.
+
+6. Model determination
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Basis: 93% licensing revenue; no customer deposits, insurance reserves, regulated project cash, or financial balance-sheet model.
+
+7. Owner earnback calculations (CNY)
+- OCF = 3,368,093,894.40
+- Capex = 259,263,014.40
+- Stock compensation deduction = 916,664,659.20
+- Sustainable distributable cash profit = 2,192,166,220.80
+- Discounted detachable net cash = 3,555,633,751.68
+- Operating business price = 37,172,450,355.01 - 3,555,633,751.68 = 33,616,816,603.33
+- Owner earnback years = 33,616,816,603.33 / 2,192,166,220.80 = 15.3349761
+- Market cap / cash profit = 16.9569488
+- Forecast dividend = USD 34.4m x 4 x 7.1328 = CNY 981,473,280.00
+- Forecast dividend yield = 2.6403244%
+
+8. Protocol writes and validation
+- Populated result fields using protocol CLI set commands; complex result was not hand-written from scratch.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+
+9. Outputs
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

@@ -1,0 +1,47 @@
+stock-research trace
+company=600461.SH 洪城环境
+period=2025-12-31 annual
+generated_for_input=2026-07-31T18:20:35+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields only through protocol set/append commands in outputs/populate_result.sh.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   validation_status=ok
+
+[source discovery and reuse]
+- No annual facts package, normalized facts, raw filing metadata, or prior stock-research result existed in the supplied /workspace paths.
+- Searched official/public filing indexes and located the 2025 annual report.
+- Primary filing downloaded from:
+  https://static.cninfo.com.cn/finalpage/2026-04-16/1225108019.PDF
+- Local primary filing:
+  stock_report/data/raw/filings/600461.SH/2025-12-31/annual-report-2025.pdf
+- Extracted text used for local verification:
+  stock_report/data/raw/filings/600461.SH/2025-12-31/annual-report-2025.txt
+- Market value and PE were reused from config/input.json, source Tencent qt.gtimg.cn, timestamp 20260731114329.
+
+[model decision]
+- Confirmed statement_model=utility_concession from filing facts, not merely the input hint.
+- Evidence: supply and gas businesses rely on regional concessions; wastewater and solid-waste BOT/TOT facilities are operated during contractual periods and transferred to government at expiry.
+- Auditor identified concession-project assets as a key audit matter; carrying amount at 2025-12-31 was CNY 12,071,651,500.
+- owner_earnback_applicability=requires_special_model.
+- Ordinary owner-earnback fields remain null as required by the result contract.
+- Missing aggregate disclosure of project-by-project remaining term, minimum volume, project debt and maintenance capex prevents a defensible concession-project DCF.
+
+[core calculations]
+gross_profit=7,486,062,467.65-4,929,780,627.72=2,556,281,839.93
+gross_margin=2,556,281,839.93/7,486,062,467.65=0.341471
+net_margin=1,193,215,598.06/7,486,062,467.65=0.159393
+operating_free_cash_flow_simplified=1,910,179,414.92-1,044,238,133.52=865,941,281.40
+forecast_dividend_yield=599,700,563.39/11,776,000,000=0.050927
+minority_interest_ratio=1,208,748,921.56/11,200,605,105.26=0.107918
+interest_bearing_debt_approx=1,931,316,546.67+1,054,256,252.58+658,019,157.57+3,973,997,632.74=7,617,589,589.56
+
+[quality note]
+- Cash-flow capex is the annual-report line "cash paid to acquire fixed assets, intangible assets and other long-term assets"; it includes CNY 826,721,486.05 paid for concession rights.
+- Dividend forecast is the board proposal, not an unconditional future payment.
+- Company-reported market-position statements were not independently verified with an industry association.

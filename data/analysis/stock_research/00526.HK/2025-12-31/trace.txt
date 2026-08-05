@@ -1,0 +1,79 @@
+stock-research trace
+task_input=config/input.json
+query=00526.HK
+analysis_as_of=2025-12-31
+generated_at=2026-08-03T15:54:06+08:00
+
+1. Protocol initialization
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+status=success
+
+2. Required contracts read
+file=.agents/skills/stock-research/references/result-contract.md
+file=.agents/skills/stock-research/references/report-contract.md
+status=complete
+
+3. Reuse audit
+checked=stock_report/data/analysis/annual_review/00526.HK/2025-12-31
+checked=stock_report/data/raw/filings/00526.HK/2025-12-31
+checked=stock_report/data/normalized/facts/00526.HK/2025-12-31
+checked=stock_report/data/analysis/stock_research/00526.HK/2025-12-31
+result=no reusable facts, filings, or prior research found in workspace
+
+4. Primary sources
+source=https://www.hkexnews.hk/listedco/listconews/sehk/2025/0730/2025073000643.pdf
+use=FY2025 audited annual report; core statements, segments, asset notes, cash flow, dividends
+source=https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0629/2026062901737.pdf
+use=FY2026 audited final-results announcement; subsequent cross-check only
+source=https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0625/2026062500619.pdf
+use=HKEX disciplinary findings and internal-control history
+source=config/input.json / Tencent qt.gtimg.cn
+use=market cap, snapshot date, PE TTM
+
+5. Period decision
+input_period=2025-12-31
+issuer_fiscal_year_end=03-31
+core_financial_period=FY ended 2025-03-31
+reason=latest annual report publicly available by the input analysis date
+subsequent_period=FY ended 2026-03-31
+handling=cross-check only; not substituted into core FY2025 statements
+
+6. Model verification
+input_hint=financial_brokerage
+verified_model=ordinary_operating
+reason=annual report identifies manufacturing/trading, retail/property rental, wholesale/HVAC, and investment holding; no brokerage client money, margin financing, or repo-funded securities model
+
+7. Core calculations (CNY yuan)
+total_assets=1383336000+2814958000=4198294000
+total_liabilities=1620956000+95150000=1716106000
+gross_margin=603384000/2684824000=0.2247391411
+net_margin=35690000/2684824000=0.0132932279
+operating_free_cash_flow=323853000-129370000=194483000
+discounted_cash=976157000*0.70=683309900
+discounted_restricted_cash=250984000*0=0
+discounted_trust_products=783221000*0.50=391610500; rounded in breakdown to 391610000
+financing_debt=795202000+11656600=806768600; model uses rounded disclosed components 806768000
+discounted_detachable_net_cash=683309900+391610000-806768000=268151900
+operating_business_price=836934256.360531-268151900=568782356.360531
+discounted_sustainable_cash_profit=120000000
+owner_earnback_years=568782356.360531/120000000=4.7398529697
+market_cap_to_cash_profit=836934256.360531/120000000=6.9744521363
+forecast_cash_dividend=0
+forecast_dividend_yield=0
+
+8. Judgment notes
+cash_haircut=30% retained for operating liquidity across manufacturing, wholesale, retail, and installation activities
+restricted_cash_haircut=100% because funds are restricted/pledged
+trust_product_haircut=50% because variable-return, 36-month products mature in 2027-2028 and use Level 3 fair value
+receivables_haircut=100% excluded from detachable cash because mainly operating/related-party receivables with material impairment
+sustainable_cash_profit=120m, below FY2025 FCF of 194.483m; reflects non-repeatable working-capital release, recurring impairment risk, and FY2026 profit cross-check of 122.686m
+dividend_forecast=zero because FY2024 and FY2025 final dividends were zero and policy has no committed payout
+
+9. Protocol population
+method=protocol set commands by section; result JSON was not authored from scratch
+sections=analysis.sources_used, analysis_model, metrics, financials, asset_analysis, owner_earnback, dividend, business, risks, evidence, data_quality
+
+10. Validation
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

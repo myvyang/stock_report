@@ -1,0 +1,74 @@
+stock-research trace
+company: 富奥股份 (000030.SZ)
+period: 2025-12-31 annual
+generated for task date: 2026-08-01 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md in full.
+- Read references/report-contract.md in full.
+- Read references/data-reuse.md because local-data reuse was evaluated.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Expected annual facts, normalized facts, filing metadata and prior stock-research files under stock_report were absent.
+- The configured /root/aicode/stock_report sync source also contained no 000030.SZ files.
+- Therefore no prior annual fact pack or historical stock-research conclusion was reused.
+
+3. Primary filing acquisition
+- Located the official Shenzhen Stock Exchange disclosure PDF for the 2025 annual report:
+  https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-22/afe67bd5-20d1-48b1-ab7e-a5d2eed3f6df.PDF
+- Downloaded it to stock_report/data/raw/filings/000030.SZ/2025-12-31/annual-report-2025.pdf.
+- Extracted text locally to annual-report-2025.txt using pypdf in an isolated temporary virtual environment because pdftotext and pypdf were not preinstalled. Project dependencies were not modified.
+
+4. Financial statement extraction
+- Balance sheet: annual report pp.85-88.
+- Income statement: annual report pp.90-92.
+- Cash flow statement: annual report pp.93-95.
+- Revenue/product/customer tables: annual report pp.23-26.
+- Dividend proposal: annual report pp.59-60 and post-balance-sheet events.
+- Notes used: cash and financial assets, debt, revenue/cost, investment income, cash-flow reconciliation.
+- All amounts stored in result.json are absolute CNY yuan.
+
+5. Analysis model review
+- Confirmed ordinary_operating/applicable.
+- Reason: revenue is from direct sales of manufactured automotive parts; working capital, plant, equipment and R&D are ordinary operating assets. The company is not a bank, broker, insurer, property developer, construction contractor, concession utility or investment holding platform.
+- Special analytical handling retained for material equity-accounted investments and their dividend cash path.
+
+6. Key calculations
+- Gross profit = 17,410,397,362.62 - 15,244,757,636.33 = 2,165,639,726.29.
+- Gross margin = 2,165,639,726.29 / 17,410,397,362.62 = 12.4388%.
+- Parent net margin = 702,615,804.90 / 17,410,397,362.62 = 4.0356%.
+- Operating free cash flow = 536,199,267.13 - 371,940,621.99 = 164,258,645.14.
+- Discounted detachable net cash:
+  unrestricted cash equivalents 2,568,616,118.95 x 60%
+  + structural deposits 180,956,812.30 x 90%
+  + debt-to-equity investment 28,789,264.39 x 30%
+  - interest-bearing borrowing 999,719,548.68
+  - lease liabilities 188,317,098.97
+  = 524,630,934.107.
+- Sustainable cash profit:
+  parent net profit 702,615,804.90
+  -> quarterly disclosed recurring parent profit sum 633,571,937.01
+  -> cash-conversion/cycle haircut to 550,000,000.00.
+- Cross-check: cash received from investment income was 507,700,801.28 versus equity-accounted investment income of 485,392,360.62.
+- Operating business price = 7,430,000,000.00 - 524,630,934.107 = 6,905,369,065.893.
+- Owner earnback = 6,905,369,065.893 / 550,000,000.00 = 12.5552 years.
+- Market-cap/cash-profit = 7,430,000,000.00 / 550,000,000.00 = 13.5091.
+- Forecast dividend yield = 257,971,626.75 / 7,430,000,000.00 = 3.4720%.
+
+7. Structured result construction
+- outputs/result.json was initialized by the protocol CLI, not handwritten from scratch.
+- Fields and arrays were populated using repeated protocol `set` commands.
+- No ranking labels or buy/sell recommendation were added.
+
+8. Validation
+- Command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[]
+
+9. Limitations
+- Market capitalization and PE were accepted from config/input.json and not independently refreshed.
+- The 550 million sustainable cash-profit figure and cash haircuts are analytical judgments, clearly separated from filing facts.
+- No upstream annual-facts package existed; this task worked directly from the official annual report.

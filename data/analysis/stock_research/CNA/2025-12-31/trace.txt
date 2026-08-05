@@ -1,0 +1,66 @@
+stock-research trace — CNA — period 2025-12-31
+generated: 2026-08-04 Asia/Shanghai
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - /workspace/AGENTS.md supplied in task context
+
+2. Initialized protocol result
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+   Expected annual facts, normalized facts and raw filing paths from config/input.json did not exist locally. Only config/input.json and the initialized result were available. No historical stock-research result was reused.
+
+4. Primary-source retrieval
+   - SEC filing index: https://www.sec.gov/Archives/edgar/data/21175/000002117526000011/0000021175-26-000011-index.htm
+   - CNA Financial 2025 Form 10-K: https://www.sec.gov/Archives/edgar/data/21175/000002117526000011/cna-20251231.htm
+   - Filing date 2026-02-10; report date 2025-12-31.
+   - SAFE 2025-12-31 FX page: https://www.safe.gov.cn/safe/2025/1231/26980.html
+   - SAFE attachment was used to support USD/CNY 7.0288 for protocol conversion.
+
+5. Model override
+   input hint: ordinary_operating / applicable
+   verified model: financial_insurance / requires_special_model
+   reason: CNA underwrites property and casualty risks; investments support claim, unearned-premium and future-policy-benefit reserves. These assets and liabilities are the operating model, not detachable cash and ordinary debt.
+
+6. Key USD facts (millions unless stated)
+   Total assets 69,443; liabilities 57,822; equity 11,621.
+   Investments 50,447; claim reserves 26,599; unearned premiums 7,635; future policy benefits 13,448.
+   Revenue 14,989; net earned premiums 10,900; pretax income 1,620; net income 1,278.
+   Operating cash flow 2,490; property/equipment purchases 86; dividends paid 1,047.
+   P&C underwriting gain 551; underlying underwriting gain 855; P&C net investment income 1,581.
+   Net investment income 2,557; fixed-income effective yield 4.9%.
+   Catastrophe loss 240; unfavorable prior-year reserve development 185.
+   CCC statutory capital and surplus 11,578; statutory net income 1,258.
+   2026 ordinary dividend capacity without prior approval 1,266, less dividends paid during the preceding twelve months at measurement date.
+   2025 declared/paid dividend $3.84 per share including $2.00 special.
+   2026-02-06 declared quarterly $0.48 plus special $2.00 per share.
+
+7. Currency conversion
+   All protocol financial amounts = disclosed USD amount × 7.0288 CNY/USD.
+   This is a uniform presentation conversion. Income/cash-flow items were not translated at an annual average rate; limitation disclosed.
+   Market cap was retained exactly from input because it was already supplied in CNY.
+
+8. Dividend forecast
+   Assumption: four 2026 quarterly dividends at $0.48 plus the already-declared $2.00 special = $3.92 per share.
+   Shares: 270,671,747 at 2025-12-31.
+   Forecast cash dividend: $1,061,033,248.24 × 7.0288 = CNY 7,457,790,495.23.
+   Forecast yield: CNY 7,457,790,495.23 / CNY 95,786,406,217.14 = 0.077877 (rounded).
+   Principal uncertainty: special dividend recurrence is not guaranteed.
+
+9. Null-field decisions
+   gross_margin and net_margin: null because insurance revenue/claims do not map cleanly to ordinary gross-margin economics.
+   operating_free_cash_flow: null because reserve growth and premium/claim timing make ordinary OCF-minus-capex non-comparable.
+   discounted_net_cash, discounted_cash_profit, operating_business_price, owner_earnback_years, market_cap_to_cash_profit: null because ordinary owner-earnback model is not applicable.
+
+10. Protocol population and validation
+   outputs/result.json was initialized and populated with the protocol CLI through /workspace/update_result.sh; it was not composed as a complex JSON object from scratch.
+   Validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Validation result: status=ok, errors=[]
+
+11. Data quality
+   status=complete under special-model minimum requirements.
+   Important limitations are embedded in result.json and report.md: mismatched valuation/financial dates; single-date FX translation; dividend forecast dependence on a special dividend; no single consolidated RBC percentage disclosed.

@@ -1,0 +1,68 @@
+stock-research trace
+company=北京利尔 (002392.SZ)
+period=2025-12-31 annual
+generated_for=2026-08-01 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields with protocol set commands; complex JSON was not authored from scratch.
+5. Protocol validation passed before report creation.
+6. Final protocol validation passed after all three outputs were written: status=ok, errors=[].
+
+[source acquisition]
+- Local annual filing/fact packages were absent.
+- Downloaded official Shenzhen Stock Exchange filing:
+  https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-10/65201eb3-9003-42fb-b504-82e654059443.PDF
+- Saved as stock_report/data/raw/filings/002392.SZ/2025-12-31/annual-report-2025.pdf.
+- Extracted a local text working copy with pypdf in an isolated /tmp virtual environment because pdftotext was unavailable.
+- Market cap and PE were reused from config/input.json as instructed.
+
+[model decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Business is manufacturing/direct sales plus on-site refractory-material contracting. Balance-sheet assets are not the business model itself as in a bank, insurer, developer, concession or investment holding company.
+
+[core calculations]
+gross_profit = 6,970,292,887.24 - 5,980,036,010.83 = 990,256,876.41
+gross_margin = 990,256,876.41 / 6,970,292,887.24 = 0.14206818743912325
+net_margin = 400,973,948.96 / 6,970,292,887.24 = 0.057526126297222514
+operating_free_cash_flow = 128,876,363.35 - 47,263,047.94 = 81,613,315.41
+
+discounted_detachable_net_cash:
+  cash_and_cash_equivalents 843,586,866.38 * 100% = 843,586,866.38
+  wealth_management_products 15,182,614.42 * 95% = 14,423,483.699
+  trading_equity_instruments 352,808,299.35 * 50% = 176,404,149.675
+  interest_bearing_debt -(358,386,414.91 + 180,211,184.72 + 95,000,000.00) = -633,597,599.63
+  total = 400,816,900.124
+
+discounted_sustainable_cash_profit:
+  parent_net_profit 400,973,948.96
+  less_nonrecurring_gain 162,768,670.32
+  adjusted_parent_profit 238,205,278.64
+  cash_conversion_haircut 85%
+  total = 202,474,486.844
+
+operating_business_price = 8,595,000,000.00 - 400,816,900.124 = 8,194,183,099.876
+owner_earnback_years = 8,194,183,099.876 / 202,474,486.844 = 40.47020060453025
+market_cap_to_cash_profit = 8,595,000,000 / 202,474,486.844 = 42.4497927317735
+forecast_dividend_yield = 41,667,179.37 / 8,595,000,000 = 0.004847839368237347
+
+[key annual-report locations]
+- pp.10-18: business model, products, industry and positioning.
+- pp.18-20: revenue mix, segment margins, production/sales.
+- pp.29-31: cash-flow explanation, non-core gains, cash reconciliation.
+- pp.50-51: dividends and 2025 distribution proposal.
+- pp.84-86: consolidated balance sheet.
+- pp.88-90: consolidated income statement.
+- pp.92-93: consolidated cash-flow statement.
+- pp.128-129: restricted cash and trading financial assets.
+- pp.132-133: receivables aging and provisions.
+- pp.159, 163-164: short-term and long-term borrowings.
+
+[limitations]
+- Market snapshot was not independently reconstructed.
+- Sustainable cash profit and asset haircuts are analytical assumptions, explicitly separated from reported facts.
+- 2025 dividend is a board proposal, not guaranteed final payment.

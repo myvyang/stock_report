@@ -1,0 +1,91 @@
+stock-research trace
+company: 00387.HK / Leeport (Holdings) Limited / 力丰（集团）有限公司
+period: 2025-12-31 annual
+generated_for_input: 2026-08-03T14:49:22+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because no reusable facts package was present.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. All result fields were populated using protocol `set`; no complex result object was handwritten from scratch.
+6. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[source discovery]
+- Local annual facts, normalized facts and prior research outputs were absent.
+- Official annual report downloaded from HKEX:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042900890.pdf
+- Local copy:
+  stock_report/data/raw/filings/00387.HK/2025-12-31/annual_report_2025.pdf
+- HKEX annual report pages used: 5-9, 62, 64-65, 68-69, 92, 96-99, 103, 105, 119, 135-136, 146-147.
+- RMB exchange-rate source: China Foreign Exchange Trade System central parity, published through SAFE/Xinhua.
+  2025-12-31: 1 HKD = CNY 0.90322.
+  2026-07-31: 100 HKD = CNY 86.559, i.e. 1 HKD = CNY 0.86559.
+- Market cap and PE: config/input.json, Tencent qt.gtimg.cn snapshot at 2026/07/31 16:08:46.
+
+[model audit]
+Input hint: financial_brokerage / requires_special_model.
+Annual-report finding: principal activities are trading metalworking machinery, measuring instruments, cutting tools and electronic equipment; revenue comes from goods, agency/technical-support commission and after-sales service.
+Override: ordinary_operating / applicable.
+Reason: no brokerage customer funds, proprietary securities book or repo financing; working capital consists mainly of receivables, inventory, trade payables and bank borrowings.
+
+[currency]
+Result contract requires absolute CNY yuan.
+2025 statement amounts: HKD thousands x 1,000 x 0.90322.
+Forecast dividend: HKD/share x shares x 0.86559 to align with valuation date.
+Ratios are calculated from same-currency inputs and are unaffected by translation.
+
+[reported facts, HKD'000]
+Revenue 552,889; cost of sales 411,799; gross profit 141,090; operating profit 31,442.
+Profit for year 16,096; attributable to owners 16,097.
+Total assets 678,677; total liabilities 257,938; total equity 420,739; parent equity 425,600; NCI -4,861.
+Cash 51,906; restricted deposits 210; inventories 58,812; trade/bills receivables 213,178.
+Investment properties 70,796; FVOCI/FVPL financial assets 17,904.
+Borrowings 68,346; lease liabilities 2,011.
+Operating cash flow 49,524; capex 433; reported operating FCF 49,091.
+Cash dividends paid 36,812.
+
+[formula checks]
+gross_margin = 141,090 / 552,889 = 0.2551868458.
+net_margin = 16,097 / 552,889 = 0.0291143430.
+reported_FCF_CNY = (49,524 - 433) x 1,000 x 0.90322 = 44,339,973.02.
+
+discounted detachable net cash:
+  cash: 51,906 x 1,000 x 0.90322 x 100% = 46,882,537.32
+  FVOCI/FVPL assets: 17,904 x 1,000 x 0.90322 x 50% = 8,085,625.44
+  investment property: 70,796 x 1,000 x 0.90322 x 50% = 31,972,181.56
+  less borrowings and leases: (68,346 + 2,011) x 1,000 x 0.90322 = -63,547,849.54
+  total = 23,392,494.78.
+
+normalized sustainable cash profit:
+  pre-working-capital operating inflow 35,333
+  less interest paid 4,981
+  less income tax paid 8,228
+  less capex 433
+  subtotal = 21,691 HKD'000 = CNY 19,591,745.02
+  sustainability haircut 15% for customer concentration, slower receivable turnover, associate losses and cycle
+  discounted sustainable cash profit = CNY 16,652,983.267.
+
+operating business price = 152,410,748.79407883 - 23,392,494.78 = 129,018,254.01407883.
+owner earnback years = 129,018,254.01407883 / 16,652,983.267 = 7.7474559330.
+market cap / cash profit = 152,410,748.79407883 / 16,652,983.267 = 9.1521588865.
+
+[dividend forecast]
+2025 total dividend was HKD 0.16/share, including HKD 0.10 special dividend.
+Forecast excludes the special dividend and uses HKD 0.06/share regular run-rate.
+shares = 230,076,062.
+forecast CNY dividend = 0.06 x 230,076,062 x 0.86559 = 11,949,092.3103948.
+forecast yield = 11,949,092.3103948 / 152,410,748.79407883 = 0.0784005879.
+
+[judgment boundaries]
+- Facts: reported financials, revenue split, geography, customer concentration, working-capital days and dividends.
+- Inference: 2025 reported FCF is elevated by working-capital release and should not be capitalized without normalization.
+- Subjective judgments: 50% haircuts on unlisted financial assets and investment property; 15% haircut on normalized cash profit.
+- Investment property detachability is not guaranteed. If unavailable, earnback worsens materially.
+- No buy/sell recommendation or target price produced.
+
+[validation]
+Protocol validation status: ok
+Errors: []

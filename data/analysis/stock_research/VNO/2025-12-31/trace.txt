@@ -1,0 +1,62 @@
+Stock research trace — VNO — period 2025-12-31
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+   - Checked stock_report/data for VNO/2025-12-31.
+   - No raw filing, annual facts, normalized facts, or prior stock-research outputs were present.
+   - Returned to primary public sources as required by the reuse policy.
+
+3. Protocol initialization
+   - Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Result initialized successfully from config/input.json.
+
+4. Primary sources used
+   - SEC 2025 Form 10-K, accession 0000899689-26-000009, filed 2026-02-09:
+     https://www.sec.gov/Archives/edgar/data/899689/000089968926000009/vno-20251231.htm
+   - Company-hosted copy of the same 10-K used for local text extraction:
+     https://investors.vno.com/static-files/716de864-e5d4-4cfa-80af-88e3668b7923
+   - SEC Companyfacts API, CIK 0000899689:
+     https://data.sec.gov/api/xbrl/companyfacts/CIK0000899689.json
+   - Vornado dividend announcement, 2025-12-08:
+     https://investors.vno.com/news-releases/news-release-details/vornado-declares-common-dividend-74-share-0
+   - Federal Reserve H.10 release dated 2025-12-29; last available business-day CNY rate used was 2025-12-26, 7.0063 CNY/USD:
+     https://www.federalreserve.gov/releases/h10/20251229/
+   - Market capitalization, date, PE TTM, and market source were supplied in config/input.json: Yahoo Finance yfinance, 2026-08-03.
+
+5. Model decision
+   - Input hint: ordinary_operating / applicable.
+   - Overridden to unknown_special / requires_special_model.
+   - Reason: Vornado is an equity REIT whose rental properties, property-level debt, lease liabilities, capital expenditure, and liquidity are economically integrated. Cash cannot be treated as detachable while consolidated debt was USD 7.214457bn and ongoing property capital needs were material.
+   - Required ordinary owner-earnback fields were kept null.
+
+6. Key extracted facts (USD unless stated otherwise)
+   - Total assets 15.521118bn; liabilities 8.716595bn; total equity 6.156572bn; parent shareholders' equity 5.986727bn.
+   - Revenue 1.810425bn; net income attributable to Vornado 0.904955bn; common shareholder net income 0.842851bn.
+   - Sales-type lease gain 0.803248bn materially inflated 2025 GAAP profit.
+   - Operating cash flow 1.258385bn; additions to real estate 0.268258bn; development/CIP spend 0.144609bn.
+   - FFO attributable to common shareholders plus assumed conversions 0.486826bn.
+   - Consolidated debt 7.214457bn gross, weighted average interest rate 4.73%.
+   - New York occupancy 90.0%; office 91.2%; retail 79.4%.
+   - 2026 indicated common dividend cash requirement approximately 0.141bn if USD 0.74/share policy continues.
+
+7. Currency handling
+   - All filing USD amounts in result.json converted at 7.0063 CNY/USD.
+   - Input market cap retained unchanged because it was already supplied in CNY.
+   - The mismatch between filing FX date and market-cap snapshot date is disclosed as a limitation.
+
+8. Construction and validation
+   - result.json was populated through repeated protocol CLI `set` and `append` commands in outputs/fill_result.sh; no complex result object was handwritten from scratch.
+   - Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Validation status: ok; errors: [].
+
+9. Known limitations
+   - No property-by-property NAV/capitalization-rate valuation was attempted.
+   - Capital expenditure combines additions to real estate and development/CIP spend; the filing does not provide a clean maintenance-only split for the result protocol.
+   - PE TTM is not a reliable recurring REIT measure for 2025 because of the large sales-type lease gain.
+   - Forecast dividend is management's stated policy assumption, not a declared 2026 dividend.

@@ -1,0 +1,52 @@
+stock-research trace
+company: 603612.SH 索通发展
+period: 2025-12-31 annual
+generated_at: 2026-08-01 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- Expected annual facts, normalized facts and filing metadata paths did not exist locally.
+- Initialized outputs/result.json with protocol CLI from config/input.json.
+- Because no reusable fact package existed, fetched the official 2025 annual report disclosed by SSE on 2026-04-23.
+
+3. Primary source
+- Title: 索通发展股份有限公司2025年年度报告
+- SSE disclosure URL: https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-23/603612_20260423_3UHR.pdf
+- Local copy: stock_report/data/raw/filings/603612.SH/2025-12-31/annual-report.pdf
+- Audit opinion: standard unmodified opinion, Lixin, report 信会师报字[2026]第ZA11931号.
+- Market cap and PE were reused unchanged from config/input.json; no attempt was made to replace the supplied valuation snapshot.
+
+4. Key extraction and calculations (CNY yuan)
+- Revenue 17,692,653,979.00; cost 15,218,360,315.80; gross profit 2,474,293,663.20.
+- Gross margin = 2,474,293,663.20 / 17,692,653,979.00 = 0.1398474883.
+- Parent net profit 746,663,232.66; net margin = parent net profit / revenue = 0.0422029943.
+- OCF 711,875,164.48; capex 647,035,074.58; operating FCF = 64,840,089.90.
+- Total assets 18,745,948,062.86; liabilities 11,364,191,719.11; equity 7,381,756,343.75; parent equity 5,704,588,503.87; minority interest 1,677,167,839.88.
+- Cash equivalents = 1,343,894,304.55 after excluding restricted cash 233,869,929.74.
+- Interest-bearing debt used = short-term borrowings 3,118,675,946.27 + current portion of long-term borrowings 1,285,395,725.76 + long-term borrowings 4,093,498,639.84 + lease liabilities 35,407,282.56 = 8,532,977,594.43.
+- Discounted detachable net cash = 1,343,894,304.55 - 8,532,977,594.43 = -7,189,083,289.88.
+- Sustainable cash profit = 650,000,000 research estimate, anchored to parent profit and adjusted conservatively for cycle, working capital, minority leakage and continuing expansion. This is not a reported line item. Actual 2025 FCF is disclosed beside it to prevent false precision.
+- Operating business price = 8,478,000,000 - (-7,189,083,289.88) = 15,667,083,289.88.
+- Owner earnback = 15,667,083,289.88 / 650,000,000 = 24.1032050614 years.
+- Market cap / cash profit = 8,478,000,000 / 650,000,000 = 13.0430769231.
+- Forecast dividend = implemented interim 104,034,936.39 + proposed annual 59,448,535.08 = 163,483,471.47; yield = 0.0192823104.
+
+5. Model determination
+- Confirmed ordinary_operating/applicable based on manufacturing revenue, inventory, receivables, production assets and bank financing.
+- Applied special conservatism for restricted cash, net debt, high capex, cyclicality and minority shareholders; no special-industry model was required.
+
+6. Protocol use and validation
+- result.json was created with `protocol init`.
+- Scalar/object fields were populated with repeated `protocol set`; arrays with `protocol append`.
+- Final validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].
+
+7. Data-quality limitations
+- Sustainable cash profit is an analyst estimate and is the largest sensitivity.
+- Valuation date is about seven months after the reporting date.
+- Claimed global industry position is company-reported and not independently ranked in this task.

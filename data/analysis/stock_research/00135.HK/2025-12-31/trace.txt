@@ -1,0 +1,63 @@
+stock-research trace
+company: KUNLUN ENERGY / 00135.HK
+period: 2025-12-31 annual
+generated_at: 2026-08-03T13:23:43+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- No existing raw filing, annual facts package, normalized facts, or prior stock-research result was present for 00135.HK/2025-12-31.
+- Downloaded official annual-report PDF to stock_report/data/raw/filings/00135.HK/2025-12-31/2025-annual-report.pdf.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initial hint classified the company as financial_brokerage/requires_special_model.
+
+4. Model verification and override
+- Official annual report note 33 identifies four operating segments: natural gas sales, LNG processing and terminal, LPG sales, and exploration and production.
+- No brokerage customer funds, proprietary trading assets, or repo financing business exists.
+- Overrode model to ordinary_operating/applicable.
+- Applied heavy cash and cash-profit discounts because this is capital intensive, cash is consolidated across non-wholly-owned subsidiaries, and minority interests are material.
+
+5. Primary sources
+- 2025 annual report, HKEX disclosure 2026043002625, published 2026-04-30:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0430/2026043002625.pdf
+- 2025 results announcement, HKEX disclosure 2026032401290, published 2026-03-24:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0324/2026032401290.pdf
+- 2026-2028 dividend distribution plan, HKEX disclosure 2026032401306, published 2026-03-24:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0324/2026032401306.pdf
+- Market cap and PE: config/input.json, Tencent qt.gtimg.cn snapshot at 2026/07/31 16:08:47.
+
+6. Financial extraction (RMB million; converted to absolute yuan in result.json)
+- Revenue 193,979; purchases/services/others 169,189; approximate gross profit 24,790.
+- Group net profit 8,466; parent net profit 5,346; NCI profit 3,120.
+- Total assets 144,119; liabilities 51,842; total equity 92,277; parent equity 67,757; NCI 24,520.
+- Cash equivalents 31,280; >3-month deposits 13,329; borrowings 20,743.
+- Operating cash flow 12,430; capex 5,882; operating FCF 6,548.
+- Parent shareholder dividends paid in cash 2,751; dividends attributable to 2025 profit 2,734.
+
+7. Derived metrics
+- Approximate gross margin = (193,979 - 169,189) / 193,979 = 0.127797.
+- Parent net margin = 5,346 / 193,979 = 0.027560.
+- Operating profit approximation = PBT 11,661 + interest 650 - associate profit 773 - JV profit 464 = 11,074.
+- Forecast dividend = 5,346 * 50% = 2,673 million; yield = 2,673m / 53,800.633m = 0.049683.
+- Discounted detachable net cash = (44,609m * 50%) - 20,743m = 1,561.5m.
+- Discounted sustainable cash profit = 4,000m, derived from 6,548m consolidated FCF less 2,548m for NCI attribution, continuing capex, and upstreamability constraints.
+- Operating business price = 53,800.633m - 1,561.5m = 52,239.133m.
+- Owner earnback = 52,239.133m / 4,000m = 13.0598 years.
+- Market cap / cash profit = 53,800.633m / 4,000m = 13.4502.
+
+8. Judgment boundaries
+- Facts: reported statement values, segment values, dividends, capital commitments, ownership and disclosed restrictions.
+- Derived: margins, FCF, operating profit approximation, dividend yield and payback arithmetic.
+- Judgment: 50% cash recognition and RMB4.0bn sustainable parent cash profit.
+- Gross profit is an approximation because the issuer does not present a gross-profit subtotal.
+
+9. Output construction
+- outputs/result.json initialized and updated only through stock-research protocol CLI set/append commands.
+- outputs/report.md written as a business narrative following report-contract.md.
+- Final protocol validation and arithmetic checks performed after output generation.

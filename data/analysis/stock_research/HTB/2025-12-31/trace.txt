@@ -1,0 +1,67 @@
+Stock research trace — HTB — period 2025-12-31
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Also read references/data-reuse.md because no reusable local facts were present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Searched config/, stock_report/, and outputs/.
+- No HTB raw filing, annual facts package, normalized facts, or prior stock-research output existed.
+- Downloaded the official 2025 10-K HTML to stock_report/data/raw/filings/HTB/2025-12-31/htbi-20251231.htm.
+
+3. Primary filing
+- Issuer: HomeTrust Bancshares, Inc.
+- Security/ticker in filing: HTB, NYSE.
+- Form: 10-K for year ended 2025-12-31.
+- Filed: 2026-03-13.
+- SEC accession: 0001538263-26-000030.
+- URL: https://www.sec.gov/Archives/edgar/data/1538263/000153826326000030/htbi-20251231.htm
+- Used audited statements, Financial Highlights, MD&A, nonperforming-assets discussion, deposit discussion, and Note 18 regulatory capital.
+
+4. Model decision
+- Overrode input hint ordinary_operating/applicable.
+- Confirmed financial_bank/requires_special_model because the holding company owns a regulated bank and loans, securities, deposits, and borrowings are the business itself.
+- Kept all ordinary owner-earnback fields null.
+- Bank-specific lens: NIM, ROA, ROE, asset quality, ACL, regulatory capital, deposit structure, and capital distributions.
+
+5. Key source facts in USD
+- Total assets: $4,545.635m.
+- Total liabilities: $3,944.945m.
+- Total stockholders' equity: $600.690m; no minority interest.
+- Net loans: $3,536.675m; deposits: $3,709.997m.
+- Net interest income: $176.738m; noninterest income: $36.331m.
+- Provision for credit losses: $6.938m; noninterest expense: $125.176m.
+- Net income: $64.364m; 2024 net income: $54.805m.
+- NIM: 4.25%; ROA: 1.46%; ROE: 11.06%.
+- NPA/assets: 0.98%; NPL/loans: 1.22%; ACL/NPL: 94.75%; net charge-offs/average loans: 0.24%.
+- Holding-company CET1: 13.83%; total risk-based capital: 15.22%.
+- Dividends declared: $0.49/share; payout ratio 13.02%; cash dividends approximately $8.4m.
+- Share repurchases approximately $13.6m.
+
+6. Currency conversion
+- Result contract requires CNY absolute yuan.
+- Balance-sheet conversion: approximately CNY 7.001/USD, derived from ECB 2025-12-31 EUR/CNY 8.2262 divided by EUR/USD 1.1750.
+- Income-statement conversion: Federal Reserve H.10 2025-12 monthly average CNY 7.0432/USD, used as an explicit approximation rather than claiming a full-year daily average.
+- Market cap was already supplied in CNY and was not reconverted.
+
+7. Valuation and dividend
+- Market cap: CNY 5,805,074,120.990845 as of 2026-08-03, source Yahoo Finance yfinance supplied in config/input.json.
+- PE TTM: 13.435696 from the same supplied snapshot.
+- Forecast dividend: quarterly $0.13 mechanically annualized to $0.52, multiplied by 17,286,289 shares outstanding and CNY 7.001/USD = CNY 62,931,080.83.
+- Forecast dividend yield: 0.0108407024 (about 1.08%). This is not company guidance.
+
+8. Protocol updates and validation
+- Populated initialized result exclusively with protocol set/append commands.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validator response: status ok, errors [].
+
+9. Limitations
+- Market cap and PE were supplied third-party values and were not independently rebuilt.
+- FX conversion is a display normalization and uses stated approximations.
+- Bank revenue/gross margin/ordinary operating cash flow/capex/free cash flow are not economically comparable with ordinary operating companies and remain null under the special-model contract.
+- Dividend forecast is a mechanical run-rate assumption.

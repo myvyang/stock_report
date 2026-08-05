@@ -1,0 +1,55 @@
+task: stock research 02407.HK / GAUSH MEDITECH
+period: 2025-12-31 annual
+generated_at_input: 2026-08-04T15:46:39+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md and linked data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields with repeated protocol `set` commands; JSON was not constructed from a blank file.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[reuse check]
+- Expected annual facts, normalized facts, raw filing metadata and prior stock-research outputs were absent.
+- No reusable financial fact package existed locally.
+- Downloaded official 2025 annual report to stock_report/data/raw/filings/02407.HK/2025-12-31/annual_report_2025.pdf.
+
+[primary source]
+- HKEX title search identified Annual Report 2025, released 2026-04-29.
+- Annual report URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042905920.pdf
+- Local extraction used pypdf in a temporary virtual environment because pdftotext was unavailable.
+
+[model verification]
+- Input hint: financial_brokerage / requires_special_model.
+- Annual report business and statements: R&D, manufacture, distribution and sale of ophthalmic devices/consumables plus technical services.
+- No brokerage customer funds, proprietary securities book or repurchase financing model was present.
+- Override: ordinary_operating / applicable.
+
+[key extraction, RMB]
+- Revenue 1,380,354,000; cost of sales 747,156,000; gross profit 633,198,000.
+- Net profit 91,191,000; parent net profit 96,189,000.
+- Total assets 2,624,051,000; liabilities 927,149,000; equity 1,696,902,000; parent equity 1,687,939,000.
+- OCF 144,233,000.
+- Capex = PP&E/other long-term purchases 22,769,000 + intangible additions 10,992,000 = 33,761,000.
+- Operating FCF = 144,233,000 - 33,761,000 = 110,472,000.
+- Cash equivalents 421,007,000; term deposits over three months 16,650,000; pledged deposits 3,093,000.
+- Borrowings 450,314,000; lease liabilities 56,836,000.
+- 2025 final dividend forecast 0, based on explicit board recommendation.
+
+[owner earnback assumptions]
+- Discounted cash = 421,007,000 * 90% + 16,650,000 * 90% = 393,891,300.
+- Pledged deposits haircut to zero.
+- Discounted detachable net cash = 393,891,300 - 450,314,000 - 56,836,000 = -113,258,700.
+- Sustainable distributable cash profit = 70,000,000, versus 2025 parent profit 96,189,000 and FCF 110,472,000, haircut for 2024 FCF volatility, zero 2025 final dividend, inventory provision and goodwill.
+
+[verification note]
+- Trace recomputation detected a 100,700 initial entry discrepancy. The result and report were corrected to exact discounted net cash of -113,258,700 before the final protocol validation.
+- Exact operating business price: 764,669,260.3939295.
+- Exact owner earnback years: 10.923846577056135.
+
+[market data limitation]
+- Market cap 651,410,560.3939295 and PE TTM 7.11 reused from config/input.json Tencent snapshot dated 2026/08/03 09:20:05.
+- Share count, FX conversion and TTM earnings were not independently reconstructed.

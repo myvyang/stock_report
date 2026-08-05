@@ -1,0 +1,76 @@
+task=AIG annual stock research
+period=2025-12-31
+generated_at=2026-08-04T13:44:33+08:00
+
+[protocol]
+read .agents/skills/stock-research/SKILL.md
+read references/result-contract.md
+read references/report-contract.md
+read references/data-reuse.md
+initialized outputs/result.json with protocol init
+populated outputs/result.json with protocol set commands
+
+[reuse-check]
+expected annual facts, normalized facts, raw filing metadata, and prior stock-research outputs were absent under the input paths
+decision=rebuild key facts from primary official filings
+
+[model-review]
+input_hint=ordinary_operating/applicable
+verified_model=financial_insurance/not_applicable
+reason=AIG is a property and casualty insurer; invested assets are held against claims, unearned premiums and other insurance obligations
+ordinary owner earnback metrics left null per result contract
+
+[primary-sources]
+SEC 2025 Form 10-K accession 0000005272-26-000023, filed 2026-02-12
+SEC filing URL=https://www.sec.gov/Archives/edgar/data/5272/000000527226000023/aig-20251231.htm
+SEC company facts URL=https://data.sec.gov/api/xbrl/companyfacts/CIK0000005272.json
+AIG annual report URL=https://www.aig.com/home/investor-relations/aig-2025-annual-report
+AIG FY2025 results URL=https://www.aig.com/content/dam/aig/america-canada/us/documents/investor-relations/earnings-result/aig-reports-4q25-results.pdf
+AIG Q1 2026 results URL=https://www.aig.com/content/dam/aig/america-canada/us/documents/investor-relations/earnings-result/aig-reports-1q26-results.pdf
+Federal Reserve H.10 URL=https://www.federalreserve.gov/releases/h10/hist/dat00_ch.htm
+
+[currency]
+source_currency=USD
+output_currency=CNY
+rate_date=2025-12-31
+USD_CNY=6.9931
+method=all filing monetary values multiplied by 6.9931; income statement values therefore use closing rather than average FX
+
+[key-facts-usd]
+total_assets=161254000000
+total_liabilities=120092000000
+total_equity=41162000000
+parent_equity=41139000000
+revenue=26775000000
+parent_net_income=3096000000
+net_earned_premiums=23751000000
+underwriting_income=2300000000
+combined_ratio=0.901
+adjusted_accident_year_combined_ratio=0.883
+net_investment_income=4215000000
+operating_cash_flow=3314000000
+available_for_sale_debt=71032000000
+claims_and_claim_adjustment_reserve=70666000000
+unearned_premiums=17991000000
+reinsurance_recoverable_unpaid_claims=28871000000
+long_term_debt=9191000000
+common_dividends_paid=976000000
+common_stock_repurchases=5836000000
+
+[calculations]
+net_margin=3096000000/26775000000=0.11563025210084034
+forecast_annual_dividend_usd=0.50*4*532900000=1065800000
+forecast_dividend_cny=1065800000*6.9931=7453245980
+forecast_dividend_yield=7453245980/281146024617.9258=0.026510230724865753
+
+[market-data]
+market_cap_cny=281146024617.9258
+market_cap_date=2026-08-03
+pe_ttm=13.834508
+source=Yahoo Finance yfinance, supplied in config/input.json
+
+[limitations]
+No local prebuilt annual facts package was available.
+Market data source is the supplied yfinance record rather than an exchange feed.
+Dividend forecast is a static annualization of the latest declared quarterly rate using 2026-03-31 shares.
+Insurance-specific economics make gross margin, capex-based free cash flow, detachable net cash and ordinary owner earnback metrics non-comparable; these are null.

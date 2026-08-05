@@ -1,0 +1,69 @@
+stock-research trace
+company=00023.HK BANK OF E ASIA
+period=2025-12-31
+generated_at=2026-08-03 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full as requested.
+3. Read references/data-reuse.md because no annual facts package was present and the reuse boundary governed source selection.
+4. Initialized outputs/result.json using:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated scalar/object fields with protocol set and repeated rows with protocol append; result JSON was not authored from an empty object.
+
+[reuse-check]
+Expected annual facts path: stock_report/data/analysis/annual_review/00023.HK/2025-12-31/facts.json
+Expected annual facts markdown: stock_report/data/analysis/annual_review/00023.HK/2025-12-31/annual_facts.md
+Result: neither existed. No prior stock-research result existed. Returned to the official annual report.
+
+[primary-source]
+Title: The Bank of East Asia, Limited Annual Report 2025
+URL: https://www.hkbea.com/pdf/en/about-bea/investor-communication/annual-and-interim-reports/E_2025%20Annual%20Report.pdf
+Local copy: stock_report/data/raw/filings/00023.HK/2025-12-31/annual-report-2025.pdf
+Publication cross-check: https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&market=SEHK&stockId=34
+Release date shown by HKEX: 2026-03-25
+
+[annual-report-locations]
+pp.3-6: company profile, financial highlights and five-year summary.
+pp.13-15: management financial review; profit, NIM, non-interest income, expenses, impairment, CRE provisions.
+pp.24-27: retail, wholesale, private banking and Mainland business discussion.
+p.221: consolidated income statement.
+p.223: consolidated statement of financial position.
+pp.226-227: consolidated cash flow statement; reviewed but ordinary OCF/FCF not used because customer funding and loan/securities movements are operating flows for a bank.
+p.277: dividend note.
+p.417: regulatory capital ratios and Basel III final reform note.
+
+[currency]
+Financial statements are in HKD million. Result contract requires CNY absolute yuan.
+Conversion used: HKD/CNY=0.897878955 at 2025-12-31.
+Cross-check context: PBOC/CFETS year-end RMB central parity publications and publicly filed 2025 bank annual-report disclosure of the 2025-12-31 HKD/RMB rate.
+All balance sheet, income statement, asset analysis and dividend amounts were multiplied by 1,000,000 and by 0.897878955. Ratios remain unchanged.
+
+[model-decision]
+statement_model=financial_bank
+owner_earnback_applicability=not_applicable
+Reason: customer deposits, cash/interbank balances, loans and investment securities are matched banking operating assets and liabilities under liquidity/capital constraints. They are not detachable net cash. All ordinary owner-earnback fields remain null.
+
+[key-calculations]
+net_margin=HKD 3,501m parent profit / HKD 21,019m operating income = 0.1665635853. This is an interface metric, not a conventional bank margin KPI.
+forecast_cash_dividend=HKD 1,609m * 0.897878955 = CNY 1,444,687,238.60.
+forecast_dividend_yield=CNY 1,444,687,238.60 / CNY 37,943,437,064.69 = 0.0380747594.
+reference_price_to_book=CNY 37,943,437,064.69 / CNY 94,578,079,724.93 = 0.4012. It is discussed in the report only; it is not an owner-earnback field.
+2025 ordinary shareholder payout reference=HKD 1,609m / HKD 3,207m after AT1 distribution = 50.17%.
+
+[market-data]
+market_cap=CNY 37,943,437,064.689995
+market_cap_date=2026/07/31 16:08:41
+market_cap_source=Tencent qt.gtimg.cn
+pe_ttm=12.6
+These values were supplied in config/input.json and not recomputed.
+
+[limitations]
+The PDF was downloaded successfully. The container did not provide pdftotext, so source extraction was checked through the browser's parsed official PDF text and page references.
+The dividend forecast is a flat carry-forward of the 2025 declared amount, not management guidance.
+Gross margin, ordinary operating cash flow, capex, FCF and ordinary owner-earnback metrics are intentionally null because they do not have comparable economic meaning for this bank model.
+
+[validation]
+Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+First validation after data population: status=ok, errors=[]
+Final validation is run after report and trace generation; see terminal verification output for file checksums and status.

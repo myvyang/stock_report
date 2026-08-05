@@ -1,0 +1,46 @@
+stock-research trace
+company: 德业股份 605117.SH
+period: 2025-12-31 annual
+generated_for_input: 2026-08-01T00:44:44+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reused local evidence
+- Official filing: stock_report/data/raw/filings/605117.SH/2025-12-31/annual-report.pdf
+- Filing SHA256: f59647db168aa6bb30cc9934b011f80a8ff170ec11750bc57b69f54dd98e1339
+- Official URL: https://static.cninfo.com.cn/finalpage/2026-04-10/1225089135.PDF
+- Reused ROIC review: stock_report/data/analysis/annual_review/605117.SH/2025-12-31/result.json and report.md
+- The ROIC review supplied verified detail for cash equivalents, restricted cash, wealth products, financing debt, operating cash flow and capex. It was treated as reusable evidence, not as the final stock-research result.
+
+3. Filing extraction and checks
+- Local pdftotext was unavailable; installed pypdf into a temporary directory and extracted the local official PDF for research only.
+- Checked annual-report pages 7, 16-23, 52-55, 109-118, 163, 217-224.
+- Confirmed ordinary_operating model from actual products and statements.
+- Confirmed key statements: assets 19,906,773,218.39; liabilities 9,577,447,678.62; equity 10,329,325,539.77; revenue 12,223,743,462.54; gross profit 4,660,583,718.62; parent profit 3,170,769,705.42; OCF 3,986,268,984.68; capex 1,286,968,414.66; FCF 2,699,300,570.02.
+
+4. Owner earnback assumptions
+- Excess cash = cash equivalents 5,395,120,594.03 - 25% of annual operating cash outflow 8,169,708,610.53 = 3,352,693,441.40 (reused verified rounded result).
+- Wealth products = 1,679,433,484.45, discounted to 90% = 1,511,490,136.005.
+- Financing debt = 3,420,426,395.45, deducted at 100%.
+- Discounted detachable net cash = 1,443,757,181.955.
+- Operating FCF = 2,699,300,570.02; 10% prudence haircut gives discounted sustainable cash profit 2,429,370,513.018.
+- Market cap = 106,073,000,000.00 from supplied Tencent snapshot.
+- Operating business price = 104,629,242,818.045.
+- Owner earnback = 43.0684583753 years; market cap / cash profit = 43.6627510837.
+- The 25% working-cash reserve, 90% wealth-product value and 90% FCF value are analytical assumptions, not filing facts.
+
+5. Dividend
+- Forecast uses 2025 annual board proposal 2,740,498,399.56, pending shareholder approval.
+- Forecast yield = 2.5835965793% at supplied market cap.
+
+6. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated initialized paths using repeated protocol set commands; did not construct the result object from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report completion: status ok, errors [].

@@ -1,0 +1,62 @@
+stock-research trace
+generated_at: 2026-08-04T21:03:55+08:00
+query: FAF
+period: 2025-12-31
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse audit
+- config/input.json found and read.
+- No local FAF raw filing, annual facts package, normalized facts, or prior stock-research output existed under stock_report.
+- No FAF entry was found in stock_report/data/notes/user_stock_evaluations.md.
+- Decision: retrieve primary public sources because required annual facts were absent.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized with schema stock-research-result-v1.
+
+4. Primary sources reviewed
+- SEC 2025 Form 10-K, accession 0001193125-26-055516, filed 2026-02-18, period ended 2025-12-31.
+  URL: https://www.sec.gov/Archives/edgar/data/1472787/000119312526055516/faf-20251231.htm
+- SEC filing index for filing identity and dates.
+  URL: https://www.sec.gov/Archives/edgar/data/1472787/000119312526055516/0001193125-26-055516-index.htm
+- First American investor-relations 2026 quarterly dividend announcement and dividend history.
+  URLs: https://investors.firstam.com/investors/news-and-events/news/press-release-details/2026/First-American-Financial-Corporation-Declares-Quarterly-Cash-Dividend-of-55-Cents-Per-Share/default.aspx
+        https://investors.firstam.com/investors/stock-information/dividends/default.aspx
+- Federal Reserve H.10 exchange-rate release dated 2025-12-29; 2025-12-26 rate used: CNY 7.0063 per USD.
+  URL: https://www.federalreserve.gov/releases/h10/20251229/
+- Market capitalization and PE TTM reused from config/input.json (Yahoo Finance yfinance, dated 2026-08-03).
+
+5. Model decision
+- Input hint ordinary_operating/applicable rejected after filing review.
+- Selected financial_insurance/requires_special_model.
+- Reason: title insurance is the core business; investment assets match insurance reserves, statutory capital, bank deposits and liquidity needs. The group also consolidates bank/trust and warehouse-lending balances.
+- Consequence: discounted net cash, discounted cash profit, operating business price, owner earnback years and market-cap-to-cash-profit remain null.
+
+6. Currency policy and calculations
+- All filing amounts were reported in USD millions.
+- Protocol values converted to absolute CNY yuan at 7.0063 CNY/USD.
+- Market cap was already supplied in CNY and was not converted again.
+- Net margin = parent net income 621.8 / revenue 7,452.2 = 0.0834384477.
+- Forecast annual dividend = USD 0.55 x 4 x 102.0m shares = USD 224.4m = CNY 1,572,213,720.
+- Forecast dividend yield = CNY 1,572,213,720 / CNY 51,665,919,512.43164 = 0.0304303830.
+- Operating free cash flow shown for reference = operating cash flow USD 950.8m - capital expenditure USD 188.3m = USD 762.5m; it is not treated as distributable insurance cash.
+- Gross margin left null because the insurer does not present an economically comparable cost-of-sales/gross-profit subtotal.
+
+7. Key filing facts captured
+- Revenue USD 7,452.2m; parent net income USD 621.8m.
+- Assets USD 16,228.8m; liabilities USD 10,704.5m; parent equity USD 5,499.5m.
+- Cash USD 1,387.3m; investments USD 9,394.3m; deposits USD 5,292.7m; claims reserve USD 1,169.6m.
+- Operating cash flow USD 950.8m; capex USD 188.3m; dividends paid USD 223.0m; repurchases USD 122.3m.
+- Title insurance and services pretax segment income USD 847.4m; home warranty USD 86.5m; corporate loss USD 107.7m.
+- FATICO statutory capital and surplus USD 1.5bn; statutory net income USD 349.4m.
+- 2026 ordinary upstream dividend capacity without prior regulatory approval USD 382.0m; holding-company cash USD 338.9m.
+
+8. Protocol population and validation
+- outputs/result.json populated using repeated protocol set commands; the complex JSON was not hand-written from scratch.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report handoff: status=ok, errors=[].

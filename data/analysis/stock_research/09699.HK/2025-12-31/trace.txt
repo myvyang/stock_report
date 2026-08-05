@@ -1,0 +1,52 @@
+stock-research trace
+company: 09699.HK / Hangzhou SF Intra-city Industrial Co., Ltd.
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields with repeated protocol `set` commands; no complex result JSON was created from scratch.
+5. Validated with protocol `validate`; status returned ok, errors [].
+
+[source acquisition]
+- HKEX title search for stock 09699 identified the 2025 annual report published 2026-04-28.
+- Official annual report URL:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042800530.pdf
+- Official annual results announcement URL:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0330/2026033000502.pdf
+- Saved correct annual report locally at:
+  stock_report/data/raw/filings/09699.HK/2025-12-31/2025-annual-report.pdf
+- Market data reused exactly from config/input.json: CNY 6,669,802,698.750496 at 2026/08/03 09:47:55; PE TTM 25.21; source Tencent qt.gtimg.cn.
+
+[model verification]
+- Input hint classified company as financial_brokerage.
+- Annual report pp.2 and 84 state the group provides intra-city on-demand delivery and last-mile delivery in China.
+- Financial statements contain ordinary operating assets and liabilities, not brokerage customer funds, proprietary securities or repo financing.
+- Overrode hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+[financial extraction; annual report RMB'000 converted x1000]
+- Revenue 22,898,637,000; cost of revenue 21,454,108,000; gross profit 1,444,529,000.
+- Operating profit 278,456,000; net profit and parent net profit 277,718,000.
+- Total assets 5,471,063,000; liabilities 2,189,229,000; equity attributable to owners 3,281,834,000; no NCI line.
+- Operating cash flow 394,758,000.
+- Capex: intangible additions 23,363,000 + PPE purchases 44,228,000 = 67,591,000.
+- Operating FCF: 394,758,000 - 67,591,000 = 327,167,000.
+- Cash 1,145,359,000; current structured deposits 1,504,322,000; restricted cash 3,557,000.
+- Trade receivables 2,143,744,000; trade payables 1,380,290,000; lease liabilities 27,673,000; no borrowings.
+
+[formula checks]
+- gross_margin = 1,444,529,000 / 22,898,637,000 = 0.06308362379797564.
+- net_margin = 277,718,000 / 22,898,637,000 = 0.012128145443414907.
+- discounted detachable net cash = 1,145,359,000 + 1,504,322,000 * 0.95 - 27,673,000 = 2,546,791,900.
+- net cash / market cap = 2,546,791,900 / 6,669,802,698.750496 = 0.3818391660186754.
+- operating business price = 6,669,802,698.750496 - 2,546,791,900 = 4,123,010,798.750496.
+- owner earnback years = 4,123,010,798.750496 / 327,167,000 = 12.602159749456687.
+- market cap / cash profit = 6,669,802,698.750496 / 327,167,000 = 20.38653867520409.
+- forecast dividend = 0 because 2025 final dividend is explicitly nil and no supported positive 2026 amount was available.
+
+[quality judgment]
+- status complete: identity, period, market data, model, three statements, asset/liability explanations, owner-earnback breakdown, dividend forecast, business story and evidence are present.
+- limitations retained in result.json: market snapshot not audited; dividend forecast is a base case; sustainable cash profit uses one year; industry rank is company-cited and not independently reconstructed.

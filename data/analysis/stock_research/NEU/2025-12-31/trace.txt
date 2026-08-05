@@ -1,0 +1,69 @@
+stock-research trace: NEU / 2025-12-31
+generated: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Expected raw filing, annual-review facts and normalized facts directories for NEU were absent.
+- No previous NEU stock-research result existed locally; research returned to primary filings.
+
+3. Primary sources
+- SEC 2025 Form 10-K: accession 0001282637-26-000005.
+  https://www.sec.gov/Archives/edgar/data/1282637/000128263726000005/neu-20251231.htm
+- SEC 2026 Q1 Form 10-Q: accession 0001282637-26-000009.
+  https://www.sec.gov/Archives/edgar/data/1282637/000128263726000009/neu-20260331.htm
+- Dividend 8-Ks dated 2026-02-26 and 2026-04-23.
+- Federal Reserve H.10 USD/CNY 2025-12-31 = 7.1875 CNY/USD.
+- Market cap and PE: config/input.json; Yahoo Finance yfinance, 2026-08-03.
+
+4. Model decision
+- Confirmed ordinary_operating / applicable.
+- Reason: consolidated economics are manufacturing and sale of petroleum additives and specialty aerospace/defense materials. Working capital, plants, R&D and capex are ordinary manufacturing accounts. No customer deposits, insurance reserves, regulated presale cash or concession rights.
+- Holding-company legal form did not trigger investment_holding because subsidiaries are consolidated operating businesses rather than a portfolio valued mainly from underlying quoted stakes.
+
+5. Currency convention
+- All protocol amounts are CNY absolute yuan.
+- Used one reproducible rate, 7.1875 CNY/USD, for balance-sheet, income-statement and cash-flow amounts.
+- Limitation: using separate annual-average and closing rates would create small translation differences.
+
+6. Audited source values (USD thousands unless noted)
+- Revenue 2,725,169; COGS 1,867,769; gross profit 857,400; operating profit 543,725; net income 418,747.
+- Assets 3,492,465; liabilities 1,714,222; equity 1,778,243; no minority interest.
+- Cash 77,598; receivables 422,084; inventory 502,257; PP&E 775,480; goodwill/intangibles 941,156; prepaid pension 586,053.
+- Long-term debt 883,391; finance leases 18,125; operating leases 78,250.
+- CFO 568,967; capex 77,637; operating FCF 491,330; financing cash flow -279,137.
+- Dividends paid 105,931; buybacks 77,218.
+
+7. Derived metrics
+- Gross margin = 857,400 / 2,725,169 = 0.3146226895.
+- Net margin = 418,747 / 2,725,169 = 0.1536590942.
+- Detachable net cash USD = 77.598m - 883.391m - 18.125m = -823.918m.
+- Detachable net cash CNY = -823.918m * 7.1875 = -5,921,910,625.
+- Sustainable cash profit USD:
+  CFO 568.967m
+  less normalized capex midpoint 125.000m
+  less favorable working-capital release 22.000m
+  subtotal 421.967m
+  x 90% sustainability factor = 379.7703m.
+- Sustainable cash profit CNY = 2,729,599,031.25.
+- Operating business price = 52,758,673,165.08984 - (-5,921,910,625) = 58,680,583,790.08984.
+- Owner earnback = 58,680,583,790.08984 / 2,729,599,031.25 = 21.49787684 years.
+- Market cap / cash profit = 19.32836016.
+- Dividend forecast: $3 quarterly x 4 x 9,397,364 shares x 7.1875 = CNY 810,522,645.
+- Forecast dividend yield = 810,522,645 / 52,758,673,165.08984 = 0.01536283224.
+
+8. Judgment boundaries
+- Facts: filing figures, segment mix, shipment decline, stated competitors, capex guidance and declared dividends.
+- Inference: ordinary model applicability and that pension surplus is not detachable cash.
+- Judgment: $125m normalized capex, removal of $22m working-capital benefit, and final 10% sustainability haircut.
+- Sensitivity direction: treating expansion capex as non-maintenance or adding a full year of Calca profit raises sustainable profit; continued additive weakness or poor acquisition returns lowers it.
+
+9. Protocol construction and validation
+- Complex JSON was not handwritten from a blank file. The CLI initialized the skeleton, then protocol set commands populated each path/object.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].

@@ -1,0 +1,88 @@
+UPS stock-research trace
+generated_at=2026-08-05T05:48:41+08:00
+period=2025-12-31
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated result fields using repeated protocol `set` commands; the initialized JSON was not replaced by a hand-written object.
+3. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   status=ok, errors=[]
+
+[local-reuse-check]
+- Checked paths named by config/input.json.
+- No annual facts, normalized facts, filing metadata, or prior research files existed under stock_report for UPS/2025-12-31.
+- Therefore obtained primary public disclosures rather than fabricating a local fact pack.
+
+[primary-sources]
+1. UPS 2025 Form 10-K, filed 2026-02-17:
+   https://www.sec.gov/Archives/edgar/data/1090727/000162828026008432/ups-20251231.htm
+   Used for audited statements, segments, operations, customer concentration, cash flow, debt, leases, pension, capex, factoring and dividend history.
+2. UPS 4Q/FY 2025 release, 2026-01-27:
+   https://investors.ups.com/news-events/press-releases/detail/2154/ups-releases-4q-2025-earnings-and-provides-2026-guidance
+   Used to cross-check revenue, operating profit, operating cash flow, adjusted FCF and 2026 context.
+3. UPS quarterly dividend release, 2026-05-06:
+   https://investors.ups.com/news-events/press-releases/detail/2159/ups-announces-quarterly-dividend
+   Used to confirm the second 2026 quarterly dividend at USD 1.64/share.
+4. Federal Reserve H.10 daily USD/CNY:
+   https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+   2025-12-31 rate=7.1875 CNY per USD.
+5. Yahoo Finance yfinance, supplied in config/input.json:
+   market_cap=597789523735.1016 CNY, date=2026-08-03, pe_ttm=19.371748.
+   Limitation: no original quote snapshot URL was supplied.
+
+[reported-usd-millions]
+total_assets=73090
+total_liabilities=56835
+total_equity=16255
+parent_equity=16227
+minority_interest=28
+revenue=88661
+operating_expenses=80794
+operating_profit=7867
+net_income=5572
+operating_cash_flow=8450
+capital_expenditure=3685
+operating_free_cash_flow=4765
+financing_cash_flow=-4141
+cash_dividends=5398
+share_repurchases=1000
+cash_and_equivalents=5887
+accounts_receivable=11209
+net_ppe=37731
+goodwill_plus_intangibles=9830
+current_debt_and_finance_leases=608
+long_term_debt_and_finance_leases=23519
+operating_lease_liabilities=4463
+pension_and_postretirement_obligations=6567
+
+[currency-conversion]
+All statement amounts in result.json: USD millions * 1,000,000 * 7.1875.
+The conversion is a presentation convention. Market cap is dated 2026-08-03, so CNY valuation ratios contain an FX timing mismatch disclosed in data_quality and report.md.
+
+[formula-checks]
+net_margin=5572/88661=0.0628460644
+operating_margin=7867/88661=0.0887312 (reported only in narrative; not substituted for gross margin)
+operating_free_cash_flow=(8450-3685)*1m*7.1875=34248437500 CNY
+discounted_cash=5887*1m*7.1875*(1-0.20)=33850250000 CNY
+interest_bearing_debt=(608+23519)*1m*7.1875=173412812500 CNY
+discounted_detachable_net_cash=33850250000-173412812500=-139562562500 CNY
+factoring_adjustment=(730-243)*1m*7.1875=3499531250 CNY
+post_factoring_fcf=(4765-487)=4278 USDm
+sustainable_cash_profit=3850 USDm * 1m * 7.1875=27671875000 CNY
+  Judgment: rounded 10% haircut to USD 4278m post-factoring FCF for Amazon glide-down, labor rigidity and network execution.
+operating_business_price=597789523735.1016-(-139562562500)=737352086235.1016 CNY
+owner_earnback_years=737352086235.1016/27671875000=26.6462759968
+market_cap_to_cash_profit=597789523735.1016/27671875000=21.6027806947
+forecast_shares=105245883+743855831=849101714
+forecast_dividend=849101714*USD6.56*7.1875=40035145815.10 CNY
+forecast_dividend_yield=40035145815.10/597789523735.1016=0.0669719763
+
+[data-quality-decision]
+status=partial
+Reason: UPS reports operating expenses by nature and does not disclose cost of sales or gross profit. cost_of_sales, gross_profit and gross_margin remain null rather than relabeling operating profit as gross profit. Under result-contract.md, an ordinary operating company cannot be `complete` without these core fields. Other required research fields and evidence are populated.
+
+[final-validation]
+Run after report and trace creation:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

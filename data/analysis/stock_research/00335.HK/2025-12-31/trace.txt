@@ -1,0 +1,69 @@
+stock-research trace
+company: 00335.HK / UPBEST GROUP
+input analysis period: 2025-12-31
+actual filing used: audited annual report for year ended 2025-03-31
+generated_at: 2026-08-03 Asia/Shanghai
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated fields with protocol set commands; no complex result JSON was created by hand.
+3. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+4. Final validation status: ok, errors: []
+
+[local reuse check]
+- stock_report/data/analysis/annual_review/00335.HK/2025-12-31: absent
+- stock_report/data/raw/filings/00335.HK/2025-12-31: absent
+- /root/aicode matching 00335.HK files: absent
+- Result: no prior facts package, filing cache, or stock-research result available for reuse.
+
+[primary sources]
+- HKEX annual report 2025:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2025/0721/2025072100532.pdf
+  Relevant pages: 99-105, 149-151, 160-161, 171-178, 185, 210-211.
+- PBOC RMB central parity announcement, 2025-04-01:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/5648456/index.html
+- Market snapshot supplied in config/input.json:
+  Tencent qt.gtimg.cn, 2026/07/31 16:08:44.
+
+[period decision]
+- Upbest's fiscal year ends on 31 March.
+- The task labels the analysis period 2025-12-31 and report type annual.
+- To avoid look-ahead beyond that cutoff, the most recent complete audited annual filing before the cutoff was selected: FY ended 2025-03-31.
+- The mismatch is disclosed in result.data_quality.limitations and report.md.
+
+[currency normalization]
+- Filing presentation currency: HKD, rounded to HK$'000.
+- Required result currency: CNY absolute yuan.
+- Conversion rate: HKD 1 = CNY 0.92257, PBOC central parity on 2025-04-01, the next business day after fiscal year end.
+- Formula: reported HK$'000 x 1,000 x 0.92257.
+
+[model decision]
+- Input hint: financial_brokerage / requires_special_model.
+- Filing facts show a broader mixed model: financing revenue HK$45.083m, property rent HK$34.990m, investment properties HK$2.0149bn, and financial-service licence activities.
+- Final statement_model: platform_financial_mixed.
+- Ordinary owner earnback applicability: requires_special_model.
+- All ordinary earnback ranking numbers remain null as required by result-contract.md.
+
+[key calculations]
+- total assets: HK$3,172.470m x 0.92257 = CNY 2,926,825,647.90
+- total liabilities: HK$325.680m x 0.92257 = CNY 300,462,597.60
+- parent equity: HK$2,847.857m x 0.92257 = CNY 2,627,347,432.49
+- revenue: HK$89.324m x 0.92257 = CNY 82,407,642.68
+- parent net profit: HK$69.461m x 0.92257 = CNY 64,082,634.77
+- net margin: 69.461 / 89.324 = 0.7776297524
+- operating cash flow: HK$105.109m x 0.92257 = CNY 96,970,410.13
+- capex proxy: (PPE HK$0.097m + investment property payments HK$42.806m) x 0.92257 = CNY 39,581,020.71
+- operating free cash flow proxy: (105.109 - 42.903)m HKD x 0.92257 = CNY 57,389,389.42
+- FY2025 proposed dividend: HK$40.235m x 0.92257 = CNY 37,119,603.95
+- forecast dividend yield: CNY 37,119,603.95 / CNY 1,499,941,660.814881 = 0.0247473651
+- approximate FY2025 parent ROE used in narrative: 69.461 / average(2,791.635, 2,847.857) = 2.4634%
+- investment-property fair-value gain / PBT: 37.176 / 71.153 = 52.25%
+- loans past due >=3 months / net loan receivables: (136.536 + 225.410) / 537.487 = 67.34%
+
+[judgment boundaries]
+- Facts: statement amounts, segment data, arrears ageing, ECL, dividends, shareholding and disclosed capital requirements.
+- Inference: economic weight is in property and lending rather than brokerage; high net margin is not comparable with an ordinary operating-company margin.
+- Judgment: ordinary detachable-net-cash earnback is inappropriate; specialized asset-quality, recurring-return, ROE, capital and dividend analysis is required.
+- No buy/sell recommendation or target price produced.

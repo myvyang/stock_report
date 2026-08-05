@@ -1,0 +1,57 @@
+Stock research trace
+Company: 00418.HK FOUNDER HOLD
+Period: 2025-12-31 annual
+Generated for input created_at: 2026-08-03T12:10:34+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reused local evidence
+- stock_report/data/analysis/annual_review/00418.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/00418.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/00418.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/00418.HK/2025-12-31/imported_from_agent_runs/01e1b352f607-00418_2025_annual_report.txt
+- stock_report/data/raw/filings/00418.HK/2025-12-31/imported_from_agent_runs/9b9ae7e4eae7-00418_2024_annual_report.txt
+- stock_report/data/raw/filings/00418.HK/2025-12-31/imported_from_agent_runs/78250bc7e6ca-00418_2023_annual_report.txt
+
+3. Model determination
+- Overrode input hint financial_brokerage.
+- Annual report shows operating revenue from software, hardware and system integration plus minor rental income.
+- No brokerage client funds, proprietary securities book or repo financing was found.
+- Selected statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+4. Currency conversion
+- Reporting currency in filing: HKD, unit HKD'000.
+- Output protocol currency: CNY absolute yuan.
+- Applied 2025-12-31 official central parity: HKD 1 = CNY 0.90322.
+- External official-source lookup: China Foreign Exchange Trade System rate as reproduced by Xinhua on 2025-12-31.
+
+5. Key calculations
+- Gross margin = 449,117 / 907,162 = 0.49507915896.
+- Net margin = 29,808 / 907,162 = 0.03285851921.
+- 2025 operating FCF = (35,834 - 3,864) HKD'000 = 31,970 HKD'000 = CNY 28,875,943.40.
+- Unpledged cash/time deposits = (823,270 - 2,808) HKD'000 = CNY 740,903,781.84.
+- Discounted detachable net cash = unpledged cash x 70% - one month revenue - lease liabilities.
+- Discounted detachable net cash = CNY 435,274,543.724.
+- Discounted sustainable cash profit = 2025 operating FCF x 60% = CNY 17,325,566.04.
+- Operating business price = market cap - discounted detachable net cash = CNY 199,764,507.58463198.
+- Owner earnback years = operating business price / discounted sustainable cash profit = 11.5300422.
+- Market cap / discounted cash profit = 36.6532932.
+- Forecast dividend = zero because directors recommended no dividend for 2023, 2024 and 2025.
+
+6. Judgment boundaries
+- 70% cash recognition reflects undisclosed parent/subsidiary location, predominantly RMB holdings, conversion/upstreaming and governance uncertainty.
+- One month of revenue is retained as operating cash for procurement, payroll, project execution and receivable timing.
+- 60% FCF retention reflects declining revenue/profit, higher receivables and material government-grant contribution.
+- Investment property is not included in detachable net cash.
+- Operating liabilities are treated as matched to going-concern operating assets, not mechanically netted against cash.
+
+7. Output construction and validation
+- Used outputs/populate_result.sh, which calls the protocol CLI `set` command for result fields; result.json was not authored from a blank object.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[] before report/trace final review.

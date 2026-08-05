@@ -1,0 +1,70 @@
+stock-research trace
+company=02880.HK LIAONING PORT
+period=2025-12-31 annual
+generated_at=2026-08-04T20:37:40+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Initialized result through protocol CLI
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse audit
+- Expected annual facts, normalized facts, raw metadata and prior stock-research files were absent.
+- Downloaded official HKEX 2025 annual report to stock_report/data/raw/filings/02880.HK/2025-12-31/2025-annual-report.pdf.
+- Official source: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042400964.pdf
+- Market-cap snapshot reused from config/input.json: Tencent qt.gtimg.cn, 2026/08/03 09:47:00.
+
+4. Model verification
+- input hint: financial_brokerage / requires_special_model
+- verified business: integrated port terminal and logistics operator
+- selected model: ordinary_operating / applicable
+- reason: revenue and assets arise from terminal, warehousing, logistics and transport operations; no brokerage customer-fund balance-sheet model.
+
+5. Core extracted facts
+- revenue=11358910887.75
+- cost_of_sales=8108483620.31
+- gross_profit=3250427267.44
+- parent_net_profit=1306790239.41
+- total_assets=57573679391.69
+- total_liabilities=13542064396.54
+- total_equity=44031614995.15
+- parent_equity=40342887497.81
+- minority_interest=3688727497.34
+- operating_cash_flow=5678072884.72
+- capex=490464053.47
+- operating_free_cash_flow=5187608831.25
+- cash_at_bank_and_on_hand=6697778173.07
+- borrowings_summary=5544872000.00
+- long_term_lease_liabilities=4500065629.19
+- proposed_2025_cash_dividend=674152542.29
+
+6. Calculations
+- gross_margin=3250427267.44/11358910887.75=0.2861565954
+- net_margin=1306790239.41/11358910887.75=0.1150453818
+- forecast_dividend_yield=674152542.29/14499332818.543314=0.0464954181
+- discounted_net_cash=6697778173.07*0.8-5544872000-4500065629.19=-4686715090.734
+- base_cash_profit=parent_net_profit+parent_share_of_D&A-capex=3105808983.61
+- discounted_sustainable_cash_profit=3105808983.61*0.8=2484647186.89
+- operating_business_price=14499332818.543314-(-4686715090.734)=19186047909.277
+- owner_earnback_years=19186047909.277/2484647186.89=7.72184
+- market_cap_to_cash_profit=14499332818.543314/2484647186.89=5.83557
+
+7. Key normalization judgments
+- Cash discounted 20% for operating needs and deposits with finance company.
+- All disclosed borrowings and long-term lease liabilities deducted.
+- Long-term equity investments excluded from detachable cash due to operating/strategic linkage.
+- 2025 OCF not directly capitalized because operating receivables released 1275365886.85.
+- Sustainable cash profit discounted 20% for unusually low capex versus D&A and concentration of profit improvement in crude-oil warehousing.
+
+8. Protocol writes and validation
+- Populated outputs/result.json using repeated protocol CLI set commands.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok; errors: []
+
+9. Output files
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

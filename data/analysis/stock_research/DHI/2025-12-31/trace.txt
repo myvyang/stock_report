@@ -1,0 +1,70 @@
+stock-research trace — DHI
+generated_at_input: 2026-08-04T20:23:36+08:00
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the skill directly routes reuse decisions through it.
+- Initialized outputs/result.json using:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked annual-review, raw-filing, normalized-facts and prior stock-research paths from config/input.json.
+- No DHI filing, annual fact package or prior research result existed in the workspace.
+- Fell back to primary public disclosures, consistent with data-reuse.md.
+
+3. Company and period resolution
+- SEC filing identifies registrant as D.R. Horton, Inc., ticker DHI, CIK 882184.
+- Input period 2025-12-31 is not the company's fiscal year-end.
+- Latest complete annual filing is Form 10-K for fiscal year ended 2025-09-30, filed 2025-11-19.
+- result.analysis.period set to 2025-09-30; limitation recorded explicitly.
+
+4. Primary evidence accessed
+- SEC 2025 Form 10-K:
+  https://www.sec.gov/Archives/edgar/data/882184/000088218425000081/dhi-20250930.htm
+  Used for company identity, business model, market position, FY2025 statements, inventory, debt, contingencies, dividends, buybacks and risk facts.
+- D.R. Horton fiscal 2026 Q3 release dated 2026-07-21:
+  https://investor.drhorton.com/news-and-events/press-releases/2026/07-21-2026-113055285
+  Used only for post-annual operating context, inventory-home counts and FY2026 dividend/cash-flow guidance.
+- Federal Reserve H.10/G.5 data:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.M.CH&rel=H10
+  September 2025 monthly average: 7.1235 CNY per USD.
+- Market capitalization, market-cap date, PE TTM and quote source retained from config/input.json.
+
+5. Model decision
+- Input hint ordinary_operating/applicable rejected after filing review.
+- Confirmed model: real_estate_developer.
+- Applicability: requires_special_model.
+- Reason: FY2025 inventory was USD 25.2873bn, approximately 71% of USD 35.4712bn assets. Cash, land/home/rental inventory, mortgage loans held for sale and notes payable are components of the development and financing cycle.
+- Ordinary owner-earnback fields intentionally remain null under result-contract.md; this is a model decision, not missing data.
+
+6. Financial extraction (USD millions, FY2025 unless stated)
+- Revenue 34,250.4; cost of sales 26,134.2; gross profit calculated 8,116.2.
+- Operating profit proxy calculated as revenue - cost of sales - SG&A = 4,424.2; other income excluded from this proxy.
+- Net income 3,620.9; parent net income 3,585.2.
+- Assets 35,471.2; liabilities 10,729.0; total equity 24,742.2; parent equity 24,190.4; NCI 551.8.
+- Operating cash flow 3,420.9; property/equipment expenditure 137.4; displayed operating FCF 3,283.5.
+- Financing cash flow -4,762.9; dividends plus settled buybacks 4,776.4.
+- Cash 2,985.4; restricted cash 47.9; inventory 25,287.3; mortgage loans held for sale 2,566.5; notes payable 5,965.5.
+- All result.json financial amounts multiplied by 7.1235 and 1,000,000 to produce absolute CNY yuan.
+
+7. Calculations
+- Consolidated gross margin = (34,250.4 - 26,134.2) / 34,250.4 = 0.2369665756.
+- Parent net margin = 3,585.2 / 34,250.4 = 0.1046761498.
+- NCI ratio = 551.8 / 24,742.2 = 0.0223019780.
+- FY2026 forecast dividend = USD 500m * 7.1235 = CNY 3,561,750,000.
+- Forecast dividend yield = CNY 3,561,750,000 / CNY 270,014,920,901.05078 = 0.0131909377.
+- Ordinary owner-earnback and detachable-cash calculations not performed because model is not applicable.
+
+8. Protocol population and validation
+- Populated initialized outputs/result.json through repeated protocol CLI `set` operations; did not hand-write the JSON from scratch.
+- First validation after population:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+  Result: status ok, errors [].
+- Final validation is run after report and trace completion; see task handoff for final status.
+
+9. Data-quality boundaries
+- Status complete under special-model minimum requirements.
+- FY2026 is unfinished; forecast dividend uses company guidance and is not guaranteed.
+- Market snapshot is supplied input data and was not overwritten.
+- Operating FCF is shown for reconciliation only; for a homebuilder, inventory investment is operating working capital, so OCF minus fixed-asset capex is not treated as sustainable distributable cash profit.

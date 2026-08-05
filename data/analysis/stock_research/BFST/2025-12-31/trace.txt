@@ -1,0 +1,72 @@
+BFST stock research trace
+Generated: 2026-08-05 Asia/Shanghai
+Report period: 2025-12-31 annual
+
+1. Read and applied:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Initialized structured output with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Local reuse audit:
+   - No BFST raw filing, annual facts, normalized facts, or prior stock research files existed under the paths specified by config/input.json.
+   - Therefore fetched official public disclosures rather than fabricating missing facts.
+
+4. Primary sources used:
+   - SEC Form 10-K, accession 0001624322-26-000018, filed 2026-02-26:
+     https://www.sec.gov/Archives/edgar/data/1624322/000162432226000018/bfst-20251231.htm
+   - SEC Companyfacts XBRL, CIK 0001624322:
+     https://data.sec.gov/api/xbrl/companyfacts/CIK0001624322.json
+   - SEC Form 10-Q for 2026-03-31, Progressive acquisition note:
+     https://www.sec.gov/Archives/edgar/data/1624322/000162432226000028/bfst-20260331.htm
+   - Federal Reserve H.10 released 2025-12-29:
+     https://www.federalreserve.gov/releases/h10/20251229/
+   - Market data supplied by config/input.json: Yahoo Finance yfinance, dated 2026-08-03.
+
+5. Model determination:
+   - Overrode input hint ordinary_operating/applicable.
+   - Confirmed statement_model=financial_bank and owner_earnback_applicability=requires_special_model.
+   - Reason: customer deposits and wholesale funding finance loans and securities; all are operating balance-sheet items under banking regulation. Detachable net cash and ordinary free-cash-flow earnback are not economically meaningful.
+   - Kept all ordinary owner earnback metrics null as required by contract.
+
+6. Core extracted USD facts:
+   - Total assets: 8,214,740,000
+   - Total liabilities: 7,317,857,000
+   - Stockholders' equity: 896,883,000
+   - Net income attributable to parent: 87,861,000
+   - Net income available to common: 82,460,000
+   - Net interest income: 273,163,000
+   - Noninterest income: 51,542,000
+   - Noninterest expense: 203,078,000
+   - Deposits: 6,698,590,000
+   - Cash and cash equivalents: 411,175,000
+   - FHLB advances: 431,200,000
+   - Subordinated debt: 92,530,000
+   - Common dividends paid: 16,844,000
+   - Common dividend declared per share: 0.57
+   - Net interest margin: 3.69%; ROACE: 10.59%; total risk-based capital: 12.93%; Tier 1 leverage: 10.08%.
+
+7. Currency conversion:
+   - Contract requires absolute CNY yuan.
+   - Applied USD/CNY 7.0063 from Federal Reserve H.10, observation 2025-12-26 (latest available in the cited 2025-12-29 weekly release).
+   - Used the same point rate for balance sheet, income, and dividend history for deterministic comparability. This is a limitation because income statement translation would conventionally use an average rate.
+
+8. Dividend forecast:
+   - Latest quarterly common dividend: USD 0.15; annualized USD 0.60.
+   - Estimated post-merger shares: 29,510,668 at 2025-12-31 + 3,192,367 Progressive consideration shares = 32,703,035.
+   - Forecast: 32,703,035 * 0.60 * 7.0063 = CNY 137,476,364.47.
+   - Forecast yield: 137,476,364.47 / 7,016,657,788.873718 = 0.01959285583091934.
+   - Estimate does not precisely include 2026 repurchases or employee equity changes.
+
+9. Comparability warning:
+   - Progressive closed on 2026-01-01 and contributed 3,192,367 new shares; target assets at 2025-12-31 were USD 773.8 million.
+   - Input market cap and PE are dated 2026-08-03, after the acquisition, while annual financials are pre-acquisition.
+   - Did not calculate current P/B, current ROE, or a special-model payback figure from mismatched periods.
+
+10. Result population and validation:
+   - Populated outputs/result.json exclusively through stock_research.protocol set commands after protocol initialization.
+   - Final validation command:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Validation result before report/trace final audit: status=ok, errors=[].

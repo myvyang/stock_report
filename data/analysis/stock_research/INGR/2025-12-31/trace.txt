@@ -1,0 +1,81 @@
+INGR stock research trace
+generated_for_period=2025-12-31
+task_created_at=2026-08-04T21:30:44+08:00
+
+[skill_and_contract]
+read .agents/skills/stock-research/SKILL.md
+read .agents/skills/stock-research/references/result-contract.md
+read .agents/skills/stock-research/references/report-contract.md
+read .agents/skills/stock-research/references/data-reuse.md
+
+[reuse_check]
+No INGR raw filing, annual facts, normalized facts, or prior stock-research result existed locally.
+Research therefore returned to the primary filing and official company release.
+
+[primary_sources]
+1. SEC Form 10-K, accession 0001628280-26-008603, filed 2026-02-17, period 2025-12-31
+   https://www.sec.gov/Archives/edgar/data/1046257/000162828026008603/ingr-20251231.htm
+   Local copy: stock_report/data/raw/filings/INGR/2025-12-31/ingr-20251231.htm
+2. Ingredion FY2025 results release, published 2026-02-03
+   https://ir.ingredionincorporated.com/node/29021
+3. Federal Reserve H.10 China spot exchange rate, 2025-12-31: CNY 7.1875 per USD
+   https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+4. Market snapshot supplied in config/input.json: Yahoo Finance yfinance, 2026-08-03
+
+[model_review]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=The filing describes a B2B manufacturer converting plant raw materials into ingredient products. Cash, receivables, inventory, PP&E, payables and debt have ordinary manufacturing meanings. No special-model customer funds, insurance reserves, regulated project cash, concession rights, or underlying investment holdings were identified.
+
+[source_values_usd_millions]
+revenue=7219
+cost_of_sales=5391
+gross_profit=1828
+operating_profit=1016
+net_profit_including_nci=736
+parent_net_profit=729
+total_assets=7897
+total_liabilities=3531
+total_equity=4295
+parent_equity=4274
+minority_interest=21
+operating_cash_flow=944
+capital_expenditure_and_mechanical_stores=433
+operating_free_cash_flow=511
+financing_cash_flow=-491
+dividends_paid=211
+share_repurchases=224
+cash=1030
+short_term_investments=3
+short_term_debt=48
+long_term_debt=1742
+
+[conversion]
+All filing amounts in result.json are CNY absolute yuan.
+fx=7.1875 CNY/USD as of 2025-12-31
+Example: revenue=7219*1000000*7.1875=51886562500
+
+[formulas]
+gross_margin=1828/7219=0.2532206676825045
+net_margin=729/7219=0.10098351572239922
+discounted_net_cash=(1030+3-48-1742)*1000000*7.1875=-5440937500
+discounted_cash_profit=(944-433)*1000000*7.1875=3672812500
+operating_business_price=42322472240.998535-(-5440937500)=47763409740.998535
+owner_earnback_years=47763409740.998535/3672812500=13.004587013630164
+market_cap_to_cash_profit=42322472240.998535/3672812500=11.523178011673217
+forecast_dividend=(0.82*4*64000000)*7.1875=1508800000
+forecast_dividend_yield=1508800000/42322472240.998535=0.03565009131338973
+
+[protocol]
+Initialized with:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+Populated with repeated protocol set commands; result was not authored as a standalone JSON object.
+Validated with:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[limitations]
+Market cap and PE are third-party snapshot values supplied by the task.
+One period-end FX rate was used for all statement conversions.
+Sustainable cash profit is a one-year CFO-minus-all-capex measure, not a multi-year normalized estimate.
+Dividend forecast mechanically annualizes the current quarterly rate and assumed share count; it is not company guidance.

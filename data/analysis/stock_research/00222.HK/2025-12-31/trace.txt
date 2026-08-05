@@ -1,0 +1,62 @@
+stock-research trace
+company=00222.HK MIN XIN HOLD
+period=2025-12-31
+generated_for_input=2026-08-03T16:20:27+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because no local facts package was present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- No files existed under the specified raw filing, annual review, normalized facts, or prior stock research paths.
+- Downloaded the official 2025 results announcement to:
+  stock_report/data/raw/filings/00222.HK/2025-12-31/2025-results.pdf
+- Researched the official 2025 annual report at:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0417/2026041700912.pdf
+- Official annual results announcement:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032601756.pdf
+
+3. Company/model verification
+- Input hint classified the company as financial_brokerage.
+- Filing evidence shows no brokerage model. Reportable segments are financial services via associate Xiamen International Bank and microcredit, general insurance, property investment, and strategic investment.
+- Associates were HKD6,690.945m / HKD9,461.377m total assets = 70.72%.
+- XIB contributed approximately 82.1% of 2025 group results.
+- Overrode hint with statement_model=platform_financial_mixed and owner_earnback_applicability=requires_special_model.
+- Ordinary discounted-net-cash and cash-profit sorting metrics remain null by contract.
+
+4. Currency conversion
+- Result contract requires CNY absolute yuan; filing presentation currency is HKD.
+- Derived 0.8994 CNY/HKD from annual report disclosure: Huaneng holding HKD563.62m = CNY506.92m.
+- Applied 0.8994 consistently to statement amounts. This is a point-in-time proxy; income and cash-flow translations are approximate and explicitly listed as a limitation.
+- Market cap and PE were taken directly from config/input.json without reconstruction.
+
+5. Key source facts (HKD)
+- Revenue 255.454m; operating profit 66.099m; parent/net profit 119.601m.
+- Total assets 9,461.377m; total liabilities 1,143.046m; parent equity 8,318.331m; no NCI.
+- Associates 6,690.945m; FVOCI assets 677.052m; amortized-cost debt investments 531.717m; FVTPL assets 340.091m.
+- Cash 621.400m; term deposits 267.965m; pledged/restricted term deposits 103.613m.
+- Bank borrowings 781.610m; controlling-shareholder loan 83.000m; insurance contract liabilities 170.544m.
+- Operating cash flow 56.886m; PPE purchases 0.228m; financing cash flow 268.462m; dividend paid in 2025 cash flow 0.
+- Proposed 2025 dividend HKD47,780,580.16 / HKD0.08 per share; 2024 final dividend nil.
+
+6. Derived special-model observations
+- Net margin = 119.601 / 255.454 = 46.82%, but not comparable to ordinary operating companies because associate revenue is excluded while associate profit is included.
+- Approximate ROE = 119.601 / average(8,318.331, 7,818.147) = 1.48%.
+- Approximate price/book = CNY1,546.596m / CNY7,481.507m = 0.207x.
+- Proposed dividend / input market cap = CNY42.974m / CNY1,546.596m = 2.78%.
+- Profit coverage of proposed dividend = HKD119.601m / HKD47.781m = 2.50x.
+- None of these is an ordinary owner-earnback number.
+
+7. Result construction and validation
+- Populated outputs/result.json exclusively with protocol set/append commands after protocol init; did not hand-write the complex JSON object.
+- Initial completed validation:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+  status=ok, errors=[]
+
+8. Known limitations
+- XIB loan quality, provision coverage and capital adequacy details were not fully developed in the results-announcement evidence used for this pass.
+- Input market quote lacks the underlying price and conversion rate; supplied market cap is retained as authoritative task input.
+- FX conversion uses a disclosed year-end equivalence, not income-statement average rates.

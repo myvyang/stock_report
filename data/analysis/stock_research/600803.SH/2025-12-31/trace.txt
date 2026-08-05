@@ -1,0 +1,83 @@
+stock-research trace
+company=新奥股份
+code=600803.SH
+period=2025-12-31
+generated_at=2026-07-31T15:22:15+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields with protocol set commands; the JSON was not hand-written from scratch.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Initial completed-result validation: status=ok, errors=[].
+
+[local-reuse-check]
+Checked the paths specified by config/input.json.
+No raw filing metadata, annual facts package, normalized facts, or prior stock-research result was present under the local stock_report paths.
+Therefore the research used the official annual-report disclosure and an announcement mirror rather than fabricating missing local facts.
+
+[primary-sources]
+1. 新奥天然气股份有限公司2025年年度报告, disclosure date 2026-03-28.
+   SSE disclosure URL identified:
+   https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-03-28/600803_20260328_QOXZ.pdf
+   Full-report announcement mirror used for local text extraction:
+   http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESH_STOCK/2026/2026-3/2026-03-28/12027615.PDF
+2. 新奥天然气股份有限公司2025年年度报告摘要, 证券时报公告镜像:
+   https://epaper.stcn.com/pic/202603/28/5eb7adacd7af53ce2ef5742e9cedaeac.pdf
+3. Market-cap snapshot supplied in config/input.json:
+   Tencent qt.gtimg.cn, 2026-07-31 11:43:38, market cap CNY 54,269,000,000.00001, PE TTM 12.45.
+
+[statement-extraction]
+Annual report unit was RMB 10,000; all JSON values were converted to absolute RMB.
+total_assets=135284300000
+total_liabilities=71987030000
+total_equity=63297270000
+parent_equity=24646980000
+minority_interest=38650290000
+revenue=131456770000
+cost_of_sales=113161000000
+gross_profit=18295770000
+operating_profit=11817680000
+net_profit=9984610000
+parent_net_profit=4681320000
+operating_cash_flow=14266510000
+capital_expenditure=8237860000
+operating_free_cash_flow=6028650000
+financing_cash_flow=-4965320000
+
+[model-check]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: revenue, costs, working capital and capital expenditure describe an ordinary operating energy company. The company does have utility-like pipeline and LNG infrastructure, but it is a diversified gas sales and service operator rather than a single finite-life concession asset.
+Special handling: consolidated accounts contain major non-wholly-owned subsidiaries. Minority interest is 61.0615% of total equity and minority profit exceeds parent profit, so consolidated cash and cash flow cannot be fully assigned to A-share owners.
+
+[derived-metrics]
+gross_margin=(131456770000-113161000000)/131456770000=0.1391770846
+net_margin=4681320000/131456770000=0.0356110986
+operating_free_cash_flow=14266510000-8237860000=6028650000
+forecast_dividend_yield=2970224185.92/54269000000.00001=0.0547315076
+
+[owner-earnback]
+Non-restricted cash including placements with banks=18567330000.
+Cash recognition discount=30%, discounted cash=5570199000.
+Disclosed total borrowings=33362310000, deducted at 100%.
+discounted_detachable_net_cash=5570199000-33362310000=-27792111000.
+operating_business_price=54269000000-(-27792111000)=82061111000.
+Parent-attributable FCF proxy=6028650000*(4681320000/9984610000)=2826554048.
+Rounded sustainable cash profit after an additional prudence margin=2650000000.
+owner_earnback_years=82061111000/2650000000=30.9664569811.
+market_cap_to_cash_profit=54269000000/2650000000=20.4788679245.
+The 30% cash discount and the sustainable cash-profit haircut are analyst judgments, explicitly recorded as limitations.
+
+[dividend]
+2025 annual dividend proposal=2970224185.92, based on 3093983527 shares and RMB 0.96 per share.
+2025 cash distributions already implemented consist of the 2024 final dividend 3183784205.81 plus the 2025 interim special dividend 556173022.86, total 3739957228.67.
+Proposal amount may change with the number of participating shares before the record date.
+
+[quality]
+status=complete
+Core identity, valuation, statement model, three statements, asset/liability explanations, owner-earnback breakdown, dividend forecast, business story, risks, evidence, and limitations are present.
+No buy/sell recommendation, target price, or ranking label was produced.

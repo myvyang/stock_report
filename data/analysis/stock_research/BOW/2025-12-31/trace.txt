@@ -1,0 +1,55 @@
+stock-research trace
+company=BOW | Bowhead Specialty Holdings Inc.
+period=2025-12-31
+generated_for_input=2026-08-04T13:26:53+08:00
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated scalar fields with protocol `set` and list fields with protocol `append`.
+3. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse]
+- No annual facts package, normalized facts, raw filing, or prior stock-research output existed at the paths supplied in config/input.json.
+- Research therefore returned to the primary 2025 Form 10-K and company FY2025 release.
+
+[primary sources]
+- SEC Form 10-K, filed 2026-02-24:
+  https://www.sec.gov/Archives/edgar/data/2002473/000162828026011089/bow-20251231.htm
+- Company FY2025 results release:
+  https://ir.bowheadspecialty.com/news-events/press-releases/detail/140/bowhead-specialty-holdings-inc-reports-fourth-quarter-and-full-year-2025-results
+- SAFE/PBOC exchange-rate reference for 2025-12-31; USD/CNY conversion used: 7.0288.
+- Market cap and PE: config/input.json, Yahoo Finance yfinance snapshot dated 2026-08-03.
+
+[model decision]
+- Input hint: ordinary_operating / applicable.
+- Overridden to: financial_insurance / not_applicable.
+- Reason: Bowhead is an insurance holding company. Premium float is invested to support loss reserves, reinsurance trusts, liquidity, and statutory capital. Insurance investments and liabilities are operating assets and liabilities, not detachable cash and ordinary working capital.
+- Consequently all ordinary owner-earnback metrics remain null.
+
+[currency]
+- Original filing unit: USD thousands.
+- Structured output requirement: CNY absolute yuan.
+- Conversion: USD-thousands value * 1,000 * 7.0288.
+- Market cap was retained exactly as supplied in the input.
+
+[key extracted facts, USD thousands unless noted]
+- total assets 2,371,376; total liabilities 1,922,102; stockholders equity 448,266; mezzanine + stockholders equity 449,274.
+- total revenue 551,589; net income 53,786; income before tax 67,299.
+- operating cash flow 331,587; property/equipment purchases 5,570; financing cash flow 144,516.
+- gross written premium 862,806; net earned premium 491,677.
+- loss ratio 66.7%; expense ratio 29.8%; combined ratio 96.5%; ROE 13.1%.
+- fixed maturities 1,371,006; restricted assets 879,065.
+- loss/LAE reserves 1,129,936; unearned premium 552,594; debt 146,447.
+- BICI statutory net income 44,479; statutory capital/surplus 486,174; ordinary dividend ceiling without prior regulatory approval 34,100.
+
+[interpretive checks]
+- Mechanical operating FCF was retained in financials for statement completeness, but explicitly rejected as distributable cash because operating cash flow is dominated by insurance reserve and unearned-premium growth.
+- Forecast shareholder cash dividend set to zero because the 10-K states no intention to pay common dividends in the foreseeable future. The BICI regulatory ceiling is treated only as upstream capacity, not a forecast distribution.
+- Gross margin and net margin remain null because ordinary commercial revenue/margin concepts are not economically comparable for this insurance model.
+
+[known limitations]
+- Actual 2025 RBC ratio was not disclosed; the filing states only that capital exceeds Authorized Control Level while the company-specific order requires at least 400%.
+- Long-tail reserve adequacy cannot be conclusively tested from the company's short loss history.
+- CNY translation and supplied market cap may use different FX dates.

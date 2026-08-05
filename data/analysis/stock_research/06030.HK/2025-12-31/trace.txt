@@ -1,0 +1,59 @@
+stock-research trace
+company: 06030.HK / CITIC Securities Company Limited
+period: 2025-12-31
+generated_at: 2026-08-05T03:58:13+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely as requested.
+3. Read references/data-reuse.md because the skill routes reuse decisions through it.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields with repeated protocol `set` commands; the result was not composed as a handwritten complex JSON document.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   validation status: ok; errors: []
+
+[reuse audit]
+The configured raw filing metadata, annual facts JSON/Markdown, normalized facts and prior stock-research outputs were absent in the workspace. No historical conclusion was reused. The official 2025 annual report was downloaded to:
+stock_report/data/raw/filings/06030.HK/2025-12-31/2025-annual-report.pdf
+
+[primary sources]
+S1 HKEX, CITIC Securities 2025 Annual Report, released 2026-04-22:
+https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0422/2026042200382.pdf
+Relevant locations: Important Notice; pp.19-20; pp.49-55; pp.237-248; p.285; material risk factors.
+
+S2 HKEX, poll results and payment of 2025 final dividend, released 2026-05-14:
+https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0514/2026051401302.pdf
+
+S3 config/input.json market snapshot:
+Tencent qt.gtimg.cn; amount CNY347,058,167,192.21594; PE TTM 12.12; timestamp 2026/08/03 09:47:52.
+
+[core extraction]
+All annual-report statement values were disclosed in RMB thousands and multiplied by 1,000 for result.json.
+- total revenue and other income: 104,681,538,000 (S1 p.238)
+- operating profit: 39,313,284,000 (S1 p.238)
+- net profit: 31,006,679,000 (S1 pp.238-239)
+- parent net profit: 30,076,101,000 (S1 p.239)
+- total assets: 2,081,902,593,000 (S1 pp.242-243; non-current plus current assets)
+- total liabilities: 1,756,080,209,000 (S1 p.243; current plus non-current liabilities)
+- total equity: 325,822,384,000; parent equity: 319,930,442,000; NCI: 5,891,942,000 (S1 p.244)
+- operating cash flow: -43,966,460,000; capex: 1,494,547,000; financing cash flow: 55,082,639,000 (S1 pp.247-248)
+- 2025 ordinary-share dividends paid in cash-flow/equity statement: 8,447,712,000; result field excludes distributions to perpetual bond holders and NCI (S1 p.245)
+
+[derived calculations]
+- net margin = 30,076,101,000 / 104,681,538,000 = 0.2873082559.
+- minority interest ratio = 5,891,942,000 / 325,822,384,000 = 0.0180833028.
+- operating free cash flow display = -43,966,460,000 - 1,494,547,000 = -45,461,007,000. This is not used for valuation because brokerage working capital is financial inventory and customer/financing flows.
+- baseline forecast dividend = 14,820,546,829 shares × CNY0.70 = 10,374,382,780.30.
+- baseline forecast dividend yield = 10,374,382,780.30 / 347,058,167,192.21594 = 0.0298923443.
+- price to 2025 year-end parent equity, shown only in report = 347,058,167,192.21594 / 319,930,442,000 = approximately 1.08x.
+
+[model decision]
+Confirmed financial_brokerage / requires_special_model from audited balance-sheet and business evidence. Customer cash, customer brokerage deposits, trading financial assets and liabilities, derivatives, margin accounts and repurchase financing are operating components. Ordinary detachable-net-cash and cash-profit payback calculations are therefore economically invalid. The following fields remain null by contract: discounted_net_cash, discounted_net_cash_to_market_cap, discounted_cash_profit, operating_business_price, owner_earnback_years and market_cap_to_cash_profit.
+
+[quality notes]
+- gross margin remains null because a brokerage has no comparable cost-of-sales/gross-profit structure.
+- market snapshot was supplied by the task and not independently reconstructed.
+- forecast dividend is a baseline scenario using the executed 2025 distribution, not company guidance for 2026.
+- report statements that describe sustainability, cyclicality or implications are analytical judgments; their supporting facts are identified nearby.

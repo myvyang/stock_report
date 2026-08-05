@@ -1,0 +1,61 @@
+stock-research trace
+company=01941.HK YE XING GROUP
+period=2025-12-31 annual
+run_date=2026-08-04 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- No existing raw filing, annual facts package, normalized facts, or prior stock-research output was available for 01941.HK/2025-12-31.
+- stock_report/data/notes/user_stock_evaluations.md contained no 01941.HK entry.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- The initialized financial_brokerage hint was treated as unverified input metadata.
+
+4. Primary source retrieval
+- HKEX title search identified Annual Report 2025, released 2026-04-30.
+- Official filing URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0430/2026043003330.pdf
+- Saved local copy: stock_report/data/raw/filings/01941.HK/2025-12-31/annual-report-2025.pdf
+- PDF text extraction binary was unavailable; the official HKEX PDF was read via indexed web text. Core facts came from the audited annual report, not third-party summaries.
+
+5. Model verification
+- Annual report business facts: property management, property-developer-related services, and value-added services.
+- No brokerage client money, proprietary trading assets, margin finance, or repo financing was present.
+- Overrode input hint to statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+6. Core reported facts (RMB)
+- Revenue 362,422,000; cost of services 279,908,000; gross profit 82,514,000.
+- Net profit 11,091,000; parent net profit 11,218,000.
+- Total assets 448,934,000; total liabilities 224,291,000; total equity 224,643,000; parent equity 224,126,000.
+- Operating cash flow 24,274,000; capex 1,392,000; calculated operating FCF 22,882,000.
+- Bank balances and cash 139,869,000; no bank borrowings.
+- Trade and other receivables 147,142,000; related-party receivables 14,092,000.
+- Trade receivables gross 184,038,000; loss allowance 52,949,000.
+- No 2025 final dividend recommended.
+
+7. Derived metrics and judgments
+- gross_margin=82,514,000/362,422,000=0.2276738167.
+- net_margin=11,218,000/362,422,000=0.0309528671.
+- Net current assets 86,012,000 used as detachable-cash ceiling proxy.
+- Cash haircut: 70% x 86,012,000=60,208,400, reflecting working-capital, receivable-quality, distribution, and governance constraints.
+- Profit haircut: 80% x 11,218,000=8,974,400, reflecting one-year turnaround, impairment base effects, and continuing receivable risk.
+- Operating business price=188,293,861.98103428-60,208,400=128,085,461.98103428.
+- Owner earnback years=128,085,461.98103428/8,974,400=14.2723148044.
+- Market cap/cash profit=188,293,861.98103428/8,974,400=20.9812201352.
+- Forecast dividend=0; forecast yield=0, based on no final dividend and no explicit forward commitment found.
+
+8. Protocol population and validation
+- outputs/result.json was populated using repeated protocol `set` and `append` commands; no complex JSON object was hand-written from scratch.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[].
+
+9. Limitations
+- Market cap and PE TTM came from the task-provided Tencent snapshot and were not independently cross-checked.
+- Cash and profit haircuts are analytical judgments, not reported facts.
+- No subsidiary-level distributable reserve or restricted-cash schedule was available.
+- The HKEX disciplinary action was noted as governance risk but not assigned a financial amount.

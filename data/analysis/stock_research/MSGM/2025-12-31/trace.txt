@@ -1,0 +1,67 @@
+stock-research trace
+query=MSGM
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-04T14:04:57+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+- config/input.json existed.
+- No local raw filing, metadata, annual facts, normalized facts, or prior research outputs existed for MSGM/2025-12-31.
+- Returned to primary public filings rather than inferring missing facts from the market-data input.
+
+3. Primary sources used
+- SEC accession 0001493152-26-009532, Form 10-K, filed 2026-03-10, period 2025-12-31.
+  URL: https://www.sec.gov/Archives/edgar/data/1821175/000149315226009532/form10-k.htm
+- SEC Companyfacts XBRL for CIK 0001821175, used to cross-check statement values.
+  URL: https://data.sec.gov/api/xbrl/companyfacts/CIK0001821175.json
+- Motorsport Games Q1 2026 financial results, 2026-05-13, used only for post-balance-sheet operating and repurchase context.
+  URL: https://ir.motorsportgames.com/news-releases/news-release-details/motorsport-games-reports-first-quarter-2026-financial-results
+- Federal Reserve H.10 USD/CNY spot rate, 2025-12-31: 7.1875 CNY per USD.
+  URL: https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Market cap CNY 121,961,046.80393028, date 2026-08-03, PE TTM 3.7327588: config/input.json, source Yahoo Finance yfinance.
+
+4. Model determination
+- Confirmed statement_model=ordinary_operating.
+- Confirmed owner_earnback_applicability=applicable.
+- Reason: business is game development/publishing/subscription software; balance-sheet items do not represent a financial, property-development, concession, or investment-holding model.
+
+5. Currency conversion
+- All filing amounts converted from USD to CNY using 7.1875.
+- Ratios calculated from unrounded USD values; displayed CNY values may differ slightly due to rounding.
+
+6. Key calculations
+- gross_margin = 9,204,588 / 11,297,898 = 0.8147168615.
+- net_margin = parent net income 6,928,067 / revenue 11,297,898 = 0.6132173436.
+- capex = internally developed software 1,110,751 + PPE purchases 12,067 = USD 1,122,818 = CNY 8,070,254.38.
+- operating_free_cash_flow = CFO 4,073,059 - capex 1,122,818 = USD 2,950,241 = CNY 21,204,857.19.
+- core operating profit = reported operating profit 3,248,800 - other operating income 1,608,497 = USD 1,640,303.
+- sustainable cash profit = core operating profit 1,640,303 + D&A 1,122,159 - total capex 1,122,818 - tax 245,258 = USD 1,394,386 = CNY 10,022,149.375.
+- owner_earnback_years = 121,961,046.80393028 / 10,022,149.375 = 12.1691507720.
+
+7. Cash discount judgment
+- 2025 year-end cash was USD 4,993,390.
+- By the market-cap date, the company had paid USD 3,717,063.45 for the April 2026 related-holder share repurchase and continued to require product investment.
+- Discounted detachable net cash set to zero to avoid offsetting an August 2026 market cap with a stale December 2025 cash balance.
+
+8. Dividend
+- Historical 2025 cash dividend: zero.
+- Forecast dividend: zero, based on explicit 10-K policy and credit-agreement restrictions.
+
+9. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated scalar/object fields using protocol set.
+- Populated arrays using protocol append.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+10. Known limitations
+- Financial statement date and valuation date differ.
+- Normalized cash profit relies on one transformed operating year.
+- PE TTM is retained as supplied market data but is distorted by non-recurring 2025 gains.

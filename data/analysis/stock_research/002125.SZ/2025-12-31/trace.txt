@@ -1,0 +1,87 @@
+stock-research trace
+company: 湘潭电化 (002125.SZ)
+period: 2025-12-31 annual
+generated_at: 2026-08-01 Asia/Shanghai
+
+1. Read instructions
+- /workspace/AGENTS.md
+- /workspace/.agents/skills/stock-research/SKILL.md
+- /workspace/.agents/skills/stock-research/references/result-contract.md
+- /workspace/.agents/skills/stock-research/references/report-contract.md
+- /workspace/.agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- config/input.json found.
+- No annual facts package, normalized facts, prior stock-research result, or raw filing existed for 002125.SZ/2025-12-31.
+- Therefore fetched the official 2025 annual report from Shenzhen Stock Exchange disclosure storage.
+
+3. Source acquisition
+- Official filing URL: https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-25/9814767f-89f7-43fb-8dcd-d31745ba9093.PDF
+- Local copy: stock_report/data/raw/filings/002125.SZ/2025-12-31/annual-report-2025.pdf
+- Searchable mirror used to extract tables because pdftotext was unavailable locally: Sina bulletin id 12195920, mirroring the same 2025 annual report.
+- Market cap input: 7,762,000,000 CNY at 2026-07-31 11:43:03, Tencent qt.gtimg.cn; PE TTM 29.02.
+
+4. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated initialized fields using protocol set/append commands only.
+- Did not hand-write the result JSON from scratch.
+
+5. Model decision
+- statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- Reason: 92.13% of revenue is ordinary battery-material manufacturing. The sewage concession is only 5.47% of revenue and does not dominate the consolidated economics. Restricted fundraising cash and concession assets were specially interpreted rather than treated as freely detachable cash.
+
+6. Core reported facts (CNY)
+- Revenue: 1,921,296,242.83
+- Cost of sales: 1,506,797,585.73
+- Gross profit: 414,498,657.10
+- Parent net profit: 225,447,797.28
+- Operating cash flow: 200,006,622.17
+- Capital expenditure: 41,326,421.91
+- Total assets: 5,021,347,092.51
+- Total liabilities: 1,833,308,419.20
+- Parent equity: 3,154,557,851.59
+- Cash and cash equivalents: 606,598,447.51
+- Fundraising cash with restricted use: 276,994,030.55
+- Fixed asset depreciation: 193,986,189.14
+- Equity-method investment income: 80,684,727.26
+- Cash dividend declared by associates: 7,548,622.80
+- 2025 proposed cash dividend: 72,393,803.30
+
+7. Formula checks
+- Gross margin = 414,498,657.10 / 1,921,296,242.83 = 0.2157390661.
+- Net margin = 225,447,797.28 / 1,921,296,242.83 = 0.1173415074.
+- Operating FCF = 200,006,622.17 - 41,326,421.91 = 158,680,200.26.
+- Forecast dividend yield = 72,393,803.30 / 7,762,000,000 = 0.0093266946.
+
+8. Discounted detachable net cash
+- Non-fundraising cash: (606,598,447.51 - 276,994,030.55) * 50% = 164,802,208.48.
+- Long-term equity investments: 830,034,753.50 * 50% = 415,017,376.75.
+- Other equity instruments: 35,388,420.98 * 50% = 17,694,210.49.
+- Interest-bearing financing deducted at 100%: 1,374,096,610.36, comprising short borrowing, current long borrowing, long borrowing, convertible bond, lease liability, and long-term payable.
+- Discounted detachable net cash = -776,582,814.64.
+
+9. Sustainable distributable cash profit
+- Start OCF: 200,006,622.17.
+- Normalize one-year working-capital drag: +170,693,168.20.
+- Maintenance capex proxy based on fixed-asset depreciation: -193,986,189.14.
+- Add actual associate cash dividend: +7,548,622.80.
+- Prudence buffer and rounding: -9,212,224.03.
+- Discounted sustainable cash profit: 175,000,000.00.
+
+10. Owner earnback
+- Operating business price = 7,762,000,000 - (-776,582,814.64) = 8,538,582,814.64.
+- Owner earnback years = 8,538,582,814.64 / 175,000,000 = 48.7919018.
+- Market cap / cash profit = 7,762,000,000 / 175,000,000 = 44.3542857.
+
+11. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial populated result validation: status ok, errors [].
+- Final validation rerun after report and trace creation is recorded in the task handoff.
+
+12. Limitations
+- Sustainable cash profit is an analyst normalization, not company guidance.
+- The 50% discounts on cash availability and strategic equity holdings are explicit judgment calls.
+- No point-in-time market price was applied to the Hunan Yuneng holding; book value with a 50% haircut was used.
+- Market capitalization and PE were reused from the supplied Tencent snapshot without independent reconstruction.

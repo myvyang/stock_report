@@ -1,0 +1,54 @@
+Stock research trace: 03332.HK, period 2025-12-31
+
+Protocol
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated initialized fields using protocol `set`; complex result JSON was not hand-written from scratch.
+- Validated with protocol `validate`; result: status=ok, errors=[].
+
+Skill and contracts read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+Reused sources
+- stock_report/data/analysis/annual_review/03332.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/03332.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/03332.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/03332.HK/2025-12-31/imported_from_agent_runs/3a1493d3fb85-03332_annual_report_2025_hkex.txt
+- Corresponding original annual-report PDF in the same imported_from_agent_runs directory.
+
+Model review
+- Input hint classified the company as financial_brokerage.
+- Annual report Notes 4 and 5 identify one reportable segment: manufacture and sale of nutritional supplements and packaged health food products; revenue is recognized on delivery.
+- No brokerage client funds, proprietary securities portfolio, margin finance or repurchase funding structure was found.
+- Overrode hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+Core extraction reused
+- Financial position: annual report PDF pages 212-213.
+- Profit or loss: PDF page 211; Notes 5-6 pages 261-263.
+- Cash flow: PDF pages 216-217.
+- Business and revenue recognition: Notes 4-5, PDF pages 258-261.
+- Cash and pledged deposits: Note 21, PDF page 287.
+- Borrowings and collateral: Note 24, PDF page 289.
+- Dividend: annual report financial highlights/front section.
+
+Owner earnback assumptions
+- Unpledged cash and equivalents: RMB182,323,000.
+- Pledged deposits excluded: RMB57,933,000 at 0% detachable value.
+- Interest-bearing borrowings deducted: RMB75,000,000.
+- Lease liabilities deducted: RMB32,193,000.
+- Operating cash reserve: RMB50,000,000 (analyst assumption; about 0.8 month of revenue).
+- Discounted detachable net cash: RMB25,130,000.
+- Sustainable cash profit: RMB25,000,000, anchored to 2025 parent net profit RMB24,665,000.
+- 2025 OCF less PPE capex was RMB64,964,000 but was not extrapolated because inventory fell RMB38,399,000 and 2024 OCF was only RMB957,000.
+- Operating business price: RMB112,346,577.58533955 - RMB25,130,000 = RMB87,216,577.58533955.
+- Owner earnback: RMB87,216,577.58533955 / RMB25,000,000 = 3.4886631 years.
+- Market cap/cash profit: 4.4938631 times.
+
+Known limitations
+- Market data was supplied in config/input.json and not independently reverified.
+- Cash is not split by legal entity; upstreamability is unknown.
+- Minimum operating cash was not disclosed; reserve is an explicit assumption.
+- 2023 OCF and capex were not extracted.
+- No independently verifiable market share was available.

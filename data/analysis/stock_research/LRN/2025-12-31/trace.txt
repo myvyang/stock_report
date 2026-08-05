@@ -1,0 +1,57 @@
+LRN stock research trace
+generated_at=2026-08-04T17:59:28+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- No local LRN raw filing, annual facts package, normalized facts, or prior stock-research output existed under stock_report.
+- Initialized outputs/result.json with the protocol CLI from config/input.json.
+
+3. Period resolution
+- Input requested annual period 2025-12-31.
+- Stride fiscal year ends June 30; 2025-12-31 filing is a 10-Q, not an annual report.
+- Used FY2025 Form 10-K for the fiscal year ended 2025-06-30, the latest complete annual filing available at the requested research period.
+
+4. Primary sources
+- SEC Form 10-K: https://www.sec.gov/Archives/edgar/data/1157408/000155837025010334/lrn-20250630x10k.htm
+- Federal Reserve H.10: https://www.federalreserve.gov/releases/h10/20250707/
+- Input market snapshot: Yahoo Finance yfinance, market cap date 2026-08-03.
+
+5. Currency normalization
+- All filing values were reported in USD.
+- Used 2025-06-30 H.10 rate: USD 1 = CNY 7.1636.
+- Financial statement amounts in result.json are absolute CNY yuan.
+
+6. Model decision
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Reason: education services operations have separable operating assets, cash/securities, receivables, convertible debt, and leases; no special financial-statement model applies.
+
+7. Core source values (USD thousands)
+- Assets 2,293,959; liabilities 814,340; equity 1,479,619.
+- Revenue 2,405,317; gross profit 943,919; operating profit 360,094; parent net income 287,941.
+- CFO 432,816.
+- Capex = PPE 1,781 + software 36,428 + curriculum 21,801 = 60,010.
+- Operating FCF = 432,816 - 60,010 = 372,806.
+
+8. Owner earnback assumptions
+- Cash: 100% of USD 782.497m.
+- Marketable securities: 95% of USD 228.910m.
+- Convertible debt: subtract 100% of USD 416.322m.
+- Finance leases: subtract 100% of USD 86.883m.
+- Discounted detachable net cash: CNY 3,558,564,863.40.
+- Sustainable cash profit: (FCF USD 372.806m - SBC USD 36.794m) * 90% * 7.1636 = CNY 2,166,350,006.88.
+- Operating business price: CNY 23,039,827,536.2146 - CNY 3,558,564,863.40 = CNY 19,481,262,672.8146.
+- Owner earnback: 8.992666287 years.
+
+9. Dividend forecast
+- FY2025 10-K says Stride has never paid a common cash dividend and does not currently anticipate paying one.
+- Forecast cash dividend=0; forecast yield=0.
+
+10. Protocol
+- Populated initialized result using protocol CLI set commands.
+- Protocol validate status: ok, errors=[].

@@ -1,0 +1,96 @@
+task=stock_research
+query=GNW
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-04T10:59:08+08:00
+
+[protocol]
+initialized=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+updated=all result fields were written through protocol set commands after initialization
+validated=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[reuse]
+annual_facts_json=missing
+annual_facts_md=missing
+annual_extraction_trace=missing
+raw_filing_metadata=missing
+action=returned to primary filing and issuer results because no reusable annual fact package existed
+
+[primary_sources]
+1=https://www.sec.gov/Archives/edgar/data/1276520/000162828026012828/gnw-20251231.htm
+  type=Genworth Financial 2025 Form 10-K
+  filed=2026-02-27
+  used_for=business model, consolidated statements, segment results, investments, insurance liabilities, regulatory capital, liquidity, risks
+2=https://investor.genworth.com/news-events/press-releases/detail/1053/genworth-financial-announces-fourth-quarter-2025-results
+  type=issuer FY2025 earnings release
+  published=2026-02-03
+  used_for=cross-check segment structure, Enact metrics, PMIERs capital
+3=https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/17105-2.html
+  type=CFETS/PBOC central parity publication index; 2025-12-31 rate cross-checked through Xinhua/CFETS report
+  used_for=USD/CNY conversion
+  rate=7.0288 CNY per USD
+4=config/input.json
+  type=task input
+  used_for=company identity, market cap, market cap date, PE TTM, market source
+
+[model_review]
+input_hint=ordinary_operating/applicable
+confirmed_model=financial_insurance/requires_special_model
+override_reason=USD59.172bn investment assets are held against insurance contract liabilities including USD55.228bn future policy benefits, USD13.843bn policyholder account balances and USD4.369bn separate account liabilities. Consolidated cash and investment assets are not detachable shareholder cash.
+ordinary_owner_earnback_fields=null by contract, not missing data
+
+[currency]
+financial_statement_source_currency=USD
+result_currency=CNY
+conversion_rate=7.0288
+conversion_date=2025-12-31
+method=USD million x 1,000,000 x 7.0288; market cap retained exactly from input
+limitation=income and cash-flow amounts use period-end FX for display consistency, not average-rate accounting translation
+
+[key_extractions_usd_millions]
+total_assets=88083
+total_liabilities=78316
+total_equity=9767
+parent_equity=8750
+noncontrolling_interest=1017
+revenue=7301
+pretax_continuing_income=433
+net_income=350
+parent_net_income=223
+operating_cash_flow=327
+total_investments=59172
+cash_cash_equivalents_restricted=2036
+reinsurance_recoverable_net=17837
+future_policy_benefits=55228
+policyholder_account_balances=13843
+separate_account_assets_and_liabilities=4369
+long_term_borrowings=1513
+
+[special_model_metrics]
+Enact_adjusted_operating_income_usd_m=558
+Closed_Block_adjusted_operating_loss_usd_m=-317
+Corporate_and_Other_adjusted_operating_loss_usd_m=-97
+group_adjusted_operating_income_usd_m=144
+Enact_primary_insurance_in_force_usd_m=273147
+Enact_risk_in_force_usd_m=71414
+Enact_loss_ratio_2025=0.11
+Enact_PMIERs_sufficiency_ratio=1.62
+Enact_excess_over_PMIERs_usd_m=1919
+legacy_insurers_RBC_company_action_level_ratio_approx=3.00
+holdco_unrestricted_cash_usd_m=234
+holdco_cash_reserved_for_future_obligations_usd_m_approx=127
+capital_returns_from_Enact_2025_usd_m=407
+expected_Enact_capital_returns_to_GNW_2026_usd_m_approx=405
+
+[dividend]
+GNW_common_cash_dividend_2023=0
+GNW_common_cash_dividend_2024=0
+GNW_common_cash_dividend_2025=0
+forecast_next_12m_cash_dividend=0
+forecast_basis=no established GNW common cash dividend; capital return has been via repurchases; 2025 repurchase cost USD248m
+
+[quality]
+status=complete
+ordinary_payback_null_reason=special insurance model
+known_limitations=market PE may use a different TTM period than FY2025 net income; 2026 Q1 financials were not substituted for annual statements; forward Enact capital return is management expectation, not guaranteed cash

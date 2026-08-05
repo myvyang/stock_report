@@ -1,0 +1,108 @@
+stock-research trace
+company=辉煌科技
+code=002296.SZ
+period=2025-12-31
+generated_at=2026-07-31T18:25:11+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar fields with protocol set and arrays with protocol append; the complex JSON result was not authored from scratch.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[reuse audit]
+- Checked configured annual facts, raw filing, normalized facts and prior stock-research paths.
+- None of those configured filing/facts/research files existed in the workspace.
+- Existing stock_report/data/notes/user_stock_evaluations.md was not used as a source for core financial data.
+- Therefore public disclosure retrieval was required.
+
+[sources]
+S1 河南辉煌科技股份有限公司2025年年度报告，公告编号2026-004，披露日2026-04-28。原始披露渠道：巨潮资讯网/深圳证券交易所；检索核对页：https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12223036&stockid=002296
+S2 河南辉煌科技股份有限公司2025年度利润分配预案，披露日2026-04-28。年报内载预案及上海证券报披露汇总：https://paper.cnstock.com/html/2026-04/28/content_2207909.htm
+S3 config/input.json：市值3,463,000,000元、行情时间20260731114257、来源Tencent qt.gtimg.cn、PE TTM 20.3。
+
+[model classification]
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Reason: company sells railway signalling/monitoring/information systems by project and direct sales. Balance sheet has project receivables and contract liabilities, but no customer deposits, insurance reserves, regulated presale cash, concession rights, or financial balance-sheet model.
+
+[core financial extraction from S1]
+- revenue=878,511,865.42
+- cost_of_sales=351,819,792.60
+- gross_profit=526,692,072.82
+- operating_profit=213,024,986.95
+- net_profit=185,668,336.00
+- parent_net_profit=187,106,092.94
+- operating_cash_flow=168,386,400.82
+- capital_expenditure=13,645,591.14 (cash paid to acquire fixed, intangible and other long-term assets)
+- operating_free_cash_flow=154,740,809.68
+- financing_cash_flow=-78,774,527.20
+- dividend_and_buyback_cash_out=77,916,084.00 (cash-flow statement dividend distribution; no material buyback identified)
+- total_assets=3,169,431,819.42
+- total_liabilities=723,652,094.64
+- total_equity=2,445,779,724.78
+- parent_equity=2,425,845,516.60
+- minority_interest=19,934,208.18
+
+[business extraction from S1]
+- national railway revenue=719,341,350.24; share=81.88%; gross margin=65.40%
+- urban rail revenue=107,739,284.75; YoY=-84.45%
+- monitoring product revenue=710,409,149.18; share=80.86%; gross margin=63.14%
+- direct sales share=100%
+- R&D expense=99,221,852.92; capitalization=0
+- top-five customer sales share=30.35%
+
+[asset and liability interpretation]
+- cash_and_cash_equivalents=294,473,860.37
+- restricted_cash_related_balance=19,963,208.80, described as guarantee deposits and accrued interest not yet due; excluded from detachable cash.
+- short_term_large_certificates_of_deposit=21,069,176.27
+- debt_investment_large_certificates_of_deposit=595,287,123.29; no impairment allowance shown.
+- accounts_receivable_net=1,008,579,707.41; gross=1,335,003,792.26; allowance=326,424,084.85.
+- contract_assets_net=16,071,857.05.
+- inventory=377,073,398.00.
+- notes_and_accounts_payable=449,473,204.43.
+- contract_liabilities=187,002,582.68.
+- lease-related debt=1,814,736.35; no bank borrowings or bonds shown.
+
+[calculations]
+gross_margin = 526,692,072.82 / 878,511,865.42 = 0.5995275649
+net_margin = 187,106,092.94 / 878,511,865.42 = 0.2129807177
+operating_free_cash_flow = 168,386,400.82 - 13,645,591.14 = 154,740,809.68
+
+discounted_cash:
+- 294,473,860.37 * 100% = 294,473,860.37
+- 21,069,176.27 * 95% = 20,015,717.46
+- 595,287,123.29 * 90% = 535,758,410.96
+- lease debt deduction = -1,814,736.35
+- discounted_detachable_net_cash = 848,433,252.44
+
+sustainable_cash_profit:
+- base=2025 operating free cash flow=154,740,809.68
+- project acceptance / receivable collection buffer=-10%=15,474,080.97
+- discounted_sustainable_cash_profit=139,266,728.71
+
+valuation:
+- operating_business_price = 3,463,000,000.00 - 848,433,252.44 = 2,614,566,747.56
+- owner_earnback_years = 2,614,566,747.56 / 139,266,728.71 = 18.7738
+- market_cap_to_cash_profit = 3,463,000,000.00 / 139,266,728.71 = 24.8660
+- discounted_net_cash_to_market_cap = 848,433,252.44 / 3,463,000,000.00 = 24.4999%
+
+[dividend]
+- 2025 board proposal: 389,580,420 shares * CNY0.13/share = 50,645,454.60.
+- forecast_dividend_yield = 50,645,454.60 / 3,463,000,000.00 = 1.4624%.
+- The proposal was stated as pending shareholder approval in the retrieved disclosure; no separate implementation notice was available in the workspace.
+
+[judgment boundaries]
+- Facts: filed statement numbers, segment data, receivable aging, disclosed dividend proposal, input market snapshot.
+- Inferences: business model classification and interpretation of project working capital.
+- Analyst judgments: 95%/90% deposit discounts, 10% cash-profit buffer, detachable net cash, sustainable cash profit, and payback years.
+- No target price, trading recommendation, ranking label, or unsupported industry rank was produced.
+
+[quality limitations]
+- Market cap and PE TTM were accepted from the supplied Tencent snapshot and not independently reconciled to an exchange close.
+- Final shareholder approval/implementation status of the 2025 dividend proposal was not separately established.
+- Payback results are sensitive to receivable collections, project acceptance timing, and the analyst-selected discounts.

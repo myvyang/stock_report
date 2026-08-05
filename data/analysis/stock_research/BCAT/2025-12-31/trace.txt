@@ -1,0 +1,92 @@
+stock-research trace
+query=BCAT
+period=2025-12-31
+generated_for=2026-08-04
+
+[protocol]
+Read .agents/skills/stock-research/SKILL.md in full.
+Read references/result-contract.md in full.
+Read references/report-contract.md in full.
+Read references/data-reuse.md in full because the skill requires reuse checks.
+Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+All result fields were populated with protocol `set` and `append`; the complex JSON object was not hand-written from scratch.
+
+[reuse audit]
+Checked the configured annual-review, normalized-facts, and raw-filing directories for BCAT/2025-12-31.
+No reusable files were present, so the primary annual filing was obtained from SEC EDGAR.
+
+[primary filing]
+Issuer: BlackRock Capital Allocation Term Trust
+CIK: 0001809541
+Accession: 0001193125-26-093580
+Form: N-CSR
+Period: 2025-12-31
+Filed: 2026-03-05
+URL: https://www.sec.gov/Archives/edgar/data/1809541/000119312526093580/d34815dncsr.htm
+
+[model decision]
+Input hint: ordinary_operating/applicable.
+Overridden to: investment_holding/requires_special_model.
+Basis: filing identifies BCAT as a diversified closed-end management investment company; portfolio securities and derivatives are its operating assets. Ordinary detachable-net-cash and cash-profit formulas are economically invalid.
+
+[currency conversion]
+Reporting currency in filing: USD.
+Result-contract currency: CNY absolute yuan.
+Conversion rate used: 1 USD = 7.0288 CNY, CFETS/PBOC central parity for 2025-12-31.
+Rate source landing page: https://www.safe.gov.cn/safe/rmbhlzjj/
+
+[key extracted facts: USD]
+Total assets=1,965,717,642
+Total liabilities=370,425,270
+Net assets=1,595,292,372
+Shares outstanding=104,775,271
+NAV/share=15.23
+Investments at value, unaffiliated=1,793,197,966
+Investments at value, affiliated=22,621,390
+Restricted and unrestricted cash/foreign currency=47,207,012
+Payable for investments purchased=269,303,242
+TBA sale commitments liability=84,093,023
+Options written liability=4,115,489
+Total investment income=60,466,160
+Expenses after waiver/reimbursement=22,951,574
+Net investment income=37,514,586
+Net realized gain=46,032,377
+Net unrealized appreciation=138,447,874
+Net increase in net assets from operations=221,994,837
+2025 shareholder distributions=347,962,866
+2025 distributions classified as return of capital=311,196,227
+Net cash provided by operating activities=329,512,787
+Cash dividends paid=344,703,998
+Portfolio turnover=260%
+Borrowings at period end=0
+
+[special-model interpretations]
+Revenue, gross profit, margins, capex and operating free cash flow left null because investment-company statements do not provide economically comparable ordinary-company measures.
+Parent net profit uses net increase in net assets resulting from operations, while the report explicitly splits investment income, realized gain and unrealized change.
+Operating cash flow is retained as a reported fact but not used as cash conversion because it includes securities purchases and sales.
+All ordinary owner-earnback metrics remain null per result contract.
+
+[dividend forecast]
+Official/announced monthly distribution for Jul-Sep 2026=USD 0.25423/share.
+Reference shares=105,845,249 from BlackRock official product page around 2026-07-13.
+Annualized USD cash distribution=0.25423*12*105,845,249=322,908,451.83924.
+CNY forecast=322,908,451.83924*7.0288=2,269,658,926.29.
+Forecast cash distribution yield=2,269,658,926.29/11,142,691,706.62793=0.2036903637.
+Important: managed distribution policy annualizes 20% of rolling 12-month average daily NAV; forecast is a cash payout estimate, not an earnings yield.
+
+[market data]
+Market cap=11,142,691,706.62793 CNY
+Market-cap date=2026-08-03
+Market-cap source=Yahoo Finance yfinance supplied by input
+PE TTM=7.433963 supplied by input
+PE flagged as low explanatory value because investment-company net results include unrealized fair-value changes.
+
+[secondary/current official checks]
+BlackRock official BCAT product page: investment approach, fee 1.25%, 2026 holdings, NAV/market price, leverage, term structure.
+BlackRock distribution release: managed distribution mechanism and 2026 declared distributions.
+Third-party dividend page was used only to cross-check announced per-share dates/amounts, not as a core financial source.
+
+[validation]
+Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Initial post-population validation status: ok; errors: [].

@@ -1,0 +1,20 @@
+2026-08-04 stock-research trace — RIGL / FY2025
+
+1. Read skill and required contracts:
+   .agents/skills/stock-research/SKILL.md
+   .agents/skills/stock-research/references/result-contract.md
+   .agents/skills/stock-research/references/report-contract.md
+2. Looked for supplied annual facts, normalized facts and raw filing metadata. None existed under the paths in config/input.json; only the user notes file existed.
+3. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Retrieved and checked primary sources:
+   - SEC Form 10-K, accession 0001034842-26-000015, filed 2026-03-03.
+   - Rigel FY2025 results release and 2026 outlook, 2026-03-03.
+   - Federal Reserve H.10 release dated 2025-12-29; last available listed CNY rate was 7.0063 per USD on 2025-12-26.
+5. Core USD facts from 10-K (USD thousands): assets 513,594; liabilities 122,114; equity 391,480; revenue 294,282; product cost 19,621; operating income 125,466; net income 367,024; CFO 75,655; capex 0; cash and short-term investments 154,955; loans 52,294.
+6. Quality adjustments: excluded 245,852 deferred tax benefit from sustainable profit; treated 39,981 cost-share liability release and 3,000 milestone revenue as non-recurring; noted working-capital outflow and 2026 revenue guidance.
+7. Owner earnback assumptions: retain USD50m operating/R&D reserve; 90% value on remaining cash securities; deduct loans at 100%; sustainable cash profit USD50m. Converted at 7.0063 CNY/USD.
+8. Wrote result fields using repeated protocol CLI set commands, not by constructing result.json manually.
+9. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Outcome: status=ok, errors=[]; exit code 0. jq syntax check also passed.

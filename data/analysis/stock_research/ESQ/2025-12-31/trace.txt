@@ -1,0 +1,68 @@
+stock-research trace
+task_created_at=2026-08-05T04:41:36+08:00
+period=2025-12-31
+query=ESQ
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the skill references it for reuse boundaries.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+[reuse audit]
+- No raw filing, annual review, normalized fact package, or prior ESQ stock-research result existed in the workspace.
+- Only stock_report/data/notes/user_stock_evaluations.md existed and contained no reusable ESQ annual facts.
+- Therefore official public filings had to be retrieved.
+
+[primary sources]
+- SEC Form 10-K FY ended 2025-12-31, filed 2026-03-13:
+  https://www.sec.gov/Archives/edgar/data/1531031/000110465926027706/esq-20251231x10k.htm
+- SEC exhibit/company FY2025 results release dated 2026-01-22:
+  https://www.sec.gov/Archives/edgar/data/1531031/000110465926005642/esq-20260122xex99d1.htm
+- Federal Reserve H.10, CNY per USD, 2025-12-31 = 7.1875:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- SEC Form 8-K dividend announcement dated 2026-04-30:
+  https://www.sec.gov/Archives/edgar/data/1531031/000110465926053015/esq-20260430x8k.htm
+- SEC-filed final Signature merger exchange ratio dated 2026-06-23:
+  https://www.sec.gov/Archives/edgar/data/1531031/000110465926077082/tm2618659d1_ex99-1.htm
+- Market cap, market date, PE TTM and market source were reused exactly from config/input.json.
+
+[model decision]
+- Input hint ordinary_operating/applicable was overridden.
+- Confirmed statement_model=financial_bank.
+- Confirmed owner_earnback_applicability=requires_special_model.
+- Basis: wholly owned regulated bank; loans are 74.3% of assets; customer deposits are 99.4% of liabilities. Cash, securities, loans and deposits are operating balance-sheet items under liquidity/capital constraints.
+- All ordinary owner earnback numeric fields were retained as null, per contract.
+
+[currency]
+- Reporting currency required by protocol: CNY absolute yuan.
+- All USD filing amounts converted at 7.1875 CNY/USD, the Federal Reserve H.10 spot rate for 2025-12-31.
+- Market cap was not converted again because config/input.json already supplied the protocol amount in CNY.
+
+[key calculations]
+- total_assets = USD 2,365,661,000 * 7.1875 = CNY 17,003,188,437.5
+- total_liabilities = USD 2,076,063,000 * 7.1875 = CNY 14,921,702,812.5
+- equity = USD 289,598,000 * 7.1875 = CNY 2,081,485,625
+- revenue proxy for bank = (net interest income USD 121,481,000 + noninterest income USD 25,080,000) * 7.1875 = CNY 1,053,407,187.5
+- parent net income = USD 50,822,000 * 7.1875 = CNY 365,283,125
+- static market cap / FY2025 earnings = 20.65x; disclosed input PE TTM remains 21.358677.
+- static market cap / 2025-12-31 equity = 3.62x.
+- forecast dividend = USD 0.20 quarterly * 4 * 8,636,809 pre-merger shares * 7.1875 = CNY 49,661,651.75.
+- forecast yield = CNY 49,661,651.75 / CNY 7,542,074,570.9765625 = 0.006584614257343482.
+- Mechanical bank OCF less premises/equipment and capitalized software was recorded for statement completeness, but explicitly excluded from owner-earnback interpretation.
+
+[quality cautions]
+- Financial statement conversion uses a single period-end FX rate, not average rates for income/cash flow.
+- The 2026-08-03 market cap may reflect a share-count basis changed by the Signature transaction; input does not document that denominator.
+- Dividend forecast uses the last explicitly disclosed pre-merger share count and therefore does not include approximately 3.447 million merger shares.
+- Post-merger consolidated financial statements were not available in the FY2025 annual report and are a major comparability limitation.
+
+[protocol population]
+- Used repeated protocol `set` commands to populate initialized paths; the complex result object was not hand-written from scratch.
+- No ranking labels or buy/sell recommendation were added.
+
+[validation]
+- Ran:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[]

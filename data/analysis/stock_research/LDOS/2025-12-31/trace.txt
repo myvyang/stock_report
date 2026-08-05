@@ -1,0 +1,73 @@
+stock-research trace
+generated_at: 2026-08-04 Asia/Shanghai
+query: LDOS
+input: config/input.json
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Also read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Expected paths under stock_report/data/raw/filings/LDOS/2025-12-31, annual_review, and normalized facts did not exist.
+- Configured /root/aicode sync target also contained no reusable LDOS files.
+- Therefore fetched primary official sources instead of fabricating an annual facts pack.
+
+3. Primary sources used
+- Leidos FY2025 Form 10-K, filed 2026-02-17, fiscal year ended 2026-01-02:
+  https://investors.leidos.com/node/35456/html
+- Leidos FY2025 earnings release, 2026-02-17:
+  https://investors.leidos.com/news-releases/news-release-details/leidos-posts-strong-fourth-quarter-and-fiscal-year-2025-results
+- Leidos completed Entrust acquisition, 2026-03-30:
+  https://investors.leidos.com/news-releases/news-release-details/leidos-completes-24-billion-acquisition-entrust
+- Leidos FY2026 Q1 earnings release, 2026-05-05:
+  https://investors.leidos.com/news-releases/news-release-details/leidos-posts-strong-first-quarter-results-and-raises-full-year
+- Leidos official stock quote/dividend history:
+  https://investors.leidos.com/stock-data/stock-quote-chart
+- Market cap and PE are preserved from config/input.json (Yahoo Finance yfinance).
+
+4. Period and currency normalization
+- Input period is 2025-12-31; legal FY2025 year-end is 2026-01-02. Used the legal annual report and disclosed the mismatch.
+- All filing amounts are USD. Protocol requires absolute CNY yuan.
+- Applied one research conversion rate of CNY 6.45 per USD to all financial and dividend amounts.
+- This is an explicit analysis assumption, not a Leidos-reported FX rate.
+
+5. Model decision
+- statement_model: ordinary_operating
+- applicability: applicable
+- Reason: government receivables and contract assets are working capital for service/system delivery; balance-sheet financial assets and liabilities are not the business itself as in a bank, insurer, developer, or concession operator.
+- Special handling: do not treat receivables, restricted customer cash, goodwill, or contract assets as detachable cash.
+
+6. Core FY2025 extraction (USD millions)
+- Revenue 17,174; cost of revenue 14,075; gross profit 3,099.
+- Operating income 2,109; net income 1,462; parent net income 1,448.
+- Total assets 13,493; total liabilities 8,531; equity 4,962; parent equity 4,916; NCI 46.
+- Operating cash flow 1,750; capex 125; operating FCF 1,625.
+- Dividend payments 211; stock repurchases and other 944.
+- FY2025 cash 1,108; debt 4,648. For valuation-date capital structure, replaced these with latest available post-Entrust Q1 cash 457 and debt 6,300.
+
+7. Formula trail
+- gross_margin = 3,099 / 17,174 = 0.1804471876.
+- net_margin = 1,448 / 17,174 = 0.0843134971.
+- discounted detachable net cash = (457 * 80% - 6,300) USDm * 6.45 = -38,276,880,000 CNY.
+- sustainable cash-profit normalization: FY2025 FCF 1,625 USDm -> baseline 1,450 -> subtract SBC 95 -> 10% haircut = 1,219.5 USDm = 7,865,775,000 CNY.
+- operating business price = 98,121,313,597.86035 - (-38,276,880,000) = 136,398,193,597.86035 CNY.
+- owner earnback = 136,398,193,597.86035 / 7,865,775,000 = 17.34071895 years.
+- market cap / cash profit = 98,121,313,597.86035 / 7,865,775,000 = 12.47446229.
+- dividend forecast = 0.43 * 4 * 126,380,657 * 6.45 = 1,402,067,008.758 CNY.
+- forecast yield = 1,402,067,008.758 / 98,121,313,597.86035 = 0.0142891178.
+
+8. Data limitations
+- Annual financials and latest capital structure are mixed time points by design because the market cap is post-acquisition.
+- Entrust debt/cash impact is included, but its full earnings contribution is not; earnback is directionally conservative.
+- FY2026 Q2 earnings page existed at generation time but no reproducible financial statements were available; Q1 is latest verified capital structure.
+- No buy/sell recommendation, target price, or ranking label was produced.
+
+9. Output construction and validation
+- outputs/result.json was initialized and populated only through the stock-research protocol CLI set commands.
+- outputs/report.md and outputs/trace.txt were written as human-readable artifacts.
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final result: {"status":"ok","errors":[]}
+- JSON syntax check: passed.

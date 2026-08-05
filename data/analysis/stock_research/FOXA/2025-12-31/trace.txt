@@ -1,0 +1,67 @@
+FOXA stock research trace
+generated_at=2026-08-04T18:48:39+08:00
+task_period=2025-12-31
+report_type=annual
+
+[skill_and_contract]
+read .agents/skills/stock-research/SKILL.md
+read .agents/skills/stock-research/references/result-contract.md
+read .agents/skills/stock-research/references/report-contract.md
+read .agents/skills/stock-research/references/data-reuse.md
+
+[reuse_check]
+No local raw filing, annual facts, normalized facts, or prior stock-research outputs existed under the paths supplied by config/input.json.
+Decision: rebuild from primary SEC filings.
+
+[primary_sources]
+FY2025 Form 10-K, accession 0001628280-25-038077, filed 2025-08-06:
+https://www.sec.gov/Archives/edgar/data/1754301/000162828025038077/fox-20250630.htm
+Q2 FY2026 Form 10-Q, accession 0001628280-26-005285, period ended 2025-12-31:
+https://www.sec.gov/Archives/edgar/data/1754301/000162828026005285/fox-20251231.htm
+Market cap and PE: Yahoo Finance yfinance snapshot supplied in config/input.json.
+
+[period_resolution]
+Fox fiscal year ends June 30. The requested 2025-12-31 annual task period is not an annual fiscal year-end.
+Used audited FY2025 10-K for annual core statements; used the 2025-12-31 10-Q only as a post-annual-period seasonal cross-check.
+Market cap date 2026-08-03 is retained exactly from user input and flagged as a timing limitation.
+
+[currency]
+All filing amounts were USD. Conversion assumption: 1 USD = 7.20 CNY.
+Input market cap was already provided as CNY and was not reconverted.
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: content production, licensing, distribution and advertising are ordinary operating activities; cash and borrowings are separable liquidity/financing items. Sports rights and programming create seasonal working-capital needs, handled by discounts rather than a special statement model.
+
+[core_calculations]
+FY2025 gross_profit_usd_m = revenue 16300 - operating_expenses 10518 = 5782
+gross_margin = 5782 / 16300 = 0.3547239264
+net_margin = parent_net_income 2263 / revenue 16300 = 0.1388343558
+FY2025 operating_fcf_usd_m = CFO 3324 - capex 331 = 2993
+FY2024 operating_fcf_usd_m = 1840 - 345 = 1495
+FY2023 operating_fcf_usd_m = 1800 - 357 = 1443
+three_year_average_fcf_usd_m = (2993 + 1495 + 1443) / 3 = 1977
+discounted_sustainable_cash_profit = 1977 * 0.90 * 7.20 = 12810960000 CNY
+discounted_cash = 5351 * 0.70 * 7.20 = 26969040000 CNY
+debt = 6602 * 7.20 = 47534400000 CNY
+discounted_detachable_net_cash = 26969040000 - 47534400000 = -20565360000 CNY
+operating_business_price = 164994096092.44922 - (-20565360000) = 185559456092.44922 CNY
+owner_earnback_years = 185559456092.44922 / 12810960000 = 14.4844302139
+market_cap_to_cash_profit = 164994096092.44922 / 12810960000 = 12.8791359970
+forecast_dividend = 446335925 shares * USD 0.56 * 7.20 = 1799626449.60 CNY
+forecast_dividend_yield = 1799626449.60 / 164994096092.44922 = 0.0109072172
+
+[protocol]
+Initialized outputs/result.json using protocol init.
+Populated result fields using protocol set commands.
+Protocol validation returned status=ok and errors=[].
+
+[judgment_vs_fact]
+Facts: filing statement values, segment values, shares, dividend history, input market snapshot.
+Judgments: 70% cash recognition, 100% debt deduction, three-year FCF averaging, 10% sustainability haircut, USD/CNY 7.20 conversion assumption, forecast dividend held at USD 0.56/share.
+
+[quality]
+status=complete
+incomplete_reasons=[]
+Limitations are recorded in outputs/result.json and outputs/report.md.

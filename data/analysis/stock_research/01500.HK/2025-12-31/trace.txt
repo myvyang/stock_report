@@ -1,0 +1,68 @@
+stock-research trace
+company: 01500.HK / In Construction Holdings Limited / 现恒建筑控股有限公司
+research cutoff: 2025-12-31
+generated input time: 2026-08-04T17:57:37+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because no reusable facts package was present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse and source availability
+- Expected annual facts, normalized facts, and raw filing metadata were absent.
+- Downloaded primary filings into stock_report/data/raw/filings/01500.HK/2025-12-31/:
+  annual-report-2024-2025.pdf
+  interim-report-2025-2026.pdf
+- Main audited source: HKEX Annual Report 2024/2025, released 2025-07-18, year ended 2025-03-31:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2025/0718/2025071800605.pdf
+- Cutoff-date update: HKEX interim results announcement, released 2025-11-28, six months ended 2025-09-30:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2025/1128/2025112801626.pdf
+
+3. Period decision
+- Input period 2025-12-31 is treated as research/data cutoff, not statutory year-end.
+- Company statutory year-end is 31 March.
+- Used FY2024/25 audited annual statements as main annual dataset and H1 FY2025/26 only as a subsequent update available before the cutoff.
+- Did not use FY2025/26 annual report released in July 2026 for financial conclusions because it is after the 2025-12-31 cutoff.
+
+4. Model correction
+- Input hint said financial_brokerage, but source tags also said construction contractor.
+- Annual report P7 and P65 explicitly identify the group as a Hong Kong foundation contractor.
+- Overrode hint with statement_model=construction_project and owner_earnback_applicability=requires_special_model.
+- Ordinary net-cash/cash-profit/payback fields remain null as required by the contract.
+
+5. Audited annual facts (HKD'000 unless stated)
+- Revenue 273,600; direct costs 273,366; gross profit 234.
+- Operating loss 18,693; loss attributable to owners 18,911.
+- Total assets 369,075; total liabilities 126,406; total/parent equity 242,669; no NCI.
+- Contract assets 230,499; inventories 11,095; trade and other receivables 54,072.
+- Cash and bank balances 72,999, including restricted deposits 41,551.
+- Trade and other payables 100,350; contract liabilities 13,041; shareholder loan 13,000.
+- Operating cash flow -5,809; purchase of PPE 313; operating FCF -6,122.
+- No FY2024/25 final dividend.
+- No new project in FY2024/25; six projects; outstanding contract sum 416.4m; largest project 44.7% of revenue.
+
+6. Interim cutoff update (HKD'000 unless stated)
+- H1 revenue 177,250; gross profit 34,592; parent profit 27,444.
+- Contract assets 228,760; cash 98,787, of which about 40,400 restricted.
+- No new project; outstanding contract sum declined to 241.3m.
+- No interim dividend.
+- Interim report was unaudited but reviewed by KPMG under HK Standard on Review Engagements 2410.
+
+7. Currency translation
+- Result contract requires absolute CNY yuan.
+- Used PBOC/CFETS central parity on 2025-04-01, the first trading day after annual balance-sheet date: 1 HKD = 0.92257 CNY.
+- Financial statement amounts in result.json are HKD source amounts x 0.92257 x 1,000.
+- Ratios are calculated from original HKD amounts and are currency invariant.
+
+8. Valuation caveat
+- Market cap CNY 274,908,866.43230915 and PE TTM 4.93 copied from input source Tencent qt.gtimg.cn at 2026-08-03 09:43:18.
+- Market date is later than research cutoff. PE TTM is inconsistent with the audited FY2024/25 loss and likely incorporates later profit; it was retained as supplied but not used to derive payback.
+
+9. Result construction and validation
+- Used protocol CLI set/append commands to populate outputs/result.json; did not hand-write the JSON object.
+- Forecast cash dividend set to 0 and forecast yield to 0 based on the latest annual and interim board resolutions available by cutoff.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]

@@ -1,0 +1,56 @@
+Stock research trace — DEC — period 2025-12-31
+Generated for task created_at 2026-08-04T20:51:40+08:00
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because no prior annual facts were available.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated initialized paths exclusively through protocol `set` commands; did not hand-write result.json.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation response: {"status":"ok","errors":[]}
+
+2. Local reuse audit
+- Checked stock_report/data/analysis/annual_review/DEC/2025-12-31, stock_report/data/raw/filings/DEC/2025-12-31, and stock_report/data/normalized/facts/DEC/2025-12-31.
+- No existing annual facts, normalized facts, or filing were present, so official filing retrieval was required.
+- Saved the company-hosted SEC filing copy to stock_report/data/raw/filings/DEC/2025-12-31/dec-20251231.htm.
+
+3. Primary sources
+- Diversified Energy Company 2025 Form 10-K, filed 2026-02-26:
+  https://www.sec.gov/Archives/edgar/data/1922446/000192244626000020/dec-20251231.htm
+- Diversified Energy dividend and tax information:
+  https://ir.div.energy/dividend-tax-information
+- Federal Reserve G.5 release, December 2025 average China yuan per USD = 7.0432:
+  https://www.federalreserve.gov/releases/g5/20260302/
+- Market cap, market-cap date, PE TTM: supplied in config/input.json, source labelled Yahoo Finance yfinance.
+
+4. Model decision
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Rationale: DEC produces, transports, and markets natural gas, oil, and NGLs; its balance sheet is not customer deposits, insurance reserves, regulated project cash, or an investment-holding portfolio.
+- Resource-business handling: exclude restricted cash, deduct all interest-bearing debt, deduct all reported capex from operating cash flow, and separately disclose reserve decline and ARO.
+
+5. Translation and calculations
+- All filing values were reported in USD thousands and multiplied by 1,000 * 7.0432 to obtain absolute CNY yuan.
+- Calculated gross profit = total revenue - lease operating expense - production taxes - midstream operating expense - transportation expense.
+- Gross margin = 1,090.388 / 1,829.142 = 0.5961199295.
+- Net margin = parent net income 341.115 / revenue 1,829.142 = 0.1864890752.
+- Operating FCF = CFO 464.619 - capex 184.600 = USD 280.019m = CNY 1,972,229,820.8.
+- Discounted detachable net cash = unrestricted cash USD 29.697m - current and long-term debt USD 2,952.014m = CNY -20,582,463,094.4.
+- Operating business price = market cap - discounted net cash = CNY 26,857,647,604.24161.
+- Owner earnback years = operating business price / operating FCF = 13.6179096984.
+- Market cap / cash profit = 3.1817714364.
+- Forecast dividend = USD 0.29 * 4 * 76,979,625 shares * 7.0432 = CNY 628,932,157.968.
+- Forecast dividend yield = forecast dividend / input market cap = 0.1002252853.
+
+6. Important limitations retained in result.json
+- Market snapshot was not independently reconciled to a primary exchange feed.
+- One December monthly FX rate was used for both stock and flow items to meet the unified-CNY contract.
+- Gross profit is an analyst-computed subtotal and includes derivative gains in revenue.
+- Sustainable cash profit is a one-year audited CFO-minus-capex proxy; acquisition mix, working capital, hedging settlements, maintenance needs, and ARO cash outlays can change it.
+
+7. Outputs
+- outputs/result.json — protocol initialized, populated, and validated.
+- outputs/report.md — human-readable operating and owner-earnback report.
+- outputs/trace.txt — this reproducibility trace.

@@ -1,0 +1,76 @@
+stock-research execution trace
+company: 02671.HK / USAS BUILDING
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse check
+   - config/input.json exists.
+   - No annual facts package, normalized facts, raw filing metadata, or prior stock research output was present under the paths supplied by input.
+   - Public filing retrieval was therefore required.
+
+3. Protocol initialization
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   result: initialized stock-research-result-v1 structure.
+
+4. Company/model verification
+   - Input hint said financial_brokerage.
+   - HKEX Annual Report 2025 identifies the issuer as USAS Building System (Shanghai) Co., Ltd., stock 02671.HK.
+   - Disclosed operations are integrated prefabricated steel-structure building subcontracting, professional general contracting, and industrial environmental equipment.
+   - Hint overridden with construction_project / requires_special_model.
+   - Reason: contract assets, receivables, payables, short-term borrowings and cash are linked to project performance and settlement; cash is not mechanically detachable.
+
+5. Primary evidence used
+   - HKEX Annual Report 2025, published 2026-04-23:
+     https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042303272.pdf
+   - HKEX Annual Results Announcement for year ended 2025-12-31, published 2026-03-26:
+     https://newsfile.futunn.com/public/NN-PersistNoticeAttachment/7781/20260326/12071078-0.PDF
+   - Input market snapshot: Tencent qt.gtimg.cn, 2026/08/03 09:20:05.
+
+6. Key extracted values (RMB absolute yuan)
+   revenue=2,294,079,000
+   cost_of_sales=2,063,944,000
+   gross_profit=230,135,000
+   net_profit=65,812,000
+   parent_net_profit=65,647,000
+   total_assets=1,927,797,000
+   total_liabilities=1,265,873,000
+   total_equity=661,924,000
+   parent_equity=624,148,000
+   operating_cash_flow=127,543,000
+   property_plant_equipment_capex=4,893,000
+   cash_and_cash_equivalents=419,503,000
+   contract_assets=740,638,000
+   trade_and_bills_receivables=327,120,000
+   trade_and_bills_payables=692,414,000
+   bank_borrowings=410,653,000
+
+7. Calculations
+   gross_margin = 230,135,000 / 2,294,079,000 = 0.1003160744
+   parent_net_margin = 65,647,000 / 2,294,079,000 = 0.0286158505
+   operating_free_cash_flow = 127,543,000 - 4,893,000 = 122,650,000
+   forecast_dividend = RMB0.37 * 120,550,005 shares = RMB44,603,501.85, rounded to RMB44,603,502
+   forecast_dividend_yield = 44,603,502 / 425,211,880.21540636 = 0.1048971209
+
+8. Special-model handling
+   - discounted_net_cash=null
+   - discounted_cash_profit=null
+   - operating_business_price=null
+   - owner_earnback_years=null
+   - market_cap_to_cash_profit=null
+   - Interpretation supplied in result.json and report.md.
+
+9. Protocol updates and validation
+   - All structured fields were populated using protocol CLI set commands after protocol initialization.
+   - command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - result: status=ok, errors=[]
+
+10. Known limitations
+   - Market cap and PE TTM are from the supplied Tencent snapshot, not an official exchange quote.
+   - Listed-company history after the 2025-12-30 listing is short.
+   - One-year cash conversion is affected by large and offsetting project working-capital movements.
+   - Industry rank is limited to the China industrial PS-building market definition used in offering documents.

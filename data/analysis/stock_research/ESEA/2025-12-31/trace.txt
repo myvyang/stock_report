@@ -1,0 +1,80 @@
+Stock research trace — ESEA — period 2025-12-31
+Generated for input created_at 2026-08-04T17:07:36+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked configured raw filing, annual review, normalized facts, and prior stock research paths.
+- No filing metadata, annual facts, normalized facts, or prior research artifacts existed for ESEA/2025-12-31 in the workspace.
+- Therefore returned to primary public disclosures instead of fabricating a facts package.
+
+3. Primary sources retrieved/used
+- SEC audited FY2025 Form 20-F, filed 2026-04-29:
+  https://www.sec.gov/Archives/edgar/data/1341170/000117184326002807/esea20251231_20f.htm
+- SEC FY2025 results Form 6-K, filed 2026-02-26:
+  https://www.sec.gov/Archives/edgar/data/1341170/000131786126000010/f022626esea6k.htm
+- SEC Q1 2026 results/dividend Form 6-K, filed 2026-05-21:
+  https://www.sec.gov/Archives/edgar/data/1341170/000131786126000024/f052126esea6k.htm
+- USD/CNY 2025-12-31 central parity 7.0288, CFETS figure relayed by Xinhua:
+  https://english.news.cn/20251231/d55adf458b384452b9c936aff80e901f/c.html
+- Market cap, date, PE TTM and source were taken unchanged from config/input.json.
+
+4. Model decision
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Rationale: revenue is earned by owning and time-chartering containerships. Vessels and related bank debt are operating capital, not customer funds or regulated balances.
+- Special handling: capital intensity, newbuilding commitments, and shipping cyclicality require conservative cash and profit discounts.
+
+5. Audited USD inputs from FY2025 Form 20-F
+- Total assets: 700,455,517
+- Total liabilities: 237,011,730
+- Total equity / parent equity: 463,443,787; no NCI
+- Cash and cash equivalents: 176,460,053
+- Restricted cash current + long term: 6,864,027
+- Vessels, net: 465,913,492
+- Advances for vessels under construction: 35,890,936
+- Current + long-term debt carrying amount: 216,811,383
+- Net revenue: 227,873,562
+- Research direct cost: voyage 1,059,154 + vessel opex 46,846,903 + drydock 6,607,677 + related-party management 7,995,498 = 62,509,232
+- Research gross profit: 165,364,330; GAAP did not report gross profit.
+- Operating income: 149,499,413
+- Net income / parent net income: 136,967,379
+- Operating cash flow: 141,133,485
+- Capital expenditure: newbuildings 74,450,202 + acquisitions/improvements 2,601,808 = 77,052,010
+- Operating free cash flow: 64,081,475
+- Financing cash flow: -23,275,444
+- Dividends + repurchases paid: 18,956,612 + 2,122,174 = 21,078,786
+- Vessel depreciation: 28,612,080
+- Six-vessel outstanding newbuilding commitments: 295,800,000 (27.3m in 2026, 137.1m in 2027, 131.4m in 2028).
+
+6. Conversion and formulas
+- All filing USD amounts multiplied by 7.0288 to produce CNY absolute yuan.
+- Input market cap 3,758,310,881.1188965 CNY was not reconverted.
+- Gross margin = 165,364,330 / 227,873,562 = 0.7256845794.
+- Net margin = 136,967,379 / 227,873,562 = 0.6010674420.
+- Discounted detachable net cash USD = 176,460,053 × 50% - 216,811,383 = -128,581,356.5; restricted cash receives zero credit.
+- Discounted detachable net cash CNY = -903,772,638.57.
+- Operating business price = market cap - discounted net cash = 4,662,083,519.69 CNY.
+- Sustainable pre-haircut cash USD = OCF 141,133,485 - depreciation proxy 28,612,080 = 112,521,405.
+- Discounted sustainable cash profit = 112,521,405 × 65% × 7.0288 = 514,078,793.45 CNY.
+- Owner earnback = 4,662,083,519.69 / 514,078,793.45 = 9.0688112 years.
+- Market cap / cash profit = 3,758,310,881.12 / 514,078,793.45 = 7.3107682 years.
+- Forecast dividend = USD 0.80 × 4 × 7,055,881 shares × 7.0288 = 158,702,004.39 CNY.
+- Forecast yield = 158,702,004.39 / 3,758,310,881.12 = 0.04222695.
+
+7. Judgment separation
+- Facts: audited financial statement values, fleet metrics, charter coverage, contracted revenue, dividend declaration and commitments.
+- Inference: classification as ordinary operating company and interpretation of assets/liabilities.
+- Subjective research assumptions: 50% credit to unrestricted cash, zero credit to restricted cash, depreciation as maintenance-capex proxy, and 35% cyclical/execution haircut.
+- No target price, buy/sell advice, or ranking label produced.
+
+8. Output construction and validation
+- Populated outputs/result.json only through protocol CLI set/append commands after initialization.
+- Created outputs/report.md and outputs/trace.txt.
+- Protocol validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed result validation status: ok; errors: [].

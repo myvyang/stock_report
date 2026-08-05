@@ -1,0 +1,57 @@
+stock-research task trace
+company: 600824.SH 益民集团
+period: 2025-12-31 annual
+generated_for_input_at: 2026-07-31T23:53:52+08:00
+
+1. Read instructions
+- /workspace/AGENTS.md
+- /workspace/.agents/skills/stock-research/SKILL.md
+- /workspace/.agents/skills/stock-research/references/result-contract.md
+- /workspace/.agents/skills/stock-research/references/report-contract.md
+- /workspace/.agents/skills/stock-research/references/data-reuse.md
+
+2. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: initialized stock-research-result-v1 skeleton.
+
+3. Reuse audit
+- Checked stock_report/data/raw/filings/600824.SH/2025-12-31.
+- Checked stock_report/data/analysis/annual_review/600824.SH/2025-12-31.
+- Checked stock_report/data/analysis/stock_research/600824.SH/2025-12-31.
+- Checked matching /root/aicode/stock_report sync targets.
+- No filing, annual facts, normalized facts, or prior research files were present; fell back to public filing research.
+
+4. Primary filing identification and extraction
+- Filing: 上海益民商业集团股份有限公司2025年年度报告.
+- Announcement date: 2026-04-28.
+- Audit: standard unqualified opinion, 上会会计师事务所（特殊普通合伙）.
+- Official disclosure venue identified in filing: Shanghai Stock Exchange, www.sse.com.cn.
+- Text used for extraction: Sina Finance full-text reproduction, bulletin id 12213786, stockid 600824.
+- Core extracted sections: important notice, business review, operating-mode revenue/cost table, consolidated balance sheet, consolidated income statement, consolidated cash-flow statement, and notes for cash, deposits, inventory, financial assets, investment property, lease liabilities, tax liabilities and dividends.
+
+5. Key calculations
+- gross_profit = 677123982.09 - 342712013.30 = 334411968.79.
+- gross_margin = 334411968.79 / 677123982.09 = 0.4938711043.
+- net_margin = 121602611.04 / 677123982.09 = 0.1795869209.
+- operating_free_cash_flow = 88829504.21 - 3660358.13 = 85169146.08.
+- discounted cash = (603712417.11 - 202500.00) * 0.80 = 482807933.69.
+- discounted one-year deposits = 563290768.22 * 0.90 = 506961691.40.
+- discounted long deposits = 150056424.66 * 0.80 = 120045139.73.
+- lease obligations = 15514613.72 + 39923985.58 = 55438599.30.
+- discounted detachable net cash = 482807933.69 + 506961691.40 + 120045139.73 - 55438599.30 = 1054376165.51.
+- discounted sustainable cash profit = 85169146.08 - 25169146.08 = 60000000.00. The 25.17m safety reduction reflects revenue decline, working-capital variability and negative adjusted net profit; it is an analyst judgment, not company guidance.
+- operating business price = 3742000000.00 - 1054376165.51 = 2687623834.49.
+- owner earnback years = 2687623834.49 / 60000000.00 = 44.7937305748.
+- market cap to cash profit = 3742000000.00 / 60000000.00 = 62.3666666667.
+- forecast dividend yield = 36890947.56 / 3742000000.00 = 0.0098586177.
+
+6. Model determination
+- Confirmed ordinary_operating/applicable.
+- Reason: retail, property leasing and service operations are ordinary businesses; cash/deposits are not customer funds and liabilities are not financial-institution or project-model operating liabilities.
+- Other non-current financial assets were excluded from detachable net cash because valuation and exit timing are uncertain.
+
+7. Protocol population and validation
+- Populated result fields using repeated protocol `set` commands after initialization; did not construct result.json from scratch.
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final output: {"status":"ok","errors":[]}
+- Cross-check: evidence rows 5; asset rows 5; liability rows 3; data_quality.status complete; incomplete_reasons empty.

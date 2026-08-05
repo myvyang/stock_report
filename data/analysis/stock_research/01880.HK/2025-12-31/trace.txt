@@ -1,0 +1,71 @@
+stock-research trace
+task: 01880.HK / CTG DUTY-FREE
+period: 2025-12-31 annual
+generated: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the selected skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked configured annual-review, normalized-facts, raw-filing and prior stock-research paths.
+- No reusable annual facts or prior research were present at task start.
+- Downloaded the official HKEX 2025 annual report to:
+  stock_report/data/raw/filings/01880.HK/2025-12-31/2025-annual-report.pdf
+- pdftotext was unavailable; used the HKEX indexed PDF text for line/page-level extraction and retained the original PDF locally.
+
+3. Model review
+- Input hint classified the company as financial_brokerage.
+- Annual report describes duty-free and duty-paid travel retail through airport, port, Hainan and downtown stores, supported by inventory, leased/self-built properties, licences and supply chain.
+- No brokerage customer funds, proprietary securities portfolio or repo financing business was identified.
+- Overrode model to ordinary_operating and owner_earnback_applicability to applicable.
+
+4. Core reported facts (RMB)
+- Revenue: 53,693,579,000; cost of sales: 36,641,831,000; gross profit: 17,051,748,000.
+- Operating profit: 5,648,071,000; net profit: 3,750,145,000; parent net profit: 3,643,905,000.
+- Total assets: 74,891,423,000; total liabilities: 13,857,345,000; total equity: 61,034,078,000; parent equity: 55,396,040,000; NCI: 5,638,038,000.
+- Operating cash flow: 6,058,560,000.
+- Purchases of PPE and other non-current assets used as capex: 1,273,062,000.
+- Operating free cash flow: 4,785,498,000.
+- Sources: audited consolidated statements on annual report pp.87-94 and notes.
+
+5. Owner earnback assumptions
+- Bank/on-hand cash 10,329,614,000 at 100%.
+- Deposits at CTG Finance 8,968,620,000 at 70% due related-party concentration/governance constraints.
+- Time deposits in cash note 14,483,011,000 at 90%.
+- Six-month time deposits in receivables 2,991,243,000 at 90%.
+- Interest-bearing borrowings 3,505,280,000 deducted at 100%.
+- DFS acquisition reserve 2,100,000,000 deducted, approximating USD294m paid in March 2026; new H-share subscription proceeds not netted, conservatively.
+- Discounted detachable net cash = 26,729,196,600.
+- Sustainable cash profit set at 3,600,000,000, slightly below 2025 parent profit and well below 2025 FCF because earnings were falling and inventory release should not be extrapolated.
+- Market cap 94,828,383,227.0676 from input.
+- Operating business price = 68,099,186,627.0676.
+- Owner earnback years = 18.91644.
+- Market cap / cash profit = 26.34122.
+
+6. Dividend
+- 2025 first-three-quarter dividend: RMB0.25/share, RMB517,215,000.
+- 2025 final dividend: RMB0.45/share, RMB935,008,490; approved at the 2025 AGM by the valuation date.
+- Forecast/declared annual cash dividend used: RMB1,452,223,490.
+- Yield on input market cap: 0.015314.
+
+7. Sources
+- Primary: China Tourism Group Duty Free Corporation Limited 2025 Annual Report, HKEX, released 2026-04-15:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0415/2026041500422.pdf
+- Primary: HKEX title search for 01880, including AGM poll result/final dividend announcements released 2026-06-26:
+  https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=1000163062
+- Market snapshot: Tencent qt.gtimg.cn supplied in config/input.json, dated 2026-08-03 09:48:07.
+
+8. Protocol operations and validation
+- Populated initialized JSON with protocol set commands; did not hand-write the JSON structure.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed-result validation status: ok, errors: [].
+
+9. Known limitations
+- Market price/PE input was not independently verified.
+- Market-cap date is later than the annual-report balance sheet; acquisition and share issuance create timing mismatch.
+- Cash haircuts, USD-to-CNY acquisition reserve and sustainable profit are analyst assumptions, explicitly separated from reported facts.

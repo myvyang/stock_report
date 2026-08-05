@@ -1,0 +1,51 @@
+stock-research trace
+company=000568.SZ 泸州老窖
+period=2025-12-31
+generated_at=2026-07-31T18:57:02+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md; no annual facts package, normalized facts, prior research result, or raw filing existed for this company/period.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields through protocol set commands; did not create the JSON from scratch.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result={"status":"ok","errors":[]}
+
+[source acquisition]
+- Downloaded public PDF mirror of 泸州老窖股份有限公司2025年年度报告全文:
+  https://pdf.dfcfw.com/pdf/H2_AN202604281821699992_1.pdf
+- Saved as stock_report/data/raw/filings/000568.SZ/2025-12-31/annual-report-2025.pdf.
+- Extracted 183 pages to annual-report-2025.txt for local evidence checks.
+- Cross-checks used search results from cninfo.com.cn/szse.cn, the annual-report full-text page, and company website business information.
+- Market cap and PE were supplied by config/input.json: Tencent qt.gtimg.cn, 20260731114342.
+
+[verified filing facts]
+- Business and channel: annual report pp.10-17. White-liquor design/production/sales; traditional dealer channel; dealer settlement is cash before delivery.
+- Revenue=25,731,010,647.32; cost=3,441,749,582.69; gross_profit=22,289,261,064.63.
+- Operating_profit=14,684,531,745.87; net_profit=10,859,910,680.17; parent_net_profit=10,830,713,936.14.
+- Total_assets=64,794,994,851.27; total_liabilities=14,900,912,470.81; total_equity=49,894,082,380.46; parent_equity=49,780,293,635.74.
+- OCF=7,123,218,677.88; capex=1,932,762,969.97; FCF=5,190,455,707.91.
+- Cash_and_cash_equivalents=26,925,093,961.82. Trading_financial_assets=1,584,771,959.37. Non-cash-equivalent monetary funds=416,472,736.55 excluded.
+- Interest-bearing deduction=one-year noncurrent liabilities 4,074,199,213.05 + long-term loans 2,627,166,310.93 + lease liabilities 15,693,190.61 = 6,717,058,714.59.
+- Inventory=15,396,031,707.35, up 2,003,237,231.39. Contract liabilities=3,367,443,727.83.
+- Dividend: 2025 interim 1,998,897,185.75 already implemented plus annual proposal 6,501,567,650.57 = 8,500,464,836.32.
+
+[calculations]
+gross_margin=(25,731,010,647.32-3,441,749,582.69)/25,731,010,647.32=0.8662411815119095
+net_margin=10,830,713,936.14/25,731,010,647.32=0.4209206581346647
+discounted_net_cash=26,925,093,961.82+1,584,771,959.37*0.90-6,717,058,714.59=21,634,330,010.663
+discounted_cash_profit=7,123,218,677.88-1,932,762,969.97=5,190,455,707.91
+operating_business_price=132,913,000,000.00002-21,634,330,010.663=111,278,669,989.33702
+owner_earnback_years=111,278,669,989.33702/5,190,455,707.91=21.439094417038138
+market_cap_to_cash_profit=132,913,000,000.00002/5,190,455,707.91=25.60719279377476
+forecast_dividend_yield=8,500,464,836.32/132,913,000,000.00002=0.06395510474009314
+
+[judgment boundaries]
+- statement_model=ordinary_operating; applicable because inventory and productive assets support a branded manufacturing/distribution business, while borrowings are ordinary financing.
+- No value assigned to receivables financing, inventory, long-term equity investment, or other equity instruments as detachable cash.
+- Trading financial assets discounted to 90%; debt deducted at 100%.
+- Sustainable cash profit uses unadjusted 2025 actual FCF. No normalization of working-capital outflow and no distinction between maintenance and expansion capex.
+- Forecast dividend is announcement-based; the annual proposal was pending shareholder approval at annual-report publication.

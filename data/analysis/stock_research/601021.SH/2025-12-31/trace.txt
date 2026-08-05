@@ -1,0 +1,65 @@
+task=stock_research
+company=601021.SH 春秋航空
+period=2025-12-31
+generated_at=2026-08-01 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields with repeated protocol `set` commands; result was not authored as a fresh complex JSON object.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   status=ok, errors=[]
+
+[reuse_check]
+Requested annual facts, normalized facts, raw filing metadata and prior stock research files were absent from the provided workspace. Only stock_report/data/notes/user_stock_evaluations.md existed. Research therefore returned to the official annual report.
+
+[sources]
+official_ir=https://www.ch.com/invester/gpfx2
+annual_report=https://ajax.springairlines.com/content/invester/%E6%98%A5%E7%A7%8B%E8%88%AA%E7%A9%BA2025%E5%B9%B4%E5%B9%B4%E5%BA%A6%E6%8A%A5%E5%91%8A.pdf
+annual_report_pages=203
+annual_report_auditor=Deloitte Touche Tohmatsu Certified Public Accountants LLP, unmodified opinion
+market_snapshot=Tencent qt.gtimg.cn, supplied in config/input.json, 2026-07-31 11:43:38
+
+[key_report_locations]
+PDF p8: three-year headline financial data.
+PDF p16-p24: fleet, routes, traffic, load factor, business model and revenue management.
+PDF p24-p31: income/cash flow discussion, segment margins, asset restrictions.
+PDF p41-p43: competition, fuel, safety, foreign exchange and subsidy risks.
+PDF p56-p58: 2025 dividend proposal and three-year cumulative dividends.
+PDF p105-p119: audited consolidated statements (image pages).
+PDF p147-p180: cash, fixed assets, construction in progress, debt, leases, income and cash-flow notes.
+
+[calculations]
+gross_profit=21459531429-18544164818=2915366611
+gross_margin=2915366611/21459531429=0.135853
+net_margin=2317401673/21459531429=0.107990
+reported_operating_fcf=6623358345-6331743500=291614845
+
+unrestricted_cash=8829762289-201406157=8628356132
+discounted_cash=8628356132*0.90=7765520519 (rounded)
+financing_obligations=20617604877 (bank debt, bond, lease and other financing obligations per note 54(c))
+discounted_detachable_net_cash=7765520519-20617604877=-12852084358
+
+maintenance_capex_proxy=3083383043 (fixed asset, right-of-use asset and other amortization/depreciation)
+lease_principal=942547133 (cash repayment of lease liabilities in note 54(c); avoids treating financing-classified lease principal as distributable cash)
+pre_discount_cash_profit=6623358345-3083383043-942547133=2597428169
+discounted_sustainable_cash_profit=2597428169*0.90=2337685352 (rounded to yuan)
+operating_business_price=45835000000-(-12852084358)=58687084358
+owner_earnback_years=58687084358/2337685352=25.1048
+market_cap_to_cash_profit=45835000000/2337685352=19.6070
+forecast_dividend_yield=927094452.14/45835000000=0.020227
+
+[model_decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Air transport is capital intensive but the company earns operating revenue from passenger/cargo services. It is not a financial, property-development, concession or holding-company statement model. Ordinary earnback is usable only after treating aircraft debt, leases and maintenance capital expenditure economically.
+
+[limitations]
+- No annual facts package was supplied locally; the official annual report was used directly.
+- Maintenance capital expenditure is not separately disclosed. Depreciation/amortization is used as a proxy and lease principal is additionally deducted.
+- Future fleet growth capital expenditure is excluded from the sustainable-profit denominator; expansion could reduce actual distributable cash.
+- The annual portion of the 2025 dividend proposal was pending shareholder approval at annual-report publication.
+- Market capitalization and PE TTM are input market snapshots, not annual-report facts.

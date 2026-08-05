@@ -1,0 +1,71 @@
+2026-08-05 stock research trace — ICFI — FY2025
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+   - Checked stock_report/data/analysis/annual_review/ICFI/2025-12-31,
+     stock_report/data/raw/filings/ICFI/2025-12-31, and normalized facts path.
+   - No reusable ICFI annual fact package or raw filing was present.
+
+3. Protocol initialization
+   - Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init
+     --input config/input.json --output outputs/result.json
+   - Initialized schema stock-research-result-v1 from task input.
+
+4. Primary-source retrieval
+   - Located SEC Form 10-K accession 0001193125-26-082536, filed 2026-02-27,
+     period 2025-12-31.
+   - Retrieved SEC filing HTML and SEC XBRL Companyfacts (CIK 0001362004).
+   - Used ICF Investor Relations stock page for dividend history/2026 continuity.
+   - Used official CFETS rate as republished by Guangdong tax authority:
+     2026-07-01 USD/CNY central parity = 6.8067.
+
+5. Analysis-model determination
+   - Confirmed ordinary_operating / applicable.
+   - Reason: consulting and technology/project services, one operating segment;
+     no financial-institution, insurance, development-property, or concession
+     balance-sheet structure.
+   - Restricted cash excluded from detachable cash because the 10-K states it is
+     mainly related to energy incentive programs and restricted program advances.
+
+6. Core source figures (USD, before conversion)
+   - Revenue 1,872,851,000; direct costs 1,176,835,000; derived gross profit
+     696,016,000; operating income 145,465,000; net income 91,588,000.
+   - Assets 2,050,171,000; liabilities 1,021,689,000; equity 1,028,482,000.
+   - Cash 5,297,000; restricted cash 47,984,000; debt 401,355,000.
+   - CFO 141,870,000; capex/capitalized software 21,659,000; operating FCF
+     120,211,000; non-cash equity compensation 17,686,000.
+   - 2025 cash dividends paid 10,356,000; year-end shares 18,247,837.
+
+7. Derived calculations
+   - Gross margin = (revenue - direct costs) / revenue = 37.1634%.
+   - Net margin = net income / revenue = 4.8903%.
+   - Discounted detachable net cash = cash - debt; restricted cash assigned 0%.
+     USD -396,058,000; CNY -2,695,847,988.60.
+   - Sustainable cash profit = CFO - capex - equity compensation economic cost.
+     USD 102,525,000; CNY 697,856,917.50.
+   - Operating business price = market cap - discounted net cash
+     = CNY 12,581,602,124.55.
+   - Owner earnback = operating business price / cash profit = 18.0289 years.
+   - Market cap / cash profit = 14.1659 years.
+   - Forecast dividend = USD 0.56 * 18,247,837 shares * 6.8067
+     = CNY 69,557,667.30; yield = 0.7036%.
+
+8. Protocol population and validation
+   - Populated initialized result exclusively through repeated protocol `set`
+     commands; did not replace it with a hand-written JSON document.
+   - Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate
+     --result outputs/result.json
+   - Validation result: {"status":"ok","errors":[]}.
+
+9. Data-quality notes
+   - Complete under result-contract minimum fields.
+   - Financial-statement translation uses one recent official USD/CNY rate for
+     consistent CNY display, not historical accounting translation.
+   - Market cap and PE are input-provided third-party snapshot values.
+   - Gross profit is analytically derived because ICF labels the relevant expense
+     line “direct costs” and does not present a “gross profit” subtotal.

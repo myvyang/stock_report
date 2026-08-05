@@ -1,0 +1,61 @@
+stock-research trace
+company=688516.SH 奥特维
+period=2025-12-31
+generated_for=2026-08-03 task input
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the skill routes reuse decisions through it.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated the initialized structure only through protocol set commands.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse check]
+- Checked workspace stock_report paths and /root/aicode/stock_report sync targets.
+- No existing 688516.SH/2025-12-31 annual facts, raw filing metadata, normalized facts, or prior stock research result was present.
+- Therefore rebuilt the required facts from the published 2025 annual report.
+
+[primary sources]
+1. 无锡奥特维科技股份有限公司2025年年度报告, disclosed 2026-04-23, 301 pages.
+   Company report index: https://cn.wxautowell.com/m/about/report
+   Retrieved PDF mirror used for text extraction: https://stockmc.xueqiu.com/202604/688516_20260423_ZGN5.pdf
+   Used for audited statements, business model, segments, orders, receivables, inventory, debt, cash flow, risks, and dividend proposal.
+2. 无锡奥特维科技股份有限公司2025年年度报告摘要.
+   https://dataclouds.cninfo.com.cn/shgonggao/hsomarket/2026/20260422/83f0436919704e759cf61c27a414c1ea.PDF
+   Used to cross-check audit opinion, main financial data, business description, and dividend proposal.
+3. 上海证券交易所披露的奥维转债转股价格调整临时受托管理报告, 2026-06-12.
+   https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-06-12/688516_20260612_NQCC.pdf
+   Used to confirm the RMB 0.80/share 2025 distribution was implemented.
+4. config/input.json market snapshot: Tencent qt.gtimg.cn, market cap CNY 11,929,000,000, PE TTM 29.99, timestamp 20260731161453.
+
+[extraction and calculations]
+- Annual report PDF downloaded to temporary storage and text-extracted with pypdf in an isolated /tmp virtual environment because no PDF text utility was installed.
+- Revenue=6,397,183,864.63; cost=4,347,230,372.13; gross profit=2,049,953,492.50.
+- Gross margin=2,049,953,492.50 / 6,397,183,864.63 = 0.3204462363.
+- Parent net profit=444,515,645.34; parent net margin=0.0694861450.
+- OCF=888,115,724.57; capex=401,485,495.20; operating FCF=486,630,229.37.
+- Discounted detachable net cash:
+  unrestricted cash 1,987,145,765.84 * 100%
+  + trading financial assets 144,645,222.75 * 80%
+  + other non-current financial assets 213,565,638.66 * 50%
+  - interest debt, leases and recourse factoring 3,071,897,199.84
+  = -861,678,836.47.
+- Sustainable cash profit=300,000,000 judgmental normalization from parent profit 444,515,645.34. Downward adjustment reflects inventory-release support to OCF, rising receivables, large impairments, and photovoltaic cyclicality.
+- Operating business price=11,929,000,000 - (-861,678,836.47)=12,790,678,836.47.
+- Owner earnback years=12,790,678,836.47 / 300,000,000=42.6355961.
+- Market cap/cash profit=11,929,000,000 / 300,000,000=39.7633333.
+- Forecast/implemented dividend yield=252,264,112.80 / 11,929,000,000=0.0211471299.
+
+[model decision]
+- statement_model=ordinary_operating.
+- owner_earnback_applicability=applicable.
+- Reason: revenue comes from manufacturing and servicing equipment; deposits, inventory, receivables and supplier liabilities are operating working capital, while borrowings and convertible bonds are financing. No bank, brokerage, insurance, real-estate-development, construction-contract, concession, or holding-company model applies.
+
+[limitations]
+- Sustainable cash profit is an analytical estimate, not company guidance.
+- Other non-current financial assets were not fully look-through valued; a 50% haircut was used.
+- Market cap/PE are accepted from task input and were not independently exchange-verified.
+- Report date and market valuation date differ.

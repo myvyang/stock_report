@@ -1,0 +1,81 @@
+stock-research trace
+company=00038.HK FIRST TRACTOR
+period=2025-12-31
+generated_at=2026-08-03T14:40:05+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+- config/input.json present.
+- No local raw filing, annual facts, normalized facts, or prior stock-research result existed for stock_report/.../00038.HK/2025-12-31.
+- Reuse was therefore not possible.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initial skeleton inherited analysis_model_hint=financial_brokerage.
+
+4. Official filing retrieval
+- HKEX title search identified First Tractor Company Limited 2025 Annual Report, published 2026-04-28.
+- Official URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042804965.pdf
+- Downloaded to a temporary directory and extracted locally for research; temporary material was not copied into outputs.
+- Filing contains 2025 audited financial statements, audit opinion dated 2026-03-26.
+
+5. Model verification
+- Annual report describes tractors, agricultural machinery components, and diesel engines.
+- All 2025 revenue is equipment manufacturing; financial-sector statement rows are blank.
+- No construction-project balance-sheet pattern was found.
+- Overrode input hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+6. Core audited facts used (RMB)
+- Revenue: 10,822,591,178.94
+- Cost of sales: 9,183,170,444.95
+- Gross profit: 1,639,420,733.99 (calculated)
+- Operating profit: 918,225,438.46
+- Net profit: 859,838,703.36
+- Parent net profit: 811,953,460.29
+- Total assets: 15,097,537,416.28
+- Total liabilities: 6,866,713,331.94
+- Total equity: 8,230,824,084.34
+- Parent equity: 7,660,705,431.31
+- Operating cash flow: 915,718,981.93
+- Capital expenditure: 192,925,213.20
+- Operating free cash flow: 722,793,768.73 (calculated as CFO less capex)
+- Financing cash flow: -286,872,751.72
+
+7. Owner-earnback calculations
+- Market cap supplied in input: 8,564,716,694.623232
+- Cash and cash equivalents: 1,333,492,655.01 at 100%
+- Current large-denomination CDs: 2,942,714,233.85 at 95%
+- Long-term CDs/time deposits: 2,839,788,030.21 at 95%
+- Other time deposits: 249,985,723.82 at 95%
+- Trading financial assets: 946,000,000.00 at 80%
+- Less borrowing principal and lease liabilities: 452,438,223.33 at 100%
+- Discounted detachable net cash: 7,368,718,020.166
+- Discounted net cash / market cap: 0.8603574739
+- Operating business price: 1,195,998,674.4572
+- 2025 operating FCF: 722,793,768.73
+- Sustainability haircut: 15%, reflecting revenue/profit/CFO declines and Q4 loss
+- Discounted sustainable cash profit: 614,374,703.4205
+- Owner earnback years: 1.9466925767
+- Market cap / cash profit: 13.9405425499
+
+8. Dividend calculation
+- 2025 interim dividend: RMB0.6844 per 10 shares, RMB76.9023m.
+- 2025 final dividend: RMB1.9746 per 10 shares, approximately RMB221.875m.
+- Full-year cash dividend: RMB298.7773m, payout ratio 36.80%.
+- Dividend yield against supplied market cap: 0.0348846682.
+
+9. Protocol population and validation
+- Populated result fields with repeated protocol `set` commands; did not hand-write the complex JSON skeleton.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+
+10. Important limitations
+- Market cap and PE are from supplied Tencent snapshot, not independently verified against official exchange market data.
+- Trading financial assets are classified as equity instruments while management commentary also mentions structured-deposit maturity; 80% recovery is a judgment, not a filing fact.
+- Sustainable cash profit uses one-year FCF with a 15% haircut rather than a full-cycle 3-5 year normalized series.
+- No local annual facts package was available; research returns directly to the official annual report.

@@ -1,0 +1,63 @@
+stock-research trace
+generated_at=2026-08-03T14:09:14+08:00
+query=00417.HK
+input_period=2025-12-31
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because no local fact package could initially be assumed.
+- Initialized outputs/result.json with the protocol CLI:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local data reuse check
+- Checked the paths declared in config/input.json.
+- No raw filing, annual facts, normalized facts, prior research result, report, or extraction trace existed under stock_report for 00417.HK/2025-12-31.
+- Therefore researched from public filings rather than inventing or silently reusing unavailable data.
+
+3. Company and model verification
+- Official annual report/final-results materials identify the issuer as Tse Sui Luen Jewellery (International) Limited, stock code 417.
+- Segment disclosures show retail, wholesale, e-business and other jewellery operations.
+- Overrode analysis_model_hint=financial_brokerage with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: no brokerage client money, proprietary securities book, repo funding, or brokerage activities appear in the official business and financial statements.
+
+4. Reporting-period handling
+- Input period is 2025-12-31, while the issuer's statutory fiscal year ends on 31 March.
+- Used the latest full annual report available by 2025-12-31: year ended 2025-03-31, published 2025-07-22; final results were announced 2025-06-30.
+- Did not substitute the 2025-09 interim report for an annual report.
+
+5. Primary and corroborating sources
+- Annual report 2024/2025: https://doc.irasia.com/listco/hk/tsesuiluen/annual/2025/ar2025.pdf
+- Audited final results for year ended 2025-03-31: https://doc.irasia.com/listco/hk/tsesuiluen/annual/2025/res.pdf
+- HKEX issuer title-search record: https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&market=SEHK&stockId=827
+- Company financial highlights: https://corporate.tslj.com/en/ir/finhigh.php
+- Etnet cash-flow summary used only to cross-check the annual-report cash-flow figures: https://www.etnet.com.hk/www/eng/stocks/realtime/quote_ci_cashflow.php?code=417
+- Input valuation: config/input.json, Tencent qt.gtimg.cn, market cap CNY154,346,423.80416393 at 2026/07/31 16:08:46, PE TTM 1.57.
+- Translation rate: 1 HKD=0.9323 CNY at 2025-03-31. All financial-statement amounts in result.json are CNY absolute yuan.
+
+6. Key extracted HKD facts
+- Revenue 1,712,297,000; cost of sales 1,128,784,000; gross profit 583,513,000.
+- Operating loss 92,224,000; net loss 197,799,000; parent loss 197,752,000.
+- Total assets 1,682,197,000; total liabilities 1,328,975,000; total equity 353,222,000; parent equity 354,025,000.
+- Inventory 1,044,023,000; cash 129,378,000; pledged deposits 58,309,000.
+- Bank borrowings 720,671,000; gold loan 10,963,000; lease liabilities 74,417,000.
+- Operating cash flow 236,684,000; capex about 26,404,000; operating free cash flow about 210,280,000; financing cash outflow 501,007,000.
+- No final dividend; company financial highlights show nil dividends for FY2023-FY2025.
+
+7. Owner-earnback judgments
+- Discounted detachable net cash=0 because cash plus pledged deposits are far below bank and gold borrowings; pledged deposits and other assets also secure banking facilities.
+- Discounted sustainable cash profit=0 because the group incurred a parent loss and positive free cash flow was materially supported by inventory and working-capital release during contraction.
+- Operating business price=market cap-discounted detachable net cash=CNY154,346,423.80416393.
+- Owner earnback years and market cap/cash profit left null because sustainable cash profit is not positive.
+- Forecast cash dividend=0 and forecast yield=0 based on three nil-dividend years, current loss, refinancing pressure and going-concern emphasis.
+
+8. Data-quality and valuation caveats
+- Auditor opinion was unmodified but included a material uncertainty related to going concern.
+- The group breached certain borrowing covenants and obtained waivers; HKD678m of HKD721m bank borrowings was current.
+- Market-cap date is approximately 16 months after the annual balance-sheet date.
+- Input PE TTM=1.57 cannot reconcile to FY2025 loss and therefore reflects later-period earnings; it is preserved as input market data but not used to infer FY2025 profitability.
+
+9. Protocol writes and validation
+- All structured fields were written after protocol initialization using repeated protocol CLI set commands; result.json was not authored from a blank complex object.
+- First completed validation command returned status=ok and errors=[].
+- Final validation repeated after report.md and trace.txt creation.

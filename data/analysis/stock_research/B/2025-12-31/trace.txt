@@ -1,0 +1,75 @@
+Stock research trace — Barrick Mining Corporation (NYSE: B)
+Generated for period: 2025-12-31
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the skill routes reuse decisions through that reference.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the annual-review, normalized-facts, raw-filing and prior stock-research paths supplied in config/input.json.
+- No Barrick 2025 fact pack, normalized facts, raw filing or prior research output existed locally.
+- Therefore returned to primary public disclosures rather than inventing missing facts.
+
+3. Primary sources retrieved
+- SEC Form 40-F filing index, accession 0001193125-26-079253, filed 2026-02-27.
+- SEC Exhibit 99.3: audited consolidated financial statements for 2025.
+  https://www.sec.gov/Archives/edgar/data/756894/000119312526079253/d833573dex993.htm
+- SEC Exhibit 99.4 / Barrick 2025 MD&A, plus Barrick full-year and Q4 2025 results.
+  https://www.barrick.com/English/news/news-details/2026/q4-2025-results/default.aspx
+- Barrick official shares and dividends page.
+  https://www.barrick.com/English/investors/shares-and-dividends/default.aspx?LanguageId=1
+- PBOC/CFETS 2025-12-26 central parity announcement: USD 1 = CNY 7.0358.
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- Market cap and PE were reused exactly from config/input.json (Yahoo Finance yfinance, 2026-08-03).
+
+4. Identity and model check
+- The SEC filing identifies Barrick Mining Corporation, formerly Barrick Gold Corporation, ticker B on NYSE.
+- Statement model confirmed as ordinary_operating: gold/copper mining uses PP&E, inventory and reserves to produce commodity sales.
+- Owner earnback is applicable, but mining requires special analytical caution for depletion, sustaining/growth capital, commodity cycles and non-controlling interests.
+
+5. Currency convention
+- Financial statements are in USD millions.
+- All statement amounts were multiplied by 1,000,000 and then by 7.0358 to produce absolute CNY yuan.
+- This period-end-near rate is used consistently for comparability; it is not an average income-statement rate.
+
+6. Core extracted USD million facts
+- Revenue 16,956; cost of sales 8,265; gross profit derived 8,691.
+- Income before finance items and tax 9,032; net income 7,154; parent net income 4,993.
+- Total assets 51,577; liabilities 15,661; equity 35,916; parent equity 26,557; NCI 9,359.
+- Operating cash flow 7,689; capex 3,821; derived operating FCF 3,868.
+- Financing cash flow -3,823; dividends 890; buybacks 1,500.
+- Cash 6,706; total current/non-current debt 4,703.
+- Company-reported attributable free cash flow 2,837 and adjusted net earnings 4,139.
+- Weighted average shares 1,707 million.
+
+7. Derived formulas
+- Gross margin = (16,956 - 8,265) / 16,956 = 0.5125619249823071.
+- Net margin = 4,993 / 16,956 = 0.2944680349138948.
+- Discounted cash = CNY cash × 50% = 23,591,037,400.
+- Debt deduction = CNY debt × 100% = 33,089,367,400.
+- Discounted detachable net cash = -9,498,330,000.
+- Sustainable cash profit = attributable FCF CNY 19,960,564,600 × 70% = 13,972,395,220.
+- Operating business price = 416,280,393,249.6094 - (-9,498,330,000) = 425,778,723,249.6094.
+- Owner earnback = 425,778,723,249.6094 / 13,972,395,220 = 30.472851400606846 years.
+- Market cap / cash profit = 29.793058863218256.
+
+8. Dividend forecast
+- Base quarterly dividend is USD 0.175; annual base assumed USD 0.70/share.
+- Forecast uses 1,707 million weighted average shares: USD 1,194.9 million, CNY 8,406,125,100.
+- Forecast yield = 8,406,125,100 / 416,280,393,249.6094 = 0.02019545449432578.
+- No performance top-up is forecast; actual dividends remain at Board discretion.
+
+9. Judgment flags
+- 50% cash haircut is an analytical judgment reflecting operating liquidity, taxes, rehabilitation and project commitments.
+- 30% attributable-FCF haircut is an analytical judgment reflecting elevated commodity-price sensitivity and continuing sustaining/growth capital needs.
+- Asset sale gains make reported parent net income less repeatable than attributable FCF.
+- Proposed North American asset IPO may make the present consolidated base non-comparable after completion.
+
+10. Protocol operations and validation
+- Populated scalar fields using protocol `set` commands.
+- Populated asset, liability, adjustment, dividend history, risk and evidence lists using protocol `append` commands.
+- First completed validation returned: {"status":"ok","errors":[]}.
+- Final validation after report/trace creation returned: {"status":"ok","errors":[]}.

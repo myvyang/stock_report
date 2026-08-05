@@ -1,0 +1,56 @@
+stock-research trace
+company=00101.HK Hang Lung Properties Limited
+period=2025-12-31
+generated_at=2026-08-03T17:31:52+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md completely.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields through repeated protocol `set` commands; did not construct result.json manually from scratch.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse-check]
+No raw filing, annual facts, normalized facts, or prior stock-research outputs for 00101.HK/2025-12-31 were present in the workspace. Research therefore returned to official company disclosures.
+
+[model-review]
+Input hint said financial_brokerage. Rejected after reviewing official business and financial statements.
+Confirmed statement_model=real_estate_developer and owner_earnback_applicability=requires_special_model.
+Reason: rental investment properties dominate revenue and assets, while development properties, properties for sale, restricted pre-sale cash, contract liabilities, and project borrowings are economically linked. Ordinary detachable-net-cash payback is not meaningful.
+
+[official-sources]
+Annual report 2025, published 2026-03-26:
+https://www.hanglung.com/getattachment/8ec4481f-3bdf-4cae-9c59-51962da2ff52/HLP_2025-AR_E.pdf?lang=en-US
+Used PDF pages 157, 159, 162, 190-194 and related notes for statements, cash, debt, properties for sale, payables and tax.
+
+2025 annual results press release, published 2026-01-30:
+https://www.hanglung.com/en-us/group/media/press-releases/2026/20260130
+Used for segment revenue/profit, occupancy, underlying profit, dividend and project status.
+
+Official financial highlights:
+https://www.hanglung.com/en-us/investor/financial-information/financial-highlights
+Used for five-year headline comparison, shares issued and net-debt-to-equity ratio.
+
+Market snapshot supplied in config/input.json:
+Tencent qt.gtimg.cn; timestamp 2026/07/31 16:08:47.
+
+[key-calculations]
+gross_profit_rmb=9,140,000,000-3,144,000,000=5,996,000,000
+gross_margin=5,996,000,000/9,140,000,000=0.6560175055
+net_margin=1,667,000,000/9,140,000,000=0.1823851204
+capex_rmb=111,000,000+1,793,000,000+225,000,000=2,129,000,000
+operating_free_cash_flow=5,358,000,000-2,129,000,000=3,229,000,000
+forecast_dividend_hkd=0.52*5,057,000,000=2,629,640,000
+implicit_average_hkd_to_rmb=9,140/9,950=0.9185929648
+forecast_dividend_rmb=2,629,640,000*0.9185929648=2,415,568,804.0201006
+forecast_dividend_yield=2,415,568,804.0201006/32,631,583,511.01458=0.0740254853
+
+[currency]
+JSON amounts use CNY absolute yuan. The annual report's RMB columns are explicitly marked for information only; they were used to satisfy the result protocol. Segment metrics, net debt and DPS remain in HKD where the company discloses no matching RMB segment table; report text labels those amounts explicitly.
+
+[limitations]
+- Market cap and PE were accepted from input and were not independently reconstructed.
+- Dividend forecast assumes the 2025 DPS persists and uses 2025 year-end shares; actual cash payout depends on FX, share issuance and scrip elections.
+- Ordinary owner earnback metrics are null by contract because a special real-estate model is required.

@@ -1,0 +1,79 @@
+stock-research trace
+generated_for=PLMR
+period=2025-12-31
+report_type=annual
+
+[protocol]
+Read .agents/skills/stock-research/SKILL.md in full.
+Read .agents/skills/stock-research/references/result-contract.md in full.
+Read .agents/skills/stock-research/references/report-contract.md in full.
+Read .agents/skills/stock-research/references/data-reuse.md in full because the skill routes reuse decisions there.
+Initialized outputs/result.json with:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+Populated scalar fields with protocol set and list rows with protocol append; result.json was not authored as a standalone complex JSON object.
+
+[reuse_check]
+Checked the input-designated annual review, normalized facts, and raw filing locations under stock_report for PLMR/2025-12-31.
+No reusable PLMR annual facts package or local raw filing was present, so primary-source retrieval was required.
+
+[primary_sources]
+SEC 2025 Form 10-K HTML:
+https://www.sec.gov/Archives/edgar/data/1761312/000119312526067364/plmr-20251231.htm
+SEC accession index:
+https://www.sec.gov/Archives/edgar/data/1761312/000119312526067364/0001193125-26-067364-index.htm
+Filed 2026-02-24; report period 2025-12-31.
+
+U.S. Treasury Fiscal Data API query:
+https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange?filter=country:eq:China,record_date:eq:2025-12-31
+Returned China-Renminbi exchange_rate=6.998 for record_date=2025-12-31.
+
+Market snapshot reused from config/input.json:
+market_cap_cny=23928089792.47998
+market_cap_date=2026-08-03
+market_cap_source=Yahoo Finance yfinance
+pe_ttm=18.659693
+
+[model_decision]
+Input hint ordinary_operating/applicable was rejected after filing review.
+Selected statement_model=financial_insurance.
+Selected owner_earnback_applicability=requires_special_model.
+Reason: Palomar is a property and casualty insurance holding company. Investments and cash support unearned premium, loss reserves, regulatory capital, and catastrophe liquidity. They are not detachable net cash. Operating cash flow is strongly affected by premium growth, reserve movements, and reinsurance settlements, so it is not ordinary distributable cash profit.
+
+[financial_extraction]
+Source units: USD thousands. CNY conversion: USD-thousands * 1000 * 6.998.
+2025 total_assets_usd_thousand=3050967 -> cny=21350667066
+2025 total_liabilities_usd_thousand=2108300 -> cny=14753883400
+2025 total_equity_usd_thousand=942667 -> cny=6596783666
+2025 total_revenue_usd_thousand=875967 -> cny=6130017066
+2025 net_income_usd_thousand=197070 -> cny=1379095860
+2025 underwriting_income_usd_thousand=185946 -> cny=1301250108
+2025 operating_cash_flow_usd_thousand=409121 -> cny=2863028758
+2025 capex includes purchases of property/equipment 137 plus capitalized software 6090 = 6227 USD thousand -> cny=43576546
+operating_free_cash_flow mechanical value=409121-6227=402894 USD thousand -> cny=2819452212; not treated as distributable cash profit.
+2025 financing_cash_flow_usd_thousand=-28786 -> cny=-201444428
+2025 common_stock_repurchases_usd_thousand=37284 -> cny=260913432
+
+[insurance_metrics]
+gross_written_premium_usd_thousand=2028252
+net_earned_premium_usd_thousand=802635
+loss_ratio=0.285
+expense_ratio=0.484
+combined_ratio=0.769
+adjusted_combined_ratio=0.727
+annualized_roe=0.236
+net_margin=197070/875967=0.2249742285
+No ordinary gross margin was calculated because insurance statements do not have comparable sales and cost-of-sales economics.
+
+[special_model_observations]
+market_cap_to_2025_year_end_book_equity=3.6272x
+market_cap_to_2025_net_income=17.3506x
+These are report observations only, not ordinary owner-earnback fields.
+Forecast dividend set to zero because the 10-K says the company does not intend to declare and pay cash dividends in the foreseeable future and subsidiary distributions are legally constrained.
+
+[post_period_event]
+The 10-K reports the January 2026 Gray Surety acquisition and a new unsecured credit facility totaling USD 450 million. These are subsequent events and are not fully reflected in the 2025 year-end consolidated balance sheet.
+
+[validation]
+Protocol validation was run after all three outputs were completed:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Final validator response: {"status":"ok","errors":[]}

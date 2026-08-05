@@ -1,0 +1,55 @@
+stock-research trace: MLGO / 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- No existing MLGO raw filing, annual facts package, normalized facts, or stock-research output was found under stock_report/data.
+- Downloaded the SEC 2025 Form 20-F to stock_report/data/raw/filings/MLGO/2025-12-31/microalgoinc_20f.htm.
+- Primary filing: SEC accession 0001829126-26-002991, filed 2026-04-01, period 2025-12-31.
+- Market snapshot reused exactly from config/input.json: CNY 300,501,834.4872894 market cap; 2026-08-03; Yahoo Finance yfinance; PE TTM 1.9198115.
+
+3. Model decision
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Basis: one operating segment provides central-processing algorithm services. The balance sheet does not contain customer deposits, insurance reserves, property project liabilities, concession rights, or other special-model items.
+- Special handling retained: separate Level 1 marketable securities from operating assets; heavily haircut cash accessibility; exclude investment gains from sustainable operating profit.
+
+4. Audited 2025 facts extracted from Form 20-F (CNY)
+- Cash 1,228,983,711; short-term Level 1 marketable securities 1,138,090,600.
+- Total assets 2,462,524,963; total liabilities 109,483,304; total equity 2,353,041,659; parent equity 2,321,799,192; NCI 31,242,467.
+- Revenue 422,045,319; cost of revenue 313,222,200; gross profit 108,823,119; operating profit 22,377,995; net profit 127,561,937; parent net profit 113,907,431.
+- Investment income 132,251,951, mainly realized gains and fair-value gains on short-term investments.
+- Operating cash flow 17,441,724; property/equipment purchases 8,149; operating FCF 17,433,575; financing cash flow 1,082,024,350.
+- All convertible notes were converted into shares by year-end; bank borrowings were 30,000,000.
+- The company states no near-term dividend plan. WiMi controls about 73.2% of voting power through the dual-class structure.
+
+5. Deterministic formulas
+- gross_margin = 108,823,119 / 422,045,319 = 0.25784699912759845.
+- net_margin = 113,907,431 / 422,045,319 = 0.26989383810699247.
+- operating_FCF = 17,441,724 - 8,149 = 17,433,575.
+- discounted cash: 1,228,983,711 * 30% = 368,695,113.3.
+- discounted securities: 1,138,090,600 * 20% = 227,618,120.
+- discounted detachable net cash = 368,695,113.3 + 227,618,120 - 30,000,000 = 566,313,233.3.
+- discounted net cash / market cap = 1.8845583231338103.
+- discounted sustainable cash profit = 17,433,575 * 50% = 8,716,787.5.
+- operating business price = 300,501,834.4872894 - 566,313,233.3 = -265,811,398.81271052.
+- owner earnback years = -265,811,398.81271052 / 8,716,787.5 = -30.49419282192098.
+- market cap / cash profit = 300,501,834.4872894 / 8,716,787.5 = 34.473919948982285.
+- forecast dividend = 0; forecast yield = 0.
+
+6. Judgment flags
+- 30% cash inclusion, 20% security inclusion, and 50% FCF sustainability are analyst haircuts, not reported facts.
+- Haircuts reflect financing origin, voting control, PRC-to-offshore transfer constraints, lack of dividend intent, reinvestment discretion, and security price volatility.
+- A negative operating-business price is a formula result only; it does not mean immediate distribution or guaranteed recovery.
+- No verifiable market share was disclosed.
+
+7. Protocol operations and validation
+- Populated result sections with protocol `set` and evidence rows with protocol `append`; did not hand-write a complex JSON object from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation response: {"status":"ok","errors":[]}

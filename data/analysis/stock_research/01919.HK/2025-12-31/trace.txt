@@ -1,0 +1,88 @@
+stock-research trace
+company: 01919.HK / 中远海控
+period: 2025-12-31 annual
+generated context date: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely as requested.
+- Read references/data-reuse.md because the skill routes reuse decisions through that reference.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated JSON through repeated protocol `set` commands; no complex JSON was hand-written as a new file.
+
+2. Reuse decision
+- Checked the raw filing, annual review, normalized facts, and historical stock research paths from config/input.json.
+- None of the specified 2025 filing/facts/research files existed in the workspace.
+- Therefore fetched and read the official 2025 annual report rather than inventing or reusing absent facts.
+
+3. Primary source
+- COSCO SHIPPING Holdings Co., Ltd. Annual Report 2025.
+- HKEX release date: 2026-04-24.
+- URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042401981.pdf
+- Local temporary extraction only: /tmp/cosco_2025/annual.pdf and /tmp/cosco_2025/annual.txt.
+- The PDF had 307 pages. Text was extracted with pypdf installed under /tmp/cosco_2025/pylibs because pdftotext was unavailable.
+
+4. Model verification
+- Input hint said financial_brokerage / requires_special_model.
+- Annual report note 1 says the Group provides container shipping and operates container terminals.
+- Segment note 6 identifies container shipping and terminal business; no brokerage client funds, proprietary securities portfolio, margin finance, or repo funding model exists.
+- Input's own industry tags also say Industrial Transportation, transport_operator, logistics_service.
+- Overrode hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+5. Core reported facts (annual report, RMB'000 converted to absolute RMB)
+- Revenue: 219,503,805,000.
+- Cost of services: 176,802,237,000.
+- Gross profit: 42,701,568,000.
+- Operating profit: 34,518,641,000.
+- Net profit: 35,216,223,000.
+- Parent net profit: 30,859,651,000.
+- Total assets: 483,758,024,000.
+- Total liabilities: 200,351,999,000.
+- Total equity: 283,406,025,000.
+- Parent equity: 232,265,324,000.
+- Minority interest: 51,140,701,000.
+- Operating cash flow: 45,545,770,000.
+- Capex cash proxy (purchase of PPE, investment properties, intangible assets): 25,015,552,000.
+- Operating free cash flow: 20,530,218,000.
+- Financing cash flow: -51,737,289,000.
+- Cash and cash equivalents: 150,881,601,000.
+- Restricted deposits excluded from cash: 588,110,000.
+- Borrowings: 33,194,270,000.
+- Lease liabilities: 43,365,326,000.
+- Contracted capital commitments: 55,641,975,000, including vessels 52,054,279,000.
+
+6. Formula checks
+- Gross margin = 42,701,568,000 / 219,503,805,000 = 0.1945379374.
+- Net margin = 30,859,651,000 / 219,503,805,000 = 0.1405882279.
+- Free cash flow = 45,545,770,000 - 25,015,552,000 = 20,530,218,000.
+- Dividend and buyback cash out = shareholder dividends 24,638,847,000 + share repurchases 6,560,757,000 = 31,199,604,000. NCI dividends excluded from this parent-shareholder field.
+- 2025 full-year dividend basis = approximately 15,412,000,000; forecast-basis yield = 15,412,000,000 / 206,090,759,128.7583 = 0.0746855525.
+
+7. Owner earnback scenario
+- Starting cash: 150,881,601,000.
+- Less borrowings: 33,194,270,000.
+- Less lease liabilities: 43,365,326,000.
+- Less proposed 2025 final dividend: 6,738,000,000.
+- Less one-year capex buffer: 25,015,552,000.
+- Residual: 42,568,453,000.
+- Apply 80% inclusion to residual because 77,793,990,000 is deposited with related COSCO SHIPPING Finance, and because of overseas cash, working-capital, and cycle constraints.
+- Discounted detachable net cash: 34,054,762,400.
+- Sustainable cash profit starts from reported FCF 20,530,218,000 and deducts 5,530,218,000 for cycle normalization / large capital commitments, producing a transparent scenario value of 15,000,000,000.
+- Operating business price = 206,090,759,128.7583 - 34,054,762,400 = 172,035,996,728.7583.
+- Owner earnback years = 172,035,996,728.7583 / 15,000,000,000 = 11.4690664486.
+- Market cap / cash profit = 206,090,759,128.7583 / 15,000,000,000 = 13.7393839419.
+- These discounts are analyst judgment, not reported company facts or guidance.
+
+8. Market data
+- Market cap: 206,090,759,128.7583.
+- PE TTM: 7.01.
+- Timestamp: 2026/08/03 09:48:07.
+- Source supplied by input: Tencent qt.gtimg.cn.
+- No independent market-price recomputation was possible from the annual report; limitation recorded in result.json.
+
+9. Validation
+- Protocol validation executed after population:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed JSON validation status: ok, errors: [].
+- A final validation and file consistency check is performed after report/trace creation.

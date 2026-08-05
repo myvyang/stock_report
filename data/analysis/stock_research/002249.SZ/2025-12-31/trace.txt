@@ -1,58 +1,62 @@
 大洋电机 002249.SZ 2025 股票研究 trace
-生成时间：2026-07-27 Asia/Shanghai
+生成日期：2026-07-31 Asia/Shanghai
 
-本次任务输入：
+任务输入
 - config/input.json
 
-已按 stock-research skill 要求读取：
+已读取的技能与契约
 - .agents/skills/stock-research/SKILL.md
 - .agents/skills/stock-research/references/result-contract.md
 - .agents/skills/stock-research/references/report-contract.md
 - .agents/skills/stock-research/references/data-reuse.md
 
-协议 CLI 使用记录：
+协议 CLI
 - PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- 多次使用 protocol set 写入 outputs/result.json 的 financials、metrics、asset_analysis、owner_earnback、dividend、business、risks、evidence、data_quality 字段。
+- 使用 protocol set 写入 analysis.sources_used、analysis_model、financials、asset_analysis、metrics、owner_earnback、dividend、business、risks、evidence、data_quality。
 - PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-- 最终校验结果：status ok，errors []
+- 校验结果：status=ok，errors=[]。
 
-读取和复用的本地资料：
+复用资料
 - stock_report/data/analysis/annual_review/002249.SZ/2025-12-31/facts.json
 - stock_report/data/analysis/annual_review/002249.SZ/2025-12-31/annual_facts.md
-- stock_report/data/analysis/annual_review/002249.SZ/2025-12-31/extraction_trace.txt
-- stock_report/data/raw/filings/002249.SZ/2025-12-31/metadata.json
 - stock_report/data/raw/filings/002249.SZ/2025-12-31/002249_2025_annual_report.txt
 - stock_report/data/analysis/stock_research/002249.SZ/2025-12-31/result.json
 - stock_report/data/analysis/stock_research/002249.SZ/2025-12-31/report.md
 - stock_report/data/analysis/stock_research/002249.SZ/2025-12-31/trace.txt
 
-关键数据来源和处理：
-- 三张表核心数字来自年度事实包 facts.json，源头为中山大洋电机股份有限公司 2025 年年度报告。
-- 市值 172.20 亿元、PE TTM 15.9 使用 config/input.json 中的批次输入快照，日期 2026-07-24。
-- 毛利率按 2025 年毛利 2,730,490,873.54 元 / 营收 12,221,287,989.74 元计算。
-- 净利率按 2025 年归母净利润 1,082,717,150.84 元 / 营收 12,221,287,989.74 元计算。
-- 经营自由现金流按经营现金流 1,993,209,708.24 元 - 资本开支 739,899,274.82 元计算。
-- 预测现金分红 481,797,924.10 元来自 2025 年报利润分配预案，每 10 股派 1.96 元。
-- 预测分红率按 481,797,924.10 元 / 17,220,000,000 元计算。
-- 折后可剥离净现金 4,376,899,385.5235 元、折后可持续可分配现金利润 680,000,000 元复用既有 stock_research 结果中的 owner_earnback 数值，并按当前 result-contract 公式重新复核。
-- 经营业务购买价按市值 - 折后可剥离净现金计算。
-- 控股回本年按经营业务购买价 / 折后可持续可分配现金利润计算。
-- 市值/折后现金利润按市值 / 折后可持续可分配现金利润计算。
+模型复核
+- 年报显示收入来自电机及驱动系统制造和直销。
+- 应收、存货、固定资产、在建工程及供应链应付款为普通制造业务占用。
+- 未发现银行、保险、地产开发、工程施工、收费权或投资控股等特殊模型特征。
+- 结论：statement_model=ordinary_operating；owner_earnback_applicability=applicable。
 
-已核查的年报位置：
-- 利润分配预案：raw filing text lines around 154-156 and 3276-3287。
-- 报告期内分红：raw filing text lines around 3249-3253。
-- 分配股利、利润或偿付利息支付的现金：raw filing text lines around 5313-5364。
-- 业务、三张表、资金类资产、经营资产、投资资产、负债分类、利润现金转化：annual_review facts.json。
+核心事实与计算
+- 市值 18,280,000,000 元，PE TTM 16.66，行情时间 20260731114324，来源 Tencent qt.gtimg.cn。
+- 收入 12,221,287,989.74 元；毛利 2,730,490,873.54 元；毛利率 22.3421%。
+- 归母净利润 1,082,717,150.84 元；净利率 8.8593%。
+- 经营现金流 1,993,209,708.24 元；资本开支 739,899,274.82 元；经营自由现金流 1,253,310,433.42 元。
+- 预测现金分红 481,797,924.10 元；预测分红率=481,797,924.10/18,280,000,000=2.6357%。
+- 折后可剥离净现金 4,376,899,385.5235 元，沿用既有专题保守总额；占市值 23.9437%。
+- 折后可持续可分配现金利润 680,000,000 元，沿用既有专题保守假设。
+- 经营业务购买价=18,280,000,000-4,376,899,385.5235=13,903,100,614.4765 元。
+- 控股回本年=13,903,100,614.4765/680,000,000=20.4457 年。
+- 市值/现金利润=18,280,000,000/680,000,000=26.8824 倍。
 
-数据缺口和限制：
-- 年度事实包覆盖核心三张表和重要资产负债项目，但未完整重分类所有资产科目；报告只解释已抽取的重要项目。
-- 本工作区未发现独立 owner_earnback 目录，折后净现金和折后现金利润来自既有 stock_research 结构化结果，并用当前协议公式复核。
-- 年报未逐笔披露全部大额存单银行、期限、提前支取条款和集团内资金调拨路径，影响折后可剥离净现金精度。
-- 年报未完整拆出投资收益中来自大额存单本金的精确金额，影响资金收益双算剔除精度。
-- 市值和 PE 来自输入快照，本次未重新联网抓取行情。
+证据定位
+- 年报利润分配预案：raw filing text 约第 154-156、3272-3285 行。
+- 销售、管理和研发费用：约第 1265-1270、1491-1501、5131-5133 行。
+- 利息收入、投资收益、公允价值变动收益：约第 5136-5143 行。
+- 在建工程变化及摩洛哥、电驱动项目：约第 1747-1749 行。
+- 三张表、分部业务、资金类资产、经营资产、投资资产与负债分类：annual_review facts.json。
 
-输出文件：
+数据限制
+- 年度事实包未重分类全部资产科目。
+- 既有专题只保留折后净现金和折后现金利润总额，本工作区缺少逐项折价底稿。
+- 年报未披露精确必要经营现金，也未逐笔披露大额存单提前支取条件及集团资金调拨路径。
+- 年报未完整拆出投资收益中来自已扣资金本金的精确金额。
+- 市值和 PE 直接采用输入快照，本次未联网另行核验。
+
+最终输出
 - outputs/result.json
 - outputs/report.md
 - outputs/trace.txt

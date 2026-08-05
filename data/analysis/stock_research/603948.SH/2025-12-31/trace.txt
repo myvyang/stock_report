@@ -1,48 +1,72 @@
-运行时间：2026-07-27T02:53:37+08:00
-公司：603948.SH 建业股份
-报告期：2025-12-31 年报
+任务：603948.SH 建业股份，2025-12-31 年报研究
+生成日期：2026-07-31（Asia/Shanghai）
 
-已按 stock-research skill 读取协议文件：
-- .agents/skills/stock-research/references/result-contract.md
-- .agents/skills/stock-research/references/report-contract.md
+协议与流程
+1. 已完整读取 stock-research/SKILL.md。
+2. 已读取 result-contract.md、report-contract.md，并补读 data-reuse.md。
+3. 使用协议 CLI init 从 config/input.json 初始化 outputs/result.json。
+4. 复用年度事实包 facts.json、annual_facts.md 和 extraction_trace.txt。
+5. 对关键业务、分红、产品收入、产销量及产能回到年报文本复核。
+6. 所有 result.json 内容通过协议 CLI set 写入。
+7. 使用协议 CLI validate 校验，首次最终校验状态为 ok，errors 为空。
 
-协议 CLI：
-- 已运行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- 完成写入后运行 validate，结果见命令输出。
+主要来源
+- stock_report/data/raw/filings/603948.SH/2025-12-31/603948_2025_annual_report.pdf
+- stock_report/data/raw/filings/603948.SH/2025-12-31/603948_2025_annual_report.txt
+- stock_report/data/raw/filings/603948.SH/2025-12-31/metadata.json
+- stock_report/data/analysis/annual_review/603948.SH/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/603948.SH/2025-12-31/annual_facts.md
+- config/input.json
+- 上交所官方披露链接：
+  http://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-24/603948_20260424_79FA.pdf
 
-读取和复用的本地资料：
-- config/input.json：公司、报告期、2026-07-24 输入市值 2,985,000,000 元、PE TTM 12.98。
-- stock_report/data/analysis/annual_review/603948.SH/2025-12-31/facts.json：年度事实包主来源。
-- stock_report/data/analysis/annual_review/603948.SH/2025-12-31/annual_facts.md：事实包摘要和缺口。
-- stock_report/data/raw/filings/603948.SH/2025-12-31/603948_2025_annual_report.txt：年报文本复核。
-- stock_report/data/analysis/stock_research/603948.SH/2025-12-31/result.json、report.md、trace.txt：复用已核查的经营叙述、风险核查和 owner_earnback 数字；未复用旧结果中的榜单标签字段。
+财报模型复核
+- 业务是精细化工产品制造与销售。
+- 不存在银行客户存款、券商客户资金、保险准备金、地产预售监管资金、
+  工程合同资产主导、收费权或投资控股底层资产等特殊报表特征。
+- 结论：ordinary_operating；普通控股回本口径 applicable。
 
-年报复核位置：
-- 利润分配预案：文本行 41-45、1769-1811。
-- 主营业务分产品和产销量：文本行 520-620。
-- 合并资产负债表：文本行 2780-2905。
-- 合并利润表：文本行 3008-3088。
-- 合并现金流量表：文本行 3214-3290。
-- 货币资金和受限资产：文本行 4580-4593、6192-6200。
-- 应收票据、应收账款、存货：文本行 4626-4860、5309-5375。
-- 经营计划和风险提示：文本行 1300-1375。
+关键财务事实（人民币元）
+- 总资产 2,631,954,171.11
+- 总负债 474,168,055.65
+- 归母权益 2,157,786,115.46
+- 营收 2,057,461,224.38
+- 毛利 361,891,290.38
+- 归母净利润 229,958,411.58
+- 扣非归母净利润 212,958,288.09
+- 经营现金流 384,506,969.29
+- 资本开支 10,850,899.65
+- 经营自由现金流 373,656,069.64
 
-关键计算：
-- gross_margin = 361,891,290.38 / 2,057,461,224.38 = 0.175892155872
-- net_margin = 229,958,411.58 / 2,057,461,224.38 = 0.111768041533
-- forecast_dividend_yield = 162,489,167.00 / 2,985,000,000.00 = 0.054435231826
-- discounted_net_cash_to_market_cap = 891,765,676.056 / 2,985,000,000.00 = 0.298748970203
-- operating_business_price = 2,985,000,000.00 - 891,765,676.056 = 2093234323.944000
-- owner_earnback_years = 2093234323.944000 / 164,425,741.0448 = 12.730575581677
-- market_cap_to_cash_profit = 2,985,000,000.00 / 164,425,741.0448 = 18.154091816966
+现金折扣计算
+- 银行存款 1,297,634,953.20
+- 必要经营现金估算 250,000,000.00
+- 余额 1,047,634,953.20 × 90% = 942,871,457.88
+- 受限银行承兑汇票保证金 56,975,695.85 × 0% = 0
+- 租赁负债扣除 1,107,148.60
+- 折后可剥离净现金 = 941,764,309.28
 
-数据质量限制：
-- 银行存款未披露活期、定期和大额存单期限结构。
-- 必要经营现金没有公司披露精确数。
-- 18 万吨环保增塑剂一期项目总投资、售价、开工率和回报率未完整披露。
+利润调整计算
+- 扣非归母净利润起点 212,958,288.09
+- 利息收入 22,960,282.12，按 25%所得税率估算税后影响 17,220,211.59
+- 调整后利润 195,738,076.50
+- 化工周期折扣 15%
+- 折后可持续现金利润 = 166,377,365.03
+
+回本计算
+- 输入市值 3,167,000,000.00
+- 经营业务购买价 = 市值 - 折后净现金 = 2,225,235,690.72
+- 经营业务回本期 = 2,225,235,690.72 / 166,377,365.025 = 13.3746 年
+- 市值/现金利润 = 3,167,000,000 / 166,377,365.025 = 19.0350
+- 折后净现金/市值 = 29.7368%
+
+分红
+- 2025 年董事会预案每股 1.00 元，合计 162,489,167.00 元。
+- 按输入市值计算预测税前股息率 5.1307%。
+- 年报披露时该预案尚需股东会批准。
+
+已知限制
+- 银行存款未披露活期、定期、大额存单期限结构。
+- 必要经营现金 2.5 亿元为研究估算，不是公司披露数字。
 - 2023 年资本开支未从 2025 年报直接抽取。
-
-写入文件：
-- outputs/result.json
-- outputs/report.md
-- outputs/trace.txt
+- 市值和 PE TTM 使用输入行情快照，未二次校验交易所收盘数据。

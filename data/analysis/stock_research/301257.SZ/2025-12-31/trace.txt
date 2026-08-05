@@ -1,0 +1,94 @@
+stock-research trace
+company=普蕊斯
+code=301257.SZ
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-01T03:33:15+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full as requested.
+3. Read references/data-reuse.md because the skill routes reuse decisions to that reference.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated initialized fields using protocol set commands; no complex result JSON was written from scratch.
+6. Validated result with protocol validate; status=ok, errors=[].
+
+[local-reuse-check]
+Command: rg --files across configured annual_review, raw_filing, normalized_facts, and prior stock_research paths.
+Result: only config/input.json existed; no local 2025 annual facts package, raw filing, or prior research result was available for reuse.
+Decision: retrieve public disclosures, prioritizing official exchange/Cninfo documents for core facts.
+
+[sources]
+S1. 普蕊斯2025年年度报告，公告编号2026-024，披露日期2026-04-29。
+    Public text mirror used for line-addressable extraction:
+    https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12247051&stockid=301257
+    Report identifies Cninfo as the exchange-designated disclosure site and carries the audited annual report text.
+    Key extracted facts:
+    - revenue=842,504,397.82
+    - cost_of_sales=624,556,583.37
+    - operating_profit=127,918,726.09
+    - parent_net_profit=109,638,075.40
+    - operating_cash_flow=35,693,336.09
+    - capex=7,832,264.89
+    - total_assets=1,543,917,740.79
+    - total_liabilities=274,412,772.05
+    - parent_equity=1,269,504,968.74
+    - cash=467,277,567.13
+    - trading_financial_assets=150,308,429.30
+    - accounts_receivable=169,474,328.58
+    - contract_assets=442,923,014.92
+    - long_term_equity_investment=171,509,207.54
+    - contract_liabilities=153,621,236.76
+    - annual SMO revenue share=99.90%
+    - employee compensation share of operating cost=87.19%
+    - year-end remaining performance obligations corresponding revenue=1,982,237,555.32
+
+S2. 巨潮资讯：普蕊斯投资者关系活动记录表，编号2026-005，2026-04-30。
+    https://static.cninfo.com.cn/finalpage/2026-04-30/1225273461.PDF
+    Used to cross-check 2025 revenue/profit, new orders, operating footprint, and management's description of demand/pricing recovery.
+
+S3. 普蕊斯关于2025年度利润分配方案的公告，董事会审议日期2026-04-27，披露日期2026-04-29。
+    Line-addressable public mirror:
+    https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12247045&stockid=301257
+    Key facts: base shares=79,004,770; cash dividend=0.80 yuan per 10 shares; calculated total=6,320,381.60 yuan.
+
+S4. config/input.json market snapshot.
+    source=Tencent qt.gtimg.cn
+    timestamp=20260731114306
+    market_cap=3,118,000,000
+    pe_ttm=27.29
+
+[calculations]
+gross_profit = 842,504,397.82 - 624,556,583.37 = 217,947,814.45
+gross_margin = 217,947,814.45 / 842,504,397.82 = 0.2586901704
+net_margin = 109,638,075.40 / 842,504,397.82 = 0.1301335344
+operating_free_cash_flow = 35,693,336.09 - 7,832,264.89 = 27,861,071.20
+
+discounted cash components:
+- cash: 467,277,567.13 * 50% = 233,638,783.57
+- trading financial assets: 150,308,429.30 * 90% = 135,277,586.37
+- lease-related liabilities: -(3,707,525.16 + 611,387.10) = -4,318,912.26
+- discounted detachable net cash = 364,597,457.68
+- operating business price = 3,118,000,000.00 - 364,597,457.68 = 2,753,402,542.32
+- owner earnback years = 2,753,402,542.32 / 27,861,071.20 = 98.8262
+- market cap / cash profit = 3,118,000,000.00 / 27,861,071.20 = 111.9124
+
+[model-judgment]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: SMO project services are an ordinary operating business; there are no bank deposits, insurance reserves, property-development inventories, concessions, or other balance-sheet items that make the balance sheet itself the product. Receivables and contract assets are operating working capital and are explicitly excluded from detachable cash.
+
+[cash-profit-judgment]
+Reported parent profit was not used directly. Deducted non-recurring difference to reach adjusted parent profit of 88,697,493.54, then applied a cash-conversion constraint. Because contract assets increased materially and 2025 operating cash flow was much lower than profit, discounted sustainable cash profit was set to actual 2025 operating free cash flow of 27,861,071.20. This is a conservative one-year stress convention, not a forecast.
+
+[limitations]
+- No local annual fact pack/raw filing was supplied.
+- The annual report was extracted through a line-addressable public mirror; core company disclosures were cross-checked against an official Cninfo investor-relations PDF.
+- Market cap and PE TTM were accepted from the task input.
+- Financial-product restrictions and the underlying value of the Helizhiye arrangement were not penetrated instrument-by-instrument.
+
+[final-check]
+- Reconciled discounted cash breakdown to the aggregate and corrected all derived valuation fields.
+- Re-ran protocol validate after correction: status=ok, errors=[].
+- Confirmed report figures are rounded presentations of result.json values.

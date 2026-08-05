@@ -1,0 +1,67 @@
+stock-research trace
+task: 920834.BJ 三维装备
+period: 2025-12-31 annual
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the configured raw filing, annual review, normalized facts and prior stock research paths.
+- No annual facts package, normalized facts, metadata or historical stock research result existed at task start.
+- Therefore the analysis_model_hint was treated only as a hint and audited annual-report facts were collected anew.
+
+3. Primary filing obtained
+- Filing: 镇江三维输送装备股份有限公司《2025年年度报告》, announcement no. 2026-020, disclosed 2026-04-23.
+- Audit: 公证天业会计师事务所（特殊普通合伙）, standard unqualified opinion, report dated 2026-04-22.
+- Disclosure page: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12164029&stockid=920834
+- PDF mirror: https://file.finance.sina.com.cn/211.154.219.97%3A9494/MRGG/CNSEBJ_STOCK/2026/2026-4/2026-04-23/12164029.PDF
+- Saved local PDF and extracted text under stock_report/data/raw/filings/920834.BJ/2025-12-31/ for reproducibility.
+
+4. Model determination
+- The company manufactures and sells conveying-machine components; revenue is mainly product sales.
+- Inventory, receivables, plant and equipment are ordinary manufacturing operating assets.
+- No customer deposits, regulated project cash, insurance reserves, concession rights or investment-holding structure was identified.
+- statement_model = ordinary_operating; owner_earnback_applicability = applicable.
+
+5. Audited facts used (CNY)
+- Total assets 389,449,302.38; liabilities 76,897,830.93; equity 312,551,471.45; parent equity 308,279,311.10.
+- Revenue 308,453,777.87; cost of sales 208,352,941.50; gross profit 100,100,836.37.
+- Net profit 47,252,542.24; parent net profit 47,098,139.82; deducted parent profit 44,251,841.40.
+- Operating cash flow 53,144,372.60; capex 12,032,725.25; operating FCF 41,111,647.35.
+- Cash 186,373,089.49; structured deposits 17,000,000.00; short borrowings 10,008,311.11.
+- Actual 2025 dividend cash paid 27,600,001.15, excluding interest.
+- 2025 annual dividend proposal 19,920,000.83, approved by board on 2026-04-22 and pending shareholder approval at annual-report disclosure.
+
+6. Owner earnback judgments and formulas
+- Cash haircut: 186,373,089.49 * 80% = 149,098,471.592. Rationale: retain operating liquidity and allow for governance/time mismatch.
+- Structured deposit haircut: 17,000,000 * 90% = 15,300,000.
+- Deduct short borrowings in full: 10,008,311.11.
+- Deduct proposed dividend: 19,920,000.83 to avoid double counting against the later 2026-07-31 market-cap date.
+- Discounted detachable net cash = 134,470,159.652.
+- Operating business price = 997,000,000 - 134,470,159.652 = 862,529,840.348.
+- Operating FCF = 53,144,372.60 - 12,032,725.25 = 41,111,647.35.
+- Sustainable cash-profit haircut = 10%, reflecting single-year margin, export and working-capital variability.
+- Discounted sustainable cash profit = 41,111,647.35 * 90% = 37,000,482.615.
+- Owner earnback years = 862,529,840.348 / 37,000,482.615 = 23.3113.
+- Market cap / cash profit = 997,000,000 / 37,000,482.615 = 26.9456.
+- Forecast dividend yield = 19,920,000.83 / 997,000,000 = 1.99799%.
+
+7. Market-data source
+- Market cap 997,000,000.00, PE TTM 21.44, timestamp 20260731153759.
+- Source supplied by config/input.json: Tencent qt.gtimg.cn.
+
+8. Known limitations
+- Financial position is dated 2025-12-31 while market capitalization is dated 2026-07-31.
+- Industry position relies on company-disclosed customer count and standard-drafting status; no independently verifiable market share was available.
+- Dividend forecast uses the explicit 2025 annual board proposal and assumes no additional 2026 interim dividend.
+- The sustainable cash-profit estimate uses one audited annual period and an explicit 10% prudence haircut rather than an unavailable multi-year normalized capex series.
+
+9. Protocol construction and validation
+- outputs/result.json was populated through repeated protocol `set` commands after protocol initialization; it was not handwritten from a blank JSON object.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].

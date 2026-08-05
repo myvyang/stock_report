@@ -1,0 +1,32 @@
+HMN stock research trace
+generated_at: 2026-08-04 Asia/Shanghai
+period: 2025-12-31 annual
+
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read result-contract.md, report-contract.md, and data-reuse.md in full.
+3. Checked configured annual-review, normalized-facts, and raw-filing paths. No reusable annual facts package or prior filing artifact was present.
+4. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Located and downloaded official SEC Form 10-K:
+   issuer: Horace Mann Educators Corporation
+   form: 10-K
+   period: 2025-12-31
+   filed: 2026-02-27
+   accession: 0000850141-26-000007
+   url: https://www.sec.gov/Archives/edgar/data/850141/000085014126000007/hmn-20251231.htm
+   local: stock_report/data/raw/filings/HMN/2025-12-31/hmn-20251231.htm
+6. Extracted and cross-checked consolidated statements, segment MD&A, investment portfolio, capital resources, dividend restrictions, and statutory-capital disclosure.
+7. Overrode input analysis_model_hint from ordinary_operating/applicable to financial_insurance/not_applicable. Reason: investments, policy liabilities, separate accounts, reserves, and regulatory capital are the insurance operating model.
+8. Kept ordinary owner-earnback fields null as required by result contract. Used underwriting, spread, investment quality, ROE, dividend capacity, and regulatory upstreaming as the special-model analysis.
+9. Currency conversion: 2025 Federal Reserve G.5A average rate, USD 1 = CNY 7.1875. Applied consistently to filing amounts. Source: https://www.federalreserve.gov/releases/g5a/current/
+10. Market snapshot reused exactly from config/input.json: market cap CNY 14,199,566,435.206787; date 2026-08-03; PE TTM 13.092965; source Yahoo Finance yfinance.
+11. Dividend forecast: USD 1.44 indicated annual dividend x 40,449,550 shares outstanding at 2026-02-17 x 7.1875 = CNY 418,652,842.50; yield = 2.948349475% of input market cap.
+12. Populated result fields through protocol CLI set commands; did not hand-write result.json from scratch.
+13. Validation command:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    result: status=ok, errors=[]
+
+Known limitations:
+- Market cap and PE are supplied secondary-market data and were not reconstructed from exchange trades.
+- Insurance gross margin, ordinary capex, ordinary FCF, and detachable net cash are economically non-comparable and intentionally null.
+- Form 10-K says each insurance subsidiary exceeded required statutory capital but does not provide a directly reproducible consolidated RBC percentage in the reviewed disclosure.

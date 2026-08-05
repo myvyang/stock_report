@@ -1,0 +1,50 @@
+task: stock research for 00709.HK, period 2025-12-31
+generated_at: 2026-08-03T14:20:48+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local data reuse check
+- config/input.json present.
+- No raw filing, annual facts package, normalized facts, or prior stock-research output existed for 00709.HK/2025-12-31.
+- Initialized outputs/result.json with the protocol CLI.
+
+3. Model verification
+- Input hint classified the company as financial_brokerage.
+- Giordano 2025 Annual Report identifies the group as an international apparel retailer operating direct stores, e-commerce, and franchise wholesale.
+- Overrode the hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+4. Primary sources reviewed
+- Giordano International Limited Annual Report 2025:
+  https://corp.giordano.com.hk/upload/report/121/doc_1/ew0709_AR.pdf
+  Key pages: 2-3 (ten-year highlights and stores), 11-31 (MD&A), 97-103 (audit), 104 (income statement), 106-107 (balance sheet), 108-109 (cash flow), 155-159 (segments), 160-161 (other gains/expenses), 169 (cash).
+- Giordano FY2025 results press release:
+  https://corp.giordano.com.hk/upload/press_release/85/doc_1/FY25_Press_Release_%28E%29.pdf
+- PBOC-authorized CFETS central parity for 2025-12-31: HKD 1 = CNY 0.90322.
+- Market cap and PE TTM reused from config/input.json Tencent snapshot.
+
+5. Currency and formulas
+- All HKD financial-statement amounts converted at 0.90322 CNY/HKD.
+- Gross margin = 2,149 / 3,854 = 55.760249%.
+- Net margin = parent profit 217 / revenue 3,854 = 5.630514%.
+- Operating free cash flow = operating cash flow 472 - capex 66 = HKD 406 million.
+- Discounted detachable net cash = cash 723 * 70% - bank loans 25 = HKD 481.1 million = CNY 434,539,142.
+- Property disposal gain was HKD 49 million pre-tax. Estimated after-tax amount used the FY2025 effective tax rate, then removed from parent profit; rounded sustainable profit input is HKD 173 million = CNY 156,257,060.
+- Operating business price = CNY 1,946,798,689.1430616 - CNY 434,539,142 = CNY 1,512,259,547.1430616.
+- Owner earnback = operating business price / sustainable cash profit = 9.678024 years.
+- Market cap / sustainable cash profit = 12.458949.
+- Dividend reference = HKD 0.139/share * 1,616,369,000 shares * 0.90322 = CNY 202,931,216.34; yield = 10.423842%.
+
+6. Judgment notes
+- Cash discounted by 30% because inventory purchasing, payroll, leases, tax, and multi-region operations require liquidity; this is an analyst assumption.
+- Lease liabilities were not deducted again from net cash because they pair with right-of-use assets and are intrinsic to the store network. Lease principal remains a real recurring cash obligation and is discussed in the report.
+- Sustainable cash profit uses one normalized year rather than a full-cycle average; this limitation is explicit.
+- Historical annual dividend is used as the forecast reference because both interim and final FY2025 amounts were publicly established by the analysis date. It is not treated as a guaranteed FY2026 dividend.
+
+7. Protocol operations
+- result.json initialized using `protocol init`.
+- Sections populated using repeated `protocol set` operations.
+- Final `protocol validate` status: ok, errors: [].

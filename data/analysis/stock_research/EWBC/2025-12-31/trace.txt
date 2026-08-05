@@ -1,0 +1,71 @@
+EWBC stock research trace
+Generated: 2026-08-04 Asia/Shanghai
+Period: 2025-12-31 annual
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initialization succeeded.
+
+3. Reuse check
+- The input-referenced annual-review and raw-filing directories were absent from /workspace.
+- No prior EWBC annual facts or stock-research result was available locally.
+- Returned to primary public filings as permitted by data-reuse.md.
+
+4. Primary evidence acquired and reviewed
+- SEC Form 10-K, accession 0001069157-26-000009, filed 2026-02-27, period 2025-12-31.
+- SEC Companyfacts JSON for CIK 0001069157, used to cross-check consolidated XBRL values.
+- East West Bancorp 2025 full-year earnings release, dated 2026-01-22.
+- East West Bancorp Q1 2026 earnings release, dated 2026-04-21.
+- SEC 2026 proxy statement for company positioning and network facts.
+- Federal Reserve H.10 annual China spot-rate series; 2025 value 7.1875 CNY/USD.
+- Market cap and PE retained from config/input.json as required.
+
+5. Model decision
+- Input hint: ordinary_operating / applicable.
+- Filing fact: East West Bancorp is a bank holding company and East West Bank is its principal asset.
+- Overrode model to financial_bank / requires_special_model.
+- Reason: deposits, loans, securities, cash and wholesale funding are integral regulated banking assets and liabilities. They are not detachable net cash, and bank cash flow is not ordinary-company free cash flow.
+- All ordinary owner-earnback sorting fields were left null.
+
+6. Key USD facts extracted
+- Total assets: 80,434,997,000
+- Total liabilities: 71,535,795,000
+- Parent stockholders' equity: 8,899,202,000
+- Total revenue: 2,931,856,000
+- Net interest income: 2,552,629,000
+- Noninterest income: 379,227,000
+- Parent net income: 1,325,188,000
+- Net loans: 56,068,399,000
+- Deposits: 67,082,701,000
+- Dividends declared: 335,208,000; USD 2.40/share
+- NIM: 3.41%; ROA: 1.70%; ROE: 16.01%; efficiency ratio: 35.69%
+- NPA/assets: 0.26%; net charge-off ratio: 0.11%; ALLL/loans: 1.42%; ALLL/nonaccrual loans: 488.28%
+- Company CET1: 15.1%; total capital: 16.4%; Tier 1 leverage: 10.9%
+- Adjusted uninsured domestic deposit ratio: 45%
+
+7. Currency and dividend calculations
+- Protocol requires CNY absolute yuan.
+- All filing USD amounts translated at 7.1875 CNY/USD for consistent consumption.
+- Forecast assumption: USD 0.80 quarterly dividend x 4 x 137,622,675 shares = USD 440,392,560.
+- CNY forecast dividend = 3,165,321,525.
+- Forecast yield = 3,165,321,525 / 121,103,047,438.875 = 0.02613742256649363.
+- Translation rate is a research presentation convention, not an accounting or transaction-date FX rate.
+
+8. Protocol population
+- outputs/result.json was populated from the initialized skeleton using protocol set and append commands.
+- The complex result object was not handwritten from scratch.
+
+9. Validation
+- Protocol validation result before report creation: status=ok, errors=[]
+- Final validation is run after all files are created; see final command result in task handoff.
+
+10. Output files
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

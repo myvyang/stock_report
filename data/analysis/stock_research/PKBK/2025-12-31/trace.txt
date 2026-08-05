@@ -1,0 +1,67 @@
+PKBK stock research trace
+generated_at: 2026-08-04 Asia/Shanghai
+period: 2025-12-31 annual
+
+1. Protocol initialization
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+status: completed
+
+2. Local reuse audit
+checked:
+- stock_report/data/raw/filings/PKBK/2025-12-31
+- stock_report/data/analysis/annual_review/PKBK/2025-12-31
+- stock_report/data/normalized/facts/PKBK/2025-12-31
+result: no filing, annual fact pack, normalized facts, or prior research result was present in the workspace.
+
+3. Primary sources
+- SEC 2025 Form 10-K, accession 0001437749-26-007748, filed 2026-03-11:
+  https://www.sec.gov/Archives/edgar/data/1315399/000143774926007748/pkbk20251231_10k.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/1315399/000143774926007748/0001437749-26-007748-index.htm
+- Federal Reserve H.10, 2025-12-31 USD/CNY observation 6.9931, release dated 2026-01-05:
+  https://www.federalreserve.gov/releases/h10/20260105/
+- Market cap snapshot: config/input.json, attributed there to Yahoo Finance yfinance, as of 2026-08-03.
+
+4. Model decision
+input hint: ordinary_operating / applicable
+final decision: financial_bank / not_applicable
+reason: loans and customer deposits are the operating assets and funding of a regulated bank. Cash, securities, deposits, and borrowings cannot be separated into ordinary detachable net cash. Ordinary owner-earnback metrics remain null.
+
+5. Key reported USD facts
+- total assets: $2,249.436m
+- total liabilities: $1,924.918m
+- shareholders' equity: $324.518m
+- gross loans: $2,035.227m
+- allowance for credit losses: $34.649m
+- deposits: $1,758.669m
+- uninsured deposits: $728.398m
+- net interest income: $76.458m
+- net income attributable to company: $37.775m
+- net income available to common: $37.755m
+- 2025 common dividends: $8.4m
+- 2025 common share repurchases: $6.5m
+- net interest margin: 3.64% (2024: 3.00%)
+- company Tier 1 leverage ratio: 15.69%
+- bank community bank leverage ratio: 15.61%
+
+6. Derived calculations
+FX: CNY amount = USD amount * 6.9931
+- loan/deposit = 2,035.227 / 1,758.669 = 115.73%
+- ACL/gross loans = 34.649 / 2,035.227 = 1.70%
+- nonaccrual loans/gross loans = 10.793 / 2,035.227 = 0.53%
+- uninsured deposits/deposits = 728.398 / 1,758.669 = 41.42%
+- estimated ROE = 37.775 / average(324.518, 300.073) = 12.10%
+- price/book = input CNY market cap / translated 2025 year-end equity = 1.20x
+- forecast dividend = 2025 actual common dividend held flat = $8.4m = CNY58.74204m
+- forecast dividend yield = CNY58.74204m / CNY2,729.057961m = 2.1525%
+
+7. Judgment boundaries
+- Dividend forecast is a flat-run-rate scenario, not company guidance.
+- Income statement flows use year-end FX for consistent protocol presentation rather than an average annual FX rate.
+- Market cap and PE are accepted from task input and were not independently reconstructed from exchange price and diluted share count.
+- Bank operating/free cash flow and ordinary owner earnback figures are intentionally null because they lack comparable economic meaning.
+
+8. Output construction
+- outputs/result.json initialized and populated exclusively through the stock-research protocol CLI init/set/append commands.
+- outputs/report.md and outputs/trace.txt authored as human-readable deliverables.
+- final protocol validation follows output creation.

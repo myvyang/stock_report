@@ -1,0 +1,65 @@
+stock-research trace
+company: GUOCO GROUP (00053.HK)
+requested archive period: 2025-12-31
+report type: annual
+actual audited annual-report period: year ended 2025-06-30
+generated at: 2026-08-03 Asia/Shanghai
+
+1. Read protocol instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+   - No annual facts package, normalized facts, historical stock-research result, or raw filing was present for 00053.HK/2025-12-31.
+   - stock_report/data/notes/user_stock_evaluations.md existed but contained no reusable company facts required for this task.
+
+3. Official filing acquired
+   - HKEX Annual Report 2025 PDF:
+     https://www.hkexnews.hk/listedco/listconews/sehk/2025/1020/2025102001049.pdf
+   - Local copy:
+     stock_report/data/raw/filings/00053.HK/2025-12-31/annual-report-2025.pdf
+   - Filing date: 2025-10-20; audited financial statements signed 2025-09-19.
+   - The environment lacked pdftotext/PDF Python libraries, so research used HKEX's indexed PDF text and page/line references; local PDF retained for reproducibility.
+
+4. Model verification
+   - Input hint: financial_brokerage.
+   - Annual report evidence: company principal activity is investment holding and management; reportable segments are principal investment, property development and investment, hospitality and leisure, and financial services. Financial services is operated by an associate.
+   - Overrode hint with statement_model=investment_holding.
+   - owner_earnback_applicability=requires_special_model.
+   - Reason: consolidated cash, securities, property assets, project debt, leases, associates and NCI are integral to different underlying businesses and cannot be treated as detachable ordinary-company net cash.
+
+5. Core source locations
+   - Principal activities: annual report p.50.
+   - Group financial commentary and segment PBT: p.28.
+   - Income statement: p.73.
+   - Statement of financial position: pp.75-76.
+   - Cash flow statement: pp.79-80.
+   - Dividends: pp.50 and 110.
+   - Segment definitions and results: pp.111-113.
+
+6. Currency and formulas
+   - Protocol currency: CNY, absolute yuan.
+   - Annual report HKD amounts converted at working rate HKD/CNY=0.913.
+   - Annual-report cash-flow USD amounts first translated at HKD/USD=7.85 (consistent with report supplementary HKD presentation), then at HKD/CNY=0.913.
+   - gross margin = HKD 8,728.099m / HKD 24,443.169m = 35.7077%.
+   - net margin = parent profit HKD 4,030.678m / revenue HKD 24,443.169m = 16.4900%.
+   - operating free cash flow = operating cash flow - PPE purchases - investment-property development additions - intangible purchases = CNY 5,380,748,793. This is descriptive only, not used as owner cash profit.
+   - FY2025 dividend baseline = HKD 3.50 x 329,051,373 shares = HKD 1,151,679,806 (result uses HKD 1,151,682,000 based on disclosed rounded interim/final totals), converted to CNY 1,051,485,666.
+   - forecast dividend yield = CNY 1,051,485,666 / input market cap CNY 19,886,574,461.61 = 5.2874%.
+   - Market-cap input was accepted as CNY under the result protocol. If upstream Tencent amount was actually unconverted HKD, valuation-dependent ratios require a synchronized FX correction.
+
+7. Protocol operations
+   - Initialized outputs/result.json with:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Populated fields using protocol set/append commands; no complex JSON result was handwritten from scratch.
+   - Final validation command:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Final protocol validation status: ok; errors: [].
+
+8. Output status
+   - outputs/result.json: complete under the special-model completion rules.
+   - outputs/report.md: completed.
+   - outputs/trace.txt: completed.
+   - Ordinary owner-earnback sorting fields intentionally null in accordance with the result contract.

@@ -1,0 +1,66 @@
+stock-research trace
+company: 00990.HK / Deep Source Holdings Limited（至源控股有限公司）
+period: 2025-12-31 annual
+generated_at: 2026-08-03T13:49:02+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+- No annual facts package, normalized facts, prior research result, or filing metadata existed for this company/period.
+- Existing user evaluation notes were not used because no sufficiently specific 00990.HK research fact package was present.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: stock-research-result-v1 skeleton created.
+
+4. Official filing obtained
+- HKEX annual report URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042904086.pdf
+- Local copy: stock_report/data/raw/filings/00990.HK/2025-12-31/annual-report-2025.pdf
+- Release date: 2026-04-29.
+- Identity cross-check: HKEX name-change announcement dated 2025-08-05; stock code remained 990.
+
+5. Model review
+- Input hint financial_brokerage was rejected as incomplete.
+- Filing note 7 shows 2025 distribution/trading/processing revenue HK$20,504.744m and financial-services revenue HK$847.543m.
+- Segment profit was HK$490.531m and HK$248.047m respectively.
+- Selected statement_model: platform_financial_mixed.
+- Selected owner_earnback_applicability: requires_special_model.
+- All ordinary owner-earnback ranking fields retained as null.
+
+6. Currency conversion
+- Filing currency: HKD; protocol currency: CNY.
+- Applied 2025-12-31 midpoint 1 HKD = 0.90322 CNY to absolute filing amounts.
+- FX source: China Foreign Exchange Trade System/PBOC announcement, reproduced at https://www.ce.cn/xwzx/gnsz/gdxw/202512/t20251231_2676993.shtml
+- Ratios were computed from original HKD values. Income statement conversion at closing rate is a display convention, not accounting restatement.
+
+7. Core filing facts used (HK$'000 before conversion)
+- Revenue 21,352,287; cost of sales 20,536,265; gross profit 816,022.
+- Profit from operations 754,287; net profit 822,623; parent net profit 719,661.
+- Total assets 22,631,388; liabilities 14,230,305; equity 8,401,083; parent equity 7,330,760; NCI 1,070,323.
+- Operating cash flow 1,563,193; PPE purchases 6,749; financing cash flow -1,759,670.
+- General cash 1,962,296; restricted deposits 725,462; trust/customer segregated cash 5,031,853.
+- Inventory 3,527,077; trade/bills receivable 3,744,904; accounts receivable 2,771,690; associates 2,573,487.
+- Trade/bills payable 5,805,074; accounts payable 4,903,174; bank borrowings 435,694; trust receipt loans 110,889.
+- No 2025 interim or final dividend recommended.
+
+8. Material qualification
+- Auditor issued a qualified opinion.
+- Matter relates to suspected misappropriation at a Singapore non-wholly owned subsidiary, HK$167m loss recognized in 2024, ongoing legal proceedings, and insufficient audit evidence affecting the relevant financial information and comparatives.
+- Consequence: data remains consumable with explicit limitation; trend and governance conclusions carry reduced confidence.
+
+9. Result population
+- All result.json mutations after init used protocol `set` or `append` commands.
+- No complex result JSON was hand-written.
+- Market cap and PE retained from config/input.json: CNY 6,608,093,379.428982; PE TTM 10.67; timestamp 2026/07/31 16:08:45; source Tencent qt.gtimg.cn.
+
+10. Validation
+- Final protocol validation command and workspace checks recorded after execution below.
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}.
+- JSON parse check: passed.
+- stock_analysis.stock_research.runner.validate_workspace_outputs: no errors.
+- Required outputs present: outputs/result.json, outputs/report.md, outputs/trace.txt.

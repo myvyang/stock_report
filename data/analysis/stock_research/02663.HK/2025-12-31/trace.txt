@@ -1,0 +1,62 @@
+stock-research trace
+company: 02663.HK KPa-BM Holdings Limited
+requested_period: 2025-12-31
+actual_filing_period: 2025-03-31
+generated_at: 2026-08-04T20:07:22+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: initialized stock-research-result-v1 skeleton.
+
+3. Local reuse check
+- Checked configured raw filing, annual review and normalized fact paths under stock_report/data.
+- No 02663.HK filing, facts package or prior research files were present locally.
+
+4. Primary filing retrieval and identity/model verification
+- HKEX Annual Report 2025: https://www.hkexnews.hk/listedco/listconews/sehk/2025/0728/2025072800179.pdf
+- HKEX FY2025 annual results: https://www1.hkexnews.hk/listedco/listconews/sehk/2025/0625/2025062501942.pdf
+- Annual report states year ended 31 March 2025 and describes two segments: structural engineering works; supply, installation and trading of building materials.
+- Decision: override input hint financial_brokerage with construction_project. Reason: project receivables, retention receivables, contract assets/liabilities and supplier credit are integral to operating model.
+- Decision: owner_earnback_applicability=requires_special_model. Ordinary discounted net cash/payback fields remain null.
+
+5. Extracted filing figures (HK$'000 unless stated)
+- Revenue 667,711; cost of revenue 560,616; gross profit 107,095; profit before tax 41,264; net/parent profit 36,157.
+- Total assets 437,817; total equity/parent equity 261,398; derived total liabilities 176,419; no minority interest.
+- Cash 119,966; contract assets 70,970; trade and other receivables/deposits/prepayments 200,811; inventories 19,409.
+- Contract liabilities 42,437; trade and other payables 119,503; lease liabilities 12,980; bank borrowings nil.
+- Operating cash flow 33,069; capex 1,013; derived operating FCF 32,056; financing cash flow -83,016; dividends paid 66,831.
+- FY2025 segment external revenue: structural engineering 596,969; building materials 70,742.
+- FY2025 dividends attributable to year: special interim 22,277 and proposed final 16,708, total 38,985.
+
+6. Currency conversion
+- Result contract requires absolute CNY amounts.
+- Applied 2025-03-31 reference rate: 1 HKD = 0.9323 CNY.
+- Every filing amount was multiplied by 1,000 and 0.9323. Market cap was retained directly from input because it is already supplied in the required result currency convention.
+
+7. Derived calculations
+- gross_margin = 107,095 / 667,711 = 0.1603912471.
+- net_margin = 36,157 / 667,711 = 0.0541506730.
+- operating_profit = profit before tax + finance costs = HK$43.765m; converted CNY 40,802,109.5.
+- operating_free_cash_flow = 33,069 - 1,013 = HK$32.056m; converted CNY 29,885,808.8.
+- forecast dividend uses proposed final HK$16.708m only; converted CNY 15,576,868.4.
+- forecast_dividend_yield = 15,576,868.4 / 220,400,258.14831257 = 0.0706753637.
+- No ordinary owner earnback metrics calculated because construction_project model requires special handling.
+
+8. Data quality decisions
+- analysis.period overwritten from input label 2025-12-31 to actual audited annual period 2025-03-31.
+- status=complete because audited statements, business identity, special model, asset/liability explanations, dividend basis and evidence are populated.
+- Limitations recorded for period mismatch, FX conversion and non-forward-looking dividend proxy.
+
+9. Protocol operations
+- All result fields were populated through protocol `set` commands; complex result JSON was not handwritten from scratch.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- First completed validation result: status ok, errors [].
+
+10. Final checks
+- Re-ran protocol validation after writing report.md and trace.txt: status ok, errors [].
+- Confirmed outputs/result.json parses as JSON and all three required output files are non-empty.

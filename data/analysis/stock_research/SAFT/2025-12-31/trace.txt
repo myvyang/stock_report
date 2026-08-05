@@ -1,0 +1,28 @@
+2026-08-04 stock research trace — SAFT / 2025-12-31
+
+1. Read stock-research SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Inspected configured annual-review, normalized-facts, and raw-filing paths. No pre-existing 2025 annual facts or filing package was present.
+3. Initialized outputs/result.json with the required protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Located the official 2025 Form 10-K at SEC accession 0001172052-26-000005, filed 2026-02-27, and the 2025 results release at SEC Exhibit 99.1, filed 2026-02-25.
+5. Saved the SEC inline-XBRL filing and SEC companyfacts JSON under stock_report/data/raw/filings/SAFT/2025-12-31 for reproducibility.
+6. Overrode the input model hint after factual review: Safety is a property-and-casualty insurer, so statement_model=financial_insurance and owner_earnback_applicability=requires_special_model.
+7. Extracted audited 2025 USD financial facts: assets 2,471.108m; liabilities 1,578.797m; equity 892.311m; revenue 1,263.732m; net income 99.255m; operating cash flow 194.498m; capex 2.508m; dividends paid 53.865m; repurchases 20.000m.
+8. Extracted insurance-specific facts: net earned premium 1,139.011m; combined ratio 99.0%; net investment income 62.732m; prior-year favorable reserve development 44.6m; investments 1,687.521m; loss reserves 761.739m; unearned-premium reserves 654.803m; statutory surplus 833.432m; 2026 ordinary dividend capacity without prior regulatory approval 83.343m.
+9. Currency conversion policy: 2025 flow figures translated at 7.188 CNY/USD; 2025-12-31 stock figures and forward dividend estimate translated at 7.1875 CNY/USD, using Federal Reserve H.10/G.5A data. All result amounts are absolute CNY yuan.
+10. Forecast dividend: latest approved quarterly dividend USD 0.92 annualized to USD 3.68, multiplied by 14,631,684 year-end shares outstanding and 7.1875 CNY/USD = CNY 387,008,041.80; divided by input market cap CNY 10,242,216,109.94 = 3.778557664%.
+11. Ordinary owner-earnback fields were intentionally left null because investments and cash support insurance liabilities and regulatory capital; no detachable-net-cash or ordinary cash-profit payback was fabricated.
+12. Populated outputs/result.json through protocol CLI set/append commands; did not construct the result JSON from scratch.
+13. Validation command completed successfully:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Result: status=ok, errors=[]
+
+Primary sources:
+- https://www.sec.gov/Archives/edgar/data/1172052/000117205226000005/saft-20251231x10k.htm
+- https://www.sec.gov/Archives/edgar/data/1172052/000117205226000002/saft-20260225xex99d1.htm
+- https://data.sec.gov/api/xbrl/companyfacts/CIK0001172052.json
+- https://www.federalreserve.gov/releases/h10/20251229/
+- Federal Reserve H.10/G.5A data series for annual and year-end CNY/USD conversion
+
+Market-data source carried from input:
+- Yahoo Finance yfinance; market cap date 2026-08-03; market cap CNY 10,242,216,109.940186; PE TTM 24.44208.

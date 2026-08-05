@@ -1,0 +1,49 @@
+2026-08-05 stock-research trace — CFBK / 2025-12-31 annual
+
+1. Read skill and contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - references/result-contract.md
+   - references/report-contract.md
+   - references/data-reuse.md
+
+2. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse audit:
+   - No local raw filing, annual facts package, normalized facts, or prior stock-research output existed for CFBK/2025-12-31.
+   - Retrieved the primary 2025 Form 10-K from SEC EDGAR, accession 0001193125-26-103638, filed 2026-03-12.
+
+4. Model determination:
+   - Overrode input hint ordinary_operating/applicable.
+   - Confirmed financial_bank/requires_special_model because the operating subsidiary is a regulated commercial bank and loans/deposits dominate the balance sheet.
+   - Kept all ordinary owner-earnback sorting fields null.
+
+5. Primary facts extracted from Form 10-K:
+   - Total assets $2,117.321m; liabilities $1,932.895m; equity $184.426m.
+   - Net interest income $55.023m; net income $17.541m; common-attributable income $17.001m.
+   - NIM 2.77%; ROA 0.84%; ROE 9.90%; efficiency ratio 51.15%.
+   - NPL ratio 0.87%; ACL/NPL 115.32%; net charge-offs/average loans 0.42%.
+   - CET1 13.85%; total capital 15.02%; leverage ratio 11.40%.
+   - Common dividend $0.30/share; company anticipates similar future level subject to constraints.
+
+6. Currency conversion:
+   - Used Federal Reserve H.10 annual 2025 rate: 7.1875 CNY per USD.
+   - All financial-statement and dividend amounts in result.json are CNY absolute yuan.
+   - Limitation recorded: annual-average FX was also used for period-end balance-sheet amounts for consistent protocol display.
+
+7. Derived figures:
+   - P/B = input market cap CNY 1,576,268,808.84 / converted equity CNY 1,325,561,875 = 1.1891x.
+   - Forecast dividend = $0.30 × 6,418,349 year-end common shares × 7.1875 = CNY 13,839,565.03.
+   - Forecast dividend yield = CNY 13,839,565.03 / input market cap = 0.877995%.
+   - These are labeled as calculations/assumptions, not company commitments.
+
+8. Populated result.json exclusively through protocol CLI set operations after initialization; no complex JSON file was hand-written from scratch.
+
+9. Validation:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Initial completed result validation: status ok, errors [].
+
+Primary URLs:
+https://www.sec.gov/Archives/edgar/data/1070680/000119312526103638/cfbk-20251231.htm
+https://www.sec.gov/Archives/edgar/data/1070680/000119312526103638/0001193125-26-103638-index.html
+https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10

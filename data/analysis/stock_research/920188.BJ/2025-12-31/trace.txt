@@ -1,0 +1,33 @@
+2026-08-03 stock-research trace
+
+1. Read skill: .agents/skills/stock-research/SKILL.md
+2. Read required contracts:
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+3. Read data reuse guidance. Checked configured annual-review, raw-filing and prior stock-research paths; no reusable files existed.
+4. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Located and reviewed悦龙科技2025年年度报告（公告编号2026-043）及北交所发行公告。核心财务数字取自年报合并报表及附注；行情取自输入文件。
+6. Confirmed model ordinary_operating/applicable from business and balance-sheet facts.
+7. Calculation record (CNY):
+   gross_profit = 288611277.14 - 121085456.57 = 167525820.57
+   gross_margin = 167525820.57 / 288611277.14 = 0.5804548673
+   net_margin = 90277501.54 / 288611277.14 = 0.3127996329
+   operating_free_cash_flow = 81568070.90 - 14064455.85 = 67503615.05
+   discounted_cash_profit = 67503615.05 * 0.90 = 60753253.545
+   discounted_net_cash = 136904897.59 + 110161143.18*0.95 + 19787170.43*0.50 - 675286.11 = 250776282.716
+   operating_business_price = 1788000000 - 250776282.716 = 1537223717.284
+   owner_earnback_years = 1537223717.284 / 60753253.545 = 25.30273899
+   market_cap_to_cash_profit = 1788000000 / 60753253.545 = 29.43052258
+   forecast_dividend = 82993198 * 0.50 = 41496599
+   forecast_dividend_yield = 41496599 / 1788000000 = 0.0232083887
+8. Important limitation: annual balance sheet predates the March 2026 IPO, while market cap is dated July 2026. IPO proceeds were not estimated into discounted net cash.
+9. Populated result fields using protocol CLI set commands; complex JSON was not written from scratch.
+10. Validation:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Result: {"status":"ok","errors":[]}
+
+Primary accessible sources:
+- Annual report full-text mirror: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12227884&stockid=920188
+- BSE issuance announcement: https://www.bse.cn/disclosure/2026/2026-03-12/1773305048_265801.pdf
+- BSE board announcement confirming annual report no. 2026-043: https://static.cninfo.com.cn/finalpage/2026-04-27/1225220234.PDF

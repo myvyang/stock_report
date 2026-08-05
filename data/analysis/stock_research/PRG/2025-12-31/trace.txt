@@ -1,0 +1,69 @@
+Stock research trace — PRG — period 2025-12-31
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because no annual facts package was found.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields only through protocol set/append commands in outputs/populate.sh.
+
+2. Reuse audit
+- Checked stock_report/data/analysis/annual_review/PRG/2025-12-31,
+  stock_report/data/normalized/facts/PRG/2025-12-31, and
+  stock_report/data/raw/filings/PRG/2025-12-31.
+- No reusable facts.json, annual-facts.json, filing metadata, or prior research output existed.
+
+3. Primary sources consulted
+- SEC 2025 Form 10-K, accession 0001808834-26-000012, filed 2026-02-18:
+  https://www.sec.gov/Archives/edgar/data/1808834/000180883426000012/prg-20251231.htm
+  Used audited balance sheet, earnings, cash flow, segment/business descriptions, portfolio accounting, concentration, GMV, and subsequent-event acquisition financing.
+- SEC 2026 Q1 Form 10-Q:
+  https://www.sec.gov/Archives/edgar/data/1808834/000180883426000066/prg-20260331.htm
+  Used Purchasing Power consideration and post-acquisition debt.
+- PROG dividend announcement dated 2026-02-25:
+  https://investor.progholdings.com/news-releases/news-release-details/prog-holdings-inc-increases-dividend-77
+  Used declared quarterly dividend of USD 0.14/share.
+- IRS yearly average currency rates:
+  https://www.irs.gov/individuals/international-taxpayers/yearly-average-currency-exchange-rates
+  Used 2025 China yuan rate of 7.129 per USD.
+- Market cap, market date, PE TTM: copied from config/input.json (Yahoo Finance yfinance).
+
+4. Financial extraction (original USD thousands)
+- Cash 308,774; accounts receivable net 74,228; lease merchandise net 609,009;
+  loans receivable net 90,648; goodwill 296,061; intangibles net 57,774.
+- Total assets 1,610,408; total liabilities 863,991; equity 746,417; debt net 594,861.
+- Revenue 2,409,223; lease depreciation 1,590,240; lease merchandise write-off provision 173,115;
+  operating profit 206,773; net earnings 146,788.
+- Operating cash flow 334,962; PPE outflows 10,042; financing cash flow -128,488;
+  dividends paid 20,767; treasury stock acquisition 51,775.
+
+5. Conversions and formulas
+- All USD statement values converted to CNY yuan as: USD thousands × 1,000 × 7.129.
+- Display gross profit = revenue - lease merchandise depreciation - lease merchandise write-off provision
+  = USD 645.868m = CNY 4,604,392,972.
+- Display gross margin = 645.868 / 2,409.223 = 0.2680814519868024.
+- Net margin = 146.788 / 2,409.223 = 0.060927527256713056.
+- Operating free cash flow = (334.962 - 10.042) USD m × 7.129 = CNY 2,316,354,680.
+- Forecast annual dividend = USD 0.14 × 4 × 39,575,810 shares × 7.129
+  = CNY 157,996,131.7144.
+- Forecast dividend yield = 157,996,131.7144 / 11,831,865,285.336548
+  = 0.013353442412009843.
+
+6. Model decision
+- Input hint ordinary_operating/applicable was overridden.
+- Selected platform_financial_mixed/requires_special_model because lease merchandise,
+  lease receivables and BNPL loans are income-producing operating assets and debt funds the portfolios.
+- The USD 308.8m year-end cash was partly consumed immediately after year-end by the USD 424.2m
+  Purchasing Power acquisition, together with USD 260m new corporate debt.
+- Therefore discounted net cash, discounted cash profit, operating business price,
+  owner earnback years, and market-cap-to-cash-profit remain null by contract.
+
+7. Quality and validation
+- Material timing limitation: market cap is dated 2026-08-03, while annual statements are dated 2025-12-31,
+  and a major acquisition changed the balance sheet on 2026-01-02.
+- Gross margin is an analytical display convention because the issuer does not report a traditional gross-profit subtotal.
+- Dividend forecast is simple annualization, not a board commitment.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

@@ -1,0 +1,69 @@
+stock-research trace
+company: 03601.HK / LUDASHI
+period: 2025-12-31 annual
+generated context date: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Read references/data-reuse.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the configured raw filing, annual review, normalized facts and historical stock research paths under /workspace.
+- Checked /root/aicode/stock_report for 03601.HK reusable artifacts.
+- No existing annual facts, normalized facts or prior research result was available; only the user evaluation notes file existed.
+
+3. Official source acquisition
+- HKEX title search: https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=1000001763
+- 2025 Annual Report, released 2026-04-29:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042900948.pdf
+- 2025 Annual Results Announcement, released 2026-03-30:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0330/2026033001444.pdf
+- Downloaded the annual report to stock_report/data/raw/filings/03601.HK/2025-12-31/annual-report-2025.pdf for reproducibility.
+- Market cap and PE source: config/input.json; Tencent qt.gtimg.cn snapshot at 2026/08/03 09:20:05.
+
+4. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Official annual report business facts: free PC/mobile utilities acquire users; monetization through advertising, e-commerce traffic placement, online game platform and exclusive licensed game operations.
+- Balance sheet contains no brokerage customer funds, self-operated securities book, margin financing or repurchase funding structure.
+- Overrode hint with ordinary_operating / applicable.
+
+5. Core extracted facts (annual report page references)
+- Revenue RMB1,091,373,000; cost of sales/services RMB966,380,000; gross profit RMB124,993,000; parent net profit RMB26,104,000: p.113.
+- Total assets RMB754,869,000; total liabilities RMB79,431,000; total equity RMB675,438,000; parent equity RMB677,570,000: pp.114-115.
+- Cash RMB429,260,000; current FVTPL assets RMB50,000,000; non-current FVTPL assets RMB9,727,000; trade receivables RMB161,744,000: p.114.
+- Operating cash flow RMB26,899,000; PPE purchases RMB303,000; dividends paid RMB24,645,000: pp.118-119.
+- Revenue split and changes: pp.12-13. MAU: p.7. Customer concentration: p.34.
+- No 2025 final dividend recommended: p.34 and note 12 p.153.
+
+6. Calculations (CNY absolute yuan)
+- gross margin = 124,993,000 / 1,091,373,000 = 0.1145282135.
+- net margin = 26,104,000 / 1,091,373,000 = 0.0239184953.
+- operating free cash flow = 26,899,000 - 303,000 = 26,596,000.
+- discounted cash = 429,260,000 * 70% = 300,482,000.
+- discounted FVTPL assets = 59,727,000 * 60% = 35,836,200.
+- discounted detachable net cash = 300,482,000 + 35,836,200 - 79,431,000 = 256,887,200.
+- discounted net cash / market cap = 256,887,200 / 173,565,525.90429783 = 1.4800588922.
+- sustainable cash profit base = min(26,104,000, 26,596,000) = 26,104,000.
+- discounted sustainable cash profit = 26,104,000 * 80% = 20,883,200.
+- operating business price = 173,565,525.90429783 - 256,887,200 = -83,321,674.09570217.
+- owner earnback years = -83,321,674.09570217 / 20,883,200 = -3.9898901555.
+- market cap / cash profit = 173,565,525.90429783 / 20,883,200 = 8.3112514320.
+- forecast dividend = 0 based on announced no-final-dividend decision; forecast yield = 0.
+
+7. Judgment boundaries
+- Cash haircut reflects working capital, onshore cash upstreaming, tax and governance/VIE uncertainty; these are estimates, not reported restrictions quantified by the issuer.
+- FVTPL haircut reflects maturity/redemption/valuation constraints.
+- All liabilities deducted at 100%; operating payables are not treated as permanent free funding.
+- Negative owner earnback years is a formula output indicating discounted net cash exceeds market cap, not literal recovery time and not evidence of immediate distributability.
+- Sustainable cash profit receives a 20% haircut for game decline, customer concentration and annual working-capital volatility.
+
+8. Protocol mutation and validation
+- Populated the initialized skeleton exclusively through protocol 'set' and 'append' commands.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Re-ran validation after final numeric and text QA.
+- Final validation result: status=ok, errors=[].

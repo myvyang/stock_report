@@ -1,0 +1,78 @@
+SKYW stock-research trace
+generated_at: 2026-08-05 Asia/Shanghai
+period: 2025-12-31 annual
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because local-data reuse was relevant.
+- Initialized outputs/result.json with protocol CLI:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- No raw filing, annual-review facts, normalized facts, or previous SKYW stock-research output existed under stock_report.
+- Only config/input.json and stock_report/data/notes/user_stock_evaluations.md existed.
+- Therefore researched the official filing rather than fabricating or reusing absent facts.
+
+3. Primary sources
+- SEC Form 10-K: https://www.sec.gov/Archives/edgar/data/793733/000110465926016358/skyw-20251231x10k.htm
+  accession: 0001104659-26-016358
+  filed: 2026-02-17
+- SEC filing index: https://www.sec.gov/Archives/edgar/data/793733/000110465926016358/0001104659-26-016358-index.htm
+- SkyWest annual reports page: https://inc.skywest.com/investor-relations/annual-reports/
+- Federal Reserve H.10: https://www.federalreserve.gov/releases/h10/20251229/
+- Market data: config/input.json, source Yahoo Finance yfinance, as of 2026-08-03.
+
+4. Currency conversion
+- Reporting currency: USD; output currency required by protocol: CNY absolute yuan.
+- Applied USD/CNY 7.0063, the Federal Reserve H.10 China yuan rate for 2025-12-26, the last available observation in the 2025-12-29 year-end release.
+- Formula for filing facts: USD thousands * 1,000 * 7.0063.
+- Market cap was already supplied in CNY and was not converted again.
+
+5. Financial statement extraction (USD thousands)
+- Assets 7,386,249; liabilities derived as 7,386,249 - 2,746,433 = 4,639,816; equity 2,746,433.
+- Revenue 4,058,202; total operating expenses 3,440,356; operating income 617,846; net income 428,334.
+- Operating cash flow 940,364.
+- Capital expenditure = aircraft/rotable spares 546,040 + buildings/ground equipment 32,023 = 578,063. Aircraft deposits 75,303 excluded from standard property/equipment acquisition capex and disclosed as a limitation.
+- Operating free cash flow = 940,364 - 578,063 = 362,301.
+- Financing cash flow -393,219; treasury stock purchase and excise tax 84,930.
+- No noncontrolling interest identified; parent equity and parent net income equal consolidated values.
+
+6. Model classification
+- Confirmed ordinary_operating/applicable.
+- Rationale: revenue comes from airline operations and leasing services; no customer deposits, insurance reserves, regulated project cash, or financial intermediation balance sheet requiring a special model.
+- Special handling retained for aircraft-heavy assets, financing debt, liquidity needs, and continuing capex.
+
+7. Gross margin proxy
+- The airline filing does not report cost of sales or gross profit.
+- For required structured fields only: cost_of_sales proxy = total operating expenses; gross_profit proxy = operating income.
+- gross_margin = 617,846 / 4,058,202 = 0.1522462411.
+- This is explicitly labeled an operating-margin proxy in result limitations and report; it is not comparable to traditional gross margin.
+
+8. Owner earnback assumptions and formulas
+- Reported cash plus marketable securities: USD 706,909 thousand.
+- Cash haircut: 20% to preserve operating, capex, lease, and debt-service liquidity.
+- Discounted cash: 706,909 * 80% = USD 565,527.2 thousand.
+- Debt: current maturities 546,812 + long-term debt 1,845,272 = USD 2,392,084 thousand, deducted at 100%.
+- Discounted detachable net cash: (565,527.2 - 2,392,084) * 7.0063m = CNY -12,797,404,907.84.
+- Sustainable cash profit: 428,334 * 85% * 7.0063m = CNY 2,550,881,028.57.
+- Cross-check: reported operating FCF CNY 2,538,389,496.30, close to sustainable cash profit.
+- Operating business price = 28,628,121,774.660645 - (-12,797,404,907.84) = CNY 41,425,526,682.50064.
+- Owner earnback years = 41,425,526,682.50064 / 2,550,881,028.57 = 16.2396937444.
+- Market cap/cash profit = 28,628,121,774.660645 / 2,550,881,028.57 = 11.2228369156.
+
+9. Dividend forecast
+- 2025 filing showed no common cash dividend; cash shareholder return was repurchase.
+- Forecast cash dividend = 0 and forecast dividend yield = 0 because no evidence of an announced recurring dividend was found.
+- Buybacks were not misclassified as dividends.
+
+10. Protocol write and validation
+- Populated initialized result with repeated protocol CLI set commands; result was not handwritten from an empty file.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validator status: ok; errors: [].
+
+11. Data-quality judgment
+- status: complete.
+- Core three-statement fields, asset/liability explanations, owner-earnback rows, dividend forecast, business story, and evidence are populated.
+- Limitations explicitly preserve the gross-margin proxy, FX convention, input-market-data dependency, and judgment in cash/profit haircuts.

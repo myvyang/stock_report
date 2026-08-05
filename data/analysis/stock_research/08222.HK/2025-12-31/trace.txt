@@ -1,0 +1,50 @@
+stock-research trace
+generated_at: 2026-08-04T16:07:51+08:00
+query: 08222.HK
+requested_period: 2025-12-31
+requested_report_type: annual
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No annual facts, normalized facts, raw filing metadata, or prior stock-research result existed under the input-specified stock_report paths.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initialized successfully from config/input.json.
+
+4. Official-source identity and period check
+- HKEX Annual Report 2024/25: https://www.hkexnews.hk/listedco/listconews/gem/2025/0710/2025071000243.pdf
+- The report identifies stock code 8222 and the group business as Hong Kong retail chains for lighting, designer furniture and household products, plus wholesale/trading of tableware and gifts.
+- The audited annual reporting date is 2025-03-31, not 2025-12-31.
+- HKEX issuer title search: https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=112364
+- Company investor-relations financial highlights identify 2025-09-30 as a six-month period, not an annual reporting date.
+
+5. Model decision
+- Overrode input hint financial_brokerage with ordinary_operating.
+- Reason: official annual report shows merchandise retail/wholesale operations and ordinary retail assets and liabilities; no brokerage client money, proprietary financial assets, repo funding, or securities operating segments were identified.
+- owner_earnback_applicability remains applicable in principle for the correctly dated annual report.
+
+6. Data-quality decision
+- Set status to invalid because no annual report exists for requested period 2025-12-31.
+- Did not substitute FY ended 2025-03-31 or interim period ended 2025-09-30.
+- Kept target-period financials, dividend forecast, and all owner-earnback ranking fields null.
+- Used FY ended 2025-03-31 figures only as clearly labeled background in report.md and evidence entries.
+
+7. Background facts checked from HKEX Annual Report 2024/25 (HK$'000)
+- Revenue 69,737; cost of sales 34,390; gross profit 35,347; attributable loss 4,666.
+- Total assets 24,490; total liabilities 20,467; net assets 4,023.
+- Cash and bank balances 5,389; inventories 7,867; trade and other receivables 4,323; right-of-use assets 4,153; rental deposits 2,602.
+- Net operating cash flow 14,821; property, plant and equipment purchases 3; lease principal repayment 14,207; lease interest paid 1,116.
+- Right-of-use asset impairment 5,771.
+
+8. Result population
+- Used protocol set/append commands for all changes to outputs/result.json; the JSON was not constructed manually.
+
+9. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[]

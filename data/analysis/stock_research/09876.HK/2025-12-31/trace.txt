@@ -1,0 +1,53 @@
+stock-research trace
+generated_at: 2026-08-05 Asia/Shanghai
+query: 09876.HK
+task_period: 2025-12-31
+
+1. Read skill and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+   - No existing raw filing, annual facts, normalized facts, or stock-research result was present for 09876.HK/2025-12-31.
+
+3. Official filing used
+   - Ocean One Holding Ltd. Annual Report 2026
+   - HKEX URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0612/2026061200820.pdf
+   - audited year ended: 2026-03-31
+   - auditor: Deloitte Touche Tohmatsu; report date 2026-06-09
+   - key pages: 7-13 business/MD&A; 77 P&L; 78 balance sheet; 80 cash flow; 96-97 revenue; 102 dividend; 103-108 assets/liabilities
+
+4. Model verification
+   - Input hint financial_brokerage rejected.
+   - Filing shows frozen seafood import/wholesale only; no brokerage client money, proprietary financial book, or repo financing.
+   - Final model: ordinary_operating; owner earnback applicable.
+
+5. Currency normalization
+   - Filing currency: HKD; result contract currency: CNY.
+   - Conversion used: 1 HKD = 0.87 CNY, approximate reference to PBOC/CFETS June-July 2026 central parity around 0.87.
+   - Market cap retained as input CNY amount.
+
+6. Key calculations
+   - gross margin = 69.100 / 426.404 = 16.2053%
+   - net margin = 39.172 / 426.404 = 9.1867%
+   - FCF = (27.908 - 0.776) HKDm * 0.87 = CNY23,604,840
+   - after-tax one-off addback = 4.058 * (1 - 16.5%) HKDm * 0.87 = CNY2,947,620
+   - sustainable cash profit = CNY26,552,460
+   - detachable cash = (109.851 + 47.250 - 1.131 - 30.000) HKDm * 0.87 = CNY109,620,000
+   - operating business price = CNY548,011,102.8552055 - CNY109,620,000 = CNY438,391,102.8552055
+   - owner earnback = 438,391,102.8552055 / 26,552,460 = 16.5104 years
+   - market cap / cash profit = 20.6388x
+   - forecast dividend = HKD11.760m * 0.87 = CNY10,231,200; yield = 1.8670%
+
+7. Protocol commands
+   - PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Fields populated exclusively through protocol set commands.
+   - PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+8. Important limitations
+   - Task period differs from statutory year-end; latest audited FY2026 report used.
+   - FX conversion is approximate.
+   - Sustainable cash profit uses one latest fiscal year; working-capital movements are volatile.
+   - Market cap and PE were supplied by the task and not independently cross-checked.

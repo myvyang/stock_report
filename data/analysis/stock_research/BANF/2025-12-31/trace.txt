@@ -1,0 +1,60 @@
+stock-research trace
+company=BANF
+period=2025-12-31
+generated_at=2026-08-04T23:33:13+08:00
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated scalar fields with protocol set and arrays with protocol append.
+3. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[local reuse check]
+- Checked stock_report/data paths specified by config/input.json.
+- No BANF 2025-12-31 raw filing, annual facts package, normalized facts, or prior stock-research output existed locally.
+- Reused the input market snapshot; retrieved primary public filings only where local facts were absent.
+
+[primary sources]
+- BancFirst Corporation 2025 Form 10-K, filed 2026-02-26, SEC accession 0001193125-26-075954:
+  https://www.sec.gov/Archives/edgar/data/760498/000119312526075954/banf-20251231.htm
+- BancFirst Corporation dividend Form 8-K, 2025-08-28:
+  https://www.sec.gov/Archives/edgar/data/760498/000076049825000004/banf-20250828.htm
+- BancFirst investor relations page:
+  https://www.bancfirst.bank/investor-relations
+- Federal Reserve H.10 release dated 2025-12-29:
+  https://www.federalreserve.gov/releases/h10/20251229/
+- Market cap and PE: supplied in config/input.json, source labeled Yahoo Finance yfinance, dated 2026-08-03.
+
+[model decision]
+- Input hint ordinary_operating/applicable was rejected after filing review.
+- BANF is a financial holding company whose core assets and liabilities are loans, deposits, securities, and bank liquidity.
+- Selected statement_model=financial_bank and owner_earnback_applicability=requires_special_model.
+- Kept all ordinary owner-earnback sorting values null: discounted_net_cash, discounted_cash_profit, operating_business_price, owner_earnback_years, and market_cap_to_cash_profit.
+- Replaced ordinary FCF analysis with NIM, ROAE, asset quality, capital adequacy, deposit structure, and dividend capacity.
+
+[currency conversion]
+- Filing currency: USD; output contract currency: CNY absolute yuan.
+- FX used: 7.0063 CNY/USD, Federal Reserve H.10 value for 2025-12-26, the closest available observation in the cited year-end release.
+- Every filing-derived monetary value in outputs/result.json was multiplied by 7.0063.
+- Ratios and per-share USD values were not currency-converted unless turned into an aggregate CNY amount.
+
+[key extracted facts, USD]
+- Total assets 14,838,893,000; total liabilities 12,984,768,000; equity 1,854,125,000.
+- Net income 240,610,000; net interest income 490,487,000; noninterest income 200,141,000.
+- Loans net 8,428,554,000; deposits 12,670,393,000; cash/bank deposits/federal funds 4,496,072,000.
+- NIM 3.74%; ROAA 1.70%; ROAE 13.93%; efficiency ratio 55.00%.
+- CET1 17.83%; total capital ratio 19.88%.
+- Nonaccrual loans 61,130,000 (0.72% of loans); allowance/loans 1.22%; OREO 47,909,000.
+- 2025 cash dividend per share 1.90; recent stated quarterly dividend 0.49.
+
+[forecast dividend]
+- Mechanical forecast: USD 0.49 x 4 x 33,539,032 year-end shares = USD 65,736,502.72 aggregate.
+- Converted forecast in result.json: CNY 460,569,659.01.
+- Forecast yield: 460,569,659.01 / 25,569,631,844.76709 = 0.018012369587612705.
+- This is a run-rate estimate, not a declared annual dividend or management guidance.
+
+[quality]
+- status=complete under the special-financial-model minimum threshold.
+- Bank-specific metrics do not have dedicated fields in result-contract-v1; preserved them in interpretation, evidence, report, and limitations.

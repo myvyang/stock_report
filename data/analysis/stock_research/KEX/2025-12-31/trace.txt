@@ -1,0 +1,59 @@
+Stock research trace — KEX — period 2025-12-31
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because it is directly linked by the skill and governs source reuse.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All result mutations were performed with protocol `set` or `append`; no complex result JSON was handwritten from scratch.
+
+2. Reuse audit
+- Checked the configured raw filing, annual review, normalized facts, and prior stock research paths.
+- No KEX filing or annual fact package existed locally at task start; only stock_report/data/notes/user_stock_evaluations.md existed.
+- Therefore returned to primary filings as required by data-reuse.md.
+
+3. Primary sources acquired
+- SEC Form 10-K HTML:
+  https://www.sec.gov/Archives/edgar/data/56047/000119312526054016/kex-20251231.htm
+  Filing date 2026-02-17; report period 2025-12-31; accession 0001193125-26-054016.
+  Saved to stock_report/data/raw/filings/KEX/2025-12-31/kex-20251231.htm.
+- SEC Companyfacts API:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0000056047.json
+  Saved to stock_report/data/raw/filings/KEX/2025-12-31/companyfacts.json.
+- FX source: China Foreign Exchange Trade System central parity announcement, authorized by PBOC, 2025-12-31. USD/CNY = 7.0288.
+- Market valuation reused exactly from config/input.json: CNY 47,319,124,284.0791, date 2026-08-03, Yahoo Finance yfinance, PE TTM 20.175385.
+
+4. Model classification
+- Verified ordinary_operating / applicable.
+- Evidence: revenue is earned from domestic tank-barge transport contracts and equipment/parts/service sales. Major assets are vessels, equipment, receivables, and inventory. No customer deposits, insurance reserves, regulated presale cash, underlying investment holdings, or finite concession-right structure was identified.
+
+5. Financial extraction (USD, before conversion)
+- Balance sheet: assets 6,008.045m; liabilities 2,625.252m (assets less total equity); total equity 3,382.793m; Kirby equity 3,380.512m; NCI 2.281m; cash 78.775m; interest-bearing debt 919.281m; PP&E net 4,098.058m; operating lease liabilities 215.620m.
+- Income statement: revenue 3,364.050m; costs of sales and operating expenses 2,216.501m; computed gross profit 1,147.549m; operating income 496.284m; net income 355.415m; Kirby net income 354.569m.
+- Cash flow: CFO 670.204m; total capex 264.473m; full-capex FCF 405.731m; financing cash flow -313.693m; treasury-stock purchases 354.199m.
+- MD&A maintenance split: maintenance and improvements to existing marine equipment/facilities 226.600m; growth spending 37.900m.
+- Segment facts: marine revenue 1,935.305m and operating income 374.458m; KDS revenue 1,428.745m; inferred KDS operating income approximately 121.826m as consolidated operating income less marine operating income.
+
+6. Transformations
+- Every USD monetary fact multiplied by 7.0288 to meet the result contract's CNY absolute-yuan requirement.
+- Gross profit = revenue - costs of sales and operating expenses = USD 1,147.549m.
+- Gross margin = 1,147.549 / 3,364.050 = 0.3411212675.
+- Net margin = Kirby net income 354.569 / revenue 3,364.050 = 0.1053994441.
+- Full-capex FCF = CFO 670.204 - capex 264.473 = USD 405.731m = CNY 2,851,802,052.8.
+- Discounted detachable net cash = cash at 100% - interest-bearing debt at 100% = USD -840.506m = CNY -5,907,748,572.8. Operating lease liabilities are separately explained but not added again to interest-bearing net cash.
+- Sustainable cash profit = CFO 670.204 - disclosed maintenance/existing-equipment capex 226.600 = USD 443.604m = CNY 3,118,003,795.2. Growth capex excluded from this maintenance-profit denominator.
+- Operating business price = market cap - discounted net cash = CNY 53,226,872,856.8791.
+- Owner earnback years = 53,226,872,856.8791 / 3,118,003,795.2 = 17.0708172129.
+- Market cap / cash profit = 47,319,124,284.0791 / 3,118,003,795.2 = 15.1760957947.
+- Forecast cash dividend = 0 and yield = 0 because no common cash dividends were paid in 2023-2025 and no declared future cash dividend was evidenced. Buybacks are disclosed separately and not relabeled as dividends.
+
+7. Data-quality judgments
+- Status set to complete: identity, model, valuation, three statements, assets/liabilities explanations, owner-earnback breakdown, dividend forecast, business story, risks, and evidence are populated.
+- Limitations retained in result.json: mixed valuation/financial dates; computed gross-profit presentation; single-year sustainable cash-profit estimate; input market data not independently verified as an official filing fact.
+
+8. Validation
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Expected/final protocol response: {"status":"ok","errors":[]}

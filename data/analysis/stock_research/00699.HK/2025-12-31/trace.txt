@@ -1,0 +1,70 @@
+stock-research trace
+company: Ningbo Joyson Electronic Corp. / JOYSON ELEC / 00699.HK / 600699.SH
+period: 2025-12-31 annual
+generated_at: 2026-08-03T16:59:08+08:00
+
+1. Protocol and contracts read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Existing-data audit
+- config/input.json existed.
+- No annual facts package, normalized facts, historical research output, or raw filing was present for 00699.HK/2025-12-31.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Company identity and filing retrieval
+- HKEX title search identified stock 00699 as Ningbo Joyson Electronic Corp. (JOYSON ELEC), annual report published 2026-04-21.
+- Primary annual report URL:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0421/2026042101442.pdf
+- Saved as stock_report/data/raw/filings/00699.HK/2025-12-31/annual_report_2025.pdf.
+- Extracted locally to annual_report_2025.txt with pypdf in a temporary virtual environment because pdftotext was unavailable.
+- HKEX issuer title search:
+  https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=1000279756
+
+4. Model correction
+- Input hint financial_brokerage contradicted the audited filing.
+- Annual report Note 1 says the group is principally engaged in automotive components.
+- Revenue and assets are those of a manufacturing company; no broker customer funds, proprietary securities portfolio, margin finance, or repo financing model exists.
+- Set statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+5. Core audited facts (RMB absolute yuan; annual report values converted from RMB'000)
+- Revenue 61,182,689,000; cost of sales 49,986,618,000; gross profit 11,196,071,000.
+- Operating profit 3,262,967,000; net profit 1,615,546,000; parent net profit 1,335,820,000.
+- Total assets 69,154,537,000; liabilities 45,127,676,000; equity 24,026,861,000; parent equity 17,322,417,000; NCI 6,704,444,000.
+- Operating cash flow 5,398,030,000; capex 4,308,140,000; operating FCF 1,089,890,000.
+- Cash equivalents 7,964,822,000; restricted cash 828,278,000; borrowings 24,208,961,000.
+- Primary source pages: annual report pp. 97-103, 169-170, plus MD&A pp. 26-32.
+
+6. Owner earnback judgments
+- Detachable net cash set to zero: cash is far below borrowings and needed for working capital/capex; restricted cash is pledged.
+- Sustainable cash profit starts from 2025 operating FCF 1,089,890,000.
+- Applied 10% prudential haircut for single-year auto cyclicality, 49% top-five customer concentration, and capex variability.
+- Discounted sustainable cash profit = 980,901,000.
+- Operating business price = market cap 17,682,855,779.129864 - detachable net cash 0.
+- Owner earnback years = market cap / discounted cash profit = 18.027156439976984.
+- This haircut is an analyst judgment, not a reported fact.
+
+7. Dividend
+- Annual report proposal: RMB1.8 per 10 shares; estimated total RMB276,859,178.64 using the 2026-03-30 distribution base.
+- Annual report pages 46 and 186 (Note 33(b)). HKEX title search also shows 2026-05-12 AGM result and updated final-dividend disclosure.
+- Forecast yield = 276,859,178.64 / 17,682,855,779.129864 = 0.015656926805157918.
+
+8. Market data
+- Market cap 17,682,855,779.129864; PE TTM 13.9; timestamp 2026/07/31 16:08:42.
+- Source supplied in config/input.json: Tencent qt.gtimg.cn.
+- Market snapshot was reused as instructed; share-count/FX reconstruction was not performed.
+
+9. Result construction and validation
+- outputs/result.json was populated field-by-field using repeated protocol CLI `set` commands; it was not hand-written as a complex JSON object.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].
+
+10. Known limitations
+- Sustainable cash profit uses one annual period and a judgmental 10% haircut.
+- Annual report does not fully separate maintenance capex from growth capex; all capex was deducted.
+- 2025 other-segment growth includes Senssun consolidation and is not fully comparable year on year.
+- Market cap and PE are from the supplied quote snapshot rather than independently reconstructed.

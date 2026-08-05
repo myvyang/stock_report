@@ -1,0 +1,63 @@
+stock-research trace: ALLE / period 2025-12-31
+generated_at_input: 2026-08-05T05:44:04+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Initialized outputs/result.json using:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated fields using protocol `set` commands; result.json was not constructed manually from an empty file.
+4. Final validation command and result are recorded below.
+
+[reuse audit]
+- config/input.json existed.
+- No staged raw filing, annual facts, normalized facts, or prior stock-research outputs for ALLE/2025-12-31 were present in the workspace.
+- Therefore core facts were obtained from primary public filings and company disclosures.
+
+[primary sources]
+- SEC 2025 Form 10-K, accession 0001579241-26-000007, filed 2026-02-17:
+  https://www.sec.gov/Archives/edgar/data/1579241/000157924126000007/alle-20251231.htm
+  Used for business model, segments, income statement, balance sheet, cash flow, inventory, goodwill, debt, capital allocation, and risks.
+- Allegion FY2025 results and 2026 outlook, 2026-02-17:
+  https://investor.allegion.com/news-and-events/news-releases/2026/02-17-2026-110034304
+  Used to cross-check FY2025 revenue, earnings, segment results, ACF, cash and debt, and outlook.
+- Allegion dividend history:
+  https://investor.allegion.com/stock-information/dividend-info
+  Used for quarterly dividend history.
+- Allegion 2026 dividend increase announcement, 2026-02-04:
+  https://investor.allegion.com/news-and-events/news-releases/2026/02-04-2026-220018508
+  Used for the $0.55 quarterly dividend and 8% increase statement.
+- Federal Reserve H.10 historical exchange rates:
+  https://www.federalreserve.gov/releases/h10/hist/
+  https://www.federalreserve.gov/releases/h10/20260105/
+  Used for 2025 average USD/CNY 7.1875 and 2025-12-31 spot USD/CNY 6.9931.
+- Market data: task input, Yahoo Finance yfinance, market cap CNY 90,320,558,058.25488 as of 2026-08-03 and PE TTM 20.656168.
+
+[key USD facts]
+- Revenue 4,067.3m; COGS 2,229.0m; gross profit 1,838.3m; operating income 859.5m; parent net income 643.8m.
+- Total assets 5,223.7m; liabilities 3,156.1m; equity/parent equity 2,067.6m; NCI 0.
+- Cash 356.2m; short-term/current debt 0.2m; long-term debt 1,979.9m; total debt 1,980.1m.
+- OCF / capex / FCF: 2023 600.6 / 84.2 / 516.4m; 2024 675.0 / 92.1 / 582.9m; 2025 783.8 / 98.1 / 685.7m.
+- 2025 dividends paid 175.3m; share repurchases 80.0m; acquisitions and equity investments net of cash 592.2m.
+
+[conversion]
+- Income statement and cash-flow amounts: USD x 7.1875 CNY/USD.
+- Balance-sheet amounts: USD x 6.9931 CNY/USD.
+- Ratios based on same-statement USD figures so currency conversion does not alter margins.
+
+[owner earnback]
+- Three-year average FCF = (516.4 + 582.9 + 685.7) / 3 = USD 595.0m.
+- Sustainable haircut = 90%; discounted cash profit = USD 535.5m x 7.1875 = CNY 3,848,906,250.
+- Discounted detachable net cash = (cash 356.2m - debt 1,980.1m) x 6.9931 = CNY -11,356,095,090.
+- Operating business price = market cap - discounted net cash = CNY 101,676,653,148.25488.
+- Owner earnback years = 101,676,653,148.25488 / 3,848,906,250 = 26.4170251349.
+- Market cap / cash profit = 90,320,558,058.25488 / 3,848,906,250 = 23.4665518440.
+
+[dividend forecast]
+- Annualized 2026 dividend = USD 0.55 x 4 x 86.1m shares = USD 189.42m.
+- Forecast CNY dividend = 189.42m x 7.1875 = CNY 1,361,456,250.
+- Forecast yield = 1,361,456,250 / 90,320,558,058.25488 = 0.0150736031671.
+
+[validation]
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}
+- Additional checks: outputs/result.json parsed successfully with python3 -m json.tool; report and trace were checked for unresolved TODO/null placeholders and legacy ranking labels.

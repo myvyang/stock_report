@@ -1,0 +1,63 @@
+stock-research trace
+company: 00063.HK / CHI ASIA VALLEY
+period: 2025-12-31 annual
+generated for task date: 2026-08-03 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill directs reuse decisions.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Requested annual facts, normalized facts, raw filing metadata and prior stock research paths did not exist.
+- Only stock_report/data/notes/user_stock_evaluations.md existed and contained no matching research fact used here.
+- Conclusion: official filing retrieval was necessary.
+
+3. Primary filing retrieval
+- HKEX title search identified Annual Report 2025, released 2026-04-28.
+- Source URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042802019.pdf
+- Downloaded to stock_report/data/raw/filings/00063.HK/2025-12-31/annual-report-2025.pdf.
+- Environment lacked pdftotext and PDF Python packages. Created a temporary venv, installed pypdf, and extracted text to annual-report-2025.txt for local verification.
+- Key audited report locations: consolidated income statement pp.41; financial position pp.42; cash flows pp.44-45; revenue note 7 pp.78; segments note 9 pp.79-86; investment properties note 18 pp.94-97; receivables/cash notes 22-25 pp.99-102; borrowings/leases notes 28-29 pp.104-106; related parties note 38 p.114; subsequent event note 40 p.116.
+
+4. Model verification
+- Input hint financial_brokerage was rejected based on the annual report.
+- Actual activities: property investment and sub-leasing, property management, construction, horticulture and plant sales.
+- Property investment revenue was HK$118.796m of HK$156.589m total revenue (75.9%).
+- Selected statement_model=investment_holding with property-asset-operation explanation.
+- Selected owner_earnback_applicability=requires_special_model because investment property, landlord deposit, lease liabilities and secured debt jointly form the rent-generating structure.
+- All ordinary owner earnback ranking fields remain null as required by contract.
+
+5. Currency normalization
+- Result protocol requires CNY absolute yuan.
+- Filing currency: HKD thousands.
+- Conversion used for both stock and flow fields: 1 HKD = CNY 0.90322, the 2025-12-31 central parity rate authorized by PBOC/CFETS.
+- Public source used: https://www.ce.cn/xwzx/gnsz/gdxw/202512/t20251231_2676993.shtml
+- Limitation recorded: flow amounts were not converted using an annual average rate.
+
+6. Principal calculations
+- total assets: HK$1,072.675m * 0.90322 = CNY 968,861,513.50
+- total liabilities: HK$570.478m * 0.90322 = CNY 515,267,139.16
+- total/parent equity: HK$502.197m * 0.90322 = CNY 453,594,374.34
+- revenue: HK$156.589m * 0.90322 = CNY 141,434,316.58
+- parent net profit: HK$10.191m * 0.90322 = CNY 9,204,715.02
+- net margin: 10.191 / 156.589 = 0.0650811998
+- operating cash flow: HK$91.870m * 0.90322 = CNY 82,978,821.40
+- capex: HK$0.514m * 0.90322 = CNY 464,255.08
+- reported-basis operating FCF: (91.870 - 0.514)m * 0.90322 = CNY 82,514,566.32
+- forecast cash dividend: CNY 0; forecast yield: 0 / 169,418,879.8826933 = 0
+- gross profit/margin left null because accounts use an expense-by-nature format and disclose no unified cost of sales.
+
+7. Important interpretation checks
+- Reported operating FCF is not treated as distributable cash without qualification: HK$70.474m lease principal and HK$19.528m lease interest are classified as financing cash flows but economically support the sub-leasing business.
+- 2025 parent profit HK$10.191m included HK$16m fair-value gain on investment properties.
+- Net current liabilities were HK$173.627m; going-concern assessment relies on controlling-shareholder support and a bank non-demand letter.
+- Subsequent event: RMB77.6471m cash subscription for 66% of You Wei, principally to acquire industrial land.
+
+8. Result construction and validation
+- Populated the initialized skeleton exclusively through protocol set commands; no complex JSON was created from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report creation: {"status":"ok","errors":[]}

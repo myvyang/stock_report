@@ -1,0 +1,64 @@
+stock-research trace
+task: DCBO, annual period 2025-12-31
+generated_at: 2026-08-05T00:27:42+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- /workspace/AGENTS.md supplied in task context
+
+2. Local reuse check
+- Checked stock_report/data paths specified by config/input.json.
+- No DCBO 2025 raw filing, annual facts package, normalized facts, or prior stock-research result was present.
+- Therefore retrieved primary public disclosures rather than fabricating missing facts.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized from task identity, period, market capitalization, PE, and model hint.
+
+4. Primary evidence used
+- SEC audited FY2025 consolidated financial statements (Exhibit 99.2):
+  https://www.sec.gov/Archives/edgar/data/1829959/000162828026012566/docebo-20251231.htm
+- Docebo FY2025 results release dated 2026-02-27:
+  https://www.docebo.inc/news/news-details/2026/Docebo-Reports-Fourth-Quarter-and-Fiscal-Year-2025-Results/default.aspx
+- Federal Reserve G.5A 2025 annual exchange rate, CNY 7.1875 per USD:
+  https://www.federalreserve.gov/Releases/g5a/current/
+- Market cap and PE: config/input.json; Yahoo Finance yfinance as named by the task.
+
+5. Model determination
+- Confirmed ordinary_operating / applicable.
+- Reason: hosted SaaS subscriptions plus professional services; no customer funds, insurance reserves, development inventory, project advances, concession rights, or investment-holding balance sheet.
+- FY2025 revolving credit facility was undrawn; lease obligations treated as debt-like.
+
+6. Currency conversion
+- Audited statements are in USD thousands.
+- All statement amounts were multiplied by 1,000 and by CNY 7.1875/USD.
+- One annual average rate was used consistently for income statement, cash flow, and balance sheet. Limitation recorded because exact balance-sheet translation would normally use a closing rate.
+
+7. Core calculations
+- gross margin = 194.836 / 242.687 = 80.2828%.
+- net margin = 37.512 / 242.687 = 15.4569%.
+- 2025 FCF = CFO 28.173 - capex 0.981 = USD 27.192m.
+- 2024 FCF = CFO 29.249 - capex 1.245 = USD 28.004m.
+- 2025 adjusted cash profit = FCF 27.192 - SBC 5.998 = USD 21.194m.
+- 2024 adjusted cash profit = FCF 28.004 - SBC 7.330 = USD 20.674m.
+- sustainable cash profit = two-year mean USD 20.934m = CNY 150,463,125.
+- discounted detachable cash = cash USD 74.037m * 70% - lease liabilities USD 2.560m = USD 49.2659m = CNY 354,098,656.25.
+- operating business price = CNY 3,540,401,869.205841 - CNY 354,098,656.25 = CNY 3,186,303,212.955841.
+- owner earnback = 3,186,303,212.955841 / 150,463,125 = 21.1766 years.
+- market cap / cash profit = 3,540,401,869.205841 / 150,463,125 = 23.5300.
+- forecast cash dividend = zero; no cash dividends disclosed for 2024 or 2025. Buybacks excluded from dividend yield.
+
+8. Structured result construction
+- Used protocol CLI `set` and `append` commands via update_result.sh.
+- Did not hand-write the complex JSON object.
+
+9. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed validation result: {"status":"ok","errors":[]}.
+
+10. Output scope
+- outputs/result.json: structured sortable result and evidence.
+- outputs/report.md: human-readable operating story and owner-earnback interpretation.
+- outputs/trace.txt: provenance, formulas, assumptions, and validation trail.

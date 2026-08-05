@@ -1,0 +1,76 @@
+stock-research trace
+generated_at=2026-08-05T05:26:02+08:00
+company=Stifel Financial Corp. (NYSE: SF)
+period=2025-12-31
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated scalar fields with protocol `set` and list rows with protocol `append`; the JSON was not hand-written from scratch.
+3. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+4. Final validation status: ok; errors=[]
+
+[local-reuse-check]
+- Checked the input-declared annual review, normalized facts, raw filing, and prior stock research paths.
+- No local SF annual facts, filing package, normalized facts, or prior research outputs existed at task start.
+- Therefore fetched the primary SEC filing and used official Stifel investor-relations material.
+
+[primary-sources]
+- SEC 2025 Form 10-K, filed 2026-02-24, accession 0001193125-26-067130:
+  https://www.sec.gov/Archives/edgar/data/720672/000119312526067130/sf-20251231.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/720672/000119312526067130/0001193125-26-067130-index.html
+- Stifel 2025 annual report page:
+  https://www.stifel.com/investor-relations/annual-reports
+- Stifel Q4/full-year 2025 earnings release dated 2026-01-28:
+  https://www.stifel.com/investor-relations/DownloadEarningsReleaseFile?fiscalYear=2025&id=252
+- Federal Reserve H.10 release dated 2026-01-05 (2025-12-31 CNY/USD spot rate 6.9931):
+  https://www.federalreserve.gov/releases/h10/20260105/
+- Federal Reserve G.5A release dated 2026-01-05 (2025 annual average CNY/USD 7.1875):
+  https://www.federalreserve.gov/releases/g5a/20260105/
+- Market data supplied by config/input.json: Yahoo Finance yfinance, market cap CNY 84,810,513,845.42578 as of 2026-08-03; PE TTM 14.831842.
+
+[model-decision]
+- Input hint: ordinary_operating / applicable.
+- Filing facts: Stifel is a financial holding company with wealth management, broker-dealer, investment banking and banking operations. At 2025-12-31 it reported USD 29.752bn bank deposits, USD 22.427bn loans, trading assets/liabilities, client/broker receivables/payables, and repo financing. Broker-dealer and bank subsidiaries are subject to regulatory capital restrictions.
+- Decision: override hint with statement_model=financial_brokerage and owner_earnback_applicability=requires_special_model.
+- Consequence: discounted net cash, discounted cash profit, operating business price, owner earnback years and market-cap/cash-profit fields remain null. Cash, securities, deposits and client balances were not treated as detachable.
+
+[reported-usd-facts]
+- Total assets: USD 41,270.782m.
+- Total liabilities: USD 35,293.465m.
+- Total equity: USD 5,977.317m; no noncontrolling interest was separately reported.
+- 2025 net revenues: USD 5,529.730m.
+- Income before income taxes: USD 871.139m.
+- Net income: USD 683.779m.
+- Net income available to common shareholders: USD 646.498m.
+- 2025 operating cash flow: USD 1,117.029m; fixed-asset purchases: USD 62.088m. Both are kept null in structured comparable cash-flow fields because trading/client balance movements make ordinary-company FCF interpretation misleading.
+- Global Wealth Management: revenue USD 3,536.780m; pretax income USD 1,105.184m.
+- Institutional Group: revenue USD 1,914.846m; pretax income USD 329.439m.
+- Other: revenue USD 78.104m; pretax loss USD 563.484m.
+- Client assets: USD 551.9bn; branch financial advisors: more than 2,200; branches: 402.
+- Stifel Financial CET1 ratio: 15.5%; Stifel broker-dealer net capital USD 559.5m and excess net capital USD 529.8m.
+- 2025 provision for credit losses: USD 38.404m; loan ACL approximately USD 132.2m; 97.1% of loan portfolio collateralized.
+- Common cash dividends paid to common stock/equity-award holders: 2023 USD 162.984m, 2024 USD 190.002m, 2025 USD 206.268m.
+- Announced 2026 quarterly dividend: split-adjusted USD 0.34/share, annualized USD 1.36/share.
+
+[currency-conversion]
+- Protocol requires CNY absolute yuan.
+- Balance-sheet stocks converted at 6.9931 CNY/USD (2025-12-31 spot).
+- Income-statement flows and dividend history converted at 7.1875 CNY/USD (2025 annual average).
+- Forecast dividend used 154.8m split-adjusted shares x USD 1.36 x 6.9931 = CNY 1,472,243,356.8.
+- Forecast dividend yield = CNY 1,472,243,356.8 / CNY 84,810,513,845.42578 = 0.017359208075113024.
+- Net margin = USD 646.498m common income / USD 5,529.730m net revenues = 0.1169131223405121.
+
+[judgment-boundaries]
+- Fact: 2025 revenue rose 11.3% while common net income fell 6.9%; legal provisions affected non-GAAP EPS by USD 1.16 after tax.
+- Inference: underlying operating momentum was stronger than reported net income, but legal/compliance costs remain a genuine recurring uncertainty and were not simply excluded from the report conclusion.
+- Fact: regulatory capital ratios exceeded disclosed thresholds at year-end.
+- Judgment: this supports capital resilience but does not prove the excess is immediately distributable to the parent or common shareholders.
+- Forecast: dividend is a static annualization of the announced quarterly rate and then-current split-adjusted shares, not management guidance for guaranteed annual cash paid.
+
+[limitations]
+- Input market cap and PE were preserved exactly but not independently reconciled to an exchange historical snapshot.
+- The input PE differs from market cap divided by FY2025 common net income because it is TTM as of 2026-08-03 and may incorporate 2026 interim earnings, FX and data-provider adjustments.
+- No ordinary owner-earnback metric is provided because doing so would misclassify regulated financial assets and liabilities.

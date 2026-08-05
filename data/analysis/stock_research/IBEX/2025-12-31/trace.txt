@@ -1,0 +1,33 @@
+2026-08-05 stock-research trace — IBEX
+
+1. Read stock-research SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Inspected configured raw filing, annual review, normalized facts, and historical research paths. No reusable IBEX filing or facts package existed locally.
+3. Initialized outputs/result.json with the protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Company/report identification:
+   - SEC FY2025 Form 10-K, accession 0001720420-25-000027, filed 2025-09-11, fiscal year ended 2025-06-30.
+   - The SEC filing for 2025-12-31 is a Form 10-Q, not an annual report. Annual figures therefore use FY2025 10-K, the latest complete annual filing available by the requested research date.
+5. Core extraction from audited Form 10-K (USD thousands):
+   assets 273,215; liabilities 138,906; equity 134,309; revenue 558,273; cost of services 385,692; operating income 46,611; net income 36,864; CFO 45,668; capex 18,375; financing cash flow -74,660; buybacks 78,014; cash 15,350; debt 1,619.
+6. Currency conversion: all financial statement amounts converted at 1 USD = CNY 7.1586, the PBOC-reported June 2025 end-of-period rate. This is a comparability translation, not a restatement of IBEX's USD accounts.
+7. Derived metrics:
+   gross profit = revenue - cost of services = USD 172.581m; gross margin = 30.9134%.
+   net margin = net income / revenue = 6.6032%.
+   operating FCF = CFO - capex = USD 27.293m.
+8. Owner earnback assumptions:
+   - 50% of cash is detachable because IBEX is payroll-intensive, carried only USD 15.35m cash at year-end, and was expanding delivery capacity.
+   - 100% of interest-bearing debt is deducted.
+   - No receivables, PP&E, lease ROU assets, goodwill, or other operating assets are treated as detachable.
+   - Sustainable cash profit = operating FCF USD 27.293m less stock compensation USD 5.432m = USD 21.861m; FY2025 actual elevated capex is retained and no impairment addback is made.
+   - Discounted net cash = (15.350m × 50% - 1.619m) × 7.1586 = CNY 43,352,481.60.
+   - Discounted cash profit = 21.861m × 7.1586 = CNY 156,494,154.60.
+   - Operating business price = CNY 3,192,960,405.87 - CNY 43,352,481.60 = CNY 3,149,607,924.27.
+   - Owner earnback = 20.1260 years; market cap/cash profit = 20.4031x.
+9. Dividend forecast set to zero because the Form 10-K states the company does not anticipate paying common-share dividends; buybacks are discussed separately.
+10. outputs/result.json populated only through protocol set/append commands, then validated with the protocol CLI.
+
+Primary sources:
+- https://www.sec.gov/Archives/edgar/data/1720420/000172042025000027/ibex-20250630.htm
+- https://investors.ibex.co/news-releases/news-release-details/ibex-reports-strongest-quarterly-growth-rate-nearly-3-years/
+- https://www.pbc.gov.cn/diaochatongjisi/attachDir/2025/11/2025111913535626943.pdf
+- Input market data: Yahoo Finance yfinance, market cap date 2026-08-03.

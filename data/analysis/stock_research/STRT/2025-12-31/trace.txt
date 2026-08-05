@@ -1,0 +1,68 @@
+STRT stock-research trace
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md and references/data-reuse.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked configured raw filing, annual-review, normalized-facts and prior stock-research directories.
+- No reusable STRT filing, annual facts or prior research outputs existed for 2025-12-31.
+- Downloaded SEC filing to stock_report/data/raw/filings/STRT/2025-12-31/strt-20250629.htm.
+- Downloaded SEC Companyfacts to a temporary file for cross-checking statement values.
+
+3. Identity and period
+- Issuer: STRATTEC Security Corporation; ticker STRT; CIK 0000933034.
+- Filing: Form 10-K, accession 0000950170-25-111218, filed 2025-08-25.
+- Fiscal year ended 2025-06-29. The task research period 2025-12-31 is not the issuer's fiscal year-end; FY2025 is the latest annual filing available by that date.
+
+4. Primary sources
+- SEC 10-K HTML: https://www.sec.gov/Archives/edgar/data/933034/000095017025111218/strt-20250629.htm
+- SEC filing index: https://www.sec.gov/Archives/edgar/data/933034/000095017025111218/0000950170-25-111218-index.htm
+- Federal Reserve H.10: https://www.federalreserve.gov/releases/h10/20250630/
+- Market snapshot: config/input.json; Yahoo Finance yfinance, market cap date 2026-08-03.
+
+5. Statement facts (USD)
+- Revenue 565,066,000; gross profit 84,577,000; operating profit 22,784,000.
+- Consolidated net income 18,919,000; parent net income 18,685,000.
+- Assets 391,454,000; liabilities 145,023,000; total equity 246,431,000; parent equity 221,592,000; NCI 24,839,000.
+- Cash 84,579,000; receivables 102,061,000; inventory 64,701,000; net PP&E 77,410,000.
+- Credit-facility borrowing 8,000,000.
+- Operating cash flow 71,677,000; capex 7,156,000; operating FCF 64,521,000; financing cash flow -4,939,000.
+- No common cash dividend in FY2024/FY2025 comparative equity or cash-flow statements.
+
+6. Currency translation
+- Used 7.1721 CNY per USD: Federal Reserve H.10 rate for 2025-06-27, the last business day before 2025-06-29 fiscal year-end.
+- All result.json monetary statement fields are absolute CNY yuan.
+- Supplied market cap was already CNY and was not retranslated.
+
+7. Analysis model
+- Confirmed ordinary_operating / applicable.
+- Reason: single-segment component manufacturing business; receivables, inventory, PP&E and normal operating liabilities are conventional operating-company accounts. Cash and credit borrowing are separately identifiable.
+
+8. Calculations
+- Gross margin = 84.577 / 565.066 = 0.149676321.
+- Net margin = 18.685 / 565.066 = 0.033066934.
+- Operating FCF = 71.677 - 7.156 = USD64.521m.
+- FY2025 FCF not treated as sustainable because inventory +USD16.948m, other-assets +USD12.027m and accounts-payable +USD10.674m were major cash sources.
+- Discounted cash = USD84.579m * 70% * 7.1721 = CNY424,626,332.13.
+- Debt deduction = USD8m * 100% * 7.1721 = CNY57,376,800.
+- Discounted detachable net cash = CNY367,249,532.13.
+- Pre-haircut normalized cash profit = (USD18.685m parent NI + USD14.764m depreciation - USD13m FY2026 capex guide) * 7.1721 = CNY146,662,272.90.
+- Discounted sustainable cash profit = CNY146,662,272.90 * 80% = CNY117,329,818.32.
+- Operating business price = CNY2,478,369,431.927582 - CNY367,249,532.13 = CNY2,111,119,899.80.
+- Owner earnback = CNY2,111,119,899.80 / CNY117,329,818.32 = 17.9930 years.
+- Market cap / cash profit = 21.1231 years.
+- Forecast dividend = 0; yield = 0 because no recurring dividend evidence was found.
+
+9. Judgment flags
+- 70% cash recognition and 80% normalized-profit recognition are analyst haircuts, not reported facts.
+- USD13m normalized capex is management's FY2026 guidance, used because FY2025 capex was unusually low relative to depreciation and the next-year program requirement.
+- Market data and annual financial statements have a date mismatch, disclosed in data_quality and report.md.
+
+10. Protocol completion
+- Populated result fields through protocol CLI set operations, not by constructing result.json from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

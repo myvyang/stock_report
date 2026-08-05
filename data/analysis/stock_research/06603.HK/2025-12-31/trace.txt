@@ -1,0 +1,67 @@
+IFBH 06603.HK stock research trace
+Generated for period: 2025-12-31
+Task created_at: 2026-08-04T12:36:22+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the task required deciding whether existing facts could be reused.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- No annual facts, normalized facts, prior stock-research result, or raw filing metadata existed under the input-specified 06603.HK/2025-12-31 paths.
+- Downloaded the official HKEX 2025 annual report to:
+  stock_report/data/raw/filings/06603.HK/2025-12-31/annual-report-2025.pdf
+- Local pdftotext was unavailable. Research used the searchable text layer of the same official HKEX PDF; no core financial number was taken from a media summary.
+
+3. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Official annual report facts: IFBH sells ready-to-consume beverages and snacks; principal brands are if and Innococo; business uses co-packers and distributors.
+- No brokerage client money, proprietary securities portfolio, repo financing, or other securities-firm balance-sheet structure was present.
+- Overrode hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+4. Primary sources
+- IFBH Limited 2025 Annual Report, HKEX, released 2026-03-27:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0327/2026032700938.pdf
+- IFBH Limited Annual Results Announcement, HKEX, released 2026-02-26 (cross-check only).
+- Market cap CNY1,250,557,895.515561, PE TTM 8.2 and timestamp 2026/08/03 09:48:03 were taken unchanged from config/input.json, source Tencent qt.gtimg.cn.
+- CNY translation convention: USD1=CNY7.0288, identified as the 2025 year-end official reference. All USD financial-statement amounts were multiplied by this single rate for protocol comparability. This is a research presentation convention, not the issuer's transaction-date accounting rate.
+
+5. Core audited inputs (USD'000)
+- Revenue 176,399; cost of sales 118,395; gross profit 58,004.
+- Profit before tax 28,537; net and parent profit 22,768.
+- Total assets 200,123; total liabilities 29,291; total equity 170,832; parent equity 170,816; NCI 16.
+- Cash at banks and money-market/pledged deposits 163,858.
+- Trade receivables 19,235; loan receivables 2,786.
+- Operating cash flow 12,332; cash purchase of plant/equipment 465; operating FCF 11,867.
+- Financing cash flow 98,898; ordinary dividends paid 42,000 (mostly restructuring/pre-listing context).
+- Proposed FY2025 final dividend: USD0.026/share, approximately USD6.9m.
+
+6. Key operating facts
+- Mainland China revenue USD159.385m, about 90.4% of total.
+- Top five customers 97.2% of sales; largest customer 50.9%.
+- Top five suppliers 91.7% of purchases; largest supplier 35.2%.
+- 95% of year-end trade receivables due from four major customers.
+- Gross margin fell from 36.7% to 32.9%, attributed to THB appreciation and a mix shift toward lower-margin 1-litre coconut water.
+- Unutilized IPO proceeds at year-end were approximately USD135.0m, earmarked through 2028 for fulfilment, brand building, expansion, product development, alliances/acquisitions, and working capital.
+
+7. Owner earnback judgments
+- Book cash: USD163.858m.
+- Less unutilized earmarked IPO proceeds: USD135.0m.
+- Less pledged cash USD1.016m, lease liabilities USD1.441m, and income tax payable USD5.476m.
+- Less basic working-capital reserve: USD17.6399m, set at 10% of revenue because receivables rose sharply and the model depends on concentrated distributors and co-packers.
+- Residual detachable cash before haircut: USD3.2851m; 80% recognition gives USD2.62808m / CNY18.472m.
+- Sustainable discounted cash profit: USD20.0m / CNY140.576m. This is below FY2025 profit adjusted for listing fees; reduction covers interest on excess cash, weaker margin, working-capital conversion, and continuing brand investment.
+- Operating business price = market cap - discounted detachable net cash = CNY1,232.086m.
+- Owner earnback years = operating business price / discounted sustainable cash profit = 8.7646 years.
+- Market cap / cash profit = 8.8960x.
+- Forecast dividend yield = USD6.9m * 7.0288 / market cap = 3.8782%.
+
+8. Quality controls
+- outputs/result.json was populated through protocol set commands after protocol initialization; it was not authored as a standalone complex JSON object.
+- Final protocol validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report completion: status=ok, errors=[].
+- A final validation and formula consistency check is performed after all three output files are present.
+- Final validation result: status=ok, errors=[]. Formula checks for market-cap synchronization, operating business price, both payback multiples, dividend yield, and the balance-sheet equation all passed within rounding tolerance.

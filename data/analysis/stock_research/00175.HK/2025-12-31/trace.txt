@@ -1,0 +1,69 @@
+stock-research trace
+company: 00175.HK / 吉利汽车控股有限公司
+period: 2025-12-31 annual
+generated context date: 2026-08-03 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Read references/data-reuse.md completely because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse check
+- Checked the configured raw filing, annual review, normalized facts, and prior stock research paths.
+- No 2025 filing, annual facts package, normalized facts, or prior research result existed locally.
+- Therefore fetched the HKEX annual report rather than pretending the input hint was evidence.
+
+3. Primary sources acquired/used
+- HKEX Annual Report 2025 (released 2026-04-27):
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042700756.pdf
+  Saved copy: stock_report/data/raw/filings/00175.HK/2025-12-31/annual-report-2025.pdf
+- Company official 2025 annual-results press release (2026-03-18):
+  https://www.geelyauto.com.hk/wp-content/uploads/2026/03/e_20260318_Press-Release_Geely_2025-Annual-Results.pdf
+- Company official brief:
+  https://www.geelyauto.com.hk/company-brief/
+- Market snapshot was supplied in config/input.json:
+  Tencent qt.gtimg.cn; 2026/07/31 16:08:41; market cap RMB183,713,237,622.16867; PE TTM 11.45.
+
+4. Model verification
+- Input hint said financial_brokerage and requires_special_model.
+- Annual report and company brief identify passenger-vehicle development, manufacturing, and sales.
+- Balance sheet and cash flow are those of an operating manufacturer; no brokerage client-money model exists.
+- Overrode hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+5. Audited financial statement extraction (annual report RMB'000 converted to absolute RMB)
+- Profit or loss, p.123: revenue 345,232,201; cost of sales 287,885,471; gross profit 57,346,730; profit for year 16,628,326; parent profit 16,852,231.
+- Financial position, pp.125-126: total assets 290,410,094; total liabilities 196,794,886 (179,459,527 current + 17,335,359 non-current); total equity 93,615,208; parent equity 92,398,489; NCI 1,216,719.
+- Cash flow, pp.129-131: operating cash flow 47,274,244; PP&E purchases 4,127,869; land additions 1,933; intangible additions 13,789,725; financing cash flow -1,839,073.
+- Full capex = 4,127,869 + 1,933 + 13,789,725 = 17,919,527 (RMB'000).
+- Operating FCF = 47,274,244 - 17,919,527 = 29,354,717 (RMB'000).
+- Dividend/buyback cash out = parent dividends 3,119,413 + dividends to NCI 644,519 + share repurchase 349,668 = 4,113,600 (RMB'000).
+
+6. Owner earnback judgments
+- Reported OCF includes receivable release RMB10,822.180m and payable increase RMB8,822.034m.
+- Pre-working-capital cash basis after paid tax = operating profit before WC 33,035.974m - tax paid 4,039.657m = RMB28,996.317m.
+- Subtract full capex RMB17,919.527m gives RMB11,076.790m; rounded conservative sustainable cash profit to RMB11.1bn.
+- Discounted detachable net cash:
+  cash 65.319279bn * 80% = 52.2554232bn
+  + FVOCI notes 25.792822bn * 50% = 12.896411bn
+  + restricted deposits 2.898009bn * 0% = 0
+  - bank debt, bonds and leases 23.105624bn
+  - operating liquidity reserve 30bn
+  = RMB12.0462102bn.
+- Operating business price = 183.713237622bn - 12.0462102bn = RMB171.667027422bn.
+- Owner earnback = 171.667027422 / 11.1 = 15.4655 years.
+- Market cap/cash profit = 183.713237622 / 11.1 = 16.5507.
+- These discounts and reserve are analytical judgments, not reported facts.
+
+7. Dividend forecast
+- Annual report note 11, p.198: proposed 2025 final dividend HK$0.50/share, translated total RMB4,732.406m.
+- Forecast yield = 4.732406bn / 183.713237622bn = 2.57597%.
+- No unannounced interim or special dividend assumed.
+
+8. Validation
+- Populated outputs/result.json only through protocol CLI set commands after initialization.
+- Protocol validation executed:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed result status: ok; errors: [].

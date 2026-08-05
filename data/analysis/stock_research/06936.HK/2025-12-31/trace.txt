@@ -1,0 +1,56 @@
+task: stock research for 06936.HK, period 2025-12-31
+generated_at: 2026-08-04T21:57:03+08:00
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Initialized outputs/result.json with protocol CLI
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+   - config/input.json existed.
+   - No local 2025 annual facts, normalized facts, filing metadata, or raw filing was present at the supplied paths.
+   - Public primary filing was therefore retrieved for missing core facts.
+
+4. Primary source
+   - HKEX issuer title search for stock 06936.
+   - S.F. Holding Co., Ltd. Annual Report 2025, released 2026-04-09.
+   - URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0409/2026040900571.pdf
+   - Auditor: PricewaterhouseCoopers; report date 2026-03-30.
+   - Core statements: annual report pp.131-139.
+   - Business, segments, cash flow discussion and balance-sheet interpretation: MD&A pp.17-83 and Directors' Report pp.104-105.
+
+5. Analysis-model override
+   - Input hint: financial_brokerage / requires_special_model.
+   - Filing fact: revenue derives from express and freight delivery, intra-city delivery, and supply chain/international logistics.
+   - Final model: ordinary_operating / applicable.
+   - Reason: cash investments, borrowings, and logistics operating assets can be separated under an ordinary operating-company model; there are no brokerage customer funds or securities-financing liabilities.
+
+6. Unit normalization
+   - Annual report statement unit RMB'000; multiplied by 1,000 for result.json absolute yuan.
+   - Market-cap input retained exactly: RMB153,801,776,474.32626 at 2026/08/03 09:48:03.
+
+7. Key calculations
+   - gross_margin = 40,283,594,000 / 308,226,647,000 = 0.1306947157.
+   - net_margin = 11,117,216,000 / 308,226,647,000 = 0.0360683157.
+   - reported operating free cash flow = operating cash flow 27,555,275,000 - non-equity capex about 9,620,000,000 = about 17,930,000,000.
+   - post-lease cash = 17,930,000,000 - lease principal 7,553,488,000 = about 10,376,512,000.
+   - discounted sustainable parent cash profit = RMB9,500,000,000 after minority/cycle conservatism.
+   - discounted detachable net cash = cash 19,959,631,000*50% + structured deposits 16,080,264,000*90% + fixed-income certificate 5,618,400,000*90% - borrowings 33,808,398,000 = -4,299,784,900.
+   - operating business price = market cap - discounted net cash = 158,101,561,374.32626.
+   - owner earnback years = 158,101,561,374.32626 / 9,500,000,000 = 16.6422696184.
+   - market cap / cash profit = 16.1896606815.
+   - forecast dividend yield = 4,460,000,000 / 153,801,776,474.32626 = 0.0289983647.
+
+8. Judgment boundaries
+   - Restricted cash excluded from detachable cash.
+   - PP&E, right-of-use assets, receivables, contract assets, investment property, associates, FVOCI investments, and intangibles excluded from detachable cash.
+   - Lease liabilities were not subtracted again in net cash because annual lease principal was deducted from sustainable cash profit.
+   - Cash discounts and sustainable cash profit are analyst assumptions, not company guidance.
+
+9. Protocol edits and validation
+   - All result fields were updated through repeated protocol `set` commands after `init`; no complex JSON file was authored from scratch.
+   - Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Validation result before report handoff: status=ok, errors=[].

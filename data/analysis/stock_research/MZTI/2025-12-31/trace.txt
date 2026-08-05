@@ -1,0 +1,32 @@
+2026-08-05 stock-research trace — MZTI
+
+1. Read skill instructions and all directly referenced contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - references/result-contract.md
+   - references/report-contract.md
+   - references/data-reuse.md
+2. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Reuse check: no existing MZTI raw filing, annual facts, normalized facts, or historical research files were present under the paths supplied in config/input.json.
+4. Company identity and fiscal-period check via SEC submissions (CIK 0000057515): issuer is The Marzetti Company, formerly Lancaster Colony Corporation; fiscal year ends June 30. The requested 2025-12-31 annual period is not a statutory annual-report date.
+5. Primary filings used:
+   - FY2025 10-K, filed 2025-08-21: https://www.sec.gov/Archives/edgar/data/57515/000005751525000020/mzti-20250630.htm
+   - 2025-12-31 10-Q, filed 2026-02-03: https://www.sec.gov/Archives/edgar/data/57515/000005751526000005/mzti-20251231.htm
+6. Period convention: balance sheet and shares use 2025-12-31 10-Q; annual income and cash flow use FY ended 2025-06-30 10-K. Interim facts are used for trend and dividend forecast, not spliced into a synthetic annual statement.
+7. Currency conversion: USD amounts multiplied by 7.129 CNY/USD, the IRS 2025 yearly average rate: https://www.irs.gov/individuals/international-taxpayers/yearly-average-currency-exchange-rates
+8. Model classification: ordinary_operating/applicable. The company manufactures and markets food; receivables, inventory, plants, leases and payables are ordinary operating balances. No revolver borrowings were outstanding at 2025-12-31.
+9. Owner earnback assumptions:
+   - Detachable cash: 2025-12-31 cash USD 201.584m × 50% haircut × 7.129 = CNY 718,546,168. Remaining cash is retained for operations, capex, acquisitions and distributions.
+   - FY2023 FCF = 225.901m - 90.181m = USD 135.720m.
+   - FY2024 FCF = 251.553m - 67.576m = USD 183.977m.
+   - FY2025 FCF = 261.496m - 58.000m = USD 203.496m.
+   - Three-year mean FCF ≈ USD 174.398m; rounded base USD 170m, then 10% sustainability haircut = USD 153m = CNY 1,090,737,000.
+   - Operating business price = CNY 19,775,890,909.0437 - 718,546,168 = CNY 19,057,344,741.0437.
+   - Owner earnback = 19,057,344,741.0437 / 1,090,737,000 = 17.47199 years.
+   - Market cap/cash profit = 19,775,890,909.0437 / 1,090,737,000 = 18.13076.
+10. Dividend forecast: latest 2025-12-31 quarter dividend USD 1.00/share × 4 × 27,423,042 shares × 7.129 = CNY 781,995,465.672; yield = 3.95429% of supplied market cap.
+11. Market data was not independently reconstructed: CNY 19,775,890,909.0437 market cap, 2026-08-03, PE TTM 16.724571, source Yahoo Finance yfinance, all supplied in config/input.json.
+12. outputs/result.json populated only after protocol initialization, using repeated protocol CLI set operations.
+13. Final validation:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Result: status=ok, errors=[]

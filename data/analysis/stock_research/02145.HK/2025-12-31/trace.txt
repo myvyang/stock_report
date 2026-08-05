@@ -1,0 +1,68 @@
+stock-research trace
+company: 02145.HK / 上海上美化妆品股份有限公司
+period: 2025-12-31
+generated_for_input: 2026-08-04T21:20:55+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md in full.
+- Read references/report-contract.md in full.
+- Read references/data-reuse.md because local evidence availability had to be assessed.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Expected annual facts, normalized facts, raw filing metadata, and prior stock-research outputs were absent under the paths in config/input.json.
+- stock_report/data/notes/user_stock_evaluations.md was present but contained no filing facts required for this task.
+- Therefore fetched the primary annual report from HKEX rather than fabricating or relying on secondary summaries.
+
+3. Primary filing
+- HKEX title search: https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=1000178602
+- Annual report: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0416/2026041602138.pdf
+- Local downloaded copy: stock_report/data/raw/filings/02145.HK/2025-12-31/annual-report-2025-en.pdf
+- Published: 2026-04-16; audited financial statements dated 2026-03-26.
+
+4. Model verification
+- Input hint said financial_brokerage.
+- Annual report p.131 says the group is principally engaged in R&D, production and sale of cosmetics.
+- Balance sheet contains ordinary operating items, not brokerage client money or matched trading books.
+- Overrode hint to statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+5. Extracted audited facts (RMB)
+- Revenue 9,177,796,000; cost of sales 2,163,141,000; gross profit 7,014,655,000.
+- Operating profit 1,402,328,000 calculated as gross profit + other income/gains - selling/distribution - administration - R&D - financial-asset impairment - other expenses.
+- Net profit 1,154,213,000; parent net profit 1,102,574,000.
+- Total assets 4,967,340,000, derived from non-current assets 1,805,376,000 + current assets 3,161,964,000.
+- Total liabilities 2,092,836,000, derived from current liabilities 1,709,336,000 + non-current liabilities 383,500,000.
+- Equity 2,874,504,000; parent equity 2,768,157,000; NCI 106,347,000.
+- Operating cash flow 1,205,198,000.
+- Capital expenditure 514,654,000 = PP&E 414,429,000 + leasehold land 99,681,000 + intangibles 544,000.
+- Operating free cash flow 690,544,000 = OCF - capex.
+- Financing cash flow -404,818,000; dividend cash paid 609,192,000.
+
+6. Owner earnback assumptions and formulas
+- Cash 802,308,000 at 100% = 802,308,000.
+- FVTPL assets 148,383,000 at 80% = 118,706,400.
+- Pledged deposits 7,112,000 at 0% = 0.
+- Bank borrowings 290,064,000 at 100% deduction = -290,064,000.
+- Discounted detachable net cash = 630,950,400.
+- Sustainable distributable cash profit = 700,000,000, rounded from 690,544,000 single-year FCF; below parent profit to retain a quality/cycle haircut.
+- Operating business price = 10,196,895,069.127083 - 630,950,400 = 9,565,944,669.127083.
+- Owner earnback years = 9,565,944,669.127083 / 700,000,000 = 13.665635241610119.
+- Market cap / cash profit = 10,196,895,069.127083 / 700,000,000 = 14.566992955895833.
+
+7. Dividend estimate
+- 2025 interim RMB0.50/share + final RMB0.75/share = RMB1.25/share.
+- Year-end shares 398,107,000; estimated cash dividend 497,633,750.
+- Forecast dividend yield = 497,633,750 / 10,196,895,069.127083 = 0.04880247826680838.
+
+8. Market snapshot
+- Market cap 10,196,895,069.127083; PE TTM 9.71.
+- Timestamp 2026/08/03 09:47:43; source Tencent qt.gtimg.cn, supplied in config/input.json.
+- Not independently audited or refreshed.
+
+9. Output construction and validation
+- outputs/result.json was populated through repeated protocol `set` calls after protocol initialization; it was not authored as a free-form complex JSON file.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok; errors [].

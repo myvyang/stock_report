@@ -1,0 +1,67 @@
+stock-research trace
+company=600548.SH 深高速
+period=2025-12-31 annual
+generated_for=2026-08-01 Asia/Shanghai
+
+[protocol]
+1. Read stock-research/SKILL.md.
+2. Read result-contract.md, report-contract.md, and data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar and array fields through protocol set/append commands.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   status=ok; errors=[]
+
+[reuse audit]
+Expected local raw filing, annual facts, normalized facts, and prior stock-research artifacts for 600548.SH/2025-12-31 were absent.
+Only stock_report/data/notes/user_stock_evaluations.md existed locally.
+Result: fetched and used the official 2025 annual-report disclosure; no historical research conclusion was reused.
+
+[primary sources]
+Annual report PDF: https://static.cninfo.com.cn/finalpage/2026-03-26/1225032115.PDF
+Company official site: https://www.sz-expressway.com/
+Company official 2025 results page: https://www.sz-expressway.com/CompanyNews/info_itemid_32764.html
+Market snapshot: config/input.json; source Tencent qt.gtimg.cn; timestamp 20260731114333.
+
+[model decision]
+statement_model=utility_concession
+owner_earnback_applicability=requires_special_model
+Evidence: annual report states toll-road business is the largest revenue and profit source; year-end intangible assets were CNY 24,921,365,882.90 and long-term equity investments CNY 19,655,223,202.88. Project rights have finite concession lives, while cash, debt, maintenance, expansion capex, and minority interests are economically linked.
+Decision: all ordinary owner-earnback ranking values remain null. No synthetic net-cash or payback figure was produced.
+
+[statement extraction]
+Balance sheet, annual report pp.190-191:
+total_assets=71,289,150,413.25
+total_liabilities=39,236,668,403.08
+total_equity=32,052,482,010.17
+parent_equity=27,031,138,112.07
+minority_interest=5,021,343,898.10
+
+Income statement, annual report pp.194-195:
+revenue=9,264,480,541.03
+cost_of_sales=6,456,994,563.54
+gross_profit=2,807,485,977.49 [calculated revenue-cost]
+operating_profit=1,685,094,480.43
+net_profit=1,185,645,124.74
+parent_net_profit=1,149,351,721.66
+
+Cash flow statement, annual report p.196:
+operating_cash_flow=4,623,661,085.18
+capital_expenditure=3,279,556,923.08 [cash paid to acquire fixed, intangible and other long-term assets]
+operating_free_cash_flow=1,344,104,162.10 [calculated OCF-capex; not treated as sustainable distributable cash]
+financing_cash_flow=2,276,629,448.73
+dividend_and_buyback_cash_out=1,057,445,503.80 [CNY 619,236,894.99 parent-company ordinary dividend paid plus CNY 438,208,608.81 dividends paid by subsidiaries to minorities; no buyback included]
+
+[calculations]
+gross_margin=2,807,485,977.49 / 9,264,480,541.03 = 0.3030366080
+net_margin=1,149,351,721.66 / 9,264,480,541.03 = 0.1240600266
+minority_interest_ratio=5,021,343,898.10 / 32,052,482,010.17 = 0.1566616275
+forecast_cash_dividend=0.244 * 2,537,856,127 = 619,236,894.988
+forecast_dividend_yield=619,236,894.988 / 21,800,000,000 = 0.0284053622
+Forecast basis: board-proposed 2025 final dividend, pending shareholder approval.
+
+[limitations]
+No project-by-project schedule of remaining toll periods, forecast traffic, tariff assumptions, maintenance capex, expansion capex, and debt amortization was available in a form sufficient for a defensible equity DCF.
+Cash-flow-statement capex mixes maintenance and growth expenditure.
+Market data was accepted from the provided input snapshot and not reconstructed.

@@ -1,0 +1,56 @@
+stock-research trace
+company: 603416.SH 信捷电气
+period: 2025-12-31 annual
+generated_at: 2026-08-01T04:41:47+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields through protocol `set`; the result was not hand-written from scratch.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   validation status: ok, errors: []
+
+[reuse check]
+- Expected annual facts, normalized facts, filing metadata, and prior stock-research outputs listed in config/input.json were absent from the workspace.
+- Only stock_report/data/notes/user_stock_evaluations.md existed under stock_report.
+- Therefore no annual fact package could be reused; research returned to the primary annual filing.
+
+[primary sources]
+1. Shanghai Stock Exchange, 无锡信捷电气股份有限公司2025年年度报告, disclosed 2026-04-17.
+   URL: https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-17/603416_20260417_1MLC.pdf
+   Local temporary extraction: /tmp/stock-research-603416/annual.pdf and annual.txt (not a deliverable).
+   Key pages checked: 5, 10, 29-42, 46-48, 102-111, 149, 162-163, 201-203.
+2. Shanghai Stock Exchange, 关于2025年利润分配预案的公告, disclosed 2026-04-17.
+   URL: https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-17/603416_20260417_5AN5.pdf
+3. config/input.json market snapshot: market cap CNY 7,802,000,000; PE TTM 29.72; Tencent qt.gtimg.cn; timestamp 2026-07-31 11:43:31.
+
+[model decision]
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Evidence: the company manufactures and sells PLC, drive systems, HMI, and intelligent equipment. Balance-sheet assets are ordinary manufacturing cash/investments, receivables, inventory, and plant; liabilities are predominantly supplier and operating obligations. No special-model customer funds, reserves, regulated project cash, concession rights, or look-through holding-company structure were identified.
+
+[formula checks]
+- gross_profit = 2,013,585,833.71 - 1,258,670,253.96 = 754,915,579.75
+- gross_margin = 754,915,579.75 / 2,013,585,833.71 = 0.3749110503
+- net_margin = 254,166,282.87 / 2,013,585,833.71 = 0.1262257007
+- operating_free_cash_flow = 92,796,960.04 - 72,054,578.35 = 20,742,381.69
+- discounted_detachable_net_cash = 121,719,182.47 + 90% * 1,195,469,734.37 - 978,774.25 - 908,088.43 = 1,195,755,080.723
+- operating_business_price = 7,802,000,000 - 1,195,755,080.723 = 6,606,244,919.277
+- owner_earnback_years = 6,606,244,919.277 / 20,742,381.69 = 318.4901819863
+- market_cap_to_cash_profit = 7,802,000,000 / 20,742,381.69 = 376.1380981511
+- forecast_dividend_yield = 241,573,552.60 / 7,802,000,000 = 0.0309630290
+
+[judgment boundaries]
+- Cash and cash equivalents were included at 100%; short-term wealth-management products at 90%; restricted cash at 0%; long-term equity/non-current financial investments at 0%; lease-like debt was deducted at 100%.
+- Sustainable discounted cash profit uses reported 2025 operating free cash flow without subjective working-capital normalization. This is conservative and may understate cross-cycle cash generation because receivables and inventory expanded sharply.
+- Forecast dividend is a static extrapolation of the disclosed 2025 full-year cash distribution (interim paid plus annual proposal), not a management promise.
+- Market capitalization and PE were accepted from the task input and not independently reconstructed.
+
+[data quality]
+status: complete
+limitations:
+- No local fact package was available.
+- Single-year free cash flow is sensitive to working-capital timing.
+- Annual distribution proposal was the disclosed basis; future dividends remain uncertain.

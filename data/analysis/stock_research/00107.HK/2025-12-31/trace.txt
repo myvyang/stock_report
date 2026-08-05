@@ -1,0 +1,62 @@
+stock-research trace
+company: 00107.HK 四川成渝高速公路股份有限公司
+period: 2025-12-31 annual
+generated_at: 2026-08-03 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because no local annual facts package was present.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields only through protocol set/append commands.
+6. Validated result with the protocol CLI; final status recorded below.
+
+[local reuse check]
+- No files existed under stock_report/data/analysis/annual_review/00107.HK/2025-12-31.
+- No files existed under stock_report/data/raw/filings/00107.HK/2025-12-31 before this run.
+- No historical 00107.HK stock research result was available locally.
+
+[official sources retrieved]
+- HKEX 2025 Annual Report, released 2026-04-20:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0420/2026042000352.pdf
+  local copy: stock_report/data/raw/filings/00107.HK/2025-12-31/2025-annual-report.pdf
+  extracted text: stock_report/data/raw/filings/00107.HK/2025-12-31/2025-annual-report.txt
+- Company official 2025 annual report landing page:
+  https://www.cygs.com/details.aspx?mid=292&sid=198880
+- HKEX issuer title-search page used to confirm annual report, annual-results and dividend filings:
+  https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=171
+- Market cap, timestamp and PE TTM were supplied by config/input.json with source Tencent qt.gtimg.cn.
+
+[identity and model audit]
+- Input hint said financial_brokerage, but input tags said industrial transportation and the official annual report says the group invests in, constructs, operates and manages expressways.
+- Official segment data: expressway revenue RMB4,685,565,000, 54.65% of total revenue; expressway segment result RMB2,134,420,000.
+- Official balance sheet: service concession arrangements RMB53,022,785,000 and interest-bearing borrowings RMB39,851,577,000. Major concession rights are pledged for project loans.
+- Decision: override hint with statement_model=utility_concession and owner_earnback_applicability=requires_special_model.
+- Consequence required by result contract: all ordinary owner-earnback amount and ratio fields remain null.
+
+[core financial extraction; RMB absolute yuan]
+- Revenue 8,573,129,000; cost of sales 5,699,135,000; gross profit 2,873,994,000; operating profit 2,460,465,000; total profit 1,547,613,000; parent net profit 1,515,006,000. Source: annual report p.143.
+- Total assets 63,810,274,000; liabilities 42,561,795,000; total equity 21,248,479,000; parent equity 20,151,457,000; NCI 1,097,022,000. Source: annual report pp.145-146.
+- Operating cash flow 1,133,228,000; PPE cash purchases 257,225,000; financing cash flow 520,379,000. Source: annual report pp.149-151.
+- Cash paid to owners 885,912,000, perpetual-equity holders 87,693,000 and NCI 68,801,000; combined 1,042,406,000. Source: annual report p.150.
+
+[calculations]
+- gross_margin = 2,873,994,000 / 8,573,129,000 = 0.3352304328.
+- net_margin = 1,515,006,000 / 8,573,129,000 = 0.1767191378.
+- minority_interest_ratio = 1,097,022,000 / 21,248,479,000 = 0.0516289445.
+- forecast_dividend_yield = 908,244,000 / 12,733,308,969.342113 = 0.0713266827.
+- operating_free_cash_flow = 1,133,228,000 - 257,225,000 = 876,003,000.
+- FCF convention note: RMB1,798,002,000 concession-construction cash outflow is already included in operating cash flow. Subtracting it again would double count. Broader disclosed capex/additions are described separately in report and limitations.
+
+[key judgement boundaries]
+- Market PE is not converted into an owner earnback result because finite concession lives, pledged project assets, large debt and expansion commitments require project-by-project cash-flow modelling.
+- No special-model DCF or payback year was produced because final post-expansion toll periods, annual project capex and debt-service schedules were not available in the reviewed disclosures.
+- Dividend forecast uses the approved 2025 final dividend as a static annualized basis, not a promise for 2026.
+- Facts, inferences and limitations are separated in report.md.
+
+[validation]
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}
+- JSON parse check: passed.
+- Required outputs present: outputs/result.json, outputs/report.md, outputs/trace.txt.

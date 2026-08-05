@@ -1,0 +1,76 @@
+stock-research trace
+company=SandRidge Energy, Inc. (NYSE: SD)
+period=2025-12-31
+generated_for_input=2026-08-04T17:37:23+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated initialized paths using repeated protocol set commands; result.json was not authored from a blank object.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse-audit]
+Requested annual facts, normalized facts, raw filing metadata and prior stock-research files were absent from the workspace.
+Research therefore returned to primary filings rather than inventing a local fact package.
+
+[primary-sources]
+SEC 2025 Form 10-K, accession 0001628280-26-015318:
+https://www.sec.gov/Archives/edgar/data/1349436/000162828026015318/sd-20251231.htm
+- Business and reserves: company is an independent Mid-Continent oil and gas producer; 1,446 gross/825 net producing wells; 574,599 gross/378,537 net acres; 69.1 MMBoe proved reserves.
+- Balance sheet (USD thousands): cash 110,998; restricted cash 1,347; receivables 26,186; net oil/gas properties 340,639; other PP&E 75,649; DTA 78,336; assets 644,021; AP/accruals 59,037; ARO 72,391; liabilities 133,150; equity 510,871.
+- Operations (USD thousands): revenue 156,357; lease operating expense 36,191; production taxes 9,846; D&A 42,872; operating income 60,950; tax benefit 5,535; net income 70,203.
+- Cash flow (USD thousands): CFO 100,140; cash oil/gas PP&E capex 58,611; other PP&E 562; financing cash flow -23,295; dividends 15,862; repurchases 6,455.
+- Operating facts: 6,768 MBoe production; oil revenue 77,270; gas revenue 41,587; NGL revenue 37,500; 2025 LOE includes 4,300 favorable non-recurring non-cash prior-period accrual corrections.
+
+SEC Q1 2026 results exhibit, accession 0001628280-26-031401:
+https://www.sec.gov/Archives/edgar/data/1349436/000162828026031401/sd3312026-ex991earningsrel.htm
+- Board raised ongoing quarterly dividend 8% to USD 0.13/share on 2026-05-05.
+
+SEC acquisition 8-K, accession 0001213900-26-072879:
+https://www.sec.gov/Archives/edgar/data/1349436/000121390026072879/ea0296206-8k_sandridge.htm
+- Signed USD 65m cash Cherokee acquisition on 2026-06-26, expected Q3 2026 close, funded from cash on hand; three potential USD 2m earn-outs.
+
+Federal Reserve H.10 release dated 2025-12-29:
+https://www.federalreserve.gov/releases/h10/20251229/
+- China yuan rate on 2025-12-26: 7.0063 CNY per USD. This rate converted all filing amounts for protocol consistency.
+
+Market data from config/input.json:
+- market cap CNY 3,467,811,958.1424866 as of 2026-08-03, Yahoo Finance yfinance.
+- PE TTM 6.790244.
+
+[calculation-notes]
+Production gross profit = revenue - lease operating expense - production/ad valorem/other taxes
+= USD 156.357m - 36.191m - 9.846m = USD 110.320m.
+This is a non-GAAP analytical production-margin definition because the issuer does not report gross profit.
+
+Operating FCF = CFO - cash PP&E capex
+= USD 100.140m - 58.611m - 0.562m = USD 40.967m = CNY 287,027,092.1.
+
+Discounted sustainable cash profit:
+USD 40.967m - USD 4.300m favorable accrual correction = USD 36.667m.
+Apply 80% retention for commodity cycle, depletion and capex variability = USD 29.3336m.
+USD 29.3336m * 7.0063 = CNY 205,520,001.68.
+
+Discounted detachable net cash:
+USD 110.998m cash - USD 65m signed acquisition - USD 20m operating/liquidity reserve
+= USD 25.998m * 7.0063 = CNY 182,149,787.40.
+Restricted cash excluded. Potential USD 6m earn-out not deducted; disclosed as limitation.
+
+Operating business price = CNY 3,467,811,958.1424866 - CNY 182,149,787.40
+= CNY 3,285,662,170.7424865.
+Owner earnback years = 3,285,662,170.7424865 / 205,520,001.68 = 15.9870676522.
+Market cap / cash profit = 3,467,811,958.1424866 / 205,520,001.68 = 16.8733550496.
+
+Forecast dividend = USD 0.13 * 4 * 36.825m shares * 7.0063
+= CNY 134,163,638.70; yield = 3.86882681%.
+
+[fact-inference-judgment-separation]
+Facts: filing figures, production/reserve data, declared quarterly dividend, signed acquisition terms, market-cap input and official FX rate.
+Inference: ordinary_operating model is applicable; cash commitment makes year-end cash non-detachable; production gross-margin construction.
+Judgment: USD 20m operating reserve and 20% sustainable-profit haircut. Both are explicit and sensitivity-bearing, not company guidance.
+
+[validation]
+Initial completed result validation: status=ok, errors=[].

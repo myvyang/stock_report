@@ -1,0 +1,61 @@
+stock-research trace
+company: Moelis & Company (NYSE: MC)
+period: 2025-12-31 annual
+generated for task date: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because no local annual fact pack was present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Requested annual-review, normalized-facts, raw-filing and prior stock-research paths did not exist in the workspace.
+- Returned to primary public filings.
+
+3. Primary sources used
+- SEC Form 10-K accession 0001193125-26-076747, filed 2026-02-26:
+  https://www.sec.gov/Archives/edgar/data/1596967/000119312526076747/mc-20251231.htm
+- Moelis FY2025 earnings release, dated 2026-02-04:
+  https://investors.moelis.com/press-releases/news-details/2026/Moelis--Company-Reports-Fourth-Quarter-and-Full-Year-2025-Financial-Results-Declares-Regular-Quarterly-Dividend-of-0-65-Per-Share-and-Board-Approves-New-300-Million-Share-Repurchase-Authorization/default.aspx
+- Market cap and PE: config/input.json, Yahoo Finance yfinance snapshot supplied by task.
+- FX: PBOC 2025-12-31 USD/CNY central parity 7.0288.
+
+4. Model decision
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: advisory-fee business; the 10-K says the firm does not rely on balance-sheet lending or trading, is capital-light, and had no debt. Broker-dealer registrations do not make customer funds, trading inventory or credit assets the operating balance sheet here.
+- Special handling: treat equity compensation as a real shareholder cost; deduct compensation payable and tax receivable agreement liability before treating liquidity as detachable.
+
+5. Source USD facts (thousands unless per-share)
+- Assets 1,740,685; liabilities 1,060,308; equity 680,377; parent equity 568,439; NCI 111,938.
+- Revenue 1,516,796; compensation and benefits 1,017,076; operating income 273,863; net income 259,617; parent net income 233,037.
+- CFO 576,297; capex 36,330; financing cash flow -283,896; dividends/tax distributions 208,703; treasury stock purchases 74,591.
+- Cash and equivalents 508,595; investments 369,072; company-stated cash and liquid investments 848,800.
+- Compensation payable 439,394; TRA liability 301,053; lease liabilities 267,155.
+- 2025 year-end Class A shares outstanding 73,420,907; announced regular quarterly dividend $0.65.
+
+6. Conversion and analytical calculations
+- All USD statement amounts converted at 7.0288 CNY/USD; this is a comparability convention, not GAAP translation.
+- Analytical gross profit proxy = revenue - compensation and benefits = USD 499.720m; gross margin proxy = 32.9458%. Company does not report GAAP gross profit.
+- Net margin = parent net income / revenue = 15.3638%.
+- Operating FCF = CFO - capex = USD 539.967m, but not used as sustainable cash profit because CFO adds back stock compensation and benefits from increased compensation payable.
+- Parent attribution proxy = parent equity / total equity = 83.5477%.
+- Detachable cash pre-attribution = USD 848.800m - 439.394m - 301.053m = 108.353m.
+- Discounted detachable net cash = USD 108.353m * 83.5477% * 80% * 7.0288 = CNY 509,033,489.86.
+- Sustainable cash profit = [USD 273.863m * (1-29.8%) * 83.5477% - USD 36.330m * 83.5477%] * 90% * 7.0288 = CNY 824,071,416.00.
+- Operating business price = CNY 33,533,151,307.23 - 509,033,489.86 = 33,024,117,817.37.
+- Owner earnback = 33,024,117,817.37 / 824,071,416.00 = 40.0743 years.
+- Market cap / cash profit = 40.6920x.
+- Forecast dividend = $0.65 * 4 * 73,420,907 * 7.0288 = CNY 1,341,758,264.92; yield = 4.0013%.
+
+7. JSON construction and validation
+- Populated initialized JSON using protocol CLI `set` commands; did not construct the result object by hand.
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status recorded after report creation in terminal output.
+
+8. Known limitations
+- Gross margin is an analytical labor-cost proxy, not a disclosed GAAP subtotal.
+- Sustainable cash profit uses one strong-cycle year and explicit discounts; it is not management guidance.
+- Input historical market-cap snapshot was accepted as supplied and not reconstructed.
+- PBOC period-end FX was applied to both balance-sheet and flow values.

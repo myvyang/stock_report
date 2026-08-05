@@ -1,0 +1,89 @@
+stock-research trace
+company=603181.SH 皇马科技
+period=2025-12-31
+generated_at=2026-08-01T01:47:34+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated initialized fields using repeated protocol `set` commands (invoked through a Python subprocess driver; no result JSON was created from scratch).
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   status=ok, errors=[]
+
+[reuse check]
+- config/input.json existed.
+- No raw filing, annual facts, normalized facts, or prior stock-research result existed under the paths declared in the input.
+- Therefore public disclosure retrieval was required.
+
+[sources]
+- Zhejiang Huangma Technology Co., Ltd. 2025 Annual Report, disclosed 2026-04-22. Full-text mirror used for extraction:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12129420&stockid=603181
+- Shanghai Stock Exchange 2025 annual-report summary, disclosed 2026-04-22, used for cross-check:
+  https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-22/603181_20260422_FLVJ.pdf
+- 2025 annual equity distribution implementation announcement, disclosed 2026-05-30:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12363782&stockid=603181
+- Market cap and PE TTM: config/input.json, Tencent qt.gtimg.cn snapshot at 20260731114327.
+
+[key extracted facts, CNY]
+revenue=2404399560.31
+cost_of_sales=1774358129.53
+gross_profit=630041430.78
+parent_net_profit=436605190.72
+operating_cash_flow=451049467.03
+capital_expenditure=285366813.86
+operating_free_cash_flow=165682653.17
+total_assets=4315645829.78
+total_liabilities=869632462.31
+parent_equity=3446013367.47
+cash_and_bank=525368463.93
+cash_and_cash_equivalents=341998685.41
+term_deposits_and_interest=180485466.89
+restricted_guarantee_deposits=2884311.63
+short_term_wealth_products=110611951.18
+other_noncurrent_financial_assets=30030000.00
+current_portion_noncurrent_debt=38933487.29
+long_term_borrowings=418450854.81
+fixed_assets=1835595035.68
+construction_in_progress=698473850.95
+fixed_asset_depreciation=126853346.34
+cash_dividend_2025=130974300.00
+
+[formula checks]
+gross_profit = revenue - cost_of_sales = 630041430.78
+gross_margin = gross_profit / revenue = 0.26203690982989886
+net_margin = parent_net_profit / revenue = 0.18158595514952947
+operating_free_cash_flow = operating_cash_flow - capital_expenditure = 165682653.17
+
+discounted cash components:
+- excess cash equivalents: (341998685.41 - 150000000.00) * 100% = 191998685.41
+- term deposits: 180485466.89 * 90% = 162436920.20
+- short-term wealth products: 110611951.18 * 90% = 99550756.06
+- other noncurrent financial assets: 30030000.00 * 50% = 15015000.00
+- debt deducted: 38933487.29 + 418450854.81 = 457384342.10
+- discounted detachable net cash = 11617019.57
+
+sustainable cash profit:
+- operating cash flow 451049467.03
+- less estimated maintenance capex 126853346.34 (fixed-asset depreciation proxy)
+- less prudence adjustment 24196120.69
+- discounted sustainable cash profit = 300000000.00
+
+operating_business_price = 7600000000.00 - 11617019.57 = 7588382980.43
+owner_earnback_years = 7588382980.43 / 300000000.00 = 25.2946099348
+market_cap_to_cash_profit = 7600000000.00 / 300000000.00 = 25.3333333333
+forecast_dividend_yield = 130974300.00 / 7600000000.00 = 0.0172334605
+
+[judgment boundaries]
+- Fact: third-factory construction, CNY 698.47m construction in progress, and CNY 418.45m long-term borrowings.
+- Inference: much of 2025 capex is growth capex; the filing does not split maintenance and growth capex.
+- Assumption: CNY 150m operating cash reserve approximates a little over one month of 2025 operating cash outflows.
+- Assumption: fixed-asset depreciation proxies maintenance capex; an extra CNY 24.20m haircut absorbs working-capital and subsidy volatility.
+- Judgment: industry position is credible as a specialized domestic leader, but no uniform third-party market-share figure was found.
+
+[limitations]
+- Official full annual-report PDF was not present locally; full-text extraction used a public mirror of the filed report and the SSE summary for cross-check.
+- Maintenance capex is not officially disclosed.
+- Market quote was accepted from task input and not independently reconstructed.

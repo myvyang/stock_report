@@ -1,0 +1,70 @@
+stock-research trace
+company: FBIZ / First Business Financial Services, Inc.
+period: 2025-12-31 annual
+generated_at: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because local source reuse was evaluated.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked configured raw filing, annual review, normalized facts, and prior stock research paths.
+- No FBIZ filing metadata, annual facts, normalized facts, or prior research result existed locally.
+- Therefore retrieved the primary SEC filing and SEC Companyfacts data.
+
+3. Primary sources used
+- SEC Form 10-K for year ended 2025-12-31, filed 2026-02-25.
+  Accession: 0001193125-26-071523
+  URL: https://www.sec.gov/Archives/edgar/data/1521951/000119312526071523/fbiz-20251231.htm
+- SEC Companyfacts API, CIK 0001521951.
+  URL: https://data.sec.gov/api/xbrl/companyfacts/CIK0001521951.json
+- First Business Bank Q4/FY 2025 earnings release, dated 2026-01-29.
+  URL: https://www.businesswire.com/news/home/20260129063241/en/First-Business-Bank-Announces-Fourth-Quarter-2025-Financial-Results-and-17-Cash-Dividend-Increase
+- First Business Bank Q1 2026 earnings release filed with SEC, dated 2026-04-23.
+  URL: https://www.sec.gov/Archives/edgar/data/1521951/000119312526173671/fbiz-ex99_1.htm
+- Federal Reserve H.10, release dated 2025-12-29; last available rate in that week used: CNY 7.0063 per USD.
+  URL: https://www.federalreserve.gov/releases/h10/20251229/
+- Market cap and PE TTM were supplied in config/input.json, source Yahoo Finance yfinance, dated 2026-08-03.
+
+4. Model determination
+- Input hint ordinary_operating/applicable was rejected after filing review.
+- 10-K identifies FBFS as a registered bank holding company conducting commercial banking through First Business Bank.
+- At 2025-12-31, deposits were USD 3.380bn and net loans/leases were USD 3.337bn against USD 4.082bn assets.
+- Selected model: financial_bank.
+- Owner earnback applicability: not_applicable.
+- All ordinary discounted net cash, cash profit, operating business price, and payback metrics remain null.
+
+5. Key extracted USD facts
+- Total assets 4,081,887,000; liabilities 3,710,302,000; equity 371,585,000.
+- Net loans and leases 3,337,364,000; gross loans and leases 3,375,000,000; deposits 3,380,415,000.
+- Net interest income 136,690,000; non-interest income 31,937,000; top-line revenue 168,627,000.
+- Net income 50,319,000; net income available to common shareholders 49,444,000.
+- NIM 3.64%; ROAA 1.24%; ROATCE 15.25%; efficiency ratio 58.78%.
+- NPAs 43,900,000 / assets 1.07%; ACL / loans 1.12%; ACL / nonperforming loans 85.95%.
+- CRE loans 2,060,000,000 / loans 61.0%.
+- Consolidated CET1 ratio 9.48%; total capital ratio 12.24%.
+- Common dividends paid: 2025 9,686,000; 2024 8,320,000; 2023 7,578,000.
+
+6. Currency and derived values
+- Contract requires absolute CNY amounts. All USD filing amounts converted at 7.0063 CNY/USD.
+- Revenue is defined for this bank as net interest income plus non-interest income.
+- Net margin shown as common-shareholder income / top-line revenue = 49.444 / 168.627 = 29.3215%; gross margin is null because it lacks comparable banking meaning.
+- Forecast dividend: USD 0.34 quarterly * 4 * 8,362,166 shares = USD 11,372,545.76; converted CNY 79,679,467.36.
+- Forecast yield: CNY 79,679,467.36 / CNY 3,961,802,493.81 = 2.0112%.
+- 2026 share count comes from the Q1 2026 10-Q cover as of 2026-04-20.
+
+7. Structured result construction
+- Used protocol set commands for scalar fields, arrays, and objects after protocol initialization.
+- Did not construct result.json from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].
+
+8. Limitations
+- Period flows were translated at the same near-year-end exchange rate as balance sheet values rather than an annual average rate.
+- Input Yahoo Finance market cap and PE were not independently rebuilt from exchange price and share count.
+- Dividend forecast annualizes the latest declared quarterly rate; future board declarations remain discretionary and regulatorily constrained.
+- Bank operating cash flow and capex fields are null because ordinary free-cash-flow interpretation is not economically comparable.

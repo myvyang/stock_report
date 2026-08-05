@@ -1,0 +1,55 @@
+stock-research trace — 00618.HK
+generated: 2026-08-03T12:44:15+08:00
+
+1. Read contracts
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+   - config/input.json exists.
+   - No raw filing, annual facts, normalized facts, or prior stock-research files existed for 00618.HK/2025-12-31.
+   - Public official filing retrieval was therefore required.
+
+3. Official-source retrieval
+   - HKEX issuer title-search page confirmed company identity and filings.
+   - Latest complete annual filing: 2025/26 Annual Report, released 2026-07-24.
+   - URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0724/2026072400422.pdf
+   - Annual results announcement: released 2026-06-30.
+   - URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0630/2026063003283.pdf
+   - PDF downloaded to temporary workspace and text-extracted for review; no permanent raw-filing package was created because the requested deliverables are outputs/* only.
+
+4. Period handling
+   - Input period: 2025-12-31.
+   - Issuer statutory year end: 31 March.
+   - Financial facts used: year ended 2026-03-31, the latest complete annual report available at task creation.
+   - outputs/result.json retains the initialized input period and records the mismatch under data_quality.limitations.
+
+5. Model verification
+   - Input hint financial_brokerage rejected.
+   - Evidence: revenue segments are medical/pharmaceutical retail, e-commerce/distribution, property development, and property investment/management. A Type 9 licensed subsidiary exists, but the consolidated group is not a brokerage.
+   - Selected model: platform_financial_mixed; owner_earnback_applicability: requires_special_model.
+   - Reason: 2026 earnings and balance-sheet contraction were dominated by deconsolidation/disposal of property projects; remaining assets include completed properties, investment properties, large other receivables, and special-opportunity investments.
+
+6. Key extracted facts (RMB)
+   - Revenue 1,551,533,000; cost of sales 1,436,395,000; gross profit 115,138,000.
+   - Profit before tax 1,643,839,000; net profit 1,645,010,000; parent net profit 1,783,484,000.
+   - Gain on disposal of subsidiaries 2,265,688,000.
+   - Total assets 3,849,363,000; liabilities 2,074,168,000; equity 1,775,195,000.
+   - Parent equity 589,683,000; NCI 1,185,512,000.
+   - Operating cash flow 215,406,000; capex 22,145,000; derived operating FCF 193,261,000.
+   - No company dividend declared/paid; no final dividend recommended.
+   - Formula checks: gross margin = 115,138,000 / 1,551,533,000 = 0.0742075856; parent net margin = 1,783,484,000 / 1,551,533,000 = 1.1495037418; NCI ratio = 1,185,512,000 / 1,775,195,000 = 0.6678178961.
+
+7. Protocol operations
+   - Initialized outputs/result.json with:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Populated fields with repeated protocol set commands.
+   - Ordinary owner-earnback ranking fields retained as null, as required for a special model.
+   - Final validation command:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+8. Data-quality judgment
+   - status=complete because identity, valuation snapshot, verified model, special-model minimum financials, dividend forecast, asset/liability explanations, business story, and evidence are present.
+   - Limitations retained for fiscal-period mismatch, un-recomputed market snapshot, and insufficient project-level liquidation/receivable detail.

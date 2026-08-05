@@ -1,0 +1,56 @@
+stock-research trace
+company=300972.SZ 万辰集团
+period=2025-12-31 annual
+created_at_input=2026-07-31T22:58:22+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields only through protocol CLI set operations.
+
+[reuse audit]
+- Expected annual facts, normalized facts, raw filing metadata and prior stock-research outputs were absent under the paths specified by config/input.json.
+- No prior conclusion was reused.
+- Public filing retrieval was therefore required.
+
+[sources]
+- 福建万辰食品集团股份有限公司2025年年度报告全文, disclosed 2026-03-18; audited by Zhongshen Zhonghuan with an unmodified opinion. Accessible filing copy: https://pdf.dfcfw.com/pdf/H2_AN202603171820603741_1.pdf
+- 万辰集团2025年度财务决算报告, primary company disclosure mirrored at: https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12000589
+- 2025年度利润分配预案 and 2025年度权益分派 implementation information: total cash dividend CNY 162,599,377.25; original CNY 8.50 per 10 shares and actual CNY 8.372088 per 10 shares after share-count change.
+- Market cap CNY 42,855,000,000, PE TTM 24.36, timestamp 20260731114327, source Tencent qt.gtimg.cn: supplied in config/input.json and not independently recomputed.
+
+[model check]
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Basis: operating revenue arises from snack retail/wholesale/franchise services and edible-fungi production. Deposits, insurance reserves, regulated presale funds, concession rights or comparable special-model balances are absent.
+- Expansion working capital, subsidiary cash and minority interests require discounts; they do not make the normal model inapplicable.
+
+[derived figures]
+- gross_profit = 51,459,148,553.51 - 45,077,627,129.59 = 6,381,521,423.92
+- gross_margin = 6,381,521,423.92 / 51,459,148,553.51 = 0.1240114072
+- net_margin = 1,344,598,814.55 / 51,459,148,553.51 = 0.0261294416
+- operating_free_cash_flow = 3,631,481,203.78 - 77,439,316.17 = 3,554,041,887.61
+- financing debt deducted = short-term borrowings 636,573,867.94 + current non-current liabilities 295,244,782.82 + long-term borrowings 974,324,200.00 = 1,906,142,850.76
+- discounted detachable net cash = cash equivalents 4,648,997,667.04 * 90% - financing debt 1,906,142,850.76 = 2,277,955,049.576
+- discounted sustainable cash profit = recurring parent net profit 1,276,923,835.29 * 80% = 1,021,539,068.232
+- operating business price = 42,855,000,000 - 2,277,955,049.576 = 40,577,044,950.424
+- owner earnback years = 40,577,044,950.424 / 1,021,539,068.232 = 39.7214812554
+- market cap / cash profit = 42,855,000,000 / 1,021,539,068.232 = 41.9514058079
+- forecast dividend yield = 162,599,377.25 / 42,855,000,000 = 0.00379417518
+
+[judgment flags]
+- 90% cash-equivalent recognition is an analyst haircut for ongoing working capital, subsidiary transferability and minority-owner constraints.
+- 80% recognition of recurring parent profit is an analyst sustainability haircut because 2025 was a high-growth year and reported cash flow included working-capital tailwinds.
+- Consolidated free cash flow was deliberately not used as sustainable shareholder cash profit because it is not attributable by ownership and includes a large increase in payables.
+
+[quality]
+- Intended result status: complete.
+- Limitations are recorded in outputs/result.json and report.md.
+- Final protocol validation is executed after file creation; its output/status is appended below if needed.
+
+[validation]
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[]
+- JSON syntax check: passed (python3 -m json.tool).
+- Cross-file checks: core financial, valuation, dividend and earnback figures agree across result.json, report.md and trace.txt.

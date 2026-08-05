@@ -1,0 +1,101 @@
+stock-research trace
+task_created_at=2026-08-03T13:56:07+08:00
+input=config/input.json
+requested_period=2025-12-31
+requested_report_type=annual
+
+[protocol]
+initialized=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+mutation_method=protocol set/append commands; result.json was not handwritten from scratch
+
+[local_reuse]
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+prior_stock_research=missing
+decision=fetch official filing because no reusable annual facts existed
+
+[source_1]
+type=official annual filing
+issuer=Damai Entertainment Holdings Limited
+title=2025/26 Annual Report
+fiscal_year_end=2026-03-31
+published=2026-07-21 16:31 HKT
+url=https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0721/2026072100294.pdf
+used_for=business model, segments, income statement, balance sheet, cash flow, notes, dividends, commitments, ownership
+
+[source_2]
+type=market snapshot supplied by input
+provider=Tencent qt.gtimg.cn
+as_of=2026/07/31 16:08:42
+market_cap_cny=13410279042.86921
+pe_ttm=19.52
+limitation=not independently rebuilt from shares outstanding and FX
+
+[period_resolution]
+finding=2025-12-31 is not the issuer's statutory year-end; issuer closes on March 31
+decision=use latest complete audited annual report available as of task creation, FY ended 2026-03-31
+result_analysis_period=2026-03-31
+reason=do not label six-month interim figures as annual
+
+[model_resolution]
+input_hint=financial_brokerage/requires_special_model
+verified_model=ordinary_operating/applicable
+reason=annual report identifies four operating segments: live entertainment content and technology, IP merchandizing, film content and technology, drama series production; no brokerage client funds, proprietary securities book or repo funding model
+
+[key_extractions_cny]
+revenue=8024447000
+cost_of_sales=5259221000
+gross_profit=2765226000
+operating_profit=738190000
+net_profit=692188000
+parent_net_profit=705193000
+total_assets=25879937000
+total_liabilities=8795061000
+total_equity=17084876000
+parent_equity=16832410000
+minority_interest=252466000
+operating_cash_flow=2649968000
+capex_ppe_and_investment_property=161576000
+capex_intangible=1834000
+capital_expenditure_total=163410000
+operating_free_cash_flow=2486558000
+
+[cash_discount]
+cash_equivalents=3573632000 rate=1.00 discounted=3573632000
+term_deposits=5536804000 rate=0.95 discounted=5259963800
+structured_deposits=1728011000 rate=0.80 discounted=1382408800
+lease_liabilities=-278335000 rate=1.00 discounted=-278335000
+film_partner_investment_liabilities=-264101000 rate=1.00 discounted=-264101000
+discounted_detachable_net_cash=9673568600
+excluded=restricted cash, equity-method investments, other FVTPL assets, receivables, film/TV rights, inventories
+
+[cash_profit]
+parent_net_profit_start=705193000
+normalized_finance_and_investment_adjustment=-300000000
+content_working_capital_maintenance_buffer=-5193000
+discounted_sustainable_cash_profit=400000000
+warning=FY2026 OCF includes working-capital releases/inflows: payables +1483721000, contract liabilities +634001000, film/TV rights +483473000; reported FCF is not treated as sustainable distributable cash
+
+[formula_check]
+gross_margin=2765226000/8024447000=0.3446001948794727
+net_margin=705193000/8024447000=0.08788057295412381
+operating_business_price=13410279042.86921-9673568600=3736710442.8692093
+owner_earnback_years=3736710442.8692093/400000000=9.341776107173024
+market_cap_to_cash_profit=13410279042.86921/400000000=33.52569760717302
+forecast_dividend=0
+forecast_dividend_yield=0
+
+[dividend]
+FY2026=0; board did not recommend dividend
+FY2025=0
+company_distributable_reserves_at_2026-03-31=0
+
+[quality]
+status=complete
+limitations=period corrected to statutory FY; valuation uses supplied quote snapshot; owner-earnback discounts and sustainable cash profit are analyst estimates; contracted commitments at FY end were RMB870780000
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

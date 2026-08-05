@@ -1,0 +1,73 @@
+stock-research trace
+company=AEG | Aegon Ltd. New York Registry Shares
+period=2025-12-31
+generated_for_input=2026-08-04T10:42:54+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the skill identified it as the reuse boundary.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields using protocol set commands; complex JSON was not handwritten as a result file.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse-check]
+The input-referenced annual facts, normalized facts, raw filing metadata, and prior stock-research outputs were absent from /workspace. No reusable annual fact package was available, so primary public disclosures were consulted.
+
+[primary-sources]
+- Aegon Ltd. Annual Report on Form 20-F 2025, filed 2026-03-26:
+  https://www.sec.gov/Archives/edgar/data/769218/000119312526124987/d29563d20f.htm
+  Used for company identity, business segments, consolidated statements, operating result, free cash flow, capital ratios, dividends, risks, and strategic transition.
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/control/000119312526124987/0001193125-26-124987-index.htm
+- Aegon publication notice for Integrated Annual Report 2025:
+  https://wwwedit-va-nl.aegon.com/newsroom/news/press-releases/2026/aegon-publishes-integrated-annual-report-2025
+- ECB Euro Foreign Exchange Reference Rates, 2025-12-31:
+  https://www.ecb.europa.eu/stats/exchange/eurofxref/shared/pdf/2025/12/20251231.pdf
+  EUR/CNY=8.2262.
+- Market cap and PE TTM: config/input.json, source labeled Yahoo Finance yfinance, date 2026-08-03.
+
+[model-decision]
+Input hint ordinary_operating/applicable was overridden.
+Confirmed statement_model=financial_insurance and owner_earnback_applicability=requires_special_model.
+Reason: Aegon's insurance and investment assets are matched against insurance and investment-contract liabilities and are integral to underwriting, retirement, and savings operations. Consolidated cash is also subject to regulated-entity capital and remittance constraints. Ordinary detachable-net-cash and cash-profit payback calculations would be economically misleading.
+
+[conversion]
+All EUR financial-statement amounts were multiplied by 8.2262 and by 1,000,000 because the filing reports EUR millions. The same year-end rate was used for stock and flow figures for consistent website presentation. This is a research display conversion, not an IFRS translation method.
+
+[key-extractions-eur-million]
+total_assets=317233
+total_liabilities=307738
+group_equity=9495
+parent_equity=9410
+non_controlling_interests=85
+insurance_revenue=9097
+net_result=980
+parent_net_result=977
+cash_and_cash_equivalents=2733
+investments=285141
+reinsurance_contract_assets=17153
+joint_ventures_and_associates=4204
+insurance_contract_liabilities=176067
+investment_contract_liabilities=119095
+financing_liabilities=3542
+insurance_service_result=511
+operating_result=1702
+company_defined_free_cash_flow=829
+cash_dividends_to_shareholders=596
+share_buybacks=512
+group_solvency_ratio=184%
+US_RBC_ratio=424%
+2025_dividend_per_common_share=EUR0.40
+
+[judgment-notes]
+- revenue is populated with IFRS insurance revenue for schema consumption; gross profit, gross margin, and net margin remain null because ordinary-company margin formulas are not economically comparable for an insurer.
+- operating cash flow, capex, and operating free cash flow remain null in structured ordinary-company fields. The consolidated cash-flow statement reports EUR434m operating cash inflow, but policyholder flows and investment transactions make ordinary FCF interpretation misleading. Aegon's own EUR829m free-cash-flow KPI is discussed in the report and evidence.
+- forecast dividend assumes the 2025 EUR0.40/share level is maintained and uses disclosed EUR596m annual cash dividend as the aggregate proxy. It excludes buybacks and is conditional on capital generation and regulatory buffers.
+- market cap and PE were accepted from task input. ADR/common-share mapping was not independently reconstructed.
+
+[final-validation]
+status=ok
+errors=[]

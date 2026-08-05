@@ -1,0 +1,71 @@
+stock-research trace
+company: 00062.HK / Transport International Holdings Limited / 载通国际控股有限公司
+period: 2025-12-31 annual
+generated_for_input: 2026-08-03T15:32:22+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the skill routes reuse decisions through it.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields only through protocol set/append commands.
+6. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[local reuse check]
+- config/input.json exists.
+- No raw filing, annual facts, normalized facts, or prior stock-research result existed under the supplied 00062.HK/2025-12-31 paths.
+- Therefore returned to the original annual report.
+
+[primary filing]
+- Document: Transport International Holdings Limited 2025 Annual Report
+- HKEX URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0416/2026041600708.pdf
+- HKEX release: 2026-04-16
+- Local temporary copy used for extraction: /tmp/stockresearch-00062/annual-report-2025.pdf
+- Pages used (printed page numbers):
+  - p.8: financial and operational highlights
+  - pp.106-111: financial review, segments, capex, liquidity and loans
+  - pp.186-193: consolidated profit or loss, financial position and cash flow
+  - p.194 onward: notes; revenue, segment reporting and asset details
+
+[model override]
+- Input hint: financial_brokerage / requires_special_model.
+- Filing fact: principal activities are franchised and non-franchised public transportation plus property holdings/development; franchised bus external revenue was HKD8,053.325m, about 95% of consolidated revenue.
+- Override: utility_concession / requires_special_model.
+- Rationale: regulated fare/service franchise, operating fleet and recurring replacement capex make cash and debt part of the operating system. Ordinary detachable-net-cash earnback fields remain null.
+
+[currency conversion]
+- Result contract requires absolute CNY yuan.
+- Conversion used for 2025 financial statements: 1 HKD = 0.8988 CNY at 2025-12-31.
+- Public cross-check: 1 CNY = 1.1126 HKD on 2025-12-31.
+- URL: https://www.china.org.cn/china/Off_the_Wire/2025-12/31/content_118255014.shtml
+- Limitation: income and cash-flow lines use the year-end rate rather than a yearly average rate.
+
+[key extraction and calculations]
+- Revenue: HKD8,442.725m x 0.8988 = CNY7,588,321,230.
+- Operating profit: HKD687.578m x 0.8988 = CNY617,995,106.4.
+- Parent net profit: HKD398.022m x 0.8988 = CNY357,742,173.6.
+- Reported net margin: 398.022 / 8,442.725 = 0.0471437836.
+- Total assets: HKD23,459.904m x 0.8988 = CNY21,085,761,715.2.
+- Total liabilities: HKD6,286.696m x 0.8988 = CNY5,650,482,364.8.
+- Parent equity: HKD17,173.208m x 0.8988 = CNY15,435,279,350.4.
+- Net operating cash flow: HKD1,646.278m x 0.8988 = CNY1,479,674,666.4.
+- Cash capex definition: PP&E HKD530.450m + investment property under development HKD85.881m + intangible assets HKD44.794m = HKD661.125m = CNY594,219,150.
+- Single-year operating FCF: HKD1,646.278m - HKD661.125m = HKD985.153m = CNY885,455,516.4.
+- 2025 dividend baseline: HKD0.80/share x 534.540m shares = HKD427.632m = CNY384,355,641.6.
+- Forecast dividend yield: CNY384,355,641.6 / input market cap CNY4,379,279,745.816588 = 0.0877668621.
+- Net borrowings: HKD1,591m x 0.8988 = CNY1,429,990,800.
+- Special-model diagnostic EV: input market cap + net borrowings = CNY5,809,270,545.82.
+- Underlying EBITDA: HKD1,879.8m x 0.8988 = CNY1,689,564,240.
+- Diagnostic EV/underlying EBITDA: 3.4383x. Not placed in ordinary earnback sorting fields.
+
+[accounting choices]
+- Gross profit and gross margin remain null because the annual report presents operating costs by nature and does not disclose a defensible cost-of-sales subtotal.
+- Minority interest set to zero because consolidated net assets equal equity attributable to equity shareholders and profit is attributable to those shareholders.
+- Dividend forecast is a flat 2025 ordinary-dividend scenario, not management guidance.
+
+[market data limitation]
+- Input: market cap amount 4,379,279,745.816588; date 2026/07/31 16:08:41; source Tencent qt.gtimg.cn; PE TTM 12.79.
+- Input does not specify currency. Per initialized result protocol, amount was treated as CNY. If source amount was actually HKD, yield and EV diagnostic require retranslation at the market-date FX rate.

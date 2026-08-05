@@ -1,0 +1,67 @@
+Stock research trace — SLF — period 2025-12-31
+Generated for input created_at: 2026-08-05T03:31:32+08:00
+
+1. Protocol and model
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Overrode input analysis_model_hint after financial-statement review:
+  statement_model=financial_insurance; owner_earnback_applicability=not_applicable.
+- Reason: invested assets, insurance liabilities, investment-contract liabilities, and segregated-fund balances are operating structures of an insurer, not detachable cash/debt items.
+
+2. Reuse and source acquisition
+- No existing SLF annual facts, normalized facts, or stock-research result was present under the configured stock_report paths.
+- Downloaded official Sun Life 2025 Annual Report PDF to:
+  stock_report/data/raw/filings/SLF/2025-12-31/annual-report-2025-e.pdf
+- Core official sources:
+  https://www.sunlife.com/content/dam/sunlife/regional/global-marketing/documents/com/annual-report-2025-e.pdf
+  https://www.sunlife.com/content/dam/sunlife/regional/global-marketing/documents/com/consolidated-financial-statements-notes-2025-e.pdf
+  https://www.sunlife.com/en/newsroom/news-releases/announcement/sun-life-reports-fourth-quarter-and-full-year-2025-results/124057/
+  https://www.sunlife.com/en/investors/shareholder-services/dividend-information/
+  https://www.sunlife.com/en/investors/shareholder-services/dividend-history/sun-life-financial-common-share/
+  https://www.bankofcanada.ca/rates/exchange/annual-average-exchange-rates/
+- Market cap and PE were reused unchanged from config/input.json, source Yahoo Finance yfinance, dated 2026-08-03.
+
+3. Currency conversion
+- All result.json amounts are absolute CNY yuan as required by the protocol.
+- 2025 income statement, cash flow, and dividends: Bank of Canada 2025 annual average CNY/CAD=0.1944; therefore CAD/CNY=5.1440329218.
+- 2025-12-31 balance sheet: CNY/CAD approximately 0.1960; therefore CAD/CNY=5.1020408163.
+- Original CAD amounts remain visible in report.md to preserve auditability.
+
+4. Key extracted facts (CAD millions unless stated)
+- Total assets 398,455; total liabilities 372,963; total equity 25,492; total shareholders' equity 24,532.
+- Cash, cash equivalents and short-term securities 14,841.
+- Invested assets 199,175; segregated-fund investments 166,566.
+- Insurance contract liabilities 176,018 including segregated fund; investment contract liabilities 158,254 including segregated fund.
+- Insurance revenue 23,982; net insurance service result 3,474; fee income 9,059.
+- Total net income 3,782; common shareholders' net income 3,472.
+- Underlying net income 4,201; underlying ROE 18.2%; reported ROE 15.1%.
+- Operating cash flow 2,799; net property/equipment purchases 145. These are recorded but not used as ordinary free cash flow due to insurer cash-flow classification.
+- AUM CAD 1.605 trillion; new business CSM 1,727; after-tax CSM 11,300.
+- SLF Inc. LICAT 157%; Sun Life Assurance LICAT 140%; financial leverage 23.5%.
+- 2025 dividend per share CAD 3.52; underlying payout ratio 47%.
+- Latest declared quarterly common dividend as of market date CAD 0.96.
+
+5. Derived values and assumptions
+- Forecast dividend: CAD 0.96 x 4 x 553.8m year-end shares = CAD 2,126.592m; converted to CNY 10,939,259,259.26.
+- Forecast dividend yield: CNY 10,939,259,259.26 / CNY 310,267,409,871.73 = 3.5256%.
+- The forecast is a flat annualization of the latest declared quarter, not company guidance.
+- Total revenue C$41.9bn is the sum of four quarterly total-revenue figures in the annual MD&A financial summary. Gross margin and net margin are null because insurer revenue and investment/insurance finance movements are not comparable with ordinary-company sales and cost of sales.
+- Mechanical operating free cash flow is stored as OCF less property/equipment purchases for statement completeness, but explicitly excluded from owner earnback analysis.
+- Parent equity uses total shareholders' equity. Minority interest is the difference between total equity and shareholders' equity, including participating-account equity and NCI.
+
+6. Owner-earnback treatment
+- discounted_net_cash=null
+- discounted_cash_profit=null
+- operating_business_price=null
+- owner_earnback_years=null
+- market_cap_to_cash_profit=null
+- Interpretation: evaluate underwriting/service result, underlying earnings and ROE, CSM/new-business CSM, LICAT, leverage, and dividend coverage instead of ordinary detachable-net-cash/free-cash-flow payback.
+
+7. Validation
+- Populated result.json only through protocol init/set/append commands.
+- Protocol validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial populated result validation: status=ok, errors=[].
+

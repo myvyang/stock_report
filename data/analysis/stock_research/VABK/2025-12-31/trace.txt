@@ -1,0 +1,53 @@
+Stock research trace: VABK / 2025-12-31 annual
+Generated for task timestamp: 2026-08-04 Asia/Shanghai
+
+1. Read instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+   - No existing annual facts package, normalized facts, raw filing, or prior stock-research output was present for VABK/2025-12-31.
+   - Downloaded SEC inline-XBRL 10-K to stock_report/data/raw/filings/VABK/2025-12-31/vabk-20251231.htm.
+   - Downloaded SEC Company Facts temporarily for XBRL cross-checking.
+
+3. Primary sources
+   - SEC Form 10-K, accession 0001193125-26-128416, filed 2026-03-27:
+     https://www.sec.gov/Archives/edgar/data/1572334/000119312526128416/vabk-20251231.htm
+   - VABK 2025 full-year results release, dated 2026-01-29:
+     https://ir.vnb.com/news/news-details/2026/VIRGINIA-NATIONAL-BANKSHARES-CORPORATION-ANNOUNCES-2025-FULL-YEAR-RESULTS-AND-QUARTERLY-DIVIDEND/default.aspx
+   - Federal Reserve H.10 weekly FX release dated 2025-12-29; 2025-12-26 China yuan observation = 7.0063 CNY/USD:
+     https://www.federalreserve.gov/releases/h10/20251229/
+   - Market cap, date, source and PE were taken from config/input.json as supplied by the task.
+
+4. Model decision
+   - Overrode input hint ordinary_operating/applicable.
+   - Confirmed financial_bank/not_applicable because Virginia National Bank is the principal operating subsidiary and deposits, loans, securities and liquidity are the operating model.
+   - Kept all ordinary owner-earnback metrics null per result contract.
+
+5. Currency handling
+   - Result protocol requires absolute CNY yuan.
+   - Converted 2025 fiscal USD amounts at 7.0063 CNY/USD, the latest Federal Reserve H.10 observation available immediately before fiscal year-end.
+   - Retained task-provided market capitalization in CNY without reconversion.
+
+6. Key source facts in USD
+   - Total assets 1,649,742,000; liabilities 1,465,581,000; equity 184,161,000.
+   - Net loans 1,229,307,000; securities 254,164,000; deposits 1,431,731,000.
+   - Net interest income 51,509,000; noninterest income 6,094,000; noninterest expense 33,384,000; net income 19,261,000.
+   - 2025 FTE NIM 3.40%; FTE efficiency ratio 57.6%.
+   - NPA 9,240,000 or 0.56% of assets; ACL 8,270,000 or 0.67% of loans.
+   - Tier 1 leverage ratio 12.52%; total risk-based capital ratio 20.42%.
+   - 2025 dividend 1.41 per share; forecast baseline 1.44 per share from quarterly 0.36 run-rate.
+
+7. Protocol operations
+   - Initialized outputs/result.json with:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Populated fields only through protocol set/append commands.
+   - Initial validation after population: status=ok, errors=[].
+
+8. Judgment boundaries
+   - Revenue, gross margin, operating cash flow, capex and ordinary free cash flow remain null because they are not economically comparable for a bank under the contract.
+   - Forecast dividend is a baseline extrapolation, not a declared full-year amount or guarantee.
+   - The May 2026 insurance-interest sale gain is treated as nonrecurring and excluded from sustainable conclusions.
+   - No buy/sell recommendation or target price was produced.

@@ -1,0 +1,77 @@
+APOG stock research trace
+generated_at: 2026-08-05T02:39:10+08:00
+input: config/input.json
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill defines reuse priority.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked stock_report/data/raw/filings/APOG/2025-12-31, annual_review, normalized facts, and prior stock_research paths.
+- No APOG filing, annual facts package, normalized facts, or prior research output existed in the workspace.
+- Therefore retrieved official public disclosures rather than inventing missing facts.
+
+3. Company and period identification
+- Confirmed issuer is Apogee Enterprises, Inc., Nasdaq ticker APOG, SEC CIK 0000006845; rejected search noise for Apogee Therapeutics (APGE).
+- Input period is the calendar research bucket 2025-12-31. Apogee's fiscal year is non-calendar.
+- Selected FY2025 Form 10-K, fiscal year ended 2025-03-01, filed 2025-04-24, accession 0000006845-25-000049: the annual filing ending in the requested calendar year and publicly available by the requested period.
+- Source URL: https://www.sec.gov/Archives/edgar/data/6845/000000684525000049/apog-20250301.htm
+
+4. Financial extraction
+- Downloaded the SEC inline XBRL filing and SEC companyfacts for CIK 0000006845.
+- Extracted FY2025 USD facts tied to accession 0000006845-25-000049:
+  assets 1,175,269,000; equity 487,898,000; liabilities derived as assets-equity 687,371,000.
+  revenue 1,360,994,000; gross profit 359,893,000; operating income 118,110,000; net income 85,052,000.
+  operating cash flow 125,162,000; capex 35,593,000; operating FCF 89,569,000.
+  financing cash flow +146,049,000; dividends 21,737,000; repurchases 45,364,000.
+  cash 41,448,000; debt 285,000,000; receivables 185,590,000; inventory 92,305,000; PP&E 268,139,000; goodwill 235,775,000; finite-lived intangibles 109,421,000.
+- Confirmed the balance sheet equation after conversion.
+
+5. Business and model review
+- Read Form 10-K business, competition, raw-material, customer concentration, MD&A, segment, backlog, liquidity, acquisition and revenue-recognition disclosures.
+- Confirmed four ordinary operating segments: Architectural Metals, Architectural Services, Architectural Glass, Performance Surfaces.
+- Confirmed approximately 36% of FY2025 revenue came from longer-term fixed-price contracts.
+- Confirmed UW Solutions acquired 2024-11-04 for USD 240.9m; USD 250m term-loan draw funded acquisition/general purposes; ending debt USD 285m.
+- Classified statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+6. Currency translation
+- Required result currency is CNY absolute yuan.
+- Used Federal Reserve FRED DEXCHUS observation 2026-07-31 = 6.7509 CNY per USD, the latest available observation before the 2026-08-03 valuation date when researched.
+- Source: https://fred.stlouisfed.org/series/DEXCHUS
+- Applied 6.7509 consistently to all USD filing and dividend amounts. Ratios are invariant to translation.
+
+7. Owner earnback calculation
+- Detachable net cash = cash 279,811,303.2 CNY - interest-bearing debt 1,924,006,500.0 CNY = -1,644,195,196.8 CNY.
+- No receivables, inventory, PP&E, goodwill, intangibles, contract liabilities, or operating liabilities treated as detachable cash.
+- Reported operating FCF = 844,956,145.8 - 240,284,783.7 = 604,671,362.1 CNY.
+- Sustainable cash profit = operating FCF x 90% = 544,204,225.89 CNY. The 10% haircut covers working-capital, project-estimate, integration, leverage and single-year uncertainty.
+- Did not mechanically add back acquisition, arbitration, restructuring, or impairment items.
+- Operating business price = market cap 5,576,441,943.0234375 - (-1,644,195,196.8) = 7,220,637,139.823438 CNY.
+- Owner earnback years = 7,220,637,139.823438 / 544,204,225.89 = 13.26824893.
+- Market cap / cash profit = 10.24696553.
+
+8. Dividend forecast
+- Company dividend history showed 2025 quarterly dividends of USD 0.26 and the first three 2026 declarations at USD 0.27.
+- Forecast annual dividend = USD 0.27 x 4 x 21,220,737 shares x 6.7509 = 154,719,799.29 CNY.
+- Forecast yield = 154,719,799.29 / 5,576,441,943.0234375 = 0.0277452542.
+- This is an annualization assumption, not a board commitment.
+
+9. Market data
+- Used input market cap 5,576,441,943.0234375 CNY, date 2026-08-03, source Yahoo Finance yfinance.
+- Used input PE TTM 12.413793.
+- Market data was not replaced with a different snapshot.
+
+10. Output construction and validation
+- Populated outputs/result.json only through stock_analysis.stock_research.protocol set after protocol init; did not hand-write the JSON file.
+- Wrote outputs/report.md as the human-readable operating story.
+- Wrote this outputs/trace.txt with sources, transformations, assumptions and formulas.
+- Final protocol validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+Key limitations
+- FY2025 includes only about four months of UW Solutions earnings but the full acquired assets and acquisition debt at year-end; sustainable cash profit is likely conservative if integration succeeds.
+- Treating all cash as detachable is optimistic because normal operations require liquidity; this is disclosed in the cash breakdown.
+- Operating lease liabilities are disclosed separately but not included in interest-bearing net debt; lease expense flows through operating cash flow.

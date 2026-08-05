@@ -1,0 +1,56 @@
+stock-research trace
+company: Haitian International Holdings Limited (01882.HK)
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the skill routes source-reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse check
+- Checked stock_report/data/raw/filings/01882.HK/2025-12-31.
+- Checked stock_report/data/analysis/annual_review/01882.HK/2025-12-31.
+- Checked stock_report/data/normalized/facts/01882.HK/2025-12-31.
+- Checked stock_report/data/analysis/stock_research/01882.HK/2025-12-31.
+- No filing, annual facts, normalized facts, or prior stock-research result existed locally. Public official sources were therefore required.
+
+3. Official sources used
+- HKEX annual results announcement, published 2026-03-16:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0316/2026031602244.pdf
+  Used for audited consolidated income statement, statement of financial position, condensed cash flow, capex, dividends, business identity, revenue mix, receivable terms, FVPL asset nature, liquidity and management discussion.
+- Haitian International Facts & Figures:
+  https://haitianinter.com/facts-figures/
+  Used for approximately 56,800 machines delivered and company-stated industry positioning.
+- Haitian International 2025 results news:
+  https://haitianinter.com/all-en/haitian-international-reports-10-revenue-growth-in-2025/
+  Used as company-site cross-check for revenue, profit and overseas growth.
+- Market data supplied in config/input.json: Tencent qt.gtimg.cn, timestamp 2026/08/03 09:47:27. No replacement quote was used.
+
+4. Model resolution
+- Input hint said financial_brokerage/requires_special_model.
+- Official filing states the group manufactures and distributes plastic injection moulding machines.
+- Balance sheet contains ordinary manufacturing assets and liabilities, not brokerage customer money or repo financing.
+- Overrode hint with ordinary_operating/applicable.
+
+5. Key calculations (CNY yuan)
+- gross_margin = 5,799,113,000 / 17,733,166,000 = 0.3270207362
+- net_margin = 3,301,137,000 / 17,733,166,000 = 0.1861560987
+- operating_free_cash_flow = 3,479,819,000 - 1,148,427,000 = 2,331,392,000
+- sustainable_cash_profit = 2,331,392,000 * 0.90 = 2,098,252,800
+- discounted_detachable_net_cash = cash 3,739,397,000*0.50 + term deposits 2,435,275,000*0.90 + FVPL assets 9,523,946,000*0.70 - bank borrowings 3,172,789,000 - declared dividend 1,126,355,000 = 6,429,064,200
+- operating_business_price = 28,559,207,188.797 - 6,429,064,200 = 22,130,142,988.797
+- owner_earnback_years = 22,130,142,988.797 / 2,098,252,800 = 10.54693838
+- market_cap_to_cash_profit = 28,559,207,188.797 / 2,098,252,800 = 13.61094678
+- forecast_dividend_yield = 1,126,355,000 / 28,559,207,188.797 = 0.0394392951
+
+6. Judgment versus fact
+- Reported balances and financial performance are filing facts.
+- Cash/term-deposit/FVPL discounts, the 10% FCF haircut, and resulting earnback years are analyst assumptions.
+- Dividend forecast assumes the 2025 declared RMB-equivalent amount is maintained; the company has no predetermined payout ratio.
+
+7. Validation
+- Populated result.json using protocol set commands; did not hand-write the JSON object.
+- Protocol validation after population returned: {"status":"ok","errors":[]}.

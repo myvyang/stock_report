@@ -1,0 +1,80 @@
+stock-research trace
+company: 002014.SZ 永新股份
+period: 2025-12-31 annual
+generated_for: 2026-08-01 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read result-contract.md, report-contract.md, and data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated top-level sections with protocol `set` commands; did not construct result.json from scratch.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: {"status":"ok","errors":[]}
+
+[reuse audit]
+- Expected annual facts, normalized facts, raw filing metadata, and historical stock research paths from config/input.json were checked.
+- No 2025 annual facts package, raw filing metadata, or prior stock-research result existed in the workspace.
+- Therefore returned to official public disclosures for core facts.
+
+[primary sources]
+- Shenzhen Stock Exchange annual report PDF:
+  https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-24/9b97f576-a272-4963-9ab5-648be5119b2b.PDF
+  Relevant annual-report pages: business/industry 9-21; consolidated statements 65-73; financial asset, restriction, debt, revenue and dividend notes 139-159.
+- CNINFO annual report summary PDF:
+  https://static.cninfo.com.cn/finalpage/2026-04-24/1225165216.PDF
+  Used to verify the 2025 year-end proposal of CNY 2.70 per 10 shares.
+- Market snapshot: config/input.json; Tencent qt.gtimg.cn; timestamp 20260731114330; market cap CNY 6,670,000,000; PE TTM 15.16.
+
+[model classification]
+- statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- Basis: revenue comes from manufactured flexible-packaging, film and ink products; balance sheet does not contain customer deposits, insurance reserves, regulated presale cash, concession rights, or similar special-model items.
+
+[reported financial facts]
+- total assets 4,328,444,720.43
+- total liabilities 1,804,039,168.22
+- total equity 2,524,405,552.21
+- parent equity 2,476,511,792.85
+- revenue 3,723,366,355.59
+- cost of sales 2,866,861,167.76
+- parent net profit 438,133,521.15
+- deducted-nonrecurring parent profit 408,858,895.52
+- operating cash flow 343,030,281.22
+- capital expenditure 178,253,767.72
+- operating free cash flow 164,776,513.50
+
+[formula checks]
+- gross profit = 3,723,366,355.59 - 2,866,861,167.76 = 856,505,187.83
+- gross margin = 856,505,187.83 / 3,723,366,355.59 = 0.2300351634
+- net margin = 438,133,521.15 / 3,723,366,355.59 = 0.1176713434
+- forecast year-end dividend = 612,491,866 shares * CNY 0.27 = 165,372,803.82
+- forecast dividend yield = 165,372,803.82 / 6,670,000,000 = 0.0247935238
+
+[discounted detachable net cash]
+- restricted cash excluded: 55,334,482.51
+- unrestricted cash: 737,784,630.30 * 95% = 700,895,398.79
+- trading financial assets: 837,483,072.83 * 90% = 753,734,765.55
+- current debt investment: 107,055,342.47 * 90% = 96,349,808.22
+- interest-bearing and lease debt deducted at 100%:
+  805,991,870.27 + 47,606,568.00 + 216,113,402.69 + 3,287,114.60 = 1,072,998,955.56
+- discounted detachable net cash = 477,981,017.00 (rounded)
+
+[sustainable cash profit judgment]
+- Starting reported parent net profit: 438,133,521.15
+- Remove nonrecurring profit: -29,274,625.63 => 408,858,895.52
+- Cash-conversion, working-capital and capital-spending buffer: -128,858,895.52
+- Discounted sustainable distributable cash profit: 280,000,000.00
+- This is an analyst conservative scenario, not management guidance. It reflects 2025 OCF below profit, rising receivables/inventory, capex, and increased prepaid equipment purchases.
+
+[owner earnback]
+- operating business price = 6,670,000,000 - 477,981,017 = 6,192,018,983
+- owner earnback years = 6,192,018,983 / 280,000,000 = 22.11435351
+- market cap / cash profit = 6,670,000,000 / 280,000,000 = 23.82142857
+
+[limitations]
+- Financial products were not penetrated instrument by instrument; a uniform 90% discount was used.
+- Industry position lacks independently verified market share.
+- Market data was reused from the provided snapshot rather than independently refreshed.
+- No trading recommendation or target price was produced.

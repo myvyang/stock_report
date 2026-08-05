@@ -1,0 +1,52 @@
+TRMK stock research trace
+Generated: 2026-08-04 Asia/Shanghai
+Period: 2025-12-31 annual
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because no staged facts package was present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked configured annual-review, normalized-facts, and raw-filing paths.
+- Only config/input.json was present in the workspace; no annual facts or raw filing metadata could be reused.
+- Researched the official SEC filing and issuer-filed earnings exhibit.
+
+3. Primary evidence
+- Trustmark Corporation 2025 Form 10-K, SEC accession 0001193125-26-064009, filed 2026-02-23:
+  https://www.sec.gov/Archives/edgar/data/36146/000119312526064009/trmk-20251231.htm
+- Trustmark Corporation FY2025 results, SEC Exhibit 99.1, filed 2026-01-27:
+  https://www.sec.gov/Archives/edgar/data/36146/000119312526024604/trmk-ex99_1.htm
+- Federal Reserve H.10 daily USD/CNY series; 2025-12-31 observation 7.1875:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Market capitalization and PE TTM reused exactly from config/input.json (Yahoo Finance yfinance snapshot dated 2026-08-03).
+
+4. Model decision
+- Overrode input hint ordinary_operating/applicable.
+- Confirmed financial_bank/requires_special_model because Trustmark is a bank holding company and Trustmark Bank represents about 99.99% of consolidated assets.
+- Kept all ordinary owner-earnback fields null. Deposits, loans, securities and operating liquidity are integral to banking and cannot be converted into detachable net cash.
+
+5. Currency and calculations
+- Contract requires CNY absolute yuan. Converted USD financial statement amounts at 7.1875 CNY/USD.
+- Total assets: USD 18,925,211,000 * 7.1875 = CNY 136,024,954,062.50.
+- Total liabilities: USD 16,803,534,000 * 7.1875 = CNY 120,775,400,625.00.
+- Equity: USD 2,121,677,000 * 7.1875 = CNY 15,249,553,437.50.
+- Net income: USD 224,135,000 * 7.1875 = CNY 1,610,970,312.50.
+- Bank revenue display proxy: (net interest income USD 636,138,000 + noninterest income USD 163,640,000) * 7.1875 = CNY 5,753,676,875.00.
+- Forecast dividend: 58,849,788 shares * USD 1.00 * 7.1875 = CNY 422,982,851.25.
+- Forecast dividend yield: CNY 422,982,851.25 / CNY 18,643,434,398.828613 = 0.0226880328.
+- Market cap / year-end book equity = approximately 1.22x. This is discussed in report only and not introduced as a non-contract ranking field.
+
+6. Interpretation choices
+- Gross margin, operating cash flow, capex and ordinary free cash flow kept null because they lack comparable economic meaning for a deposit-taking bank.
+- 2024 net income comparison flagged as distorted by the completed insurance sale and discontinued operations.
+- Dividend forecast includes the announced USD 1.00 annualized regular dividend only. The discretionary USD 100 million 2026 repurchase authorization is excluded.
+- Key bank metrics used: NIM 3.80%, ROA 1.21%, ROTE 12.97%, NPA/loans 0.65%, ACL/loans 1.15%, CET1 11.72%, total risk-based capital 14.41%.
+
+7. Output construction and validation
+- Populated outputs/result.json through repeated protocol CLI set operations; did not hand-write the complex JSON structure.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation result: status ok, errors [].

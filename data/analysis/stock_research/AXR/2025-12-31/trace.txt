@@ -1,0 +1,68 @@
+stock-research trace
+company: AMREP Corporation (NYSE: AXR; CIK 0000006207)
+input period: 2025-12-31
+generated for task date: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because no local annual facts package was present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse decision
+- No AXR raw filing, annual review, normalized facts, or prior stock-research result existed in the workspace at task start.
+- Downloaded primary filings and SEC companyfacts into stock_report/data/raw/filings/AXR/2025-12-31/.
+- Primary annual source: FY2025 10-K, period ended 2025-04-30, filed 2025-07-25, accession 0001410578-25-001515.
+- Latest filing available by the input cutoff: FY2026 Q2 10-Q, period ended 2025-10-31, filed 2025-12-12, accession 0001104659-25-120644.
+
+3. Period handling
+- AMREP fiscal year ends April 30, so input period 2025-12-31 is not an annual reporting date for this issuer.
+- Used audited FY2025 figures as annual core financials and the 2025-10-31 10-Q only as a subsequent operating/balance-sheet update.
+- Did not combine annual and interim flows into a fabricated calendar-year statement.
+
+4. Model classification
+- Input hint: ordinary_operating / applicable.
+- Filing evidence: business is land development and homebuilding; balance sheet is unclassified because the real-estate operating cycle exceeds one year; cash, real-estate inventory, project development, and delivery are economically linked.
+- Final model: real_estate_developer / requires_special_model.
+- Consequence: all ordinary owner-earnback sorting numbers remain null. No detachable cash, sustainable cash profit, operating business price, or payback year was fabricated.
+
+5. Financial extraction (USD, FY2025)
+- Revenue 49,694,000.
+- Direct cost of sales 30,309,000 = land 12,361,000 + home 16,812,000 + other 1,136,000.
+- Gross profit 19,385,000; gross margin 39.0087334487%.
+- Operating profit 12,107,000.
+- Parent/net income 12,716,000; net margin 25.5886022457%.
+- Operating cash flow 10,242,000.
+- Property/equipment capex 583,000.
+- Protocol operating free cash flow 9,659,000.
+- Financing cash flow -9,000; dividend and buyback cash out 0.
+- Total assets 133,776,000; liabilities 3,815,000; parent equity 129,961,000; NCI 0.
+
+6. Currency conversion
+- Protocol requires CNY absolute yuan.
+- Applied 1 USD = 7.0358 CNY, the PBOC/CFETS central parity announced 2025-12-26.
+- All financial statement and asset-analysis amounts in result.json are USD facts multiplied by 7.0358.
+- Ratios were calculated from the original USD figures and are FX invariant.
+
+7. Interim cross-check (USD, six months/at 2025-10-31)
+- Revenue 27,250,000 versus 30,997,000 prior year.
+- Land revenue 8,319,000 versus 15,206,000; home revenue 17,296,000 versus 14,326,000.
+- Net income 5,892,000 versus 8,106,000.
+- Operating cash flow 5,273,000 versus 10,509,000.
+- Cash 44,620,000; real-estate inventory 68,584,000; investment assets 16,362,000; total liabilities 4,105,000.
+
+8. Dividend and valuation
+- Forecast dividend set to zero because 10-K says no cash dividends since FY2008 and current cash-flow statements show none.
+- Market cap CNY 831,979,994.2243423, date 2026-08-03, PE TTM 9.643153, source Yahoo Finance yfinance: directly reused from input and not independently recalculated.
+
+9. Data-quality judgment
+- Status complete under the special-model minimum fields.
+- Principal limitation: project-level expected selling prices, remaining development costs, restrictions, liquidation taxes, and realization timing are unavailable; therefore special-model net liquidation value is not quantified.
+- Report and result explicitly distinguish annual core figures from the interim update.
+
+10. Validation
+- Populated result.json only through protocol set/append commands after protocol initialization.
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation result: status ok, errors [].

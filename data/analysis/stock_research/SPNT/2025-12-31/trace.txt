@@ -1,0 +1,60 @@
+stock-research trace
+task: SPNT annual research, period 2025-12-31
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Initialized protocol result
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse audit
+   - Input-referenced annual facts, normalized facts, raw filing metadata, and research outputs were absent under /workspace/stock_report.
+   - Matching files were also absent under /root/aicode/stock_report.
+   - Rebuilt core facts from primary public sources rather than fabricating missing local facts.
+
+4. Primary sources
+   - SEC Form 10-K, accession 0001576018-26-000032, filed 2026-02-24:
+     https://www.sec.gov/Archives/edgar/data/1576018/000157601826000032/spnt-20251231.htm
+   - SEC company facts API, CIK 0001576018, used to cross-check tagged statement facts:
+     https://data.sec.gov/api/xbrl/companyfacts/CIK0001576018.json
+   - SiriusPoint FY2025 results release, dated 2026-02-18:
+     https://investors.siriuspt.com/press-releases/news-details/2026/SiriusPoint-Reports-Fourth-Quarter-2025-Net-Income-of-240m-Return-on-Equity-of-44-9-and-Operating-Return-on-Equity-of-17-1/default.aspx
+   - SAFE 2025-12-31 exchange-rate index; USD/CNY midpoint 7.0288:
+     https://www.safe.gov.cn/safe/2025/1231/26980.html
+   - Market cap and PE: config/input.json, Yahoo Finance yfinance snapshot dated 2026-08-03.
+
+5. Model decision
+   - Input hint ordinary_operating/applicable rejected.
+   - Confirmed financial_insurance/requires_special_model because SiriusPoint writes insurance and reinsurance and holds investments against claims reserves, unearned premiums, collateral, rating, and regulatory-capital requirements.
+   - Ordinary discounted net cash, cash profit, operating business price, owner earnback years, and market-cap/cash-profit metrics retained as null.
+
+6. Currency method
+   - All USD financial-statement amounts multiplied by 7.0288 and stored as absolute CNY yuan.
+   - Ratios retained as decimals.
+   - Market cap retained exactly from input because it was already supplied in CNY.
+
+7. Key cross-checks
+   - Assets USD 12.5696bn x 7.0288 = CNY 88,349,204,480.
+   - Liabilities USD 10.0987bn x 7.0288 = CNY 70,981,742,560.
+   - Equity USD 2.4709bn x 7.0288 = CNY 17,367,461,920.
+   - Assets - liabilities = equity: CNY 17,367,461,920.
+   - Revenue USD 3.2051bn x 7.0288 = CNY 22,528,006,880.
+   - Parent net income USD 459.6m x 7.0288 = CNY 3,230,436,480.
+   - Net margin = 459.6 / 3,205.1 = 0.1433964619.
+   - Ordinary common dividends 2023/2024/2025 = zero; forecast cash dividend and yield set to zero.
+   - Common repurchases USD 490.8m plus preferred dividends USD 16.0m = USD 506.8m; translated CNY 3,562,195,840.
+
+8. Protocol population
+   - Used protocol set/append commands for all result sections; did not construct result.json from scratch.
+
+9. Validation
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: status ok, errors []
+
+10. Known limitations
+   - Filing date, market-cap date, and post-balance-sheet capital actions differ.
+   - USD statement translation uses one period-end midpoint for protocol comparability, not transaction-date rates.
+   - Gross margin, capex, and ordinary free cash flow are null because they do not have comparable meaning for this insurance model.

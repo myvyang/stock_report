@@ -1,0 +1,78 @@
+EDUC stock-research trace
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill directly specifies reuse boundaries.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse decision
+- Checked stock_report/data/raw/filings/EDUC/2025-12-31,
+  stock_report/data/analysis/annual_review/EDUC/2025-12-31, and
+  stock_report/data/normalized/facts/EDUC/2025-12-31.
+- No EDUC filing or annual-facts package existed, so official-source research was required.
+
+3. Period handling
+- Input requested annual period 2025-12-31, but EDUC's fiscal year ends on February 28/29.
+- The latest full annual report available before task creation was FY2026, period ended 2026-02-28, filed 2026-05-19.
+- analysis.period was corrected to 2026-02-28. The limitation is explicitly recorded in result.json and report.md.
+
+4. Primary sources
+- SEC FY2026 Form 10-K:
+  https://www.sec.gov/Archives/edgar/data/31667/000118518526001927/educ10k022826.htm
+  Used for company identity, business model, segments, partner counts, financial statements,
+  inventory composition, Usborne concentration, sale-leaseback, debt repayment, leases,
+  cash flow, dividends, and subsequent liquidity disclosure.
+- SEC FY2026 results release:
+  https://www.sec.gov/Archives/edgar/data/31667/000118518526001926/educex99-1.htm
+  Used as a cross-check of revenue, pretax earnings, property-sale gain and net earnings.
+- ECB/EU Official Journal reference rates dated 2026-02-27:
+  https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:C/2026/00531
+  EUR/USD = 1.1805; EUR/CNY = 8.0961; derived USD/CNY = 8.0961 / 1.1805 = 6.8582.
+- Valuation source was supplied by config/input.json:
+  Yahoo Finance yfinance, market cap CNY 79,386,510.30535698 as of 2026-08-03,
+  PE TTM 5.75.
+
+5. Source financials (USD, FY2026)
+- Total assets 54,311,600; total liabilities 11,521,100; equity 42,790,500.
+- Revenue 22,913,600; COGS 9,309,300; gross profit 13,604,300.
+- Operating profit derived as 13,604,300 - 20,789,700 = -7,185,400.
+- Net earnings 2,325,200; property-sale net gain 12,190,900.
+- CFO 2,005,300; capex 542,800; operating FCF 1,462,500.
+- Inventory working-capital release 6,884,200.
+- Financing cash flow -31,031,200; treasury-stock cash out 137,900; dividends zero.
+- Cash 1,118,400; restricted cash 222,000; total inventory 37,663,900.
+- No bank debt at year-end; operating lease liabilities total 6,716,100.
+
+6. Calculations (CNY)
+- All statement values multiplied by 6.8582.
+- Gross margin = 93,301,010.26 / 157,146,051.52 = 59.3722%.
+- Net margin = 15,946,686.64 / 157,146,051.52 = 10.1477%.
+- Reported operating FCF = 13,752,748.46 - 3,722,630.96 = 10,030,117.50.
+- Sustainable cash profit = operating FCF 10,030,117.50
+  - inventory release 47,213,220.44 = -37,183,102.94.
+- Discounted detachable net cash = cash 7,670,210.88 * 50% = 3,835,105.44.
+- Operating business price = market cap 79,386,510.30535698
+  - discounted net cash 3,835,105.44 = 75,551,404.86535698.
+- Discounted net cash / market cap = 4.8309%.
+- Sustainable cash profit is non-positive; owner earnback years and market-cap-to-cash-profit remain null per contract.
+- Forecast dividend = 0; forecast dividend yield = 0.
+
+7. Judgment boundaries
+- Fact: FY2026 net income was positive and PE TTM input was 5.75.
+- Fact: FY2026 included a USD 12.19m property-sale gain; core operating profit was negative.
+- Fact: positive CFO included USD 6.88m inventory release.
+- Inference: inventory liquidation is temporary and excluded from sustainable cash profit.
+- Judgment: only 50% of unrestricted cash is detachable because operating losses, seasonality,
+  working-capital needs and a subsequent USD 2m credit line indicate liquidity must remain in the business.
+- Judgment: zero near-term dividend is the appropriate base case; this is not company guidance.
+
+8. Protocol population and validation
+- Populated initialized fields with protocol `set` commands.
+- Added assets, liabilities, haircut rows, profit adjustments, dividend history, risks and evidence
+  with protocol `append` commands.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: {"status":"ok","errors":[]}

@@ -1,0 +1,57 @@
+stock-research trace
+generated_at=2026-08-04T19:10:43+08:00
+company=PEGA Pegasystems Inc.
+period=2025-12-31
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- Checked configured raw filing, annual review, normalized facts, and historical stock research directories.
+- No PEGA 2025 filing/fact/research artifacts existed locally; only stock_report/data/notes/user_stock_evaluations.md existed.
+- Returned to primary filings because all configured reusable sources were absent.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Complex result object was not written from scratch. Initialized protocol skeleton, then populated fields with repeated protocol set commands.
+
+4. Primary sources
+- SEC 2025 Form 10-K, accession 0001013857-26-000017, filed 2026-02-10:
+  https://www.sec.gov/Archives/edgar/data/1013857/000101385726000017/pega-20251231.htm
+- SEC Companyfacts XBRL for CIK 0001013857:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0001013857.json
+- Federal Reserve H.10 USD/CNY on 2025-12-31: 7.1875 CNY per USD:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Market cap CNY 33,892,309,890.04834, date 2026-08-03, PE TTM 17.357954: config/input.json, source Yahoo Finance yfinance.
+
+5. Model determination
+- Confirmed ordinary_operating/applicable.
+- Reason: enterprise software, hosting, licensing, maintenance, and consulting are ordinary operations; no financial matched-balance-sheet substrate.
+
+6. Currency normalization
+- All filing USD figures multiplied by 7.1875.
+- Valuation amount retained from input because input protocol already supplies CNY amount.
+
+7. Owner earnback calculations
+- Discounted detachable cash = cash USD 212.447m * 80% + marketable securities USD 213.352m * 95% - lease liabilities USD 75.967m; then * 7.1875 = CNY 2,132,351,562.50.
+- Sustainable cash profit = average of (FCF - stock-based compensation) for 2023-2025.
+- 2023: (USD 201.004m - USD 143.352m) * 7.1875 = CNY 414,373,750.
+- 2024: (USD 338.214m - USD 142.718m) * 7.1875 = CNY 1,405,127,500.
+- 2025: (USD 490.723m - USD 155.239m) * 7.1875 = CNY 2,411,291,250.
+- Three-year average = CNY 1,410,264,166.67.
+- Operating business price = CNY 33,892,309,890.05 - CNY 2,132,351,562.50 = CNY 31,759,958,327.55.
+- Owner earnback = 31,759,958,327.55 / 1,410,264,166.67 = 22.5206 years.
+- Market cap / cash profit = 24.0326.
+
+8. Key judgment flags
+- 2025 net income not used directly because USD 112.810m income-tax benefit was driven mainly by deferred-tax valuation allowance releases.
+- Stock-based compensation treated as an economic cost because it dilutes owners or requires offsetting repurchases.
+- Receivables, unbilled receivables, deferred tax assets, and deferred revenue excluded from detachable cash.
+- Dividend forecast annualizes USD 0.03 quarterly dividend using 170.347m year-end shares; board may change or terminate it.
+
+9. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[]

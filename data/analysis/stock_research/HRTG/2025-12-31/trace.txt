@@ -1,0 +1,72 @@
+HRTG stock-research trace
+generated_at=2026-08-04T12:48:00+08:00
+period=2025-12-31
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked the configured raw filing, annual review, normalized facts, and prior stock research paths.
+- No reusable HRTG 2025 fact package or prior research result was present.
+
+3. Primary-source retrieval and verification
+- Downloaded the SEC-filed 2025 Form 10-K to stock_report/data/raw/filings/HRTG/2025-12-31/hrtg-20251231.htm.
+- SEC filing: https://www.sec.gov/Archives/edgar/data/1598665/000119312526103715/hrtg-20251231.htm
+- SEC accession: 0001193125-26-103715; filed 2026-03-12.
+- Retrieved SEC companyfacts for CIK 0001598665:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0001598665.json
+- Cross-checked annual results release:
+  https://investors.heritagepci.com/2026-03-09-Heritage-Reports-Fourth-Quarter-and-Full-Year-2025-Results
+- FX source: PBOC/CFETS central parity for 2025-12-31, USD/CNY=7.0288.
+  https://www.ce.cn/xwzx/gnsz/gdxw/202512/t20251231_2676993.shtml
+- Market cap and PE were taken from config/input.json as supplied: Yahoo Finance yfinance, market date 2026-08-03.
+
+4. Model decision
+- Input hint ordinary_operating/applicable was rejected after filing review.
+- Heritage underwrites personal and commercial residential property insurance; investment assets and cash support insurance liabilities and regulatory capital.
+- Set statement_model=financial_insurance and owner_earnback_applicability=requires_special_model.
+- Kept all ordinary owner-earnback numeric fields null per result contract.
+
+5. Key USD facts from 2025 Form 10-K / SEC companyfacts
+- Total assets: 2,195,822,000
+- Total liabilities: 1,690,571,000
+- Parent stockholders' equity: 505,251,000
+- Total revenue: 847,330,000
+- Net premiums earned: 794,157,000
+- Parent net income: 195,594,000
+- Operating cash flow: 182,238,000
+- Capital expenditure: 8,074,000
+- Cash and cash equivalents: 559,274,000
+- Fixed income securities: approximately 713,200,000
+- Reinsurance recoverable on unpaid claims: 269,367,000
+- Gross loss and LAE reserve: 579,477,000
+- Unearned premiums: 707,923,000
+- Long-term debt: 78,428,000
+- Combined statutory surplus: 392,500,000
+- Statutory net income: 108,300,000
+- Net combined ratio: 73.1%; net loss ratio: 39.4%; net expense ratio: 33.6%; ceded premium ratio: 44.5%.
+
+6. Currency conversion
+- All filing amounts in outputs/result.json were multiplied by 7.0288 CNY/USD.
+- Ratios were computed from unrounded source amounts.
+- Market cap was not reconverted because config/input.json already supplies it as CNY absolute yuan.
+
+7. Dividend forecast
+- The parent declared no common dividends in calendar 2023-2025.
+- Heritage P&C and NBIC paid no subsidiary dividends in the last three years; Zephyr paid none in 2024-2025.
+- Baseline forecast cash dividend=0 and yield=0 pending affirmative board evidence.
+
+8. Protocol writes and validation
+- Populated initialized result via repeated protocol `set` commands; did not construct result.json from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validator status: ok; errors: [].
+
+9. Limitations
+- Supplied market cap and PE were not independently reconstructed from share count and price.
+- No standardized consolidated RBC ratio was available in the reviewed filing.
+- 2025 benefited from unusually lower catastrophe losses and favorable prior-year reserve development; one-year earnings are not a full-cycle estimate.

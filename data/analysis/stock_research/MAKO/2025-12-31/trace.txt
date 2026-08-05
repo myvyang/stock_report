@@ -1,0 +1,68 @@
+Stock research trace: MAKO / Mako Mining Corp.
+Period: 2025-12-31 annual
+Generated for task created_at: 2026-08-04T23:28:54+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Also read references/data-reuse.md to apply the prescribed reuse boundary.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- Checked the configured annual-review, normalized-facts, raw-filing, and prior stock-research paths.
+- No existing MAKO facts package, normalized facts, prior result, or raw filing was present.
+- Downloaded the issuer's 2025 audited financial statements and MD&A into:
+  stock_report/data/raw/filings/MAKO/2025-12-31/
+
+3. Identity and model verification
+- Audited financial statements state that Mako Mining Corp. traded as TSX-V: MKO and commenced Nasdaq trading under MAKO on 2026-03-30.
+- The company mines, develops, and explores gold assets; revenue is from selling gold/silver products to refiners.
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Mining-specific adjustments: resource depletion, cash capital expenditure, reclamation liabilities, and development cash needs.
+
+4. Primary sources
+- Mako Mining Corp., Consolidated Financial Statements for years ended 2025-12-31 and 2024, audited by PwC, dated 2026-03-31:
+  https://www.makominingcorp.com/_resources/financials/2025/Mako-Q4-2025-FS.pdf
+- Mako Mining Corp., Management's Discussion and Analysis for 2025:
+  https://makominingcorp.com/_resources/financials/2025/Mako-Q4-2025-MDA.pdf
+- Mako Mining Corp., FY2025 results release, dated 2026-04-01:
+  https://www.makominingcorp.com/news-media/press-releases/index.php?content_id=1116
+- Federal Reserve Board G.5A 2025 annual USD/CNY exchange rate:
+  https://www.federalreserve.gov/releases/g5a/current/
+- Market cap, date, source, and PE TTM were taken verbatim from config/input.json.
+
+5. Currency conversion
+- Financial statements are in USD thousands.
+- Result contract requires absolute CNY yuan.
+- Applied 2025 annual average USD/CNY 7.1875 to all financial-statement amounts for a consistent display basis.
+- Limitation: balance-sheet amounts were not translated at a period-end rate.
+
+6. Core source figures (USD thousands)
+- Assets 208,445; liabilities 57,712; equity/parent equity 150,733; NCI nil.
+- Revenue 148,472; cost of sales 73,455; gross profit 75,017; net/parent profit 33,740.
+- Operating cash flow 52,977; cash capex 12,320; operating FCF 40,657; financing cash flow 30,071.
+- Cash 77,277; inventories current plus non-current 42,007; mining interests, plant and equipment 80,581.
+- Accounts payable/accruals 28,498; reclamation obligation 20,441; no term loans at year-end.
+- Segment disclosure: revenue 99% gold / 1% silver, sold to three refiners at spot prices.
+
+7. Formula checks
+- Gross margin = 75,017 / 148,472 = 0.505263.
+- Net margin = 33,740 / 148,472 = 0.227246.
+- Operating FCF = CNY 380,772,187.5 - 88,550,000 = 292,222,187.5.
+- Discounted detachable net cash = cash 555,428,437.5 * 80% - reclamation 146,919,687.5 = 297,423,062.5.
+- Sustainable cash profit = FCF 292,222,187.5 - working-capital release 18,213,125 - restricted-cash refund 10,802,812.5 - share compensation 14,180,937.5 = 249,025,312.5.
+- Operating business price = market cap 4,195,292,368.138 - discounted net cash 297,423,062.5 = 3,897,869,305.638.
+- Owner earnback = 3,897,869,305.638 / 249,025,312.5 = 15.6525 years.
+- Market cap / cash profit = 4,195,292,368.138 / 249,025,312.5 = 16.8469.
+- Forecast dividend = 0 because 2025 had no cash dividend and disclosed development uses for cash; forecast yield = 0.
+
+8. Protocol population and validation
+- Populated the initialized result only through protocol CLI set operations.
+- Initial post-population validation returned: {"status":"ok","errors":[]}.
+- Final validation and JSON parse checks were run after report and trace creation.
+
+9. Judgment boundaries
+- Facts: audited statements, issuer releases, supplied market snapshot, and Federal Reserve FX rate.
+- Inferences: 80% cash recognition, full reclamation deduction, and removal of working-capital release, restricted-cash refund, and share compensation from sustainable cash profit.
+- Subjective assessment: the static 15.7-year result is highly sensitive to gold prices, mine lives, Moss ramp-up, and development capex and must not be treated as a perpetual-annuity valuation or investment recommendation.

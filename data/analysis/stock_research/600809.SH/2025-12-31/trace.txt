@@ -1,0 +1,54 @@
+stock-research trace
+company=600809.SH 山西杏花村汾酒厂股份有限公司
+period=2025-12-31 annual
+generated_context=2026-07-31 Asia/Shanghai
+
+[protocol]
+read .agents/skills/stock-research/SKILL.md
+read references/result-contract.md
+read references/report-contract.md
+read references/data-reuse.md
+initialized outputs/result.json with protocol CLI init
+populated fields with protocol CLI set via /tmp/stock_research_600809/populate.py
+validated with protocol CLI validate: status=ok, errors=[]
+
+[reuse]
+checked configured annual facts, normalized facts, raw filing, and prior stock research paths
+no 600809.SH annual fact pack, raw filing, or prior research existed in workspace
+only stock_report/data/notes/user_stock_evaluations.md existed; no reusable company facts found
+
+[sources]
+1. 山西汾酒2025年年度报告, disclosed 2026-04-23, 169 report pages; source discovery via company disclosure page and SSE-indexed search; locally text-extracted from a mirrored PDF for line-item verification.
+   official index: https://www.fenjiu.com.cn/gf/disclosure/index.html
+   verified sections: pages 2, 7-21, 30-32, 49-58, 88, 102, 120, 136-144.
+2. 中国注册会计师协会 2025年度财务报表审计报告情况明细表: 600809, disclosed 2026-04-23, Tianheng, unmodified opinion.
+   https://www.cicpa.org.cn/xxfb/news/202604/W020260429621043350797.pdf
+3. config/input.json market snapshot: market cap CNY 154,557,000,000; PE TTM 14.07; timestamp 20260731114339; Tencent qt.gtimg.cn.
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=liquor manufacturing and brand distribution are ordinary operations; deposits are treasury management, while inventory and contract liabilities are operating-cycle items.
+
+[key calculations]
+gross_profit=38,718,257,657.74-9,736,672,076.79=28,981,585,580.95
+gross_margin=28,981,585,580.95/38,718,257,657.74=0.7485250457
+net_margin=12,246,329,337.25/38,718,257,657.74=0.3162933995
+operating_free_cash_flow=9,013,519,822.15-1,194,271,115.52=7,819,248,706.63
+discounted_cash=9,736,319,122.65*0.80=7,789,055,298.12
+discounted_unpledged_deposits=(19,400,422,975.59-3,730,000,000)*0.80=12,536,338,380.47
+discounted_receivable_financing=2,060,271,766.71*0.70=1,442,190,236.70
+deducted_bills_and_lease_liabilities=988,879,472.77+189,055,887.22+7,788,227.26=1,185,723,587.25
+discounted_detachable_net_cash=20,581,860,328.04
+operating_business_price=154,557,000,000-20,581,860,328.04=133,975,139,671.96
+owner_earnback_years=133,975,139,671.96/7,819,248,706.63=17.1340169240
+market_cap_to_cash_profit=154,557,000,000/7,819,248,706.63=19.7662212572
+forecast_dividend_yield=8,002,965,296.32/154,557,000,000=0.0517800248
+
+[judgment boundaries]
+contract liabilities were not treated as financial debt because they are customer prepayments tied to delivery.
+inventory was not treated as detachable cash because aged liquor and finished goods are required operating assets.
+cash/deposits received 20% haircuts for operating needs and distribution constraints; pledged deposits were excluded before haircut.
+receivable financing received a 30% haircut.
+single-year operating free cash flow was used as a conservative sustainable-cash-profit anchor; no growth assumed.
+channel inventory and wholesale price could not be independently verified from official sources.

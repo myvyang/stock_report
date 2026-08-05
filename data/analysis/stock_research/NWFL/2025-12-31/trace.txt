@@ -1,0 +1,55 @@
+stock-research trace
+task: NWFL annual 2025-12-31
+generated_at: 2026-08-04T23:19:28+08:00
+
+1. Read instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No existing raw filing, annual facts, normalized facts, or annual research result was present under the configured NWFL/2025-12-31 paths.
+- Downloaded official SEC filing to stock_report/data/raw/filings/NWFL/2025-12-31/nwfl-20251231x10k.htm.
+
+3. Protocol initialization
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initialized schema_version stock-research-result-v1 from the task input.
+
+4. Model decision
+- Input hint ordinary_operating/applicable was rejected after filing review.
+- Confirmed Norwood Financial Corp is a one-bank holding company whose operating subsidiary is Wayne Bank.
+- Selected statement_model=financial_bank and owner_earnback_applicability=requires_special_model.
+- Kept ordinary owner-earnback sorting fields null because deposits, loans, securities and liquidity are the banking business itself.
+
+5. Primary sources
+- SEC 2025 Form 10-K: https://www.sec.gov/Archives/edgar/data/1013272/000101327226000003/nwfl-20251231x10k.htm
+- SEC filing index: https://www.sec.gov/Archives/edgar/data/1013272/000101327226000003/0001013272-26-000003-index.htm
+- SEC 2026-06-18 dividend Form 8-K: https://www.sec.gov/Archives/edgar/data/1013272/000101327226000009/nwfl-20260618x8k.htm
+- SEC 2026-06-18 borrower bankruptcy Form 8-K: https://www.sec.gov/Archives/edgar/data/1013272/000101327226000007/nwfl-20260618x8k.htm
+- Federal Reserve H.10 / FRED DEXCHUS: https://fred.stlouisfed.org/series/DEXCHUS
+- Market valuation: config/input.json, Yahoo Finance yfinance snapshot dated 2026-08-03.
+
+6. Currency conversion
+- Financial statement amounts: USD x 6.9931 CNY/USD, Federal Reserve H.10 rate for 2025-12-31.
+- Dividend forecast: USD x 6.7509 CNY/USD, Federal Reserve H.10 rate for 2026-07-31, the latest available business day before valuation date in the retrieved series.
+- All monetary fields in outputs/result.json are absolute CNY yuan.
+
+7. Key extracted facts
+- Total assets USD 2,424.842m; liabilities USD 2,182.685m; equity USD 242.157m.
+- Net income USD 27.755m; net interest income USD 78.324m.
+- Net interest margin 3.49%; ROA 1.17%; ROE 12.22%; efficiency ratio 58.2%.
+- Net loans USD 1,833.540m; deposits USD 2,078.645m; AFS securities USD 408.782m.
+- NPL ratio 0.34%; nonperforming assets/assets 0.29%; ACL/NPL 313.65%; net charge-offs/average loans 0.11%.
+- Leverage ratio 9.65%; CET1/Tier 1 risk-based ratio 12.37%; total risk-based capital ratio 13.41%.
+- 2025 cash dividends paid USD 11.489m; reported payout ratio 41.39%.
+- Latest declared quarterly dividend USD 0.32/share; annualized forecast uses 10,889,603 shares outstanding as of 2026-03-01.
+
+8. Timing limitations
+- PB Bankshares acquisition closed 2026-01-05 for approximately USD 58m and was not reflected in the 2025-12-31 balance sheet.
+- Market cap and PE are dated after the acquisition, creating a period mismatch disclosed in data_quality and report.md.
+- Two borrowers' June 2026 Chapter 11 filings are a subsequent risk and are not reflected in 2025 credit metrics.
+
+9. Result construction and validation
+- Used protocol set/append commands to populate initialized outputs/result.json; did not construct the complete JSON manually.
+- Ran protocol validation after population; status returned ok with no errors.

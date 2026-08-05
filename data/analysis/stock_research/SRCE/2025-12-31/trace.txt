@@ -1,0 +1,74 @@
+stock-research trace
+company=SRCE / 1st Source Corporation
+period=2025-12-31
+generated_for=2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the paths declared in config/input.json.
+- No raw filing metadata, annual facts JSON/Markdown, normalized facts, or prior stock-research result existed in the workspace for SRCE/2025-12-31.
+- Therefore retrieved the official SEC filing and used official company releases for missing/current context.
+
+3. Primary sources
+- SEC 2025 Form 10-K, filed 2026-02-17:
+  https://www.sec.gov/Archives/edgar/data/34782/000003478226000011/source-20251231.htm
+- SEC companyfacts API used to cross-check XBRL values:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0000034782.json
+- Company 2025 Q4 earnings release:
+  https://www.1stsource.com/news/earnings-report-2025-q4/
+- Company 2026 Q2 earnings release, dated 2026-07-23:
+  https://www.1stsource.com/news/earnings-report-2026-q2/
+- ECB 2025-12-31 exchange-rate sheet:
+  https://www.ecb.europa.eu/stats/exchange/eurofxref/shared/pdf/2025/12/20251231.pdf
+- Market cap and PE: config/input.json, source labelled Yahoo Finance yfinance.
+
+4. Model decision
+- Input hint ordinary_operating/applicable was rejected after filing review.
+- Form 10-K identifies 1st Source as a bank holding company whose principal subsidiary takes deposits, makes loans, holds securities, and provides wealth/insurance services.
+- statement_model=financial_bank.
+- owner_earnback_applicability=requires_special_model.
+- Bank deposits, loans, securities and liquidity balances are operating structure. Ordinary detachable-net-cash and free-cash-flow payback metrics remain null by contract.
+
+5. Currency conversion
+- Contract requires absolute CNY yuan.
+- ECB 2025-12-31 quotes EUR/USD=1.1750 and EUR/CNY=8.2262.
+- Cross rate: USD/CNY = 8.2262 / 1.1750 = 7.001021276595745.
+- Balance-sheet, income, historical dividend and forecast dividend USD amounts were multiplied by this rate.
+- Limitation: income statement flows were not translated at an annual average rate; this is a protocol-normalization choice, not an FX performance analysis.
+
+6. Key filing facts in native USD
+- Total assets 9,055,270,000.
+- Total liabilities 7,737,180,000.
+- Total equity 1,318,090,000; parent shareholders' equity 1,274,971,000; NCI 43,119,000.
+- Gross loans and leases 7,046,669,000; allowance 161,846,000; net loans 6,884,823,000.
+- AFS securities at fair value 1,522,486,000.
+- Cash and due from banks plus federal funds sold/interest-bearing bank deposits 119,857,000.
+- Deposits 7,225,575,000.
+- Short-term borrowings + long-term debt/mandatorily redeemable securities + subordinated notes = 340,715,000.
+- Net income 158,259,000; net income available to common shareholders 158,277,000.
+- Net interest income 348,175,000; noninterest income 85,603,000; noninterest expense 216,839,000.
+- 2025 tax-equivalent NIM 4.07%; ROA 1.76%; average common ROE 13.16%.
+- Nonperforming assets 77,378,000 versus 31,334,000 in 2024.
+- NPL ratio 1.09%; allowance/NPL coverage 210.02%; net charge-offs/average loans 0.06%.
+- Holding-company capital ratios: total 18.05%, Tier 1 16.79%, CET1 15.52%, leverage 14.69%.
+
+7. Dividend forecast
+- 2026 Q2 release: board approved USD 0.45 quarterly dividend per common share.
+- 2025 year-end shares outstanding = 28,205,674 issued - 3,836,656 treasury = 24,369,018.
+- Mechanical annual forecast = 0.45 * 4 * 24,369,018 = USD 43,864,232.40.
+- CNY forecast = 307,094,424.31394.
+- Forecast yield = 307,094,424.31394 / 14,575,291,628.302002 = 0.021069521773247456.
+- This is an annualization of the latest approved quarterly rate, not board guidance.
+
+8. Protocol population and validation
+- Populated initialized result through repeated protocol CLI set commands; did not hand-write result.json from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation output: {"status":"ok","errors":[]}.

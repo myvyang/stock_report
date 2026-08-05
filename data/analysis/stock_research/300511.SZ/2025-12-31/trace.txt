@@ -1,0 +1,69 @@
+stock-research trace
+company: 300511.SZ 雪榕生物
+period: 2025-12-31 annual
+generated_at: 2026-08-01T04:09:13+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result
+- PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+- No annual facts, normalized facts, prior research result, or raw filing existed for 300511.SZ/2025-12-31.
+- Downloaded official annual report PDF to stock_report/data/raw/filings/300511.SZ/2025-12-31/annual-report-2025.pdf.
+- Official filing: https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-28/74b8f28f-7b9b-4d64-ac97-58f5d259cfd9.PDF
+- PDF text utilities were unavailable; figures were extracted from the searchable annual-report announcement body and reconciled to the official filing's tables.
+
+4. Model review
+- Input classification (pharmaceutical/drug manufacturer) rejected.
+- Annual report says food-fungi sales were RMB 1,965,748,829.82, 98.90% of revenue.
+- Selected ordinary_operating with capital-intensive factory maintenance adjustment.
+
+5. Core calculations (CNY)
+- revenue = 1,987,614,708.05
+- cost_of_sales = 1,716,846,513.77
+- gross_profit = 270,768,194.28
+- gross_margin = 13.6227707102%
+- parent_net_profit = 29,793,998.17
+- net_margin = 1.4989825769%
+- operating_cash_flow = 415,848,126.65
+- reported_capex = 79,587,860.55
+- reported_operating_free_cash_flow = 336,260,266.10
+
+6. Cash-profit normalization (CNY)
+- operating_cash_flow: +415,848,126.65
+- maintenance capex proxy (fixed-asset depreciation): -327,920,341.21
+- reverse working-capital net outflow: +24,570,239.03
+- remove government grants in operating cash receipts: -9,356,727.38
+- pre-discount sustainable cash profit: 103,141,297.09
+- sustainability factor: 80%
+- discounted sustainable cash profit: 82,513,037.672
+
+7. Detachable net cash (CNY)
+- cash and cash equivalents: 159,139,572.15 x 90% = 143,225,614.935
+- other non-current financial assets: 12,046,795.26 x 50% = 6,023,397.63
+- financing liabilities: 1,322,528,455.68 x 100% = -1,322,528,455.68
+- discounted detachable net cash = -1,173,279,443.115
+- operating business price = 3,300,000,000 - (-1,173,279,443.115) = 4,473,279,443.115
+- owner earnback years = 4,473,279,443.115 / 82,513,037.672 = 54.2130
+- market cap / cash profit = 3,300,000,000 / 82,513,037.672 = 39.9937
+
+8. Dividend
+- 2025 year-end accumulated retained earnings: -434,958,854.21
+- approved 2025 cash dividend: 0
+- forecast cash dividend: 0; forecast yield: 0%
+
+9. Quality notes
+- Market cap and PE are taken from the input's Tencent snapshot and were not refreshed.
+- Sustainable cash profit is an analyst normalization, not company guidance.
+- No independently verified national market-share statistic was available, so no numeric industry rank was asserted.
+
+10. Protocol population and validation
+- Used protocol set commands for all structured sections; complex result JSON was not handwritten from scratch.
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}
+- JSON syntax check: passed (python3 -m json.tool outputs/result.json).

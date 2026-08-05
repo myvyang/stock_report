@@ -1,75 +1,58 @@
 stock-research trace
+company: 601163.SH 三角轮胎
+period: 2025-12-31 annual
+generated_at: 2026-07-31T14:48:43+08:00
 
-task:
-- query: 601163.SH
-- company: 三角轮胎
-- period: 2025-12-31
-- report_type: annual
-- created_at: 2026-07-28T17:49:33+08:00
+[protocol]
+initialized outputs/result.json with:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+reused prior same-period stock research as a fact/analysis baseline, then updated fields through protocol set commands.
+final validation command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
 
-protocol:
-- Read /workspace/.agents/skills/stock-research/SKILL.md.
-- Read references/result-contract.md and references/report-contract.md as requested.
-- Also read references/data-reuse.md to apply the reuse boundary.
-- Initialized outputs/result.json with:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- Populated outputs/result.json through the protocol set/append CLI.
-- Validated outputs/result.json with:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-- Validation result: {"status": "ok", "errors": []}
+[sources]
+1. config/input.json
+   - market cap CNY 10,560,000,000
+   - quote timestamp 20260731114343
+   - source Tencent qt.gtimg.cn
+   - PE TTM 10.83
+2. stock_report/data/raw/filings/601163.SH/2025-12-31/metadata.json
+   - company official-site annual-report PDF metadata
+3. stock_report/data/analysis/annual_review/601163.SH/2025-12-31/facts.json
+   - statements, business, assets/liabilities, cash conversion and evidence
+4. stock_report/data/raw/filings/601163.SH/2025-12-31/601163_2025_annual_report.txt
+   - used indirectly through the verified annual fact pack and prior same-period research
+5. stock_report/data/analysis/stock_research/601163.SH/2025-12-31/result.json
+   - reused same-filing financial facts, asset classifications, haircuts and explanations; stale market snapshot replaced
 
-source files used:
-- config/input.json
-- stock_report/data/raw/filings/601163.SH/2025-12-31/metadata.json
-- stock_report/data/raw/filings/601163.SH/2025-12-31/601163_2025_annual_report.txt
-- stock_report/data/analysis/annual_review/601163.SH/2025-12-31/facts.json
-- stock_report/data/analysis/annual_review/601163.SH/2025-12-31/annual_facts.md
-- stock_report/data/analysis/annual_review/601163.SH/2025-12-31/extraction_trace.txt
+[model]
+statement_model: ordinary_operating
+owner_earnback_applicability: applicable
+reason: core activity is tire manufacturing and sales; production assets, inventory, receivables and own funds form an ordinary manufacturing balance sheet. No customer deposits, reserves, regulated project cash, concession rights or other special-model structure was identified.
 
-primary filing:
-- title: 三角轮胎股份有限公司2025年年度报告
-- official URL: https://www.triangle.com.cn/Public/Uploads/uploadfile/files/20260429/20260429075349_69f1488d2dbc2.pdf
-- source site: 三角轮胎公司官网定期报告
-- downloaded_at: 2026-07-24T12:30:52+08:00
-- pages: 157
+[calculations]
+gross_margin = 1,965,808,347.53 / 9,820,936,611.28 = 0.2001650581
+net_margin = 922,888,822.03 / 9,820,936,611.28 = 0.0939715690
+operating_free_cash_flow = 864,389,677.18 - 92,079,175.38 = 772,310,501.80
+discounted_detachable_net_cash:
+  cash 2,610,539,857.45 at 100%
+  current term deposits 1,187,288,997.81 at 90%
+  negotiable certificates of deposit 7,624,974,842.11 at 90%
+  non-current term deposits 252,089,251.14 at 90%
+  listed shares 1,064,360.64 at 50%
+  less short-term borrowing 1,146,098,436.08 at 100%
+  total = 9,622,891,383.644
+discounted_net_cash_to_market_cap = 9,622,891,383.644 / 10,560,000,000 = 0.9112586538
+discounted_sustainable_cash_profit = CNY 700,000,000
+  cross-check: 2025 deducted parent profit CNY 718,251,477.87
+  cross-check: 2025 FCF CNY 772,310,501.80
+  cross-check: 2024-2025 average FCF about CNY 722,492,550.62
+operating_business_price = 10,560,000,000 - 9,622,891,383.644 = 937,108,616.356
+owner_earnback_years = 937,108,616.356 / 700,000,000 = 1.3387265948
+market_cap_to_cash_profit = 10,560,000,000 / 700,000,000 = 15.0857142857
+forecast_dividend_yield = 320,000,000 / 10,560,000,000 = 0.0303030303
 
-reused annual facts:
-- Business: tire R&D, manufacturing and global marketing; 2025 main business revenue 9,785,594,828.57 yuan, including tire product revenue 9,758,656,740.48 yuan.
-- Production/sales/inventory: production 24.0877 million tires, sales 22.6069 million tires, inventory 2.9870 million tires.
-- Balance sheet: total assets 19,463,163,813.66; total liabilities 5,516,872,902.36; parent equity 13,944,638,381.83.
-- Income statement: revenue 9,820,936,611.28; cost of sales 7,855,128,263.75; gross profit 1,965,808,347.53; operating profit 1,040,487,085.50; parent net profit 922,888,822.03.
-- Cash flow: operating cash flow 864,389,677.18; capex 92,079,175.38; operating free cash flow 772,310,501.80.
-- Profit quality: deducted parent net profit 718,251,477.87; entrusted investment/asset management gain 216,948,885.76.
-- Dividend: proposed 2025 cash dividend 320,000,000.00; 2024 cash dividend 424,000,000.00; latest three-year cumulative cash dividend 1,280,000,000.00.
-
-valuation handling:
-- Input market cap: 10,200,000,000.00 yuan.
-- Input market_cap.date was blank.
-- Used task created date 2026-07-28 as the market cap snapshot date, recorded as a limitation.
-- Input pe_ttm was null.
-- Calculated PE from input market cap / 2025 parent net profit = 11.052252185224141, recorded as a calculated value rather than a market-source PE.
-
-formulas and assumptions:
-- gross_margin = gross_profit / revenue = 0.20016505811392143.
-- net_margin = parent_net_profit / revenue = 0.0939715689611519.
-- funds assets considered: cash 2,610,539,857.45; one-year deposit 1,187,288,997.81; transferable certificates of deposit 7,624,974,842.11; long deposit 252,089,251.14; stock financial asset 1,064,360.64.
-- financing debt deduction: short-term borrowing 1,146,098,436.08.
-- haircut assumptions: cash 0%; one-year deposit 10%; transferable certificates of deposit 10%; long deposit 10%; stock financial asset 50%; short-term borrowing deducted 100%.
-- discounted_detachable_net_cash = 9,622,891,383.644.
-- discounted_net_cash_to_market_cap = 0.9434207238866665.
-- discounted_sustainable_cash_profit = 700,000,000.00.
-- operating_business_price = market_cap - discounted_detachable_net_cash = 577,108,616.3560009.
-- owner_earnback_years = operating_business_price / discounted_sustainable_cash_profit = 0.8244408805085727.
-- market_cap_to_cash_profit = market_cap / discounted_sustainable_cash_profit = 14.571428571428571.
-- forecast_dividend_yield = forecast_cash_dividend / market_cap = 0.03137254901960784.
-
-limitations:
-- Annual report does not disclose the per-instrument maturity, rate, bank, or early withdrawal restrictions for transferable certificates of deposit and term deposits.
-- 2023 capex was not directly available in the 2025 annual report three-year table; cash profit cross-check used 2025 and 2024 operating free cash flow.
-- Market cap date came from task timestamp because the input market_cap.date field was blank.
-- PE TTM was computed from the supplied market cap and 2025 parent net profit because the input pe_ttm field was null.
-
-outputs:
-- outputs/result.json
-- outputs/report.md
-- outputs/trace.txt
+[limitations]
+- term-deposit and negotiable-CD instrument-level maturity, bank, rate and early-withdrawal restrictions are not disclosed.
+- 2023 capex is not directly included in the annual-report three-year table; sustainable cash profit relies mainly on 2024-2025 FCF and 2025 deducted profit.
+- market valuation is a point-in-time input snapshot and can differ from current pricing.

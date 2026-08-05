@@ -1,0 +1,61 @@
+stock-research trace
+task: 06058.HK / annual / 2025-12-31
+generated_at: 2026-08-04T18:19:39+08:00
+
+1. Read protocol and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse audit
+- Checked configured local paths under stock_report/data/raw/filings, annual_review, normalized/facts, and stock_research.
+- None of the configured 06058.HK filing/fact artifacts existed in /workspace or the supplied /root/aicode sync target.
+- Existing user evaluation note contained no 06058.HK research.
+- Decision: rebuild core facts from the official HKEX audited annual report; do not invent upstream artifacts.
+
+3. Primary filing
+- HKEX 2025 Annual Report, published 2026-03-31:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0331/2026033101119.pdf
+- Audited by KPMG; audit report dated 2026-03-25.
+- Key pages used: pp.3-10 (highlights, business review, liquidity); pp.50-56 (primary statements); pp.85-86 (revenue detail); p.96 (dividends); pp.108, 116-117, 144-145 (client money and repo/collateral mechanics).
+
+4. Model decision
+- Confirmed financial_brokerage.
+- Ordinary owner earnback applicability: requires_special_model.
+- Reason: trust/client cash is restricted; investment securities, repo funding, bank borrowings and capital requirements are operating architecture.
+- Enforced null for discounted net cash, discounted cash profit, operating business price, owner earnback years and market-cap-to-cash-profit.
+
+5. Currency normalization
+- Filing currency: HKD; protocol currency: CNY absolute yuan.
+- Applied 1 HKD = 0.90486 CNY to all filing amounts in result.json.
+- Official reference: PBOC/CFETS central parity announcement, 2025-12-26 (nearest retrieved official year-end rate):
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- Limitation: income statement was not translated using an annual average rate; CNY figures are normalized display amounts, not an FX accounting restatement.
+
+6. Key extracted facts (HKD)
+- Revenue: 911,245,968; profit attributable to owners: 167,056,975.
+- Ordinary-equity earnings after other-equity distribution: 120,806,975.
+- Total assets: 24,600,339,307; total liabilities: 20,172,482,964; total equity: 4,427,856,343; ordinary shareholder equity: 3,427,856,343.
+- General cash: 2,165,859,422; trust cash: 2,434,108,361.
+- FVTPL assets: 6,606,601,061; FVOCI assets: 8,415,190,308; amortized-cost debt investments: 3,526,635,000.
+- Repo liabilities: 10,957,987,462; bank borrowings: 5,156,127,781; bonds and notes: 658,978,710.
+- Financial products and investments revenue: 597,243,097, 65.54% of revenue.
+- Company-disclosed ROE: 5.5%; gearing: 378.8%; net debt/equity: 329.9%.
+- 2025 final dividend recommendation: nil.
+
+7. Market data
+- Used supplied input unchanged: market cap CNY 1,720,600,008.9645386; PE TTM 11.97; timestamp 2026/08/03 09:20:05; source Tencent qt.gtimg.cn.
+- Not independently reconciled to HKEX because market data is not an issuer filing; disclosed as a limitation.
+
+8. Protocol operations
+- Initialized with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields via repeated protocol set operations; result.json was not hand-built from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+
+9. Output policy
+- No buy/sell recommendation, target price, ranking label or unsupported certainty.
+- gross_margin, cost_of_sales and gross_profit left null because brokerage financial statements do not present an economically comparable gross-profit model.
+- operating cash flow, capex and operating free cash flow left null because brokerage operating cash flow is dominated by trading assets, client funds and repo movements; ordinary FCF interpretation is not comparable.

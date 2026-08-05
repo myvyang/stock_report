@@ -1,0 +1,67 @@
+OPHC stock research trace
+generated_at: 2026-08-04T16:39:02+08:00
+period: 2025-12-31
+
+1. Read protocol and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Initialized structured output with protocol CLI
+- PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Local reuse check
+- No annual facts, normalized facts, raw filing metadata, or prior stock-research result existed under the paths supplied by config/input.json.
+- Research therefore used the primary filing directly.
+
+4. Primary sources
+- SEC 2025 Form 10-K (filed 2026-02-26): https://www.sec.gov/Archives/edgar/data/1288855/000149315226008143/form10-k.htm
+- SEC filing index: https://www.sec.gov/Archives/edgar/data/1288855/000149315226008143/0001493152-26-008143-index.htm
+- U.S. Treasury Fiscal Data exchange-rate API: https://api.fiscaldata.treasury.gov/services/api/fiscal_service/v1/accounting/od/rates_of_exchange?filter=record_date:eq:2025-12-31,country:eq:China
+- Market data supplied by config/input.json: Yahoo Finance yfinance, market cap date 2026-08-03.
+
+5. Model decision
+- Input hint ordinary_operating/applicable was overridden.
+- Filing identifies the issuer as a bank holding company owning 100% of OptimumBank.
+- Net loans were about 85% of assets and deposits were the main liability.
+- Selected statement_model=financial_bank and owner_earnback_applicability=not_applicable.
+- Ordinary discounted net cash, cash profit, operating business price, and earnback fields remain null.
+
+6. Currency conversion
+- Filing currency: USD; filing tables are generally USD thousands.
+- Structured result currency required by protocol: CNY absolute yuan.
+- Applied 2025-12-31 U.S. Treasury rate: USD 1 = CNY 6.998.
+- Report body retains USD source amounts where useful for auditability.
+
+7. Key extracted source facts (USD thousands unless ratios)
+- total assets 1,111,678
+- total liabilities 989,781
+- stockholders' equity 121,897
+- net loans 947,294
+- deposits 931,750
+- cash and cash equivalents 114,559
+- available-for-sale debt securities 25,184
+- net interest income 42,587
+- credit loss expense 2,036
+- noninterest income 6,774
+- noninterest expense 25,154
+- income before tax 22,171
+- net income 16,648
+- operating cash flow 17,841
+- premises/equipment purchases 896
+- financing cash flow 159,772
+- net interest margin 4.28%
+- nonperforming loans 2,897 / gross loans 0.3%
+- allowance / loans 1.07%
+- Tier 1 leverage ratio 11.39%
+- commercial real estate / loans 69.6%
+- loan/deposit ratio about 103%
+- external common shareholder dividend 0; subsidiary-to-parent one-time dividend USD 500 thousand
+
+8. Population method
+- Scalar and array fields were populated with protocol CLI set/append commands.
+- outputs/result.json was not hand-written as a complex JSON object.
+
+9. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[]

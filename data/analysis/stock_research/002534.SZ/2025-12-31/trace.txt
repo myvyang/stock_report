@@ -1,0 +1,80 @@
+task=stock_research
+company=002534.SZ 西子洁能
+period=2025-12-31
+report_type=annual
+generated_at=2026-07-31T17:42:04+08:00
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+mutation=all result.json research fields set through protocol set commands
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validate_status=ok
+
+[reuse_audit]
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+prior_stock_research=missing
+decision=fetch and verify 2025 annual disclosure because no local fact pack existed
+
+[sources]
+1=西子洁能2025年年度报告，公告日期2026-04-10，指定披露网站巨潮资讯；使用可检索的新浪公告全文转录和下载入口 https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12073126&stockid=002534
+2=西子洁能2025年度审计报告，天健审〔2026〕5060号
+3=config/input.json; market cap 11661000000; timestamp 20260731114342; source Tencent qt.gtimg.cn; PE TTM 26.32
+
+[model_review]
+input_hint=ordinary_operating/applicable
+confirmed_model=ordinary_operating
+applicability=applicable
+reason=97.04% revenue classified as equipment manufacturing; the company has substantive order-based R&D, manufacturing, delivery and service operations. EP/EPC/PC solutions are 46.20% of revenue, so project working-capital constraints require special cash discounts but do not by themselves replace the whole statement with a pure construction model.
+
+[core_facts_cny]
+revenue=6241290689.53
+cost_of_sales=5054448829.74
+gross_profit=1186841859.79
+parent_net_profit=436577648.34
+deducted_parent_net_profit=256188153.53
+operating_cash_flow=762152849.66
+capital_expenditure=143450052.30
+operating_free_cash_flow=618702797.36
+total_assets=14351603841.18
+total_liabilities=8217968819.05
+total_equity=6133635022.13
+parent_equity=5608481806.52
+minority_interest=525153215.61
+cash_book_balance=3043089452.80
+restricted_cash=733905277.43
+cash_and_cash_equivalents=2309184175.37
+trading_financial_assets=827134954.18
+accounts_receivable=1423599458.12
+contract_assets=2128571956.26
+inventory=1222149160.63
+contract_liabilities=1838758964.92
+
+[calculations]
+gross_margin=(6241290689.53-5054448829.74)/6241290689.53=0.19015968312146908
+net_margin=436577648.34/6241290689.53=0.06994989819531647
+operating_free_cash_flow=762152849.66-143450052.30=618702797.36
+financing_like_debt=23002248.89+51414960.18+293233998.63+42544451.78+17863279.15=428058938.63
+discounted_net_cash=(2309184175.37+827134954.18)*0.50-428058938.63=1140100626.145
+discounted_cash_profit=436577648.34-180389494.81=256188153.53
+operating_business_price=11661000000-1140100626.145=10520899373.855
+owner_earnback_years=10520899373.855/256188153.53=41.0670799132911
+market_cap_to_cash_profit=11661000000/256188153.53=45.51732716491311
+forecast_cash_dividend=835935177/10*1=83593517.70
+forecast_dividend_yield=83593517.70/11661000000=0.0071686405711345515
+
+[judgments]
+cash_discount=50%; rationale: project advances, restricted balances, performance guarantees, settlement timing and minimum operating liquidity make full detachment inappropriate.
+sustainable_profit=2025 deducted parent net profit; rationale: excludes 180.39m non-recurring gains, chiefly relocation asset disposal; 618.70m annual FCF is not extrapolated because working-capital release was material.
+industry_position=company self-description only; no independent share data obtained.
+dividend_status=2025 board distribution proposal basis; update if final implementation changes.
+
+[outputs]
+outputs/result.json=protocol initialized and validated
+outputs/report.md=written
+outputs/trace.txt=written

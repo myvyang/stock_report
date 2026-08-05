@@ -1,0 +1,75 @@
+stock-research trace
+generated_at=2026-08-04T21:04:11+08:00
+query=BANR
+period=2025-12-31
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- /workspace/AGENTS.md supplied in task context
+
+2. Reuse audit
+- Checked paths declared in config/input.json.
+- No local raw filing, metadata, annual facts, normalized facts, or prior stock-research result existed for BANR/2025-12-31.
+- Proceeded to primary public sources because required core facts were absent.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized successfully from task input.
+
+4. Primary sources reviewed
+- SEC 2025 Form 10-K: https://www.sec.gov/Archives/edgar/data/946673/000094667326000009/banr-20251231.htm
+- SEC filing accession: 0000946673-26-000009, filed 2026-02-25.
+- Banner 2026 Q1/Q2 earnings releases for declared quarterly dividend.
+- SEC 8-K accession 0000946673-26-000123 for Pacific Financial merger announcement.
+- PBOC/China Foreign Exchange Trade System 2025-12-31 USD/CNY central parity, 7.0288.
+- Market cap and PE retained exactly from config/input.json (Yahoo Finance yfinance).
+
+5. Model decision
+- Input hint: ordinary_operating / applicable.
+- Verified fact: Banner Corporation wholly owns Banner Bank; consolidated balance sheet is dominated by loans, securities, customer deposits, and bank funding.
+- Override: financial_bank / requires_special_model.
+- Reason: bank financial assets and customer deposits are operating assets/liabilities, not detachable cash and ordinary debt.
+- Required ordinary owner-earnback ranking fields left null.
+
+6. Key USD facts extracted from 10-K
+- Total assets: 16,354,488,000
+- Total liabilities: 14,408,191,000 (assets less equity)
+- Total/common shareholders' equity: 1,946,297,000
+- Net loans: 11,561,411,000
+- Cash and securities: 3,400,097,000
+- Deposits: 13,743,146,000
+- Borrowings: 336,866,000
+- Revenue: 660,733,000
+- Net interest income: 587,919,000
+- Provision for credit losses: 13,045,000
+- Net income: 195,382,000
+- 2025 cash dividend per share: 1.94
+- Tax-equivalent NIM: 3.96%
+- ROA: 1.21%; ROE: 10.51%
+- NPA/assets: 0.31%; ACL/loans: 1.37%; ACL/nonperforming loans: 351.18%
+- CET1: 12.81%; total capital: 14.69%; leverage ratio: 11.41%
+
+7. Currency conversion
+- Contract requires CNY absolute yuan.
+- Used 1 USD = 7.0288 CNY for all filing amounts to keep a deterministic display basis.
+- Limitation recorded: income statement translation uses year-end rather than annual-average FX; USD originals and ratios are economically preferable.
+- Input market cap was already stated in CNY and was not reconverted.
+
+8. Dividend forecast
+- Annualized declared run-rate: USD 0.52 x 4 x 34,097,856 shares.
+- Converted forecast cash dividend: CNY 498,507,381.33.
+- Forecast dividend yield against supplied market cap: 3.0872800858%.
+- Forecast explicitly described as an annualized scenario, not a board commitment.
+
+9. Result construction
+- Used protocol CLI `set` commands to populate outputs/result.json.
+- Did not hand-write the complex JSON object.
+- First validation identified one missing requirement: evidence required for complete status.
+- Added eight evidence records through protocol CLI.
+
+10. Final validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final status: ok
+- Final errors: []

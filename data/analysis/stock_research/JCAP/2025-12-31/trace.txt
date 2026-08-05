@@ -1,0 +1,55 @@
+stock-research trace
+generated_at: 2026-08-04T21:09:47+08:00
+company: Jefferson Capital, Inc. (NASDAQ: JCAP)
+period: 2025-12-31 annual
+
+1. Read required skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- config/input.json present.
+- No existing raw filing, annual facts package, normalized facts, or prior JCAP stock-research output was present under stock_report.
+- Therefore fetched the official SEC filing rather than relying on third-party summaries.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result initialized with stock-research-result-v1 schema.
+
+4. Primary sources inspected
+- SEC Form 10-K accession 0001104659-26-027199, filed 2026-03-13, fiscal year ended 2025-12-31.
+- SEC XBRL company facts for CIK 0002046042 used to cross-check three-statement facts.
+- Jefferson Capital Q1 2026 results and Form 10-Q for repeated $0.24 quarterly dividend and Q1 declared dividend total.
+- Federal Reserve G.5A / FRED AEXCHUS: 2025 annual average USD/CNY 7.1875.
+- Market cap and PE retained from config/input.json (Yahoo Finance yfinance; 2026-08-03).
+
+5. Model decision
+- Input hint ordinary_operating/applicable was rejected after filing review.
+- 2025 portfolio revenue = $566.417m / total revenue $613.289m = 92.36%.
+- Investments in receivables, net = $1,928.742m / total assets $2,087.373m = 92.40%.
+- Purchases and principal collections of receivable portfolios are investing cash flows; notes payable finance portfolio ownership.
+- Final model: platform_financial_mixed; owner_earnback_applicability: requires_special_model.
+- All ordinary owner earnback sorting metrics remain null.
+
+6. Conversion and calculations
+- All result.json filing amounts converted at 7.1875 CNY/USD for a consistent protocol currency.
+- Net margin = $187.965m / $613.289m = 0.3064868276.
+- Forecast dividend = Q1 2026 declared total $14.805m x 4 x 7.1875 = CNY 425,643,750.
+- Forecast dividend yield = CNY 425,643,750 / CNY 8,361,102,561.690674 = 0.0509076128.
+- Gross margin left null because no economically comparable cost-of-sales/gross-profit line exists.
+- Operating free cash flow field mechanically equals operating cash flow less PP&E purchases, but report and limitations explicitly state it excludes core portfolio deployment and is not distributable cash.
+
+7. Protocol population
+- Used protocol `set` commands for analysis sources, model, metrics, financials, asset/liability analysis, owner earnback interpretation, dividend, business, risks, evidence, and data quality.
+- Did not construct result.json by hand.
+
+8. Known limitations
+- Balance-sheet values use the annual average rather than year-end spot FX for consistency.
+- Input market data is a third-party snapshot.
+- Dividend forecast is an annualization, not a promise.
+- Market-share ranking was not asserted because no sufficiently verifiable official market-share source was found.
+
+9. Final validation
+- See final protocol validate command output recorded during completion.

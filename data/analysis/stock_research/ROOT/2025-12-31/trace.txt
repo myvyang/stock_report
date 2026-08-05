@@ -1,0 +1,67 @@
+Stock research trace — ROOT — period 2025-12-31
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Instructions and protocol
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields through protocol `set`; no complex result object was authored from scratch.
+
+2. Reuse audit
+- Checked stock_report/data/analysis/annual_review/ROOT/2025-12-31,
+  stock_report/data/raw/filings/ROOT/2025-12-31, and
+  stock_report/data/normalized/facts/ROOT/2025-12-31.
+- No usable local 2025 filing or annual facts package existed, so primary public sources were retrieved.
+
+3. Primary sources
+- SEC Form 10-K, period 2025-12-31, filed 2026-02-25,
+  accession 0001788882-26-000014:
+  https://www.sec.gov/Archives/edgar/data/1788882/000178888226000014/root-20251231.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/1788882/000178888226000014/0001788882-26-000014-index.htm
+- Root FY2025 results/shareholder letter, issued 2026-02-25:
+  https://ir.joinroot.com/news-releases/news-release-details/root-inc-announces-2025-fourth-quarter-and-full-year-results
+- SAFE exchange-rate reference, 2025-12-31:
+  https://www.safe.gov.cn/safe/2025/1231/26980.html
+- Market capitalization, date, source and PE TTM were reused verbatim from config/input.json.
+
+4. Model decision
+- Overrode input hint ordinary_operating/applicable.
+- Confirmed financial_insurance/requires_special_model because Root is a holding
+  company for regulated P&C insurance carriers. Cash and investments support loss
+  reserves, unearned premium liabilities and regulatory capital. Ordinary detachable
+  net cash and free-cash-flow owner earnback metrics are therefore not economically valid.
+- All ordinary owner-earnback sorting numbers remain null.
+
+5. Currency and calculations
+- Reporting contract requires CNY absolute yuan. USD statement amounts were converted
+  at 1 USD = CNY 7.0288 as of 2025-12-31. This single closing rate is a display
+  normalization; no FX-performance inference was made.
+- gross_margin = 386.6 / 1,517.1 = 0.25482829081800806.
+- net_margin = 38.3 / 1,517.1 = 0.02524553424296355, using income attributable
+  to common shareholders.
+- For insurance, gross profit follows Root's disclosed definition: total revenue less
+  loss and LAE and other insurance expense.
+- Cost of sales proxy = loss and LAE 924.2 + other insurance expense 206.3 = USD 1,130.5m.
+- Ordinary capex and operating FCF are null because they lack comparable owner-cash
+  meaning in this insurance model.
+- Forecast common dividend = 0 because the 10-K states no historical cash dividend and
+  no anticipated cash dividend in the foreseeable future.
+
+6. Important evidence checks
+- Policies in force: 481,869; gross premiums written: USD 1,505.8m.
+- Total revenue: USD 1,517.1m; common-shareholder net income: USD 38.3m.
+- Net combined ratio: 98.2% vs 96.4% in 2024; gross combined ratio: 97.1%.
+- Cash: USD 669.3m; investments: USD 391.4m; loss reserves: USD 483.6m;
+  unearned premiums: USD 393.7m; long-term debt: USD 200.3m.
+- Statutory capital and surplus of three U.S. insurance subsidiaries: USD 247.0m.
+- Root Insurance Company paid USD 123.0m extraordinary subsidiary dividend after
+  regulatory approval; Root Re paid USD 60.0m to an intermediate holding company.
+  Neither is a common-stockholder dividend.
+
+7. Validation
+- Ran:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed result validation status: ok; errors: [].
+- Final validation repeated after report/trace generation and cleanup.

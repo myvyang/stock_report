@@ -1,0 +1,50 @@
+[2026-08-03 Asia/Shanghai] task initialized
+- Read stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because no annual fact package was present.
+- Initialized outputs/result.json with protocol CLI:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+[source reuse audit]
+- stock_report contained only data/notes/user_stock_evaluations.md.
+- No 300488.SZ/2025-12-31 raw filing, annual facts, normalized facts, or prior stock-research result was available.
+- Therefore retrieved the official 2025 annual report and dividend announcement from CNInfo.
+
+[primary sources]
+1. 恒锋工具股份有限公司2025年年度报告, published 2026-04-28
+   https://static.cninfo.com.cn/finalpage/2026-04-28/1225203250.PDF
+   Used pages/sections: business and industry pp.12-22; risks pp.31-32; audited statements pp.77-86; cash/financial asset notes pp.122-123; cash-flow supplement pp.152-154.
+2. 恒锋工具股份有限公司关于2025年度利润分配预案的公告, published 2026-04-28
+   https://static.cninfo.com.cn/finalpage/2026-04-28/1225203263.PDF
+3. config/input.json
+   Used only for company identity and Tencent market-cap/PE snapshot at 20260731161409.
+
+[model decision]
+- Confirmed statement_model=ordinary_operating.
+- Confirmed owner_earnback_applicability=applicable.
+- Reason: revenue derives from precision cutting-tool manufacturing/services; assets are production equipment, inventory, trade receivables, corporate cash products and ordinary financing. No customer funds, insurance reserves, regulated presale cash, concession asset, or holding-company structure was identified.
+
+[derived figures]
+- gross_profit = 713054243.47 - 394530956.43 = 318523287.04
+- gross_margin = 318523287.04 / 713054243.47 = 0.4467041464
+- net_margin = 169443029.60 / 713054243.47 = 0.2376313257
+- operating_free_cash_flow = 170424318.41 - 122501272.69 = 47923045.72
+- discounted cash = 104667495.35*70% + 517309968.67*60% + 197391232.88*85% = 551435775.895
+- financing debt deducted = 40132782.26 + 390054215.62 = 430186997.88
+- discounted detachable net cash = 121248778.015
+- sustainable cash profit = 139915255.34*90% = 125923729.81
+- operating business price = 5412000000.00 - 121248778.015 = 5290751221.985
+- owner earnback = 5290751221.985 / 125923729.81 = 42.0155 years
+- market cap / cash profit = 5412000000.00 / 125923729.81 = 42.9784
+- forecast dividend yield = 37644164.60 / 5412000000.00 = 0.0069556845
+
+[judgment boundaries]
+- Facts: reported financial statements, product revenue/margins, financial-asset composition, capex, dividend proposal, and disclosed risks.
+- Inference: ordinary-operating model applicability based on the economic substance of the business and balance sheet.
+- Judgment: cash discount rates and 10% haircut to recurring profit. These are disclosed explicitly in result.json and report.md.
+- Limitation: maintenance capex versus growth/fundraising-project capex is not separately disclosed. Commercial-paper endorsements used to acquire long-term assets (91210506.00) are discussed but are not added to the protocol's cash capex field, which follows the cash-flow statement amount.
+
+[protocol operations]
+- Initialized via protocol init.
+- Populated all branches through repeated protocol set commands; result was not handwritten from a blank JSON object.
+- Protocol validation after population returned: {"status":"ok","errors":[]}.

@@ -1,0 +1,106 @@
+task=stock_research
+query=FSBC
+period=2025-12-31
+report_type=annual
+research_date=2026-08-05
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+population=protocol set commands only; complex result object was not handwritten from scratch
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[reuse_check]
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+prior_stock_research=missing
+action=returned to primary filing and official company disclosures
+
+[primary_filing]
+issuer=Five Star Bancorp
+cik=0001275168
+form=10-K
+accession=0001628280-26-012724
+filed=2026-02-27
+period=2025-12-31
+url=https://www.sec.gov/Archives/edgar/data/1275168/000162828026012724/fsbc-20251231.htm
+local_copy=stock_report/data/raw/filings/FSBC/2025-12-31/fsbc-20251231.htm
+extraction=SEC inline XBRL contexts c-1 (FY2025) and c-4 (2025-12-31), cross-checked against SEC companyfacts and company annual-results release
+
+[model_decision]
+input_hint=ordinary_operating/applicable
+verified_model=financial_bank/requires_special_model
+reason=Five Star Bancorp operates wholly through a regulated bank; customer deposits and loans are the funding and earning assets of the business. Cash and securities support liquidity and cannot be treated as detachable cash.
+ordinary_owner_earnback_fields=null
+
+[currency]
+source=Federal Reserve Board via FRED AEXCHUS
+source_url=https://fred.stlouisfed.org/series/AEXCHUS
+rate_period=2025 annual average
+usd_cny=7.1875
+method=all filing USD amounts multiplied by 7.1875 for protocol CNY display
+limitation=balance-sheet CNY values are not period-end spot-rate translations
+
+[audited_facts_usd]
+total_assets=4754861000
+total_liabilities=4309029000
+stockholders_equity=445832000
+gross_loans=4077019000
+allowance_for_credit_losses=44409000
+cash_and_bank_deposits=506851000
+afs_securities_fair_value=94699000
+htm_securities_carrying_value=2190000
+deposits=4201084000
+noninterest_bearing_deposits=1084537000
+interest_bearing_deposits=3116547000
+subordinated_debt=74041000
+net_interest_income=151905000
+noninterest_income=6535000
+noninterest_expense=65008000
+provision_for_credit_losses=9700000
+net_income=61606000
+cash_dividends=17085000
+
+[derived_bank_metrics]
+loan_to_deposit=0.9704683363
+allowance_to_loans=0.0108925173
+roe_using_average_2024_2025_equity=0.1462533355
+dividend_payout=0.2773268837
+market_cap_to_2025_net_income=17.3334846
+market_cap_to_2025_year_end_book_equity=2.3950455
+net_interest_margin=0.0355
+efficiency_ratio=0.4103
+nonperforming_loans_to_loans=0.0008
+cet1_ratio=0.1058
+total_capital_ratio=0.1333
+real_estate_related_loans_ratio=0.8607
+deposits_over_usd5m_relationships_ratio=0.6090
+largest_single_deposit_ratio=0.0690
+
+[dividend_forecast]
+evidence=2026 January, April and July declarations each USD0.25 per share
+annualized_dividend_per_share_usd=1.00
+shares_outstanding_2026-02-24=21301477
+forecast_cash_dividend_usd=21301477
+forecast_cash_dividend_cny=153104365.9375
+forecast_dividend_yield=0.0199491643
+status=scenario, not board commitment
+
+[market_input]
+market_cap_cny=7674725786.114136
+market_cap_date=2026-08-03
+market_cap_source=Yahoo Finance yfinance
+pe_ttm=18.800797
+limitation=input did not expose underlying share price, share count, or FX conversion details
+
+[output_checks]
+result_json=outputs/result.json
+report_md=outputs/report.md
+trace_txt=outputs/trace.txt
+special_model_null_check=discounted_net_cash, discounted_cash_profit, operating_business_price, owner_earnback_years, market_cap_to_cash_profit all null
+data_quality=complete

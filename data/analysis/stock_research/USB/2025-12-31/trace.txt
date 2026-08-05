@@ -1,0 +1,66 @@
+Stock research trace: USB / U.S. Bancorp / period 2025-12-31
+Generated for task timestamp: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Read references/data-reuse.md completely because it governs source reuse.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- Checked stock_report/data/analysis/annual_review/USB/2025-12-31, stock_report/data/raw/filings/USB/2025-12-31, and stock_report/data/normalized/facts/USB/2025-12-31.
+- No USB filing, annual facts pack, normalized facts, or prior stock-research result existed in the workspace.
+- Therefore returned to official filings and company disclosures.
+
+3. Primary sources retrieved and inspected
+- SEC Form 10-K, accession 0000036104-26-000011:
+  https://www.sec.gov/Archives/edgar/data/36104/000003610426000011/usb-20251231.htm
+- SEC Exhibit 13 / annual-report HTML:
+  https://www.sec.gov/Archives/edgar/data/36104/000003610426000011/usb-20251231_d2.htm
+- SEC annual report to shareholders, accession 0000036104-26-000014:
+  https://www.sec.gov/Archives/edgar/data/36104/000003610426000014/a2025annualreport.pdf
+- U.S. Bancorp 2025-12-09 quarterly dividend announcement:
+  https://ir.usbank.com/news-events/news/news-details/2025/U-S--Bancorp-Announces-Quarterly-Dividends-97097a9a4/default.aspx
+- RMB central parity reference for 2025-12-31: USD/CNY 7.0288, announced under authorization of the China Foreign Exchange Trade System.
+- Market snapshot was reused exactly from config/input.json: CNY 662,334,225,881.6953 market cap, 2026-08-03, Yahoo Finance yfinance, PE TTM 12.576845.
+
+4. Model decision
+- Input hint ordinary_operating/applicable was rejected after filing review.
+- Confirmed statement_model=financial_bank and owner_earnback_applicability=not_applicable.
+- Reason: deposits, loans, securities, cash, short-term borrowings, and long-term debt are the operating funding and asset structure of a bank. They cannot be converted into detachable net cash under the ordinary-company formula.
+- All ordinary owner-earnback amounts and ratios remain null as required by the result contract.
+- Replacement model: net interest margin, credit quality, allowance coverage, CET1, ROE, and common-dividend coverage.
+
+5. Extracted source facts (USD millions unless noted)
+- Total assets 692,345; total liabilities 626,694; total equity 65,651.
+- U.S. Bancorp shareholders' equity 65,193; noncontrolling interests 458; preferred stock 6,808.
+- Cash and due from banks 46,890; HTM securities 76,170; AFS securities 90,838; loans held for sale 2,538; net loans 383,730.
+- Deposits 522,216; short-term borrowings 17,162; long-term debt 60,764; other liabilities 26,552.
+- Net interest income 16,649; noninterest income 11,891; income before tax 9,517; net income 7,596; net income attributable to U.S. Bancorp 7,570; common-shareholder income 7,194.
+- Net interest margin 2.72%; average common equity ROE 13.0%; CET1 ratio 10.8%.
+- Allowance for credit losses 7,947; nonperforming assets 1,590; net charge-off ratio 0.57%.
+- 2025 common dividends declared 3,198; common repurchases 490.
+- Quarterly common dividend announced in December 2025: USD 0.52 per share, or USD 2.08 annualized.
+- Common shares outstanding at 2026-01-31: 1,553,695,799.
+
+6. Transformations and assumptions
+- All USD financial-statement amounts multiplied by 7.0288 to produce absolute CNY yuan required by the protocol.
+- Bank revenue used for net-margin calculation = GAAP net interest income + noninterest income = USD 28,540 million.
+- Structured net margin = attributable parent net income / bank revenue = 7,570 / 28,540 = 0.2652417659.
+- Forecast common dividend = 1,553,695,799 shares * USD 2.08 * 7.0288 = CNY 22,714,883,426.58.
+- Forecast dividend yield = CNY 22,714,883,426.58 / CNY 662,334,225,881.6953 = 0.0342951980.
+- The dividend forecast is mechanical annualization, not management guidance.
+- Gross margin, operating cash flow, capital expenditure, and operating free cash flow are null because they do not have ordinary-company comparability for a bank.
+
+7. Data-quality limitations
+- A single 2025-12-31 closing FX rate is used for both balance-sheet and income-statement translation to satisfy the unified CNY output contract; this is not period-average translation accounting.
+- Market cap and PE are input-provided data. Their upstream FX conversion could not be reconstructed from local material.
+- Forward dividend depends on unchanged share count, unchanged USD 0.52 quarterly dividend, board approval, and regulatory capital constraints.
+
+8. Protocol mutations and validation
+- Populated outputs/result.json only through protocol set and append commands after initialization.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result after population: status=ok, errors=[]

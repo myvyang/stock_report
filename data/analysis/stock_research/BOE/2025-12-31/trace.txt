@@ -1,0 +1,62 @@
+stock-research trace
+task: BOE / 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+   - Searched stock_report/data for BOE facts, filings, normalized facts, and prior research.
+   - No reusable BOE files were present in the workspace.
+
+3. Protocol initialization
+   - Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Result: stock-research-result-v1 skeleton created.
+
+4. Primary-source retrieval
+   - SEC Form N-CSR accession 0001193125-26-093621, filed 2026-03-05, period 2025-12-31.
+   - BlackRock 2025 Annual Report to Shareholders, pages 11-13, 98, 101, 105, 110-111, 118, 146 and related notes.
+   - Key extracted USD facts:
+     total assets 727,206,291; total liabilities 10,702,959; net assets 716,503,332;
+     unaffiliated investments 720,097,983; affiliated investments 5,505,831;
+     option liabilities 7,965,349;
+     net investment income 8,347,591; realized gain 68,738,880;
+     unrealized appreciation 25,418,448; net increase from operations 102,504,919;
+     2025 distributions 56,008,915; 2025 repurchases 34,701,871;
+     NAV/share 12.89; market price/share 11.71; monthly distribution/share 0.0827;
+     annualized distribution/share 0.9924; option overwrite 43.2%.
+
+5. Model override
+   - Input hint ordinary_operating/applicable was rejected.
+   - Confirmed statement_model=investment_holding and owner_earnback_applicability=not_applicable.
+   - Reason: BOE is a closed-end investment fund; investments and derivatives are the business itself.
+   - All ordinary owner-earnback sorting fields remain null.
+
+6. Currency conversion
+   - Used 2025-12-31 CFETS/PBOC-authorized central parity: USD 1 = CNY 7.0288.
+   - Financial statement USD amounts were multiplied by 7.0288 and stored as absolute CNY yuan.
+   - Market cap was preserved from input because it was already supplied in CNY.
+
+7. Forecast distribution
+   - Assumption: monthly USD 0.0827 continues for 12 months, annualized USD 0.9924.
+   - Yield = 0.9924 / 11.71 = 0.08474807856532877.
+   - Forecast CNY cash distribution = input market cap 4,543,546,614.595093 × yield = 385,056,845.46.
+   - This is a mechanical run-rate assumption, not company guidance.
+
+8. Protocol population
+   - Used repeated protocol set commands for analysis, model, metrics, financials, assets/liabilities, owner_earnback interpretation, dividend, business, risks, evidence, and data_quality.
+   - Complex JSON was not hand-created as an output file.
+
+9. Validation
+   - Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Final result after arithmetic and source-consistency review: status ok, errors [].
+   - JSON syntax check: passed.
+   - Output presence: result.json 209 lines; report.md 66 lines; trace.txt present.
+
+10. Known limitations
+   - PE TTM is retained from input but is not economically comparable to an operating-company PE.
+   - Ordinary revenue, gross margin, operating cash flow, capex, free cash flow, and owner-earnback fields are null by design.
+   - Forecast distribution can change and its final tax characterization is unknown in advance.

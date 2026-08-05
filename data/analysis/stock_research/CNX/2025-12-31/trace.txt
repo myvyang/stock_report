@@ -1,0 +1,67 @@
+CNX stock research trace
+generated_at=2026-08-04T21:42:19+08:00
+period=2025-12-31
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, data-reuse.md.
+2. Ran protocol init with config/input.json -> outputs/result.json.
+3. Populated scalar fields with protocol set and list entries with protocol append.
+4. Ran protocol validate after report and trace creation.
+
+[reuse audit]
+- No CNX annual facts package, normalized facts, prior research result, or raw filing existed locally.
+- Downloaded the SEC filing into stock_report/data/raw/filings/CNX/2025-12-31/cnx-20251231.htm.
+- Downloaded SEC Company Facts for cross-checking audited totals; temporary file was not treated as an output.
+
+[primary sources]
+- SEC Form 10-K, accession 0001070412-26-000038, filed 2026-02-10:
+  https://www.sec.gov/Archives/edgar/data/1070412/000107041226000038/cnx-20251231.htm
+- CNX Q4 2025 Earnings Results & Supplemental Information:
+  https://investors.cnx.com/~/media/Files/C/CNX-Resources-IR-V2/events/2025/cnx-q4-earnings-results-and-supplemental-information-2025.pdf
+- Federal Reserve H.10 DEXCHUS via FRED:
+  https://fred.stlouisfed.org/series/DEXCHUS
+- Market cap, date and PE: config/input.json, attributed there to Yahoo Finance yfinance.
+
+[source facts in USD]
+2025 revenue_and_other_operating_income=2239134000
+2025 total_operating_expense=1348211000
+2025 constructed_operating_surplus_proxy=890923000
+2025 net_income=633162000
+2025 operating_cash_flow=1028957000
+2025 capital_expenditure=494988000
+2025 simple_operating_fcf=533969000
+2025 company_defined_fcf=646000000
+2025 stock_repurchase_cash=523561000
+2025 ending_assets=9094446000
+2025 ending_liabilities=4757430000
+2025 ending_equity=4337016000
+2025 ending_cash=779000
+2025 ending_restricted_cash=12685000
+2025 ending_debt_carrying_value=2421359000
+2025 ending_finance_leases=30086000
+
+[fx]
+2025 DEXCHUS valid-observation average=7.187543 CNY/USD (250 observations); used for income statement and cash flow.
+2025-12-31 DEXCHUS=6.9931 CNY/USD; used for balance sheet.
+Input market cap was already denominated in CNY and was not translated.
+
+[judgments]
+- statement_model=ordinary_operating: owned oil/gas and midstream operating assets; no customer funds or special balance-sheet model.
+- Issuer does not present gross profit. Constructed proxy equals total revenue and other operating income less total operating expense. It includes DD&A and SG&A and is flagged as non-comparable.
+- Detachable net cash includes 100% cash and deducts 100% debt plus finance leases. Restricted cash receives 0% because of Apex escrow/settlement obligation.
+- Commodity derivative assets and liabilities are not separately included in net cash because they match future production and their cash effect is captured through sustainable profit.
+- Sustainable cash profit starts from company-defined 2025 FCF of USD646m and applies a 25% judgmental haircut for commodity, hedge, definition, and maintenance-capex uncertainty.
+- Forecast dividend is zero because 2023-2025 declared dividends per share were zero and capital return was conducted through repurchases.
+
+[formulas in CNY]
+discounted_net_cash=5447624.9-17143200029.5=-17137752404.6
+discounted_cash_profit=646000000*7.187543*0.75=3482364583.5
+operating_business_price=35739986179.85156-(-17137752404.6)=52877738584.45156
+owner_earnback_years=52877738584.45156/3482364583.5=15.184434977
+market_cap_to_cash_profit=35739986179.85156/3482364583.5=10.263137395
+forecast_dividend_yield=0/35739986179.85156=0
+
+[limitations]
+- Input valuation was not independently recalculated.
+- Gross-margin proxy is issuer-specific and not peer-comparable.
+- Owner cash profit includes an explicit subjective haircut and is sensitive to gas price and maintenance capital needs.

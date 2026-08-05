@@ -1,0 +1,83 @@
+stock-research trace
+company: 中国移动 (600941.SH)
+period: 2025-12-31 annual
+created_at_input: 2026-07-31T19:24:25+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+- No files existed at stock_report/data/analysis/annual_review/600941.SH/2025-12-31.
+- No files existed at stock_report/data/raw/filings/600941.SH/2025-12-31 before this run.
+- No corresponding reusable material was found under /root/aicode/stock_report.
+- Therefore returned to official filing source.
+
+4. Official filing acquired
+- Source: Hong Kong Exchanges and Clearing issuer filing, China Mobile Limited Annual Report 2025.
+- Disclosure page/document URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042300752.pdf
+- Publication date shown by HKEX: 2026-04-23.
+- Saved PDF: stock_report/data/raw/filings/600941.SH/2025-12-31/annual-report-2025.pdf
+- Extracted text: stock_report/data/raw/filings/600941.SH/2025-12-31/annual-report-2025.txt
+- PDF pages: 171.
+- Extraction method: pypdf in temporary virtual environment because no system PDF text extractor was available.
+
+5. Key filing locations used
+- Annual report pp. 15-18: headline performance, business mix, customer scale, capex, FCF and dividend policy.
+- Annual report pp. 27-30: revenue, operating expenses, profitability, capital structure and cash flow review.
+- Annual report pp. 79-86: audited consolidated income statement, balance sheet and cash flow statement.
+- Annual report pp. 141-145: cash composition, financing liabilities, payables, contract liabilities and China Mobile Finance deposits.
+- Annual report pp. 147-150: issued shares and dividends.
+
+6. Analysis model decision
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- China Mobile is capital-intensive and regulated, but deposits/insurance reserves/project liquidation are not the business model.
+- Operating prepayments and network payables were not treated as detachable cash.
+- Cash, deposits and securities were haircut; bank borrowing, lease liabilities and CMCC Group deposits in China Mobile Finance were fully deducted.
+
+7. Important analytical conventions
+- Filing does not present a consolidated all-business cost-of-sales subtotal.
+- Analytical gross profit proxy = operating revenue - network operation/support expense - cost of products sold
+  = 1,050,187m - 285,698m - 152,992m = 611,497m.
+- Proxy gross margin = 58.2274%. This excludes depreciation, employee and other service-delivery costs and is not directly comparable with standard reported gross margin.
+- Filing/company FCF = 82,041m; inferred capex used by that formula = OCF 232,919m - FCF 82,041m = 150,878m, consistent with rounded headline capex of 150.9bn.
+
+8. Owner earnback calculations
+- Included cash: 97,267m * 50% = 48,633.5m.
+- Included bank deposits: 135,512m * 70% = 94,858.4m.
+- Included FVPL financial assets: 389,447m * 50% = 194,723.5m.
+- Included amortised-cost financial assets: 12,464m * 60% = 7,478.4m.
+- Included FVOCI financial assets: 33,078m * 40% = 13,231.2m.
+- Deducted bank borrowings 9,748m + lease liabilities 91,449m + CMCC Group deposits 40,005m = 141,202m.
+- Discounted detachable net cash = 217,722m.
+- Sustainable distributable cash profit = 2025 parent net profit 137,095m * 75% = 102,821.25m.
+- Market cap = 2,108,089m.
+- Operating business price = 2,108,089m - 217,722m = 1,890,367m.
+- Owner earnback years = 1,890,367 / 102,821.25 = 18.38498.
+- Market cap / cash profit = 20.50246.
+
+9. Dividend forecast
+- 2025 dividend attributable to year: 103,532m; payout ratio stated as 75%.
+- 2026 guidance: payout ratio stable-to-rising.
+- Static forecast avoids assuming earnings growth: 137,095m * 75% = 102,821.25m.
+- Forecast yield = 102,821.25m / 2,108,089m = 4.87746%.
+
+10. Market data
+- Market cap and PE TTM were reused exactly from config/input.json.
+- Source: Tencent qt.gtimg.cn.
+- Snapshot timestamp: 20260731114348.
+
+11. Protocol population and validation
+- All result fields were populated using repeated protocol CLI `set` commands invoked programmatically; the complex JSON result was not handwritten from scratch.
+- First completed validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- First completed validation result: status=ok, errors=[]
+
+12. Output files
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

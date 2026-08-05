@@ -1,0 +1,75 @@
+stock-research trace
+company: 德瑞锂电 (920523.BJ)
+period: 2025-12-31 annual
+research_created_at: 2026-08-03 Asia/Shanghai
+
+[skill and contracts]
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because SKILL.md directly defines it as the reuse boundary.
+- Used protocol CLI init before populating outputs/result.json.
+- Used protocol CLI set for every populated JSON field; did not hand-write result.json from scratch.
+
+[reuse audit]
+- config/input.json exists.
+- Expected raw filing, annual review, normalized facts and prior stock-research files for 920523.BJ/2025-12-31 were absent.
+- Only stock_report/data/notes/user_stock_evaluations.md existed and contained no reusable company research needed here.
+- Therefore retrieved public disclosure text; no stale historical owner-earnback result was reused.
+
+[sources]
+1. 德瑞锂电：2025年年度报告, disclosed 2026-04-22, audited by Da Hua with unmodified opinion.
+   Public full-text mirror: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12140528&stockid=920523
+   Annual report states the designated disclosure venue is Beijing Stock Exchange (www.bse.cn).
+   Used for company identity, business model, industry position, all three statements, asset/liability details, customers/suppliers, geographic revenue, capex project and risks.
+2. 德瑞锂电：2025年年度权益分派预案公告, disclosed 2026-04-22.
+   https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12140536&stockid=920523
+   Used for CNY 30,390,410.70 dividend / CNY 0.30 per share. Public implementation record shows ex-dividend date 2026-05-27.
+3. config/input.json market snapshot: market cap CNY 1,555,000,000; timestamp 2026-07-31 15:38:20; source Tencent qt.gtimg.cn; PE TTM 11.41.
+
+[model determination]
+- Annual report identifies the company as a manufacturer of primary lithium batteries, mainly lithium-manganese and lithium-iron products.
+- Balance sheet contains ordinary manufacturing cash, receivables, inventory, plant/equipment, payables and bank debt.
+- No banking deposits/client funds, insurance reserves, developer presale structure, construction contract assets, concession rights or investment-holding structure was found.
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable, overriding the hint reason with filing-based facts.
+
+[reported financial facts, CNY]
+- Revenue 521,851,735.32; cost of sales 297,311,803.04; gross profit 224,539,932.28.
+- Operating profit 169,307,945.48; net and parent net profit 145,222,928.17.
+- Total assets 1,021,720,545.15; liabilities 312,094,039.70; equity and parent equity 709,626,505.45; minority interest 0.
+- Operating cash flow 128,809,544.15.
+- Cash paid to acquire fixed/intangible/other long-term assets 93,804,425.50.
+- Operating free cash flow = 128,809,544.15 - 93,804,425.50 = 35,005,118.65.
+- Financing cash flow 11,413,658.31.
+- Owner distributions recorded in equity statement 30,390,410.70. Cash-flow statement line for dividends/profit/interest is 33,924,369.94 and includes interest, so dividend-only cash out uses 30,390,410.70.
+- Cash 374,277,755.43; current portion of non-current liabilities 8,397,190.26; long-term loans 153,067,944.85.
+
+[derived metrics]
+- Gross margin = 224,539,932.28 / 521,851,735.32 = 0.4302753389.
+- Net margin = 145,222,928.17 / 521,851,735.32 = 0.2782838848.
+- Forecast/implemented dividend yield = 30,390,410.70 / 1,555,000,000 = 0.0195436725.
+- Interest-bearing debt = 8,397,190.26 + 153,067,944.85 = 161,465,135.11.
+- Discounted detachable net cash = 374,277,755.43 * 85% - 161,465,135.11 = 156,670,957.0055.
+- Discounted net cash / market cap = 0.1007530270.
+- 2025 fixed-asset depreciation 17,284,175.14 used as maintenance-capex proxy. Actual CNY 93.80m capex includes the disclosed expansion project and is not treated as recurring maintenance.
+- Pre-haircut sustainable cash profit proxy = 128,809,544.15 - 17,284,175.14 = 111,525,369.01.
+- Discounted sustainable cash profit = 111,525,369.01 * 90% = 100,372,832.109.
+- Operating business price = 1,555,000,000 - 156,670,957.0055 = 1,398,329,042.9945.
+- Owner earnback years = 1,398,329,042.9945 / 100,372,832.109 = 13.9313498844.
+- Market cap / cash profit = 1,555,000,000 / 100,372,832.109 = 15.4922399550.
+
+[judgment boundaries]
+- Fact: reported statement figures, project status, customer/supplier concentration and dividend.
+- Inference: ordinary-operating model classification based on business and statement structure.
+- Judgment/estimate: 85% cash haircut, depreciation as maintenance-capex proxy, and 90% sustainability haircut.
+- These assumptions are explicit in result.json. No target price, recommendation or ranking label is produced.
+
+[quality limitations]
+- No local annual-report PDF/fact pack was supplied; public filing text mirror was used, with original disclosure venue identified as BSE.
+- Maintenance capex is not directly disclosed and is the principal sensitivity in owner-earnback results.
+- Market capitalization and PE were accepted from the provided Tencent snapshot and not independently reconstructed.
+
+[validation]
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}
+- Ran Python json.tool parse check: passed.
+- Checked required output presence and searched for prohibited legacy ranking labels: passed; the only "incomplete" occurrence is the required empty incomplete_reasons field.

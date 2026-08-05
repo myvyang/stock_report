@@ -1,0 +1,60 @@
+MRP stock-research trace
+generated_at=2026-08-04T23:56:03+08:00
+period=2025-12-31
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md completely.
+- Read references/report-contract.md completely.
+- Read references/data-reuse.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse decision
+- No raw filing, annual facts package, normalized facts, or prior MRP stock-research outputs existed under stock_report/data.
+- Public-source retrieval was therefore required.
+
+3. Primary evidence
+- Millrose Properties 2025 Form 10-K, SEC accession 0002017206-26-000002, filed 2026-03-02:
+  https://www.sec.gov/Archives/edgar/data/2017206/000201720626000002/ck0002017206-20251231.htm
+- Millrose Properties dividend Form 8-K, filed 2026-06-23:
+  https://www.sec.gov/Archives/edgar/data/2017206/000119312526279485/ck0002017206-20260623.htm
+- IRS 2025 yearly average currency exchange rates:
+  https://www.irs.gov/individuals/international-taxpayers/yearly-average-currency-exchange-rates
+- PBOC 2025-12-26 USD/CNY central parity announcement:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- SAFE 2025-12-31 year-end conversion-rate publication page:
+  https://www.safe.gov.cn/safe/2025/1231/26980.html
+- Market cap, date, source, and PE were reused exactly from config/input.json.
+
+4. Model determination
+- Input hint ordinary_operating/applicable was overridden.
+- Selected statement_model=real_estate_developer and owner_earnback_applicability=requires_special_model.
+- Reason: homesites under option contracts and development loans are income-producing operating capital; builder deposits and debt are matched to the land-banking cycle. They are not detachable cash or ordinary working-capital balances.
+- Ordinary owner-earnback metrics were kept null as required by the result contract.
+
+5. Currency translation
+- Balance-sheet USD amounts multiplied by 7.0358 CNY/USD, the nearest explicitly extracted official year-end central-parity value.
+- Income-statement and cash-flow USD amounts multiplied by IRS 2025 average 7.129 CNY/USD.
+- No currency conversion was applied to the supplied CNY market cap.
+
+6. Key calculations
+- net_margin = USD 404.824m parent-attributable net income / USD 600.461m revenue = 0.6741886650.
+- price_to_book = CNY 31.351347736bn market cap / CNY 41.203488180bn parent equity = approximately 0.761.
+- 2025 AFFO dividend coverage = USD 427.904m / USD 423.309m declared dividends = approximately 1.011.
+- forecast annual dividend = USD 0.77 latest quarterly dividend * 4 * 166,003,497 year-end shares = USD 511.29077076m.
+- forecast annual dividend CNY = USD 511.29077076m * 7.129 = CNY 3,644,991,904.75.
+- forecast dividend yield = CNY 3,644,991,904.75 / CNY 31,351,347,736.26416 = 0.1162626862.
+- Forecast is a mechanical annualization, not company guidance.
+
+7. Cash-flow treatment
+- Reported operating cash flow includes USD 3.216bn of homesite takedowns.
+- USD 5.722bn of core homesite acquisitions/development-loan deployment is classified as investing cash flow.
+- Consequently capital_expenditure and operating_free_cash_flow were left null; OCF minus conventional capex would not describe distributable cash for this model.
+
+8. Output construction and validation
+- result.json was populated through repeated protocol CLI set commands, not handwritten from scratch.
+- report.md and trace.txt were authored from the validated result and cited primary evidence.
+- Protocol validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before final consistency checks: status=ok, errors=[]

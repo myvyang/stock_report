@@ -1,0 +1,84 @@
+stock-research trace
+company=浙江仙通
+code=603239.SH
+period=2025-12-31
+generated_for_input_created_at=2026-08-01T00:14:58+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Read references/data-reuse.md because the skill and task require reuse-first research.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result.json exclusively through protocol set/append commands.
+6. Validation command and result are recorded below after final validation.
+
+[reuse-check]
+Requested annual facts, normalized facts, raw filing metadata, and historical stock-research outputs did not exist in the workspace at task start.
+Therefore official/public filing retrieval was required.
+
+[sources]
+Primary filing URL:
+https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-08/603239_20260408_ROO9.pdf
+
+The SSE server rejected direct CLI download with anti-bot HTTP 403. The filing identity and URL were located via web search, and the full annual-report text was obtained from the Sina Finance filing transcription:
+https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12066982&stockid=603239
+
+Market snapshot source is preserved from config/input.json:
+Tencent qt.gtimg.cn, timestamp 20260731114325, market cap 3777000000.0000005 CNY, PE TTM 18.48.
+
+[key-extractions]
+Revenue=1522197826.54
+Cost_of_sales=1076252421.95
+Gross_profit=445945404.59
+Parent_net_profit=221904993.82
+Operating_cash_flow=115031684.67
+Cash_capex_per_cash_flow_statement=7195697.99
+Operating_free_cash_flow_per_contract=107835986.68
+Noncash_long_lived_asset_purchase_settled_by_endorsed_notes=128676228.92
+Total_assets=1802456284.79
+Total_liabilities=466795718.43
+Total_equity=1335660566.36
+Parent_equity=1325860781.80
+Cash_and_cash_equivalents=116571471.91
+Restricted_cash=25497505.67
+Lease_related_debt=435174.92
+Proposed_2025_cash_dividend=81216000.00
+
+[analysis_model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: the company manufactures automotive sealing components. Receivables, notes, inventory, plant, equipment and supplier payables are ordinary manufacturing operating assets and liabilities; no financial-institution, property-development, concession, construction-project or investment-holding balance-sheet model was found.
+
+[calculations]
+gross_margin=(1522197826.54-1076252421.95)/1522197826.54=0.2929630613430772
+net_margin=221904993.82/1522197826.54=0.14577933947466267
+forecast_dividend_yield=81216000/3777000000=0.021502779984114374
+
+discounted_detachable_net_cash=
+  cash_and_cash_equivalents 116571471.91 * 0.80
+  - lease_related_debt 435174.92
+  =92822002.608
+
+discounted_sustainable_cash_profit=
+  operating_cash_flow 115031684.67
+  - depreciation_proxy_for_maintenance_capex 63221206.58
+  =51810478.09
+
+operating_business_price=3777000000.0000005-92822002.608=3684177997.392
+owner_earnback_years=3684177997.392/51810478.09=71.10702413309172
+market_cap_to_cash_profit=3777000000.0000005/51810478.09=72.8994528400762
+
+[judgment-boundaries]
+Facts: reported financial statement numbers, product split, customer concentration, restricted cash, note-settled asset purchases and dividend proposal.
+Inference: ordinary operating model applicability and the interpretation of working-capital growth.
+Subjective assumptions: 80% cash discount and depreciation as maintenance-capex proxy. These are disclosed in result.json and report.md.
+The robot business forecast/order plans were not included in sustainable profit because 2025 contribution was immaterial and independently realized economics were not yet demonstrated.
+
+[validation]
+Command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+Result:
+status=ok
+errors=[]

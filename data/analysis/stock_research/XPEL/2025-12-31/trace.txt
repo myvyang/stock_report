@@ -1,0 +1,64 @@
+Stock research trace — XPEL — period 2025-12-31
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill identifies it as the reuse boundary.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the workspace for XPEL/2025-12-31 raw filings, annual facts, normalized facts, and prior stock research.
+- No reusable XPEL filing or annual fact package was present; stock_report contained only its notes directory.
+- Therefore returned to primary public sources.
+
+3. Primary sources used
+- SEC Form 10-K, accession 0001767258-26-000014, filed 2026-02-27, period 2025-12-31:
+  https://www.sec.gov/Archives/edgar/data/1767258/000176725826000014/xpel-20251231.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/1767258/000176725826000014/0001767258-26-000014-index.htm
+- XPEL investor relations Q4/full-year 2025 results:
+  https://investor.xpel.com/financials/quarterly-results/default.aspx
+- Federal Reserve H.10, daily USD/CNY, 2025-12-31 = 7.1875 CNY per USD:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Market cap CNY 8,251,999,599.730957, date 2026-08-03, PE TTM 23.230366: supplied input, source Yahoo Finance yfinance.
+
+4. Model decision
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: revenue comes from film products, installation and software; inventory, receivables, payables and leases are ordinary operating balances. No bank deposits, customer funds, insurance reserves, regulated presale cash, concession rights, or investment-holding structure was found.
+
+5. Currency conversion
+- All filing figures were reported in USD thousands.
+- Converted to CNY absolute yuan using 7.1875 CNY/USD for consistency with result-contract.
+- This period-end rate was also applied to income and cash-flow figures for a uniform display convention; recorded as a limitation because it is not an average-rate translation.
+
+6. Key reported USD figures used
+- Balance sheet: assets 382.526m; liabilities 97.341m; total equity 285.185m; parent equity 280.282m; NCI 4.903m; cash 50.864m; AR 49.846m; inventory 122.755m.
+- Income: revenue 476.200m; cost of sales 275.181m; gross profit 201.019m; operating income 62.649m; net income 51.589m; parent net income 51.226m.
+- Cash flow: CFO 66.938m; PP&E purchases 4.008m; intangible development 1.550m; financing cash flow -3.657m; treasury share purchases 2.999m.
+- Owner-cash constraints: notes payable 0.059m; contingent liabilities at fair value 19.966m; main revolving credit facility balance zero.
+
+7. Formula record
+- Gross margin = 201.019 / 476.200 = 0.4221314574.
+- Net margin = 51.226 / 476.200 = 0.1075724486.
+- Operating free cash flow = (66.938 - 4.008 - 1.550)m USD × 7.1875 = CNY 441,168,750.
+- Discounted detachable net cash = (50.864 × 80% - 19.966 - 0.059)m USD × 7.1875 = CNY 148,538,312.50.
+- Discounted sustainable cash profit = operating FCF × 90% = CNY 397,051,875.00.
+- Operating business price = market cap - discounted net cash = CNY 8,103,461,287.230957.
+- Owner earnback years = operating business price / discounted cash profit = 20.4090744748.
+- Market cap / cash profit = 20.7831775123.
+- Discounted net cash / market cap = 0.0180002811.
+- Forecast cash dividend = 0 and yield = 0 because the 10-K states no cash dividend is anticipated in the foreseeable future.
+
+8. Judgment notes
+- Cash haircut: 20% reserve for working capital, expansion, and integration; all disclosed notes and contingent acquisition liabilities deducted.
+- Profit haircut: treated PP&E purchases and capitalized intangible development as capital expenditure, then applied a further 10% sustainability discount.
+- Acquisition cash outlays were not classified as maintenance capex. If recurring acquisitions are necessary to sustain growth, this convention overstates distributable cash; disclosed in report and data-quality limitations.
+- Share repurchase was recorded as owner cash outflow history, not as forecast dividend.
+
+9. Output construction and validation
+- Populated outputs/result.json through protocol CLI set operations after protocol initialization; did not construct the result object from scratch.
+- Wrote outputs/report.md to follow the operating-story sequence required by report-contract.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

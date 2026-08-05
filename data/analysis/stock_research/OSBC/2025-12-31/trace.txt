@@ -1,0 +1,60 @@
+Stock research trace: OSBC / 2025-12-31 annual
+Generated: 2026-08-05 Asia/Shanghai
+
+1. Read instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - /workspace/AGENTS.md instructions supplied in task context
+
+2. Reuse check
+   - Checked configured annual-review, normalized-facts, raw-filing and prior stock-research paths.
+   - No OSBC filing/fact package/prior result existed in the workspace; only config/input.json was present.
+
+3. Protocol initialization
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Primary-source research
+   - SEC 2025 Form 10-K, accession 0001104659-26-020393, filed 2026-02-26:
+     https://www.sec.gov/Archives/edgar/data/357173/000110465926020393/osbc-20251231x10k.htm
+   - SEC filing index:
+     https://www.sec.gov/Archives/edgar/data/357173/000110465926020393/0001104659-26-020393-index.html
+   - Old Second Q4 2025 earnings release:
+     https://www.oldsecond.com/clientuploads/pdf/OSBC_Earnings_Release_Q4-2025_-_EX_99-1_and_EX_99-2.pdf
+   - Federal Reserve H.10, release dated 2026-01-05; 2025-12-31 CNY/USD = 6.9931:
+     https://www.federalreserve.gov/releases/h10/20260105/
+   - Market cap and PE were reused from config/input.json (Yahoo Finance yfinance, 2026-08-03).
+
+5. Model decision
+   - Overrode input hint ordinary_operating/applicable.
+   - Confirmed financial_bank/not_applicable because the company is a bank holding company with one community-banking segment.
+   - Deposits, loans, securities, cash and wholesale funding are operating balance-sheet items; all ordinary owner-earnback ranking fields remain null.
+
+6. Key extracted USD facts
+   - Total assets 6,902.675m; liabilities 6,005.907m; equity 896.768m.
+   - Gross loans 5,252.131m; ACL 72.301m; net loans 5,179.830m.
+   - AFS securities 1,090.523m; cash and equivalents 124.025m; deposits 5,596.069m.
+   - Net interest income 292.964m; provision 27.553m; noninterest income 46.362m; noninterest expense 204.022m; net income 80.310m.
+   - Adjusted net income 102.570m; NIM 4.96%; ROA 1.27%; ROE 10.27%.
+   - ACL/loans 1.38%; net charge-offs/average loans 0.35%; nonaccrual loans/loans 0.91%; NPA/assets 0.81%.
+   - Consolidated CET1 12.99%; total capital 15.46%; leverage 11.70%.
+   - 2025 dividends 12.240m and buybacks 7.412m; next declared quarterly dividend USD 0.07/share.
+
+7. Currency and forecast method
+   - All USD statement amounts multiplied by 6.9931 to satisfy the CNY absolute-yuan result contract.
+   - Forecast dividend = USD 0.07 x 4 x 52,690,806 shares x 6.9931 = CNY 103,172,181.12.
+   - Forecast yield = CNY 103,172,181.12 / CNY 8,693,086,893.94 = 1.1874456%.
+   - Income statement translation also uses the period-end rate for protocol consistency; this is disclosed as a limitation.
+
+8. Result population
+   - Populated outputs/result.json only through repeated protocol CLI `set` commands after initialization.
+   - Did not construct or replace the complex JSON manually.
+
+9. Validation
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+10. Outputs
+   - outputs/result.json
+   - outputs/report.md
+   - outputs/trace.txt

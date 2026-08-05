@@ -1,0 +1,75 @@
+stock-research execution trace
+task: 01899.HK, annual, period 2025-12-31
+generated timezone: Asia/Shanghai
+
+1. Read instructions
+   - /workspace/AGENTS.md
+   - /workspace/.agents/skills/stock-research/SKILL.md
+   - /workspace/.agents/skills/stock-research/references/result-contract.md
+   - /workspace/.agents/skills/stock-research/references/report-contract.md
+
+2. Protocol initialization
+   command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   outcome: stock-research-result-v1 skeleton created from task input.
+
+3. Local reuse check
+   checked paths from config/input.json under stock_report/data/analysis/annual_review/01899.HK/2025-12-31 and stock_report/data/raw/filings/01899.HK/2025-12-31.
+   outcome: referenced annual facts, normalized facts, metadata and prior research did not exist locally; only user notes existed.
+
+4. Primary-source retrieval
+   source: HKEX issuer title search for stock code 01899.
+   filing: Xingda International Holdings Limited, Annual Report 2025, published 2026-04-29.
+   URL: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042900694.pdf
+   saved: stock_report/data/raw/filings/01899.HK/2025-12-31/annual-report-2025.pdf
+   method: PDF text extraction with pypdf in a temporary virtual environment because pdftotext was unavailable.
+
+5. Analysis-model verification
+   input hint: financial_brokerage / requires_special_model.
+   filing evidence: revenue is sale of radial tire cords and wires to tire manufacturers; revenue is recognized upon product delivery; operating assets are factories, inventory and trade/bills receivables; liabilities include trade payables and bank borrowings.
+   conclusion: input hint is a master-data misclassification. Overridden to ordinary_operating / applicable.
+
+6. Core financial extraction (RMB)
+   revenue: 11,480,328,000
+   gross profit: 2,132,962,000
+   parent net profit: 340,408,000
+   total assets: 21,193,694,000
+   total liabilities: 12,325,772,000
+   total equity: 8,867,922,000
+   parent equity: 6,647,060,000
+   operating cash flow: 1,972,177,000
+   cash purchases of PPE: 1,337,461,000
+   operating free cash flow: 634,716,000
+   bank borrowings: 7,420,833,000
+   source locations: annual report pp. 206-212 and notes 23-27.
+
+7. Owner-earnback assumptions
+   bank cash: 1,155,232,000 x 50% = 577,616,000
+   unrestricted/unpledged term deposits: 1,143,500,000 x 70% = 800,450,000
+   listed securities: 106,332,000 x 50% = 53,166,000
+   pledged/restricted term deposits: 674,439,000 x 0% = 0
+   bank borrowings: -7,420,833,000 x 100% = -7,420,833,000
+   discounted detachable net cash: -5,989,601,000
+   sustainable distributable cash-profit estimate: 250,000,000
+   rationale: begin with parent profit, haircut identifiable VAT additional deduction and FX gains, avoid treating working-capital release or minority-owned consolidated FCF as recurring parent cash.
+   market cap from input: 1,932,706,975.069642
+   operating business price: 7,922,307,975.069642
+   owner earnback: 31.68923190027857 years
+   market cap / cash profit: 7.730827900278568 years
+
+8. Dividend treatment
+   2025 final dividend recommendation: nil.
+   HKD 0.25 per-share special dividend was approved after period-end and paid 2026-03-06, before the market-cap snapshot.
+   forecast after valuation date: RMB 0; yield 0%. This avoids treating a paid one-off distribution as recurring.
+
+9. Result population
+   method: outputs/result.json was populated from the initialized skeleton exclusively with protocol CLI set commands in outputs/populate_result.sh; no complex JSON object was handwritten from scratch.
+
+10. Protocol validation
+    command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    outcome: status ok; errors [].
+
+11. Known limitations
+    - Tencent market-cap/PE snapshot was supplied by input and lacks a separately archived response in this workspace.
+    - Annual report does not split maintenance and expansion capex.
+    - Consolidated cash flow includes economic interests attributable to minority shareholders.
+    - Only the requested annual period was fully extracted; no complete multi-year normalized cash-flow series was available.

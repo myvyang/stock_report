@@ -1,0 +1,146 @@
+stock-research trace
+company=600573.SH 惠泉啤酒
+period=2025-12-31
+generated_for_input=2026-07-31T16:15:40+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md completely.
+3. Read references/report-contract.md completely.
+4. Read references/data-reuse.md because SKILL.md directly routes reuse decisions to it.
+5. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+6. Populated result fields only through repeated protocol `set` commands.
+7. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+8. Final validation response:
+   {"status":"ok","errors":[]}
+
+[local reuse audit]
+- Expected annual facts:
+  stock_report/data/analysis/annual_review/600573.SH/2025-12-31/facts.json
+  stock_report/data/analysis/annual_review/600573.SH/2025-12-31/annual_facts.md
+- Expected normalized facts:
+  stock_report/data/normalized/facts/600573.SH/2025-12-31/annual-facts.json
+- Expected prior stock research:
+  stock_report/data/analysis/stock_research/600573.SH/2025-12-31/
+- Result: none existed in the supplied workspace.
+- Action: returned to the public annual filing instead of substituting third-party financial summaries.
+
+[filing retrieval and extraction]
+- Full annual report public mirror:
+  https://stockmc.xueqiu.com/202604/600573_20260413_G9P3.pdf
+- Saved local copy:
+  stock_report/data/raw/filings/600573.SH/2025-12-31/2025-annual-report.pdf
+- Filing identity: 福建省燕京惠泉啤酒股份有限公司2025年年度报告, 146 pages.
+- Filing date stated by public disclosure index: 2026-04-13.
+- Official cross-check: CNINFO annual report summary
+  https://static.cninfo.com.cn/finalpage/2026-04-13/1225096913.PDF
+- Text extracted locally from the full PDF for page-level checks.
+- Auditor: 安永华明会计师事务所（特殊普通合伙）.
+- Opinion: standard unqualified opinion.
+
+[statement model]
+- Confirmed ordinary_operating.
+- Reason: revenue is overwhelmingly beer product sales; the company owns brewery production assets, inventory and distribution relationships. No bank deposits belonging to customers, insurance reserves, property-development contract structure, construction project advances, concession rights or holding-company look-through structure.
+- Owner earnback applicability: applicable.
+- Special handling: cash and deposits are haircutted as detachable assets; their interest/investment income is removed from sustainable operating profit to avoid double counting.
+
+[financial statement facts: CNY]
+balance_sheet.total_assets=1746294454.20
+balance_sheet.total_liabilities=379110697.36
+balance_sheet.total_equity=1367183756.84
+balance_sheet.parent_equity=1357585189.30
+balance_sheet.minority_interest=9598567.54
+income.revenue=640300233.69
+income.cost_of_sales=416884246.78
+income.gross_profit=223415986.91
+income.operating_profit=95229428.58
+income.net_profit=80138938.15
+income.parent_net_profit=79990456.49
+cashflow.operating_cash_flow=98612013.10
+cashflow.capital_expenditure=9884269.50
+cashflow.operating_free_cash_flow=88727743.60
+cashflow.financing_cash_flow=-57039928.06
+cashflow.dividend_cash_out=20000000.00
+
+[formula checks]
+gross_profit = 640300233.69 - 416884246.78 = 223415986.91
+gross_margin = 223415986.91 / 640300233.69 = 0.34892379411213276
+net_margin = 79990456.49 / 640300233.69 = 0.12492648336081538
+operating_free_cash_flow = 98612013.10 - 9884269.50 = 88727743.60
+forecast_dividend_yield = 25000000 / 2420000000 = 0.010330578512396695
+
+[operating facts]
+- Beer sales volume: 221.7 thousand kilolitres, -3.03% YoY.
+- Beer production: 220.9 thousand kilolitres, -3.38% YoY.
+- Beer main-business revenue: 620523423.08, -1.68% YoY.
+- Mid/high-end beer revenue: 399766916.36; gross margin 44.20%.
+- Ordinary beer revenue: 220756506.72; gross margin 15.20%.
+- Fujian revenue share of beer main-business revenue: 75.51%.
+- Dealers: 418 inside Fujian, 384 outside Fujian.
+- Three production bases: design capacity 800 thousand tonnes/year; disclosed actual capacity 550 thousand tonnes/year.
+- Annual report industry datum: China above-scale beer output 35.36 million kilolitres, -1.1%, sourced by company to National Bureau of Statistics.
+
+[asset and liability facts]
+cash_and_accrued_interest=1081411966.06
+cash_equivalents=60345115.50
+term_deposits_over_three_months=951000000.00
+term_deposit_interest_receivable=70066850.56
+structured_deposits=90326711.68
+long_term_deposit_and_interest=174482876.71
+inventory=81980154.31
+fixed_assets=246515634.10
+intangible_assets=50748150.65
+interest_bearing_debt=40000000.00+475117.55+6401583.84=46876701.39
+notes_payable=86874684.50
+accounts_payable=99231124.12
+contract_liabilities=81596278.14
+other_payables=45205240.53
+- Annual report states no restricted assets and no cash held overseas with remittance restrictions.
+
+[owner earnback assumptions and calculations]
+cash row 1:
+  cash equivalents 60345115.50 * 100% = 60345115.50
+cash row 2:
+  term deposits and accrued interest 1021066850.56 * 90% = 918960165.50
+cash row 3:
+  structured deposits 90326711.68 * 85% = 76777704.93
+cash row 4:
+  long-term deposits 174482876.71 * 80% = 139586301.37
+cash row 5:
+  interest-bearing debt 46876701.39 * 100% = -46876701.39
+discounted_detachable_net_cash=1148792585.91
+discounted_net_cash_to_market_cap=1148792585.91/2420000000=0.4747076801280991
+operating_business_price=2420000000-1148792585.91=1271207414.09
+
+profit normalization:
+- Starting parent net profit: 79990456.49.
+- Financial expenses were -30941795.67 because interest income was 32984265.03 versus interest expense 1916629.45.
+- Investment income was 5640988.97 and fair-value gain was 326711.68.
+- Cash assets are separately deducted from market cap, so related earnings were removed on an estimated after-tax basis.
+- Recurring operating/distributable cash profit before haircut was rounded to 50000000 after considering deducted funding income, 76995544.14 recurring parent profit, working-capital movements, depreciation and maintenance capex.
+- Sustainability haircut: 10%, reflecting declining volume, regional concentration, underused capacity and the need to verify one-year margin expansion.
+discounted_sustainable_cash_profit=45000000.00
+owner_earnback_years=1271207414.09/45000000=28.249053646444448
+market_profit_payback_years=2420000000/45000000=53.77777777777778
+
+[dividend]
+- 2023 cash dividend used in history: 15000000.
+- 2024 cash dividend paid in July 2025: 20000000, CNY 0.80 per 10 shares.
+- 2025 board proposal: 25000000, CNY 1.00 per 10 shares.
+- At the annual-report date, the 2025 proposal still required shareholder approval.
+
+[market data]
+market_cap=2420000000.0
+market_cap_date=20260731114330
+market_cap_source=Tencent qt.gtimg.cn
+pe_ttm=29.55
+- These values were reused exactly from config/input.json and were not independently recalculated.
+
+[quality and limitations]
+- status=complete because all minimum fields, evidence, model classification, statements, asset/liability explanations, dividend forecast and owner-earnback components are present.
+- The full filing PDF was obtained from a public mirror because the workspace contained no filing/fact package. Core numbers were cross-checked against the official CNINFO annual report summary.
+- Market data is an input snapshot.
+- Haircuts and sustainable profit are research estimates, not reported facts.
+- No buy/sell recommendation or target price is produced.

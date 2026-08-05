@@ -1,0 +1,60 @@
+stock-research trace
+task: 00658.HK / annual / 2025-12-31
+generated: 2026-08-03 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated initialized paths via repeated protocol `set` commands (16 section/field updates); did not replace the initialized object with a handwritten JSON file.
+5. First protocol validation result: {"status":"ok","errors":[]}.
+
+[source discovery and reuse]
+- Checked the supplied annual-review, normalized-facts, raw-filing, and prior stock-research paths.
+- No existing 00658.HK annual fact pack, normalized facts, filing metadata, or prior research output was present in /workspace.
+- Located the official 2025 annual report on HKEX News and downloaded the original PDF:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0626/2026062601613.pdf
+- Local original: stock_report/data/raw/filings/00658.HK/2025-12-31/annual-report-2025.pdf
+- Extracted text: stock_report/data/raw/filings/00658.HK/2025-12-31/annual-report-2025.txt
+- Extraction used pypdf 6.4.1 in temporary virtual environment /tmp/stockresearch-pdf because system pdftotext and PDF libraries were absent. No source PDF was modified.
+
+[identity and model check]
+- Input hint said financial_brokerage. Official annual report says the group researches, designs, manufactures and sells mechanical transmission equipment.
+- Note 5 reports 2025 wind and industrial gear revenue RMB19,396,844,000, 98.3% of group revenue RMB19,734,338,000.
+- Overrode the hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+[core financial facts; RMB]
+- Revenue 19,734,338,000; cost of sales 15,461,669,000; gross profit 4,272,669,000.
+- Operating profit 1,527,017,000; net profit 934,641,000; parent net profit 211,203,000.
+- Total assets 39,227,676,000; liabilities 25,883,044,000; total equity 13,344,632,000; parent equity 8,460,113,000; NCI 4,884,519,000.
+- Operating cash flow 3,171,505,000; cash purchase of PP&E 1,096,778,000; simple operating FCF 2,074,727,000.
+- Cash equivalents 5,643,539,000; pledged deposits 3,143,328,000; borrowings 9,345,990,000.
+- No 2025 final dividend recommended.
+
+[calculations]
+- gross_margin = 4,272,669,000 / 19,734,338,000 = 0.216512407.
+- parent net margin = 211,203,000 / 19,734,338,000 = 0.01070236.
+- operating FCF = 3,171,505,000 - 1,096,778,000 = 2,074,727,000.
+- discounted detachable net cash = 5,643,539,000 - 9,345,990,000 = -3,702,451,000. Pledged deposits receive a 0% detachable weight.
+- operating business price = input market cap 1,617,871,585.4293108 - (-3,702,451,000) = 5,320,322,585.429311.
+- sustainable distributable cash profit = 0 as a data-reliability convention: group FCF cannot be demonstrated as recurring cash distributable to parent shareholders because the 98%-revenue core subsidiary is non-wholly owned, control relies on a terminable concert agreement, the audit is qualified, and no parent cash upstream evidence was available.
+- owner earnback years and market-cap/cash-profit left null because the cash-profit denominator is not positive/reliably established.
+- forecast dividend = 0; forecast yield = 0 / market cap = 0.
+
+[material audit/governance evidence]
+- Qualified audit opinion: unresolved evidence limitations cover historical trading receivables/prepayments and related parties, EPC project balances, and opening/movement of certain FVPL assets.
+- Auditor reported inability to determine whether adequate accounting records were kept for the qualified matters.
+- Emphasis of matter: Nanjing High Speed provided about 98% of 2025 revenue; control depends on a concert agreement that may terminate in specified circumstances.
+- Historical trading gross receivables RMB3,188,981,000 and prepayments RMB3,450,531,000 were fully impaired in 2024; recovery litigation refers to about RMB6.64 billion.
+- 2025 financial guarantee impairment was RMB391,827,000.
+
+[market data]
+- Used task input without alteration: market cap CNY1,617,871,585.4293108, PE TTM 8.04, timestamp 2026/07/31 16:08:44, source Tencent qt.gtimg.cn.
+- Limitation: market snapshot, currency conversion, and share-count construction were not independently verified.
+
+[output status]
+- data_quality.status=complete means the record satisfies the consumption contract, not that the audit evidence is clean or the stock is attractive.
+- Owner earnback ratio fields are intentionally null and should not enter ordinary positive-cash-profit ranking.
+- Final protocol validation rerun after report and trace creation: {"status":"ok","errors":[]}.
+- Final JSON parse check passed; required files present: outputs/result.json, outputs/report.md, outputs/trace.txt.

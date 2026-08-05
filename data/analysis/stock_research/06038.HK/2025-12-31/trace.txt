@@ -1,0 +1,58 @@
+stock-research trace
+generated_at=2026-08-04T11:51:49+08:00
+company=06038.HK G & M HLDGS
+period=2025-12-31
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated result fields using protocol set/append commands; no hand-written result object was used.
+4. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[local reuse audit]
+- stock_report/data/analysis/annual_review/06038.HK/2025-12-31/facts.json: missing
+- stock_report/data/analysis/annual_review/06038.HK/2025-12-31/annual_facts.md: missing
+- stock_report/data/raw/filings/06038.HK/2025-12-31/metadata.json: missing
+- No prior normalized facts or stock-research outputs were present under /workspace.
+- Because reusable facts were absent, the official annual report was retrieved and reviewed.
+
+[sources]
+- G & M Holdings Limited, Annual Report 2025, HKEX release 2026-04-28:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042804385.pdf
+- People's Bank of China, HKD/CNY central parity on 2025-12-26 (1 HKD = CNY 0.90486):
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026/08/03 09:30:00.
+
+[model audit]
+- Input hint: financial_brokerage / requires_special_model.
+- Filing fact: all 2025 revenue and operating results were attributable to the Construction Business; the group provides podium facade and curtain-wall design-and-build and maintenance services in Hong Kong.
+- Override: construction_project / requires_special_model.
+- Ordinary owner-earnback fields intentionally remain null because contract assets, contract liabilities, retention monies, project surety bonds, and working capital are part of the business model.
+
+[key extracted facts; original currency HKD'000]
+- Revenue 380,422; cost of revenue 280,284; gross profit 100,138.
+- Profit before tax 65,245; finance costs 451; net and parent profit 55,571.
+- Total assets 481,977; total liabilities 184,507; total/parent equity 297,470.
+- Cash and bank balances 387,299; contract assets 62,663; trade and other receivables/deposits/prepayments 20,459.
+- Contract liabilities 99,745; trade and other payables 45,538; lease liabilities 4,119; dividend payable 35,105.
+- Operating cash flow 50,647; capex 1,049; operating FCF 49,598; financing cash flow -3,619; dividends paid in 2025 cash flow statement nil.
+- 2025 dividend attributable to year: special dividend 35,105; no final dividend recommended.
+- Remaining performance obligations 242,492 versus 345,919 in 2024.
+- Major customers: 268,398 and 54,604, together 84.9% of revenue.
+- Surety bonds in favor of customers: 68,376.
+
+[conversion and formulas]
+- Financial statement amounts converted at 0.90486 CNY/HKD; values are absolute CNY yuan in result.json.
+- Gross margin = 100,138 / 380,422 = 0.2632287302.
+- Net margin = 55,571 / 380,422 = 0.1460772511.
+- Operating profit is derived as profit before tax plus finance costs: (65,245 + 451) * 0.90486.
+- Operating FCF = (50,647 - 1,049) * 0.90486.
+- Forecast cash dividend = 0 because the annual report expressly recommends no final dividend and no later declared distribution was identified by the research date; this is a conservative forecast, not a permanence assumption.
+- Market cap and PE were retained from input. Input does not expose its underlying HKD-to-CNY conversion methodology.
+
+[quality notes]
+- Annual report is audited and provides all minimum special-model fields.
+- P&L and cash-flow conversion uses a period-end-near rate rather than an annual average rate.
+- The annual report does not quantify how much cash is legally/reliably detachable from project obligations, so no ordinary net-cash valuation was produced.

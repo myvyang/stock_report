@@ -1,0 +1,63 @@
+stock-research trace
+company: 01669.HK / Global International Credit Group Limited / GIC GROUP
+period: year ended 2025-12-31
+generated_for_input: config/input.json
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md in full.
+- Read references/report-contract.md in full.
+- Read references/data-reuse.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields via repeated protocol `set` commands; the initialized JSON was not replaced by a hand-written object.
+
+2. Local reuse check
+- No prior filing, annual facts, normalized facts, or stock-research result existed for 01669.HK/2025-12-31.
+- Downloaded official annual report to:
+  stock_report/data/raw/filings/01669.HK/2025-12-31/annual-report-2025.pdf
+
+3. Primary sources
+- HKEX issuer title search:
+  https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=115502
+- HKEX Annual Report 2025, released 2026-04-30:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0430/2026043002146.pdf
+- HKEX Final Results 2025, released 2026-03-27:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0327/2026032701721.pdf
+- SAFE historical RMB central parity data landing page:
+  https://www.safe.gov.cn/safe/2020/1218/17833.html
+- Market-cap input source: Tencent qt.gtimg.cn, snapshot 2026/08/03 09:34:57, supplied in config/input.json.
+
+4. Model determination
+- Input hint said financial_brokerage.
+- Annual report pp. 7-8 states the group operates money lending under Hong Kong's Money Lenders Ordinance, focused on short- and long-term property mortgage loans.
+- Overrode model to platform_financial_mixed / requires_special_model.
+- Reason: loan receivables and cash are both components of the lending capital pool; cash released by loan-book contraction is not ordinary recurring free cash flow.
+
+5. Key extracted HKD facts
+- Revenue HK$77.189m; other income net HK$7.336m; administrative expense HK$23.938m; financial-asset impairment reversal HK$2.338m; attributable profit HK$52.233m (annual report p. 98).
+- Total assets HK$953.545m; net loans HK$500.822m; cash HK$400.797m; repossessed assets HK$15.864m; FVTPL assets HK$15.703m; total liabilities HK$8.428m; attributable equity HK$945.117m (pp. 99-100).
+- Operating cash flow HK$278.421m; capex HK$0.056m; financing cash flow HK$-50.433m; dividends paid HK$48.000m (p. 102).
+- Gross loans HK$507.976m; Stage 3 gross loans HK$61.978m; loan impairment allowance HK$7.154m (p. 132).
+- Weighted average LTV 61.3%; average month-end aggregate loans HK$648.2m, down 20.1% (pp. 5, 8).
+- FY2025 dividend HK$52.0m / HK$0.13 per share, including HK$31.2m / HK$0.078 per share special dividends (p. 149).
+
+6. Currency and calculations
+- Result-contract requires CNY absolute yuan.
+- Applied HKD/CNY 0.897878955 at 2025-12-31 to all filing amounts for consistent output.
+- Net margin = 52.233 / 77.189 = 67.66897%; this is not comparable with an industrial gross/net margin because revenue is lending interest.
+- Approximate ROE = 52.233 / average(940.884, 945.117) = 5.539%.
+- Stage 3 gross-loan ratio = 61.978 / 507.976 = 12.201%.
+- Conservative forecast dividend = ordinary interim HK$0.028 + ordinary final HK$0.024 = HK$0.052/share x 400m shares = HK$20.8m; special dividends excluded.
+- Forecast yield = HK$20.8m x 0.897878955 / CNY450,797,202.35 = 4.14286%.
+- Ordinary owner-earnback fields remain null as required for a special financial model.
+
+7. Validation
+- Command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final status: ok; errors: [].
+
+8. Limitations
+- Income statement and cash-flow translations use the period-end exchange rate rather than an annual average rate.
+- Market cap and PE were supplied by the task and not independently reconstructed.
+- Forecast dividend is an analyst convention based on ordinary FY2025 dividends, not management guidance.

@@ -1,0 +1,60 @@
+stock-research trace
+task: HCI / annual / 2025-12-31
+generated_at: 2026-08-04T13:39:13+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Checked reusable local data
+- No annual facts, normalized facts, raw filing metadata, or prior stock-research output existed under the HCI/2025-12-31 paths.
+- Research therefore returned to the original SEC filing and official company earnings exhibit.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: initialized stock-research-result-v1 skeleton.
+
+4. Primary sources
+- SEC 2025 Form 10-K, accession 0001193125-26-076743, filed 2026-02-26:
+  https://www.sec.gov/Archives/edgar/data/1400810/000119312526076743/hci-20251231.htm
+- SEC FY2025 earnings release Exhibit 99.1, accession 0001193125-26-071719, filed 2026-02-25:
+  https://www.sec.gov/Archives/edgar/data/1400810/000119312526071719/hci-ex99_1.htm
+- SEC companyfacts API for audited XBRL cash-flow facts:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0001400810.json
+- PBOC/CFETS USD-CNY central parity, 2025-12-26, USD 1 = CNY 7.0358:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- Market cap and PE: config/input.json, Yahoo Finance yfinance snapshot dated 2026-08-03.
+
+5. Model determination
+- Input hint ordinary_operating was rejected after filing review.
+- 10-K states HCI is primarily engaged in property and casualty insurance.
+- Cash and investments support claims, unearned premiums, reinsurance settlement, liquidity, and regulatory capital.
+- Set statement_model=financial_insurance and owner_earnback_applicability=requires_special_model.
+- All ordinary owner-earnback values remain null per result contract.
+
+6. Key audited/original-currency facts (USD)
+- Total assets 2,528,928,000; liabilities 1,414,284,000; total equity 1,111,285,000; parent equity 1,041,077,000.
+- Revenue 900,946,000; net income 320,395,000; parent net income 299,005,000.
+- Operating cash flow 444,449,000; capex 3,633,000; ordinary dividends paid 19,289,000.
+- Cash 1,210,126,000; investments 789,655,000; reinsurance recoverables 289,896,000.
+- Loss and LAE reserves 576,495,000; unearned premiums 643,328,000; interest-bearing debt 67,877,000.
+- Net combined ratio 56.3%; gross loss ratio 19.6%; policies in force approximately 313,400.
+- Restricted net assets 516,547,000.
+- US insurance subsidiaries statutory surplus 468,290,000; minimum capital/surplus 84,601,000; dividends allowed without approval 45,225,000.
+
+7. Currency conversion
+- All result.json financial-statement amounts = USD fact x 7.0358 CNY/USD.
+- This is a unified display conversion, not GAAP translation; limitation recorded in data_quality and report.
+
+8. Dividend forecast
+- Scenario: quarterly dividend continues at USD 0.40, annualized USD 1.60.
+- Shares held constant at 12,992,147 (2025 year-end).
+- Forecast CNY cash dividend = 1.60 x 12,992,147 x 7.0358 = 146,256,236.58.
+- Forecast yield = 146,256,236.58 / 15,074,822,434.040771 = 0.009702020519319402.
+
+9. Protocol writes and validation
+- result.json was populated through repeated protocol set commands; it was not hand-written from a blank object.
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].

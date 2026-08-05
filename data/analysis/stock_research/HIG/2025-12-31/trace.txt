@@ -1,0 +1,74 @@
+task=stock_research
+query=HIG
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-04T14:22:18+08:00
+
+[protocol]
+1. Read stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated initialized fields only through protocol set/append commands.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse-check]
+The paths declared in config/input.json for raw filing, annual facts, normalized facts, and prior stock research did not exist under /workspace. No prior financial fact pack or research conclusion was reusable.
+
+[primary-sources]
+SEC 2025 Form 10-K, accession 0000874766-26-000012:
+https://www.sec.gov/Archives/edgar/data/874766/000087476626000012/hig-20251231.htm
+Used for company identity, business segments, audited statements, underwriting ratios, investment portfolio, reserves, capital resources, subsidiary dividend capacity, RBC statement, historical dividends, and risks.
+
+The Hartford Q2 2026 results release, 2026-07-23:
+https://ir.thehartford.com/news/news-details/2026/The-Hartford-Reports-Strong-Second-Quarter-2026-Financial-Results/
+Used for the latest available ROE, book value per diluted share, and post-period operating cross-check.
+
+The Hartford dividend release, 2026-05-20:
+https://ir.thehartford.com/news/news-details/2026/The-Hartford-Declares-Quarterly-Dividends-Of-0-60-Per-Share-Of-Common-Stock-And-375-Per-Share-Of-Series-G-Preferred-Stock-f7c9e31bf/default.aspx
+Used to confirm continuation of the $0.60 quarterly common dividend.
+
+PBOC/CFETS central parity announcement, 2025-12-26:
+https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+Used for USD/CNY conversion at 7.0358, the nearest directly verified official rate before period end.
+
+[market-source]
+Market capitalization CNY 262510049512.4414, date 2026-08-03, and PE TTM 9.807187 were carried from config/input.json; source there is Yahoo Finance yfinance.
+
+[model-decision]
+Input hint ordinary_operating/applicable was overridden.
+Confirmed model=financial_insurance.
+Confirmed owner_earnback_applicability=requires_special_model.
+Reason: invested assets and liquidity support insurance reserves, policy liabilities, statutory capital, and ratings; subsidiary dividends are regulated. They are not detachable net cash.
+All ordinary owner earnback sorting metrics remain null as required by the result contract.
+
+[currency-conversion]
+All 2025 filing amounts were reported in USD millions and converted to CNY absolute yuan using amount_usd_millions * 1,000,000 * 7.0358.
+Examples:
+total_assets=85997m USD -> 605057692600 CNY
+total_liabilities=67018m USD -> 471525244400 CNY
+total_equity=18979m USD -> 133532448200 CNY
+revenue=28368m USD -> 199591574400 CNY
+parent_net_profit=3815m USD -> 26841577000 CNY
+investment_portfolio=64000m USD -> 450291200000 CNY
+claims_reserve=46268m USD -> 325532394400 CNY
+unearned_premiums=10053m USD -> 70730897400 CNY
+
+[derived-fields]
+net_margin=3815/28368=0.1344825155104343
+forecast_cash_dividend=670m USD * 7.0358=4713986000 CNY
+forecast_dividend_yield=4713986000/262510049512.4414=0.01795735469012643
+static_market_cap_to_2025_equity=262510049512.4414/133532448200=1.9666 (report context only; not a protocol sorting field)
+
+[special-model-observations]
+2025 Business Insurance combined ratio=88.3; underlying combined ratio=88.5.
+2025 Personal Insurance combined ratio=91.9; underlying combined ratio=88.0.
+2025 net investment income=2911m USD.
+All U.S. operating insurance subsidiaries reported RBC ratios above applicable regulatory minimums; no single group RBC percentage was disclosed.
+Holding company resources at 2025 year-end were approximately 1500m USD.
+Expected 2026 upstream net dividends: P&C 2200m USD, HLA 580m USD, Hartford Funds 170m USD.
+
+[quality]
+status=complete
+limitations include FX translation, non-official market snapshot, absence of a disclosed group RBC percentage, and lack of dedicated protocol fields for insurer-specific ratios.

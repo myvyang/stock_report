@@ -1,0 +1,69 @@
+[2026-08-04 Asia/Shanghai] stock-research trace — TDW / 2025-12-31 annual
+
+1. Protocol and instructions
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as explicitly requested.
+- Read references/data-reuse.md because the skill routes existing-fact reuse through this reference.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse assessment
+- config/input.json was present.
+- The referenced annual fact package, normalized fact package, raw filing metadata, and prior stock-research outputs were absent under stock_report/data for TDW/2025-12-31.
+- Therefore no annual facts were reusable; researched the primary filing.
+
+3. Primary sources
+- SEC filing: Tidewater Inc. Form 10-K for year ended 2025-12-31, filed 2026-03-02, accession 0001437749-26-006391.
+  URL: https://www.sec.gov/Archives/edgar/data/98222/000143774926006391/tdw20251231_10k.htm
+- SEC filing index: https://www.sec.gov/Archives/edgar/data/98222/000143774926006391/0001437749-26-006391-index.htm
+- IRS 2025 yearly average USD/CNY: 7.129 CNY per USD.
+  URL: https://www.irs.gov/individuals/international-taxpayers/yearly-average-currency-exchange-rates
+- Federal Reserve H.10 spot USD/CNY at 2025-12-31: 7.1875 CNY per USD.
+  URL: https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Market snapshot reused verbatim from config/input.json: market cap CNY 25,188,817,471.91455; date 2026-08-03; PE TTM 12.657673; source Yahoo Finance yfinance.
+
+4. Statement model review
+- Confirmed ordinary_operating / applicable.
+- Economic substance: owned offshore support vessels are productive operating assets; contracts generate day-rate service revenue. Debt finances the fleet. The balance sheet is not principally customer money, insurance reserves, regulated project funds, concession rights, or underlying investments.
+
+5. Filing facts used (USD thousands unless noted)
+- Balance sheet: assets 2,386,911; liabilities 1,025,657 (derived as 315,237 + 649,048 + 61,372); total equity 1,361,254; parent equity 1,365,388; NCI -4,134; cash 578,761; receivables 285,372; supplies 38,482; net PPE 1,072,020; deferred drydock 139,736; deferred tax asset 200,939; debt 654,893.
+- Income: revenue 1,352,786; direct vessel/other operating costs 687,002; research gross profit 665,784; operating income 282,596; net income 333,453; parent net income 334,661.
+- Cash flow: CFO 379,108; additions to PPE 25,761; operating FCF 353,347; financing cash flow -135,959; common stock purchases 90,089.
+- 2024 comparison: CFO 282,472; PPE additions 27,580; operating FCF 254,892.
+- Operating facts: 208 owned vessels; operations in over 30 countries; total utilization 76.1%; active utilization 78.7%; average day rate USD 22,573; eight stacked vessels. PSV/AHTS/other vessel revenue shares 72.3%/24.2%/3.5%.
+- Dividends: none declared in 2023, 2024, or 2025.
+- Important quality item: deferred income tax benefit 195,816; 2025 net income is not used directly as sustainable distributable cash.
+
+6. Currency translation
+- 2025 income statement and cash flow values multiplied by 7.129.
+- 2024 FCF multiplied by 7.189, the IRS 2024 yearly average rate.
+- 2025-12-31 balance sheet values multiplied by 7.1875.
+- Ratios calculated before/consistently after translation as appropriate.
+
+7. Owner earnback assumptions and formulas
+- Discounted cash = CNY 4,159,844,687.50 × 90% = CNY 3,743,860,218.75.
+- Debt deducted at 100% = CNY 4,707,043,437.50.
+- Discounted detachable net cash = -CNY 963,183,218.75.
+- 2025 operating FCF = CNY 2,519,010,763.00.
+- 2024 operating FCF = USD 254,892,000 × 7.189 = CNY 1,832,418,588.00.
+- Two-year average FCF = CNY 2,175,714,675.50.
+- Sustainable cash profit applies 20% haircut = CNY 1,740,571,740.40.
+- Operating business price = market cap - discounted net cash = CNY 26,152,000,690.66455.
+- Owner earnback years = operating business price / sustainable cash profit = 15.0249484601.
+- Market cap / cash profit = 14.4715767166.
+- Forecast cash dividend = zero; forecast dividend yield = zero, based on three consecutive years with no declared dividend.
+
+8. Judgment boundaries
+- Facts: filing numbers, fleet statistics, debt maturity, dividend history, exchange rates, supplied market snapshot.
+- Inference: ordinary operating classification and explanations of operating leverage/cash conversion.
+- Subjective but explicit assumptions: 90% cash haircut, two-year FCF normalization, 20% cycle/maintenance haircut, zero-dividend base forecast.
+- Limitation: post-period Brazilian joint venture acquisition announcement is not reflected in 2025 statements or owner-earnback base.
+
+9. Output construction and validation
+- outputs/result.json was initialized and populated only through the stock-research protocol CLI; it was not written from scratch.
+- outputs/report.md and outputs/trace.txt were created after the JSON passed protocol validation.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed-result validation status: ok, errors: [].
+- Final cross-file validation repeated after report and trace creation: ok, errors: []; JSON parse check passed; no legacy ranking labels or initialization placeholders found.

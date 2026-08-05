@@ -1,0 +1,65 @@
+stock-research trace
+company: 美德乐 (920119.BJ)
+period: 2025-12-31 annual
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely as requested.
+- Read references/data-reuse.md because the skill routes research through existing long-term artifacts first.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked paths specified by config/input.json.
+- Missing: raw filing metadata, annual facts JSON/Markdown, normalized facts and prior stock-research outputs for 920119.BJ/2025-12-31.
+- Therefore no prior facts or conclusions were reused; public filing retrieval was necessary.
+
+3. Sources acquired and used
+- 大连美德乐工业自动化股份有限公司2025年年度报告, dated 2026-04-15, audit report 容诚审字[2026]215Z0007号.
+  Retrieved PDF mirror: https://cdn.financialreports.eu/financialreports/media/filings/58732/2026/RNS/58732_rns_2026-04-15_ca891a01-6f7d-4342-b31b-4fc078750da0.PDF
+  The document is the issuer's full annual report; core financial figures were extracted from the audited statements and notes.
+- Beijing Stock Exchange listing information: https://www.bse.cn/issue_report_meeting/200027671.html
+  Used for IPO date, shares issued, issue price and gross proceeds.
+- Company announcement on fundraising: net IPO proceeds RMB 608,267,200.83 after issuance costs.
+- 2025 annual equity distribution implementation announcement (2026-096):
+  https://dataclouds.cninfo.com.cn/sjother2/bse_onmarket/2026/20260512/59356cdc4df111f1be3afa163e296ac0.pdf
+- Market data was accepted from config/input.json: Tencent qt.gtimg.cn, market cap RMB 4,703,000,000, PE TTM 16.87, timestamp 20260731153802.
+
+4. Model decision
+- Confirmed statement_model=ordinary_operating.
+- Reason: company manufactures and sells modular conveying systems and industrial components; its statements are driven by inventory, receivables, contract liabilities, production assets and customer delivery, not by financial intermediation, real-estate development, concession rights or investment holding.
+- Ordinary owner earnback is applicable, with special caution that contract liabilities are delivery obligations and IPO proceeds are earmarked.
+
+5. Core audited figures (RMB)
+- Revenue 1,368,812,906.41; cost of sales 874,756,661.17; gross profit 494,056,245.24.
+- Operating profit 315,531,811.84; net profit 272,557,757.53; parent net profit 271,336,786.40.
+- Total assets 2,792,634,867.42; total liabilities 1,501,379,321.19; total equity 1,291,255,546.23; parent equity 1,283,880,817.22; minority interest 7,374,729.01.
+- Operating cash flow 211,086,333.86; capital expenditure 59,401,655.90; operating free cash flow 151,684,677.96.
+- Cash and cash equivalents 116,056,058.44; trading financial assets 342,187,568.14; reverse repos 44,662,500.00; lease liabilities 3,645,733.21.
+- Inventory 1,222,791,394.08; contract liabilities 1,021,413,643.91; operating receivables 694,717,101.53.
+
+6. Calculations and judgments
+- Gross margin=(revenue-cost)/revenue=0.3609377461.
+- Net margin=parent net profit/revenue=0.1982278112.
+- Operating FCF=operating cash flow-capex=151,684,677.96.
+- Discounted detachable net cash=(116,056,058.44+342,187,568.14+44,662,500.00)*50%-3,645,733.21=247,807,330.08.
+- The 50% cash discount is an analyst judgment reflecting project delivery, RMB 1.021bn contract liabilities, expansion and working-capital volatility.
+- IPO net proceeds RMB 608,267,200.83 assigned a 0% detachable weight because they are post-period and earmarked for investment projects.
+- Discounted sustainable cash profit set to RMB 150,000,000, anchored to 2025 operating FCF and rounded down. This is deliberately below reported parent net profit.
+- Operating business price=4,703,000,000-247,807,330.08=4,455,192,669.92.
+- Owner earnback years=4,455,192,669.92/150,000,000=29.7012844661.
+- Market cap/cash profit=4,703,000,000/150,000,000=31.3533333333.
+- Forecast dividend=72,123,267 shares*RMB0.50=36,061,633.50; yield=0.0076677936. Stock capitalization is excluded from cash return.
+
+7. Protocol operations and validation
+- All complex result fields were populated using protocol `set`; the JSON object was not handwritten from scratch.
+- First full validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[].
+
+8. Known limitations
+- Valuation date is 2026-07-31 but the latest full balance sheet used is 2025-12-31.
+- Known post-period IPO and dividend events were incorporated, but no same-date balance sheet exists in the supplied workspace.
+- The 50% cash discount and RMB150m sustainable cash profit are conservative analytical assumptions, not issuer guidance.
+- No independently verifiable company market share was found; industry-position wording distinguishes issuer claims from verified facts.

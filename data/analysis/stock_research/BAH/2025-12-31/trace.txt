@@ -1,0 +1,39 @@
+task: BAH annual stock research
+input: config/input.json
+generated_at: 2026-08-04T21:03:19+08:00
+
+1. Read stock-research/SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Ran protocol CLI init against config/input.json to create outputs/result.json.
+3. Checked configured annual-review/raw-filing directories. No reusable BAH FY2025 fact package or raw filing was present in the workspace.
+4. Resolved period mismatch: BAH fiscal year ends March 31. For report_type=annual and input period=2025-12-31, used the latest annual filing available by that date: FY2025 Form 10-K for year ended 2025-03-31, filed 2025-05-23, SEC accession 0001443646-25-000076. Did not substitute the 2025-12-31 10-Q for an annual filing.
+5. Core sources:
+   - SEC 10-K: https://www.sec.gov/Archives/edgar/data/1443646/000144364625000076/bah-20250331.htm
+   - SEC filing index: https://www.sec.gov/Archives/edgar/data/1443646/0001443646-25-000076-index.htm
+   - SEC Companyfacts: https://data.sec.gov/api/xbrl/companyfacts/CIK0001443646.json
+   - Company dividend history: https://investors.boozallen.com/stock-information
+   - Federal Reserve H.10: https://www.federalreserve.gov/releases/h10/20250331/
+   - Market cap and PE: supplied input snapshot, Yahoo Finance yfinance, dated 2026-08-03.
+6. Financial statement source values in USD millions:
+   - assets 7,312; liabilities 6,309; equity/parent equity 1,003
+   - cash 885; receivables 2,271; PP&E 177; lease ROU 178; goodwill 2,405; intangibles 563
+   - current debt 83; long-term debt 3,915
+   - revenue 11,980; cost of revenue 5,419; billable expenses 3,780; constructed gross profit 2,781; operating income 1,370; parent net income 935
+   - CFO 1,009; productive asset purchases/capex 98; operating FCF 911; financing cash flow -460; dividends 268; buybacks 812
+7. Currency convention: multiplied all USD filing values by 7.2628 CNY/USD, the Federal Reserve H.10 rate for 2025-03-28 (last published business-day rate before fiscal year end). This is a uniform comparison convention, not period-average GAAP translation.
+8. Gross profit convention: revenue less cost of revenue and billable expenses = USD 2,781m; BAH does not present a separate GAAP gross-profit subtotal.
+9. Analysis model confirmed ordinary_operating/applicable. BAH is a single-segment government technology/consulting contractor; no financial-institution, regulated project cash, concession, development inventory, or investment-holding balance-sheet model was identified.
+10. Owner earnback assumptions:
+    - cash haircut: 50% of USD 885m because payroll, bonus, subcontractor, and receivables working capital require liquidity
+    - debt haircut: 100% of USD 3,998m
+    - discounted detachable net cash: (885 * 50% - 3,998) * 7.2628 = CNY -25,822,885,400
+    - FY2023/FY2024/FY2025 FCF: USD 527m / 192m / 911m; three-year average USD 543.3m
+    - sustainable cash profit selected: USD 600m = CNY 4,357,680,000, above the three-year mean to recognize the higher FY2025 earnings base but 34% below FY2025 FCF to haircut working-capital volatility
+    - operating business price: CNY 56,590,542,214.316895 - (-25,822,885,400) = CNY 82,413,427,614.3169
+    - owner earnback: 82,413,427,614.3169 / 4,357,680,000 = 18.912225683 years
+    - market cap / cash profit: 56,590,542,214.316895 / 4,357,680,000 = 12.986392350 years
+11. Dividend forecast: USD 0.59 quarterly * 4 * FY2025 ending shares 124.879m * 7.2628 = CNY 2,140,452,034.83; yield = 3.7823494%. Share count is a proxy and does not anticipate further repurchases.
+12. Populated result fields and list rows exclusively through protocol CLI set/append commands after initialization; complex result JSON was not handwritten.
+13. Wrote outputs/report.md and outputs/trace.txt.
+14. Validation command and result recorded after final checks below.
+15. Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+16. Validation result: status=ok, errors=[]

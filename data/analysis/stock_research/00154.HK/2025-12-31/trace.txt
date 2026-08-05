@@ -1,0 +1,48 @@
+stock-research trace
+company: 00154.HK / 北京控股环境集团有限公司
+period: 2025-12-31 annual
+generated_at_input: 2026-08-03T15:15:52+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated every result field through repeated protocol `set` CLI calls driven by a temporary Python subprocess wrapper; no direct result.json serialization was used.
+4. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse check]
+Expected raw filing, annual review and normalized fact paths from config/input.json did not exist in the workspace. No historical fact pack or prior stock-research result was reused.
+
+[sources]
+Primary filing: HKEX Annual Report 2025, published 2026-04-30
+https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0430/2026043000533.pdf
+Primary announcement: 2025 annual results, published 2026-03-25
+https://doc.irasia.com/listco/hk/beegl/announcement/a332715-ew_00154ann_25032026.pdf
+Market snapshot: config/input.json, Tencent qt.gtimg.cn, 2026/07/31 16:08:47.
+
+[model decision]
+Input hint financial_brokerage rejected. Filing says the group operated 11 solid-waste projects, including 10 household waste-to-energy projects; principal assets are operating concessions and service-concession receivables, with BOT/BOO periods generally 15-30 years. Selected utility_concession / requires_special_model. Ordinary owner-earnback fields remain null as required by the contract.
+
+[core extraction; filing amounts RMB'000 converted x1000]
+Revenue 1,420,814; cost of sales 832,809; gross profit 588,005; operating profit 479,432; net profit 253,571; parent net profit 232,178.
+Total assets 10,179,764; liabilities 5,988,870; equity 4,190,894; parent equity 3,866,172; NCI 324,722.
+Operating cash flow 545,237; reported segment capital expenditure 148,866; calculated operating FCF 396,371; financing cash flow -69,834; dividends/buybacks 0.
+Cash 1,608,062; restricted deposits 1,003; operating concessions 2,834,960; concession receivables current/noncurrent 93,075/2,306,494; goodwill 1,010,296; borrowings current/noncurrent 2,616,072/1,912,383.
+
+[formulas]
+gross_margin = 588,005,000 / 1,420,814,000 = 0.4138497352.
+net_margin = 232,178,000 / 1,420,814,000 = 0.1634133636.
+operating_free_cash_flow = 545,237,000 - 148,866,000 = 396,371,000.
+forecast dividend = 0; forecast yield = 0 / 522,761,297.72365093 = 0.
+minority_interest_ratio = 324,722,000 / 4,190,894,000 = 0.0774827624.
+
+[judgment boundaries]
+Fact: existing operational-project revenue rose 8.7%, while construction revenue fell 91.2%; total revenue fell 14.6%.
+Inference: the revenue decline mainly reflects transition from construction to operation, not contraction of the core operating portfolio.
+Judgment: low input PE does not establish short owner earnback because project debt, concession lives, maintenance obligations, parent distributable reserves and cash-upstreaming are unresolved.
+
+[limitations]
+The task input does not document HKD/CNY conversion for market cap. Per protocol, the supplied amount is consumed as CNY absolute yuan, with limitation disclosed.
+Project-level volumes, tariffs, maintenance capex, debt and remaining cash flows were insufficient for a concession DCF.
+Capex differs by presentation: segment disclosure RMB148.866m; cash additions to concessions/PPE/other intangibles total RMB223.940m. The former is used for the standardized FCF field and the difference is disclosed.

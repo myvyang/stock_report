@@ -1,21 +1,21 @@
 stock_research trace
 
 Task: 000719.SZ 中原传媒, 2025-12-31 annual.
-Generated at: 2026-07-28 Asia/Shanghai.
+Generated from input: 2026-07-31T12:27:19+08:00.
 
-Skill and protocol:
-- Read /workspace/.agents/skills/stock-research/SKILL.md.
-- Read /workspace/.agents/skills/stock-research/references/result-contract.md.
-- Read /workspace/.agents/skills/stock-research/references/report-contract.md.
-- Also read data-reuse.md because local annual facts and historical stock_research outputs existed.
+Protocol and contracts:
+- Read /workspace/.agents/skills/stock-research/SKILL.md completely.
+- Read /workspace/.agents/skills/stock-research/references/result-contract.md completely.
+- Read /workspace/.agents/skills/stock-research/references/report-contract.md completely.
+- Read /workspace/.agents/skills/stock-research/references/data-reuse.md because annual facts and prior same-period research existed.
 - Initialized outputs/result.json with:
   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- Populated the initialized skeleton programmatically from the annual fact pack and existing stock_research result, then corrected the asset_analysis group field name required by the result contract: interpretation -> explanation.
-- Validated with:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-- Validation result: {"status":"ok","errors":[]}
+- Reused the existing same-company, same-period annual fact pack and stock-research fields, while preserving the newly initialized company, timestamp, and valuation.
+- The first validation found that the historical result had analysis_model=null. Did not reuse that field.
+- Set analysis_model through the protocol CLI using annual-report business and balance-sheet facts.
+- Recomputed every market-cap-dependent metric from the current input.
 
-Primary local sources used:
+Primary local sources:
 - config/input.json
 - stock_report/data/raw/filings/000719.SZ/2025-12-31/metadata.json
 - stock_report/data/raw/filings/000719.SZ/2025-12-31/2025_annual_report.txt
@@ -25,39 +25,62 @@ Primary local sources used:
 - stock_report/data/analysis/stock_research/000719.SZ/2025-12-31/report.md
 - stock_report/data/analysis/stock_research/000719.SZ/2025-12-31/trace.txt
 
-Key extracted and reused facts:
-- Company identified as 中原传媒, A-share market, code 000719.SZ.
-- 2025 revenue 9,351,938,909.62 yuan; cost of sales 5,398,178,027.26 yuan; gross profit 3,953,760,882.36 yuan.
-- 2025 net profit 1,401,084,225.87 yuan; parent net profit 1,375,648,060.55 yuan; deducted non-recurring parent profit 1,342,875,603.33 yuan.
-- 2025 operating cash flow 2,085,222,521.73 yuan; capex 477,645,954.43 yuan; operating free cash flow 1,607,576,567.30 yuan.
-- 2025 total assets 19,123,981,461.49 yuan; total liabilities 6,773,515,729.56 yuan; total equity 12,350,465,731.93 yuan; parent equity 12,265,552,041.61 yuan.
-- Funds assets 9,913,332,016.26 yuan, including cash/equivalents, short-term time deposits, deposit interest receivable, wealth-management products, long-term time deposits and restricted cash.
-- Discounted detachable net cash 7,234,905,487.89 yuan, reused from existing owner_earnback research and carried with data-quality limitations.
-- Discounted sustainable cash profit 977,500,000.00 yuan, reused from existing owner_earnback research after excluding/deducting main fund income and applying profit cash-conversion judgment.
-- 2025 dividend proposal: 1,023,203,749 shares, 6.6 yuan per 10 shares, total cash dividend 675,314,474.34 yuan.
-- 2024 dividend implemented in 2025: 613,922,249.40 yuan.
-- Market cap 12,585,000,000.00 yuan and PE TTM 9.148415471155008 from config/input.json, date 2026-07-23, source "stock_report existing research input".
+Model decision:
+- statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- Reason: the company earns from publishing, distribution, materials, printing and cultural services. Cash and time deposits are funding assets held by an operating company; bank borrowings and bonds are nil. There is no bank-deposit, insurance-reserve, property-presale, concession or similar balance-sheet structure in which financial assets and liabilities are the business itself.
+
+Core filing facts reused:
+- Revenue: 9,351,938,909.62 yuan.
+- Cost of sales: 5,398,178,027.26 yuan.
+- Gross profit: 3,953,760,882.36 yuan.
+- Net profit: 1,401,084,225.87 yuan.
+- Parent net profit: 1,375,648,060.55 yuan.
+- Deducted non-recurring parent profit: 1,342,875,603.33 yuan.
+- Operating cash flow: 2,085,222,521.73 yuan.
+- Capital expenditure: 477,645,954.43 yuan.
+- Operating free cash flow: 1,607,576,567.30 yuan.
+- Total assets: 19,123,981,461.49 yuan.
+- Total liabilities: 6,773,515,729.56 yuan.
+- Total equity: 12,350,465,731.93 yuan.
+- Parent equity: 12,265,552,041.61 yuan.
+- Funds assets: 9,913,332,016.26 yuan.
+- 2025 proposed cash dividend: 675,314,474.34 yuan.
+
+Owner-earnback assumptions reused:
+- Discounted detachable net cash: 7,234,905,487.89 yuan.
+- Discounted sustainable distributable cash profit: 977,500,000.00 yuan.
+- These estimates retain the prior research limitations: no line-by-line maturity/withdrawal terms for long-term deposits, and required operating cash is an estimate rather than a company-disclosed minimum.
+
+Current market input:
+- Market cap: 13,056,000,000.00 yuan.
+- Market timestamp: 20260731114248.
+- Market source: Tencent qt.gtimg.cn.
+- PE TTM: 9.48.
 
 Formula checks:
 - Gross margin = 3,953,760,882.36 / 9,351,938,909.62 = 0.4227744557.
 - Net margin = 1,375,648,060.55 / 9,351,938,909.62 = 0.1470976312.
-- Forecast dividend yield = 675,314,474.34 / 12,585,000,000.00 = 0.0536602681.
-- Operating business price = 12,585,000,000.00 - 7,234,905,487.89 = 5,350,094,512.11.
-- Owner earnback years = 5,350,094,512.11 / 977,500,000.00 = 5.4732424676.
-- Market cap to cash profit = 12,585,000,000.00 / 977,500,000.00 = 12.8746803069.
+- Forecast dividend yield = 675,314,474.34 / 13,056,000,000.00 = 0.0517244542.
+- Discounted net cash / market cap = 7,234,905,487.89 / 13,056,000,000.00 = 0.5541441091.
+- Operating business price = 13,056,000,000.00 - 7,234,905,487.89 = 5,821,094,512.11.
+- Owner earnback years = 5,821,094,512.11 / 977,500,000.00 = 5.9550838999.
+- Market cap / cash profit = 13,056,000,000.00 / 977,500,000.00 = 13.3565217391.
 
-External/background sources carried over from existing research where directly relevant:
-- https://m.bjnews.com.cn/detail/1767865693169344.html for 2025 book retail market and channel pressure.
-- https://www.nppa.gov.cn/xxfb/tzgs/202503/t20250321_888045.html for publishing integration policy background.
-- https://guangdong.chinatax.gov.cn/gdsw/zjfg/2023-09/27/content_7d5eb2ad19f3484c8085f976032c169a.shtml for publication VAT preference through 2027-12-31.
-- https://static.cninfo.com.cn/finalpage/2026-04-17/1225112362.PDF for the 2025 annual report.
+Limitations:
+- Long-term time deposits lack line-by-line maturity dates and early-withdrawal terms.
+- Required operating cash is an owner-earnback estimate.
+- 2023 capex was not completed in the annual fact pack.
+- Publication VAT policy after 2027-12-31 is unknown.
+- Project-level cash returns from the digital publishing park cannot be confirmed.
+- Market cap and PE use the supplied snapshot and were not independently repriced.
 
-Limitations recorded:
-- Long-term time deposits were not disclosed with line-by-line maturity dates or early withdrawal terms.
-- Required operating cash is an owner-earnback estimate, not a company-disclosed minimum cash balance.
-- 2028 and later publication VAT preference is future policy and cannot be confirmed from public filings.
-- Digital publishing park project-level cash return, occupancy, rental return, or operating contribution cannot be confirmed from public filings.
-- Market cap and PE were taken from the batch input snapshot as of 2026-07-23 and were not independently repriced.
+Validation:
+- Initial post-merge validation error: analysis_model must be object.
+- Corrective action: populated analysis_model through the protocol CLI from verified annual-report facts.
+- Validation after correction:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+  {"status":"ok","errors":[]}
 
 Outputs:
 - outputs/result.json

@@ -1,0 +1,77 @@
+task=stock_research
+company=301386.SZ 未来电器
+period=2025-12-31
+report_type=annual
+timezone=Asia/Shanghai
+
+[protocol]
+2026-07-31T15:29:46+08:00 initialized outputs/result.json with:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+Result fields were populated through protocol set commands, not by constructing a replacement JSON document.
+
+[reuse_check]
+Checked the paths declared in config/input.json.
+stock_report/data/analysis/annual_review/301386.SZ/2025-12-31/facts.json: missing
+stock_report/data/analysis/annual_review/301386.SZ/2025-12-31/annual_facts.md: missing
+stock_report/data/analysis/annual_review/301386.SZ/2025-12-31/extraction_trace.txt: missing
+stock_report/data/raw/filings/301386.SZ/2025-12-31/metadata.json: missing
+Decision: no annual fact package or raw filing was available locally; obtain official-disclosure facts from public filing pages.
+
+[sources]
+1. 苏州未来电器股份有限公司2025年年度报告，公告编号2026-017，公告日期2026-04-24。
+   Web mirror: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12174473&stockid=301386
+   Used for business description, segment revenue/margins, customer concentration, three statements, asset notes, restricted cash, non-recurring items and dividend history.
+2. 苏州未来电器股份有限公司2025年年度审计报告，信会师报字[2026]第ZA11349号。
+   Web mirror: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12174472&stockid=301386
+   Used to confirm standard unqualified audit opinion and statement period.
+3. 苏州未来电器股份有限公司2025年年度报告摘要，公告编号2026-016。
+   Web mirror: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12174446&stockid=301386
+   Used to confirm dividend proposal of CNY 0.5 per share on 140 million shares.
+4. config/input.json market snapshot, Tencent qt.gtimg.cn, timestamp 20260731114318.
+   Used for market cap CNY 2,670,000,000 and PE TTM 29.09.
+
+[model_review]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: products are manufactured low-voltage circuit-breaker accessories and intelligent terminal devices. Receivables, inventory and plant are normal operating assets. No bank borrowing exists. Cash-management products are not matched to customer funds, insurance reserves, project advances, regulated presale cash or concession liabilities.
+
+[calculations]
+gross_profit = 545467232.28 - 392808530.05 = 152658702.23
+gross_margin = 152658702.23 / 545467232.28 = 0.2798677779
+net_margin = 96525163.34 / 545467232.28 = 0.1769586835
+operating_free_cash_flow = 159221140.47 - 9022106.10 = 150199034.37
+
+discounted_cash:
+  available cash/equivalents = 516138935.46 * 0.80 = 412911148.368
+  frozen structure-deposit subscription = 20000000.00 * 0.90 = 18000000.00
+  trading financial assets = 684665593.02 * 0.90 = 616199033.718
+  lease-related debt = -1633680.17
+  discounted_detachable_net_cash = 1045476501.916
+
+sustainable_profit:
+  parent_net_profit = 96525163.34
+  less non-recurring profit = 19228374.67
+  recurring parent profit = 77296788.67
+  prudence factor = 0.90
+  discounted_sustainable_cash_profit = 69567109.803
+
+operating_business_price = 2670000000 - 1045476501.916 = 1624523498.084
+owner_earnback_years = 1624523498.084 / 69567109.803 = 23.3518900337
+market_cap_to_cash_profit = 2670000000 / 69567109.803 = 38.3802059272
+forecast_cash_dividend = 140000000 * 0.5 = 70000000
+forecast_dividend_yield = 70000000 / 2670000000 = 0.0262172285
+
+[fact_inference_judgment]
+Fact: audited statement values, product mix, margins, customer concentration, restricted cash, nature of trading financial assets and dividend proposal.
+Inference: customer relationships are a central competitive position; 2025 cash conversion includes working-capital timing and should not be extrapolated directly.
+Judgment: 80% cash inclusion, 90% cash-management-product inclusion and 90% recurring-profit factor. These are disclosed as assumptions, not company guidance.
+
+[limitations]
+No local filing PDF or annual fact package was supplied. Core values were read from the filing's full-text web mirror and cross-checked against the annual report summary and audit report.
+Market cap and PE were accepted from the task input and were not independently recomputed.
+The 2025 annual dividend is a proposal, not the final implementation result.
+
+[validation]
+Final command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Final result: {"status":"ok","errors":[]}

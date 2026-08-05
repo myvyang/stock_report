@@ -1,0 +1,105 @@
+TBPH stock-research trace
+generated_for_period=2025-12-31
+valuation_date=2026-08-03
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated initialized paths only through protocol set commands.
+3. Final validation command and outcome are recorded at the end of this file.
+
+[local reuse audit]
+- Checked annual review, normalized facts, raw filing, and prior stock-research paths supplied in config/input.json.
+- No TBPH filing/fact/research artifacts existed in the workspace; only config/input.json was present.
+- Therefore sourced primary public filings rather than reusing absent data.
+
+[identity and model]
+- SEC CIK 1583107; Nasdaq symbol TBPH; fiscal year ended 2025-12-31.
+- 10-K states one segment: development and commercialization of human therapeutics.
+- Model confirmed as ordinary_operating/applicable because cash and securities are separable from a non-financial operating business.
+- Special handling: collaboration accounting has no reported cost of sales; 2025 profit/cash flow is unusually affected by milestone and royalty-sale events; pending merger overlays standalone valuation.
+
+[primary sources]
+S1 SEC 2025 10-K, filed 2026-03-23
+https://www.sec.gov/Archives/edgar/data/1583107/000110465926033077/tbph-20251231x10k.htm
+
+S2 Company 2025 full-year results, 2026-03-19
+https://investor.theravance.com/news-releases/news-release-details/theravance-biopharma-inc-reports-fourth-quarter-and-full-year-8
+
+S3 2026 Q1 Form 10-Q, filed 2026-05-07
+https://investor.theravance.com/static-files/aac332c3-4cdf-4d8b-9dc2-02c5edb5224c
+
+S4 SEC 8-K announcing definitive Zymeworks merger, filed 2026-06-29
+https://www.sec.gov/Archives/edgar/data/1583107/000110465926078453/tm2619064d1_8k.htm
+
+S5 Federal Reserve H.10 release containing 2025-12-31 USD/CNY rate
+https://www.federalreserve.gov/releases/h10/20260105/
+
+S6 Market snapshot supplied by task input
+source=Yahoo Finance yfinance
+market_cap_cny=5896567501.772278
+market_cap_date=2026-08-03
+pe_ttm=7.5605383
+
+[currency]
+- All statement and analytical USD values converted at 1 USD = 6.9931 CNY (Federal Reserve H.10, 2025-12-31).
+- USD thousands conversion formula: reported_value * 1000 * 6.9931.
+
+[2025 audited statement extraction from S1; USD thousands]
+total_assets=485570
+total_liabilities=188847 (485570 - 296723)
+total_equity=296723
+parent_equity=296723
+minority_interest=0
+revenue=107464
+cost_of_sales=0 (no cost-of-sales line is reported)
+gross_profit=107464 (protocol representation only; not comparable product gross profit)
+operating_profit=-3602
+net_profit=105895
+parent_net_profit=105895
+operating_cash_flow=238541
+capital_expenditure=42
+operating_free_cash_flow=238499
+financing_cash_flow=-3248
+dividend_and_buyback_cash_out=4034 (share withholding repurchase; dividends zero)
+
+[key business facts]
+- 2025 YUPELRI end-market net sales: USD 266.6m, +12% (S2).
+- Viatris collaboration revenue: USD 74.964m; licensing/milestone revenue USD 32.5m (S1).
+- 2025 recurring operating expenses reported: USD 111.066m (S1).
+- CYPRESS Phase 3 missed primary endpoint; ampreloxetine wind-down initiated (S1/S3).
+- Company expects about USD 70m annualized expense savings, full run-rate beginning Q3 2026 (S3).
+- March 31, 2026 cash/cash equivalents/marketable securities: USD 394.666m; no long-term debt (S3).
+- March 31, 2026 total liabilities: USD 181.719m (31.775 + 29.752 + 32.795 + 87.153 + 0.244; S3).
+- Definitive merger terms: USD 17.00 cash/share plus CVR for 80% of net ampreloxetine monetization proceeds over ten years; closing expected H2 2026 subject to shareholder approval and customary conditions (S4).
+
+[formula checks]
+gross_margin=107464/107464=1.0; accounting presentation artifact.
+net_margin=105895/107464=0.9853997617806893; includes one-off gains.
+
+discounted_detachable_net_cash_usd_m=394.666-181.719=212.947
+discounted_detachable_net_cash_cny=212.947m*6.9931=1489159665.70
+discounted_net_cash_to_market_cap=1489159665.70/5896567501.772278=0.2525468698954802
+
+normalized_recurring_revenue_usd_m=74.964
+normalized_expense_usd_m=111.066-70.000=41.066
+normalized_pre_tax_cash_profit_usd_m=74.964-41.066=33.898
+normalized_after_tax_cash_profit_usd_m=33.898*(1-0.21)=26.77942
+discounted_sustainable_cash_profit_cny=26.77942m*6.9931=187271162.002
+
+operating_business_price=5896567501.772278-1489159665.70=4407407836.072278
+owner_earnback_years=4407407836.072278/187271162.002=23.534898747652388
+market_cap_to_cash_profit=5896567501.772278/187271162.002=31.486788669092057
+forecast_cash_dividend=0; merger consideration is not a dividend.
+forecast_dividend_yield=0/5896567501.772278=0
+
+[judgment boundaries]
+- Facts: audited 2025 statements, Q1 2026 cash/liabilities, failed CYPRESS outcome, management cost-reduction target, signed merger terms.
+- Inference/estimate: normalized cash profit assumes the full USD 70m savings is realized and applies a simplified 21% tax rate.
+- Conservative judgment: deducted all March 2026 liabilities from liquid assets rather than only debt; excluded restricted cash and all milestones/asset-sale gains from sustainable profit.
+- Limitation: full post-restructuring annual results were not yet available at the 2026-08-04 research date.
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

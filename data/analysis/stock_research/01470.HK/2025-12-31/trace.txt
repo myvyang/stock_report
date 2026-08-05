@@ -1,0 +1,84 @@
+stock-research trace
+====================
+
+Input
+- config/input.json
+- query: 01470.HK
+- requested observation period: 2025-12-31
+- report_type: annual
+- market cap: CNY 94,288,880.49125673 at 2026-08-03 09:20:05
+- PE TTM: 22.39
+
+Skill and contracts read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+Reuse audit
+- The paths declared for raw filings, annual facts, normalized facts and historical stock research did not exist in /workspace.
+- No reusable annual fact package was available, so research returned to official public disclosures.
+
+Protocol CLI
+- Initialized with: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields with repeated protocol `set` operations; the complex result object was not hand-written from scratch.
+- Final validation: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: {"status":"ok","errors":[]}
+
+Primary sources
+1. HKEX annual report 2024/25, published 2025-08-28:
+   https://www.hkexnews.hk/listedco/listconews/sehk/2025/0828/2025082801100.pdf
+   Used for company identity, business segments, audited statements, asset/liability notes, related-party transactions and dividend history.
+2. PBOC/CFETS central parity announcement, 2025-04-30:
+   https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/5695102/index.html
+   Used exchange rate: HKD 1 = CNY 0.92813.
+3. Tencent qt.gtimg.cn market snapshot supplied in config/input.json.
+
+Model decision
+- Input hint: financial_brokerage / requires_special_model.
+- Filing evidence: watch wholesale/repair, fertiliser trading agency, compound fertiliser manufacture and sales.
+- Override: ordinary_operating / applicable.
+- Reason: no brokerage, underwriting, asset management, proprietary securities or client-fund balance sheet was disclosed. Working-capital balances are ordinary operating obligations, although strongly linked and related-party concentrated.
+
+Period treatment
+- Prosper One's fiscal year ended 2025-04-30, not 2025-12-31.
+- As 2025-12-31 was not an annual reporting date, analysis.period was corrected to 2025-04-30, the latest annual filing available by the requested observation date.
+
+Currency conversion
+- All protocol amounts are CNY absolute yuan.
+- HKD filing values were multiplied by 0.92813.
+- The same closing rate was used for balance sheet, income statement and cash flow for consistency; using a period-average rate for flow statements would produce slightly different numbers.
+
+Key audited HKD figures
+- Revenue 77,224,000; cost of sales 54,867,000; gross profit 22,357,000.
+- Operating profit 6,949,000; parent/net profit 5,416,000.
+- Total assets 208,918,000; liabilities 188,494,000; equity 20,424,000; no NCI.
+- Cash 127,130,000; inventory 7,298,000; receivables/prepayments 72,739,000.
+- Trade and other payables 142,112,000; due to ultimate holding company 46,074,000; current tax 148,000; deferred tax liability 160,000.
+- OCF 62,815,000; capex 477,000; operating FCF 62,338,000; financing CF -967,000.
+
+Ratios
+- Gross margin = 22,357 / 77,224 = 28.95%.
+- Net margin = 5,416 / 77,224 = 7.01%.
+
+Owner earnback calculations
+- Non-cash current operating assets = inventory 7,298 + receivables/prepayments 72,739 = HKD 80,037k.
+- Operating-liability funding requirement = trade/other payables 142,112 - non-cash current operating assets 80,037 = HKD 62,075k.
+- Preliminary detachable cash = cash 127,130 - operating funding 62,075 - due to ultimate holding company 46,074 - current tax 148 = HKD 18,833k.
+- CNY preliminary detachable cash = 18,833,000 * 0.92813 = 17,479,472.29.
+- Cash discount = 70%; discounted detachable net cash = CNY 12,235,630.60.
+- Sustainable profit starts from PBT HKD 6,940k, removes disposal gain HKD 285k and wine commission HKD 1,607k, and applies actual tax rate 1,524 / 6,940.
+- Normalized after-tax profit = HKD 3,939,476.66.
+- Profit discount = 70%; discounted sustainable cash profit = HKD 2,757,633.66 = CNY 2,559,442.53.
+- Operating business price = 94,288,880.49 - 12,235,630.60 = CNY 82,053,249.89.
+- Owner earnback = 82,053,249.89 / 2,559,442.53 = 32.06 years.
+- Market cap / cash profit = 94,288,880.49 / 2,559,442.53 = 36.84.
+
+Dividend forecast
+- FY2025 actual/recommended dividend: zero.
+- FY2024 dividend: zero.
+- No positive management guidance found; forecast dividend set to zero and yield to 0%.
+
+Data quality
+- status: complete under the contract because identity, model, valuation inputs, three statements, asset/liability explanations, owner-earnback details, dividend forecast, business story and evidence are present.
+- Main limitations are the fiscal-date mismatch, closing-rate conversion for flows, 15-month market-cap/filing date gap, and absence of positive dividend guidance.

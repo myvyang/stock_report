@@ -1,0 +1,51 @@
+task=stock_research
+company=08193.HK ASIAPAC FIN INV
+requested_period=2025-12-31
+actual_filing_period=2025-03-31
+run_created_at=2026-08-04T11:12:54+08:00
+
+[protocol]
+initialized=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+validated=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[sources_reused]
+annual_fact_pack=stock_report/data/analysis/annual_review/08193.HK/2025-12-31/facts.json
+annual_fact_report=stock_report/data/analysis/annual_review/08193.HK/2025-12-31/annual_facts.md
+annual_extraction_trace=stock_report/data/analysis/annual_review/08193.HK/2025-12-31/extraction_trace.txt
+raw_annual_report=stock_report/data/raw/filings/08193.HK/2025-12-31/2025_annual_report.pdf
+raw_annual_report_text=stock_report/data/raw/filings/08193.HK/2025-12-31/2025_annual_report.txt
+primary_filing_url=https://www1.hkexnews.hk/listedco/listconews/gem/2025/0729/2025072900397.pdf
+
+[research_checks]
+business_and_segments=Annual Report 2025 pages 6-8, 82, 86
+profit_statement=Annual Report 2025 pages 43-44
+balance_sheet=Annual Report 2025 pages 45-46
+cash_flow=Annual Report 2025 pages 48-49
+loan_credit_quality=Annual Report 2025 pages 75-77, 98
+listed_investments=Annual Report 2025 pages 12-13, 100
+borrowings_and_notes=Annual Report 2025 page 103
+dividends=Annual Report 2025 page 91
+fx_rate=People's Bank of China central parity chart, 2025-03-31, HKD/CNY 0.92283
+market_data=config/input.json; Tencent qt.gtimg.cn, 2026-08-03 09:20:05
+
+[model_decision]
+input_hint=financial_brokerage
+final_model=platform_financial_mixed
+owner_earnback_applicability=requires_special_model
+reason=No brokerage, investment banking, asset management, or client-money business was found. The group combines project-based professional services, licensed money lending, and a material listed-equity portfolio. Loan principal and securities are income-producing risk assets, not mechanically detachable cash.
+ordinary_owner_earnback_fields=null as required by result contract
+
+[currency_conversion]
+source_currency=HKD
+output_currency=CNY
+source_unit=HKD thousand
+rate=0.92283 CNY per HKD
+formula=CNY yuan = HKD thousand * 1000 * 0.92283
+
+[quality_notes]
+- Requested period label differs from actual annual-report end date.
+- PE TTM 0.74 conflicts with annual-report loss and five-year loss history; retained as supplied market data but not used as sustainable-profit evidence.
+- 2023 and 2024 full annual reports were not separately read; comparative and five-year figures came from Annual Report 2025.
+- Accruals and other payables were not further disaggregated.
+- FVTPL 'other investments' were not disclosed security by security.

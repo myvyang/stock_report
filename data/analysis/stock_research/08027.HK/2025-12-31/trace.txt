@@ -1,0 +1,64 @@
+stock-research trace
+company: 08027.HK / KPM HOLDING
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- config/input.json existed.
+- No annual facts package, normalized facts, metadata, or prior stock-research outputs existed for 08027.HK/2025-12-31.
+- Downloaded the official HKEX annual report PDF to stock_report/data/raw/filings/08027.HK/2025-12-31/annual-report-2025.pdf.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initialization succeeded.
+
+4. Model verification
+- Input hint said financial_brokerage/requires_special_model.
+- Official annual report identified actual activities as signage design/fabrication/installation/maintenance, fitting-out and renovation, and IT solution development.
+- FVTPL asset was a UOB-managed money market fund investing primarily in short-term bonds from excess cash reserves, not a brokerage trading book.
+- Overrode hint with ordinary_operating/applicable.
+
+5. Primary sources
+- HKEX Annual Report 2025: https://www.hkexnews.hk/listedco/listconews/gem/2026/0429/2026042906264.pdf
+- HKEX proposed rights issue announcement dated 2026-07-13: https://www1.hkexnews.hk/listedco/listconews/gem/2026/0713/2026071301015.pdf
+- PBOC/CFETS SGD-CNY central parity dated 2025-12-26: https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- Market quote: config/input.json, Tencent qt.gtimg.cn, 2026/08/03 09:20:05.
+
+6. Currency conversion
+- Filing presentation currency: SGD.
+- Protocol output currency: CNY absolute yuan.
+- Applied one uniform rate: SGD 1 = CNY 5.4655.
+- This preserves statement identities and ratios; it is a display conversion, not a transaction-rate assertion.
+
+7. Key extracted SGD figures (S$'000)
+- Revenue 19,068; cost of sales 13,481; gross profit 5,587.
+- Profit before tax 1,706; finance cost 81; inferred operating profit/EBIT 1,787; parent profit 1,303.
+- Total assets 18,848; liabilities 7,628; equity/parent equity 11,220; minority interest nil.
+- Operating cash flow 2,023; PPE purchases 87; operating free cash flow 1,936; financing cash flow -542; dividends/buybacks nil.
+- Cash 2,935; money market fund 4,032; trade and other receivables 5,231; contract assets 2,858.
+- Bank loan 1,251; lease liabilities 802.
+
+8. Owner earnback judgement
+- Applicability: ordinary formula applicable.
+- Discounted detachable net cash: zero.
+- Reason: project working-capital needs; cash fell to about S$2.5m by July 2026; proposed net rights proceeds up to HK$45.6m were intended for signage expansion/operations, fitting-out project funding, and general working capital.
+- Sustainable cash profit: 50% of 2025 parent profit = S$651,500 = CNY 3,560,773.25.
+- Reason for 50% haircut: company stated 2025 was the only profitable year in the prior five years; fitting-out remained loss-making.
+- Operating business price: CNY 27,503,791.14329815.
+- Owner earnback years and market-cap/cash-profit: 7.724106314070449.
+- Forecast dividend: zero, based on no recommended 2025 final dividend, no dividend cash outflow, and subsequent capital raising plan.
+
+9. JSON construction
+- Used protocol set commands for scalar/object paths.
+- Used protocol append commands for asset rows, liability rows, cash breakdown, profit adjustments, dividend history, risks, and evidence.
+- Did not hand-write result.json from scratch.
+
+10. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[]

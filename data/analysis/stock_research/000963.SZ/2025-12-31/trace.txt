@@ -1,0 +1,77 @@
+stock-research trace
+company: 华东医药 (000963.SZ)
+period: 2025-12-31
+generated_at: 2026-07-31T17:25:09+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated initialized fields with repeated protocol `set` commands; no result JSON was authored from scratch.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[].
+
+[reuse decision]
+- No annual facts package, normalized facts, historical stock-research result, or raw filing existed in the workspace for 000963.SZ/2025-12-31.
+- Downloaded a public copy of 华东医药股份有限公司2025年年度报告全文:
+  https://cs.cnpharm.com/upload/resources/file/2026/04/24/187957.pdf
+- Local source:
+  stock_report/data/raw/filings/000963.SZ/2025-12-31/2025-annual-report.pdf
+- Extracted text:
+  stock_report/data/raw/filings/000963.SZ/2025-12-31/2025-annual-report.txt
+- Web cross-check located the same 2025 annual report content and audit report via public disclosure mirrors. Core financial values were taken from the annual report, not secondary summaries.
+
+[source map]
+- Annual report pp. 5, 67, 87-88: dividend proposal and implemented interim dividend.
+- Annual report pp. 15-29: business model, industry position, segment operating review.
+- Annual report pp. 35-36: segment revenue, costs, and gross margins.
+- Annual report pp. 50-51: direct R&D spending and capitalization.
+- Annual report pp. 154-164: audited consolidated balance sheet, income statement, and cash-flow statement.
+- Annual report notes: restricted cash, borrowing, goodwill, receivables.
+- config/input.json: market cap CNY 51,034,000,000; timestamp 20260731114309; source Tencent qt.gtimg.cn; PE TTM 14.57.
+
+[key facts]
+revenue=43,612,009,891.02
+cost_of_sales=29,499,479,451.02
+gross_profit=14,112,530,440.00
+parent_net_profit=3,414,335,326.41
+operating_cash_flow=4,245,604,371.17
+capital_expenditure=1,574,454,008.41
+operating_free_cash_flow=2,671,150,362.76
+cash=4,978,052,188.84
+restricted_cash=222,334,308.28
+short_and_long_near_debt=1,982,810,110.87
+
+[judgment and formulas]
+- Statement model confirmed as ordinary_operating because the company earns from manufacturing, distribution, medical aesthetics, and industrial microbiology; its balance-sheet assets are ordinary operating, production, R&D, and investment assets.
+- Detachable cash excludes restricted funds and applies a 90% discount to unrestricted cash.
+- All short-term borrowings, long-term borrowings, and current non-current liabilities are deducted at 100%.
+- discounted_net_cash =
+  (4,978,052,188.84 - 222,334,308.28) * 90% - 1,982,810,110.87
+  = 2,297,335,981.634001
+- operating_business_price =
+  51,034,000,000 - 2,297,335,981.634001
+  = 48,736,664,018.366
+- sustainable cash profit uses operating cash flow less reported purchases of fixed assets, intangible assets and other long-term assets; it then receives a 10% safety haircut for medical-aesthetics weakness, working-capital exposure, and increased R&D capitalization.
+- discounted_cash_profit =
+  (4,245,604,371.17 - 1,574,454,008.41) * 90%
+  = 2,404,035,326.484
+- owner_earnback_years =
+  48,736,664,018.366 / 2,404,035,326.484
+  = 20.2728568426
+- market_cap_to_cash_profit =
+  51,034,000,000 / 2,404,035,326.484
+  = 21.2284734079
+- forecast dividend combines the implemented 2025 interim dividend and proposed 2025 annual dividend:
+  613,907,366.80 + 1,017,167,371.84 = 1,631,074,738.64
+- forecast_dividend_yield =
+  1,631,074,738.64 / 51,034,000,000
+  = 0.0319605506
+
+[quality]
+- data_quality.status=complete
+- Formula identities checked after population.
+- Protocol validation passed.
+- Limitations are recorded in outputs/result.json and outputs/report.md.

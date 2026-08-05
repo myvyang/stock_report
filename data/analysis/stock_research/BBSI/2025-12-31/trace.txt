@@ -1,0 +1,56 @@
+stock-research trace — BBSI — period 2025-12-31
+generated for task created_at 2026-08-05T01:12:58+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse decision
+- Checked the configured raw filing, annual review, normalized facts, and prior stock-research paths.
+- No BBSI filing, annual facts package, or prior research result existed locally; only stock_report/data/notes/user_stock_evaluations.md existed.
+- Therefore fetched and checked primary public filings rather than fabricating missing facts.
+
+3. Primary evidence reviewed
+- SEC Form 10-K, accession 0001193125-26-072255, fiscal year ended 2025-12-31:
+  https://www.sec.gov/Archives/edgar/data/902791/000119312526072255/bbsi-20251231.htm
+- SEC Exhibit 99.1, FY2025 results and 2026 outlook:
+  https://www.sec.gov/Archives/edgar/data/902791/000119312526071531/bbsi-ex99_1.htm
+- SEC Form 8-K, 2026-05-06 dividend confirmation:
+  https://www.sec.gov/Archives/edgar/data/902791/000119312526208950/bbsi-20260506.htm
+- SEC Form 8-K, 2026-03-30 tax-court event:
+  https://www.sec.gov/Archives/edgar/data/902791/000119312526133452/bbsi-20260330.htm
+- China NBS 2025 Statistical Communiqué: average USD/CNY 7.1429.
+- Market cap, date and PE reused exactly from config/input.json (Yahoo Finance yfinance).
+
+4. Extraction and normalization
+- USD original amounts are from the audited 10-K unless identified as operating KPI/outlook.
+- All statement amounts were converted to CNY at 7.1429 CNY/USD for protocol consistency.
+- 2025 USD thousands: assets 779,067; liabilities 538,067; equity 241,000; revenue 1,240,298; cost 979,385; gross profit 260,913; operating income 62,163; net income 54,448; CFO 65,955; capex 18,777; financing CF -52,970; dividends 8,182; stock repurchases 41,958; award-withholding repurchases 6,031.
+- Formula checks: gross margin=260,913/1,240,298=21.0363%; net margin=54,448/1,240,298=4.3899%; FCF=65,955-18,777=47,178 USD thousands.
+
+5. Model decision
+- Confirmed ordinary_operating / applicable.
+- PEO-specific handling: wages are largely pass-through; restricted insurance assets are not detachable; receivables and payroll/tax liabilities are paired; single-year CFO is timing-sensitive.
+
+6. Owner earnback
+- Detachable cash: 95.033m USD cash x 50% + 62.154m USD unrestricted investments x 80% - 0 debt = 97.2417m USD = CNY 694,573,453.13.
+- Restricted cash/investments 203.426m USD assigned 0% detachable value.
+- Sustainable cash profit: net income 54.448m - after-tax investment income 7.060m + D&A 8.256m - capex 18.777m = 36.866m USD = CNY 263,330,769.98.
+- Operating business price=CNY 6,470,041,273.58 - 694,573,453.13 = 5,775,467,820.45.
+- Earnback=5,775,467,820.45/263,330,769.98=21.9324 years.
+- Market cap/cash profit=24.5700x.
+- Annualized dividend=USD 0.32 x 25,203,090 shares x 7.1429=CNY 57,607,408.50; yield=0.8904%.
+
+7. Protocol population and validation
+- Populated initialized JSON only through protocol CLI `set` commands; did not hand-write result.json.
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validator response: {"status":"ok","errors":[]}
+
+8. Known limitations
+- A single average FX rate was used even for balance-sheet values; this favors consistent protocol arithmetic over closing-rate translation.
+- Input market cap and PE were not independently reconstructed.
+- Cash discounts and sustainable cash profit are analytical estimates, not reported GAAP measures.

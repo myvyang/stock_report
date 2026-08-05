@@ -1,0 +1,72 @@
+stock-research trace
+company: 00693.HK TAN CHONG INTERNATIONAL LIMITED
+period: 2025-12-31 annual
+generated: 2026-08-03 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Also read references/data-reuse.md because no local annual facts package was found.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check and source acquisition
+- No files existed under the requested raw filing, annual review, normalized facts, or prior stock research paths.
+- Downloaded the official 2025 annual report from HKEX to:
+  stock_report/data/raw/filings/00693.HK/2025-12-31/annual-report-2025.pdf
+- Official filing URL:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042301449.pdf
+- Company IR cross-check:
+  https://www.tanchong.com/en/investor_relations.aspx
+- Local pdftotext was unavailable. The downloaded PDF was retained; financial tables were read from the web-indexed HKEX PDF and checked against the company final-results highlights.
+
+3. Model decision
+- Input hint said financial_brokerage/requires_special_model.
+- Rejected that hint based on annual report note 37: the reportable businesses are motor distribution, industrial equipment, property, transportation, and other operations including leasing/financing and workshop services.
+- No brokerage, investment banking, asset management, or proprietary securities segment was disclosed.
+- Final model: platform_financial_mixed; owner earnback applicability: applicable with special handling.
+- Loans and advances are treated as operating financial assets, not detachable cash. Bank borrowings and overdrafts are fully deducted.
+
+4. Currency convention
+- Annual report original unit: HKD thousand.
+- JSON contract requires CNY absolute yuan.
+- Conversion used for all statement and dividend values: 1 HKD = 0.8988 CNY, approximate 2025-12-31 historical rate.
+- This single closing rate was also applied to income and cash-flow values for consistent display; limitation is recorded in data_quality.
+
+5. Core extracted facts (HKD thousand)
+- Revenue 12,044,085; cost of sales 9,612,907; gross profit 2,431,178.
+- Operating profit 741,792; net profit 318,133; parent net profit 143,594.
+- Total assets 23,773,386; total liabilities 10,759,084; total equity 13,014,302; parent equity 11,769,985; NCI 1,244,317.
+- Operating cash flow 1,406,875.
+- Capital expenditure definition: PPE purchases 481,127 + intangible additions 32,216 = 513,343. Investment-property purchase 36,034 excluded because the related rental/property segment is separately reflected and the protocol field is operating capex.
+- Operating FCF 893,532.
+- Financing cash flow -959,811; shareholder and NCI dividends paid 213,900.
+- Cash 2,517,101; FVOCI investments 1,668,935; loans and advances 5,496,940.
+- Borrowings and overdrafts 7,893,923; lease liabilities 569,683.
+- 2025 dividend attributable to year: 161,065 (HKD 0.08/share).
+
+6. Formula calculations
+- Gross margin = 2,431,178 / 12,044,085 = 20.1856596%.
+- Parent net margin = 143,594 / 12,044,085 = 1.1922367%.
+- Discounted detachable net cash, HKD thousand:
+  cash 2,517,101 + FVOCI 1,668,935 * 70% - borrowings/overdrafts 7,893,923
+  = -4,208,567.5; converted CNY = -3,782,660,469.
+- Loans and advances were assigned 0% detachable value; lease liabilities were not separately deducted because matched lease-use assets remain in the operating business.
+- Sustainable cash profit = HKD 300,000 thousand = CNY 269,640,000.
+- Rationale: close to 2023-2025 average parent profit and below normalized 2025 cash capacity after removing the large inventory release; includes a conservative allowance for NCI, cyclicality, and financing-model uncertainty.
+- Operating business price = CNY 2,771,275,801.438689 - (-3,782,660,469) = CNY 6,553,936,270.438689.
+- Owner earnback years = 6,553,936,270.438689 / 269,640,000 = 24.30624637.
+- Market cap/cash profit = 2,771,275,801.438689 / 269,640,000 = 10.27768803.
+- Forecast dividend yield = CNY 144,765,222 / market cap = 5.22377534%.
+
+7. Protocol mutation and validation
+- All result fields were populated using protocol `set` and `append`; the JSON was not created manually.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation result: status=ok, errors=[]
+
+8. Data-quality notes
+- Market cap and PE TTM were accepted from config/input.json (Tencent qt.gtimg.cn); no local raw quote snapshot was provided.
+- Market date is after the financial statement date.
+- Sustainable cash profit is an analyst normalization, not management guidance.
+- The mixed financing model makes debt allocation and cash-profit normalization especially sensitive.

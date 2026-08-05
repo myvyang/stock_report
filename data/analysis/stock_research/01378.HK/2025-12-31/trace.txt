@@ -1,0 +1,59 @@
+stock-research trace
+generated_at: 2026-08-03T14:29:18+08:00
+query: 01378.HK
+period: 2025-12-31
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+- config/input.json present.
+- No local raw filing, annual facts package, normalized facts, or prior stock-research result existed for 01378.HK/2025-12-31.
+- Public filing retrieval was therefore required.
+
+3. Primary sources used
+- China Hongqiao Group Limited 2025 Annual Report, HKEX, published 2026-04-24:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042400888.pdf
+- China Hongqiao 2025 Annual Results, HKEX, published 2026-03-20:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0320/2026032001112.pdf
+- Market cap and PE: config/input.json, Tencent qt.gtimg.cn snapshot dated 2026-07-31 16:08:47.
+- HKD/CNY reference: CFETS/PBOC central parity for 2026-07-01, republished by State Taxation Administration:
+  https://guangdong.chinatax.gov.cn/gdsw/lvxx/2026-07/01/content_ba81c8e3923f4642920eee26c09b592e.shtml
+
+4. Model decision
+- Input hint financial_brokerage rejected.
+- Filing confirms vertically integrated aluminum manufacturing and sales.
+- Selected statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+5. Core extraction (CNY yuan)
+- Revenue 162,353,725,000; gross profit 41,505,249,000; parent net profit 22,636,105,000.
+- Total assets 245,379,016,000; total liabilities 103,668,524,000; total equity 141,710,492,000; parent equity 132,593,035,000.
+- Operating cash flow 38,995,459,000; capex 10,656,667,000; operating FCF 28,338,792,000.
+- Cash and equivalents 51,187,377,000; time deposits 3,001,867,000; restricted deposits 3,325,853,000.
+
+6. Owner earnback judgments
+- Discounted fund assets: 44,490,936,150.
+- Financing and lease liabilities deducted: 75,452,726,000.
+- Discounted detachable net cash: -30,961,789,850.
+- Sustainable cash profit: parent net profit capped and discounted 20% for commodity cycle and continuing capital needs = 18,108,884,000.
+- Operating business price = market cap - discounted net cash = 238,266,578,536.08353.
+- Owner earnback years = 13.157441316432505.
+- Market cap / cash profit = 11.447684389942722.
+
+7. Dividend estimate
+- 2025 dividend HKD1.65/share x 9,932,297,039 year-end shares x 0.86784 CNY/HKD = CNY14,222,413,692.837502.
+- Forecast dividend yield against supplied market cap = 0.0686062959904614.
+- Limitation: actual entitlement shares and settlement FX may differ.
+
+8. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields using protocol set and append commands; complex JSON was not authored from scratch.
+- Negative CLI numeric argument issue was corrected using --json=<negative-number>.
+- Asset categories reconcile to total assets; liability categories reconcile to total liabilities; discounted cash breakdown reconciles to discounted detachable net cash.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final protocol validation status: ok; errors: [].

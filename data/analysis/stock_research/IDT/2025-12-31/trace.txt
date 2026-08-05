@@ -1,0 +1,71 @@
+stock-research trace: IDT / task period 2025-12-31
+generated_at: 2026-08-05T01:25:11+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- No IDT raw filing, annual facts, normalized facts, or prior stock-research result existed under stock_report/data.
+- Initialized outputs/result.json with the protocol CLI from config/input.json.
+
+3. Primary documents consulted
+- SEC FY2025 Form 10-K, accession 0001493152-25-016071, filed 2025-09-29:
+  https://www.sec.gov/Archives/edgar/data/1005731/000149315225016071/form10-k.htm
+- SEC FY2026 Q2 earnings exhibit, filed 2026-03-10:
+  https://www.sec.gov/Archives/edgar/data/1005731/000149315226009545/ex99-1.htm
+- SEC Form 8-K dividend declaration, filed 2026-05-28:
+  https://www.sec.gov/Archives/edgar/data/1005731/000143774926018878/idt20260528_8k.htm
+- Federal Reserve H.10 historical USD/CNY:
+  https://www.federalreserve.gov/releases/h10/hist/dat00_ch.htm
+- Market snapshot was supplied in config/input.json and attributed there to Yahoo Finance yfinance.
+
+4. Period mapping
+- Task period: 2025-12-31, annual.
+- IDT fiscal year ends July 31. Latest complete annual filing available by task period: FY2025 ended 2025-07-31.
+- FY2025 10-K is the core financial source. Post-year-end FY2026 disclosure was used only for the current annualized dividend forecast.
+
+5. Currency conversion
+- Required result currency: CNY absolute yuan.
+- Applied 7.2002 CNY per USD, the Federal Reserve H.10 rate for 2025-07-31, to all USD filing amounts.
+- This creates a known limitation for income/cash-flow items, for which an average rate could also be used.
+
+6. Financial extraction (USD millions before conversion)
+- Total assets 626.203; total liabilities 295.787; total equity 318.957; parent equity 305.131; NCI 13.826.
+- Revenue 1,231.495; cost of revenue 785.300; gross profit 446.195; operating profit 100.424; net income 81.139; parent net income 76.094.
+- Operating cash flow 127.061; capex 20.770; operating FCF 106.291; financing cash flow -23.423.
+- Dividends plus Class B repurchases: 5.550 + 17.773 = 23.323.
+
+7. Model classification
+- ordinary_operating / applicable.
+- Fintech includes remittance, a small bank, and an e-money institution, but consolidated earnings are predominantly fee-based operating activities.
+- Restricted cash 115.327 and customer funds deposits 114.708 were treated as matched operating/regulatory balances and excluded from detachable cash.
+
+8. Owner earnback construction (USD millions before conversion)
+- Cash 226.505 x 70% = 158.5535.
+- Debt securities 21.649 x 90% = 19.4841.
+- Current + non-current equity investments 12.295 x 50% = 6.1475.
+- Less redeemable NCI 11.459 x 100%.
+- Discounted detachable net cash = 172.7261 = CNY 1,243,662,465.22.
+- Sustainable profit base = parent net income 76.094 + D&A 21.008 - capex 20.770 = 76.332.
+- 10% sustainability haircut gives 68.6988 = CNY 494,645,099.76.
+- Operating business price = 11,052,169,605.995361 - 1,243,662,465.22 = CNY 9,808,507,140.775362.
+- Owner earnback years = 9,808,507,140.775362 / 494,645,099.76 = 19.829383.
+- Market cap / cash profit = 22.343635.
+
+9. Dividend forecast
+- Annualized dividend rate: USD 0.28 per share from FY2026 Q2 board action.
+- Share base: FY2025 year-end Class A 1.574m + Class B 23.656m = 25.230m.
+- Forecast: 25.230m x USD 0.28 x 7.2002 = CNY 50,865,092.88.
+- Forecast yield: 0.460227% of supplied market cap.
+
+10. Protocol operations
+- outputs/result.json created with `protocol init`.
+- Sections populated with repeated `protocol set` calls; JSON was not authored from an empty file.
+- Final `protocol validate` result is recorded after validation below.
+
+11. Validation result
+- protocol validate: status=ok, errors=[]
+- Additional cross-checks passed: balance-sheet equation including redeemable NCI; cash-breakdown sum; profit-adjustment sum.

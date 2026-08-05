@@ -1,0 +1,71 @@
+stock-research trace
+company: LEVER STYLE (01346.HK)
+period: 2025-12-31
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md in full.
+- Read references/report-contract.md in full.
+- Read references/data-reuse.md in full.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- No files for 01346.HK existed under the input-specified raw filing, annual review, normalized facts, or prior stock research paths.
+- Therefore researched primary public filings rather than reusing a missing facts package.
+
+3. Primary sources
+- HKEX Annual Report 2025, released 2026-03-17:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0317/2026031700566.pdf
+  Used pages 4-10 for operating narrative; pages 93-99 for the three statements; pages 144-155 and 180-182 for dividend, EPS, receivables, cash, cash flow and commitments; page 85 for customer concentration.
+- HKEX Interim Results Announcement for six months ended 2026-06-30, released 2026-07-13:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0713/2026071300602.pdf
+  Used only as post-period evidence for AAG integration, cash movement and the 2026 interim dividend; not merged into FY2025 statements.
+- National Bureau of Statistics of China, Statistical Communique for 2025, released 2026-02-28:
+  https://www.stats.gov.cn/english/PressRelease/202602/t20260228_1962661.html
+  Used 2025 average rate CNY 7.1429 per USD.
+- Market cap, date, PE and quote source reused from config/input.json: Tencent qt.gtimg.cn, 2026/07/31 16:08:47.
+
+4. Model correction
+- Input hint said financial_brokerage and also carried automobile/EV tags.
+- Filing evidence says the group sells garments and provides apparel supply-chain solutions. Cost of sales is materials and subcontracting; assets are ordinary cash, receivables and inventory; liabilities are ordinary trade payables and leases; there are no bank borrowings.
+- Overrode model to ordinary_operating / applicable.
+
+5. Currency conversion
+- All USD filing amounts multiplied by 7.1429 to comply with CNY absolute-yuan result contract.
+- Limitation: the same annual-average rate was applied to balance-sheet amounts, so displayed CNY balance-sheet values are analytical translations, not closing-rate accounting translations.
+
+6. Key calculations
+- gross_margin = 57,012,819 / 200,156,359 = 0.2848414074.
+- net_margin = 15,870,991 / 200,156,359 = 0.0792929642.
+- operating_profit = (profit before tax 19,363,458 + finance costs 65,167) * 7.1429 = CNY 138,776,725.51.
+- capex = cash purchase of plant and equipment US$1,589,175 * 7.1429 = CNY 11,351,318.11. Deposit paid for equipment excluded because protocol capex uses paid acquisition of operating fixed assets and the deposit has not yet become equipment.
+- operating_free_cash_flow = (18,831,570 - 1,589,175) * 7.1429 = CNY 123,160,703.25.
+- dividend_and_buyback_cash_out = (dividend 8,063,487 + award-scheme share purchases 2,059,779) * 7.1429 = CNY 72,309,476.71.
+
+7. Owner earnback
+- Starting cash = US$41,525,543.
+- Less lease liabilities = US$2,950,478.
+- Less committed AAG business-asset consideration = US$13,000,000, completed 2026-01-02 before valuation date.
+- Remaining = US$25,575,065 * 7.1429 = CNY 182,680,131.79.
+- Apply 70% detachable-cash factor = CNY 127,876,092.25. The 30% reserve covers order working capital, customer credit and FX/cross-border settlement uncertainty.
+- Sustainable cash profit = FY2025 parent net profit CNY 113,364,901.61 * 80% = CNY 90,691,921.29. This is below FY2025 operating FCF and includes a cycle/integration buffer.
+- Operating business price = 764,247,508.98 - 127,876,092.25 = CNY 636,371,416.73.
+- Owner earnback years = 636,371,416.73 / 90,691,921.29 = 7.01685.
+- Market cap / cash profit = 764,247,508.98 / 90,691,921.29 = 8.42685.
+
+8. Dividend forecast
+- FY2025 cash dividend paid = US$8,063,487 * 7.1429 = CNY 57,596,681.29, corresponding to HK$0.03 interim plus HK$0.07 final from the prior annual cycle.
+- FY2025 proposed final remained HK$0.07 and 2026 interim remained HK$0.03.
+- Forecast uses recurring HK$0.10 annual level proxied by the audited FY2025 cash outflow.
+- Forecast yield = 57,596,681.29 / 764,247,508.98 = 0.0753639111.
+
+9. Result construction
+- outputs/result.json was initialized by protocol CLI.
+- Scalar/object fields were populated with repeated protocol set commands.
+- Assets, liabilities, cash breakdown, profit adjustments, dividend history, risks and evidence were populated with repeated protocol append commands.
+- Complex JSON was not authored from an empty file.
+
+10. Validation
+- Protocol validate after structured population returned status=ok and errors=[].

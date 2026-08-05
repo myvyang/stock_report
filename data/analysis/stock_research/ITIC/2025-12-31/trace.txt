@@ -1,0 +1,50 @@
+stock-research trace
+company=ITIC
+period=2025-12-31
+generated_for=2026-08-05 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse audit
+- Checked configured annual review, normalized facts, raw filing, and prior stock-research paths.
+- No reusable files existed at the configured paths at research start.
+
+3. Primary-source retrieval
+- Downloaded SEC 2025 Form 10-K accession 0000720858-26-000011 to stock_report/data/raw/filings/ITIC/2025-12-31/itic-20251231.htm.
+- Retrieved SEC Companyfacts for CIK 0000720858 and cross-checked statement values.
+- Reviewed SEC 2026 Q1 Form 10-Q for post-period operating data and dividend payment.
+- Reviewed company/press-release dividend disclosures through 2026-08-05.
+- Used IRS 2025 annual average USD/CNY rate 7.129 for income and cash-flow items.
+- Used Federal Reserve H.10 2025-12-29 USD/CNY rate 7.0063 for 2025-12-31 balance-sheet items.
+- Preserved input market cap, date, PE TTM, and Yahoo Finance yfinance attribution without reconstruction.
+
+4. Model decision
+- Input hint ordinary_operating/applicable was rejected after filing review.
+- Final model: financial_insurance / requires_special_model.
+- Basis: 90.2% of revenue from title insurance; investments support policy obligations, statutory reserves, and regulatory capital; $121.4m subsidiary net assets were not transferable without approval.
+- Consequence: all ordinary owner-earnback sortable fields remain null; no detachable-cash calculation was manufactured.
+
+5. Protocol usage
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields through repeated protocol set commands; no complex result JSON was handwritten.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+
+6. Key transformations
+- Income/cash flow USD values multiplied by 7.129.
+- Balance-sheet USD values multiplied by 7.0063.
+- Net margin = 35.180m / 272.755m = 12.8983%.
+- Operating free cash flow = (30.939m - 5.556m) USD, then translated.
+- Forecast dividend = $0.46 x 4 x 1,887,574 shares x 7.0063 = CNY 24,333,834.
+- Forecast dividend yield = CNY 24,333,834 / CNY 3,685,611,706.437195 = 0.6602%.
+- Special dividends excluded from forecast because they are discretionary and variable.
+
+7. Output status
+- outputs/result.json: complete and protocol-valid.
+- outputs/report.md: completed under report contract; no recommendation or target price.
+- outputs/trace.txt: completed.

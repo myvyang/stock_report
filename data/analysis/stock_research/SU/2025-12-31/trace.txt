@@ -1,0 +1,76 @@
+stock-research trace
+company: Suncor Energy Inc. (NYSE/TSX: SU)
+period: 2025-12-31 annual
+generated for input timestamp: 2026-08-05T03:21:30+08:00
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated fields with repeated protocol `set` calls; complex JSON was not authored as an uninitialized standalone object.
+3. Validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[reuse audit]
+- Expected local annual-review, normalized-facts, raw-filing and prior stock-research files for SU/2025-12-31 were absent.
+- Research therefore returned to Suncor's official 2025 Annual Report and official dividend disclosures.
+- Attempted direct PDF download was served a 4,545-byte non-PDF response and local `pdftotext` was unavailable; source was read through the web PDF parser. No incomplete local filing was treated as evidence.
+
+[primary sources]
+S1 Suncor Energy 2025 Annual Report (IFRS; CAD millions unless noted)
+   https://www.suncor.com/-/media/project/suncor/files/investor-centre/annual-report-2025/2025-annual-report-en.pdf
+   Relevant pages/lines inspected: pp. 13-16, 39, 43, 71-73, 85-96, 100-102.
+S2 Suncor official dividends page
+   https://www.suncor.com/en-ca/investors/dividends
+   Relevant declarations: 2025-11-04, 2026-02-03, 2026-05-05 at CAD 0.60/share quarterly.
+S3 Suncor May 5, 2026 dividend news release
+   https://www.suncor.com/-/media/project/suncor/files/news-releases/2026/2026-05-05-news-release-suncor-energy-declares-dividend-en.pdf
+S4 Task input market snapshot
+   Yahoo Finance yfinance: market cap CNY 536,064,745,420.47656; 2026-08-03; PE TTM 17.941334.
+
+[currency]
+- Protocol requires absolute CNY amounts. All CAD financial-statement and dividend amounts were converted at assumed CAD/CNY 5.20.
+- This is a transparent research conversion assumption, not a verified official 2026-08-03 closing FX rate.
+- Formulas below use the same rate throughout, so ratios among filing amounts are unaffected; market-cap comparisons retain FX-basis uncertainty.
+
+[reported facts and conversions]
+- Revenue: CAD 52,377m * 5.20 = CNY 272,360.4m.
+- Analytical cost base: royalties 3,469 + purchased crude/products 18,053 + operating/SG&A 13,248 + transport/distribution 1,961 = CAD 36,731m; *5.20 = CNY 191,001.2m.
+- Analytical gross profit: 52,377 - 36,731 = CAD 15,646m; *5.20 = CNY 81,359.2m.
+- Analytical gross margin: 15,646 / 52,377 = 0.29872. Suncor does not report conventional gross profit; cross-company comparability is limited.
+- Operating profit proxy before financing and tax: EBT 7,948 + financing expense 1,080 = CAD 9,028m; *5.20 = CNY 46,945.6m.
+- Net/parent profit: CAD 5,918m *5.20 = CNY 30,773.6m. Net margin 5,918 / 52,377 = 0.11299.
+- Assets CAD 89,913m; liabilities CAD 44,789m; equity CAD 45,124m. Converted at 5.20.
+- OCF CAD 12,781m; cash capex CAD 5,856m; simple FCF CAD 6,925m. Converted at 5.20.
+- Financing cash flow reconstructed from statement lines: debt net -4, lease payments -690, option issuance +181, share repurchase -3,129, NCI distributions -17, dividends -2,809 = CAD -6,468m; converted CNY -33,633.6m.
+- Dividend plus buyback cash out: (2,809 + 3,129)*5.20 = CNY 30,877.6m.
+
+[analysis model]
+- ordinary_operating / applicable.
+- Basis: business is oil sands, upstream production, refining, distribution and retail; no customer deposits, policyholder reserves or similarly inseparable financial-model balance sheet.
+- Heavy-asset handling: PP&E, inventory, receivables and restoration obligations stay with the operating business; only haircut cash less debt and leases is detachable.
+
+[owner earnback]
+- Cash CAD 3,650m *5.20 = CNY 18,980m; 80% detachable = CNY 15,184m.
+- Interest-bearing debt CAD 9,987m *5.20 = CNY 51,932.4m, deducted 100%.
+- Lease liabilities CAD 4,517m *5.20 = CNY 23,488.4m, deducted 100%.
+- Discounted detachable net cash = 15,184 - 51,932.4 - 23,488.4 = CNY -60,236.8m.
+- Adjusted funds from operations CAD 12,783m *5.20 = CNY 66,471.6m.
+- Less sustainment/maintenance capex CAD 3,162m *5.20 = CNY 16,442.4m.
+- Pre-haircut sustainable cash = CNY 50,029.2m.
+- Commodity-cycle/reliability/model haircut = 30%, an analyst judgment.
+- Discounted sustainable cash profit = 50,029.2 *70% = CNY 35,020.44m; the explicit cycle adjustment is CNY -15,008.76m.
+- Operating business price = 536,064.7454204766 - (-60,236.8) = CNY 596,301.5454204766m.
+- Owner earnback = 596,301.5454204766 / 35,020.44 = 17.0272 years.
+- Market cap/cash profit = 536,064.7454204766 / 35,020.44 = 15.3072 years.
+
+[dividend forecast]
+- Shares outstanding at 2026-02-24: 1,186,910,947 (S1 p.43).
+- Annualized dividend: CAD 0.60 *4 *1,186,910,947 = CAD 2,848.586m.
+- Converted forecast dividend = approximately CNY 14,812.65m.
+- Forecast yield = stored dividend / input market cap = approximately 2.765%.
+- Buybacks excluded because they are discretionary and price-dependent.
+
+[quality]
+- status complete: identity, period, valuation fields, three statements, asset/liability explanations, owner-earnback components, dividend forecast, business story, risks and evidence are present; protocol validation passes.
+- limitations: assumed FX; analytical rather than reported gross profit; subjective 30% cyclic haircut; market-cap source is supplied third-party snapshot rather than an official issuer filing.

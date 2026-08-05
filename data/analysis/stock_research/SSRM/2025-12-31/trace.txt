@@ -1,0 +1,69 @@
+stock-research trace: SSRM / 2025-12-31
+generated: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because no annual facts package was present and reuse boundaries were needed.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked config, outputs, annual-review, normalized-facts, and raw-filing paths.
+- No SSRM annual facts, normalized facts, prior stock-research output, or raw filing existed in the workspace; only config/input.json was present.
+- Therefore retrieved the primary filing and official supporting disclosures.
+
+3. Primary sources
+- SEC Form 10-K, fiscal year ended 2025-12-31, filed 2026-02-17, accession 0000921638-26-000035:
+  https://www.sec.gov/Archives/edgar/data/921638/000092163826000035/ssrm-20251231.htm
+- SSR Mining FY2025 results / 2026 operating guidance, filed as SEC exhibit:
+  https://www.sec.gov/Archives/edgar/data/921638/000092163826000036/ssrminingreportsfull-year2.htm
+- Federal Reserve H.10 release dated 2025-12-29; 2025-12-26 CNY per USD = 7.0063:
+  https://www.federalreserve.gov/releases/h10/20251229/
+- Market cap, date, source and PE TTM reused exactly from config/input.json.
+
+4. Model decision
+- Confirmed statement_model = ordinary_operating.
+- Confirmed owner_earnback_applicability = applicable.
+- Reason: revenue arises from producing and selling metals from operated mines; inventories and mining PP&E are operating assets, not customer funds or matched financial liabilities.
+- Special treatment: finite mine lives, sustaining capital, closure/reclamation liabilities, Çöpler suspension, commodity cyclicality, and material non-controlling interests.
+
+5. Audited USD facts used (USD thousands unless noted)
+- Revenue 1,629,637; cost of sales 653,303 (explicitly excludes DD&A); operating income 461,442.
+- Net income 362,417; parent net income 395,754.
+- Total assets 6,093,898; liabilities 1,779,644; equity 4,314,254; parent equity 3,507,773; NCI 806,481.
+- Operating cash flow 471,853; PP&E additions 230,204; operating FCF 241,649; financing cash flow 26,170.
+- Cash 534,834; marketable securities 40,779; total inventories 1,120,163; mining PP&E 4,133,254.
+- Reclamation/remediation liabilities 631,483; debt including related-party debt 292,059; contingent consideration 192,981.
+- Dividends and repurchases in 2025: zero.
+- 2025 production: gold 333,078 oz; silver 9.814 Moz.
+- Adjusted attributable net income: 430,468.
+- 2025 sustaining capital and lease-related expenditures in AISC reconciliation: 121,084.
+- 2026 sustaining-capital guidance: USD 202 million.
+
+6. Currency conversion
+- All financial-statement amounts multiplied by 7.0063 CNY/USD.
+- This is a uniform protocol conversion, not an accounting translation using average income-statement rates.
+
+7. Owner-earnback judgments
+- 2025 operating FCF = USD 241.649m.
+- Removed USD 44.4m one-time business interruption insurance proceeds: USD 197.249m.
+- Applied a further judgmental haircut for commodity-price cyclicality, higher 2026 sustaining capital, and unresolved Çöpler maintenance/remediation: sustainable distributable cash profit = USD 150m = CNY 1,050,945,000.
+- Discounted detachable net cash = zero. Cash and securities are real and liquid, but are required against debt, reclamation liabilities, contingent consideration, Çöpler costs and Hod Maden payments; no positive detachable net amount was recognized.
+- Operating business price = CNY 35,871,838,431.77197.
+- Owner earnback = market cap / CNY 1,050,945,000 = 34.132936 years.
+
+8. Dividend forecast
+- Forecast cash dividend = zero and forecast yield = zero.
+- Basis: no dividends declared in 2024 or 2025. The February 2026 buyback authorization is not treated as a dividend or guaranteed cash return.
+
+9. Protocol writes and validation
+- Populated result.json through repeated protocol `set` commands; did not hand-write the complex JSON result from scratch.
+- Protocol validation after population returned:
+  {"status":"ok","errors":[]}
+
+10. Known limitations
+- Market cap and PE were supplied by Yahoo Finance yfinance input and not independently reconstructed.
+- Gross margin uses reported cost of sales, which excludes DD&A; an economic margin including DD&A would be lower.
+- Sustainable cash profit is an explicit judgment, not company guidance.
+- Çöpler restart timing, ultimate remediation costs, future metal prices and actual project capital remain uncertain.

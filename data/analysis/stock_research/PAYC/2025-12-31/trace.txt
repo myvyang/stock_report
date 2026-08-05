@@ -1,0 +1,35 @@
+2026-08-05 stock-research trace: PAYC / FY2025
+
+1. Read stock-research/SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Checked configured long-term data paths. No PAYC FY2025 raw filing, annual facts package, normalized facts, or prior stock-research result existed in the workspace; only the user evaluation notes file existed.
+3. Initialized outputs/result.json with the required protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Located the official filing:
+   SEC Form 10-K, accession 0001193125-26-059372, filed 2026-02-19
+   https://www.sec.gov/Archives/edgar/data/1590955/000119312526059372/payc-20251231.htm
+5. Cross-checked core US-GAAP facts with SEC Company Facts API (CIK 0001590955). Extracted FY2025 income statement, balance sheet, cash-flow statement, client funds treatment, operating KPIs, expense explanations, and risk disclosures.
+6. Confirmed analysis model as ordinary_operating/applicable. Special handling: funds held for clients USD 5.137bn exactly matched client funds obligation USD 5.137bn and were excluded from detachable cash.
+7. Currency conversion: all USD filing values translated at USD/CNY 7.0288, the 2025-12-31 central parity published by CFETS under PBOC authorization.
+8. Owner earnback assumptions:
+   - Own cash USD 370.0m x 80% = USD 296.0m.
+   - Less operating lease liabilities USD 90.3m = discounted detachable net cash USD 205.7m / CNY 1.44582416bn.
+   - FY2025 OCF USD 678.9m less capex USD 270.9m = operating FCF USD 408.0m.
+   - Less stock-based compensation economic cost USD 118.7m = sustainable cash profit USD 289.3m / CNY 2.03343184bn.
+   - Operating business price CNY 50.1424965898bn; earnback 24.6590 years; market cap/cash profit 25.3701x.
+9. Dividend forecast: latest declared quarterly dividend USD 0.375 annualized at USD 1.50, multiplied by FY2025 ending shares 54.8m = USD 82.2m / CNY 577.76736m, yield 1.11996% on supplied market cap.
+10. Populated result fields only through protocol CLI set/append commands; did not hand-write result.json.
+11. Validation command:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Expected/observed status: ok, no errors.
+
+Primary sources:
+- SEC filing: https://www.sec.gov/Archives/edgar/data/1590955/000119312526059372/payc-20251231.htm
+- SEC filing index: https://www.sec.gov/Archives/edgar/data/1590955/000119312526059372/0001193125-26-059372-index.htm
+- FY2025 results: https://investors.paycom.com/news/news-details/2026/Paycom-Software-Inc--Reports-Fourth-Quarter-and-Year-End-2025-Results/default.aspx
+- 2026-05-04 dividend: https://investors.paycom.com/news/news-details/2026/Paycom-Announces-Quarterly-Cash-Dividend-1963dcfaa/default.aspx
+- SAFE/CFETS exchange-rate reference: https://www.safe.gov.cn/safe/rmbhlzjj/
+
+Limitations:
+- Market cap and PE are the supplied Yahoo Finance yfinance snapshot and were not independently reconstructed from exchange close and diluted share count.
+- Dividend forecast annualizes the latest quarterly declaration; it is not company guidance.
+- Sustainable cash profit depends on judgments about normalized capex and stock compensation.

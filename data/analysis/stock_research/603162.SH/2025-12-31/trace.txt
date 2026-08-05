@@ -1,0 +1,52 @@
+task: 603162.SH 海通发展 / 2025-12-31 annual
+generated_for_input: 2026-08-01T04:11:46+08:00
+
+[protocol]
+1. Read stock-research/SKILL.md, result-contract.md, report-contract.md, data-reuse.md.
+2. Initialized with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated fields only through protocol set commands (driver: /tmp/populate_stock_result.py).
+4. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+5. Validation result: {"status":"ok","errors":[]}
+
+[source discovery]
+- No local annual facts, normalized facts, raw filing metadata, or prior stock-research output existed for the requested company/period.
+- Primary document used: 福建海通发展股份有限公司2025年年度报告, disclosed 2026-03-19; public full-text transcription at Sina bulletin id 12003870.
+- Cross-check: 2025 annual report summary (bulletin id 12003863) for revenue, parent net profit, total assets, and parent equity.
+- Valuation source was not refreshed: config/input.json, Tencent qt.gtimg.cn snapshot at 2026-07-31 11:43:42.
+
+[reported facts]
+revenue=4,442,994,963.64
+cost_of_sales=3,719,208,190.62
+parent_net_profit=464,999,332.55
+adjusted_parent_net_profit=463,509,697.38
+operating_cash_flow=1,311,113,176.28
+capital_expenditure=1,184,401,340.32
+total_assets=6,793,884,301.69
+total_liabilities=2,272,738,237.99
+parent_equity=4,521,146,063.70
+cash=608,162,567.41
+trading_financial_assets=82,490,765.30
+borrowings_and_lease_financing=1,691,976,553.79
+2025_cash_dividend=92,777,105.80 (implemented interim + board-proposed final)
+
+[calculations]
+gross_profit = revenue - cost_of_sales = 723,786,773.02
+gross_margin = gross_profit / revenue = 0.1629051527
+net_margin = parent_net_profit / revenue = 0.1046589826
+operating_free_cash_flow = operating_cash_flow - capital_expenditure = 126,711,835.96
+discounted_funds = (cash + trading_financial_assets) * 0.80 = 552,522,666.168
+discounted_detachable_net_cash = discounted_funds - borrowings_and_lease_financing = -1,139,453,887.622
+discounted_sustainable_cash_profit = adjusted_parent_net_profit * 0.75 = 347,632,273.035
+operating_business_price = market_cap - discounted_detachable_net_cash = 15,821,453,887.622
+owner_earnback_years = operating_business_price / discounted_sustainable_cash_profit = 45.5120399193
+market_cap_to_cash_profit = market_cap / discounted_sustainable_cash_profit = 42.2342835774
+forecast_dividend_yield = 92,777,105.80 / 14,682,000,000 = 0.0063191054
+
+[judgment boundary]
+- Fact: company is a dry-bulk shipping operator; ships and lease-related assets are operating assets.
+- Inference: ordinary-operating statement model is applicable, with debt/lease financing paired to ships.
+- Assumption: 80% realization factor for cash and short-term investments.
+- Assumption: 25% haircut to adjusted profit for shipping cyclicality and undisclosed maintenance capex.
+- Limitation: local official exchange PDF was absent; full-text transcription was used and core totals were cross-checked against the annual summary.

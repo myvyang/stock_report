@@ -1,0 +1,100 @@
+stock-research trace
+company=FRSH / Freshworks Inc.
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-04T20:09:00+08:00
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated every field through protocol `set` and `append` operations; result.json was not authored as a standalone complex JSON object.
+3. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+4. Final validation status: ok; errors: []
+
+[local reuse audit]
+- Checked the paths declared in config/input.json.
+- No raw filing, annual facts package, normalized facts, or prior FRSH stock-research result existed under stock_report/.
+- Therefore fetched and used official public filings instead of fabricating missing local facts.
+
+[primary sources]
+S1 Freshworks Inc. Form 10-K for year ended 2025-12-31, filed 2026-02-26.
+   https://www.sec.gov/Archives/edgar/data/1544522/000154452226000036/frsh-20251231.htm
+   Used for audited financial statements, business description, customer/ARR facts, cash and securities composition, stock compensation, tax adjustment, leases, contractual commitments, and risks.
+S2 Freshworks FY2025 results release, dated 2026-02-10.
+   https://ir.freshworks.com/news/news-details/2026/Freshworks-Reports-Fourth-Quarter-and-Full-Year-2025-Results/
+   Used to cross-check revenue, operating cash flow, adjusted free cash flow, >$5k ARR customer count, and NDR.
+S3 Federal Reserve H.10 weekly release dated 2026-01-05.
+   https://www.federalreserve.gov/releases/h10/20260105/
+   2025-12-31: CHINA, P.R. YUAN = 6.9931 currency units per USD.
+S4 config/input.json market snapshot.
+   Market cap CNY 21,181,364,811.107666; date 2026-08-03; source Yahoo Finance yfinance; PE TTM 18.614754.
+
+[statement model]
+- Confirmed ordinary_operating / applicable.
+- Rationale: subscription SaaS; no customer deposits, insurance reserves, construction advances, regulated project cash, concession rights, or operating financial asset/liability structure.
+
+[currency convention]
+- Result contract requires absolute CNY yuan.
+- All USD financial-statement amounts converted at 6.9931 CNY/USD.
+- USD tables in the 10-K are in thousands; formula: CNY yuan = reported USD thousands * 1,000 * 6.9931.
+- Limitation: balance-sheet closing FX was also applied to income and cash-flow items for consistency; no annual-average translation was used.
+
+[audited core facts, USD thousands]
+total_assets=1,602,712
+total_liabilities=570,062
+total_equity=1,032,650
+parent_equity=1,032,650
+minority_interest=0
+revenue=838,809
+cost_of_revenue=126,145
+gross_profit=712,664
+operating_profit=13,205
+net_income=183,723
+operating_cash_flow=242,370
+purchases_of_property_and_equipment=5,700
+capitalized_internal_use_software=15,791
+operating_free_cash_flow=220,879
+financing_cash_flow=-436,658
+share_repurchases=386,306
+stock_based_compensation=146,819
+interest_and_other_income_net=40,077
+release_of_deferred_tax_asset_valuation_allowance=151,738
+
+[ratios]
+gross_margin = 712,664 / 838,809 = 0.8496141553
+net_margin = 183,723 / 838,809 = 0.2190284081
+Note: net margin is not sustainable margin because net income includes the USD 151.738m valuation-allowance release.
+
+[discounted detachable net cash]
+cash_and_equivalents USD 569.774m * 90% = USD 512.7966m
+marketable_securities USD 211.597m * 95% = USD 201.01715m
+restricted_cash USD 62.374m * 0% = USD 0
+operating_lease_liabilities USD 42.503m * -100% = USD -42.503m
+total = USD 671.31075m
+total_CNY = 4,694,543,205.825
+discounted_net_cash_to_market_cap = 0.2216355390
+
+[discounted sustainable cash profit]
+operating_free_cash_flow USD 220.879m
+less stock_based_compensation economic cost USD 146.819m
+less interest_and_other_income_net tied to detachable financial assets USD 40.077m
+= USD 33.983m
+* 6.9931 = CNY 237,646,517.30
+The interest removal is a conservative pretax approximation. SBC is treated as an owner cost because it creates dilution or requires cash repurchases to offset.
+
+[owner earnback]
+market_cap_CNY=21,181,364,811.107666
+operating_business_price = 21,181,364,811.107666 - 4,694,543,205.825 = 16,486,821,605.282665
+owner_earnback_years = 16,486,821,605.282665 / 237,646,517.30 = 69.3753975131
+market_cap_to_cash_profit = 21,181,364,811.107666 / 237,646,517.30 = 89.1297084921
+
+[dividend]
+- 2025 cash dividend=0.
+- 2025 cash share repurchases=USD 386.306m; repurchases are not classified as dividends.
+- Forecast next-12-month cash dividend=0 and yield=0 absent an announced cash dividend.
+
+[quality]
+status=complete
+incomplete_reasons=[]
+Key limitations are recorded in result.json and report.md: financial/valuation date mismatch, FX convention, and analytical judgment in cash/SBC/interest adjustments.

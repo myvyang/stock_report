@@ -1,0 +1,69 @@
+stock-research trace — EXEL — 2025 annual
+generated_at: 2026-08-04T23:13:20+08:00
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+   - config/input.json exists.
+   - No EXEL annual facts, normalized facts, raw filing metadata, or prior stock-research output existed in the workspace.
+   - Therefore returned to primary filing sources.
+
+3. Primary sources
+   - SEC 2025 Form 10-K, accession 0000939767-26-000021, filed 2026-02-10:
+     https://www.sec.gov/Archives/edgar/data/939767/000093976726000021/exel-20260102.htm
+   - SEC company facts API, CIK 0000939767:
+     https://data.sec.gov/api/xbrl/companyfacts/CIK0000939767.json
+   - Market cap and PE: config/input.json; Yahoo Finance yfinance snapshot dated 2026-08-03.
+
+4. Period handling
+   - Requested period: 2025-12-31.
+   - Legal fiscal year end: 2026-01-02 under Exelixis 52/53-week calendar.
+   - Filing explicitly labels this period as 2025 / December 31, 2025 for convenience; used requested period and disclosed limitation.
+
+5. Currency normalization
+   - SEC filing currency: USD.
+   - Result contract currency: CNY absolute yuan.
+   - Applied transparent analytical FX assumption USD/CNY = 7.00 to all filing amounts.
+   - Market cap was already supplied in CNY and was not retransformed.
+
+6. Core USD facts (millions)
+   - Revenue 2,320.126; COGS 83.697; gross profit calculated 2,236.429.
+   - Operating income 872.191; parent net income 782.570.
+   - Total assets 2,844.423; liabilities 683.104; parent equity 2,161.319; NCI 0.
+   - Cash 482.488; current marketable securities 576.603; non-current marketable securities 603.603.
+   - CFO 884.267; capex 8.429; operating FCF calculated 875.838.
+   - Stock compensation 112.983; share repurchases 947.511; financing cash flow -969.594.
+
+7. Formula checks
+   - Gross margin = (revenue - COGS) / revenue = 0.9639256661.
+   - Net margin = parent net profit / revenue = 0.3372963365.
+   - Discounted net cash = cash*100% + marketable securities*95% - all liabilities
+     = CNY 6,444,057,900.
+   - Sustainable cash profit = (FCF - stock compensation) * 80%
+     = CNY 4,271,988,000.
+   - Operating business price = market cap - discounted net cash
+     = CNY 83,502,464,448.45996.
+   - Owner earnback = operating business price / sustainable cash profit
+     = 19.5465119397 years.
+   - Market cap / cash profit = 21.0549566966 years.
+   - Forecast dividend = 0; yield = 0 because no cash dividend was paid or announced.
+
+8. Judgment separation
+   - Fact: CABOMETYX generated USD 2,113.369m, about 91.1% of revenue.
+   - Fact: 2025 CFO exceeded net income and capex was low.
+   - Judgment: 5% haircut on marketable securities for disposal/volatility/operating buffer.
+   - Judgment: deduct stock compensation as a real shareholder dilution cost.
+   - Judgment: further 20% cash-profit haircut for product concentration, patent duration/litigation, and pipeline uncertainty.
+
+9. Protocol operations
+   - Initialized outputs/result.json using protocol CLI init.
+   - Populated initialized paths using protocol CLI set; did not hand-write a result object from scratch.
+   - Protocol validation result after population: status=ok, errors=[].
+
+10. Data quality
+   - status=complete under result-contract minimum requirements.
+   - Limitations recorded in outputs/result.json and outputs/report.md.

@@ -1,0 +1,83 @@
+stock-research trace
+company=603280.SH 南方路机
+period=2025-12-31
+generated_for=2026-07-31
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+3. Initialized outputs/result.json:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields with protocol `set`; no complex JSON skeleton was handwritten.
+5. Validated result:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   status=ok, errors=[]
+
+[reuse check]
+Expected annual facts, normalized facts, raw filing metadata, and prior stock-research outputs were absent.
+Only config/input.json and stock_report/data/notes/user_stock_evaluations.md existed.
+Result: fetched the official annual report because core fields could not be supported from local artifacts.
+
+[primary sources]
+Annual report:
+https://resource.china.nflg.com/uploads/20260430/ltKeC35Hi-N1n237K924SglU66vr.pdf
+Local copy:
+stock_report/data/raw/filings/603280.SH/2025-12-31/annual-report-2025.pdf
+Company investor report/dividend page:
+https://www.nflg.com/investor/report.htm
+Market-cap snapshot:
+config/input.json; Tencent qt.gtimg.cn; timestamp=20260731114343
+
+[financial extraction]
+revenue=1037107776.87
+cost_of_sales=724830685.53
+gross_profit=312277091.34
+gross_margin=312277091.34/1037107776.87=0.3011037987608722
+parent_net_profit=94674305.15
+net_margin=94674305.15/1037107776.87=0.091286852978509
+deducted_nonrecurring_parent_profit=80275637.75
+operating_cash_flow=184332437.28
+capital_expenditure=8624388.82
+operating_free_cash_flow=184332437.28-8624388.82=175708048.46
+total_assets=2231945894.56
+total_liabilities=856473028.35
+total_equity=parent_equity=1375472866.21
+minority_interest=0
+
+[model confirmation]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: equipment manufacturer using order-driven production, not construction contracting or another special statement model. Inventory, receivables and contract liabilities are operating working capital. No bank borrowing at year-end.
+
+[discounted detachable net cash]
+cash_and_cash_equivalents=232432153.30 * 100%=232432153.30
+time_deposits_and_interest=148694688.30 * 90%=133825219.47
+wealth_management_products=558343470.41 * 95%=530426296.8895
+bill_and_guarantee_deposits=34063913.57 * 0%=0
+lease_liabilities=4951050.86 * -100%=-4951050.86
+discounted_detachable_net_cash=891732618.7995
+discounted_net_cash_to_market_cap=891732618.7995/2665000000=0.3346088625889306
+
+[sustainable cash profit]
+Start from audited parent net profit=94674305.15.
+Subtract nonrecurring gains=14398667.40.
+discounted_sustainable_cash_profit=80275637.75.
+Rationale: use audited deducted-nonrecurring profit as a conservative distributable earnings proxy. Do not extrapolate 2025 free cash flow because contract liabilities rose by about RMB102m and collection timing materially helped operating cash flow.
+
+[earnback formulas]
+market_cap=2665000000
+operating_business_price=2665000000-891732618.7995=1773267381.2005
+owner_earnback_years=1773267381.2005/80275637.75=22.08973271222003
+market_cap_to_cash_profit=2665000000/80275637.75=33.19811682218619
+
+[dividend]
+2025 cash dividend=30353866.76
+forecast_dividend_yield=30353866.76/2665000000=0.011389818671669794
+Basis: implemented 2025 annual distribution of RMB2.8 per 10 shares on 108406667 shares.
+
+[quality and limitations]
+data_quality.status=complete
+Market value and PE were accepted from the supplied Tencent snapshot.
+No 2026 interim results were used.
+The 95% haircut on wealth-management products is an analytical assumption because product-level maturity and underlying assets were not disclosed.
+No authoritative market-share evidence was found; industry position remains qualitative.

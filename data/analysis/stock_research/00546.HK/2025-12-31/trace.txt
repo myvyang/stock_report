@@ -1,0 +1,80 @@
+stock-research trace
+company: Fufeng Group Limited / 00546.HK
+period: 2025-12-31 annual
+generated context date: 2026-08-03 Asia/Shanghai
+
+1. Protocol and contracts
+- Read: .agents/skills/stock-research/SKILL.md
+- Read: .agents/skills/stock-research/references/result-contract.md
+- Read: .agents/skills/stock-research/references/report-contract.md
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All complex result sections were populated through protocol `set`; result was not hand-built from scratch.
+
+2. Local reuse audit
+- Requested paths under stock_report/data/raw/filings/00546.HK/2025-12-31 and stock_report/data/analysis/annual_review/00546.HK/2025-12-31 did not exist.
+- No prior stock research output existed for this company-period.
+- Public first-party filings therefore had to be retrieved.
+
+3. Primary filing sources
+- Fufeng Group Limited Annual Report 2025, HKEX, released 2026-04-23:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042302480.pdf
+- Fufeng Group Limited Announcement of Annual Results for year ended 2025-12-31, HKEX, released 2026-03-26. The annual report was used as the final core source.
+- Market cap RMB 11,173,619,473.215939, PE TTM 4.76, timestamp 2026/07/31 16:08:47: supplied input snapshot, source Tencent qt.gtimg.cn.
+
+4. Model classification audit
+- Input hint: financial_brokerage / requires_special_model.
+- Filing fact: group manufactures and sells fermentation-based food additives, biochemical products and starch-based products; five segments are food additives, animal nutrition, high-end amino acid, colloid and others.
+- Override: ordinary_operating / applicable.
+- Reason: inventories, PP&E, receivables, payables, revenue and operating cash flow have ordinary manufacturing economics. No brokerage customer funds, proprietary trading book or repo funding business exists in the filing.
+
+5. Financial statement extraction (RMB yuan)
+- Revenue: 27,879,194,000
+- Cost of sales: 22,397,259,000
+- Gross profit: 5,481,935,000
+- Operating profit: 2,725,858,000
+- Parent/net profit: 2,465,228,000
+- Total assets: 43,714,724,000
+- Total liabilities: 24,254,618,000
+- Total/parent equity: 19,460,106,000; minority interest 0
+- Operating cash flow: 2,911,344,000
+- PP&E payments: 2,569,008,000
+- Intangible asset payments: 29,248,000
+- Land-use-right payments: 72,362,000
+- Capital expenditure analysis total: 2,670,618,000
+- Operating free cash flow: 2,911,344,000 - 2,670,618,000 = 240,726,000
+- Financing cash flow: 1,785,498,000
+- Dividend/buyback cash out: 1,341,937,000 (no 2025 buyback cash out)
+
+6. Ratio calculations
+- Gross margin = 5,481,935,000 / 27,879,194,000 = 0.19663176058820064
+- Net margin = 2,465,228,000 / 27,879,194,000 = 0.08842536839479649
+
+7. Owner earnback calculations
+- Cash and cash equivalents: 13,465,776,000 x 80% = 10,772,620,800
+- Restricted bank balances: 6,030,251,000 x 0% = 0
+- Borrowings: 17,645,810,000 x 100% deduction = -17,645,810,000
+- Discounted detachable net cash = -6,873,189,200
+- Sustainable cash profit judgment = 1,600,000,000
+  starting OCF 2,911,344,000
+  less estimated maintenance capex 1,300,000,000 (reference: depreciation/amortization about RMB1.3bn)
+  less conservative rounding/cycle buffer 11,344,000
+- Operating business price = 11,173,619,473.215939 - (-6,873,189,200) = 18,046,808,673.21594
+- Owner earnback years = 18,046,808,673.21594 / 1,600,000,000 = 11.279255420759961
+- Market cap / cash profit = 11,173,619,473.215939 / 1,600,000,000 = 6.983512170759962
+
+8. Dividend calculations
+- 2025 total dividend from annual report: RMB equivalent 1,104,247,000, HKD0.487/share, payout 44.8%.
+- Forecast/base-case yield = 1,104,247,000 / 11,173,619,473.215939 = 0.0988262579235823.
+- One-off Meihua-compensation dividend: RMB196,749,000.
+- Recurring basic + regular special dividend: RMB907,498,000; yield approximately 0.081216.
+
+9. Key judgment limitations
+- The filing does not split maintenance from expansion capex. Sustainable cash profit is an analytical estimate and the largest source of model sensitivity.
+- Restricted cash is excluded from detachable cash because the filing identifies pledges for borrowings, notes payable and swaps.
+- 2025 dividend forecast is a run-rate scenario, not certainty; it includes a one-off compensation-linked dividend.
+- Post-year-end 2026 interim results were not incorporated into this annual-period model.
+
+10. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final status: ok; errors: []

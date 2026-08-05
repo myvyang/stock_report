@@ -1,0 +1,73 @@
+stock-research trace
+company=002054.SZ 德美化工
+period=2025-12-31
+generated_for=2026-08-01 Asia/Shanghai
+
+1. Read protocol and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- annual_review directory contained no usable facts package.
+- stock_research directory contained no reusable prior result.
+- Official filing was therefore fetched from Shenzhen Stock Exchange:
+  https://disc.static.szse.cn/disc/disk03/finalpage/2026-03-31/3c86b6d9-16ae-42c2-9751-c2631d6637fa.PDF
+- Local raw copy:
+  stock_report/data/raw/filings/002054.SZ/2025-12-31/annual-report-2025.pdf
+
+3. Protocol initialization
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Model decision
+- Confirmed ordinary_operating / applicable.
+- Evidence: 99.06% of revenue was chemical manufacturing; assets are mainly receivables, inventory, chemical production assets and investments; liabilities are bank borrowings and operating payables.
+- No bank, brokerage, insurance, property-development, construction-contract, concession, or investment-holding statement structure identified.
+
+5. Core filing facts (CNY)
+- revenue=2997948510.72
+- cost_of_sales=2196434244.00
+- gross_profit=801514266.72
+- parent_net_profit=118183534.79
+- operating_cash_flow=404510442.74
+- capital_expenditure=245759492.85
+- operating_free_cash_flow=158750949.89
+- total_assets=6625976039.36
+- total_liabilities=3459909935.62
+- total_equity=3166066103.74
+- parent_equity=2560332208.31
+- minority_interest=605733895.43
+- cash=426836923.89
+- interest_bearing_debt=2716396641.09
+
+6. Derived formulas
+- gross_margin=(2997948510.72-2196434244.00)/2997948510.72=0.2673542431
+- net_margin=118183534.79/2997948510.72=0.0394214729
+- operating_free_cash_flow=404510442.74-245759492.85=158750949.89
+- discounted_detachable_net_cash=426836923.89-2716396641.09=-2289559717.20
+- discounted_sustainable_cash_profit=100000000.00
+  Judgment: 2025 parent net profit less a 15.4% prudence haircut; cross-checked below 2025 operating FCF. Reasons include investment income, investment impairment, project recovery uncertainty, capex and leverage.
+- operating_business_price=3317000000.00-(-2289559717.20)=5606559717.20
+- owner_earnback_years=5606559717.20/100000000.00=56.065597172
+- market_cap_to_cash_profit=3317000000.00/100000000.00=33.17
+- forecast_dividend_yield=33723220.79/3317000000.00=0.0101667835
+
+7. Dividend verification
+- 2025 annual report proposed CNY 0.70 per 10 shares on 481,760,297 participating shares.
+- Shenzhen Stock Exchange implementation announcement dated 2026-04-22 confirms total cash dividend CNY 33,723,220.79.
+
+8. Protocol mutations
+- outputs/result.json was initialized and populated only through protocol init/set commands.
+- Complex result object was not hand-written from scratch.
+
+9. Validation
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]
+
+10. Known limitations
+- Market cap and PE TTM come from the task-provided Tencent snapshot and were not cross-checked with a second quote source.
+- Maintenance and growth capex are not separately disclosed.
+- Sustainable cash profit is an analyst estimate, not company guidance.
+- Industry-position statements lack independent market-share verification.

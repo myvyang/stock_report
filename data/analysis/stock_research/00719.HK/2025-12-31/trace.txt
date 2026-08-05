@@ -1,0 +1,72 @@
+stock-research trace
+company: 00719.HK / Shandong Xinhua Pharmaceutical Company Limited
+period: 2025-12-31 annual
+generated_at: 2026-08-03T14:55:37+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- Expected annual facts, normalized facts and extraction trace were absent.
+- No prior stock-research result existed locally.
+- Downloaded official HKEX 2025 annual report to:
+  stock_report/data/raw/filings/00719.HK/2025-12-31/2025-annual-report.pdf
+- Extracted searchable text to:
+  stock_report/data/raw/filings/00719.HK/2025-12-31/2025-annual-report.txt
+- Source URL:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042802009.pdf
+
+3. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields using repeated protocol set and append commands.
+- Did not construct result.json manually from scratch.
+
+4. Model correction
+- Input hint: financial_brokerage / requires_special_model.
+- Annual report evidence: development, production and sale of chemical APIs, preparations, pharmaceutical intermediates and other products; ordinary manufacturing balance sheet.
+- Final model: ordinary_operating / applicable.
+
+5. Key audited facts (RMB)
+- revenue: 8,754,721,987.78
+- cost of sales: 7,110,179,626.73
+- gross profit: 1,644,542,361.05
+- parent net profit: 289,888,855.00
+- parent net profit after non-recurring items: 268,343,425.04
+- operating cash flow: 533,728,707.74
+- cash capex: 115,602,127.29
+- notes endorsed to acquire long-term assets: 377,652,891.66
+- total assets: 9,185,695,768.16
+- total liabilities: 3,729,969,264.92
+- parent equity: 5,208,753,244.52
+- cash and bank balances: 1,396,482,926.22
+- restricted cash: 113,274,012.43
+
+6. Calculations
+- gross margin = (8,754,721,987.78 - 7,110,179,626.73) / 8,754,721,987.78 = 0.1878463261
+- net margin = 289,888,855.00 / 8,754,721,987.78 = 0.0331122856
+- reported operating FCF = 533,728,707.74 - 115,602,127.29 = 418,126,580.45
+- unrestricted cash = 1,396,482,926.22 - 113,274,012.43 = 1,283,208,913.79
+- investment assets = 58,191,097.56 + 280,078,103.48 + 29,714,671.93 = 367,983,872.97
+- discounted investments = 367,983,872.97 * 50% = 183,991,936.485
+- financing and financing-like debt = 433,638,538.34 + 352,157,956.11 + 695,319,527.08 + 744,839.50 + 24,500,000.00 = 1,506,360,861.03
+- discounted detachable net cash = 1,283,208,913.79 + 183,991,936.485 - 1,506,360,861.03 = -39,160,010.755
+- sustainable cash profit = 268,343,425.04 * 80% = 214,674,740.032
+- operating business price = 3,674,057,420.142293 - (-39,160,010.755) = 3,713,217,430.897293
+- owner earnback years = 3,713,217,430.897293 / 214,674,740.032 = 17.29694621
+- market cap / cash profit = 3,674,057,420.142293 / 214,674,740.032 = 17.11453066
+- forecast dividend = 696,683,435 * 0.15 = 104,502,515.25
+- forecast dividend yield = 104,502,515.25 / 3,674,057,420.142293 = 0.02844335385
+
+7. Data-quality judgments
+- Market cap and PE were reused from config/input.json and not independently reconstructed.
+- Maintenance versus expansion capex cannot be precisely separated from one annual report.
+- Because RMB377.65m of long-term asset purchases used endorsed notes, reported cash capex understates economic investment; sustainable cash profit therefore uses adjusted parent profit with a further 20% haircut.
+- Industry position is limited to disclosed product approvals, procurement wins and qualitative API share statements; no unsupported market-share estimate was added.
+
+8. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[]

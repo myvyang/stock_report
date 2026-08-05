@@ -1,0 +1,62 @@
+task=stock-research FMBH FY2025
+input=config/input.json
+generated_at=2026-08-05T02:08:24+08:00
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+mutation=all result fields were applied through protocol set commands via .tmp_set_fmbh.py; result.json was not directly authored
+
+[reuse-check]
+stock_report annual_review/raw filing/normalized facts/stock research paths for FMBH 2025-12-31 were absent
+decision=no reusable facts package; retrieve primary official disclosures
+
+[sources]
+SEC 10-K=https://www.sec.gov/Archives/edgar/data/700565/000119312526080847/fmbh-20251231.htm
+SEC accession=0001193125-26-080847 filed=2026-02-27 period=2025-12-31
+SEC companyfacts=https://data.sec.gov/api/xbrl/companyfacts/CIK0000700565.json
+SEC 2026Q1 earnings exhibit=https://www.sec.gov/Archives/edgar/data/700565/000117184326002829/exh_991.htm
+SEC 2026Q1 10-Q=https://www.sec.gov/Archives/edgar/data/700565/000119312526213797/fmbh-20260331.htm
+Federal Reserve H.10=https://www.federalreserve.gov/releases/h10/Hist/dat00_ch.htm
+market snapshot=config/input.json source=Yahoo Finance yfinance date=2026-08-03
+
+[model-decision]
+input_hint=ordinary_operating/applicable
+verified_model=financial_bank/not_applicable
+reason=deposits fund loans and securities; cash, securities, deposits and regulatory capital are operating structure, not detachable net cash
+ordinary_owner_earnback_fields=null as required by result contract
+special_metrics=NIM 3.70%; ROA 1.20%; ROE 10.24%; NPL ratio 0.53%; CET1 13.29%; total risk-based capital 14.47%; leverage 10.88%
+
+[currency]
+reporting_currency=USD
+result_currency=CNY
+conversion=1 USD * 6.9931 CNY
+rate_date=2025-12-31
+rate_source=Federal Reserve H.10 historical daily rate
+note=all balance-sheet and income-statement USD amounts use the period-end rate for deterministic display; no average-rate translation
+
+[key-calculations]
+operating_revenue_usd=net_interest_income 256165000 + noninterest_income 93051000 = 349216000
+operating_revenue_cny=349216000 * 6.9931 = 2442102409.6
+net_income_cny=91749000 * 6.9931 = 641609931.9
+loan_deposit_ratio=5931296000 / 6395273000 = 0.9274500088
+allowance_gross_loans=74875000 / 6006171000 = 0.0124663450
+2025_payout_ratio=23395000 / 91749000 = 0.2549891552
+price_to_book=input_market_cap 9355540551.43689 / parent_equity_cny 6704229025.2 = 1.3954685194
+market_cap_to_2025_net_income=9355540551.43689 / 641609931.9 = 14.5813524484
+forecast_dividend=0.25 USD quarterly * 4 * 26615796 shares * 6.9931 = 186126923.01 CNY
+forecast_dividend_yield=186126923.01 / 9355540551.43689 = 0.0198948337
+
+[data-quality]
+status=complete
+special-model minimum fields satisfied
+cash-flow/free-cash-flow fields null because bank cash flow is not comparable to ordinary operating companies
+timing limitation=2025 audited operations; 2026-08-03 valuation; post-period Two Rivers acquisition changes share count and balance sheet
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

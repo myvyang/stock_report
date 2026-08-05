@@ -1,0 +1,84 @@
+stock-research trace
+company: 富春染织 (605189.SH)
+period: 2025-12-31 annual
+task_created_at: 2026-08-01T03:20:20+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because local data reuse was evaluated.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse check
+- Expected raw filing directory was absent: stock_report/data/raw/filings/605189.SH/2025-12-31
+- Expected annual review directory and facts were absent: stock_report/data/analysis/annual_review/605189.SH/2025-12-31
+- No prior 2025 stock-research result was available.
+- Therefore core facts were obtained from public filings rather than reconstructed from an older result.
+
+3. Sources used
+- Official SSE annual report URL:
+  https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-03-31/605189_20260331_YUOR.pdf
+  Title: 芜湖富春染织股份有限公司2025年年度报告
+  Disclosure date: 2026-03-31
+  Audit: unmodified opinion, 容诚审字[2026]241Z0030号
+- Official SSE dividend adjustment announcement:
+  https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-06-12/605189_20260612_SLUL.pdf
+  Final 2025 cash dividend: CNY 24,561,457.34, CNY 1.04 per 10 shares.
+- Market data reused exactly from config/input.json:
+  market cap CNY 4,017,000,000; PE TTM 27.67; timestamp 20260731114341; source Tencent qt.gtimg.cn.
+- The SSE annual-report PDF endpoint returned compressed anti-bot content to a direct curl attempt in this environment. The filing text was inspected through a searchable announcement mirror, while all evidence citations retain the official SSE filing URL. No third-party financial database replaced core figures.
+
+4. Model decision
+- statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- Rationale: revenue comes from dyed yarn, greige yarn, processing and limited cotton/yarn trading; assets are inventory, plant, equipment and operating working capital. No special financial, property-development, concession or investment-holding balance-sheet structure was identified.
+
+5. Core financial facts (CNY)
+- Revenue: 3,409,139,818.54
+- Cost of sales: 3,075,367,435.29
+- Gross profit: 333,772,383.25
+- Parent net profit: 76,723,898.36
+- Deducted non-recurring parent net profit: 56,182,789.45
+- Operating cash flow: 463,118,713.39
+- Capital expenditure: 176,905,500.30
+- Operating free cash flow: 286,213,213.09
+- Total assets: 5,111,054,929.12
+- Total liabilities: 3,173,682,855.37
+- Parent equity / total equity: 1,937,372,073.75
+- Minority interest: 0
+
+6. Owner earnback calculations
+- Cash basis was cash and cash equivalents, not gross cash: 625,803,391.50.
+- Restricted bank-acceptance and letter-of-credit deposits excluded: 129,158,791.81.
+- Interest-bearing debt deducted at 100%:
+  short-term borrowings 1,579,566,614.78
+  + current portion of non-current liabilities 78,135,103.18
+  + long-term borrowings 82,152,968.15
+  + bonds payable 497,000,346.82
+  = 2,236,855,032.93.
+- Discounted detachable net cash = 625,803,391.50 - 2,236,855,032.93 = -1,611,051,641.43.
+- Sustainable profit base = deducted non-recurring parent net profit 56,182,789.45.
+- Applied 20% prudence haircut for low margin, commodity/hedging volatility, interest burden and maintenance-capex uncertainty.
+- Discounted sustainable cash profit = 56,182,789.45 * 80% = 44,946,231.56.
+- 2025 operating free cash flow was not extrapolated because 2024 OCF was -1,098,443,117.94 and 2025 reflects a major working-capital reversal.
+- Operating business price = 4,017,000,000 - (-1,611,051,641.43) = 5,628,051,641.43.
+- Owner earnback years = 5,628,051,641.43 / 44,946,231.56 = 125.2174308299.
+- Market cap / cash profit = 4,017,000,000 / 44,946,231.56 = 89.3734549166.
+
+7. Dividend convention
+- Forecast/base cash dividend uses the latest actually implemented 2025 distribution after conversion-related adjustment: 24,561,457.34.
+- Forecast/base dividend yield = 24,561,457.34 / 4,017,000,000 = 0.0061143782.
+- No dividend growth was assumed.
+
+8. Structured JSON construction and validation
+- All fields in outputs/result.json were populated through protocol CLI `set` commands after protocol initialization; the complex result object was not hand-written from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed-result validation status: ok, errors: [].
+
+9. Limitations
+- No local annual facts package was present.
+- Market cap and PE were accepted from the supplied snapshot and were not independently recalculated.
+- Maintenance versus expansion capex is not separately disclosed; the cash-profit haircut is an analytical judgment.
+- Industry-position claims are company statements and were not independently verified with association market-share data.

@@ -1,0 +1,81 @@
+task=OPBK annual stock research
+period=2025-12-31
+generated_at=2026-08-04 Asia/Shanghai
+
+[protocol]
+skill=.agents/skills/stock-research/SKILL.md
+contracts=.agents/skills/stock-research/references/result-contract.md,.agents/skills/stock-research/references/report-contract.md
+data_reuse=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+mutation=stock_analysis.stock_research.protocol set commands; result was not hand-written as a complex JSON object
+validation=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[model_decision]
+input_hint=ordinary_operating/applicable
+confirmed_model=financial_bank/requires_special_model
+reason=OP Bancorp is the holding company of Open Bank; loans, deposits, cash, securities and wholesale funding are the regulated operating balance sheet. Ordinary detachable-net-cash and free-cash-flow earnback formulas are not economically applicable.
+ordinary_owner_earnback_fields=null
+
+[primary_sources]
+SEC 2025 Form 10-K=https://www.sec.gov/Archives/edgar/data/1722010/000172201026000002/opbk-20251231.htm
+SEC accession=0001722010-26-000002
+SEC companyfacts=https://data.sec.gov/api/xbrl/companyfacts/CIK0001722010.json
+OP Bancorp investor relations=https://opbancorp.q4ir.com/overview/default.aspx
+Federal Reserve H.10 FX=https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+market_snapshot=config/input.json (Yahoo Finance yfinance supplied by task)
+
+[raw_files]
+stock_report/data/raw/filings/OPBK/2025-12-31/opbk-20251231.htm
+stock_report/data/raw/filings/OPBK/2025-12-31/companyfacts.json
+
+[conversion]
+financial_statement_currency=USD
+output_currency=CNY
+usd_cny=7.1875
+fx_date=2025-12-31
+fx_source=Federal Reserve H.10 Data Download Program
+note=Market cap is dated 2026-08-03 while statement amounts use period-end FX; comparisons therefore contain an FX timing mismatch.
+
+[key_facts_usd]
+total_assets=2650226000
+total_liabilities=2422333000
+shareholders_equity=227893000
+net_income=25635000
+net_loans=2165694000
+gross_loans=2193669000
+cash_and_cash_equivalents=167311000
+available_for_sale_securities=192785000
+deposits=2280547000
+fhlb_advances=75000000
+subordinated_note_net=24586000
+net_interest_income=78348000
+noninterest_income=16332000
+cash_dividends_paid_2025=7133000
+shares_outstanding_2025_12_31=14889540
+
+[special_bank_metrics]
+net_interest_margin_2025=3.19%
+return_on_average_assets_2025=1.01%
+return_on_average_equity_2025=11.91%
+efficiency_ratio_2025=58.91%
+nonperforming_loans_to_gross_loans=0.64%
+allowance_to_gross_loans=1.28%
+allowance_to_nonperforming_loans=199%
+tier_1_leverage_ratio=8.99%
+cet1_ratio=10.93%
+total_risk_based_capital_ratio=13.31%
+real_estate_secured_share_of_gross_loans=89%
+uninsured_deposits_share=48%
+
+[dividend_forecast]
+announced_quarterly_dividend_usd_per_share=0.14
+annualized_dividend_usd_per_share=0.56
+forecast_cash_dividend_cny=59930398.5
+forecast_dividend_yield=3.822338687979041%
+assumption=The April 2026 quarterly dividend is maintained for four quarters; this is a scenario, not company guidance.
+
+[limitations]
+Bank revenue, gross margin, net margin, operating cash flow, capex and ordinary free cash flow are not comparable to ordinary operating companies and remain null.
+No pre-existing annual facts package or raw filing was present locally; official filing and SEC XBRL facts were retrieved for this task.
+No buy/sell recommendation or target price produced.

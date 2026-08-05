@@ -1,0 +1,75 @@
+stock-research trace
+company=02685.HK QUANTGROUP / Quantgroup Holding Limited / 量化派控股有限公司
+period=2025-12-31
+generated_for_input=2026-08-05T00:23:10+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read result-contract.md and report-contract.md in full.
+3. Read data-reuse.md because the skill routes reuse decisions to this reference.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields using repeated protocol `set` commands; did not construct result.json from scratch.
+
+[local reuse check]
+- stock_report contained only data/notes/user_stock_evaluations.md.
+- No raw filing, annual facts, normalized facts, or prior stock-research output existed for 02685.HK/2025-12-31.
+- Public official disclosure research was therefore required.
+
+[primary sources]
+1. HKEX Annual Report 2025, released 2026-04-23:
+   https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042300013.pdf
+   Used for company identity, business model, operational KPIs, audited statements, notes, receivables, debt, dividends, RSUs and risks.
+2. Company/HKEX annual results announcement, released 2026-03-31:
+   https://www.quantgroup.com/static/upload/2026/03/31/202603317362.pdf
+   Used to cross-check headline audited results and subsequent receivable collection disclosure.
+3. config/input.json / Tencent qt.gtimg.cn snapshot:
+   market cap RMB1,888,969,322.8417635 at 2026/08/03 09:48:08; PE TTM 10.16.
+
+[model decision]
+- Input hint financial_brokerage rejected.
+- Audited annual report says principal activities are operation of online marketplaces and advertising; Yangxiaomie was 99.0% of 2025 revenue.
+- Financial-institution matching service ceased in July 2024 and contributed zero 2025 revenue.
+- No brokerage customer funds, proprietary securities book, or repo funding structure identified.
+- Final model: ordinary_operating; owner earnback applicable with special caution for operating receivables.
+
+[audited figures; RMB]
+revenue=1,034,823,000
+cost_of_sales=47,608,000
+gross_profit=987,215,000
+operating_profit=416,654,000
+net_profit=parent_net_profit=195,146,000
+total_assets=1,592,732,000
+total_liabilities=287,706,000
+total_equity=parent_equity=1,305,026,000
+operating_cash_flow=103,666,000
+capex=14,000 PPE + 327,000 intangible = 341,000
+operating_free_cash_flow=103,325,000
+cash_and_equivalents=524,391,000
+restricted_cash=1,406,000
+trade_receivables_net=978,565,000
+FVPL_asset=46,468,000
+borrowings=70,583,000
+lease_liabilities=12,894,000
+
+[calculations]
+gross_margin=987,215,000 / 1,034,823,000 = 0.9539940618
+net_margin=195,146,000 / 1,034,823,000 = 0.1885791147
+discounted_net_cash=(524,391,000*0.50)+(46,468,000*0.50)-70,583,000-12,894,000=201,949,500
+normalized_profit=195,146,000+154,635,000 preferred-rights remeasurement=349,781,000
+discounted_sustainable_cash_profit=210,000,000 after cash-conversion/receivable-risk haircut
+operating_business_price=1,888,969,322.8417635-201,949,500=1,687,019,822.8417635
+owner_earnback_years=1,687,019,822.8417635/210,000,000=8.0334277278
+market_cap_to_cash_profit=1,888,969,322.8417635/210,000,000=8.9950920135
+forecast_dividend=0 because no 2025 dividend and no verifiable announced next-year dividend/policy
+
+[judgment boundaries]
+- Trade receivables treated as operating capital, never detachable cash.
+- Frozen cash excluded from detachable cash.
+- Cash and FVPL asset each haircut 50%; all borrowings and lease liabilities deducted.
+- Preferred-rights remeasurement added back because obligation terminated on listing; share-based compensation was not added back because dilution is economic.
+- Sustainable cash profit haircut is judgment, not a reported metric. Main verification variable is subsequent receivable collection and operating cash flow.
+
+[validation]
+Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Result: status=ok; errors=[]; exit_code=0.

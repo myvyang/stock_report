@@ -1,0 +1,61 @@
+Stock research trace — 06666.HK — period 2025-12-31
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read: .agents/skills/stock-research/SKILL.md
+- Read: .agents/skills/stock-research/references/result-contract.md
+- Read: .agents/skills/stock-research/references/report-contract.md
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated every changed result field through protocol `set`; did not construct result.json manually.
+
+2. Source inventory and reuse decision
+- Expected annual facts, normalized facts, filing metadata and prior research paths were absent/empty in the workspace.
+- Therefore retrieved the official 2025 annual report and extracted the missing facts.
+
+3. Primary filing
+- Evergrande Property Services Group Limited, 2025 Annual Report.
+- HKEX release date: 2026-04-23.
+- URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042302457.pdf
+- Company/business and scale: annual report pp. 14-18, 86, 124-127.
+- Gross margin and operating discussion: pp. 18-24.
+- Risks, deposit pledge incident and no borrowings: pp. 23-27.
+- Unmodified audit opinion and key audit matters: pp. 72-80.
+- Consolidated statements: pp. 81-85.
+- Dividends: note 16, p. 137.
+- Trade and other receivables: note 21, pp. 149-151.
+- Related-party balances and unrecognized services: note 34, pp. 162-163.
+
+4. Market source reused from task input
+- Market cap: CNY 9,626,060,207.152962.
+- PE TTM: 10.24.
+- Snapshot date: 2026/08/03 09:48:06.
+- Source: Tencent qt.gtimg.cn.
+
+5. Model override
+- Input hint `financial_brokerage` rejected.
+- Filing evidence shows ordinary property management, community living, asset management and community operation services; no brokerage balance-sheet structure.
+- Selected: statement_model=ordinary_operating, owner_earnback_applicability=applicable.
+
+6. Main formulas and judgements
+- Gross margin = 2,504,606,000 / 13,677,623,000 = 18.3117%.
+- Net margin = parent net profit 986,573,000 / revenue 13,677,623,000 = 7.2129%.
+- Operating FCF = operating cash flow 1,223,024,000 - PPE purchases 41,669,000 - intangible purchases 1,036,000 = 1,180,319,000.
+- Discounted detachable net cash = cash equivalents 4,189,546,000 × 50% + restricted cash 120,911,000 × 0% - lease liabilities 94,751,000 = 2,000,022,000.
+- Tax normalization = tax expense 348,590,000 - cash tax paid 80,346,000 = 268,244,000 reduction.
+- After capex, tax normalization and parent attribution, normalized parent cash profit is approximately CNY 892m.
+- Governance/distribution haircut retains 60%, rounded to discounted sustainable cash profit of CNY 535,000,000.
+- Operating business price = 9,626,060,207.152962 - 2,000,022,000 = 7,626,038,207.152962.
+- Owner earnback = 7,626,038,207.152962 / 535,000,000 = 14.2543 years.
+- Market cap / cash profit = 17.9926 times.
+- Forecast dividend = zero because the company declared/paid no dividend for 2024 or 2025 and recommended no 2025 final dividend.
+
+7. Exclusions and limitations
+- Excluded the RMB13.4bn deposit-pledge litigation claim: fully impaired since 2021 and recovery remains materially uncertain.
+- Restricted cash receives zero detachable value.
+- Cash and cash-profit discounts are analytical judgements, not reported facts; reasons are explicitly recorded in result.json and report.md.
+- Market snapshot was supplied by input and not independently reconstructed.
+
+8. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result before final consistency check: {"status":"ok","errors":[]}

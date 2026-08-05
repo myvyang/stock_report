@@ -1,0 +1,62 @@
+stock-research trace
+company: 天虹国际集团有限公司 / 02678.HK
+period: 2025-12-31 annual
+generated context: 2026-08-04 Asia/Shanghai
+
+1. Instructions and protocol
+- Read /workspace/.agents/skills/stock-research/SKILL.md in full.
+- Read result-contract.md and report-contract.md in full.
+- Read data-reuse.md because no local annual facts package was present.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Expected annual facts, normalized facts, raw filing metadata and prior stock-research outputs were absent.
+- Downloaded the official 2025 annual report to:
+  stock_report/data/raw/filings/02678.HK/2025-12-31/annual-report-2025.pdf
+
+3. Primary sources
+- HKEX 2025 annual report, published 2026-04-21:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0421/2026042100356.pdf
+- HKEX 2025 annual results announcement, published 2026-03-26:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032601226.pdf
+- Market capitalization and PE TTM: config/input.json, sourced there to Tencent qt.gtimg.cn, timestamp 2026/08/03 09:46:54.
+
+4. Model verification
+- Input hint said financial_brokerage/requires_special_model.
+- Annual report corporate profile and revenue notes identify manufacture and sale of yarns, garment fabrics, grey fabrics and non-woven fabrics.
+- Overrode hint with ordinary_operating/applicable.
+
+5. Key extraction (annual report page references)
+- Corporate profile and capacity: pp. 3-4.
+- Income statement: p. 109; amounts reported in RMB'000 and converted to absolute CNY.
+- Balance sheet: pp. 111-112; amounts reported in RMB'000 and converted to absolute CNY.
+- Cash flow statement: pp. 115-116; amounts reported in RMB'000 and converted to absolute CNY.
+- Product sales: p. 153.
+- Cash and pledged deposits: p. 194.
+- Dividends and no proposed 2025 final dividend: pp. 66 and 209.
+- Cash generated from operations reconciliation: pp. 210-211.
+
+6. Calculations
+- gross_margin = 3,137,669,000 / 22,715,627,000 = 0.1381282146.
+- net_margin = 913,010,000 / 22,715,627,000 = 0.0401930354.
+- operating_free_cash_flow = 4,304,363,000 - 1,226,677,000 = 3,077,686,000.
+- financing debt proxy = borrowings 5,381,861,000 + supply-chain financing 1,790,133,000 + lease liabilities 144,176,000 = 7,316,170,000.
+- cash assets = cash equivalents 2,487,669,000 + pledged deposits 7,735,000 = 2,495,404,000.
+- Since financing debt exceeds cash assets, detachable net cash is floored at 0.
+- profit before sustainability discount = parent profit 913,010,000 - (capex 1,226,677,000 - depreciation/amortisation/impairment 1,115,557,000) = 801,890,000.
+- discounted sustainable cash profit = 801,890,000 * 0.90 = 721,701,000.
+- operating business price = 5,194,181,719.062328 - 0 = 5,194,181,719.062328.
+- owner earnback years = 5,194,181,719.062328 / 721,701,000 = 7.1971380379.
+- forecast dividend = 0 based on explicit 2025 no-interim/no-final decision; yield = 0.
+
+7. Protocol writes and validation
+- Populated result fields using repeated protocol `set` commands rather than hand-writing the result object from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].
+
+8. Known limitations
+- Market quote was not independently cross-checked beyond the input snapshot.
+- Company's global industry position is company-stated; no independent association ranking was found/used.
+- Maintenance capex is not disclosed; capex less depreciation/amortisation/impairment is a conservative proxy adjustment.

@@ -1,0 +1,81 @@
+stock-research trace
+company: 八马茶业股份有限公司 (06980.HK)
+period: 2025-12-31 annual
+generated for input created_at: 2026-08-04T13:21:49+08:00
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated initialized fields using repeated protocol `set` commands; JSON was not created from scratch.
+3. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+4. Validation response: {"status":"ok","errors":[]}
+
+[source discovery and reuse]
+- Checked configured local annual-review, normalized-facts, raw-filing and historical stock-research paths.
+- No filing, annual facts package, normalized facts or historical stock-research result existed locally.
+- Retrieved the primary filing from HKEX and stored it at:
+  stock_report/data/raw/filings/06980.HK/2025-12-31/2025-annual-report.pdf
+- Primary source URL:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0330/2026033003518.pdf
+- Market data source was reused verbatim from config/input.json: Tencent qt.gtimg.cn, timestamp 2026/08/03 09:47:57.
+
+[model verification]
+- Input hint said financial_brokerage. Rejected after primary-source verification.
+- Annual report p.25 states the group processes, produces and sells tea leaves and other tea products in China.
+- Statements on pp.142-147 show an ordinary operating balance sheet and cash flow structure: inventory, receivables, PPE, right-of-use assets, trade payables, contract liabilities and lease liabilities; no brokerage customer funds or proprietary securities balance-sheet model.
+- Final model: ordinary_operating; owner earnback applicability: applicable.
+
+[core audited facts: RMB]
+- Revenue: 2,196,348,000 (annual report p.142)
+- Cost of sales: 975,585,000 (p.142)
+- Gross profit: 1,220,763,000 (p.142)
+- Operating profit: 308,813,000 (p.142)
+- Net profit: 222,338,000 (p.142)
+- Parent net profit: 222,251,000 (p.142)
+- Total assets: 2,498,664,000 = 707,765,000 non-current + 1,790,899,000 current (pp.143-144)
+- Total liabilities: 797,616,000 = 672,079,000 current + 125,537,000 non-current (p.143)
+- Total equity: 1,701,048,000; parent equity: 1,699,220,000; NCI: 1,828,000 (p.144)
+- Operating cash flow: 315,150,000 (p.146)
+- Capex: 64,686,000 = PPE 60,745,000 + intangibles 3,941,000 (p.146)
+- Operating free cash flow: 250,464,000 = 315,150,000 - 64,686,000
+- Financing cash flow: 289,275,000; dividends paid: 36,175,000 (p.147)
+
+[derived metrics]
+- Gross margin = 1,220,763,000 / 2,196,348,000 = 0.5558149255
+- Net margin = 222,251,000 / 2,196,348,000 = 0.1011911591
+- Minority interest ratio = 1,828,000 / 1,701,048,000 = 0.0010746316
+
+[owner earnback assumptions and math]
+Bank funds total 989,403,000 = cash and equivalents 889,109,000 + deposits >3 months 90,000,000 + restricted deposits 10,294,000.
+
+Excluded at 0%:
+- IPO net proceeds: 387,924,000. Annual report pp.28 and 197 states proceeds and intended uses; none used by year-end.
+- Minimum operating cash reserve: 200,000,000. Analyst assumption for inventory procurement, marketing and channel operations.
+- Restricted deposits: 10,294,000. Prepaid-card regulation and court dispute restrictions per note 17.
+
+Residual bank funds:
+989,403,000 - 387,924,000 - 200,000,000 - 10,294,000 = 391,185,000.
+At 80% = 312,948,000.
+Less lease liabilities 169,008,000 at 100% = discounted detachable net cash 143,940,000.
+
+Sustainable cash profit:
+- Starting parent profit: 222,251,000.
+- Cross-checks: operating FCF 250,464,000; company non-IFRS adjusted profit 241,311,000.
+- Conservative rounded sustainable cash profit: 220,000,000.
+
+Valuation math using input market cap 1,567,931,170.169115:
+- Operating business price = 1,567,931,170.169115 - 143,940,000 = 1,423,991,170.169115
+- Owner earnback years = 1,423,991,170.169115 / 220,000,000 = 6.4726871371
+- Market cap / cash profit = 1,567,931,170.169115 / 220,000,000 = 7.1269598644
+- Discounted net cash / market cap = 143,940,000 / 1,567,931,170.169115 = 0.0918024992
+
+[dividend]
+- 2025 final dividend proposed: nil (annual report p.27 and note 23(b), p.197).
+- Prior-year final dividend paid in 2025: 36,175,000 cash; declared amount 36,181,000, RMB0.48/share.
+- Forecast cash dividend: 0; forecast yield: 0, because the disclosed 2025 final proposal is nil and prior payout is not mechanically extrapolated.
+
+[limitations]
+- Market cap and PE TTM were not cross-checked against a second market source.
+- Cash discount, RMB200m operating reserve and RMB220m sustainable cash profit are analytical assumptions, explicitly separated from filing facts.
+- No recommendation or target price is produced.

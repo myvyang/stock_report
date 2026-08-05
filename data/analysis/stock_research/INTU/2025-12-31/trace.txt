@@ -1,0 +1,83 @@
+stock-research trace
+company: INTU / Intuit Inc.
+requested_period: 2025-12-31
+effective_filing_period: fiscal year ended 2025-07-31
+generated_for_task_date: 2026-08-05 Asia/Shanghai
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated scalar/object fields with protocol `set`; populated arrays with protocol `append`.
+4. Validation command and result are recorded at the end of this file.
+
+[data availability]
+- No local INTU raw filing, annual facts package, normalized facts, or prior stock-research output existed under stock_report.
+- Used the official Intuit investor-relations copy of FY2025 Form 10-K, official Intuit Form 8-K for the latest dividend, and Federal Reserve H.10 for FX.
+- Market cap and PE were inherited from config/input.json as required; source there is Yahoo Finance yfinance.
+
+[period mapping]
+- Intuit's annual fiscal year ended 2025-07-31, not 2025-12-31.
+- The latest complete annual statements available for the requested research period are FY2025 statements.
+- The 2026-08-03 market snapshot is approximately one year later than the balance-sheet date. This mismatch is disclosed in data_quality.limitations and report.md.
+
+[currency conversion]
+- Protocol requires absolute CNY yuan.
+- Conversion rate: 7.2002 CNY per USD on 2025-07-31, Federal Reserve H.10.
+- All balance-sheet, income-statement, cash-flow, dividend, asset-analysis, and earnback dollar figures were multiplied by 7.2002 and by 1,000,000.
+- A single spot rate was deliberately used for consistent protocol comparison; this is not GAAP currency translation and is disclosed as a limitation.
+
+[financial statement extraction; USD millions]
+- Revenue 18,831; service revenue 16,400; cost of revenue 3,848; gross profit derived 14,983.
+- Operating income 4,923; net income / parent net income 3,869.
+- Total assets 36,958; total liabilities 17,248; stockholders' equity / parent equity 19,710; minority interest 0.
+- CFO 6,207; purchases of property and equipment 84; capitalization of internal-use software 40; total capex 124; operating FCF derived 6,083.
+- Financing cash flow -1,510; share repurchases 2,793; dividends paid/declared 1,190; dividend-plus-buyback outflow 3,983.
+
+[analysis model]
+- Classified ordinary_operating because most revenue is software, subscription, expert service, and lead-generation revenue with low physical capex.
+- Special handling within the ordinary model:
+  * Customer funds receivable/held 7,076 and matching customer payables 7,076 are operational pass-through balances, excluded from detachable cash.
+  * Notes receivable 1,403 and related secured facilities are part of lending operations, not detachable investments.
+  * Net loan originations are deducted in sustainable cash profit.
+
+[owner earnback cash; USD millions]
+- Cash 2,884 x 50% = 1,442.0.
+- Short-term investments 1,668 x 90% = 1,501.2.
+- Long-term investments 94 x 30% = 28.2.
+- Debt 5,973 x 100% = -5,973.0.
+- Discounted detachable net cash = -3,001.6 USD million = -21,612,120,320 CNY.
+- Operating business price = market cap 583,410,742,508.4609 - (-21,612,120,320) = 605,022,862,828.4609 CNY.
+
+[sustainable cash profit; USD millions]
+- FY2023: CFO 5,046 - capex 260 - SBC 1,712 - net lending 256 = 2,818.
+- FY2024: CFO 4,884 - capex 250 - SBC 1,940 - net lending 236 = 2,458.
+- FY2025: CFO 6,207 - capex 124 - SBC 1,968 - net lending 724 = 3,391.
+- Three-year median = 2,818. Sustainability haircut = 90%.
+- Discounted sustainable cash profit = 2,536.2 USD million = 18,261,147,240 CNY.
+- Owner earnback = 605,022,862,828.4609 / 18,261,147,240 = 33.1317005923 years.
+- Market-cap/cash-profit = 583,410,742,508.4609 / 18,261,147,240 = 31.9481977140.
+
+[dividend]
+- FY2023 declared dividend: 898 USD million / 3.12 per share.
+- FY2024 declared dividend: 1,041 USD million / 3.60 per share.
+- FY2025 declared dividend: 1,190 USD million / 4.16 per share.
+- Latest approved quarterly dividend (2026-05-20 announcement): 1.20 USD/share.
+- Mechanical annual forecast: 1.20 x 4 x 279.129 million FY2025 ending shares = 1,339.8192 USD million = 9,646,966,203.84 CNY.
+- Forecast yield = 9,646,966,203.84 / 583,410,742,508.4609 = 0.0165354621.
+
+[formula checks]
+- Gross margin = 14,983 / 18,831 = 0.7956560990.
+- Net margin = 3,869 / 18,831 = 0.2054590834.
+- Discounted net cash / market cap = -0.0370444333.
+- All protocol metric duplicates use the same underlying values as owner_earnback/dividend.
+
+[sources]
+- Intuit FY2025 Form 10-K: https://investors.intuit.com/sec-filings/all-sec-filings/content/0000896878-25-000035/intu-20250731.htm
+- Intuit 2026-05-20 Form 8-K: https://investors.intuit.com/sec-filings/all-sec-filings/content/0000896878-26-000024/intu-20260520.htm
+- Federal Reserve H.10 CNY history: https://www.federalreserve.gov/releases/h10/hist/dat00_ch.htm
+- Input market snapshot: config/input.json
+
+[validation]
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+result: {"status":"ok","errors":[]}

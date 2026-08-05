@@ -1,0 +1,54 @@
+stock-research trace
+task: 01395.HK / FY2025 annual
+generated_at_input: 2026-08-03T13:59:32+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse check
+- Expected annual facts and normalized facts paths were absent/empty in the workspace.
+- No prior stock-research result for this company/period was available.
+- Therefore retrieved the primary FY2025 filing.
+
+3. Primary sources
+- HKEX title search for stock 01395: confirmed FY2025 annual report released 2026-04-23 and final results released 2026-03-25.
+- Annual report URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042301855.pdf
+- Final results URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0325/2026032501287.pdf
+- Company financial reports index: https://www.ellhk.com/investor-relations/financial-information/financial-reports/
+- Raw annual report saved as stock_report/data/raw/filings/01395.HK/2025-12-31/annual-report-2025.pdf
+
+4. Model verification
+- Input hint said financial_brokerage, but filing business facts show wastewater treatment and biomass power BOT concessions.
+- Overrode statement_model to utility_concession.
+- owner_earnback_applicability set to requires_special_model because service-concession receivables, pledged cash and project financing are integral to the business.
+- Ordinary owner-earnback ranking fields retained as null per contract.
+
+5. Financial extraction (HK$'000, FY2025)
+- Revenue 166,699; cost of sales 89,685; gross profit 77,014.
+- Profit before tax 33,464; finance costs 11,543; inferred operating profit before finance 45,007.
+- Net profit 22,109; parent net profit 21,291.
+- Total assets 515,314; total liabilities 240,087; total equity 275,227; parent equity 280,580; NCI -5,353.
+- Operating cash flow 26,113; company-described capital expenditure 30,000; financing cash flow -27,834.
+- Cash 49,030; pledged deposits 16,855; concession receivables 373,360; borrowings 79,149; related-party amounts due 107,024.
+
+6. Conversion
+- Result contract requires CNY absolute yuan.
+- Used 2025-12-31 CFETS/PBOC-authorized central parity: HKD 1 = CNY 0.90322.
+- Source cross-check: Xinhua/China Economic Net publication dated 2025-12-31.
+- All statement values multiplied by 1,000 and 0.90322.
+- Market cap was already supplied in CNY and was not converted.
+
+7. Key calculations
+- Gross margin = 77,014 / 166,699 = 0.4619943731.
+- Net margin = 21,291 / 166,699 = 0.1277212221.
+- Broad operating free cash flow = 26,113 - 30,000 = -3,887 HK$'000 = -3,510,816.14 CNY.
+- Forecast dividend = 0, based on no dividend in FY2024/FY2025 and explicit retention rationale.
+
+8. Protocol operations
+- Initialized with: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated through protocol `set` commands; no complex JSON result was hand-written from scratch.
+- Validated with: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation outcome: status=ok, errors=[]
+- JSON syntax check: passed.

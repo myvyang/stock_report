@@ -1,0 +1,59 @@
+stock-research trace
+company: 吉林敖东 (000623.SZ)
+period: 2025-12-31 annual
+generated for task date: 2026-08-01 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Also read references/data-reuse.md to apply the reuse boundary.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked stock_report annual_review, normalized facts, raw filing, and prior stock_research paths for 000623.SZ/2025-12-31.
+- No prior filing, annual facts package, normalized facts, or stock-research result was present.
+- Therefore fetched the official annual filing rather than reusing third-party financial data.
+
+3. Primary-source acquisition
+- Queried CNINFO announcement endpoint for 吉林敖东 annual reports dated 2026-04-01 through 2026-05-31.
+- Found official announcement:
+  title: 2025年年度报告
+  announcement ID: 1225117576
+  disclosure date: 2026-04-18
+  URL: https://static.cninfo.com.cn/finalpage/2026-04-18/1225117576.PDF
+- Saved PDF to stock_report/data/raw/filings/000623.SZ/2025-12-31/2025-annual-report.pdf.
+- Extracted text locally to 2025-annual-report.txt with pypdf in an isolated /tmp virtual environment because pdftotext was unavailable.
+
+4. Model classification
+- Input hint ordinary_operating/applicable was tested against the annual report and overridden.
+- Evidence: long-term equity investment RMB 26,199,426,315.60, 76.12% of assets; Guangfa Securities carrying amount RMB 26,119,509,935.85; equity-method income RMB 2,563,420,291.95, 105.61% of profit before tax.
+- Final model: platform_financial_mixed.
+- Ordinary owner earnback applicability: requires_special_model.
+- Consequence: all ordinary discounted net cash, cash profit, operating-business price and earnback-year fields remain null.
+
+5. Extracted and calculated core values
+- Revenue 2,335,191,263.80; cost of sales 1,209,951,484.15.
+- Gross profit calculated as revenue - cost = 1,125,239,779.65.
+- Gross margin calculated as gross profit / revenue = 0.4818619344.
+- Parent net profit 2,395,240,134.98; reported cross-model net margin = parent net profit / revenue = 1.0257147550. This is retained as a sortable numeric fact but explicitly explained as distorted by equity-method income.
+- Operating cash flow 272,258,821.17; capex 128,449,505.58; operating FCF calculated as 143,809,315.59.
+- Total assets 34,417,909,686.46; total liabilities 3,530,923,756.83; equity 30,886,985,929.63; parent equity 30,666,757,531.66; minority interest 220,228,397.97.
+- Forecast dividend uses the disclosed year-end proposal only: 351,714,476.10 / market cap 21,909,000,000 = 0.0160534244.
+- The already paid 2025 interim dividend is disclosed separately in dividend history and is not double-counted in forecast dividend.
+
+6. Market data
+- Used the task input exactly: market cap RMB 21,909,000,000; PE TTM 7.98; timestamp 20260731114300; source Tencent qt.gtimg.cn.
+- No replacement or silent date alignment was performed.
+- Limitation recorded: the Guangfa holding value is at 2025-12-31 while the input market cap is at 2026-07-31.
+
+7. Protocol construction and validation
+- Populated result fields using repeated protocol `set` commands; did not hand-write the result object from scratch.
+- Ran:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report/trace finalization: status ok, errors [].
+
+8. Interpretation boundaries
+- Guangfa Securities shares were treated as the core platform operating asset, not detachable cash.
+- Guangfa year-end screen value RMB 31.994bn is a dated look-through reference, not liquidation proceeds.
+- No buy/sell advice, target price, ranking label, or unsupported certainty was produced.

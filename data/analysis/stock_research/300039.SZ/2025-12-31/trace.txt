@@ -1,0 +1,63 @@
+stock-research trace
+company: 上海凯宝（300039.SZ）
+period: 2025-12-31 annual
+generated_at: 2026-07-31T20:10:48+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because the local reuse boundary became relevant.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- Checked the configured raw filing, annual review and normalized fact paths.
+- No local 2025 filing metadata, facts.json, annual_facts.md, normalized annual facts or historical stock-research result existed for 300039.SZ/2025-12-31.
+- Therefore obtained the official annual filing from the Shenzhen Stock Exchange public disclosure page.
+
+3. Primary sources
+- Full annual report: 上海凯宝药业股份有限公司2025年年度报告全文, disclosed 2026-04-28.
+  https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-28/7df777e8-40ea-4e65-b31a-3f249eb88e2e.PDF
+- Annual report summary: 上海凯宝药业股份有限公司2025年年度报告摘要, disclosed 2026-04-28.
+  https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-28/0cb6ec6f-3be4-4469-be7d-8041fcb1050f.PDF
+- Market data: config/input.json, Tencent qt.gtimg.cn snapshot dated 2026-07-31 11:43:12.
+
+4. Model decision
+- Confirmed ordinary_operating / applicable.
+- Reason: pharmaceutical manufacturing and distribution generate revenue; inventory, receivables, plant, equipment and R&D are ordinary operating assets. No customer deposits, insurance reserves, regulated presale cash, construction advances or concession rights were identified.
+
+5. Core extraction
+- Revenue 1,152,662,433.35; cost of sales 222,040,434.72; gross profit 930,621,998.63.
+- Operating profit 325,088,600.86; net profit 278,003,785.88; parent net profit 278,584,264.69.
+- Total assets 4,778,361,204.93; total liabilities 359,641,053.00; total equity 4,418,720,151.93; parent equity 4,418,331,903.99.
+- Operating cash flow 230,741,218.15; capex 27,037,962.42; operating FCF 203,703,255.73.
+- Revenue change -21.76%; parent net profit change -25.83%.
+- Needle injection revenue share 92.80%; distribution revenue share 99.78%.
+
+6. Owner earnback calculations
+- Unrestricted cash: (980,711,903.38 - 11,322,800.00) * 95% = 920,919,648.211.
+- Shorter-term deposits: (553,394,602.78 + 20,095,123.29) * 90% = 516,140,753.463.
+- Over-one-year deposits: 904,735,654.33 * 85% = 769,025,306.1805.
+- Wealth management and small stock position: 58,534,872.87 * 85% = 49,754,641.9395.
+- Less short-term borrowing: 4,075,487.93.
+- Discounted detachable net cash = 2,251,764,861.864.
+- Other equity instrument investments of 1,122,739,323.00 and other non-current financial assets were excluded from detachable cash because exit, tax and governance constraints were not sufficiently quantified.
+- Sustainable cash profit: anchored to 2025 operating FCF of 203,703,255.73 and reduced/rounded to 190,000,000 because revenue and earnings declined materially.
+- Operating business price = 5,774,000,000 - 2,251,764,861.864 = 3,522,235,138.136.
+- Owner earnback years = 3,522,235,138.136 / 190,000,000 = 18.5380796744.
+- Market cap / cash profit = 5,774,000,000 / 190,000,000 = 30.3894736842.
+
+7. Dividend
+- 2025 distribution proposal: RMB 1.00 per 10 shares on 1,046,000,000 shares = 104,600,000.
+- Forecast dividend yield = 104,600,000 / 5,774,000,000 = 0.0181156910.
+
+8. Protocol operations and validation
+- Populated initialized result via repeated protocol set and append commands; did not hand-write the complex result JSON.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status before report handoff: ok, errors: [].
+
+9. Judgment boundaries
+- Facts are tied to the official annual report or input market snapshot in result.evidence.
+- Discounts and sustainable cash profit are explicit analyst judgments, not company guidance.
+- No buy/sell recommendation, target price or ranking label was produced.

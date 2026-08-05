@@ -1,0 +1,80 @@
+task=stock_research
+company=02302.HK CNNC International Limited
+period=2025-12-31
+generated_at=2026-08-04T15:01:03+08:00
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+write_method=all result.json fields populated with protocol set commands; JSON was not manually authored from scratch
+
+[reuse]
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+historical_stock_research=missing
+decision=returned to primary filing because no reusable facts or prior research existed
+
+[primary_sources]
+annual_report_title=CNNC International Limited Annual Report 2025
+annual_report_release=2026-04-24
+annual_report_url=https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042401380.pdf
+annual_results_url=https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0325/2026032501917.pdf
+market_cap_source=Tencent qt.gtimg.cn, supplied in config/input.json
+market_cap_timestamp=2026/08/03 09:48:03
+fx_reference=1 HKD = 0.897878955 CNY at 2025-12-31
+fx_source=https://vpr.hkma.gov.hk/statics/assets/doc/100342/ar_25/ar_25_eng.pdf
+
+[model_review]
+input_hint=financial_brokerage / requires_special_model
+confirmed_model=ordinary_operating / applicable
+reason=2025 annual report shows all revenue came from mineral-property trading, principally natural uranium; no brokerage customer funds, proprietary securities portfolio, repo financing, or other brokerage balance-sheet features. Year-end bank borrowings were nil.
+
+[filing_facts_hkd]
+revenue=2489942000
+cost_of_sales=2218351000
+gross_profit=271591000
+profit_before_tax=229850000
+parent_net_profit=192380000
+total_assets=996814000
+total_liabilities=128265000
+parent_equity=868549000
+cash_and_cash_equivalents=907053000
+operating_cash_flow=287521000
+capital_expenditure=94000
+operating_free_cash_flow=287427000
+amount_due_from_immediate_holding_company=80542000
+trade_and_other_payables=114396000
+bank_borrowings=0
+dividend_2025=0
+
+[conversion]
+rule=HKD filing amounts multiplied by 0.897878955; output amounts are absolute CNY yuan
+limitation=single closing rate used for balance-sheet, income-statement and cash-flow figures; no period-average translation
+
+[owner_earnback]
+cash_haircut=70%
+cash_reason=working-capital needs, charged bank accounts for uranium facilities, group control, and lack of current distribution path
+discounted_cash_before_liabilities_cny=570096659.8387305
+liabilities_deducted_cny=115166444.163075
+discounted_detachable_net_cash_cny=454930215.6756555
+profit_base=2025 parent net profit
+profit_retention=70%
+profit_reason=good cash conversion but 59% largest-customer concentration, related-party dependence, falling margin and uranium trading cycle
+discounted_sustainable_cash_profit_cny=120913767.35403
+operating_business_price_cny=1329392214.620885
+owner_earnback_years=10.994547963496043
+market_cap_to_cash_profit=14.75698317357134
+forecast_cash_dividend_cny=0
+
+[quality]
+planned_status=complete
+known_limitations=market quote not independently refreshed; input PE has timing/methodology mismatch versus annual-report earnings; haircut assumptions are analyst scenarios, not management guidance
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

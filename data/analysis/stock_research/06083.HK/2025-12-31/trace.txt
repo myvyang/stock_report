@@ -1,0 +1,96 @@
+stock-research trace
+generated_at=2026-08-05T03:16:06+08:00
+company=06083.HK World-Link Logistics (Asia) Holding Limited
+period=2025-12-31 annual
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated fields with protocol `set` commands; no complex JSON object was handwritten from an empty file.
+3. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[local reuse check]
+- Checked stock_report/data/raw/filings/06083.HK/2025-12-31 and annual_review/normalized paths.
+- No filing, annual facts package, normalized facts, or prior stock-research output existed locally.
+- Therefore fetched and read primary HKEX disclosures.
+
+[primary sources]
+- HKEX 2025 Annual Report, released 2026-04-29:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042900001.pdf
+  Key pages: 5-10 business/financial review; 34-37 auditor; 38-41 statements; 57-61 segments; 66-75 dividends and balance-sheet notes.
+- HKEX joint announcement on change of control and mandatory offer, released 2026-07-17:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0717/2026071701115.pdf
+- Market cap and PE: config/input.json, Tencent qt.gtimg.cn, 2026/08/03 09:20:05.
+- FX: 2025-12-31 HKD/RMB 0.897878955, SAFE historical exchange-rate data, cross-checked against HKMA-hosted disclosure.
+
+[model override]
+- Input hint: financial_brokerage / requires_special_model.
+- Filing facts: supply-chain management services and full-service goods distribution; no brokerage client funds, proprietary securities, repo financing, investment banking or asset-management revenue.
+- Final model: ordinary_operating / applicable.
+
+[reported HKD values]
+revenue=367445000
+cost_of_products_sold=185076000
+operating_profit=22678000
+net_profit=17335000
+parent_net_profit=17932000
+total_assets=295475000
+total_liabilities=186693000
+total_equity=108782000
+parent_equity=108736000
+cash=63995000
+inventory=71388000
+trade_and_other_receivables_and_contract_assets=120823000
+trade_and_other_payables_accruals_contract_liabilities=159018000
+lease_liabilities=25907000
+bank_borrowings=0
+operating_cash_flow=85484000
+capex=1824000
+financing_cash_flow=-68614000
+dividend_cash_out=25091000
+
+[derived metrics]
+- gross_profit protocol proxy = revenue - cost of products sold = HKD 182369000.
+  Limitation: filing presents expenses by nature; this proxy excludes logistics labour, subcontracting, depreciation and rental costs and is not economically comparable to standard functional gross margin.
+- gross_margin = 182369000 / 367445000 = 0.496316455524.
+- net_margin = 17932000 / 367445000 = 0.048801861503.
+- reported operating FCF = 85484000 - 1824000 = HKD 83660000.
+  Not used as sustainable cash profit because payables-related working-capital movement was +HKD 46851000.
+
+[detachable cash]
+cash HKD 63995000
+less post-period final and special dividends HKD 13801000
+less operating cash reserve HKD 30000000
+= detachable cash HKD 20194000
+* FX 0.897878955
+= CNY 18131767.617
+
+[sustainable cash profit]
+parent net profit HKD 17932000
++ PPE depreciation HKD 2643000
+- capex HKD 1824000
+= pre-haircut cash profit HKD 18751000
+* 80% sustainability factor
+* FX 0.897878955
+= CNY 13468902.628
+ROU depreciation was not added back so recurring warehouse/office rental economics remain charged.
+
+[earnback]
+market_cap CNY 341074539.7770405
+- detachable net cash CNY 18131767.617
+= operating business price CNY 322942772.1600405
+owner earnback years = 322942772.1600405 / 13468902.628 = 23.976917873360
+market cap / cash profit = 341074539.7770405 / 13468902.628 = 25.323112742967
+
+[dividend forecast]
+- Base excludes special dividend.
+- 2025 ordinary interim + final = HKD 11290000.
+- Forecast CNY = 11290000 * 0.897878955 = 10137053.402.
+- Forecast yield = 10137053.402 / 341074539.7770405 = 0.029720932581.
+- Major uncertainty: control changed in July 2026; historical payout policy may not persist.
+
+[quality]
+- Auditor: KPMG, unmodified opinion.
+- data_quality.status=complete.
+- Explicit limitations recorded in result.json: derived gross-profit proxy, subjective cash reserve/profit haircut, input market data not independently reconstructed, and ongoing mandatory-offer event.

@@ -1,0 +1,61 @@
+stock-research trace
+company: 小方制药 603207.SH
+period: 2025-12-31 annual
+valuation_as_of: 2026-07-31 11:43:25 Asia/Shanghai
+
+[protocol]
+1. Read stock-research/SKILL.md, result-contract.md, report-contract.md, data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated result fields with repeated protocol `set` commands; no complex JSON was created from scratch.
+4. Validated with protocol `validate`; final status recorded below.
+
+[local reuse check]
+No files existed under the configured raw_filing_dir, annual_review_dir, or normalized_facts_json paths. Research therefore returned to primary exchange disclosures.
+
+[primary sources]
+2025 annual report, SSE, published 2026-04-28:
+https://www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-28/603207_20260428_Y5TF.pdf
+Used for business model, segments, balance sheet, income statement, cash flow, frozen cash, capex and operating statistics.
+
+2025 dividend plan, SSE, published 2026-04-28:
+https://www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-28/603207_20260428_Q5JX.pdf
+Used for CNY 59,503,400 year-end dividend and CNY 171,895,376.90 total 2025-attributable dividend.
+
+2025 annual-report inquiry response, SSE, published 2026-07-15:
+https://www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-07-15/603207_20260715_OBZD.pdf
+Used for channel economics, market competition, receivables explanation, customer concentration, dividend history, fundraising use and >CNY 380m project funding gap.
+
+Market snapshot: config/input.json; Tencent qt.gtimg.cn.
+Market cap CNY 3,565,000,000; PE TTM 17.51; timestamp 20260731114325.
+
+[calculations]
+gross_profit = 525,280,851.39 - 183,850,904.17 = 341,429,947.22
+gross_margin = 341,429,947.22 / 525,280,851.39 = 0.6499950385
+net_margin = 207,489,677.18 / 525,280,851.39 = 0.3950071217
+operating_free_cash_flow = 160,796,649.48 - 54,240,215.64 = 106,556,433.84
+
+discounted_detachable_net_cash =
+  647,585,411.08 cash
+  - 4,694,444.87 frozen cash
+  - 2,501,068.55 short-term borrowing and lease liabilities
+  - 380,000,000.00 disclosed project-funding-gap reserve
+  - 100,000,000.00 subjective operating-liquidity reserve
+  = 160,389,897.66
+
+discounted_sustainable_cash_profit = 150,000,000.00
+Basis: CNY 160,796,649.48 operating cash flow less CNY 10,796,649.48 conservatism for elevated receivables/inventory. Growth-project funding is reserved in net cash and therefore not deducted a second time. Maintenance/growth capex split remains an estimate.
+
+operating_business_price = 3,565,000,000.00 - 160,389,897.66 = 3,404,610,102.34
+owner_earnback_years = 3,404,610,102.34 / 150,000,000.00 = 22.6974006823
+market_cap_to_cash_profit = 3,565,000,000.00 / 150,000,000.00 = 23.7666666667
+forecast_dividend_yield = 59,503,400.00 / 3,565,000,000.00 = 0.0166909958
+
+[fact/inference/judgment separation]
+Facts: audited statements, reported business segments, dividend amounts, frozen cash, disclosed funding gap, sales and working-capital movements.
+Inference: most cash is economically constrained by construction and operating needs; growing receivables/inventory weaken cash conversion.
+Judgment: CNY 100m operating cash reserve and CNY 150m sustainable cash profit. These are explicitly identified in result.json and report.md.
+
+[final validation]
+Run: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Expected: {"status":"ok","errors":[]}

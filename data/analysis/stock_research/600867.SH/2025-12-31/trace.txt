@@ -1,0 +1,32 @@
+2026-08-01 Asia/Shanghai stock-research trace
+
+1. Read stock-research/SKILL.md and result-contract.md, report-contract.md, data-reuse.md.
+2. Ran protocol init against config/input.json to create outputs/result.json.
+3. Checked configured annual-review, raw-filing, normalized-facts and prior stock-research paths. No reusable 2025 filing/fact/research package existed locally.
+4. Located official SSE filing: 通化东宝药业股份有限公司2025年年度报告, disclosed 2026-04-20, 232 pages.
+   URL: https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-20/600867_20260420_RJ2V.pdf
+5. Extracted and cross-checked:
+   - identity/model/business: pp. 11, 25-33;
+   - audit opinion and key indicators: pp. 2, 7-10;
+   - balance sheet: pp. 94-96;
+   - income statement: pp. 99-100;
+   - cash flow statement: pp. 103-104;
+   - restricted cash/debt notes: pp. 136, 169;
+   - dividend history/proposal: pp. 58-59.
+6. Reused input market snapshot without changing it: market cap CNY 16,373,000,000; PE TTM 13.24; timestamp 2026-07-31 11:43:33; source Tencent qt.gtimg.cn.
+7. Formula checks:
+   gross profit = 2,947,228,797.15 - 874,496,476.58 = 2,072,732,320.57.
+   gross margin = 2,072,732,320.57 / 2,947,228,797.15 = 0.7032817821.
+   net margin = parent net profit 1,219,052,875.25 / revenue = 0.4136268200 (distorted by disposal gain).
+   operating FCF = 689,225,249.83 - 517,693,225.92 = 171,532,023.91.
+   discounted detachable net cash = cash*90% + structured deposit*80% - short debt - current noncurrent debt - long debt - lease liabilities = 815,139,576.52.
+   sustainable cash profit = CNY 300,000,000 judgmentally set between operating FCF CNY 171.53m and recurring parent profit CNY 374.96m, reflecting CNY 338.73m capitalized R&D.
+   operating business price = 16,373,000,000 - 815,139,576.52 = 15,557,860,423.48.
+   owner earnback years = 15,557,860,423.48 / 300,000,000 = 51.8595.
+   market cap/cash profit = 16,373,000,000 / 300,000,000 = 54.5767.
+   forecast dividend yield = 586,837,503.60 / 16,373,000,000 = 0.0358417824.
+8. Material limitation: annual report important notice checks “yes” for non-operating fund occupation by controlling shareholder/related parties, but the detailed special report was not available in the workspace. Cash was haircut and limitation disclosed.
+9. Populated result via protocol set/append commands; did not hand-write result.json.
+10. Validation commands and results appended below after execution.
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Result: {"status":"ok","errors":[]}

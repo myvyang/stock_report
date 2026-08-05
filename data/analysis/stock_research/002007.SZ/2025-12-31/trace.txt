@@ -1,0 +1,57 @@
+task=stock_research
+company=002007.SZ 华兰生物
+period=2025-12-31
+generated_at=2026-07-31T23:29:10+08:00
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+population=protocol set commands; result.json was not hand-written from scratch
+
+[reuse_check]
+annual_facts_json=missing
+annual_facts_md=missing
+raw_filing_metadata=missing
+prior_stock_research=missing
+decision=local fact package insufficient; return to official annual filing
+
+[sources]
+annual_report_url=https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-03-28/bb6d6644-1ec5-459e-99ee-7af73ecc0f6f.PDF
+annual_report_local=stock_report/data/raw/filings/002007.SZ/2025-12-31/annual-report-2025.pdf
+annual_report_pages=166
+annual_report_disclosed=2026-03-28
+annual_report_audit=unmodified opinion, Da Hua CPAs
+results_meeting_url=https://static.cninfo.com.cn/finalpage/2026-04-15/1225106341.PDF
+valuation_source=config/input.json / Tencent qt.gtimg.cn
+valuation_as_of=20260731114345
+
+[key_calculations]
+gross_profit=4595017702.01-1951537637.59=2643480064.42
+gross_margin=2643480064.42/4595017702.01=0.5752926835
+net_margin=940400665.87/4595017702.01=0.2046565926
+operating_free_cash_flow=877956500.25-197305265.37=680651234.88
+forecast_dividend_yield=913728333/24720000000=0.0369631203
+cash_haircuts=464145867.50+1836413566.37+723745991.81+1733192577.63+70137602.74-455776904.26=4371858701.79
+operating_business_price=24720000000-4371858701.79=20348141298.21
+owner_earnback_years=20348141298.21/750000000=27.1308550643
+market_cap_to_cash_profit=24720000000/750000000=32.96
+
+[judgment]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+sustainable_cash_profit=750000000; conservative judgment between 2025 parent net profit and operating free cash flow, reflecting margin and pricing pressure
+cash_haircut_reason=operating reserve, investment tenor, consolidated minority ownership, and incomplete legal-entity cash attribution
+
+[limitations]
+No pre-existing local annual fact package was available.
+Market cap and PE TTM were accepted from the supplied Tencent snapshot.
+Exact cash attribution between parent and minority-owned subsidiaries was not fully disclosed in the extracted facts; conservative discounts were applied.
+Industry-position statements are company disclosures, not independently verified market-share statistics.
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

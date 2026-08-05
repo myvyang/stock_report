@@ -1,0 +1,76 @@
+stock-research trace
+generated_at=2026-08-05T04:16:29+08:00
+company=Universal Display Corporation (NASDAQ: OLED)
+period=2025-12-31
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated scalar and array fields with protocol set/append commands; result JSON was not authored from a blank object.
+3. Final validation command and result are recorded below.
+
+[reuse]
+- Checked stock_report annual-review, normalized-facts, raw-filing and historical stock-research paths from config/input.json.
+- No existing OLED 2025 files were present in the workspace; research returned to primary public sources.
+
+[primary sources]
+- SEC 2025 Form 10-K, accession 0001193125-26-059371:
+  https://www.sec.gov/Archives/edgar/data/1005284/000119312526059371/oled-20251231.htm
+- SEC Exhibit 99.1, full-year 2025 results and 2026 guidance, 2026-02-19:
+  https://www.sec.gov/Archives/edgar/data/1005284/000119312526059359/oled-ex99_1.htm
+- SEC Exhibit 99.1, Q1 2026 results/dividend/repurchases, 2026-04-30:
+  https://www.sec.gov/Archives/edgar/data/1005284/000119312526197240/oled-ex99_1.htm
+- Company IR dividend history:
+  https://ir.oled.com/shareholders/stock-information/Dividends/default.aspx
+- Federal Reserve H.10 USD/CNY, 2025-12-31 = 7.1875 yuan/USD:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Market cap and PE TTM: config/input.json, Yahoo Finance yfinance snapshot supplied by task.
+
+[model confirmation]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=UDC sells OLED materials, licenses related patents/know-how, and provides a small amount of contract research. It has no customer deposits, insurance reserves, regulated project cash, concession accounting, or other special-model balance-sheet structure. No bank debt or bonds are separately reported.
+
+[currency]
+- Contract requires absolute CNY yuan.
+- 2025 USD financial-statement amounts were translated at 7.1875 CNY/USD, the Federal Reserve H.10 spot rate for 2025-12-31.
+- Input market cap was treated as already denominated in CNY because result initialization declares CNY and carries the supplied amount unchanged.
+
+[core calculations]
+gross_margin = 496.485 / 650.611 = 0.7631057575
+net_margin = 242.075 / 650.611 = 0.3720733280
+operating_free_cash_flow_USD = 210.830m - 56.470m = 154.360m
+operating_free_cash_flow_CNY = 154.360m * 7.1875 = 1,109,462,500
+
+cash_USD = 138.353m
+eligible_short_US_Treasuries_USD = 455.398m
+eligible_long_US_Treasuries_USD = 352.987m
+total_liabilities_USD = 202.743m
+discounted_detachable_net_cash_USD = 138.353m + 95% * (455.398m + 352.987m) - 202.743m = 703.57675m
+discounted_detachable_net_cash_CNY = 703.57675m * 7.1875 = 5,056,950,703.125
+
+effective_tax_rate = 52.721 / 294.796 = 0.1788382475
+interest_and_investment_income_removed_USD = (39.708m + 8.765m) * (1 - effective_tax_rate)
+pre_haircut_operating_cash_profit_USD = 154.360m - interest_and_investment_income_removed_USD
+discounted_sustainable_cash_profit_CNY = pre_haircut_operating_cash_profit_USD * 90% * 7.1875 = 741,033,214.5571642
+
+operating_business_price = 24,864,367,578.736816 - 5,056,950,703.125 = 19,807,416,875.611816
+owner_earnback_years = 19,807,416,875.611816 / 741,033,214.5571642 = 26.7294589318
+market_cap_to_cash_profit = 24,864,367,578.736816 / 741,033,214.5571642 = 33.5536479206
+discounted_net_cash_to_market_cap = 5,056,950,703.125 / 24,864,367,578.736816 = 0.2033814328
+
+forecast_annual_dividend_USD = 2.00/share * 47,259,748 shares = 94,519,496
+forecast_annual_dividend_CNY = 94,519,496 * 7.1875 = 679,358,877.5
+forecast_dividend_yield = 679,358,877.5 / 24,864,367,578.736816 = 0.0273225883
+forecast_basis=Q1 and Q2 2026 dividends of $0.50/share were declared; Q3 and Q4 are assumed at the same rate and remain subject to Board approval.
+
+[judgment boundaries]
+- Facts: filing line items, business descriptions, customer concentration disclosure, contract mechanics, declared dividends, guidance and input valuation.
+- Inference: ordinary-operating model classification based on those facts.
+- Analyst assumptions: 95% Treasury haircut; all liabilities deducted; non-Treasury investments excluded; tax-adjusted interest/investment income removed from FCF; 10% sustainability haircut; $2.00/share forecast dividend.
+- Limitations: market-cap currency derivation is not included in the input; PE TTM observation period differs from FY2025; single-year FCF is affected by inventory investment.
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]

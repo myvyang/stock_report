@@ -1,32 +1,41 @@
-运行时间：2026-07-26 Asia/Shanghai
-公司：00380.HK 中国管业
+运行时间：2026-08-03 Asia/Shanghai
+公司：00380.HK 中国管业（CHINA PIPE）
 报告期：2025-12-31 annual
 
-协议工具：
-- 已运行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- 已运行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-- 校验结果：status=ok，errors=[]
-
-读取的协议和写作要求：
+已读取的技能与协议：
 - .agents/skills/stock-research/SKILL.md
 - .agents/skills/stock-research/references/result-contract.md
 - .agents/skills/stock-research/references/report-contract.md
 - .agents/skills/stock-research/references/data-reuse.md
 
-复用的数据：
-- config/input.json：公司、报告期、市值和PE输入。
-- stock_report/data/analysis/annual_review/00380.HK/2025-12-31/facts.json：年度事实包、三张表、资产负债拆分、业务和证据。
-- stock_report/data/analysis/annual_review/00380.HK/2025-12-31/annual_facts.md：年度事实摘要。
-- stock_report/data/analysis/stock_research/00380.HK/2025-12-31/result.json：既有人民币折算、owner_earnback拆分、风险核查和外部来源。
-- stock_report/data/analysis/stock_research/00380.HK/2025-12-31/report.md：既有人读报告，按本次输入市值和协议禁用榜单标签要求做了更新。
-- stock_report/data/raw/filings/00380.HK/2025-12-31/china-pipe-2025-annual-report.txt：定向核查股息披露。
+协议 CLI：
+- 已运行 init：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- 已使用 protocol set 写入及更新结构化字段；复杂结构复用既有股票研究结果，没有从空白手写 JSON。
+- 第一次 validate 发现既有产物资产负债行使用旧字段 business_substance，当前协议要求 explanation。
+- 已通过 protocol set 为资产、负债各行补齐 explanation。
+- 最终运行 validate：status=ok，errors=[]。
 
-关键处理：
-- 原年报金额为港元千元；结构化结果沿用既有研究的香港税务局2025年12月汇率1港元=0.916403人民币，输出为人民币绝对元。
-- 市值采用本次输入2026-07-24人民币143,000,000元，PE采用2.79；由此重算折后净现金/市值、经营业务购买价、owner_earnback_years和market_cap_to_cash_profit。
-- 删除既有研究中的legacy investment_case_type标签，不在outputs/result.json中输出任何榜单标签。
-- 股息字段按年报披露设置为0：董事会不建议派付2025年末期股息，2024年亦为无。
+复用资料：
+- config/input.json：公司、报告期、2026/07/31 16:08:47 市值人民币 148,995,357.77628422 元、PE TTM 3.09。
+- stock_report/data/analysis/annual_review/00380.HK/2025-12-31/facts.json：2025 年业务、三张表、资产负债拆分、现金流和证据。
+- stock_report/data/analysis/annual_review/00380.HK/2025-12-31/annual_facts.md：年度事实摘要及缺口。
+- stock_report/data/raw/filings/00380.HK/2025-12-31/china-pipe-2025-annual-report.txt：定向复核业务分部、报表及股息。
+- stock_report/data/analysis/stock_research/00380.HK/2025-12-31/result.json 与 report.md：复用既有人民币折算、owner_earnback 折扣、风险核查和外部行业来源，并按本次行情重算。
 
-仍无法公开确认：
-- 年报未拆母公司和各子公司的现金、定期存款及可分派储备，影响可剥离净现金精确性。
-- 未来公共工程订单实际进入中国管业收入的比例，政府资料只能支持行业方向，不能证明公司份额。
+模型复核：
+- 输入提示为 financial_brokerage / requires_special_model，但年报确认公司只有一个经营分部：管道、管件等建筑材料贸易。
+- 报表不存在券商客户资金、自营证券或卖出回购结构；现金、库存、应收、预付款、信托收据贷款和租赁负债符合普通贸易企业。
+- 因此覆盖提示为 ordinary_operating / applicable。
+
+金额与公式：
+- 年报原币港元千元；沿用既有研究汇率 1 港元=0.916403 元人民币，结果使用人民币绝对元。
+- 折后可剥离净现金 252,039,618.38 元；折后可持续现金利润 25,320,289.12 元。
+- 经营业务购买价 = 148,995,357.77628422 - 252,039,618.38 = -103,044,260.60371578 元。
+- owner_earnback_years = -103,044,260.60371578 / 25,320,289.12 = -4.069632069182146。
+- market_cap_to_cash_profit = 148,995,357.77628422 / 25,320,289.12 = 5.884425611024943。
+- 负回本年只表示折后净现金超过市值，报告未将其解释为常规回收期。
+
+数据限制：
+- 年报未拆母公司及各子公司的现金、定存和可分派储备，折后净现金仍依赖折扣假设。
+- 2025 年经营现金流受库存和应收释放支持，不能直接外推。
+- 公共工程资料只能说明行业方向，不能证明公司未来订单份额。

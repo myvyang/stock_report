@@ -1,0 +1,93 @@
+EQNR stock-research trace
+generated_at=2026-08-05T05:20:44+08:00
+period=2025-12-31
+report_type=annual
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the task required checking reusable artifacts.
+4. Checked configured annual-review, raw-filing and historical stock-research paths. No EQNR/2025-12-31 artifacts existed in the workspace.
+5. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+6. Populated outputs/result.json exclusively through protocol `set` commands.
+7. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: {"status":"ok","errors":[]}
+
+[primary sources]
+S1 Equinor 2025 Annual Report on Form 20-F, filed 2026-03-19, SEC accession 0001140625-26-000013
+   https://www.sec.gov/Archives/edgar/data/1140625/000114062526000013/eqnr-20251231.htm
+   Used for consolidated income statement, balance sheet, cash flow, segments, debt, shares, state ownership, dividends and risks.
+S2 Equinor Annual Report 2025 / Key figures
+   https://www.equinor.com/investors/annual-reports
+   https://www.equinor.com/investors/key-figures
+   Used to cross-check revenue, operating income, net income, assets, equity, cash flow, capex, production and reserve replacement.
+S3 Equinor Our dividend and FY2025 results
+   https://www.equinor.com/investors/our-dividend
+   https://www.equinor.com/news/equinor-fourth-quarter-and-full-year-2025-results
+   Used for USD 0.39 quarterly dividend expectation, historical dividend and 2026 buyback announcement.
+S4 National Bureau of Statistics of China, Statistical Communiqué on 2025 National Economic and Social Development
+   https://www.stats.gov.cn/english/PressRelease/202602/t20260228_1962661.html
+   Used for 2025 average USD/CNY=7.1429.
+S5 Federal Reserve H.10 Data Download Program
+   https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+   Used for 2025-12-31 USD/CNY=7.1875.
+S6 Task input / Yahoo Finance yfinance
+   Used for market_cap=CNY 658,976,541,933.7266, date=2026-08-03, pe_ttm=11.138211.
+
+[currency conversion]
+Income statement and cash-flow items: USD million * 1,000,000 * 7.1429.
+Balance-sheet items: USD million * 1,000,000 * 7.1875.
+Market data retained exactly as supplied in config/input.json.
+
+[financial statement mapping]
+Revenue=CNY 760,447,419,800 from total revenues and other income USD 106,462m (S1).
+Cost of sales proxy=CNY 394,030,935,600 from purchases net of inventory variation USD 55,164m (S1).
+Gross profit proxy=CNY 366,416,484,200 = (106,462-55,164) USD m * 7.1429m.
+Gross margin proxy=51,298/106,462=0.4818432868. It excludes operating, depreciation and exploration expenses and is not cross-industry comparable.
+Operating profit=CNY 181,086,800,800 from net operating income USD 25,352m (S1).
+Net profit=CNY 36,128,788,200 from USD 5,058m (S1).
+Parent net profit=CNY 36,021,644,700 from USD 5,043m (S1).
+Net margin=5,043/106,462=0.0473690143.
+
+Total assets=CNY 946,787,812,500 from USD 131,727m (S1).
+Total liabilities=CNY 655,715,625,000 from USD 91,230m (S1).
+Total equity=CNY 291,072,187,500 from USD 40,497m (S1).
+Parent equity=CNY 290,547,500,000 from USD 40,424m (S1).
+Minority interest=CNY 531,875,000 from USD 74m (S1; rounding difference versus total equity is from source presentation).
+
+Operating cash flow=CNY 142,650,855,900 from USD 19,971m (S1).
+Capital expenditure and investments=CNY 99,957,742,600 from USD 13,994m (S1).
+Operating free cash flow=CNY 42,693,113,300 = (19,971-13,994) USD m * 7.1429m.
+Financing cash flow=CNY -82,329,065,400 from USD -11,526m (S1).
+Dividend and buyback cash out=CNY 76,479,030,300 from (4,791+5,916) USD m * 7.1429m (S1).
+
+[analysis model]
+statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+Reason: financial assets and liabilities are treasury/trading/financing support for an operating energy group, not customer deposits or insurance reserves. However, PP&E, reserves, development capex and decommissioning obligations are business assets and must not be treated as detachable cash.
+
+[owner earnback]
+Cash USD 5,036m * 7.1875 = CNY 36,196,250,000; included at 100%.
+Current financial investments USD 14,297m * 7.1875 = CNY 102,759,687,500; included at 80%.
+Finance debt USD (23,763+4,047)m * 7.1875 = CNY 199,884,375,000; deducted at 100%.
+Lease liabilities USD (2,221+1,190)m * 7.1875 = CNY 24,516,562,500; deducted at 100%.
+Discounted detachable net cash = 36,196,250,000 + 102,759,687,500*0.8 - 199,884,375,000 - 24,516,562,500 = CNY -105,996,937,500.
+Sustainable cash profit judgment=USD 5,000m * 7.1429 = CNY 35,714,500,000.
+Basis: 2025 IFRS OCF less total capex/investments was USD 5,977m; rounded down by USD 977m for commodity cycle, working-capital timing and sustaining-capex uncertainty. This is an analyst judgment, not guidance.
+Operating business price=658,976,541,933.7266 - (-105,996,937,500) = CNY 764,973,479,433.7266.
+Owner earnback years=764,973,479,433.7266 / 35,714,500,000 = 21.4191289094.
+Market cap to cash profit=658,976,541,933.7266 / 35,714,500,000 = 18.4512324667.
+
+[dividend]
+Forecast annual dividend per share/ADS=USD 0.39*4=USD 1.56 (S3).
+Outstanding shares=2,500,271,030 at 2025-12-31 (S1).
+Forecast cash dividend=1.56*2,500,271,030*7.1429=CNY 27,860,330,066.6917.
+Forecast dividend yield=27,860,330,066.6917/658,976,541,933.7266=0.04227818184.
+Does not include the announced 2026 buyback up to USD 1.5bn. Q1-Q3 dividends remain subject to quarterly board decisions.
+
+[quality and caveats]
+status=complete because company identity, model, three statements, asset/liability explanations, owner-earnback breakdown, dividend forecast, business story and primary-source evidence are populated and protocol validation passed.
+The prebuilt annual facts package was absent; official SEC/company sources were used directly.
+Proxy gross margin is not comparable with conventional manufacturing gross margin.
+USD 5bn sustainable cash profit is judgmental and highly sensitive to commodity prices, taxes and capex.

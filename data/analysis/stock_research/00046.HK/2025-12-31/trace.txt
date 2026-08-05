@@ -3,104 +3,60 @@ stock research trace for 00046.HK / 科联系统
 Run context:
 - cwd: /workspace
 - input: config/input.json
-- period: 2025-12-31
-- report_type: annual
-- created_at input: 2026-07-27T00:25:08+08:00
+- period: 2025-12-31; report_type: annual
+- input created_at: 2026-08-03T12:09:52+08:00
 - required outputs: outputs/result.json, outputs/report.md, outputs/trace.txt
 
-Protocol and contracts read:
-- /workspace/.agents/skills/stock-research/SKILL.md
-- /workspace/.agents/skills/stock-research/references/result-contract.md
-- /workspace/.agents/skills/stock-research/references/report-contract.md
-- /workspace/.agents/skills/stock-research/references/data-reuse.md
+Skill and contracts read completely:
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
 
-Protocol CLI use:
-- initialized outputs/result.json with:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- validated outputs/result.json after writing with:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-- validation result: {"status": "ok", "errors": []}
+Protocol CLI:
+- initialized outputs/result.json with `PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json`
+- populated fields using repeated protocol `set` commands; the complex JSON was not hand-written from scratch
+- final validation command: `PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json`
 
-Local files read and reused:
-- config/input.json
+Sources reused and checked:
 - stock_report/data/analysis/annual_review/00046.HK/2025-12-31/facts.json
 - stock_report/data/analysis/annual_review/00046.HK/2025-12-31/annual_facts.md
 - stock_report/data/analysis/annual_review/00046.HK/2025-12-31/extraction_trace.txt
 - stock_report/data/normalized/facts/00046.HK/2025-12-31/annual-facts.json
 - stock_report/data/raw/filings/00046.HK/2025-12-31/annual_report_2025.txt
-- stock_report/data/analysis/stock_research/00046.HK/2025-12-31/result.json
-- stock_report/data/analysis/stock_research/00046.HK/2025-12-31/report.md
-- stock_report/data/analysis/stock_research/00046.HK/2025-12-31/trace.txt
+- prior stock research result/report/trace for the same period, used as historical research assumptions
+- primary filing URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042900329.pdf
 
-Core source hierarchy:
-- Core financial numbers come from Annual Report 2025 and the annual fact pack.
-- Historical stock_research outputs were reused as prior research and explanation, not copied as-is because the old result.json schema differs and included a disallowed list-style field.
-- No market quote refresh was performed. Market cap and PE use config/input.json: CNY 278,000,000 as of 2026-07-24, PE TTM 16.62.
+Model review:
+- input hint `financial_brokerage` was rejected.
+- annual report identifies enterprise application software, SaaS/GETS/cloud, IT implementation and systems integration; investment activity is small.
+- no bank borrowings and no brokerage customer funds, repo financing or brokerage balance-sheet structure.
+- final model: ordinary_operating; ordinary owner-earnback method applicable.
 
-Currency and unit handling:
-- Annual report source currency: HKD, unit HK$'000.
-- outputs/result.json currency: CNY, unit yuan.
-- Applied historical research translation rate: 1 HKD = 0.905667 CNY.
-- Ratios are decimals in JSON.
+Currency:
+- filing currency HKD, unit HK$'000.
+- output currency CNY, absolute yuan.
+- reused historical research translation rate 1 HKD = 0.905667 CNY.
 
-Key financial facts used:
-- 2025 revenue: HK$241.291m.
-- 2025 gross profit: HK$140.139m.
-- 2025 operating profit: HK$35.989m.
-- 2025 net profit: HK$18.307m.
-- 2025 parent net profit: HK$18.444m.
-- 2025 operating cash flow: HK$36.436m.
-- 2025 PPE plus intangible capex: HK$3.175m.
-- 2025 lease principal paid: HK$4.623m.
-- 2025 dividends paid in cash flow: HK$26.728m.
+Current input valuation:
+- market cap CNY 258,545,960.3470564 at 2026/07/31 16:08:44.
+- source Tencent qt.gtimg.cn; PE TTM 16.29.
 
-Business facts used:
-- Application Services external revenue HK$136.444m, segment result HK$30.942m.
-- Solutions and Integration Services external revenue HK$103.260m, segment result HK$35.395m.
-- Investments external revenue HK$1.587m, segment result loss HK$10.849m.
-- A single major customer generated HK$83.115m, about 34.4% of revenue.
-- 2025 total DPS was 10 HK cents: first interim 5.5 HK cents and second interim 4.5 HK cents.
+Owner earnback calculations:
+- discounted detachable net cash CNY 247,577,659.
+- discounted sustainable cash profit CNY 23,094,508.
+- operating business price = 258,545,960.3470564 - 247,577,659 = 10,968,301.3470564.
+- owner earnback years = 10,968,301.3470564 / 23,094,508 = 0.4749311545.
+- market cap / cash profit = 11.1951274453.
+- discounted net cash / market cap = 0.9575769765.
 
-Asset and liability facts used:
-- Total assets HK$656.118m.
-- Total liabilities HK$161.553m.
-- Total equity HK$494.565m.
-- Parent equity HK$493.536m.
-- Cash and bank balances HK$45.739m.
-- Time deposits HK$299.613m.
-- Pledged time deposits HK$0.130m.
-- FVTPL financial assets HK$4.423m.
-- Investment property HK$44.000m.
-- Lease liabilities HK$15.370m.
-- Bank borrowings HK$0.
-- Contract liabilities HK$53.217m.
+Dividend calculation:
+- forecast cash dividend CNY 22,006,061, based on 2025 full-year DPS 10 HK cents and implied shares from disclosed dividends.
+- forecast yield = 22,006,061 / 258,545,960.3470564 = 0.0851146967.
 
-Owner earnback methodology:
-- Reused historical owner_earnback economic assumptions embedded in prior stock_research outputs:
-  - discounted detachable net cash: HK$273.365m, translated to CNY 247,577,659.
-  - pre-haircut distributable cash profit: HK$30.0m.
-  - sustainable cash profit after 0.85 haircut: HK$25.5m, translated to CNY 23,094,508.
-- Recomputed formulas against current input market cap CNY 278,000,000:
-  - operating business price = CNY 278,000,000 - CNY 247,577,659 = CNY 30,422,341.
-  - owner earnback years = CNY 30,422,341 / CNY 23,094,508 = 1.3173.
-  - market cap to cash profit = CNY 278,000,000 / CNY 23,094,508 = 12.0375.
-  - discounted net cash to market cap = 0.8906.
-
-Dividend methodology:
-- Annual report disclosed 2025 DPS of 10 HK cents.
-- 2025 cash dividends paid were HK$26.728m, corresponding to 2024 final 5.5 HK cents plus 2025 first interim 5.5 HK cents.
-- Implied shares from HK$26.728m / HK$0.11 = about 242.982m shares.
-- Forecast cash dividend uses 2025 full-year DPS: 242.982m shares * HK$0.10 * 0.905667 = CNY 22,006,061.
-- Forecast dividend yield = CNY 22,006,061 / CNY 278,000,000 = 0.07916.
-
-Report writing choices:
-- Removed old report wording that described a list or ranking label.
-- Focused risks only where they affect revenue, cash profit, cash detachability, dividend capacity, assets, liabilities, or earnback logic.
-- Explained bank interest and FVTPL gains as real earnings that should not be double-counted after the related principal is deducted as detachable cash.
-
-Remaining limitations:
-- Market cap was not refreshed; it is the batch input value as of 2026-07-24.
-- Cash by listed parent, Hong Kong subsidiaries, offshore subsidiaries and Mainland subsidiaries is not disclosed.
-- Major customer identity, contract remaining term and renewal conditions are not disclosed.
-- R&D tax dispute final result and possible interest/penalty are future tax outcomes; annual report says potential interest and penalties cannot be reliably measured.
-- Maintenance versus growth capex is not separately disclosed.
+Known limitations:
+- exchange translation uses the existing historical research rate rather than a newly sourced spot rate.
+- cash legal-entity distribution and upstream path are not fully disclosed.
+- major customer identity and renewal terms are not disclosed.
+- R&D tax dispute interest/penalty cannot be reliably measured.
+- maintenance and growth capex are not separately disclosed.

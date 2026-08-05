@@ -1,0 +1,76 @@
+2026-08-05 stock-research trace — LSBK / 2025-12-31
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Input and reuse audit
+   - Read config/input.json.
+   - Expected raw filing, annual facts, normalized facts, and prior research paths were absent under stock_report/.
+   - No prior local facts were reused.
+
+3. Protocol initialization
+   - Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Initial model hint was ordinary_operating/applicable and was treated only as a hint.
+
+4. Primary-source collection and model decision
+   - Retrieved SEC Form 10-K for FY ended 2025-12-31, filed 2026-03-17:
+     https://www.sec.gov/Archives/edgar/data/2059653/000119312526109481/lsbk-20251231.htm
+   - SEC accession: 0001193125-26-109481; issuer CIK 0002059653.
+   - Confirmed Lake Shore Bancorp is a bank holding company whose subsidiary takes deposits and makes loans.
+   - Overrode hint to financial_bank/not_applicable. Deposits, loans, securities, and liquidity cash are operating balance-sheet items, so ordinary detachable-net-cash and cash-profit formulas were left null.
+
+5. Core extracted USD facts (10-K dollars in thousands converted to absolute USD)
+   - Total assets: 727,323,000
+   - Total liabilities: 585,684,000
+   - Total shareholders' equity / parent equity: 141,639,000
+   - Net loans: 555,441,000; gross loans: 557,313,000
+   - Deposits: 573,277,000; long-term debt: 0
+   - Cash and cash equivalents: 64,280,000
+   - Securities at fair value: 56,138,000
+   - Bank-owned life insurance: 31,525,000
+   - Net interest income: 24,565,000
+   - Net income / parent net income: 7,269,000
+   - Cash dividends paid: 1,676,000
+   - Shares outstanding at 2025-12-31: 7,836,100
+   - Current expected quarterly dividend: USD 0.09/share
+
+6. Bank-specific facts and calculations
+   - Net interest margin: 3.73% vs 3.21% in 2024.
+   - Non-performing assets: USD 1.680m; NPA/assets: 0.23% vs 0.55%.
+   - Allowance for credit losses: USD 4.884m; ACL/loans: 0.87%; ACL/NPL: 290.71%.
+   - Community Bank Leverage Ratio: 16.65% vs 9.00% minimum; bank deemed well-capitalized.
+   - Commercial real estate loans: USD 327.352m / USD 557.313m gross loans = 58.73%.
+   - 2025 ROE using average beginning/end equity: 6.28%.
+
+7. Currency conversion
+   - Protocol requires CNY absolute yuan.
+   - Used Federal Reserve Board/FRED DEXCHUS 2025-12-31 observation: USD 1 = CNY 6.9931.
+   - Source: https://fred.stlouisfed.org/data/DEXCHUS
+   - Balance sheet, income, dividends, and asset/liability analyses were converted at 6.9931.
+   - Input market cap CNY 911,126,856.0525513 was not reconverted.
+
+8. Valuation and dividend cross-checks
+   - Market cap / 2025 net income = 17.92x, broadly consistent with input PE TTM 17.17x.
+   - Market cap / 2025 year-end equity = 0.92x P/B.
+   - Forecast annual dividend = 0.09 * 4 * 7,836,100 = USD 2,820,996; protocol calculation uses CNY 19,727,507.13.
+   - Forecast dividend yield = CNY 19,727,507.13 / CNY 911,126,856.05 = 2.1652%.
+   - Note: forecast is conditional; board decides quarterly and regulation/capital may constrain distributions.
+
+9. JSON population and validation
+   - Populated fields only through protocol CLI set/append commands in outputs/populate_result.sh; did not hand-write result.json.
+   - Ran protocol validate after population.
+   - Validation result: status=ok, errors=[].
+
+10. Reporting choices and limitations
+   - Bank revenue/gross margin/net margin/operating cash flow/capex/free cash flow were left null because ordinary-company meanings are not comparable and special-model complete threshold does not require them.
+   - Ordinary owner earnback fields remained null as required by contract.
+   - 2025 second-step conversion raised USD 49.5m gross and changed share structure; historical per-share dividends are not directly comparable with current shares.
+   - Market cap and PE were accepted from task input (Yahoo Finance yfinance) and not independently reconstructed.
+
+11. Final verification completed
+   - Re-ran protocol validate: status=ok, errors=[].
+   - Parsed outputs/result.json successfully with Python json.tool.
+   - Confirmed result.json, report.md, and trace.txt are non-empty.

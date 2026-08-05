@@ -1,0 +1,58 @@
+stock-research trace
+generated_at=2026-08-03T15:18:18+08:00
+query=00648.HK
+period=2025-12-31
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated result fields with protocol `set` commands; the final JSON was not hand-written from scratch.
+4. Validated with protocol `validate`; status returned ok with no errors.
+
+[reuse audit]
+- Expected annual facts, normalized facts, filing metadata and historical stock-research files were absent.
+- Downloaded the official 2025 annual-report PDF to stock_report/data/raw/filings/00648.HK/2025-12-31/2025-annual-report.pdf.
+- Primary disclosure URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0417/2026041701771.pdf
+
+[identity and model]
+- Input hint: financial_brokerage / requires_special_model.
+- Annual report evidence: sole reportable segment is distribution of medical and healthcare equipment and products in Hong Kong; no brokerage business, client money, proprietary trading book or repo funding.
+- Override: ordinary_operating / applicable.
+
+[source extraction]
+- Annual report pp.2-3: business overview, revenue, gross profit, liquidity, borrowings and cash flows.
+- pp.5-6: customer/supplier concentration, no distributable reserves, no dividend.
+- pp.19-20: independent auditor report; unmodified opinion dated 2026-03-27.
+- pp.21-24: audited income statement, balance sheet, changes in equity and cash flow statement.
+- pp.33-35: segment, geography, revenue recognition and debt restructuring.
+- pp.35-41: dividends, PPE, leases, borrowings, share issuance and non-cash debt conversion.
+- pp.43-44: credit and liquidity risks.
+
+[currency]
+- Source statements: HKD thousands.
+- Result contract: CNY absolute yuan.
+- Translation assumption: 1 HKD = 0.9205 CNY, approximated from official 2025 average USD/CNY 7.1429 and the HKD linked-exchange-rate relationship.
+- Same rate used for all statement items; this is a disclosed simplification.
+
+[calculations]
+- gross_margin = 22.593 / 68.243 = 0.3310669226.
+- net_margin = 6.950 / 68.243 = 0.1018419472.
+- total_assets = (0.515 + 48.062) HKDm = 48.577 HKDm.
+- total_liabilities = 21.004 + 0.167 = 21.171 HKDm.
+- detachable_net_cash = max(0, cash 12.027 - borrowings 12.099 - lease liabilities 0.551) = 0 HKDm.
+- operating_free_cash_flow approximated as OCF 5.398 HKDm less zero PPE additions = 5.398 HKDm.
+- discounted_sustainable_cash_profit = 5.398m * 0.9205 * 75% = CNY 3,726,644.
+- operating_business_price = market_cap - discounted_net_cash = CNY 63,584,773.33128452.
+- owner_earnback_years = 63,584,773.33128452 / 3,726,644 = 17.0622075.
+- forecast dividend = zero based on two years of no dividend and nil distributable reserves.
+
+[judgment flags]
+- Fact: statement figures, business scope, supplier/customer concentration, dividends and share issuance.
+- Inference: classification as ordinary operating company and inability to detach cash after debt.
+- Subjective judgment: 25% sustainability discount and zero near-term dividend forecast.
+
+[limitations]
+- Market cap and PE are supplied Tencent snapshot values and were not independently reconstructed.
+- Only one post-resumption full-year operating observation supports sustainable cash profit.
+- 2026 share consolidation requires adjusted-share treatment for per-share comparisons.

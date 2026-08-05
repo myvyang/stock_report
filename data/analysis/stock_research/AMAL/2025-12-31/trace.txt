@@ -1,0 +1,71 @@
+AMAL stock-research trace
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized result through protocol CLI
+- PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse audit
+- No existing annual facts, normalized facts, or prior stock-research output for AMAL/2025-12-31 was present.
+- Downloaded SEC 2025 Form 10-K HTML to stock_report/data/raw/filings/AMAL/2025-12-31/amal-20251231.htm.
+- Used SEC Companyfacts XBRL for audited statement values and the filing text for bank-specific ratios and business explanations.
+
+4. Model decision
+- Input hint: ordinary_operating / applicable.
+- Overridden to financial_bank / not_applicable.
+- Basis: Amalgamated Financial Corp. is a bank holding company; customer deposits fund loans and securities. Deposits, loans, securities and liquidity cash are operating balance-sheet items and cannot support a detachable-net-cash calculation.
+- Ordinary owner earnback metrics therefore remain null.
+
+5. Primary sources
+- SEC 2025 Form 10-K, accession 0001823608-26-000048, filed 2026-03-05:
+  https://www.sec.gov/Archives/edgar/data/1823608/000182360826000048/amal-20251231.htm
+- SEC Companyfacts, CIK 0001823608:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0001823608.json
+- FY2025/Q4 results release, 2026-01-22:
+  https://ir.amalgamatedbank.com/news-releases/news-release-details/amalgamated-financial-corp-reports-fourth-quarter-2025-financial/
+- Dividend release, 2026-01-20:
+  https://ir.amalgamatedbank.com/news-releases/news-release-details/amalgamated-financial-corp-announces-21-quarterly-dividend/
+- SAFE RMB exchange-rate reference:
+  https://www.safe.gov.cn/safe/rmbhlzjj/
+- Market cap and PE: config/input.json, Yahoo Finance yfinance snapshot dated 2026-08-03.
+
+6. Core source values in USD
+- Total assets: 8,869,836,000
+- Total liabilities: 8,075,372,000
+- Stockholders' equity: 794,464,000
+- Net loans: 4,899,687,000
+- AFS securities: 1,783,551,000
+- HTM securities net: 1,554,015,000
+- Deposits: 7,949,241,000
+- Net interest income: 297,784,000
+- Noninterest income: 30,940,000
+- Net income attributable to parent: 104,447,000
+- 2025 dividends paid: 17,203,000
+- 2025 common-stock repurchases: 32,346,000
+- NIM: 3.59%
+- NPA/assets: 0.32%
+- Bank CET1: 14.58%
+- ACL/loans: 1.16%
+
+7. Conversion and calculations
+- Presentation FX: 7.0348 CNY/USD, reference date 2025-12-31.
+- Net revenue = net interest income + noninterest income = USD 328,724,000.
+- Net margin = 104,447,000 / 328,724,000 = 0.3177346345.
+- Book equity in CNY = 794,464,000 * 7.0348 = 5,588,895,347.2.
+- Indicative price/book = 9,963,215,563.27478 / 5,588,895,347.2 = 1.78268; disclosed only in interpretation/report, not an ordinary earnback metric.
+- Forecast dividend = USD 0.17 * 4 * 29,829,356 shares * 7.0348 = CNY 142,693,616.44.
+- Forecast dividend yield = 142,693,616.44 / 9,963,215,563.27478 = 0.0143220445.
+- 2025 dividend plus buyback cash out = (17,203,000 + 32,346,000) * 7.0348 = CNY 348,567,305.2.
+
+8. Result construction
+- Used protocol CLI set commands to populate result fields; complex result JSON was not written from scratch.
+- Wrote outputs/report.md and outputs/trace.txt after completing the structured result.
+
+9. Validation
+- PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Status: ok; errors: [].

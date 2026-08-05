@@ -1,0 +1,84 @@
+2026-08-05T01:09:22+08:00 protocol init
+  command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+  result: initialized stock-research-result-v1 skeleton
+
+Local reuse audit
+  checked:
+    stock_report/data/raw/filings/02108.HK/2025-12-31
+    stock_report/data/analysis/annual_review/02108.HK/2025-12-31
+    stock_report/data/normalized/facts/02108.HK/2025-12-31
+    stock_report/data/analysis/stock_research/02108.HK/2025-12-31
+  result: no filing, facts package, normalized facts, or prior research existed; public primary-source retrieval required
+
+Company and model verification
+  input hint: financial_brokerage / requires_special_model
+  primary evidence: K2 F&B Holdings Limited Annual Report 2025, HKEX publication 2026-04-28
+  verified business: Singapore food-centre ownership/management, tenant rental/cleaning/utilities, and self-operated F&B stalls
+  override: ordinary_operating / applicable
+  constraint: property-heavy balance sheet; mortgaged property and related borrowings analyzed together and not treated as detachable cash
+
+Primary source
+  URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042800578.pdf
+  document: K2 F&B Holdings Limited Annual Report 2025
+  relevant pages:
+    pp.17-20 business footprint and revenue breakdown
+    pp.165-170 consolidated statements and cash flows
+    p.217 dividend and parent profit
+    pp.218-223 investment property, held-for-sale property, pledges and related loan
+    pp.233-242 cash, borrowings, covenants and lease liabilities
+
+Source figures in S$'000
+  revenue 51,506
+  inventories consumed 15,233
+  investment-property fair-value gain 8,400
+  profit before tax 9,898
+  net profit 9,560
+  parent net profit 9,560
+  total assets 204,590
+  total liabilities 105,815 (derived: assets 204,590 - equity 98,775)
+  total equity 98,775
+  parent equity 98,793
+  NCI -18
+  cash and cash equivalents 3,999
+  pledged deposits 1,015
+  borrowings 89,531
+  lease liabilities 6,232
+  operating cash flow 9,317
+  PPE additions paid 938
+  2025 operating free cash flow 8,379
+  2024 operating free cash flow 6,096 (OCF 9,610 - PPE additions 3,514)
+  forecast final dividend 2,500
+
+Currency conversion
+  convention: all JSON monetary values in absolute CNY
+  rate: 1 SGD = 5.4655 CNY
+  source: PBOC/CFETS central parity announcement dated 2025-12-26
+  limitation: a single closing-period proxy is used for balance-sheet, income, cash-flow and dividend values; no annual-average income-statement conversion
+
+Metric calculations
+  contribution gross profit = (51,506 - 15,233) * 1,000 * 5.4655 = CNY 198,250,081.50
+  contribution gross margin = 36,273 / 51,506 = 0.7042480488
+  note: annual report uses nature-of-expense presentation; this is revenue less inventories consumed, not conventional functional gross margin
+  net margin = 9,560 / 51,506 = 0.1856094436
+  2025 FCF = (9,317 - 938) * 1,000 * 5.4655 = CNY 45,795,424.50
+  2024 FCF = (9,610 - 3,514) * 1,000 * 5.4655 = CNY 33,316,008.00
+  discounted sustainable cash profit = average(2025 FCF, 2024 FCF) = CNY 39,556,556.25
+  discounted detachable net cash = CNY 0 because cash is far below bank and lease debt; pledged cash excluded
+  operating business price = market cap - discounted net cash = CNY 309,708,001.61361694
+  owner earnback years = 309,708,001.61361694 / 39,556,556.25 = 7.8294985958
+  forecast dividend = 2,500 * 1,000 * 5.4655 = CNY 13,663,750.00
+  forecast dividend yield = 13,663,750 / 309,708,001.61361694 = 0.0441181691
+
+Valuation source
+  market cap: CNY 309,708,001.61361694
+  timestamp: 2026/08/03 09:43:47
+  PE TTM: 6.23
+  source: Tencent qt.gtimg.cn, supplied by config/input.json
+
+Protocol mutations
+  outputs/result.json initialized by protocol CLI
+  all complex sections populated via protocol set commands; JSON was not authored from scratch
+
+Validation
+  command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+  result: status ok; errors []

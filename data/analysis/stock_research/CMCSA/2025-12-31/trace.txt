@@ -1,0 +1,103 @@
+stock-research trace
+company=CMCSA
+period=2025-12-31
+generated_for_input=2026-08-04T17:03:24+08:00
+
+[skill and contracts]
+Read .agents/skills/stock-research/SKILL.md in full.
+Read .agents/skills/stock-research/references/result-contract.md in full.
+Read .agents/skills/stock-research/references/report-contract.md in full.
+Read .agents/skills/stock-research/references/data-reuse.md in full.
+
+[reuse audit]
+Checked the paths named by config/input.json.
+No CMCSA annual facts package, normalized facts, prior stock-research result, filing metadata, or raw filing existed in the workspace.
+Checked stock_report/data/notes/user_stock_evaluations.md; no CMCSA note existed.
+Conclusion: official-source retrieval was required.
+
+[protocol]
+Initialized outputs/result.json with:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+All subsequent result mutations used protocol `set`; the result was not authored from an empty JSON file.
+Final validation command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Final validation result: status=ok, errors=[]
+
+[official sources]
+1. SEC filing index, accession 0001628280-26-004994, filed 2026-02-03:
+   https://www.sec.gov/Archives/edgar/data/1166691/000162828026004994/0001628280-26-004994-index.htm
+2. Comcast 2025 Form 10-K:
+   https://www.sec.gov/Archives/edgar/data/1166691/000162828026004994/cmcsa-20251231.htm
+3. SEC company facts for CIK 0001166691, used as a cross-check:
+   https://data.sec.gov/api/xbrl/companyfacts/CIK0001166691.json
+4. Comcast Q4 and full-year 2025 results:
+   https://www.cmcsa.com/news-releases/news-release-details/comcast-reports-4th-quarter-2025-results
+5. Comcast dividends and stock splits, observed through 2026-07-14 declaration:
+   https://www.cmcsa.com/stock-performance/dividends-and-stock-splits
+6. Federal Reserve H.10 release dated 2026-01-05; 2025-12-31 USD/CNY=6.9931:
+   https://www.federalreserve.gov/releases/h10/20260105/
+7. Market data was supplied by config/input.json: market cap CNY 573,750,961,082.6484 on 2026-08-03 and PE TTM 7.679487, source Yahoo Finance yfinance.
+
+[model decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: customer subscriptions, advertising, licensing, studios, and parks are operating businesses. Debt is ordinary financing and not customer money; content, PP&E, franchise rights, and receivables are operating assets. The formula is applicable but discounted detachable net cash is negative.
+
+[currency]
+All USD financial statement amounts were multiplied by 6.9931 CNY/USD.
+Ratios were computed before or after conversion as mathematically equivalent.
+
+[financial statement facts, USD millions]
+Revenue=123707
+Programming and production cost=34951
+Derived gross profit=88756
+Operating income=20672
+Net income=19660
+Net income attributable to Comcast=19998
+Operating cash flow=33643
+Capital expenditure=11750
+Cash paid for intangible assets=2658
+Operating free cash flow per protocol (OCF-capex)=21893
+Company-defined free cash flow (OCF-capex-intangible cash paid)=19235
+Financing cash flow=-14346
+Dividends paid=4894
+Share repurchases and employee-plan repurchases=7155
+Total assets=272631
+Total liabilities=175480 (derived as total assets-total equity)
+Total equity=97151
+Parent equity=96903
+Noncontrolling interests=249; rounding causes a USD 1m difference versus total equity.
+Cash=9481
+Investments=7952
+Debt=98937
+
+[gross margin convention]
+Comcast does not report a consolidated gross-profit subtotal or a unified cost-of-revenue line.
+For the required protocol fields only, cost_of_sales is mapped to programming and production costs.
+gross_profit = 123707 - 34951 = 88756 USD million.
+gross_margin = 88756 / 123707 = 0.7174695045551182.
+This ratio is flagged as limited-comparability in result.json and report.md.
+
+[owner earnback]
+Cash included at 100%: 9.481bn USD.
+Investments included at 50%: 3.976bn USD.
+Debt deducted at 100%: 98.937bn USD.
+Discounted detachable net cash=(9.481+3.976-98.937)*6.9931=-597,770,188,000 CNY.
+Operating business price=573,750,961,082.6484-(-597,770,188,000)=1,171,521,149,082.6484 CNY.
+
+Reported company-defined FCF history: 2023=12.962bn USD, 2024=12.543bn USD, 2025=19.235bn USD.
+Three-year mean=14.9133bn USD.
+Selected sustainable distributable cash profit=12.0bn USD=83,917,200,000 CNY.
+Judgment basis: normalize 2025 cash-tax timing; avoid treating the 9.4bn USD pre-tax Hulu disposal gain as recurring; reflect that 2025 includes Versant but the valuation date is after its separation; retain a buffer for broadband competition, content obligations, and capital intensity.
+Owner earnback years=1,171,521,149,082.6484/83,917,200,000=13.960441352698236.
+Market cap/cash profit=573,750,961,082.6484/83,917,200,000=6.837108019364903.
+
+[dividend forecast]
+Quarterly declared dividend remained USD 0.33 through 2026-07-14; annualized dividend=USD 1.32/share.
+Year-end 2025 Class A shares=3,594,768,252. Class B shares are excluded from this forecast.
+Forecast cash dividend=1.32*3,594,768,252*6.9931=33,182,917,499.240788 CNY.
+Forecast dividend yield=33,182,917,499.240788/573,750,961,082.6484=0.057835053446578556.
+Limitation: ongoing repurchases may reduce the actual share count and cash paid.
+
+[cross-period caveat]
+Versant separated on 2026-01-02. The 2025 financial statements contain full-year Versant operations, while the supplied 2026-08-03 market capitalization does not include Versant. The sustainable-cash-profit haircut mitigates but cannot eliminate this mismatch. A complete post-separation annual period is needed for a clean recalculation.

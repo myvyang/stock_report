@@ -1,0 +1,16 @@
+2026-08-03T15:12:56+08:00 | input | 读取 config/input.json；公司代码00322.HK，报告期2025-12-31，市值57,713,139,770.6926元，PE TTM 13.46。
+2026-08-03 | skill | 完整读取 stock-research/SKILL.md、result-contract.md、report-contract.md；另按技能引用读取data-reuse.md。
+2026-08-03 | reuse-check | 检查指定raw filing、annual review、normalized facts与historical stock research路径；除用户评价空目录外未发现可复用事实包或历史研究结果。
+2026-08-03 | protocol-init | 执行 PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json。
+2026-08-03 | source | 港交所2025年度业绩公告：https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0323/2026032300460.pdf 。提取三张表摘要、分部、股息及一次性收益调整。
+2026-08-03 | source | 港交所2025年度业绩演示：https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0323/2026032300476.pdf 。提取经营现金流、资本开支、产品收入、毛利率、ROE与运营效率。
+2026-08-03 | source | 港交所2025年度报告：https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042700361.pdf 。下载保存至 stock_report/data/raw/filings/00322.HK/2025-12-31/2025-annual-report.pdf；本地缺少pdftotext，核心字段改由港交所可检索年度业绩公告及演示复核。
+2026-08-03 | model-review | 财报显示公司为中国方便面及饮品经营企业，不存在券商客户资金、自营金融资产或回购业务；将错误的financial_brokerage提示覆盖为ordinary_operating，owner earnback适用。
+2026-08-03 | calculation | 毛利率=27,531,704,000/79,068,022,000=34.8203%；归母净利率=4,500,698,000/79,068,022,000=5.6922%。
+2026-08-03 | calculation | 经营自由现金流≈8,202,000,000-3,112,000,000=5,090,000,000元；两项来源为公司演示的百万元取整数。
+2026-08-03 | calculation | 折后可剥离净现金=19,486,056,000×90%-15,022,647,000=2,514,803,400元。
+2026-08-03 | calculation | 折后持续现金利润=公司披露经调整归母利润4,245,156,000×90%=3,820,640,400元。
+2026-08-03 | calculation | 经营业务购买价=57,713,139,770.6926-2,514,803,400=55,198,336,370.6926元；回本年=55,198,336,370.6926/3,820,640,400=14.4474年。
+2026-08-03 | dividend | 建议末期及特别末期股息合计4,500,698,000元；静态收益率=4,500,698,000/57,713,139,770.6926=7.7984%。
+2026-08-03 | output | 使用protocol set逐字段填充outputs/result.json；使用协议公式与complete门槛校验。
+2026-08-03 | validation | 执行 PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json；返回status=ok、errors=[]。

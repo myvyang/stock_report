@@ -1,0 +1,100 @@
+stock-research trace
+company: 00517.HK COSCO SHIPPING International (Hong Kong) Co., Ltd.
+period: 2025-12-31 annual
+generated_for_input: config/input.json
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Expected annual fact paths and normalized fact paths did not exist.
+- No prior 00517.HK stock research result existed.
+- Downloaded the official HKEX 2025 annual report to:
+  stock_report/data/raw/filings/00517.HK/2025-12-31/annual-report-2025.pdf
+- Extracted a local searchable text copy to annual-report-2025.txt. The container had no pdftotext or PDF Python library, so a temporary virtual environment under /tmp was used to install pypdf for extraction. The PDF remains the authoritative source.
+
+3. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Rejected after verification.
+- Annual report p.184 states the group principally provides shipping services and general trading.
+- Annual report p.21 states shipping-services revenue was HK$3,696.597m, 99.8% of revenue.
+- Annual report pp.224-225 says HK$230.985m fiduciary insurance-client money is unavailable for general corporate use; it is distinct from group cash.
+- Annual report p.202 states total borrowings were nil.
+- Result model set to ordinary_operating / applicable.
+
+4. Core filing facts (original currency HKD, amounts in HK$'000 unless stated)
+- Annual report p.178, statement of financial position:
+  total assets 9,505,783; total liabilities 1,237,049; total equity 8,268,734;
+  parent equity 7,941,705; non-controlling interests 327,029.
+- Annual report p.179, income statement:
+  revenue 3,705,731; cost of sales 2,811,205; gross profit 894,526;
+  operating profit 287,927; net profit 791,137; parent net profit 771,064.
+- Annual report p.183, cash flow statement:
+  operating cash flow 256,849; intangible purchases 534; PPE purchases 19,502;
+  capex 20,036; financing cash flow -844,017; dividends paid including NCI 806,744;
+  JV dividends received 266,250; associate dividends 10,521; FVOCI dividends 5,861.
+- Annual report pp.224-225, note 17:
+  total cash/deposits/restricted deposits 5,816,862; restricted deposits 5,536;
+  deposits with fellow financial institution 708,162; fiduciary client funds 230,985 excluded from usable group resources.
+- Annual report p.239, note 28:
+  2025 dividend 908,902; per share interim 0.33, final 0.19, special 0.10.
+- Annual report pp.20-21 and p.205:
+  shipping services 99.8% of revenue; segment revenue details.
+- Annual report p.20:
+  JV profit 355,240, including Jotun COSCO 337,553; associate profit 12,883.
+- Annual report p.237:
+  finance income 218,884, mostly bank-deposit interest 210,231.
+
+5. FX and valuation normalization
+- Protocol requires all absolute amounts in CNY.
+- Input market cap HK$7,541,828,592.293859 as of 2026-07-31 16:08:47, source Tencent qt.gtimg.cn; PE TTM 11.37.
+- ValutaFX historical page reports 2026-07-31 rate 1 HKD = 0.8608 CNY.
+- All statement and valuation amounts were multiplied by 0.8608 for result.json comparability.
+- Converted market cap: CNY 6,492,006,052.246553.
+
+6. Formula audit
+- gross margin = 894,526 / 3,705,731 = 0.2413898904.
+- net margin = 771,064 / 3,705,731 = 0.2080733869.
+- operating FCF = (256,849 - 20,036) * 0.8608m = CNY 203,848,630.4.
+- detachable cash HKD calculation:
+  start 5,816.862m
+  less restricted 5.536m
+  less operating reserve 500.000m
+  less proposed final + special dividend 425.131m
+  subtotal 4,886.195m; apply 90% = 4,397.5755m
+  less lease liabilities 12.515m
+  discounted detachable net cash = HK$4,385.0605m = CNY 3,774,660,078.4.
+- cash-profit HKD calculation:
+  OCF 256.849m + JV dividends 266.250m + associate dividends 10.521m
+  + FVOCI dividends 5.861m - capex 20.036m = 519.445m;
+  apply 80% = HK$415.556m = CNY 357,710,604.8.
+- operating business price = 6,492,006,052.246553 - 3,774,660,078.4
+  = CNY 2,717,345,973.846553.
+- owner earnback = 2,717,345,973.846553 / 357,710,604.8 = 7.596493 years.
+- market cap / cash profit = 6,492,006,052.246553 / 357,710,604.8 = 18.148766.
+- forecast regular dividend = HK$0.52 * 1,465,971,429 shares * 0.8608
+  = CNY 656,192,267.163264; yield = 0.101077.
+
+7. Explicit judgement calls
+- HK$500m operating reserve is an analyst assumption, not company guidance.
+- 90% cash haircut is applied after restricted cash, operating reserve and declared distributions.
+- 80% cash-profit haircut is applied to absorb working-capital and JV dividend variability.
+- Deposit interest is excluded from cash profit because the associated cash is deducted from market cap; retaining both would double count.
+- The forecast repeats the 2025 regular HK$0.52 dividend, not the HK$0.10 special dividend.
+
+8. Protocol construction and validation
+- All major result sections were populated with protocol CLI `set` commands; result.json was not written from scratch.
+- First completed validation:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+  status: ok; errors: []
+- A final validation is run after report and trace creation and recorded in the task handoff.
+
+9. Web sources
+- Official annual report: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042400806.pdf
+- HKEX title search: https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=1101
+- FX history: https://www.valutafx.com/history/hkd-cny-2026
+- HKMA daily exchange-rate API documentation (methodology reference): https://apidocs.hkma.gov.hk/documentation/market-data-and-statistics/monthly-statistical-bulletin/er-ir/er-eeri-daily/

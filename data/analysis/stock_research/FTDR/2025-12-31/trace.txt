@@ -1,0 +1,53 @@
+FTDR stock-research trace
+generated_for_period=2025-12-31
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- references/result-contract.md
+- references/report-contract.md
+- references/data-reuse.md
+
+2. Reuse check
+- No FTDR raw filing, annual facts package, normalized facts, or prior research result existed in the workspace.
+- Returned to primary official disclosure.
+
+3. Primary sources
+- SEC Form 10-K: https://www.sec.gov/Archives/edgar/data/1727263/000119312526076548/ftdr-20251231.htm
+- Filing date 2026-02-26; period 2025-12-31; accession 0001193125-26-076548.
+- PBOC/CFETS year-end RMB central-rate materials for translation convention.
+- Market cap, date and PE TTM were taken exactly from config/input.json (Yahoo Finance yfinance).
+
+4. Model decision
+- Confirmed ordinary_operating/applicable.
+- Rationale: annual home-warranty subscription and independent-contractor fulfillment business; consolidated assets and liabilities are not a financial institution's operating book.
+- Caveat: regulated subsidiaries restrict transferability of some cash; apply 80% cash haircut.
+
+5. USD source facts (millions)
+- Revenue 2,093; cost of services 936; gross profit 1,157; operating profit 395; net income 255.
+- Total assets 2,142; equity 242; inferred total liabilities 1,900; cash 566; total debt 1,173.
+- Operating cash flow 416; capex 26; operating free cash flow 390; financing cash flow -302; repurchase cash out 283.
+- No common cash dividend in 2025.
+
+6. Currency convention
+- All result amounts translated at USD/CNY 7.0288 for protocol comparability.
+- This is a display convention, not historical-average GAAP translation.
+
+7. Owner earnback
+- Discounted cash = 566m * 7.0288 * 80% = CNY 3,182,640,640.
+- Debt deduction = 1,173m * 7.0288 = CNY 8,244,782,400.
+- Discounted detachable net cash = CNY -5,062,141,760.
+- 2025 FCF = (416m - 26m) * 7.0288 = CNY 2,741,232,000.
+- Sustainable cash profit = FCF * 85% = CNY 2,330,047,200.
+- Operating business price = market cap - discounted net cash = CNY 39,484,783,567.48877.
+- Owner earnback years = operating business price / sustainable cash profit = 16.94591576.
+- Market cap / cash profit = 14.77336674.
+
+8. Protocol operations
+- Initialized with: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields only through protocol set commands.
+- Validation result: status=ok, errors=[].
+
+9. Judgment boundaries
+- 15% FCF haircut is analyst judgment for favorable 2025 weather, acquisition first full year, and working-capital normalization.
+- Cash transferability is not separately disclosed; the 80% haircut is conservative judgment.
+- No investment recommendation, target price, or ranking label was produced.

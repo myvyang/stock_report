@@ -1,0 +1,55 @@
+[2026-08-03 Asia/Shanghai] stock-research trace: 920599.BJ / 2025-12-31 annual
+
+1. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result skeleton created with schema stock-research-result-v1.
+
+2. Required contracts read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md (required by the skill's reuse routing)
+
+3. Reused local sources
+- Official filing: stock_report/data/raw/filings/920599.BJ/2025-12-31/annual-report.pdf
+- Filing SHA256 from metadata: 075f0903cf552bd4d7c1bee1cfbd2cac432ba80ad79653c4112f06adb92f9c0d
+- Official URL: https://static.cninfo.com.cn/finalpage/2026-04-10/1225096164.PDF
+- Existing annual-review fact package: stock_report/data/analysis/annual_review/920599.BJ/2025-12-31/result.json
+- Existing review was ROIC-focused; reused verified cash equivalents, restricted cash context, financing-debt components, operating cash flow and capex. It did not contain all stock-research fields, so the official PDF was read for missing facts.
+
+4. Filing extraction and verification
+- pdftotext was unavailable. Installed pypdf into /tmp/stock-research-pypdf only and extracted the local PDF to /tmp/920599-2025.txt for read-only analysis.
+- Verified business model on PDF pages 14-16.
+- Verified core P&L and headline balance-sheet figures on pages 10 and 114-119.
+- Verified cash flow on pages 121-123.
+- Verified revenue mix on pages 191-192.
+- Verified dividend proposal on page 70 and prior dividend paid in note 40.
+
+5. Analysis-model decision
+- Final model: ordinary_operating / applicable.
+- Reason: mining-vehicle manufacturer with ordinary manufacturing assets and supplier/customer working-capital accounts. No deposits, insurance reserves, regulated presale cash, concession assets or holding-company structure that would invalidate ordinary owner-earnback analysis.
+
+6. Core calculations (CNY absolute yuan)
+- Gross profit = 6,388,883,151.17 - 4,919,943,332.99 = 1,468,939,818.18.
+- Gross margin = 1,468,939,818.18 / 6,388,883,151.17 = 0.2299206414.
+- Net margin = 839,351,487.83 / 6,388,883,151.17 = 0.1313768747.
+- Operating FCF = 393,317,437.08 - 33,309,637.08 = 360,007,800.00.
+- Operating necessary cash = 3,614,508,418.44 * 25% = 903,627,104.61.
+- Discounted detachable net cash = 1,709,238,952.10 - 903,627,104.61 - 194,866,877.50 = 610,744,969.99.
+- Operating business price = 8,048,000,000.00 - 610,744,969.99 = 7,437,255,030.01.
+- Owner earnback years = 7,437,255,030.01 / 360,007,800.00 = 20.6585947.
+- Market cap / cash profit = 8,048,000,000.00 / 360,007,800.00 = 22.3550712.
+- Forecast dividend = 0.70 * 452,544,552 prior actual participating shares = 316,781,186.40.
+- Forecast dividend yield = 316,781,186.40 / 8,048,000,000.00 = 0.0393619779.
+
+7. Judgment choices and limitations
+- Sustainable cash profit uses current-year FCF rather than net profit because 2025 working-capital absorption was material. This is conservative and volatile; no unsupported normalization was invented.
+- Restricted monetary funds are excluded before cash analysis; strategic equity investments are given zero detachable value.
+- Necessary cash is a standardized 25% of annual operating cash outflow, not a disclosed company minimum.
+- Dividend total is an estimate because the annual report states CNY 0.70/share but final participating shares can change with treasury-share movements.
+- Market cap and PE were accepted from task input and were not independently verified against the filing.
+
+8. Protocol population and validation
+- result.json was populated through protocol set/append commands, not hand-written from scratch.
+- Final validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]

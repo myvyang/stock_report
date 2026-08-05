@@ -1,0 +1,65 @@
+stock-research trace: 00732.HK / FY2025
+generated_at: 2026-08-03T16:40:59+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md, references/report-contract.md and references/data-reuse.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked configured annual-review, normalized-facts, raw-filing and prior stock-research paths.
+- No reusable filing, facts package or prior research result existed for 00732.HK / 2025-12-31.
+
+3. Primary source acquisition
+- Official annual report PDF downloaded from:
+  https://truly.com.hk/Upload/trulyhk/English/FinancialStatement/2025/e2025AnnaulReport-17343340005.pdf
+- Local copy:
+  stock_report/data/raw/filings/00732.HK/2025-12-31/annual_report_2025.pdf
+- HKEX title search showed ANNUAL REPORT 2025 released 2026-04-17 for stock code 00732.
+- PDF text extracted locally for research; core evidence was taken from the audited annual report, not third-party summaries.
+
+4. Model verification
+- Input hint said financial_brokerage / requires_special_model.
+- Annual report principal activities: manufacture and sale of LCD/touch panel products and electronic consumer products including compact camera modules and fingerprint modules.
+- Balance sheet contains manufacturing PPE, inventories, trade receivables/payables and bank borrowings; no brokerage client money, proprietary trading portfolio or repurchase financing model.
+- Overrode analysis model to ordinary_operating / applicable.
+
+5. Core annual-report evidence (all original amounts HK$'000)
+- Annual report pp. 98-100: revenue 16,499,495; cost of sales 15,221,443; gross profit 1,278,052; profit before tax 262,508; net profit 220,813; parent profit 274,178; total assets 25,874,566; total liabilities 16,218,028; total equity 9,656,538; parent equity 9,576,520; NCI 80,018.
+- Annual report pp. 102-103: operating cash flow 5,860,002; purchase of PPE 423,599; financing cash flow -4,374,707; dividends paid 309,474; share repurchase cash 183,212.
+- Annual report note 40: bank borrowings of 4,212,623 represented direct payments by banks to suppliers, a non-cash transaction.
+- Annual report pp. 99-100 and notes 22-30: cash 2,321,340; restricted deposits 419,222; inventories 2,388,763; trade/other receivables 2,636,813; trade and bills receivables at FVTOCI 2,218,783; PPE 11,747,412; associate 2,757,241; borrowings 7,458,265; lease liabilities 283,770.
+- Annual report note 6: LCD external revenue 11,650,193 and segment result 888,344; electronic consumer external revenue 4,849,302 and segment loss 254,627.
+- Annual report directors' report and note 14: 2025 interim dividend HK5 cents, 152,285; proposed final dividend HK5 cents, about 149,757.
+
+6. Currency conversion
+- Result contract requires absolute CNY yuan.
+- Applied HKD/CNY 0.897878955 to annual-report HKD amounts.
+- Source/limitation recorded in result.json; original HKD numbers are retained in this trace for reproducibility.
+
+7. Owner earnback normalization
+- Discounted detachable net cash:
+  cash 100% + restricted deposits 50% - borrowings 100% - lease liabilities 100%
+  = -RMB 4,678,922,656.34.
+- Reported OCF was not used directly because trade/other payables rose HKD 4,044,248 thousand and supplier-finance non-cash bank payments were HKD 4,212,623 thousand.
+- Started with pre-working-capital operating cash flow HKD 1,887,254 thousand; deducted cash interest, tax and PPE purchases; then applied a conservative normalization for ongoing working capital, maintenance capex and distributability.
+- Discounted sustainable distributable cash profit set at HKD 500,000 thousand = RMB 448,939,477.50.
+- Operating business price = market cap - discounted net cash = RMB 6,824,553,882.52.
+- Owner earnback years = 6,824,553,882.52 / 448,939,477.50 = 15.2015009251.
+
+8. Valuation and dividend
+- Market cap RMB 2,145,631,226.1790037, date 2026/07/31 16:08:44, PE TTM 9.1, source Tencent qt.gtimg.cn (task input).
+- Forecast dividend uses FY2025 interim plus proposed final aggregate HKD 302,042 thousand, converted to RMB 271,197,155.33.
+- Forecast dividend yield = 12.63950450% versus input market cap.
+
+9. Protocol update and validation
+- Used protocol CLI set/append operations through /workspace/update_result.sh; did not hand-write the complex result object.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok; errors [].
+
+10. Known limitations
+- Sustainable cash profit is an analytical normalization, not an audited line item, and is sensitive to working capital and maintenance capex assumptions.
+- Currency conversion adds translation differences versus the HKD annual report.
+- Tencent market snapshot was supplied by the task and was not replaced with an exchange trade-level quote.

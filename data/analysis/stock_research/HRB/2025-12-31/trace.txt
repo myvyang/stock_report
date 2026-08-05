@@ -1,0 +1,101 @@
+stock-research trace: HRB
+generated_at=2026-08-04T18:20:37+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read result-contract.md and report-contract.md completely.
+- Read data-reuse.md because the skill routes reuse decisions through that reference.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked stock_report/data/raw/filings/HRB/2025-12-31, annual_review, normalized facts, and prior stock_research paths.
+- No reusable HRB facts package, raw filing, or historical research result existed locally.
+- Returned to primary sources rather than substituting third-party financial statements.
+
+3. Primary evidence used
+- SEC filing index: accession 0001605297-25-000016; filed 2025-08-15; period of report 2025-06-30.
+  https://www.sec.gov/Archives/edgar/data/12659/000160529725000016/0001605297-25-000016-index.htm
+- H&R Block FY2025 annual report / Form 10-K.
+  https://investors.hrblock.com/static-files/b75caa96-df73-43ee-bfac-b43fa9f8bafe
+- FY2025 results release and tables.
+  https://investors.hrblock.com/node/32836
+- FY2026 Q2 and Q3 results releases for post-period trend and current dividend/share count inference.
+  https://investors.hrblock.com/news-releases/news-release-details/hr-block-reports-fiscal-2026-second-quarter-results
+  https://investors.hrblock.com/news-releases/news-release-details/hr-block-reports-fiscal-2026-third-quarter-results
+- Dividend history.
+  https://investors.hrblock.com/stock-information/dividend-summary
+- Market cap and PE TTM were taken exactly from config/input.json (Yahoo Finance yfinance).
+
+4. Period resolution
+- Input period is 2025-12-31 and report_type is annual.
+- HRB fiscal year ends June 30; SEC confirms FY2025 period 2025-06-30.
+- Used FY2025 as the latest completed annual filing available at the input research period.
+- Used later FY2026 releases only as explicitly labeled subsequent trend evidence; did not mix quarterly partial-year numbers into FY2025 annual statements.
+
+5. Currency normalization
+- Result contract requires absolute CNY yuan.
+- Original filing currency: USD.
+- Working conversion rate: USD/CNY 7.1636.
+- Formula: CNY amount = USD amount * 7.1636.
+- Input market cap was already supplied in CNY and was not reconverted.
+
+6. Analysis model
+- statement_model=ordinary_operating.
+- owner_earnback_applicability=applicable.
+- Basis: one operating segment led by assisted and DIY tax preparation, franchising, and small-business software/services. Financial products are ancillary and substantially use bank partners; customer deposits/loans do not dominate HRB's consolidated balance sheet.
+- Seasonal liquidity was handled with a cash haircut, not by changing HRB to a financial-company model.
+
+7. FY2025 statement extraction (USD millions -> CNY yuan)
+- Revenue: 3,760.995 -> 26,942,263,782.
+- Operating expenses: 2,933.025 -> 21,011,017,890.
+- Operating profit derived as revenue less operating expenses: 827.970 -> 5,931,245,892.
+- Net income / parent net income: 605.773 -> 4,339,515,462.8. No minority interest reported.
+- Total assets: 3,263.898 -> 23,381,259,712.8.
+- Total liabilities: 3,175.002 -> 22,744,444,327.2.
+- Equity / parent equity: 88.896 -> 636,815,385.6.
+- Operating cash flow: 680.883 -> 4,877,573,458.8.
+- Capital expenditure: 82.034 -> 587,658,762.4.
+- Operating free cash flow: 598.849 -> 4,289,914,696.4.
+- Financing cash flow: -647.443 -> -4,637,716,454.8.
+- Dividends plus repurchases: (197.330 + 437.133) -> 4,544,897,078.8.
+- Net margin = 605.773 / 3,760.995 = 0.1610672176.
+- Issuer does not report cost of sales or gross profit. cost_of_sales, gross_profit, and gross_margin remain null. Operating profit was not relabeled as gross profit.
+
+8. Detachable cash calculation
+- Cash and cash equivalents: USD 983.277m = CNY 7,043,803,117.2.
+- Cash haircut: 85%; discounted cash = CNY 5,987,232,649.62.
+- Restricted cash: USD 19.862m = CNY 142,283,423.2; inclusion rate 0%.
+- Interest-bearing debt: USD (349.893m current + 1,143.305m long-term) = CNY 10,696,673,192.8; deducted at 100%.
+- Discounted detachable net cash = 5,987,232,649.62 - 10,696,673,192.8 = -4,709,440,543.18.
+- Discounted net cash / market cap = -0.1250439403.
+- Operating business price = 37,662,286,497.881836 - (-4,709,440,543.18) = 42,371,727,041.06184.
+
+9. Sustainable cash profit
+- FY2023 FCF = OCF 821.841 - capex 69.698 = USD 752.143m.
+- FY2024 FCF = OCF 720.860 - capex 63.678 = USD 657.182m.
+- FY2025 FCF = OCF 680.883 - capex 82.034 = USD 598.849m.
+- Three-year mean = USD 669.391333m = CNY 4,795,251,755.47.
+- Prudence adjustment = -10%, reflecting declining three-year FCF, expense growth above revenue growth, seasonal working-capital/tax movements, and continuing technology requirements.
+- Discounted sustainable cash profit = CNY 4,315,726,579.92.
+- Owner earnback years = 42,371,727,041.06184 / 4,315,726,579.92 = 9.8179822694.
+- Market cap / cash profit = 37,662,286,497.881836 / 4,315,726,579.92 = 8.7267545338.
+
+10. Dividend forecast
+- Latest declared quarterly dividend through FY2026 Q3: USD 0.42/share.
+- Annualized dividend: USD 1.68/share.
+- FY2026 Q3 implied diluted shares: 848.8m net income / 6.61 EPS ~= 128.4m shares (rounded source figures).
+- Forecast cash dividend = 1.68 * 128.4m * 7.1636 = CNY 1,545,274,483.2.
+- Forecast dividend yield = 1,545,274,483.2 / 37,662,286,497.881836 = 0.0410297575.
+- Limitation: ongoing repurchases will change actual shares and dividend cash outflow.
+
+11. Data-quality decision
+- status=partial.
+- Sole core incomplete reason: official statements do not disclose cost of sales/gross profit, so gross margin cannot be calculated reliably.
+- All other ordinary-company core statement figures, asset/liability explanations, owner earnback items, dividend forecast, business story, risks, and evidence were completed.
+
+12. Protocol validation
+- Populated initialized JSON using protocol `set` commands; did not hand-write result.json from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]

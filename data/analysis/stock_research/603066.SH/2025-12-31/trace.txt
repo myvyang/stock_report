@@ -1,0 +1,55 @@
+stock-research trace
+company: 603066.SH 音飞储存
+period: 2025-12-31 annual
+generated_at: 2026-08-01T03:18:30+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse check
+- config/input.json present.
+- No local raw filing, annual facts, normalized facts, or prior stock-research result existed for 603066.SH/2025-12-31.
+- Therefore retrieved the disclosed annual-report text from the public announcement mirror.
+
+3. Primary research source
+- Company filing: 南京音飞储存设备（集团）股份有限公司2025年年度报告, disclosed 2026-04-24 on SSE.
+- Read through Sina announcement full-text mirror: https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12162871&stockid=603066
+- Market snapshot: config/input.json; Tencent qt.gtimg.cn; 2026-07-31 11:43:38; market cap CNY 2,589,000,000; PE TTM 20.66.
+
+4. Model decision
+- Confirmed ordinary_operating.
+- Business is warehouse equipment manufacturing plus project-based automation system integration.
+- Receivables, inventories, contract assets, and contract liabilities are operating project balances, not detachable cash.
+- Ordinary owner-earnback formula applies with a large haircut to cash for working-capital and fulfillment needs.
+
+5. Core calculations
+- Gross profit = 1,255,791,331.88 - 988,201,666.96 = 267,589,664.92.
+- Gross margin = 267,589,664.92 / 1,255,791,331.88 = 0.2130844975.
+- Net margin = 33,114,327.91 / 1,255,791,331.88 = 0.0263692917.
+- Operating FCF = 46,621,800.28 - 15,905,318.60 = 30,716,481.68.
+- Discounted cash = 345,270,529.51 * 50% = 172,635,264.755.
+- Discounted trading financial assets = 11,054,775.36 * 80% = 8,843,820.288.
+- Debt deducted = 19,010,977.78 + 23,229,838.77 + 99,773,200.00 + 4,931,613.83 = 146,945,630.38.
+- Discounted detachable net cash = 34,533,454.663.
+- Sustainable cash profit judgment = CNY 25,000,000, between recurring parent profit CNY 17,534,412.73 and operating FCF CNY 30,716,481.68.
+- Operating business price = 2,589,000,000 - 34,533,454.663 = 2,554,466,545.337.
+- Owner earnback years = 2,554,466,545.337 / 25,000,000 = 102.1786618.
+- Market cap / cash profit = 103.56.
+- Forecast dividend yield = 10,002,122.52 / 2,589,000,000 = 0.0038633150.
+
+6. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields with repeated protocol set commands; did not hand-write result.json from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].
+
+7. Known limitations
+- No local original filing PDF or annual facts package was available.
+- Filing figures were read from the full-text mirror of the SSE-disclosed annual report.
+- PE TTM does not reconcile to a static multiple based on FY2025 parent profit; it was retained as an input market datum only.
+- Judicial frozen funds of CNY 40,802,504.74 were disclosed, but the adjacent annual-report note did not explain the underlying case or release timing.

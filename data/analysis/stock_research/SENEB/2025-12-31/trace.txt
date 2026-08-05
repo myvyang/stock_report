@@ -1,0 +1,58 @@
+Stock research trace — SENEB
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Protocol initialization
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   Result: initialized stock-research-result-v1 skeleton.
+
+2. Local reuse check
+   Checked paths declared in config/input.json under:
+   - stock_report/data/raw/filings/SENEB/2025-12-31
+   - stock_report/data/analysis/annual_review/SENEB/2025-12-31
+   - stock_report/data/normalized/facts/SENEB/2025-12-31
+   Result: no filing, annual fact pack, or normalized fact files existed. Only stock_report/data/notes/user_stock_evaluations.md existed and contained no SENEB note.
+
+3. Primary-source retrieval
+   - Seneca Foods FY2025 Annual Report PDF:
+     https://www.senecafoods.com/sites/default/files/inline-files/2025_SenecaAnnualReport.pdf
+   - SEC filing, accession 0001437749-25-020197:
+     https://www.sec.gov/Archives/edgar/data/88948/000143774925020197/senea20250331_10k.htm
+   - SEC Companyfacts API, CIK 0000088948:
+     https://data.sec.gov/api/xbrl/companyfacts/CIK0000088948.json
+   - Seneca Foods annual report / filing index pages used to verify filing identity and fiscal year.
+
+4. Reporting-period determination
+   Input period: 2025-12-31, report_type annual.
+   Seneca Foods FY2025 audited annual period ends 2025-03-31. The filing near calendar 2025-12-31 is a nine-month Form 10-Q for period ended 2025-12-27, not an annual report. The research therefore uses the audited FY2025 10-K and records the mismatch as a limitation.
+
+5. Currency conversion
+   All USD financial statement values converted to CNY at 1 USD = 7.1782 CNY, the 2025-03-31 central parity rate published under authorization of China Foreign Exchange Trade System and reproduced by Xinhua:
+   https://www.news.cn/20250331/936fa9fcea9f480782390983d6107051/c.html
+   This is a uniform presentation conversion; income and cash-flow values were not translated at a full-year average rate.
+
+6. Key source values in USD
+   Revenue 1,578,887,000; cost of goods and services sold 1,428,686,000; gross profit derived 150,201,000; operating income 77,770,000; net income 41,224,000.
+   Total assets 1,181,429,000; liabilities 548,406,000; equity 633,023,000; cash 42,685,000; restricted cash 7,705,000; inventory 603,955,000; receivables 96,330,000; PP&E net 324,768,000; long-term debt carrying amount 369,878,000.
+   Operating cash flow 335,475,000; capex 37,225,000; reported operating free cash flow derived 298,250,000; financing cash flow -262,124,000; repurchases 11,591,000; cash dividends about 23,000 (preferred shares).
+
+7. Derived formulas
+   Gross margin = 150,201,000 / 1,578,887,000 = 0.0951309372.
+   Net margin = 41,224,000 / 1,578,887,000 = 0.0261095316.
+   Discounted detachable net cash = (42,685,000 - 369,878,000) * 7.1782 = -2,348,656,792.60 CNY. Restricted cash excluded.
+   Base cash profit = (41,224,000 + 44,776,000 - 37,225,000) * 7.1782 = 350,099,105 CNY.
+   Discounted sustainable cash profit = base cash profit * 80% = 280,093,364 CNY.
+   Operating business price = 7,815,967,799.260254 - (-2,348,656,792.60) = 10,164,624,591.860254 CNY.
+   Owner earnback years = 10,164,624,591.860254 / 280,093,364 = 36.29013.
+   Market cap / cash profit = 7,815,967,799.260254 / 280,093,364 = 27.90487.
+   Forecast common dividend = 0; forecast dividend yield = 0.
+
+8. Judgment boundary
+   Facts: audited statements, business mix, LIFO disclosure, balance-sheet and cash-flow amounts.
+   Inference: FY2025 operating cash flow is not sustainable because inventory declined by approximately USD 268.7m.
+   Subjective adjustment: use net income + D&A - capex as base cash profit and retain 80% for agricultural/LIFO/low-margin volatility. This is explicitly disclosed in result.json and report.md.
+
+9. Protocol population and validation
+   outputs/result.json was initialized and populated through stock_analysis.stock_research.protocol set commands; it was not authored as a complex JSON object from scratch.
+   Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: {"status":"ok","errors":[]}

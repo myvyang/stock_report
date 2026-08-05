@@ -1,0 +1,70 @@
+stock-research trace
+
+任务：00725.HK PERENNIAL INT'L，2025-12-31 annual
+生成时点：2026-08-03 Asia/Shanghai
+
+协议与初始化
+- 完整读取 .agents/skills/stock-research/SKILL.md。
+- 完整读取 references/result-contract.md、report-contract.md；另按技能的数据复用规则读取 data-reuse.md。
+- 运行 protocol init --input config/input.json --output outputs/result.json，未从零手写复杂 JSON。
+- 所有结构化字段通过 protocol set 写入。
+
+复用资料
+- stock_report/data/analysis/annual_review/00725.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/00725.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/00725.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/00725.HK/2025-12-31/00725_HK_2025_annual_report.txt
+- stock_report/data/raw/filings/00725.HK/2025-12-31/metadata.json
+
+财报模型复核
+- 输入提示为 financial_brokerage/requires_special_model。
+- 年报业务回顾和 note 5 显示集团制造及销售电缆、电线、线束、电源线和塑料树脂。
+- 财务状况表显示主要资产为现金、存货、应收、PPE 与投资物业，不存在券商客户资金、自营证券组合或卖出回购业务结构。
+- 覆盖提示为 ordinary_operating/applicable。
+
+核心来源
+- 2025 年报 p27：收入、销售成本、毛利、经营利润、归母净利润。
+- 2025 年报 p29：总资产、总负债、权益及主要资产负债项目。
+- 2025 年报 p32：经营、投资和融资现金流及资本开支。
+- 2025 年报 note 5 p54：地域分部和两名主要客户收入。
+- 2025 年报 notes 16、19、20、22、24：投资物业、结构性存款、现金、应付和营运资金。
+- 2025 年报 notes 11-12：股数与股息。
+- 2025 年报五年摘要：2021-2025 每股股息和营运周转指标。
+- 2024 年报：2023 年利润、经营现金流和资本开支对照。
+- Tencent qt.gtimg.cn：2026-07-31 16:08:46 市值 HK$179,725,273.9363909，PE TTM 6.7（任务输入）。
+- 项目既有汇率快照：2026-07-21，1 HKD = 0.8638 CNY。
+
+统一换算
+- 财报原币为 HKD，事实包单位为 HK$'000；写入 result.json 前乘 1,000，再乘 0.8638。
+- 市值是港股报价口径的港币金额，同样乘 0.8638，得到 CNY 155,246,691.626254。
+- 比率使用同一币种计算，不受换算影响。
+
+控股回本计算
+- 原始资金池：现金 HK$105.484m + 结构性存款 HK$1.107m。
+- 必要营运现金：HK$40m。
+- 非 PRC/Vietnam 剩余现金：HK$42.880m × 80% = HK$34.304m。
+- PRC/Vietnam 现金：HK$22.604m × 30% = HK$6.7812m。
+- 结构性存款：HK$1.107m × 65% = HK$0.71955m。
+- 摩擦准备：HK$5m。
+- 折后可剥离净现金：(34.304 + 6.7812 + 0.71955 - 5)m HKD × 0.8638 = CNY 31,791,943.05。
+- 2023-2025 归母净利润：HK$15.746m、25.804m、31.186m；中位数 HK$25.804m。
+- 折后持续现金利润：HK$25.804m × 80% × 0.8638 = CNY 17,831,596.16。
+- 经营业务购买价：155,246,691.626254 - 31,791,943.05 = CNY 123,454,748.576254。
+- 控股回本年：123,454,748.576254 / 17,831,596.16 = 6.9233705984。
+- 市值/现金利润：155,246,691.626254 / 17,831,596.16 = 8.7062700519。
+
+分红预测
+- 基准每股股息：2025 年 HK$0.06。
+- 股数：198,958,000。
+- 预测现金股息：0.06 × 198,958,000 × 0.8638 = CNY 10,311,595.224。
+- 预测分红率：10,311,595.224 / 155,246,691.626254 = 6.6420708332%。
+
+数据限制
+- 现金和定存未按法律主体完整拆分。
+- 维持性与增长性资本开支未拆分。
+- 市值和 PE 未用第二行情源交叉验证。
+- 汇率快照比市值日期早十天；一致换算保证比例不受影响。
+
+校验
+- 首轮 protocol validate：status=ok，errors=[]。
+- 最终校验在 report.md 和 trace.txt 写入后再次执行。

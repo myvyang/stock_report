@@ -1,0 +1,51 @@
+2026-08-05 stock-research trace: 03988.HK / Bank of China / FY2025
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initial model hint: financial_bank / not_applicable.
+
+3. Reuse audit
+- No local annual facts, normalized facts, filing metadata, or prior stock-research result existed for 03988.HK/2025-12-31.
+- Reused market cap, timestamp, source, and PE TTM from config/input.json.
+
+4. Official sources acquired
+- Bank of China investor relations, 2025 Annual Report page (published 2026-03-30): https://www.boc.cn/en/investor/ir3/202603/t20260330_25657344.html
+- Official annual report PDF: https://pic.bankofchina.com/bocappd/report/202603/P020260330594078083473.pdf
+- Local copy: stock_report/data/raw/filings/03988.HK/2025-12-31/2025-annual-report-en.pdf
+- HKEX annual report disclosure: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042900928.pdf
+
+5. Extraction and checks
+- PDF contains 449 pages. Text extracted locally for research using pypdf in a temporary virtual environment because pdftotext was unavailable.
+- Financial highlights (annual report p.10): operating income RMB659,866m; parent profit RMB243,021m; assets RMB38,358,076m; liabilities RMB35,149,952m; parent equity RMB3,064,044m; ordinary dividends RMB72,917m.
+- Consolidated statements (pp.204-207): cross-checked profit, asset, liability, equity and non-controlling interest amounts.
+- Financial position analysis (p.30): checked loans, investments, central-bank/interbank assets, customer deposits, interbank/central-bank funding, and other borrowed funds.
+- Asset quality (pp.98-99): NPL RMB288,036m; NPL ratio 1.23%; allowance RMB577,144m; coverage 200.37%; special mention 1.47%.
+- Capital (p.114): CET1 ratio 12.53%; total capital ratio 18.85%.
+- Business segments (p.38): commercial banking 89.87% of operating income; personal 39.41%, corporate 37.00%, treasury 13.46%.
+
+6. Model decision
+- Confirmed financial_bank.
+- Customer deposits, loans, investments and interbank positions are operating balance-sheet items, so detachable net cash and ordinary-company cash-profit formulas are not economically valid.
+- Required owner-earnback sorting fields remain null. Bank-specific interpretation uses NIM, credit cost, asset quality, capital ratios, ROE and distributions.
+
+7. Dividend scenario
+- Static forecast amount = FY2025 ordinary cash dividends = RMB72,917,000,000.
+- Input market cap = RMB1,546,772,315,236.8748.
+- Static forecast yield = 72,917,000,000 / 1,546,772,315,236.8748 = 0.04714139196940139.
+- This is a flat-dividend scenario, not management guidance.
+
+8. Protocol population
+- All result.json changes after initialization were made with protocol `set` commands.
+- Gross margin, net margin, operating cash flow, capex and operating free cash flow remain null because ordinary-company definitions lack comparable meaning for a bank.
+
+9. Final validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}
+- JSON syntax check: passed.
+- Confirmed all ordinary owner-earnback sorting fields remain null.

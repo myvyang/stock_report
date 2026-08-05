@@ -1,0 +1,98 @@
+stock-research trace
+task_created_at=2026-08-05T00:03:09+08:00
+company=BlackRock Limited Duration Income Trust
+ticker=BLW
+period=2025-12-31
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+[reuse audit]
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+raw_filing_dir=missing
+prior_stock_research=missing
+action=returned to primary official filing and fund disclosures
+
+[identity and model]
+SEC CIK=0001233681
+SEC accession=0001193125-26-093666
+filing_type=N-CSR
+filing_date=2026-03-05
+report_period=2025-12-31
+model_hint=ordinary_operating/applicable
+model_confirmed=investment_holding/not_applicable
+reason=listed closed-end investment company whose securities portfolio, reverse-repurchase financing, derivatives, and distributions are the business itself
+ordinary_owner_earnback_fields=null by contract
+
+[primary financial evidence, USD]
+source=BlackRock 2025 Annual Report to Shareholders, Statements of Assets and Liabilities pp.147-148
+investments_unaffiliated=829176412
+investments_affiliated=4079242
+cash=1836682
+total_assets=851525335
+reverse_repurchase_agreements=290500724
+total_liabilities=308209513
+net_assets=543315822
+shares_outstanding=39084400
+nav_per_share=13.90
+
+source=BlackRock 2025 Annual Report to Shareholders, Statement of Operations p.151
+total_investment_income=60405994
+total_expenses_after_waivers=19752096
+interest_expense_and_fees=14432244
+net_investment_income=40653898
+net_realized_loss=-3137414
+net_change_unrealized_appreciation=9367549
+net_increase_from_operations=46884033
+
+source=BlackRock 2025 Annual Report to Shareholders, Statement of Changes in Net Assets p.154
+distribution_from_net_investment_income=40835982
+return_of_capital=11285802
+total_distributions=52121784
+capital_share_transactions_net=34262836
+
+[portfolio evidence]
+source=BlackRock 2025 Annual Report to Shareholders, Fund Summary pp.13-16
+corporate_bonds_pct=46.4
+floating_rate_loans_pct=38.2
+below_investment_grade_BB_through_CCC_pct=77.8
+leverage_pct=35
+market_price_2025_12_31=13.74
+nav_2025_12_31=13.90
+monthly_distribution_per_share=0.1132
+annualized_distribution_per_share=1.3584
+
+[currency conversion]
+source=U.S. Treasury Fiscal Data API, Treasury Reporting Rates of Exchange
+record_date=2025-12-31
+country_currency=China-Renminbi
+foreign_currency_per_USD=6.998
+conversion=USD amount multiplied by 6.998 to produce CNY yuan
+
+[valuation]
+source=config/input.json / Yahoo Finance yfinance
+market_cap_date=2026-08-03
+market_cap_CNY=3307318818.3108215
+pe_ttm=10.278688
+warning=market-cap date differs from financial-statement date; PE has limited interpretive value for a fair-value investment fund
+
+[forecast distribution]
+formula=0.1132 USD/share/month * 12 * 39084400 shares * 6.998 CNY/USD
+forecast_cash_dividend_CNY=371539558.22208
+forecast_dividend_yield=0.11233859770792824
+warning=mechanical annualization of managed distribution; may include return of capital and can be changed by the board
+
+[quality]
+status=complete
+scope=special-model consumption only; excluded from ordinary owner-earnback ranking
+limitations=market snapshot conversion not independently reconstructed; cross-period NAV comparison; distribution forecast is not earnings forecast
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+initial_result=status ok, errors []

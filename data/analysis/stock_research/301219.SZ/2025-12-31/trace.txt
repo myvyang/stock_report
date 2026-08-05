@@ -1,0 +1,57 @@
+stock-research trace
+company=301219.SZ 腾远钴业
+period=2025-12-31 annual
+generated_at=2026-08-01T03:54:04+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated every structured field using protocol set/append commands; complex JSON was not handwritten as a whole.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: status=ok, errors=[]
+
+[source discovery]
+- No annual facts package, normalized facts, raw filing, or prior stock-research output existed for 301219.SZ/2025-12-31.
+- Located the official full annual report via Shenzhen Stock Exchange/CNInfo search.
+- Downloaded official PDF to stock_report/data/raw/filings/301219.SZ/2025-12-31/annual_report_2025.pdf.
+- Extracted local text for page-level checking to annual_report_2025.txt using pypdf in an isolated /tmp virtual environment because pdftotext was unavailable.
+- Official filing URL: https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-21/d2640e1c-dfdc-46a1-9646-ca9cb733d52d.PDF
+- Market data reused unchanged from config/input.json: market cap CNY 17,273,000,000; timestamp 20260731114306; source Tencent qt.gtimg.cn; PE TTM 11.38.
+
+[model review]
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Basis: the company procures metal-bearing raw materials, performs metallurgical processing, holds normal manufacturing inventory/fixed assets, and sells products directly. It has no financial, real-estate, project-construction, concession, or investment-holding balance-sheet model.
+
+[financial extraction]
+- Revenue=8,339,950,841.35
+- Cost of sales=6,027,496,568.38
+- Gross profit=2,312,454,272.97; gross margin=27.7274%
+- Parent net profit=1,110,798,846.60; net margin=13.3190%
+- Operating cash flow=932,992,601.86
+- Capital expenditure=798,660,673.42 (cash paid to acquire fixed/intangible/other long-term assets)
+- Operating free cash flow=134,331,928.44
+- Total assets=13,089,182,225.31; total liabilities=3,722,164,763.06; total equity=9,367,017,462.25; parent equity=9,378,134,801.68.
+
+[owner earnback calculations]
+- Cash=3,645,527,912.57.
+- Restricted cash=57,844,097.13 (futures margin 57,013,807.13 + litigation freeze 830,290.00).
+- Non-restricted cash=3,587,683,815.44; 90% discounted value=3,228,915,433.896.
+- Financing debt=825,395,998.34 (short-term borrowing 737,167,767.52 + lease liabilities 1,020,000.00 + minority shareholder loan/long-term payable 87,208,230.82).
+- Discounted detachable net cash=2,403,519,435.556.
+- Operating business price=17,273,000,000 - 2,403,519,435.556 = 14,869,480,564.444.
+- Starting recurring profit=2025 deducted-nonrecurring parent profit 1,090,274,765.28.
+- Applied 30% cyclicality/inventory/expansion haircut; discounted sustainable cash profit=763,192,335.696.
+- Owner earnback years=14,869,480,564.444 / 763,192,335.696 = 19.4833.
+- Market cap/cash profit=17,273,000,000 / 763,192,335.696 = 22.6326.
+
+[dividend]
+- Forecast uses disclosed 2025 annual profit-distribution proposal: CNY 293,713,884.
+- Forecast yield=293,713,884 / 17,273,000,000 = 1.7004%.
+- Historical implementations checked in annual report: 2024 annual dividend CNY 146,646,217.50 and 2025 interim dividend CNY 293,292,435.00.
+
+[quality]
+- data_quality.status=complete.
+- Key limitation: sustainable cash profit haircut is an analyst scenario, not issuer guidance; metal-cycle normalization and maintenance capex lack a stable long-run disclosed benchmark.

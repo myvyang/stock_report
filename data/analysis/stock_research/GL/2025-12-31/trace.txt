@@ -1,0 +1,61 @@
+stock-research trace
+task: GL / Globe Life Inc.
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse check
+- Checked configured raw filing, annual review, normalized facts, prior stock research, and outputs paths.
+- No GL annual facts package, normalized facts, prior research result, or filing metadata existed in the workspace.
+- Downloaded SEC filing gl-20251231.htm to stock_report/data/raw/filings/GL/2025-12-31/ for evidence extraction.
+
+3. Primary sources used
+- SEC Globe Life 2025 Form 10-K, accession 0000320335-26-000090, filed 2026-02-25:
+  https://www.sec.gov/Archives/edgar/data/320335/000032033526000090/gl-20251231.htm
+- SEC Globe Life Q1 2026 Form 10-Q:
+  https://www.sec.gov/Archives/edgar/data/320335/000032033526000169/gl-20260331.htm
+- Globe Life dividend declaration, 2026-04-30:
+  https://investors.globelifeinsurance.com/news-releases/2026/april/globe-life-inc-declares-dividend
+- 2025-12-31 CFETS central parity as reported by Xinhua: USD 1 = CNY 7.0288:
+  https://english.news.cn/20251231/d55adf458b384452b9c936aff80e901f/c.html
+- Valuation snapshot supplied in config/input.json: Yahoo Finance yfinance, 2026-08-03.
+
+4. Model decision
+- Input hint ordinary_operating/applicable was rejected.
+- Confirmed financial_insurance/not_applicable because Globe Life writes life and supplemental health insurance, and its invested assets support policy liabilities and regulatory capital.
+- 2025 invested assets: USD 20.470009bn.
+- 2025 policy liabilities: USD 20.513229bn.
+- 2025 consolidated Company Action Level RBC: 316%; company target 300%-320%.
+- Ordinary discounted net cash, cash profit, operating business price, owner earnback years, and market-cap-to-cash-profit remain null by contract.
+
+5. Currency and calculations
+- All filing amounts converted from USD to CNY at 7.0288, using absolute yuan.
+- Net margin = 1,161.238 / 5,994.318 = 0.1937231225.
+- Mechanical operating FCF shown for disclosure only = operating cash flow 1,396.391m - property/equipment additions 142.484m = USD 1,253.907m; not used as distributable insurance cash profit.
+- Forecast dividend = USD 88m * 7.0288 = CNY 618,534,400.
+- Forecast dividend yield = CNY 618,534,400 / CNY 95,489,312,824.52051 = 0.0064775249.
+- 2025 dividend and buyback cash out = (USD 86.067m + USD 880.983m) * 7.0288 = CNY 6,797,201,040.
+
+6. Key financial facts extracted
+- Total assets USD 30.813692bn; liabilities USD 24.839113bn; equity USD 5.974579bn.
+- Revenue USD 5.994318bn; net income USD 1.161238bn.
+- Operating cash flow USD 1.396391bn; property/equipment additions USD 0.142484bn.
+- 2025 subsidiary dividends USD 0.815741bn; included USD 0.080bn nonrecurring extraordinary dividends.
+- Q1 2026 disclosure projects 2026 subsidiary dividends USD 0.700bn-0.740bn and shareholder dividends about USD 0.088bn.
+- 2025 annual assumption review produced a USD 0.1343bn pretax favorable remeasurement gain.
+
+7. Result construction and validation
+- Populated outputs/result.json only through protocol set and append commands after protocol init.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].
+
+8. Limitations
+- Market cap and PE were accepted from task input; underlying price, share count, and FX conversion were not independently reconstructed.
+- Full statutory statements for each insurance subsidiary were not available; capital analysis relies on company-disclosed consolidated RBC and holding-company liquidity.
+- GAAP operating cash flow is not treated as ordinary-company free cash flow for valuation.

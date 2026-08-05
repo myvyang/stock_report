@@ -1,0 +1,60 @@
+stock-research trace
+company: 00560.HK / Chu Kong Shipping Enterprises (Group) Company Limited
+period: 2025-12-31 annual
+generated_at: 2026-08-03T14:12:32+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+- Requested annual facts, normalized facts, and extraction trace were absent from the workspace.
+- Downloaded official filing from HKEX:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042800485.pdf
+- Local source: stock_report/data/raw/filings/00560.HK/2025-12-31/annual-report-2025.pdf
+- Extracted text: stock_report/data/raw/filings/00560.HK/2025-12-31/annual-report-2025.txt
+
+4. Model override
+- Input hint: financial_brokerage / requires_special_model.
+- Filing evidence: business comprises cargo transportation, cargo handling and storage, passenger transportation, fuel supply, and other operations. Assets comprise vessels/terminals/equipment, land, receivables, investments, and cash; financing is ordinary bank/lease funding.
+- Final model: ordinary_operating / applicable.
+
+5. Currency convention
+- Annual report presentation currency: HKD.
+- Protocol output currency: CNY absolute yuan.
+- Research translation assumption: HKD/CNY 0.92 for all filing values.
+- Market capitalization was retained from config/input.json under the protocol's CNY convention.
+
+6. Core calculations
+- Revenue: HK$2,551.156m x 0.92 = CNY2,347.06352m.
+- Gross profit: HK$156.942m x 0.92 = CNY144.38664m.
+- Parent net profit: HK$51.996m x 0.92 = CNY47.83632m.
+- Gross margin: 156.942 / 2,551.156 = 6.1518%.
+- Net margin: 51.996 / 2,551.156 = 2.0381%.
+- Operating cash flow: HK$280.577m x 0.92 = CNY258.13084m.
+- Capex: (HK$218.046m PPE + HK$0.211m intangible) x 0.92 = CNY200.79644m.
+- Operating FCF: CNY258.13084m - CNY200.79644m = CNY57.33440m.
+- Cash pool: HK$963.550m x 0.92 = CNY886.46600m.
+- Bank loans + leases + NCI amount due: (HK$632.858m + HK$96.321m + HK$200.310m) x 0.92 = CNY855.12884m.
+- Residual net funding: CNY31.33716m. Treated as operating reserve, so discounted detachable net cash = zero.
+- Discounted sustainable cash profit: CNY35.0m, judgmentally discounted from 2025 FCF for two-year volatility, profit decline, JV loss, subsidies, and working-capital sensitivity.
+- Operating business price: CNY588.367776m - zero = CNY588.367776m.
+- Owner earnback: CNY588.367776m / CNY35.0m = 16.8105 years.
+- Forecast dividend: 1,121.167m shares x HK$0.025 x 0.92 = CNY25.78684m.
+- Forecast dividend yield: CNY25.78684m / CNY588.367776m = 4.3828%.
+
+7. Protocol mutation and validation
+- Populated outputs/result.json using repeated protocol `set` commands; the complex JSON object was not handwritten from scratch.
+- Final validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].
+
+8. Data-quality limits
+- No pre-existing annual facts package was available.
+- One uniform research FX rate was used instead of separate average and closing rates.
+- No independently verified market-share series was available.
+- Sustainable cash profit is an analyst normalization based on only 2024-2025 comparative cash-flow evidence, not management guidance.

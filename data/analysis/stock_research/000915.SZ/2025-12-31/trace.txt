@@ -1,42 +1,55 @@
 华特达因 000915.SZ 股票研究 trace
-运行时间：2026-07-28 Asia/Shanghai
+运行日期：2026-07-31 Asia/Shanghai
 
 执行协议：
-- 已读取 /workspace/.agents/skills/stock-research/SKILL.md。
-- 已读取 /workspace/.agents/skills/stock-research/references/result-contract.md。
-- 已读取 /workspace/.agents/skills/stock-research/references/report-contract.md。
-- 补充读取 /workspace/.agents/skills/stock-research/references/data-reuse.md，用于判断事实包和历史研究结果复用边界。
-- 已运行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- 已使用 protocol set 写入 analysis、valuation、metrics、financials、asset_analysis、owner_earnback、dividend、business、risks、evidence、data_quality。
-- 已运行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- 已完整读取 /workspace/.agents/skills/stock-research/SKILL.md。
+- 已完整读取 /workspace/.agents/skills/stock-research/references/result-contract.md。
+- 已完整读取 /workspace/.agents/skills/stock-research/references/report-contract.md。
+- 已补充读取 /workspace/.agents/skills/stock-research/references/data-reuse.md。
+- 已运行 protocol init：
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- 已使用 protocol set 写入或更新 analysis、analysis_model、financials、asset_analysis、business、risks、evidence、metrics、owner_earnback、dividend、data_quality。
+- 初次 validate 发现旧底稿字段不兼容当前协议：资产负债行使用 business_substance 而非 explanation；部分证据只有 metric/value 而无 claim；另有一行金额为空的占位资产。
+- 已通过 protocol set 完成字段迁移：business_substance 改为 explanation；为旧证据补充 claim；删除金额为空且不承载分析结论的占位资产。
+- 已再次运行：
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
 - 校验结果：{"status":"ok","errors":[]}
 
-读取的输入和本地来源：
+读取并复用的本地来源：
 - /workspace/config/input.json
+- /workspace/stock_report/data/raw/filings/000915.SZ/2025-12-31/metadata.json
+- /workspace/stock_report/data/raw/filings/000915.SZ/2025-12-31/annual-report.pdf
 - /workspace/stock_report/data/analysis/annual_review/000915.SZ/2025-12-31/facts.json
 - /workspace/stock_report/data/analysis/annual_review/000915.SZ/2025-12-31/annual_facts.md
+- /workspace/stock_report/data/analysis/annual_review/000915.SZ/2025-12-31/extraction_trace.txt
 - /workspace/stock_report/data/analysis/annual_review/000915.SZ/2025-12-31/result.json
 - /workspace/stock_report/data/analysis/stock_research/000915.SZ/2025-12-31/result.json
 - /workspace/stock_report/data/analysis/stock_research/000915.SZ/2025-12-31/report.md
 - /workspace/stock_report/data/analysis/stock_research/000915.SZ/2025-12-31/trace.txt
-- /workspace/stock_report/data/raw/filings/000915.SZ/2025-12-31/annual-report.pdf
 
-关键复用判断：
-- 年度事实包足够覆盖业务、三张表、资金资产、经营资产、负债、现金流和主要证据。
-- 既有 stock_research 结果作为核查线索和字段来源复用；本次 outputs/result.json 仍通过 stock-research 协议 CLI 初始化和填充。
-- 本次输入的 market_cap.amount 为 5,971,000,000 元；market_cap.date 为空，pe_ttm 为 null。
-- 因 result-contract 的 complete 门槛要求市值日期和 PE TTM 明确，本次 data_quality.status 写为 partial，不进入正式排序。
+数据复用判断：
+- 年度事实包足以覆盖业务、三张表、资金类和经营类资产、负债、现金流、分红及主要证据，无需重复下载年报。
+- 既有股票研究结果仅作为事实与口径底稿；本次 result.json 由协议 CLI 重新初始化并写入。
+- 本次输入提供了较旧研究稿缺失的行情日期和 PE TTM，因此 data_quality.status 从 partial 更新为 complete。
+- analysis_model_hint 已用年报复核：公司为儿童医药产品研发、生产和销售企业，不存在金融、地产、施工、收费权或投资控股型特殊报表结构，ordinary_operating / applicable 成立。
 
-核心公式落地：
-- 毛利率 = 1,896,597,492.53 / 2,228,386,030.26 = 85.11%。
-- 净利率 = 535,082,160.59 / 2,228,386,030.26 = 24.01%。
-- 经营业务购买价 = 5,971,000,000.00 - 2,111,533,363.99 = 3,859,466,636.01 元。
-- 控股回本年 = 3,859,466,636.01 / 441,830,475.81 = 8.74 年。
-- 市值/现金利润 = 5,971,000,000.00 / 441,830,475.81 = 13.51 年。
-- 预测分红率 = 468,662,970.00 / 5,971,000,000.00 = 7.85%。
+行情输入：
+- 市值：6,004,000,000 元。
+- 行情时间：20260731114339，即 2026-07-31 11:43:39。
+- 行情来源：Tencent qt.gtimg.cn。
+- PE TTM：12.96。
 
-仍无法公开确认或本次输入缺失的项目：
-- 市值日期缺失；本次输入 market_cap.date 为空。
-- PE TTM 缺失；本次输入 market_cap.pe_ttm 为 null。
-- 结构性存款逐笔期限、挂钩标的和提前赎回条款；结果沿用 0.75 折扣。
-- 伊可新 2025 年单品收入；年报未披露单品金额，报告只写大单品依赖。
+核心公式：
+- 毛利率 = 1,896,597,492.53 / 2,228,386,030.26 = 85.1108%。
+- 净利率 = 535,082,160.59 / 2,228,386,030.26 = 24.0121%。
+- 预测分红率 = 468,662,970.00 / 6,004,000,000.00 = 7.8058%。
+- 折后净现金/市值 = 2,111,533,363.99 / 6,004,000,000.00 = 35.1688%。
+- 经营业务购买价 = 6,004,000,000.00 - 2,111,533,363.99 = 3,892,466,636.01 元。
+- 控股回本年 = 3,892,466,636.01 / 441,830,475.81 = 8.8099 年。
+- 市值/现金利润 = 6,004,000,000.00 / 441,830,475.81 = 13.5889 倍。
+
+仍存在但不妨碍 complete 的限制：
+- 结构性存款逐笔期限、挂钩标的和提前赎回条款未公开；按 0.75 折扣。
+- 经营必要现金不是年报直接披露值，按 2025 年经营活动现金流出 25%估算。
+- 合并经营现金流含达因药业少数股东对应部分；回本分母使用扣非归母净利润并进一步折扣。
+- 年报未披露伊可新 2025 年单品收入，未量化单品集中度。

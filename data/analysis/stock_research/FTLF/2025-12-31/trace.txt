@@ -1,0 +1,59 @@
+2026-08-05 stock research trace — FTLF — FY ended 2025-12-31
+
+1. Read required instructions:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Checked configured reusable paths under stock_report/data for FTLF/2025-12-31.
+   Result: annual facts, normalized facts, raw filing metadata, and prior stock-research outputs were absent. No historical conclusion was reused.
+
+3. Initialized outputs/result.json with the required protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Retrieved and examined the primary filing:
+   FitLife Brands, Inc. FY2025 Form 10-K, filed 2026-03-31.
+   SEC URL: https://www.sec.gov/Archives/edgar/data/1374328/000143774926010680/ftlf20251231_10k.htm
+   Accession: 0001437749-26-010680
+   Extracted audited balance sheet, income statement, cash flow statement, acquisition note, debt disclosures, business/channel descriptions, and MD&A.
+
+5. Confirmed analysis model:
+   ordinary_operating / applicable.
+   Reason: branded physical products sold via e-commerce and wholesale; financial statement assets and liabilities are ordinary cash, working capital, acquired intangibles, operating liabilities, leases, tax balances, and bank financing.
+
+6. Currency conversion:
+   Used 7.1875 CNY per USD for all filing amounts.
+   Source: Federal Reserve H.10 Data Download Program, China spot exchange rate on 2025-12-31.
+   URL: https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+   Limitation: income statement and cash flow amounts were not translated at an annual-average rate; one year-end rate was used to satisfy the unified CNY protocol.
+
+7. Core audited source values (USD thousands):
+   Total assets 106,320; total liabilities 62,681; stockholders' equity 43,639.
+   Cash 1,646; receivables 8,765; inventory 21,324; intangibles 51,440; goodwill 19,393.
+   Interest-bearing debt 44,543 = current term loan 6,094 + revolver 5,600 + long-term term loan 32,849.
+   Revenue 81,458; cost of goods sold 50,005; gross profit 31,453; operating income 10,062; net income 6,326.
+   Operating cash flow 7,439; property/equipment purchases 42; operating free cash flow 7,397.
+
+8. Formula and judgment record:
+   Gross margin = 31,453 / 81,458 = 38.6125%.
+   Net margin = 6,326 / 81,458 = 7.7660%.
+   Detachable net cash = cash CNY 11,830,625 - interest-bearing debt CNY 320,152,812.5 = CNY -308,322,187.5.
+   Operating business price = market cap CNY 628,006,142.4506378 - detachable net cash = CNY 936,328,329.9506378.
+   Reported operating FCF = CNY 53,165,937.5.
+   Sustainable-cash-profit haircut = 15%, because Irwin was consolidated only from 2025-08-08 and Legacy FitLife revenue declined 4%.
+   Discounted sustainable cash profit = CNY 45,191,046.875.
+   Owner earnback = 936,328,329.9506378 / 45,191,046.875 = 20.7193 years.
+   Market cap / cash profit = 628,006,142.4506378 / 45,191,046.875 = 13.8967 times.
+   Forecast cash dividend = 0, based on no 2025 dividend/buyback cash outflow, acquisition debt, and no cited declared dividend.
+
+9. Populated result fields using protocol CLI set/append commands. The complex result object was not handwritten from scratch.
+
+10. Validation:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    Status: ok; errors: [].
+
+11. Output files:
+    outputs/result.json
+    outputs/report.md
+    outputs/trace.txt

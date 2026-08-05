@@ -1,0 +1,83 @@
+stock-research trace
+company=SBC Medical Group Holdings Incorporated (NASDAQ: SBC)
+period=2025-12-31
+generated_at=2026-08-04T16:53:12+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because local fact reuse was evaluated.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated scalar fields with protocol `set` and list rows with protocol `append`; did not construct result.json from scratch.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   validation_status=ok
+
+[local reuse]
+- Checked annual review, normalized facts, raw filing, and prior stock research paths supplied in config/input.json.
+- No reusable SBC 2025 files were present in the workspace at research time.
+- Because the key facts were absent, returned to primary public filings.
+
+[primary sources]
+- SEC Form 10-K, accession 0001193125-26-127557, filed 2026-03-27, period 2025-12-31:
+  https://www.sec.gov/Archives/edgar/data/1930313/000119312526127557/sbc-20251231.htm
+- SEC Companyfacts, CIK 0001930313:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0001930313.json
+- Federal Reserve G.5A annual exchange rates, released 2026-01-05:
+  https://www.federalreserve.gov/releases/g5a/20260105/
+- Market cap and PE: config/input.json, Yahoo Finance yfinance snapshot dated 2026-08-03.
+
+[model decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=The company sells management, brand, recruiting, procurement, IT, loyalty, payment and related support services to aesthetic-clinic operators, with a limited number of directly operated overseas clinics. Deposits, insurance reserves, project advances or concession assets are not the business model. Related-party concentration requires conservative haircuts but does not make the financial statements a special model.
+
+[currency]
+reporting_currency=USD
+output_currency=CNY
+conversion_rate=7.1875 CNY/USD
+source=Federal Reserve 2025 annual average
+method=All statement amounts converted with the same annual-average rate to comply with the result contract. Balance-sheet values were not separately translated at a year-end spot rate; recorded as a limitation.
+
+[audited USD facts]
+revenue=173607489
+cost_of_revenue=46323767
+gross_profit=127283722
+operating_profit=67486398
+net_profit=51045023
+parent_net_profit=50985613
+operating_cash_flow=24668496
+capital_expenditure=1401012
+operating_free_cash_flow=23267484
+financing_cash_flow=38292183
+share_repurchase=4999997
+cash_and_cash_equivalents=163773838
+total_assets=380447946
+total_liabilities=117143240
+total_equity=263304706
+parent_equity=248282196
+minority_interest=15022510
+
+[formulas]
+gross_margin=127283722/173607489=0.7331695351
+net_margin=50985613/173607489=0.2936832581
+debt_and_lease_liabilities_usd=9099046+33734438+4416960+4136257+132946+116527=51636647
+discounted_detachable_net_cash=(163773838*70%-51636647)*7.1875=452848722.125 CNY
+operating_free_cash_flow=(24668496-1401012)*7.1875=167235041.25 CNY
+discounted_sustainable_cash_profit=23267484*90%*7.1875=150511537.125 CNY
+operating_business_price=2118098994.6203613-452848722.125=1665250272.4953613 CNY
+owner_earnback_years=1665250272.4953613/150511537.125=11.0639377174
+market_cap_to_cash_profit=2118098994.6203613/150511537.125=14.0726686809
+forecast_cash_dividend=0
+forecast_dividend_yield=0/2118098994.6203613=0
+
+[judgment]
+- Cash haircut: 30% retained for operating liquidity, cross-border transfer friction, acquisitions and expansion; all bank borrowings and lease liabilities deducted.
+- Cash-profit haircut: 2025 operating free cash flow used instead of accounting profit, then discounted by 10% because only two audited comparative years are available and cash conversion is affected by related-party receivables, finance-lease receivables, customer loans and taxes.
+- Acquisition cash outflows are not treated as maintenance capex.
+- Forecast dividend is zero because the 10-K states no cash dividends have been paid and none are currently anticipated for the foreseeable future.
+
+[quality]
+status=complete
+limitations=Market quote not exchange-verified; single FX rate used for all statements; only two audited comparative years; industry-position evidence is mainly company disclosed.

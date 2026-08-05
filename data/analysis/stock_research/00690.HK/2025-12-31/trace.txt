@@ -1,0 +1,81 @@
+stock-research trace
+company: UNI-BIO GROUP / Uni-Bio Science Group Limited
+code: 00690.HK
+period: 2025-12-31
+generated_at: 2026-08-03T14:44:17+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full as requested.
+3. Read references/data-reuse.md because the skill routes source reuse through that reference.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields using repeated protocol `set` commands; did not construct the full JSON by hand.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: {"status":"ok","errors":[]}
+
+[local reuse check]
+- Checked stock_report/data/analysis/annual_review/00690.HK/2025-12-31, raw filing directory, and normalized facts path.
+- No pre-existing 2025 annual facts package or prior stock-research output was available.
+- Downloaded official final-results PDF to:
+  stock_report/data/raw/filings/00690.HK/2025-12-31/final-results-2025.pdf
+- Full 2025 annual report identified at:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0422/2026042201363.pdf
+- Final-results announcement:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0327/2026032704520.pdf
+
+[model verification]
+- Input hint: financial_brokerage / requires_special_model.
+- Official annual report, Corporate Profile p.4: core business is research, development, manufacturing and sales of innovative biologic products.
+- Annual-report balance sheet contains manufacturing assets, intangibles, inventories, receivables, cash, ordinary bank borrowings and operating liabilities; no brokerage client money, proprietary trading book or repo financing structure.
+- Conclusion: input hint is factually inconsistent. Overridden to ordinary_operating / applicable.
+
+[primary financial facts: HKD]
+- Revenue: HK$586,211,000.
+- Cost of sales: HK$98,650,000.
+- Gross profit: HK$487,561,000; gross margin 83.1716%.
+- Profit before tax: HK$101,521,000.
+- Profit and parent-attributable profit: HK$93,327,000; net margin 15.9204%.
+- Total assets: HK$579,803,000.
+- Current liabilities: HK$103,545,000; non-current liabilities: HK$63,011,000; total liabilities HK$166,556,000.
+- Total and parent equity: HK$413,247,000; minority interest nil.
+- Net operating cash flow: HK$88,790,000.
+- Company-disclosed capex: HK$52,600,000; company-disclosed free cash flow: HK$37,800,000.
+- Financing cash flow: -HK$34,184,000; dividend paid: HK$16,540,000.
+- Unrestricted bank balances and cash: HK$168,822,000.
+- Restricted bank balance: HK$11,072,000.
+- Bank borrowings: HK$87,843,000; lease liabilities HK$9,914,000.
+- Proposed 2025 final dividend: HK$0.00313 per share; shares: 5,971,228,147.
+
+[currency conversion]
+- Result contract requires CNY absolute yuan.
+- Financial-statement conversion factor: 1 HKD = 0.903614458 CNY, implied by annual-report Note 22 disclosure that HK$996,000 equals RMB900,000. Used consistently for balance sheet, income and cash-flow values; limitation recorded because an annual average rate was not applied to income/cash flow.
+- Valuation-date factor: 1 HKD = 0.86648 CNY, approximate 2026-07-31 SAFE RMB central parity (100 HKD = RMB86.648 used as same-period approximation).
+- Input market cap interpreted as HKD because this is a Hong Kong listing and Tencent quote context; converted HK$390,412,745.0340986 to RMB338,284,835.317.
+
+[owner earnback assumptions]
+- Discounted detachable net cash:
+  70% * unrestricted cash - 100% * bank borrowings - 100% * lease liabilities
+  = RMB18,450,361.449.
+- Restricted cash and loan receivables assigned zero detachable value.
+- Sustainable cash profit:
+  85% * average(2025 parent profit, 2025 disclosed operating FCF)
+  = RMB50,357,507.540.
+- Operating business price:
+  RMB338,284,835.317 - RMB18,450,361.449 = RMB319,834,473.868.
+- Owner earnback:
+  RMB319,834,473.868 / RMB50,357,507.540 = 6.3513 years.
+- Market cap / cash profit = 6.7177 times.
+- These are explicit analytical scenarios, not reported facts or forecasts.
+
+[dividend]
+- Forecast/declared cash dividend:
+  5,971,228,147 shares * HK$0.00313 * 0.86648 CNY/HKD
+  = RMB16,194,462.764.
+- Yield against converted input market cap = 4.7872%.
+
+[quality and limitations]
+- data_quality.status = complete because identity, period, valuation, model, three statements, asset/liability explanations, owner-earnback assumptions, dividend and evidence are populated.
+- Main limitations: approximate FX treatment; maintenance vs expansion capex not fully split; input PE TTM not independently recomputed; market-cap currency inferred from Hong Kong quote context.
+- No buy/sell recommendation or target price produced.

@@ -1,0 +1,63 @@
+stock-research trace
+company: 02096.HK / 先声药业集团有限公司
+period: 2025-12-31
+generated_for: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md and references/report-contract.md as requested.
+- Read references/data-reuse.md because local fact reuse was part of the required workflow.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the configured annual-review, normalized-facts and raw-filing paths.
+- No 02096.HK filing package or annual fact package existed in /workspace or the supplied /root/aicode sync location.
+- Therefore researched the official 2025 annual report rather than fabricating or extrapolating missing facts.
+
+3. Primary evidence
+- Official filing: Simcere Pharmaceutical Group Limited Annual Report 2025.
+- HKEX URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042803397.pdf
+- Publication date: 2026-04-28; audited financial statements signed 2026-03-25.
+- Key pages used: 4, 34-36, 40, 45, 117, 119-124, 188-212.
+- Market valuation source was preserved from config/input.json: Tencent qt.gtimg.cn, timestamp 2026/08/03 09:48:02. It was not independently cross-checked.
+
+4. Model decision
+- Input hint said financial_brokerage, but source tags said pharmaceuticals and the annual report showed drug sales, promotion and research services.
+- The balance sheet contains ordinary manufacturing/pharma operating assets and liabilities, not brokerage client money or a trading book.
+- Overrode hint to statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+5. Core calculations (RMB)
+- total assets = 7,335,862,000 non-current + 7,389,771,000 current = 14,725,633,000.
+- total liabilities = 3,345,049,000 current + 1,965,994,000 non-current = 5,311,043,000.
+- gross margin = 6,309,856,000 / 7,731,411,000 = 0.8161325274.
+- net margin = 1,344,008,000 / 7,731,411,000 = 0.1738373500.
+- capex = 349,325,000 PPE + 512,875,000 intangible assets = 862,200,000.
+- operating free cash flow = 2,013,530,000 - 862,200,000 = 1,151,330,000.
+- discounted detachable net cash:
+  cash 3,512,088,000 x 90%
+  + time deposits 814,131,000 x 90%
+  + FVPL 1,143,560,000 x 50%
+  + FVOCI 297,365,000 x 50%
+  + third-party loan 100,105,000 x 50%
+  - bank loans 1,059,957,000
+  - lease liabilities 126,976,000
+  - redemption liability 1,183,317,000
+  = 2,293,862,100.
+- operating business price = 26,866,566,929.978134 - 2,293,862,100 = 24,572,704,829.978134.
+- owner earnback years = 24,572,704,829.978134 / 1,151,330,000 = 21.3428859058.
+- market cap / cash profit = 26,866,566,929.978134 / 1,151,330,000 = 23.3352443956.
+- forecast dividend yield = 462,001,000 / 26,866,566,929.978134 = 0.0171961308.
+
+6. Judgment boundaries
+- Restricted and pledged deposits were excluded from detachable cash.
+- Receivables, inventory, PPE, intangibles, goodwill, associates and joint ventures were not treated as detachable cash.
+- Financial investments and the third-party loan received a 50% realization discount because the annual report did not support instrument-by-instrument liquidation values.
+- Sustainable cash profit is a conservative one-year proxy, not a forecast. It deducts both tangible and intangible investment because licensed drug rights and R&D-related intangibles are recurring economic inputs for this business.
+- No buy/sell recommendation, target price or ranking label was produced.
+
+7. Output construction and validation
+- outputs/result.json was initialized and populated through the stock-research protocol CLI set operations, not written from scratch.
+- outputs/report.md and outputs/trace.txt were created after the structured calculations.
+- Final protocol validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

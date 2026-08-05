@@ -1,0 +1,68 @@
+stock-research trace
+company: LUEN THAI / 00311.HK
+period: 2025-12-31 annual
+generated context: 2026-08-03 Asia/Shanghai
+
+[1] Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely as requested.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated structured fields only through protocol set/append commands; result.json was not created as a hand-written complex object.
+
+[2] Reuse audit
+- Checked the input-declared raw filing, annual review, normalized facts and stock research paths.
+- None existed in /workspace; no prior facts.json, annual_facts.md, metadata.json, normalized fact pack or historical stock-research output was available.
+- Therefore fetched and reviewed the official HKEX 2025 annual report and final-results announcement.
+
+[3] Primary sources
+- HKEX 2025 Annual Report, released 2026-04-23:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042300668.pdf
+- HKEX Final Results for year ended 2025-12-31, released 2026-03-26:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032601306.pdf
+- Market cap, timestamp, source and PE TTM copied from config/input.json:
+  market cap CNY 207,289,286.08000278; 2026/07/31 16:08:46; Tencent qt.gtimg.cn; PE TTM 6.86.
+- FX: CFETS-authorized 2025-12-31 central parity USD/CNY 7.0288, reproduced at:
+  https://www.ce.cn/xwzx/gnsz/gdxw/202512/t20251231_2676993.shtml
+
+[4] Model verification
+- Input hint said financial_brokerage/requires_special_model.
+- Annual report Note 1 says the group principally manufactures and trades apparels and accessories, with plants in PRC, Cambodia, Philippines and Myanmar.
+- Segment note says apparel and accessories are the operating segments and there is no other material revenue stream.
+- Overrode the erroneous hint with ordinary_operating/applicable.
+
+[5] Financial extraction (reported US$000)
+- Income statement: revenue 636,987; cost of sales 542,992; gross profit 93,995; operating profit 11,845; net profit 4,404; parent net profit 4,515.
+- Balance sheet: assets 431,262; liabilities 271,906; equity 159,356; parent equity 158,719; NCI 637; cash and bank balances 54,881; borrowings 117,534.
+- Cash flow: operating cash inflow 29,832; PPE purchases 1,677; financing cash outflow 31,043.
+- All structured financial amounts converted to CNY absolute yuan by reported US$000 × 1,000 × 7.0288.
+- Gross margin = 93,995 / 636,987 = 0.1475618812.
+- Parent net margin = 4,515 / 636,987 = 0.0070880567.
+- Operating free cash flow = (29,832 - 1,677) × 1,000 × 7.0288 = CNY 197,895,864.
+
+[6] Owner earnback
+- Cash CNY 385,747,572.8 × 80% = CNY 308,598,058.24.
+- Bank borrowings CNY 826,122,979.2 deducted at 100%.
+- Discounted cash less borrowings is negative, so detachable net cash is floored at zero; no cash is deducted from market cap.
+- Operating business price = market cap - zero = CNY 207,289,286.08000278.
+- Starting parent profit = CNY 31,735,032.
+- Applied 30% stability/distributability haircut because 2025 was only the first turnaround year, revenue fell 5.5%, accessories segment profit fell 58.6%, and no dividends were paid/proposed in either 2024 or 2025.
+- Discounted sustainable cash profit = CNY 22,214,522.4.
+- Owner earnback years = 207,289,286.08000278 / 22,214,522.4 = 9.3312510774.
+- Market cap / cash profit is the same because detachable net cash is zero.
+- The much higher 2025 operating FCF was used only as cash-conversion evidence, not as the sustainable denominator, because it includes working-capital movement and unusually low capex relative to depreciation/amortization.
+
+[7] Dividend forecast
+- Annual report/final results: no dividend paid, declared or proposed for 2024 or 2025; no 2025 final dividend recommended.
+- Forecast cash dividend set to CNY 0 and forecast yield to 0 under the base case, considering the recent loss history and net debt.
+
+[8] Data-quality notes
+- Uniform period-end FX was used for balance sheet, income statement and cash flow to satisfy the CNY protocol. It is not an average-rate translation.
+- Sustainable cash profit and dividend forecast are analysis assumptions, not company guidance.
+- Market snapshot was supplied in input and not independently reconstructed.
+
+[9] Validation
+- Command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result before report/trace final check: {"status":"ok","errors":[]}

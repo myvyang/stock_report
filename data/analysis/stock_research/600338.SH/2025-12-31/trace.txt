@@ -1,0 +1,79 @@
+stock-research trace
+company: 600338.SH 西藏珠峰
+period: 2025-12-31 annual
+generated context date: 2026-08-01 Asia/Shanghai
+
+1. Protocol initialization
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+result: initialized stock-research-result-v1 skeleton.
+
+2. Required instructions read
+- .agents/skills/stock-research/SKILL.md (complete)
+- .agents/skills/stock-research/references/result-contract.md (107 lines, complete)
+- .agents/skills/stock-research/references/report-contract.md (69 lines, complete)
+- /workspace/AGENTS.md instructions supplied in task context
+
+3. Reuse check
+searched workspace paths specified by config/input.json.
+result: no annual facts package, normalized facts, raw filing metadata, or prior stock-research output for 600338.SH/2025-12-31 was present. Fresh official-source retrieval was required.
+
+4. Sources retrieved and used
+- Shanghai Stock Exchange disclosure, 2025 audited consolidated and parent financial statements, disclosure date 2026-04-23:
+  https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-23/600338_20260423_MOLM.pdf
+- 2025 annual report full text mirror used to recover annual-report narrative and tables whose statement pages were image-only in the SSE PDF extraction:
+  https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?CompanyCode=10000276&gather=1&id=12150347
+  Core financial figures were cross-checked against the audited SSE filing notes and cash-flow reconciliation.
+- Market snapshot from config/input.json: Tencent qt.gtimg.cn, 2026-07-31 11:43:18, market cap CNY 11,693,000,000, PE TTM 20.66.
+
+5. Model classification
+statement_model: ordinary_operating
+owner_earnback_applicability: applicable
+reason: The company is an operating mining group. Its assets are mines, plant, construction projects, exploration rights, working capital, and corporate financing. It is not a bank, broker, insurer, property developer, construction contractor, concession utility, or investment holding company. Ordinary earnback is usable with mining-specific capital expenditure and non-detachable cash treatment.
+
+6. Key reported facts
+total assets: 6,855,347,024.86
+total liabilities: 2,332,132,006.33
+total equity: 4,523,215,018.53
+parent equity: 4,475,513,555.42
+minority interest: 47,701,463.11
+revenue: 2,429,955,135.98
+cost of sales: 1,133,393,268.65
+gross profit: 1,296,561,867.33
+operating profit: 698,452,501.44
+net profit: 490,963,405.97
+parent net profit: 512,033,436.59
+operating cash flow: 601,084,203.43
+capital expenditure: 542,090,770.33
+operating free cash flow: 58,993,433.10
+financing cash flow: -369,372,774.90
+cash and cash equivalents: 20,301,752.94
+forecast cash dividend: 18,284,203.36
+
+7. Formula calculations
+gross margin = 1,296,561,867.33 / 2,429,955,135.98 = 0.5335744056060924
+net margin = 512,033,436.59 / 2,429,955,135.98 = 0.21071723877054097
+operating FCF = 601,084,203.43 - 542,090,770.33 = 58,993,433.10
+
+detachable cash = 0 because current liabilities exceed current assets by CNY 1,213,132,776.76 and cash is required for operations.
+financing liabilities deducted:
+- short-term borrowings: 26,516,713.07
+- lease liabilities including current portion: 104,795,702.09
+- financing cash-flow-table other payables: 405,262,596.96
+- equipment-financing-like long-term payables: 57,574,954.23
+discounted detachable net cash = 0 - sum = -594,149,966.35
+
+cash profit start = min(parent net profit 512,033,436.59, OCF 601,084,203.43) = 512,033,436.59
+maintenance capex proxy = fixed asset depreciation 284,669,255.74
+discounted sustainable cash profit = 512,033,436.59 - 284,669,255.74 = 227,364,180.85
+operating business price = 11,693,000,000 - (-594,149,966.35) = 12,287,149,966.35
+owner earnback years = 12,287,149,966.35 / 227,364,180.85 = 54.04171369656621
+market cap to cash profit = 11,693,000,000 / 227,364,180.85 = 51.4285053885171
+forecast dividend yield = 18,284,203.36 / 11,693,000,000 = 0.001563687963738989
+
+8. Important judgment and sensitivity
+The filing does not separate maintenance capex from expansion capex. Fixed-asset depreciation is used as a reproducible proxy. Actual 2025 total capex was CNY 542.09 million and reported operating FCF only CNY 58.99 million. Therefore the CNY 227.36 million sustainable cash-profit estimate is uncertain and the 54.0-year earnback is a baseline analytical result, not a forecast. No unproven future cash flow from the Argentina lithium projects was included.
+
+9. Protocol population and validation
+outputs/result.json was populated through repeated protocol `set` commands; the complex result object was not handwritten from scratch.
+validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation result before report creation: {"status":"ok","errors":[]}

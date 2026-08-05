@@ -1,0 +1,64 @@
+Stock research trace: GENCH EDU 01525.HK, period 2025-12-31
+Generated for task input created at 2026-08-04T13:13:05+08:00
+
+Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All result mutations were made through protocol set commands; the complex result object was not handwritten from scratch.
+
+Reused local sources
+- stock_report/data/analysis/annual_review/01525.HK/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/01525.HK/2025-12-31/annual_facts.md
+- stock_report/data/analysis/annual_review/01525.HK/2025-12-31/extraction_trace.txt
+- stock_report/data/raw/filings/01525.HK/2025-12-31/imported_from_agent_runs/906248fc0798-gench_edu_annual_report_2025_extracted.txt
+- stock_report/data/raw/filings/01525.HK/2025-12-31/imported_from_agent_runs/aa22f2d2c6eb-gench_edu_annual_report_2025.pdf (source represented by the extracted text and fact pack; no re-download)
+- config/input.json for market cap, PE TTM, timestamp, and Tencent source attribution.
+
+Model review
+- Input hint: financial_brokerage / requires_special_model.
+- Filing facts: the company operates Shanghai Jian Qiao University and earns tuition, boarding, education-related and training revenue. No brokerage client funds, proprietary securities trading business, or repo financing were found.
+- Override: ordinary_operating / applicable.
+- Special caution retained: mainland education operations are consolidated through contractual arrangements, and cash is not split between the listed parent, offshore entities, mainland subsidiaries, and the school. Detachable cash therefore received conservative haircuts.
+
+Key calculations (all amounts CNY yuan)
+- Revenue: 1,004,586,000; gross profit: 544,651,000; parent net profit: 242,548,000.
+- Gross margin = 544,651,000 / 1,004,586,000 = 0.5421646329930937.
+- Net margin = 242,548,000 / 1,004,586,000 = 0.24144075270808074.
+- Operating FCF = operating cash flow 441,671,000 - capex 116,600,000 = 325,071,000.
+- Discounted detachable cash:
+  unrestricted cash 350,164,000 x 50% = 175,082,000
+  FVOCI bank CDs 194,849,000 x 70% = 136,394,300
+  FVTPL wealth products 55,034,000 x 50% = 27,517,000
+  less bank borrowings 280,415,000 x 100% = -280,415,000
+  restricted cash 41,914,000 = excluded before the unrestricted-cash calculation
+  total = 58,578,300.
+- Discounted sustainable cash profit:
+  441,671,000 operating cash flow
+  -116,600,000 capex
+  -38,459,000 increase in contract liabilities
+  -39,913,000 government grant receipts
+  = 246,699,000 before prudential haircut
+  -37,004,850 (15% distribution/sustainability haircut)
+  = 209,694,150.
+- Operating business price = 928,263,704.8363686 - 58,578,300 = 869,685,404.8363686.
+- Owner earnback years = 869,685,404.8363686 / 209,694,150 = 4.1473994617225545.
+- Market cap / cash profit = 928,263,704.8363686 / 209,694,150 = 4.426750602419612.
+- Forecast dividend = 242,548,000 x disclosed 21.9% payout = 53,118,012.
+- Forecast dividend yield = 53,118,012 / 928,263,704.8363686 = 0.0572229763193892.
+
+Judgment versus fact
+- Reported statement values, enrollment, fee changes, dividend per share, payout ratio, restricted-cash composition, and contractual-arrangement descriptions are filing facts.
+- Cash haircuts, the 15% sustainability haircut, discounted cash profit, and earnback years are analyst judgments derived from those facts.
+- The company-reported CUAA ranking and “largest private university in Shanghai” position are explicitly identified as company-disclosed/third-party methodology, not independently proven competitive moats.
+
+Known limitations
+- No legal-entity cash split in the annual report/fact pack.
+- No separate extraction of 2023 operating cash flow and capex.
+- Product-level maturity and redemption restrictions for certificates of deposit and wealth products are incomplete.
+- Market data is the supplied Tencent snapshot and was not replaced or refreshed.
+
+Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status ok; errors [].

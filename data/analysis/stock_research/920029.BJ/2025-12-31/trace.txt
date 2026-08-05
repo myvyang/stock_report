@@ -1,64 +1,45 @@
-运行时间：2026-07-27 Asia/Shanghai
+stock-research trace
+company=920029.BJ 开发科技
+period=2025-12-31
+run_input_created_at=2026-08-03T10:17:18+08:00
 
-技能和协议：
-- 按用户要求使用 stock-research skill。
-- 已读取 /workspace/.agents/skills/stock-research/SKILL.md。
-- 已读取 /workspace/.agents/skills/stock-research/references/result-contract.md。
-- 已读取 /workspace/.agents/skills/stock-research/references/report-contract.md。
-- 额外读取 /workspace/.agents/skills/stock-research/references/data-reuse.md，用于确认复用边界。
+1. 按用户要求读取：
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
 
-输入：
-- config/input.json
-- query/code: 920029.BJ
-- company: 开发科技
-- period: 2025-12-31
-- report_type: annual
-- market_cap: 6,597,000,000 元，date=2026-07-24，pe_ttm=9.34
+2. 使用协议 CLI 初始化 outputs/result.json：
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
 
-复用文件：
-- stock_report/data/analysis/annual_review/920029.BJ/2025-12-31/facts.json
-- stock_report/data/analysis/annual_review/920029.BJ/2025-12-31/annual_facts.md
-- stock_report/data/analysis/annual_review/920029.BJ/2025-12-31/extraction_trace.txt
-- stock_report/data/analysis/annual_review/920029.BJ/2025-12-31/report.md
-- stock_report/data/normalized/facts/920029.BJ/2025-12-31/annual-facts.json
-- stock_report/data/raw/filings/920029.BJ/2025-12-31/metadata.json
-- stock_report/data/raw/filings/920029.BJ/2025-12-31/annual-report.pdf
-- stock_report/data/analysis/stock_research/920029.BJ/2025-12-31/result.json 作为历史研究线索，不直接沿用旧 schema。
-- stock_report/data/analysis/stock_research/920029.BJ/2025-12-31/report.md 作为报告线索，不保留旧报告中的榜单或类型标签。
+3. 复用并核对年度事实包：
+   - stock_report/data/analysis/annual_review/920029.BJ/2025-12-31/facts.json
+   - stock_report/data/analysis/annual_review/920029.BJ/2025-12-31/annual_facts.md
+   - stock_report/data/analysis/annual_review/920029.BJ/2025-12-31/extraction_trace.txt
+   年度事实包已定向核对年报 PDF p7、p9-p10、p90-p100、p164-p165、p178、p193、p203、p216。
 
-协议 CLI：
-- 已运行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- 已通过协议 CLI set 写入 metrics、financials、asset_analysis、owner_earnback、dividend、business、risks、evidence、data_quality 等字段。
-- 已运行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-- 校验结果：{"status":"ok","errors":[]}
+4. 财报模型复核：
+   公司收入来自智能计量终端及 AMI 系统软件的制造、销售和项目交付；资产负债表为普通经营公司结构，未见需特殊模型处理的客户资金、准备金、预售监管资金或收费权。结论：ordinary_operating / applicable。
 
-关键事实：
-- 2025 年营业收入 3,020,483,237.81 元，营业成本 1,833,275,437.37 元，毛利 1,187,207,800.44 元。
-- 2025 年归母净利润 706,625,347.60 元，扣非归母净利润 715,465,359.04 元。
-- 2025 年经营活动现金流净额 697,931,733.93 元，资本开支 144,360,110.79 元，经营自由现金流 553,571,623.14 元。
-- 2025 年末总资产 4,681,345,004.97 元，总负债 950,930,498.13 元，归母权益 3,730,414,506.84 元。
-- 现金及现金等价物 2,580,762,587.10 元；交易性金融资产理财产品 100,000,000 元；其他流动资产债权投资 40,006,000 元；有息融资负债 187,696,966.32 元。
-- 2025 年境外市场收入 25.88 亿元，占营业收入 85.68%。
-- 2025 年年度利润分配预案拟派现金红利 222,218,667.20 元，每 10 股派现 16.00 元。
+5. 复用边界：
+   既有 stock_research 结果仅作为已核对事实、现金折扣和研究线索；所有行情相关指标按本次 config/input.json 重算。折后净现金 1,398,308,234.7215 元及折后现金利润 442,000,000 元维持既有审慎假设，因为本期财报事实未变化。
 
-核心计算：
-- 毛利率 = 1,187,207,800.44 / 3,020,483,237.81 = 39.3052%。
-- 净利率 = 706,625,347.60 / 3,020,483,237.81 = 23.3944%。
-- 预测分红率 = 222,218,667.20 / 6,597,000,000 = 3.3685%。
-- 折后可剥离净现金 = 1,398,308,234.7215 元，复用历史 owner_earnback 审慎折扣结果。
-- 经营业务购买价 = 6,597,000,000 - 1,398,308,234.7215 = 5,198,691,765.2785 元。
-- 折后可持续可分配现金利润 = 442,000,000 元。
-- 控股回本年数 = 5,198,691,765.2785 / 442,000,000 = 11.7617 年。
-- 市值/现金利润 = 6,597,000,000 / 442,000,000 = 14.9253 年。
+6. 本次重算：
+   market_cap=7,127,000,000
+   discounted_net_cash_to_market_cap=1,398,308,234.7215 / 7,127,000,000 = 0.1961905717
+   operating_business_price=7,127,000,000 - 1,398,308,234.7215 = 5,728,691,765.2785
+   owner_earnback_years=5,728,691,765.2785 / 442,000,000 = 12.9608401929
+   market_cap_to_cash_profit=7,127,000,000 / 442,000,000 = 16.1244343891
+   forecast_dividend_yield=222,218,667.20 / 7,127,000,000 = 0.0311798312
 
-数据质量限制：
-- 市值来自 config/input.json 的 2026-07-24 批量输入快照，本次未重新联网核价。
-- 募集资金专户、境外资金、普通境内银行存款和财务公司存款没有逐账户完整勾稽。
-- 年报披露理财产品未到期余额 470,006,000 元，其中 330,000,000 元未能与资产负债表科目逐项完全映射；本次未重复加入资金池。
-- 2023 年资本开支未在年度事实包中补齐，三年自由现金流无法完整计算。
-- 未来海外大客户合同续期、项目预算和募投项目回报属于未来事项，公开资料只能验证历史集中度和资金投向。
+7. 已通过 protocol set 命令逐项写入或复用各结构，不从空文件手写复杂 JSON。
 
-输出：
-- outputs/result.json
-- outputs/report.md
-- outputs/trace.txt
+8. 已运行协议校验：
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result={"status":"ok","errors":[]}
+
+9. 已知限制：
+   - 资金账户未逐户勾稽，折后净现金是估算。
+   - 3.30 亿元理财未与资产负债表科目逐项映射，未重复计入资金池。
+   - 2023 年资本开支未补齐，可持续现金利润主要参考 2024-2025 年。
+   - 行情按任务输入快照使用，未重新联网核价。

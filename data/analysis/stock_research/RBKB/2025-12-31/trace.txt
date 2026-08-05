@@ -1,0 +1,46 @@
+2026-08-05 stock-research trace — RBKB
+
+1. Read skill and contracts:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check:
+   - No annual facts package, normalized facts, raw filing metadata, or prior RBKB research output was present under the paths supplied in config/input.json.
+   - Returned to primary public filings.
+
+3. Protocol initialization:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Primary evidence consulted:
+   - SEC Form 10-K, accession 0001751783-26-000005, period 2025-12-31, filed 2026-03-13.
+     https://www.sec.gov/Archives/edgar/data/1751783/000175178326000005/rbkb-20251231x10k.htm
+   - SEC company facts API for CIK 0001751783.
+     https://data.sec.gov/api/xbrl/companyfacts/CIK0001751783.json
+   - Rhinebeck Bancorp conversion completion disclosure, 2026-07-21, and Q2 2026 results disclosure, 2026-07-23.
+   - Nasdaq corporate action confirmation that conversion became effective 2026-07-21.
+   - U.S. Treasury Fiscal Data exchange-rate API: China-Renminbi, effective 2025-12-31, 6.998 CNY/USD.
+   - Market capitalization and PE retained from config/input.json (Yahoo Finance yfinance; market-cap date 2026-08-03).
+
+5. Model decision:
+   - Overrode input hint ordinary_operating/applicable.
+   - Confirmed financial_bank/requires_special_model because deposits, loans, securities, and liquidity balances form the regulated operating model.
+   - Ordinary discounted net cash, cash profit, operating business price, owner earnback years, and market-cap/cash-profit metrics left null.
+
+6. Key checks and judgments:
+   - 2025 net income $10.045m versus 2024 loss $8.620m; comparison distorted by the approximately $16m 2024 securities-sale loss.
+   - NIM 3.89%, efficiency ratio 73.12%, ROA 0.78%, ROE 7.77%.
+   - NPL/loans 0.39%, ACL/NPL 225.76%, net charge-offs/average loans 0.20%.
+   - Total capital 14.40%, CET1 and Tier 1 risk-based capital 13.57%, leverage capital 10.62%; bank classified well capitalized.
+   - No historical cash dividend through 2025. The conversion removed the former MHC structural constraint, but no declared dividend was found by 2026-08-05; base forecast set to zero with explicit uncertainty.
+   - Post-period conversion sold 8,880,210 shares for gross proceeds of $88.8021m and resulted in approximately 15,638,237 shares outstanding. This creates a comparability break between 2025 financials and the 2026-08-03 market cap.
+
+7. Currency conversion:
+   - All structured financial-statement amounts converted at 6.998 CNY/USD.
+   - Limitation recorded: period-end rate also used for income/cash-flow values solely for protocol-wide CNY presentation.
+
+8. Result populated using repeated protocol set commands; complex JSON was not created from a blank file.
+
+9. Validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

@@ -1,0 +1,58 @@
+stock-research trace
+generated_at=2026-08-05T00:10:45+08:00
+query=SMBC
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Initialized protocol result
+- command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- initial hint: ordinary_operating/applicable
+- override after filing review: financial_bank/not_applicable
+- reason: Southern Missouri Bancorp is the holding company of Southern Bank; deposits, loans, securities and wholesale funding are operating balance-sheet items.
+
+3. Local reuse check
+- No files existed at the annual facts, normalized facts, raw filing, or prior stock-research paths specified in config/input.json.
+- Therefore retrieved primary public filings and issuer releases.
+
+4. Primary sources used
+- SEC FY2025 Form 10-K, fiscal year ended 2025-06-30:
+  https://www.sec.gov/Archives/edgar/data/916907/000155837025012001/smbc-20250630x10k.htm
+- Issuer FY2026 preliminary results and dividend release dated 2026-07-22:
+  https://investors.bankwithsouthern.com/news-events/news/news-details/2026/SOUTHERN-MISSOURI-BANCORP-REPORTS-PRELIMINARY-RESULTS-FOR-FOURTH-QUARTER-OF-FISCAL-2026-DECLARES-QUARTERLY-DIVIDEND-OF-0-27-PER-COMMON-SHARE-CONFERENCE-CALL-SCHEDULED-FOR-THURSDAY-JULY-23-AT-930-AM-CENTRAL-TIME/default.aspx
+- Federal Reserve H.10, 2025-06-30 USD/CNY 7.1636:
+  https://www.federalreserve.gov/releases/h10/20250707/
+- Market cap, date, PE TTM: Yahoo Finance yfinance fields supplied in config/input.json.
+
+5. Period handling
+- Input requested annual period 2025-12-31.
+- Registrant fiscal year ends June 30; 2025-12-31 filing is an unaudited FY2026 Q2 10-Q, not an annual report.
+- Core annual financials use audited FY2025 10-K at 2025-06-30.
+- FY2026 preliminary release is used only for post-balance-sheet trend and dividend forecast.
+
+6. Currency handling
+- FY2025 USD balance-sheet and income-statement values converted at 7.1636 CNY/USD.
+- Latest dividend forecast uses annualized USD 1.08 per share and 6.7851 CNY/USD (Federal Reserve H.10 around 2026-06-30).
+- Market-cap amount was already supplied in CNY and was not reconverted.
+
+7. Key extracted facts
+- total assets USD 5,019.607m; liabilities USD 4,474.915m; equity USD 544.692m
+- net loans USD 4,048.961m; deposits USD 4,281.368m
+- net interest income USD 154.616m; noninterest income USD 27.984m; net income USD 58.578m
+- NIM 3.40%; ROA 1.21%; ROE 11.37%
+- NPL/gross loans 0.56%; ACL/gross loans 1.26%; ACL/NPL 224.08%
+- consolidated CET1 12.14%; total capital ratio 13.95%; bank classified well capitalized
+- non-owner occupied CRE concentration 301.1% of Bank Tier 1 capital plus ACL; 40.1% of total loans
+- FY2025 dividends paid per share USD 0.92
+- latest declared quarterly dividend USD 0.27; annualized forecast USD 1.08
+
+8. Protocol decisions
+- ordinary gross margin, net margin, operating cash flow, capex and free cash flow left null because they are not economically comparable for a bank.
+- discounted net cash, discounted cash profit, operating business price, owner earnback years and market-cap-to-cash-profit all left null because owner_earnback_applicability is not_applicable.
+- alternative valuation discussion uses PE, approximate P/B, ROE, asset quality, capital adequacy and dividend coverage.
+
+9. Validation
+- command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- result after structured population: status=ok, errors=[]

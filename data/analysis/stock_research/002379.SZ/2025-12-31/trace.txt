@@ -1,0 +1,70 @@
+stock-research trace
+generated_at=2026-07-31T16:06:38+08:00
+query=002379.SZ
+period=2025-12-31
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Local reuse check
+- config/input.json exists.
+- No raw filing metadata, annual facts, normalized facts, or prior stock-research result existed under the supplied stock_report paths.
+- Therefore research was rebuilt from public disclosures.
+
+3. Identity and model verification
+- 002379 was formerly 宏创控股 and changed its short name to 宏桥控股 on 2026-01-30.
+- 宏拓实业 100% equity was transferred on 2025-12-31; 11,894,744,449 new shares listed on 2026-01-13.
+- 2025 annual report retrospectively consolidates 宏拓实业 as a common-control combination.
+- Annual report states the post-reorganization business is integrated alumina, electrolytic aluminum and aluminum processing.
+- Overrode input hint utility_concession/requires_special_model with ordinary_operating/applicable.
+
+4. Primary disclosure facts used
+- Revenue: 156,720,854,229.71
+- Cost of sales: 126,392,440,102.70
+- Gross profit: 30,328,414,127.01
+- Parent net profit: 17,863,539,928.79
+- Operating cash flow: 23,994,898,583.36
+- Capital expenditure: 5,345,035,977.89
+- Operating free cash flow: 18,649,862,605.47
+- Total assets: 111,287,772,033.62
+- Total liabilities: 65,724,190,807.23
+- Parent equity: 45,571,106,863.72
+- Cash and cash equivalents: 15,424,179,117.05
+- Forecast cash dividend: 3,257,779,550.50
+
+5. Owner earnback assumptions
+- Cash equivalents discounted at 80%.
+- Financial assets of 1,792,385,571.46 discounted at 70%.
+- Financing liabilities of 31,283,100,216.94 deducted at 100%.
+- Discounted detachable net cash: -17,689,087,023.28.
+- Sustainable distributable cash profit: 15,000,000,000, below 2025 FCF to allow for commodity cycle, maintenance capex and related-party uncertainty.
+- Operating business price: 299,291,087,023.28.
+- Owner earnback years: 19.95274.
+- Market cap / cash profit: 18.77347.
+
+6. Important accounting interpretation
+- Reported 2025 parent net profit is 17.864bn.
+- Reported deductible non-recurring parent profit is negative because 19.125bn of pre-combination-date profit is classified as non-recurring under common-control combination rules.
+- Did not interpret the headline negative deducted profit as operating loss; used the retrospectively consolidated statements and cash flow.
+
+7. Market snapshot
+- Market cap: 281,602,000,000
+- Timestamp: 20260731114251
+- Source: Tencent qt.gtimg.cn, as supplied in config/input.json
+- PE TTM: 14.29
+
+8. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated the initialized result using repeated protocol set commands.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok; errors: []
+
+9. Limitations
+- The market snapshot was accepted from the task input and not independently reconciled to exchange tick data.
+- The sustainable cash profit is an analytical estimate, not company guidance.
+- Only one post-reorganization annual period is available; historical comparability is affected by retrospective common-control accounting.
+- Other payables have complex composition and were not treated as detachable cash.

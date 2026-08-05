@@ -1,0 +1,89 @@
+stock-research trace
+company: 大连电瓷（002606.SZ）
+period: 2025-12-31 annual
+generated_at: 2026-07-31T22:15:57+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md completely.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated the initialized result through protocol set commands; no complex JSON was hand-written from scratch.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: {"status":"ok","errors":[]}
+
+[local reuse check]
+- Requested annual facts, normalized facts, raw filing metadata, and prior stock-research outputs did not exist locally at task start.
+- Therefore retrieved the official annual report PDF from CNINFO and retained it at:
+  stock_report/data/raw/filings/002606.SZ/2025-12-31/annual-report-2025.pdf
+- Extracted text retained at:
+  stock_report/data/raw/filings/002606.SZ/2025-12-31/annual-report-2025.txt
+
+[primary sources]
+1. 大连电瓷集团股份有限公司2025年年度报告全文
+   official URL: https://static.cninfo.com.cn/finalpage/2026-04-23/1225144015.PDF
+   published: 2026-04-23
+   used for: business, industry, audited statements, notes, restricted assets, customer concentration, orders, risks, dividends.
+2. config/input.json
+   embedded quote source: Tencent qt.gtimg.cn
+   timestamp: 20260731114327
+   used for: market cap CNY 6,481,000,000 and PE TTM 25.81.
+
+[key audited facts]
+- total assets: 3,199,281,523.19
+- total liabilities: 1,287,788,509.78
+- total equity: 1,911,493,013.41
+- parent equity: 1,910,051,843.28
+- revenue: 1,779,044,963.65
+- cost of sales: 1,207,655,534.26
+- gross profit: 571,389,429.39
+- parent net profit: 211,860,603.31
+- operating cash flow: 493,569,120.18
+- capital expenditure: 97,475,252.86
+- operating free cash flow: 396,093,867.32
+- audit opinion: standard unqualified opinion
+
+[formula checks]
+- gross margin = 571,389,429.39 / 1,779,044,963.65 = 0.3211776212
+- net margin = 211,860,603.31 / 1,779,044,963.65 = 0.1190867053
+- discounted cash and investments:
+  668,283,620.80 * 90% = 601,455,258.72
+  17,133,007.13 * 80% = 13,706,405.704
+  49,775,010.07 * 50% = 24,887,505.035
+  11,053,985.20 * 50% = 5,526,992.60
+  subtotal = 645,576,162.059
+- debt deducted at 100%:
+  short-term borrowings 267,089,134.23
+  current portion of long-term borrowings 56,091,972.22
+  current lease liabilities 4,276,563.81
+  long-term borrowings 114,000,000.00
+  non-current lease liabilities 10,510,357.92
+  total = 451,968,028.18
+- discounted detachable net cash = 645,576,162.059 - 451,968,028.18 = 193,608,133.879
+- discounted sustainable cash profit:
+  parent net profit 211,860,603.31
+  less non-recurring gain 20,730,483.04
+  plus depreciation and amortization 72,956,781.47
+  less all capital expenditure 97,475,252.86
+  result = 166,611,648.88
+- operating business price = 6,481,000,000 - 193,608,133.879 = 6,287,391,866.121
+- owner earnback years = 6,287,391,866.121 / 166,611,648.88 = 37.73680837
+- market cap / cash profit = 6,481,000,000 / 166,611,648.88 = 38.89884077
+- forecast dividend reference = 4,782,732.02 + 16,522,165.16 = 21,304,897.18
+- forecast dividend yield = 21,304,897.18 / 6,481,000,000 = 0.0032872855
+
+[judgment boundaries]
+- FACT: 2025 operating cash flow was 493.57m and management attributes the increase mainly to improved collection.
+- INFERENCE: 2025 free cash flow is not treated as sustainable because the improvement contains working-capital timing effects.
+- JUDGMENT: using all capex rather than estimated maintenance capex makes sustainable cash profit conservative.
+- FACT: restricted/non-cash-equivalent monetary funds totaled 112.45m; these were excluded from detachable cash.
+- JUDGMENT: 90%/80%/50% asset haircuts provide liquidity and operating buffers; all interest-bearing and lease debt is deducted at 100%.
+- FACT: company describes itself as a domestic line porcelain-insulator leader and a major supplier to the two grid companies.
+- LIMITATION: no independent market-share dataset was obtained, so industry position is not stated as independently proven.
+- LIMITATION: 2026 dividend is not committed; the 2025 aggregate dividend is only a mechanical reference.
+
+[output status]
+- outputs/result.json: protocol validated, data_quality.status=complete
+- outputs/report.md: completed
+- outputs/trace.txt: completed

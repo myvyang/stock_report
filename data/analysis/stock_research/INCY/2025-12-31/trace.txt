@@ -1,0 +1,60 @@
+stock-research trace
+company=INCY
+period=2025-12-31
+report_type=annual
+generated_for_input=2026-08-04T23:03:07+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, data-reuse.md.
+2. Initialized outputs/result.json with protocol CLI.
+3. Populated result fields using protocol CLI set/append commands.
+4. Validated outputs/result.json with protocol CLI: status=ok, errors=[] (first pass).
+5. Re-ran protocol validation after report and trace creation: status=ok, errors=[] (final pass).
+
+[reuse]
+- No local INCY annual facts, normalized facts, raw filing, or prior stock-research files were present under stock_report.
+- Fell back to primary public filings and company investor materials as required by the reuse policy.
+
+[primary_sources]
+- SEC 2025 Form 10-K, accession 0000879169-26-000010, filed 2026-02-10:
+  https://www.sec.gov/Archives/edgar/data/879169/000087916926000010/incy-20251231.htm
+- Incyte annual reports index:
+  https://investor.incyte.com/financials/annual-reports
+- PBOC/CFETS 2025-12-26 USD/CNY central parity (1 USD = 7.0358 CNY):
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- Market cap and PE: config/input.json, Yahoo Finance yfinance, date 2026-08-03.
+
+[model]
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Rationale: prescription drug sales, royalties, and milestones are ordinary operating revenue; cash and government securities are not customer/regulatory funds; no special financial-industry balance-sheet structure.
+
+[conversion]
+- All USD filing amounts converted at 7.0358 CNY/USD for protocol consistency.
+- This is a display/unification convention, not a claim that the same rate applied throughout 2025.
+
+[formulas]
+- gross_profit = revenue - cost_of_product_revenues
+- gross_margin = gross_profit / revenue = 0.9276186571
+- net_margin = parent_net_profit / revenue = 0.2502605402
+- operating_free_cash_flow = operating_cash_flow - capital_expenditure = CNY 9,530,912,789.8
+- sustainable_cash_profit = operating_free_cash_flow + one-time Novartis settlement cash paid - stock-based compensation
+  = CNY 9,851,287,942.8
+- discounted_net_cash = 80%*(cash + marketable securities) + 50%*long-term equity investments - finance leases - contingent consideration
+  = CNY 19,227,178,840.46
+- operating_business_price = market_cap - discounted_net_cash = CNY 144,252,794,717.3193
+- owner_earnback_years = operating_business_price / sustainable_cash_profit = 14.6430391188
+- market_cap_to_cash_profit = market_cap / sustainable_cash_profit = 16.5947817693
+- forecast_cash_dividend=0 because the issuer states it has never paid dividends and does not anticipate doing so in the foreseeable future.
+
+[judgments]
+- Kept all R&D expense as operating expense because it is necessary to maintain the pipeline and offset the 2028 Jakafi loss of exclusivity.
+- Added back the USD 294.881m cash settlement because it settles historically accrued disputed royalties and is not a recurring annual outflow.
+- Deducted USD 249.346m stock compensation from cash profit because it is a recurring shareholder dilution cost.
+- Applied liquidity haircuts and deducted financing-like obligations to avoid treating all cash as immediately distributable.
+
+[known_limitations]
+- No separate average 2025 USD/CNY rate was applied to income/cash-flow lines.
+- Input market capitalization and PE were reused, not independently reconstructed.
+- Sustainable cash profit is an analyst normalization, not management guidance.
+- Static earnback does not model the expected 2028 decline in Jakafi after loss of exclusivity.

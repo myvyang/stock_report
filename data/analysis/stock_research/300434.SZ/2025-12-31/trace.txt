@@ -1,0 +1,104 @@
+stock-research trace v1
+company=300434.SZ 金石亚药
+period=2025-12-31
+generated_context=2026-08-01 Asia/Shanghai
+
+[protocol]
+read .agents/skills/stock-research/SKILL.md
+read .agents/skills/stock-research/references/result-contract.md
+read .agents/skills/stock-research/references/report-contract.md
+read .agents/skills/stock-research/references/data-reuse.md
+initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+[reuse audit]
+No raw filing, annual facts, normalized facts, or prior stock-research result existed under the input paths.
+Only stock_report/data/notes/user_stock_evaluations.md existed; it was not needed for core facts and was not modified.
+
+[primary source acquisition]
+Downloaded official filing PDF:
+  title: 四川金石亚洲医药股份有限公司2025年年度报告全文
+  disclosure_date: 2026-04-24
+  url: https://static.cninfo.com.cn/finalpage/2026-04-24/1225159411.PDF
+  local: stock_report/data/raw/filings/300434.SZ/2025-12-31/2025-annual-report.pdf
+Extracted 240 pages to:
+  stock_report/data/raw/filings/300434.SZ/2025-12-31/2025-annual-report.txt
+Extraction used pypdf in temporary virtual environment because pdftotext was unavailable.
+
+[identity and audit]
+Stock code 300434; company 四川金石亚洲医药股份有限公司.
+Financial statement date 2025-12-31; report date 2026-04-24.
+Auditor: 立信会计师事务所（特殊普通合伙）.
+Opinion: standard unqualified opinion.
+
+[model determination]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: revenue arises from pharmaceuticals, health foods, machinery, and property rental; balance sheet contains ordinary cash, inventory, receivables, operating fixed assets and ordinary debt. No bank deposits/customer funds, insurance reserves, regulated presale cash, concession rights, or project-finance balance-sheet model was identified.
+
+[core facts: CNY]
+market_cap=3985000000.00 source=config/input.json/Tencent qt.gtimg.cn timestamp=20260731114321
+pe_ttm=21.57
+revenue=1038392561.70
+cost_of_sales=433160890.32
+gross_profit=605231671.38
+operating_profit=153491802.28
+net_profit=128624961.86
+parent_net_profit=131623122.10
+parent_net_profit_ex_nonrecurring=109729483.70
+operating_cash_flow=207890209.41
+capital_expenditure=99565961.73
+operating_free_cash_flow=108324247.68
+total_assets=3225205866.45
+total_liabilities=651417153.37
+total_equity=2573788713.08
+parent_equity=2551902328.29
+minority_interest=21886384.79
+
+[business facts]
+pharmaceutical_revenue=866797205.82, share=83.47%, gross_margin=65.02%
+machinery_revenue=145146520.54, share=13.98%, gross_margin=27.51%
+property_rental_and_management_revenue=26448835.34, share=2.55%
+respiratory_drug_revenue=658813940.04, share=63.44%, gross_margin=73.84%, yoy=-6.45%
+medical_product_sales_volume_yoy=-10.97%; production_yoy=+5.04%; inventory_volume_yoy=+18.14%
+
+[cash calculation]
+cash_and_cash_equivalents=297268417.85 at 100%=297268417.85
+trading_financial_assets=60343541.67 at 90%=54309187.503
+term_deposits_and_interest=53707848.33+40474473.75+50744166.67=144926488.75 at 100%
+interest_bearing_debt=68012583.33+7008458.33=75021041.66 deducted at 100%
+discounted_detachable_net_cash=297268417.85+54309187.503+144926488.75-75021041.66=421483052.443
+Excluded from detachable cash: restricted performance deposit 10050000; investment property; long-term equity investment; other non-current financial assets; goodwill; operating working capital and productive assets.
+
+[cash profit calculation]
+2025 adjusted earnings starting point=parent net profit ex nonrecurring=109729483.70
+cash conversion ceiling=operating cash flow-capex=207890209.41-99565961.73=108324247.68
+base=min(109729483.70,108324247.68)=108324247.68
+sustainability haircut=10% for declining revenue, respiratory/seasonal concentration, inventory build and rising construction in progress
+discounted_sustainable_cash_profit=108324247.68*0.90=97491822.912
+
+[valuation formulas]
+gross_margin=(1038392561.70-433160890.32)/1038392561.70=0.5828543979447884
+net_margin=131623122.10/1038392561.70=0.12675661108792396
+operating_business_price=3985000000-421483052.443=3563516947.557
+owner_earnback_years=3563516947.557/97491822.912=36.55195729362423
+market_cap_to_cash_profit=3985000000/97491822.912=40.87522297738775
+discounted_net_cash_to_market_cap=421483052.443/3985000000=0.10576739082634883
+
+[dividend]
+2025 proposal=0.82 yuan per 10 shares on 401743872 shares; total=32942997.50; no bonus shares/capitalization.
+At annual-report disclosure date, proposal still required shareholder approval.
+forecast_dividend_yield=32942997.50/3985000000=0.008266749686323713
+2024 dividend implemented in 2025: 0.69 yuan per 10 shares, cash out=27720327.16.
+
+[quality]
+status=complete
+limitations:
+- Industry position relies on company disclosure; no independent market-share figure was verified.
+- Dividend was still a proposal at annual-report disclosure.
+- Underlying detail for other non-current financial assets was limited, so all were excluded from detachable cash.
+- Static owner earnback excludes growth, working-capital release, property disposal and uncounted investment value.
+
+[validation]
+outputs/result.json populated only through protocol CLI set/append commands after protocol init.
+First completed validation: status=ok, errors=[]

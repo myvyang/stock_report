@@ -1,0 +1,49 @@
+stock-research trace
+company: 06693.HK / CHIFENG GOLD
+period: 2025-12-31 annual
+generated_at: 2026-08-04T23:09:25+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized result through protocol CLI
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+- No existing raw filing, annual facts, normalized facts, or prior stock-research result existed for 06693.HK / 2025-12-31.
+- Downloaded official HKEX annual report PDF:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0413/2026041300962.pdf
+- Local raw filing: stock_report/data/raw/filings/06693.HK/2025-12-31/annual-report-2025.pdf
+- Extracted text: stock_report/data/raw/filings/06693.HK/2025-12-31/annual-report-2025.txt
+
+4. Model verification
+- Input hint financial_brokerage was rejected.
+- Annual report identifies operating segments as domestic mining, overseas mining, and other resource recycling.
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+5. Core calculations (RMB)
+- gross_profit = 12,638,506,229.12 - 6,008,408,689.62 = 6,630,097,539.50
+- gross_margin = 6,630,097,539.50 / 12,638,506,229.12 = 0.5245950288
+- net_margin = 3,082,367,791.68 / 12,638,506,229.12 = 0.2438870335
+- operating_free_cash_flow = 5,555,589,287.50 - 2,327,035,602.77 = 3,228,553,684.73
+- parent-attributed FCF = 3,228,553,684.73 * 3,082,367,791.68 / 3,447,387,967.50 = 2,886,704,364.39
+- discounted_sustainable_cash_profit = 2,886,704,364.39 * 70% = 2,020,693,055.07
+- discounted_detachable_net_cash = 6,702,709,528.90 - 878,011,670.70 - 183,745,252.78 - 59,167,832.67 = 5,581,784,772.75
+- operating_business_price = 53,363,910,304.03 - 5,581,784,772.75 = 47,782,125,531.28
+- owner_earnback_years = 47,782,125,531.28 / 2,020,693,055.07 = 23.6464
+- market_cap_to_cash_profit = 53,363,910,304.03 / 2,020,693,055.07 = 26.4087
+- forecast_dividend_yield = 608,131,576.96 / 53,363,910,304.03 = 0.0113959
+
+6. Result construction and validation
+- Populated outputs/result.json only after protocol initialization, using protocol set commands.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+
+7. Key limitations
+- Market cap and PE were supplied by the task and not independently verified.
+- The 70% cycle haircut is an explicit analytical judgment, not company guidance.
+- All reported purchases of fixed/intangible/other long-term assets were treated as capital expenditure because sustaining and growth capex were not separately disclosed in a directly reconcilable cash-flow figure.

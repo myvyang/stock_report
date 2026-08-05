@@ -1,0 +1,53 @@
+stock-research trace
+task: 03990.HK, annual, period 2025-12-31
+generated_at: 2026-08-04T13:48:17+08:00
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+   - No annual facts package, normalized facts, prior stock-research result, or raw filing existed for 03990.HK/2025-12-31.
+   - Downloaded the official 2025 annual report from HKEX to stock_report/data/raw/filings/03990.HK/2025-12-31/annual-report-2025.pdf.
+   - Extracted a local text copy for deterministic review; no project dependency was added.
+
+3. Protocol operations
+   - Initialized outputs/result.json with:
+     PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   - Populated fields with repeated protocol `set` calls. The JSON was not authored from a blank object.
+
+4. Model verification
+   - Input hint `financial_brokerage` rejected.
+   - Annual report page 102 states the residential property-development business was distributed in specie on 2024-10-22.
+   - Continuing operations are project management, property management, commercial/industrial-park asset operation, and real-estate technology.
+   - Selected `ordinary_operating`; owner earnback marked `applicable` with investment properties excluded from detachable cash.
+
+5. Key audited facts used (RMB)
+   - Revenue 4,149,102,000; gross profit 1,365,358,000; operating profit 829,851,000.
+   - Net profit 575,689,000; parent net profit 559,303,000; core parent profit 601,040,000.
+   - Total assets 9,628,620,000; liabilities 4,592,849,000; parent equity 4,905,783,000.
+   - OCF 975,688,000; PP&E/intangible purchases 28,596,000; operating FCF 947,092,000.
+   - Cash equivalents 1,601,390,000; restricted cash 44,970,000; wealth products 216,918,000.
+   - Borrowings 591,920,000; lease liabilities 193,033,000; supplier finance 36,502,000.
+   - Investment properties 4,832,946,000; PrivateCo revenue 1,394,900,000.
+
+6. Derived calculations
+   - Gross margin = 1,365,358,000 / 4,149,102,000 = 32.91%.
+   - Net margin = 559,303,000 / 4,149,102,000 = 13.48%.
+   - Operating FCF = 975,688,000 - 28,596,000 = 947,092,000.
+   - Discounted net cash = cash 80% + wealth products 90% - borrowings - lease liabilities - supplier finance = 655,870,000.
+   - Sustainable cash profit = core parent profit 601,040,000 less 121,040,000 judgmental concentration/track-record discount = 480,000,000.
+   - Operating business price = 3,457,674,763.0149126 - 655,870,000 = 2,801,804,763.0149126.
+   - Owner earnback years = 2,801,804,763.0149126 / 480,000,000 = 5.8371.
+   - Market cap / cash profit = 3,457,674,763.0149126 / 480,000,000 = 7.2035.
+   - Forecast dividend uses HKD0.34/share x 1,435,411,483 shares and an implied 0.9103 CNY/HKD rate from 2025 actual dividend cash payments; approx. CNY444,360,000 and 12.85% of input market cap.
+
+7. Data limitations
+   - Input market capitalization was consumed as CNY under the protocol, but source currency/conversion details were not supplied.
+   - 2025 is the first full post-restructuring year, so normalized cash profit is a scenario rather than a long time-series result.
+   - Final dividend was recommended/declared in official filings; payment remains subject to stated approval conditions.
+
+8. Validation
+   - Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json

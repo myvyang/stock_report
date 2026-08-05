@@ -1,0 +1,77 @@
+stock-research trace
+company=02680.HK INNOVAX HLDGS
+requested_period=2025-12-31
+report_type=annual
+generated_for=2026-08-05 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields only through protocol `set` commands.
+5. Validated with protocol `validate` after report generation.
+
+[reuse_check]
+- No raw filing, annual facts package, normalized facts, prior research result, or matching files existed under the input stock_report paths.
+- /root/aicode sync target also contained no 02680.HK research files.
+- Consequently, official public disclosures were consulted.
+
+[period_resolution]
+- HKEX issuer title search confirms Innovax's annual reporting year ends on the last day of February.
+- No annual report exists for year ended 2025-12-31.
+- Latest audited annual report available by created_at is Annual Report 2025/26, year ended 2026-02-28, released 2026-06-25.
+- Used that annual report for the research story but retained input analysis.period=2025-12-31 and marked data_quality.status=partial with explicit period mismatch reason.
+
+[primary_sources]
+- HKEX issuer title search: https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=197952
+- Annual Report 2025/26: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0625/2026062500609.pdf
+- SAFE RMB central parity query: https://www.safe.gov.cn/AppStructured/hlw/RMBQuery.do
+- Valuation snapshot: config/input.json, Tencent qt.gtimg.cn, dated 2026/08/03 09:20:05.
+
+[source_pages]
+- Business and licences: annual report pp.5, 7-10.
+- Revenue change, costs, profit driver, liquidity: pp.11-12.
+- Dividend and post-period control/business disposal: pp.13-14, 23, 87, 125.
+- Key audit matter for margin financing receivable: p.61.
+- Profit and loss: p.64.
+- Financial position: p.65.
+- Cash flows: p.67.
+
+[currency]
+- Financial statements are in HKD thousands.
+- Converted statement amounts to CNY absolute yuan at 2026-02-27 central parity: HKD 1 = CNY 0.9203.
+- Input market cap was retained exactly as initialized by protocol. Input does not explicitly state its native currency or conversion method; this is a limitation.
+
+[model]
+- Confirmed statement_model=financial_brokerage from audited business facts.
+- owner_earnback_applicability=requires_special_model.
+- Ordinary discounted net cash, cash profit, operating business price, earnback years, and market-cap-to-cash-profit fields remain null as required by contract.
+- Gross profit/margin remain null because brokerage revenue has no comparable cost-of-sales/gross-margin construct.
+
+[key_raw_hkd_thousand]
+revenue=22696
+profit_continuing=9359
+profit_discontinued=2348
+profit_total_parent=11707
+realised_fvtpl_gain=29055
+unrealised_fvtpl_loss=1786
+total_assets=302766
+total_liabilities=104186
+total_equity_parent=198580
+cash_own=108668
+cash_held_for_customers=76900
+accounts_receivable=52753
+fvtpl_assets=10754
+held_for_sale_assets=50943
+accounts_payable=99639
+operating_cash_flow=8956
+capex=7
+financing_cash_flow=-325
+dividend=0
+
+[judgment_separation]
+- Fact: profit turned positive and realised FVTPL gain was HKD29.055m.
+- Inference: fee operations did not cover major staff and operating expenses without investment gains.
+- Judgment: reported PE and net margin have weak standalone interpretive value because earnings are cyclical and business scope changed after year-end.
+

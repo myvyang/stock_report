@@ -1,0 +1,82 @@
+stock-research trace
+generated_at=2026-08-03T10:54:49+08:00
+company=德源药业
+code=920735.BJ
+period=2025-12-31
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+mutation=all result.json research fields populated with protocol set commands
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse_check]
+annual_facts_json=missing
+annual_facts_md=missing
+annual_extraction_trace=missing
+normalized_facts_json=missing
+historical_stock_research_result=missing
+decision=no reusable local fact pack; retrieve public annual filing content and dividend announcement
+
+[source_1]
+title=江苏德源药业股份有限公司2025年年度报告
+public_page=https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=11983104&stockid=920735
+issuer_filing_status=audited annual report
+audit_opinion=unmodified
+audit_report=天健审〔2026〕173号
+used_for=business, products, revenue, costs, margins, expenses, balance sheet, cash flow, bank wealth management, customers, risks
+
+[source_2]
+title=江苏德源药业股份有限公司2025年年度权益分派实施公告
+public_page=https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12118882&stockid=920735
+announcement_no=2026-035
+used_for=forecast dividend amount, implemented dividend basis, share capital transfer
+
+[source_3]
+title=北京证券交易所新旧代码对照表
+public_page=https://www.bse.cn/service/code_mapping.html
+used_for=identity cross-check: 832735 maps to 920735 for 德源药业
+
+[source_4]
+title=config/input.json market snapshot
+provider=Tencent qt.gtimg.cn
+timestamp=20260731153802
+used_for=market_cap 3040000000, pe_ttm 12.36
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=chemical drug manufacturer with ordinary cash, receivables, inventory, production assets and trade liabilities; no special financial/contract-liability model
+
+[calculations]
+gross_profit=1057759831.41-168420428.69=889339402.72
+gross_margin=889339402.72/1057759831.41=0.8407763053
+net_margin=236929075.58/1057759831.41=0.2239913754
+operating_free_cash_flow=156667083.89-53224934.51=103442149.38
+discounted_cash_equivalents=97094952.86*0.50=48547476.43
+discounted_bank_wealth_management=531976083.33*0.90=478778475.00
+interest_and_lease_debt=8796215.61+813572.32+800305.31=10410093.24
+discounted_detachable_net_cash=48547476.43+478778475.00-10410093.24=516915858.19
+normalized_cash_profit=103442149.38+16557850.62=120000000.00
+operating_business_price=3040000000.00-516915858.19=2523084141.81
+owner_earnback_years=2523084141.81/120000000.00=21.0257011818
+market_cap_to_cash_profit=3040000000.00/120000000.00=25.3333333333
+forecast_dividend_yield=46926396.00/3040000000.00=0.0154363145
+
+[judgment_notes]
+cash_discount=only cash equivalents used; 50% retained for operating liquidity and guarantees
+wealth_management_discount=90% because self-funded bank products had no overdue or expected principal loss, but maturity/liquidity uncertainty remains
+cash_profit=starts from audited operating FCF; partial add-back reflects concentrated new-base transfer to fixed assets, while keeping normalized cash profit far below accounting profit
+industry_position=qualitative only because no official comparable market-share dataset was available
+
+[limitations]
+local raw filing and annual fact pack were absent
+core annual report figures were read from a public full-text transcription rather than a locally archived original BSE PDF
+normalized cash profit depends on judgment about expansion versus maintenance capex
+
+[final_validation]
+status=ok
+errors=[]

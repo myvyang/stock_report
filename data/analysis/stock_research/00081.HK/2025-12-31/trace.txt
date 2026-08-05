@@ -1,0 +1,58 @@
+stock-research trace
+task: 00081.HK / annual / 2025-12-31
+generated_at_context: 2026-08-03 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated initialized paths with protocol `set` commands; complex JSON was not drafted independently of the initialized protocol object.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[local reuse audit]
+- Expected raw filing metadata, annual facts JSON/Markdown, normalized facts and prior research paths from config/input.json did not exist in the workspace.
+- No prior annual fact pack or research result was reused.
+- The protocol-generated skeleton in outputs/result.json was retained and populated.
+
+[identity and model correction]
+- Input hint classified 00081.HK as financial_brokerage.
+- HKEX 2025 annual results, general information, identifies China Overseas Grand Oceans Group Limited and states that principal activities are property development and commercial property operations in Mainland China.
+- Overrode model to real_estate_developer / requires_special_model.
+- Ordinary detachable-net-cash and owner-earnback fields remain null as required by the contract.
+
+[primary sources]
+- HKEX title search for stock 00081:
+  https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=134
+- 2025 annual results announcement, released 2026-03-23:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0323/2026032300319.pdf
+- 2025 annual report, released 2026-04-27:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042700686.pdf
+- Market data: config/input.json, source recorded as Tencent qt.gtimg.cn, timestamp 2026/07/31 16:08:47.
+
+[extracted financial facts: CNY]
+- revenue 36,874,435,000; cost of sales 33,673,545,000; gross profit 3,200,890,000.
+- operating profit 1,528,672,000; net profit 549,331,000; parent net profit 304,658,000.
+- total assets 118,698,840,000; total liabilities 80,652,100,000; total equity 38,046,740,000.
+- parent equity 31,621,347,000; non-controlling interests 6,425,393,000.
+- property inventories 71,121,208,000; investment properties 5,594,312,000; cash and bank balances 26,864,619,000.
+- pre-sales proceeds 20,075,687,000; total interest-bearing borrowings and bonds 38,907,240,000.
+- net cash from operating activities 2,187,000,000 (annual report/annual-results highlight).
+- specified non-current-asset additions 7,859,000 used as protocol capex; property-development land and construction expenditure is inventory investment and is explicitly not represented by this capex field.
+- financing cash flow -2,644,000,000 from the 2025 annual report cash flow statement.
+
+[derived figures]
+- gross margin = 3,200,890,000 / 36,874,435,000 = 0.086801.
+- net margin = 304,658,000 / 36,874,435,000 = 0.008262.
+- minority interest ratio = 6,425,393,000 / 38,046,740,000 = 0.168882.
+- operating free cash flow = 2,187,000,000 - 7,859,000 = 2,179,141,000; not treated as sustainable distributable cash because land and development spending runs through inventory.
+- latest annual dividend run-rate = 112,649,000 / 7,502,220,380.087495 = 0.015015.
+- 2025 dividend: HK$0.035/share, RMB112,649,000, payout ratio about 36.0%.
+
+[quality and limitations]
+- status complete under the special-model minimum threshold.
+- Company identity, annual period, official financial statements, model, market data, dividend basis, asset/liability explanations and evidence are present.
+- Project-level restricted cash, realizable inventory values, remaining construction/tax costs and JV/NCI liquidation waterfalls are unavailable; therefore no ordinary owner-earnback number is produced.
+- PE TTM is preserved from input. It does not exactly reconcile to market cap divided by FY2025 parent profit, so no independent conclusion is based on that reconciliation.

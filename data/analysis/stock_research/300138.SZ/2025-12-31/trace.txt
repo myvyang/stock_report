@@ -1,0 +1,54 @@
+stock-research trace
+company=300138.SZ 晨光生物
+period=2025-12-31 annual
+generated_for_input=2026-08-01T03:53:18+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the skill routes reuse decisions through it.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated scalar and list fields only through protocol set/append commands.
+6. Validated result.json with protocol validate; final validation status recorded below.
+
+[reuse-check]
+Expected local annual facts, normalized facts, raw filing and historical stock-research outputs did not exist under /workspace/stock_report for this company/period.
+The matching /root/aicode synchronization paths also contained no reusable files.
+Decision: retrieve the official annual filing and extract only fields required for this research.
+
+[primary-source]
+Title: 晨光生物科技集团股份有限公司2025年年度报告全文
+Disclosure date: 2026-03-31
+Official URL: https://disc.static.szse.cn/disc/disk03/finalpage/2026-03-31/6790f2aa-be41-4aa6-9a6e-7b456f171f0e.PDF
+Local copy: stock_report/data/raw/filings/300138.SZ/2025-12-31/annual_report_2025.pdf
+PDF pages: 216
+Audit opinion: standard unmodified opinion, 中审众环, report date 2026-03-29.
+
+[model-review]
+Input tags described the company as pharmaceutical manufacturing. The annual report instead identifies natural plant extracts, cottonseed oil/protein and related products as the actual business.
+Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable because cash, inventories, production assets and bank debt are an ordinary manufacturing/processing structure.
+Important qualification: inventory and financing are intrinsic working-capital requirements, so they were not treated as detachable assets.
+
+[core-calculations]
+gross_profit = 6,559,043,728.38 - 5,699,727,242.87 = 859,316,485.51
+gross_margin = 859,316,485.51 / 6,559,043,728.38 = 13.1012%
+net_margin = 368,871,080.68 / 6,559,043,728.38 = 5.6239%
+operating_free_cash_flow = 212,906,968.99 - 135,256,502.92 = 77,650,466.07
+interest_bearing_debt = 4,111,440,576.11 + 958,590,796.20 + 50,000,000.00 + 931,739.05 = 5,120,963,111.36
+discounted_detachable_net_cash = 785,040,710.50*80% + 750,000,000*90% + 54,657,251.48*50% - 5,120,963,111.36 = -3,790,601,917.22
+operating_business_price = 5,599,000,000 - (-3,790,601,917.22) = 9,389,601,917.22
+sustainable_cash_profit bridge = 278,932,583.15 + 184,447,383.55 - 135,256,502.92 - 78,123,463.78 = 250,000,000.00
+owner_earnback_years = 9,389,601,917.22 / 250,000,000 = 37.5584
+market_cap_to_cash_profit = 5,599,000,000 / 250,000,000 = 22.3960
+forecast_dividend_yield = 144,930,027.90 / 5,599,000,000 = 2.5885%
+
+[judgment-boundaries]
+Facts: audited statement numbers, product/revenue mix, stated business model, dividend proposal and disclosed risks.
+Inference: 250 million yuan sustainable cash profit and every asset haircut. These are conservative research assumptions, not management guidance.
+Company statement requiring external caution: global/industry ranking of main products was disclosed by management and not independently audited.
+Market data limitation: market cap and PE were accepted from config/input.json and were not independently reconstructed.
+
+[final-validation]
+Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Expected status: ok, errors=[]

@@ -1,0 +1,84 @@
+stock-research trace
+company: 银都股份 (603277.SH)
+period: 2025-12-31
+generated_at_input: 2026-07-31T16:01:55+08:00
+
+1. Skill and contracts read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- config/input.json found.
+- No raw filing metadata, annual facts package, normalized facts, or prior stock-research result existed for 603277.SH/2025-12-31.
+- Returned to public filing sources as required by data-reuse protocol.
+
+3. Source retrieval
+- Primary filing identified: 银都餐饮设备股份有限公司2025年年度报告, disclosure date 2026-04-23.
+- Official SSE announcement URL identified:
+  https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-23/603277_20260423_53W7.pdf
+- Direct download in this environment returned a compressed interception/error payload rather than a valid PDF; it was not used as financial evidence.
+- Filing content was verified through the searchable full annual-report HTML:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12144046&stockid=603277
+- Market data reused from config/input.json: Tencent qt.gtimg.cn, timestamp 20260731114339.
+
+4. Model classification
+- statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- Reason: company manufactures and sells commercial catering refrigeration, western-kitchen and buffet equipment; balance sheet contains ordinary inventory, production assets, warehouse right-of-use assets, receivables, trade liabilities, borrowings, and leases. It is not a bank, broker, insurer, developer, construction contractor, concession utility, or holding platform.
+
+5. Core filing facts (CNY)
+- Revenue: 2,729,509,997.99
+- Cost of sales: 1,568,233,037.91
+- Gross profit calculated: 1,161,276,960.08
+- Gross margin calculated: 0.42545253944303535
+- Parent net profit: 486,699,611.41
+- Net margin calculated: 0.17831025047294338
+- Deducted non-recurring parent profit: 411,849,519.31
+- Operating cash flow: 435,457,732.45
+- Capex: 67,946,478.68
+- Operating free cash flow calculated: 367,511,253.77
+- Total assets: 4,247,695,726.26
+- Total liabilities: 1,397,766,513.86
+- Parent equity / total equity: 2,849,929,212.40
+- Cash: 396,079,292.14
+- Restricted cash: 41,572,902.93
+- Trading financial assets: 820,894,349.88
+- TMF carrying value: 206,415,189.22
+- Inventory: 1,074,904,449.53
+- Short-term borrowing: 241,414,921.01
+- Current non-current liabilities: 67,695,193.40
+- Long-term lease liabilities: 247,519,323.07
+- 2025 total dividend scenario: 429,589,513.50
+
+6. Owner earnback assumptions and calculations
+- Unrestricted cash: 396,079,292.14 - 41,572,902.93 = 354,506,389.21; discount 100%.
+- Trading assets excluding TMF: 820,894,349.88 - 206,415,189.22 = 614,479,160.66; discount 90% because full underlying assets, duration, and redemption constraints were not disclosed.
+- TMF: 206,415,189.22; discount 50% because it is a 3x leveraged long-duration Treasury ETF, not a cash equivalent.
+- Deduct short-term borrowing: 241,414,921.01.
+- Deduct current non-current liabilities plus lease liabilities: 67,695,193.40 + 247,519,323.07 = 315,214,516.47.
+- Discounted detachable net cash:
+  354,506,389.21 + 553,031,244.59 + 103,207,594.61
+  - 241,414,921.01 - 315,214,516.47
+  = 454,115,790.93.
+- Sustainable cash profit: 370,000,000.00, anchored to operating FCF 367,511,253.77 and below deducted non-recurring profit 411,849,519.31.
+- Market cap: 6,560,000,000.00.
+- Operating business price: 6,560,000,000.00 - 454,115,790.93 = 6,105,884,209.07.
+- Owner earnback years: 6,105,884,209.07 / 370,000,000.00 = 16.5023897542.
+- Market cap / cash profit: 6,560,000,000.00 / 370,000,000.00 = 17.7297297297.
+- Forecast dividend yield scenario: 429,589,513.50 / 6,560,000,000.00 = 0.0654862063.
+
+7. Protocol usage
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated initialized paths with repeated protocol set commands; complex JSON was not handwritten from a blank file.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before report creation: {"status":"ok","errors":[]}
+
+8. Known limitations
+- Official SSE PDF could not be decoded from the direct endpoint in this environment; searchable HTML of the same filing was used.
+- Non-TMF asset-management plan underlyings and redemption terms are incomplete.
+- 2026 dividend is not declared; forecast uses the 2025 RMB 0.70/share scenario.
+- No independent market-share evidence supports a numeric industry rank.

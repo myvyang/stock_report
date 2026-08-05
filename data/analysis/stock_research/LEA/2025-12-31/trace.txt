@@ -1,0 +1,77 @@
+stock-research trace
+company=LEA / Lear Corporation
+period=2025-12-31
+generated_for=2026-08-05 task
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely as requested.
+- Read references/data-reuse.md to apply the reuse boundary.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields only through protocol `set` commands; did not hand-write the JSON object.
+
+2. Local data reuse audit
+- Checked stock_report/data/analysis/annual_review/LEA/2025-12-31,
+  stock_report/data/raw/filings/LEA/2025-12-31, and
+  stock_report/data/normalized/facts/LEA/2025-12-31.
+- None of the referenced LEA annual facts, normalized facts, metadata, or raw filing files existed locally.
+- /root/aicode/stock_report also had no matching LEA/2025-12-31 files.
+- Therefore used primary online filings instead of fabricating or reusing absent facts.
+
+3. Primary sources used
+- SEC 2025 Form 10-K, accession 0000842162-26-000011, filed 2026-02-13:
+  https://www.sec.gov/Archives/edgar/data/842162/000084216226000011/lear-20251231.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/842162/000084216226000011/0000842162-26-000011-index.htm
+- Lear FY2025 official results release, 2026-02-04:
+  https://ir.lear.com/news-releases/news-release-details/lear-reports-fourth-quarter-and-full-year-2025-results
+- Lear quarterly dividend announcement, 2026-05-14:
+  https://www.lear.com/newsroom/lear-declares-quarterly-cash-dividend-25
+- China Foreign Exchange Trade System / PBOC-authorized 2025-12-31 midpoint as reproduced by Xinhua: USD/CNY 7.0288:
+  https://www1.xinhuanet.com/20251231/fe9f6466f6884589b5287e6ee946baed/c.html
+- Market cap, date, PE TTM, and Yahoo Finance yfinance attribution: config/input.json.
+
+4. Model determination
+- Confirmed ordinary_operating, owner_earnback applicable.
+- Reason: Lear manufactures seating and automotive electrical distribution/connection products for OEMs. Its balance sheet has ordinary manufacturing cash, receivables, inventory, PP&E, goodwill, trade payables, accruals, and corporate debt. No customer deposits, insurance reserves, regulated presale funds, concession rights, or similar special-model balance sheet structure was identified.
+
+5. Source figures (USD millions unless noted)
+- Balance sheet: assets 14,843.1; liabilities 9,642.1 (assets less equity); equity 5,201.0; Lear equity 5,035.1; NCI 165.9; cash 1,033.0; receivables 3,902.8; inventory 1,693.2; PP&E 2,913.1; goodwill 1,777.8; AP 3,416.5; accrued liabilities 2,219.0.
+- Debt: short-term borrowings 27.9 + current long-term debt 3.7 + long-term debt 2,711.5 = 2,743.1.
+- Income: revenue 23,259.1; cost of sales 21,754.7; gross profit 1,504.4; operating profit proxy 777.3 (gross profit less SG&A 707.6 and intangible amortization 19.5); consolidated net income 527.1; Lear net income 436.8.
+- Cash flow: CFO 1,088.8; capex 561.6; operating FCF 527.2; financing cash flow -618.5; Lear dividends 164.8; repurchases 325.2; NCI dividends 86.9.
+- Segments: Seating sales 17,283.0 / earnings 948.8; E-Systems sales 5,976.1 / earnings 186.2.
+- Restructuring: 2023 132.7; 2024 138.9; 2025 253.1. No add-back was made because the charges recur.
+
+6. Currency and formulas
+- All result.json monetary values are CNY absolute yuan.
+- Conversion used: 1 USD = CNY 7.0288 for all statement figures, explicitly disclosed as a comparability convention.
+- Gross margin = 1,504.4 / 23,259.1 = 0.0646800607.
+- Net margin = 436.8 / 23,259.1 = 0.0187797464.
+- Discounted detachable net cash = cash * 80% - all interest-bearing debt
+  = (1,033.0 * 0.8 - 2,743.1) USDm * 7.0288
+  = CNY -13,472,100,960.
+- Operating business price = market cap - discounted net cash
+  = 44,161,773,668.79785 - (-13,472,100,960)
+  = CNY 57,633,874,628.79785.
+- Sustainable cash profit = (2025 FCF 527.2 - NCI dividends 86.9) * 90% * 7.0288
+  = CNY 2,785,302,576.
+- Owner earnback years = 57,633,874,628.79785 / 2,785,302,576
+  = 20.6921413585.
+- Market cap / cash profit = 15.8552876981.
+- Forecast dividend = USD 0.77 * 4 * 50,646,747 year-end shares * 7.0288
+  = CNY 1,096,436,434.3658879; yield = 0.0248277264.
+
+7. Judgement boundaries
+- Fact: reported financial statement and segment amounts, announced dividend, FX midpoint, input market data.
+- Inference: ordinary operating model; cash 80% discount; deduction of NCI dividend; 10% sustainability haircut; no restructuring add-back.
+- Limitation: input market cap is dated 2026-08-03, about seven months after the financial statement date; PE TTM was not recomputed.
+- Limitation: use of one period-end FX rate for balance sheet, income, and cash-flow values differs from accounting translation using average rates.
+- No buy/sell recommendation, target price, or ranking label was produced.
+
+8. Validation
+- Final protocol command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation result: status=ok, errors=[].
+- Also parsed outputs/result.json with python3 -m json.tool and scanned all three outputs for placeholders and prohibited ranking/advice language; no issues found.

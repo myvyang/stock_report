@@ -1,0 +1,53 @@
+stock-research trace
+company: 01300.HK / TRIGIANT GROUP LIMITED（俊知集团有限公司）
+period: 2025-12-31 annual
+generated_at: 2026-08-03T16:36:18+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+- No annual facts, normalized facts, extraction trace, prior stock-research result, or raw filing metadata existed for this period.
+- Downloaded official HKEX annual report to stock_report/data/raw/filings/01300.HK/2025-12-31/annual-report-2025.pdf.
+
+4. Primary source
+- TRIGIANT GROUP LIMITED Annual Report 2025, published on HKEX 2026-04-22.
+- URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0422/2026042200774.pdf
+- Key pages: 95 (income statement), 96-97 (balance sheet), 99-100 (cash flow), 115-118 (business, segments, customers), 122 (dividend), 125-129 (inventory, receivables, borrowings), 135-139 (credit and liquidity risk).
+
+5. Model override
+- Input hint: financial_brokerage / requires_special_model.
+- Filing fact: manufacturer and seller of telecommunications cables and electronic components; no brokerage operating assets/liabilities.
+- Final model: ordinary_operating / applicable.
+
+6. Core calculations (RMB)
+- total_assets = 363,780,000 non-current assets + 5,041,160,000 current assets = 5,404,940,000.
+- total_liabilities = 5,404,940,000 - 3,612,512,000 equity = 1,792,428,000.
+- gross_margin = 282,165,000 / 2,638,523,000 = 0.1069405196.
+- net_margin = 105,176,000 / 2,638,523,000 = 0.0398617003.
+- operating_free_cash_flow = 537,998,000 - 9,005,000 = 528,993,000.
+- discounted_detachable_net_cash = 518,916,000 unrestricted cash + 0% x 137,444,000 pledged deposits - 1,561,569,000 borrowings - 993,000 lease liabilities = -1,043,646,000.
+- discounted_sustainable_cash_profit = 105,176,000 parent profit - 29,174,000 net ECL reversal = 76,002,000.
+- operating_business_price = 1,901,263,009.9058151 - (-1,043,646,000) = 2,944,909,009.905815.
+- owner_earnback_years = 2,944,909,009.905815 / 76,002,000 = 38.74715197.
+- market_cap_to_cash_profit = 1,901,263,009.9058151 / 76,002,000 = 25.01530275.
+- forecast_cash_dividend = 0; forecast_dividend_yield = 0 because the board recommended no 2025 final dividend and no contrary policy evidence was found.
+
+7. Judgment boundaries
+- Did not treat trade receivables as detachable cash: they are operationally required, highly concentrated and materially overdue.
+- Did not use reported operating FCF as sustainable distributable profit: 2025 cash generation included RMB477.537m increase in trade and other payables and supplier-finance effects.
+- Sustainable profit is a one-year normalized proxy, not a forecast; this limitation is recorded in result.json and report.md.
+
+8. Protocol writes
+- Used protocol set commands for analysis sources, analysis_model, metrics, financials, asset_analysis, owner_earnback, dividend, business, risks, evidence and data_quality.
+
+9. Final validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: {"status":"ok","errors":[]}
+- Additional checks confirmed ordinary_operating model, complete status, empty incomplete_reasons, and non-empty assets, liabilities and evidence.

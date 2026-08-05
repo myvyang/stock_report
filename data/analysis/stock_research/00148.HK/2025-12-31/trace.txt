@@ -1,0 +1,55 @@
+stock-research trace
+company: 建滔集团有限公司 / Kingboard Holdings Limited
+code: 00148.HK
+period: 2025-12-31
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked annual-review, normalized-facts and historical stock-research paths supplied in config/input.json.
+- No reusable fact pack or historical research output existed in the workspace for 00148.HK / 2025-12-31.
+- Downloaded the official 2025 annual report to stock_report/data/raw/filings/00148.HK/2025-12-31/annual-report-2025.pdf.
+
+3. Primary sources reviewed
+- HKEX 2025 annual report, published 2026-04-22:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0422/2026042201135.pdf
+  Reviewed financial highlights; chairman's business review; audited statements of profit or loss, financial position and cash flows; revenue note; segment revenue/results/assets/liabilities; property impairment disclosures.
+- HKEX annual results announcement, published 2026-03-16:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0316/2026031600343.pdf
+- PBOC HKD/CNY central parity, 2025-12-26: HKD 1 = CNY 0.90486:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- Market-cap snapshot supplied by config/input.json: Tencent qt.gtimg.cn, 2026-07-31 16:08:47.
+
+4. Model classification audit
+- Input hint classified the company as financial_brokerage.
+- Filing evidence shows subsidiaries manufacture and sell laminates, PCBs, chemicals and magnetic products, and operate property and investment businesses.
+- 2025 external revenue was dominated by laminates, PCBs and chemicals; no brokerage customer funds, securities underwriting, margin financing or repo funding model was identified.
+- Classification overridden to platform_financial_mixed because manufacturing is the revenue core while property and investment assets are material to consolidated assets and earnings.
+- Ordinary owner-earnback applicability set to requires_special_model. All ordinary owner-earnback sorting numbers remain null by contract.
+
+5. Currency and calculations
+- Filing presentation currency: HKD; protocol currency: CNY.
+- All filing amounts converted at HKD/CNY 0.90486. This period-end-near rate is a display convention, not a full IAS/HKAS foreign-currency translation.
+- Gross margin = 7,925,653 / 45,375,014 = 17.4670%.
+- Parent net margin = 4,401,609 / 45,375,014 = 9.7005%.
+- Operating free cash flow = operating cash flow HKD 4,738.794m - PP&E purchases HKD 2,806.064m = HKD 1,932.730m.
+- Dividend baseline = HKD 2.20/share * 1,108.31m shares * 0.90486 = CNY 2,206,303,850.52.
+- Forecast dividend yield = CNY 2,206,303,850.52 / CNY 37,830,694,749.10 = 5.8320%.
+
+6. Protocol population and validation
+- Populated result.json exclusively through protocol set commands after protocol initialization.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed validation status: ok, errors: [].
+
+7. Known limitations
+- No independent reconstruction of Tencent market capitalization from share price and current shares outstanding.
+- Dividend forecast repeats FY2025 declared payout, including a special dividend; it is not management guidance.
+- Annual report does not provide independently verifiable global market share.
+- Public annual data do not allow reliable separation of maintenance and growth capital expenditure or project-level property liquidation haircuts.

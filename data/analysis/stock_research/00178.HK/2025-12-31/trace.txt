@@ -1,0 +1,71 @@
+stock-research trace
+generated_at: 2026-08-03 Asia/Shanghai
+company: SA SA INTERNATIONAL HOLDINGS LIMITED (00178.HK)
+input_period: 2025-12-31
+valuation_as_of: 2026-07-31 16:08:44
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- No files were present under the configured raw filing, annual review, normalized facts, or prior stock research paths.
+- No prior result was reused.
+
+3. Result protocol
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All material result fields were populated through protocol set commands; the complex JSON object was not handwritten from scratch.
+
+4. Company and model verification
+- Official filing identifies the issuer as Sa Sa International Holdings Limited, a beauty product retailing group.
+- Operating assets are inventory, cash, property/equipment, store right-of-use assets, receivables and deposits.
+- Operating liabilities are trade/other payables, lease liabilities, tax and retirement obligations.
+- Overrode input hint financial_brokerage/requires_special_model with ordinary_operating/applicable.
+
+5. Period handling
+- Company fiscal year end is 31 March; input 2025-12-31 is not a statutory annual reporting date.
+- Because valuation is dated 2026-07-31 and the FY2025/26 annual report was published on 2026-07-24, primary statements use the latest complete year ended 2026-03-31.
+- Input period remains unchanged in the protocol result; limitation is disclosed in result.json and report.md.
+
+6. Primary sources
+- HKEX annual report 2025/26, released 2026-07-24:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0724/2026072400448.pdf
+- Annual results for year ended 2026-03-31, released 2026-06-25:
+  https://doc.irasia.com/listco/hk/sasa/annual/2026/res.pdf
+- Market capitalization and PE: config/input.json / Tencent qt.gtimg.cn snapshot.
+
+7. Currency and key calculations
+- Display currency required by protocol: CNY yuan.
+- Analytical translation rate: CNY 0.92 per HKD 1.00.
+- Revenue: HKD 4,382.600m x 0.92 = CNY 4,031.992m.
+- Gross profit: HKD 1,674.617m x 0.92 = CNY 1,540.64764m.
+- Parent net profit: HKD 200.490m x 0.92 = CNY 184.4508m.
+- Gross margin: 1,674.617 / 4,382.600 = 38.2106%.
+- Net margin: 200.490 / 4,382.600 = 4.5747%.
+- Economic operating cash flow: disclosed cash generated from operations after lease liability and interest payments, HKD 267.3m x 0.92 = CNY 245.916m.
+- Capex: HKD 52.467m x 0.92 = CNY 48.26964m.
+- Economic operating free cash flow: CNY 197.64636m.
+
+8. Owner earnback assumptions
+- Cash/time deposits starting balance: HKD 504.8m.
+- Retain HKD 200m minimum operating cash.
+- Deduct proposed final and special dividend of HKD 164.469m.
+- Apply 10% haircut to residual detachable cash.
+- Discounted detachable net cash: CNY 116.1684m.
+- Sustainable cash profit: HKD 120m x 0.92 = CNY 110.4m.
+- Operating business price: CNY 2,456.0962918m - CNY 116.1684m = CNY 2,339.9278918m.
+- Owner earnback: 2,339.9278918 / 110.4 = 21.195 years.
+- Market cap/cash profit: 2,456.0962918 / 110.4 = 22.247 years.
+
+9. Dividend baseline
+- FY2025/26 dividend: HKD 200.156m, including a special dividend.
+- CNY forecast/base amount: 200.156m x 0.92 = CNY 184.14352m.
+- Yield on input market cap: 184.14352 / 2,456.0962918 = 7.4974%.
+- Limitation: special dividend should not be assumed recurring.
+
+10. Validation
+- Protocol validation run after population.
+- Final output checks run for result.json, report.md and trace.txt.

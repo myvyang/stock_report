@@ -1,0 +1,58 @@
+stock-research trace
+task: 02111.HK / BEST PACIFIC
+period: 2025-12-31 annual
+generated_at: 2026-08-04T14:42:15+08:00
+
+1. Read instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- No existing annual facts, normalized facts, raw filing metadata, or prior stock-research result was found under the input paths.
+- Therefore fetched the official 2025 annual report from HKEX.
+
+3. Primary sources
+- HKEX annual report URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042802559.pdf
+- Local copy: stock_report/data/raw/filings/02111.HK/2025-12-31/annual-report-2025.pdf
+- PBOC HKD/CNY central parity, 2025-12-26: 1 HKD = 0.90486 CNY.
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, 2026/08/03 09:32:34.
+
+4. Model decision
+- Input hint financial_brokerage rejected.
+- Annual report pp.24 and 152-155 identifies manufacturing/trading of elastic fabric, lace and elastic webbing.
+- Selected ordinary_operating; owner earnback applicability = applicable.
+
+5. Statement extraction (HKD'000; annual report pages)
+- P106: revenue 5,020,877; cost 3,683,724; gross profit 1,337,153; PBT 632,232; net profit 567,610; parent profit 551,358.
+- P107-108: total assets 6,662,882; liabilities 2,774,626; total equity 3,888,256; parent equity 3,784,692; NCI 103,564.
+- P111-112: OCF 1,107,828; PP&E additions 417,261; prepaid land lease 78,114; financing CF -646,658; dividends paid 295,409.
+- FCF calculation: 1,107,828 - 417,261 - 78,114 = 612,453 HKD'000.
+- Operating profit proxy: PBT 632,232 + finance costs 85,818 - JV result 4,241 = 713,809 HKD'000.
+
+6. Currency normalization
+- All statement amounts multiplied by 1,000 and by 0.90486 to CNY absolute yuan.
+- Limitation: one near-year-end rate used for both stock and flow items.
+
+7. Owner earnback assumptions
+- Cash: CNY 938,604,039.12, discount 80% = 750,883,231.296.
+- Pledged deposit: CNY 81,668,139.30, discount 0%.
+- Bank/other borrowings: CNY 1,244,612,308.50, deducted 100%.
+- Discounted detachable net cash = -493,729,077.204.
+- Sustainable cash profit = parent profit CNY 498,901,799.88 x 80% = 399,121,439.904.
+- Operating business price = 2,182,692,950.3721 - (-493,729,077.204) = 2,676,422,027.5761.
+- Owner earnback = 2,676,422,027.5761 / 399,121,439.904 = 6.7057836538 years.
+- Market cap / cash profit = 5.4687439264.
+- Reason for haircut: 2025 OCF benefited from working-capital release; revenue and parent profit declined; announced expansion requires cash.
+
+8. Dividend
+- 2025 interim 12.5 HK cents + final 14 HK cents = 26.5 HK cents/share.
+- Approx. 1.0398bn shares x HKD 0.265 x 0.90486 = CNY 249,331,458.42.
+- Yield vs input market cap = 11.42311191%.
+
+9. Protocol operations
+- Initialized with: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated by protocol set commands in outputs/populate.sh; result.json was not hand-written from scratch.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].

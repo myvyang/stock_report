@@ -1,0 +1,45 @@
+stock-research trace
+company=MTB / M&T Bank Corporation
+period=2025-12-31
+generated_for_task=2026-08-05 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- Checked configured annual facts, normalized facts, raw filing metadata, and prior stock-research paths.
+- No reusable MTB files were present under the configured stock_report paths.
+- Returned to first-party public sources.
+
+3. Primary sources used
+- SEC 2025 Form 10-K, accession 0000036270-26-000010, filed 2026-02-18.
+  https://www.sec.gov/Archives/edgar/data/36270/000003627026000010/mtb-20251231.htm
+- M&T Q4/full-year 2025 earnings release, dated 2026-01-16.
+  https://ir.mtb.com/node/40906
+- M&T Q2 2026 results, dated 2026-07-15, used only for latest capital/share context before valuation date.
+  https://ir.mtb.com/news-releases/news-release-details/mt-bank-corporation-nysemtb-announces-second-quarter-2026
+- M&T Q2 2026 dividend declaration, dated 2026-04-21.
+  https://ir.mtb.com/news-releases/news-release-details/mt-bank-corporation-announces-second-quarter-dividends
+- Federal Reserve G.5A 2025 annual FX rate: CNY 7.1875 per USD.
+  https://www.federalreserve.gov/releases/g5a/current/
+- Market cap, date, source and PE TTM reused from config/input.json.
+
+4. Model decision
+- Input hint ordinary_operating/applicable was overridden.
+- Confirmed financial_bank/not_applicable because loans, securities, deposits and wholesale funding are operating assets/liabilities.
+- All ordinary owner-earnback sortable fields remain null.
+
+5. Key transformations
+- USD financial statement amounts converted to CNY at 7.1875 for protocol consistency.
+- Forecast dividend = USD 1.50 quarterly * 4 * 146.758m latest average diluted shares * 7.1875 = CNY 6,328,938,750.
+- Forecast dividend yield = CNY 6,328,938,750 / CNY 240,873,552,065.63672 = 0.02627494258180491.
+- 2025 common dividend history estimated from USD 5.70 per share and 158.791m average diluted shares.
+- No target price, buy/sell recommendation, or ordinary cash-payback number produced.
+
+6. Protocol operations
+- Initialized outputs/result.json using protocol init.
+- Populated fields using protocol set and evidence using protocol append.
+- Final validation executed after report and trace creation.

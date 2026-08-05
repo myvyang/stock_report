@@ -1,0 +1,66 @@
+stock-research trace
+company=603390.SH 通达电气
+period=2025-12-31 annual
+generated_for=2026-08-01 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the skill defines reuse boundaries.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields using repeated protocol `set` commands; the JSON was not written from a hand-built complex object.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse-check]
+The input-referenced annual facts, normalized facts, filing metadata, and prior stock-research outputs were absent under stock_report/. No existing annual fact pack could be reused.
+
+[primary-source-retrieval]
+Downloaded the official 2025 annual-report PDF mirrored by CNINFO to:
+stock_report/data/raw/filings/603390.SH/2025-12-31/2025-annual-report.pdf
+Source URL: https://dataclouds.cninfo.com.cn/shgonggao/hsomarket/2026/20260422/622102a740d44d1a978b4b651cf1e026.PDF
+Converted the 215-page PDF to searchable text at the same location using pypdf in a temporary virtual environment.
+Report identity: 广州通达汽车电气股份有限公司2025年年度报告; disclosed 2026-04-23; audit report 天健审〔2026〕7-480号; period ended 2025-12-31.
+
+[source-locations]
+Annual report pp.9-10: three-year revenue, parent net profit, deducted parent net profit, OCF, assets and parent equity.
+Annual report pp.14-19: products, customers, operating model and industry position.
+Annual report pp.27-31: income/cost analysis, product revenue and margins, customer concentration.
+Annual report pp.33-35: asset changes, restrictions and operating risks.
+Annual report pp.56-57: 2024/2025 dividend implementation and proposal.
+Annual report pp.88-91: consolidated balance sheet.
+Annual report pp.93-95: consolidated income statement.
+Annual report pp.96-98: consolidated cash-flow statement and capital expenditure.
+Annual report notes pp.178-180: OCF reconciliation and cash restrictions.
+config/input.json: market cap CNY 3,369,000,000, timestamp 20260731114323, Tencent qt.gtimg.cn, PE TTM 25.85.
+
+[calculations]
+gross_profit = 1,013,435,535.20 - 717,167,093.31 = 296,268,441.89
+gross_margin = 296,268,441.89 / 1,013,435,535.20 = 0.2923406883
+net_margin = 85,218,551.13 / 1,013,435,535.20 = 0.0840887735
+total_equity = 2,083,070,320.23 - 434,364,862.03 = 1,648,705,458.20
+minority_interest = 1,648,705,458.20 - 1,647,084,193.18 = 1,621,265.02
+operating_free_cash_flow = 61,929,591.10 - 51,137,344.09 = 10,792,247.01
+
+discounted cash:
+  unrestricted cash 422,472,664.71 * 50% = 211,236,332.36
+  trading financial assets 5,427,710.59 * 50% = 2,713,855.30
+  long-term investments 93,572,871.39 * 0% = 0
+  less interest-bearing debt 73,304,091.72 * 100% = -73,304,091.72
+  discounted detachable net cash = 140,670,095.93
+
+discounted sustainable cash profit:
+  parent net profit = 85,218,551.13
+  deducted parent net profit = 79,405,082.06
+  final estimate = 60,000,000.00 after cash-conversion/cycle haircut
+Rationale: 2025 OCF was CNY 61.93m and FCF CNY 10.79m, while receivables expanded sharply. The estimate allows partial working-capital reversal but does not capitalize the high-growth year's full accounting profit.
+
+operating_business_price = 3,369,000,000.00 - 140,670,095.93 = 3,228,329,904.07
+owner_earnback_years = 3,228,329,904.07 / 60,000,000.00 = 53.8054984
+market_cap_to_cash_profit = 3,369,000,000.00 / 60,000,000.00 = 56.15
+forecast_dividend_yield = 38,681,718.24 / 3,369,000,000.00 = 0.0114816617
+
+[quality]
+status=complete
+Core figures are audited annual-report values. Market data is an input snapshot rather than audited information. Haircuts and sustainable cash profit are explicit estimates and are sensitive to collections, order mix, and capital expenditure.

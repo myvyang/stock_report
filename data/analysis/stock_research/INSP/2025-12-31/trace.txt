@@ -1,0 +1,105 @@
+INSP stock-research trace
+generated_for_period=2025-12-31
+valuation_date=2026-08-03
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated initialized paths with protocol set commands; result.json was not authored as a monolithic handwritten JSON object.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse_audit]
+No raw filing, annual facts package, normalized facts package, or prior INSP stock-research output existed under the paths supplied in config/input.json. Research therefore returned to the official filing and investor-relations releases.
+
+[primary_sources]
+SEC FY2025 Form 10-K, filed 2026-02-13:
+https://www.sec.gov/Archives/edgar/data/1609550/000160955026000016/insp-20251231.htm
+
+Inspire FY2025 results, dated 2026-02-11:
+https://investors.inspiresleep.com/news/news-details/2026/Inspire-Medical-Systems-Inc--Announces-Fourth-Quarter-and-Full-Year-2025-Financial-Results/default.aspx
+
+Inspire Q1 2026 results and revised guidance, dated 2026-05-04:
+https://investors.inspiresleep.com/news/news-details/2026/Inspire-Medical-Systems-Inc--Announces-First-Quarter-2026-Financial-Results-and-Updates-2026-Guidance/default.aspx
+
+PBOC/CFETS RMB central parity announcement index and official exchange-rate material:
+https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/17105-1.html
+
+[currency_conversion]
+Reporting currency in filing: USD.
+Result-contract currency: CNY absolute yuan.
+Conversion rate used for every filing amount: 1 USD = 7.0288 CNY, 2025-12-31 central parity.
+Conversion formula: USD millions * 1,000,000 * 7.0288.
+Market cap was already supplied in CNY and was not converted.
+
+[model_confirmation]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: company sells implantable medical devices to hospitals and ASCs. Balance sheet consists principally of cash, marketable debt investments, receivables, inventory, property/equipment, deferred tax assets, operating payables/accruals, and lease obligations. No customer funds, regulated deposits, insurance reserves, property project cash, concession assets, or similar special-model items were identified.
+
+[source_financials_usd_thousands]
+total_assets=907317
+total_liabilities=126157
+total_equity=781160
+parent_equity=781160
+minority_interest=0
+revenue=911981
+cost_of_sales=133225
+gross_profit=778756
+operating_profit=50954
+net_profit=145422
+parent_net_profit=145422
+operating_cash_flow=116976
+capital_expenditure=38499
+operating_free_cash_flow=78477
+financing_cash_flow=-183449
+cash_buybacks=175019
+
+[formula_checks]
+gross_margin = 778756 / 911981 = 0.8539169127426997
+net_margin = 145422 / 911981 = 0.15945726939486676
+operating_free_cash_flow = 116976 - 38499 = 78477 USD thousand
+
+[discounted_net_cash]
+Cash: USD 104.813m * 80% = USD 83.8504m.
+Short-term investments: USD 203.455m * 95% = USD 193.28225m.
+Long-term investments: USD 96.330m * 90% = USD 86.697m.
+Less non-current operating lease liability: USD 29.998m * 100%.
+Discounted detachable net cash = USD 333.83165m * 7.0288 = CNY 2,346,435,901.52.
+No accounts receivable, inventory, deferred tax assets, strategic investments, property/equipment, or ROU assets were treated as detachable cash.
+
+[sustainable_cash_profit]
+Reported net income was rejected as the sustainable base because FY2025 tax benefit included USD 88.749m release of deferred-tax valuation allowance.
+Base operating cash profit = operating income USD 50.954m * (1 - normalized tax rate 25%) = USD 38.2155m.
+Cash investment income excluded to avoid double-counting assets already deducted through discounted net cash.
+Stock-based compensation of USD 130.259m was not added back because dilution or offsetting repurchases are an economic shareholder cost.
+Maintenance capex assumption: depreciation/amortization approximates maintenance capex, so net D&A/maintenance adjustment is zero. FY2025 total capex remains reported separately.
+2026 reimbursement/coding/WISeR uncertainty haircut = 30%, supported by May 2026 guidance for revenue decline of 4%-10% and adjusted operating margin of 2%-4%.
+Discounted sustainable cash profit = USD 38.2155m * 70% * 7.0288 = CNY 188,026,374.48.
+
+[earnback]
+market_cap=CNY 9,762,388,169.008667
+operating_business_price = 9,762,388,169.008667 - 2,346,435,901.52 = 7,415,952,267.488667
+owner_earnback_years = 7,415,952,267.488667 / 188,026,374.48 = 39.44102144179505
+market_cap_to_cash_profit = 9,762,388,169.008667 / 188,026,374.48 = 51.92031275403373
+discounted_net_cash_to_market_cap = 2,346,435,901.52 / 9,762,388,169.008667 = 0.24035470224067843
+
+[dividend]
+forecast_cash_dividend=0
+forecast_dividend_yield=0
+Basis: the 10-K states the company has never declared or paid cash dividends and does not anticipate doing so for the foreseeable future. Repurchases were not classified as dividends.
+
+[valuation_input]
+market_cap=CNY 9,762,388,169.008667
+market_cap_date=2026-08-03
+pe_ttm=11.411364
+source=Yahoo Finance yfinance, as supplied in config/input.json
+No independent market-price or share-count reconstruction was performed.
+
+[limitations]
+- Income-statement and cash-flow amounts use the period-end FX rate rather than annual average rates; this is a protocol presentation conversion, not company-reported CNY accounting.
+- Normalized tax rate, maintenance-capex proxy, cash haircuts, and operating-profit discount are analyst assumptions.
+- Q1 2026 guidance is used only to test FY2025 sustainability and does not alter FY2025 reported statement values.
+- Owner earnback is highly sensitive to reimbursement resolution, operating leverage, stock-compensation treatment, and maintenance capex.

@@ -1,0 +1,88 @@
+stock-research trace
+company: 常润股份 (603201.SH)
+period: 2025-12-31 annual
+generated_at: 2026-07-31T18:08:24+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated scalar/object fields with protocol set and list fields with protocol append.
+4. Final validation command and result recorded below.
+
+[reuse decision]
+- No annual facts package, normalized facts, raw filing metadata, or prior stock research output existed for 603201.SH/2025-12-31.
+- Downloaded official-disclosure copy of the 2025 annual report from CNINFO:
+  https://static.cninfo.com.cn/finalpage/2026-04-23/1225153003.PDF
+- Local evidence file:
+  stock_report/data/raw/filings/603201.SH/2025-12-31/annual_report_2025.pdf
+- PDF has 237 pages. Text was extracted in an isolated temporary Python venv using pypdf because pdftotext was unavailable. The temporary environment was outside the workspace and did not alter project dependencies.
+
+[model decision]
+- statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- Basis: revenue comes from manufacturing and selling automotive maintenance equipment/tools and OEM automotive parts. Cash, receivables, inventory, factories, equipment, supplier payables and borrowings have ordinary operating-company substance. No customer deposits, insurance reserves, regulated presale cash, concession rights, or investment-holding structure identified.
+
+[core reported facts]
+- revenue: 3,053,020,151.69
+- cost_of_sales: 2,342,194,631.16
+- gross_profit: 710,825,520.53
+- parent_net_profit: 215,720,208.97
+- operating_cash_flow: 324,935,005.40
+- capital_expenditure: 191,887,106.72
+- operating_free_cash_flow: 133,047,898.68
+- total_assets: 3,069,495,066.56
+- total_liabilities: 1,251,983,383.80
+- total_equity: 1,817,511,682.76
+- parent_equity: 1,774,800,909.45
+- minority_interest: 42,710,773.31
+- Source: 2025 annual report, consolidated statements, pages 88-97.
+
+[derived margins]
+- gross_margin = (3,053,020,151.69 - 2,342,194,631.16) / 3,053,020,151.69 = 0.2328269992
+- net_margin = 215,720,208.97 / 3,053,020,151.69 = 0.0706579709
+
+[discounted detachable net cash]
+- unrestricted cash = 582,164,384.34 - 20,660,912.48 = 561,503,471.86
+- discounted unrestricted cash = 561,503,471.86 * 0.80 = 449,202,777.49
+- discounted trading financial assets = 131,693,513.90 * 0.90 = 118,524,162.51
+- interest-bearing and lease debt = 346,211,803.42 + 10,065,934.30 = 356,277,737.72
+- discounted_detachable_net_cash = 449,202,777.49 + 118,524,162.51 - 356,277,737.72 = 211,449,202.28
+- Cash source: annual report notes VII.1, VII.2, VII.31, pages 138 and 179-180.
+
+[sustainable cash profit]
+- 2025 FCF = 324,935,005.40 - 191,887,106.72 = 133,047,898.68
+- 2024 FCF = 327,133,609.20 - 168,016,203.58 = 159,117,405.62
+- two-year average = 146,082,652.15
+- discounted_sustainable_cash_profit = 145,000,000.00 (rounded down)
+- Reason: maintenance capex is not separately disclosed; using two-year total-capex FCF is conservative relative to reported parent profit but still uncertain during Thailand expansion.
+
+[earnback]
+- market_cap = 2,890,000,000.00 (Tencent qt.gtimg.cn snapshot 2026-07-31 11:43:36, supplied input)
+- operating_business_price = 2,890,000,000.00 - 211,449,202.28 = 2,678,550,797.72
+- owner_earnback_years = 2,678,550,797.72 / 145,000,000.00 = 18.4727641
+- market_cap_to_cash_profit = 2,890,000,000.00 / 145,000,000.00 = 19.9310345
+- discounted_net_cash_to_market_cap = 211,449,202.28 / 2,890,000,000.00 = 0.0731658140
+
+[dividend]
+- 2025 interim cash dividend already paid: 10,828,844.15
+- 2025 final proposed cash dividend: 55,094,119.38
+- forecast total: 65,922,963.53
+- forecast yield = 65,922,963.53 / 2,890,000,000.00 = 0.0228107140
+- Caveat: final proposal still required shareholder approval at annual-report publication.
+
+[quality notes]
+- Annual report audited with an unmodified opinion by RSM China (容诚会计师事务所).
+- Market quote was not independently reconciled to an exchange close.
+- Industry-position claims are company disclosures without independent market-share verification.
+- Owner cash discounts and sustainable cash profit are analytical estimates, not reported GAAP figures.
+
+[validation]
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status: ok
+errors: []
+
+[final consistency check]
+- outputs/result.json parses as valid JSON.
+- Protocol validation passed after final field correction.
+- Report and result use the same market cap, margins, dividend forecast, discounted net cash, sustainable cash profit, operating business price, and earnback figures.

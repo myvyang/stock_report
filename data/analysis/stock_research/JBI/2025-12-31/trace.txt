@@ -1,0 +1,49 @@
+Stock research trace — JBI — 2025
+
+1. Read and applied:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse check:
+   - config/input.json was present.
+   - All referenced local raw filing, annual facts, normalized facts, and prior stock-research paths were absent.
+   - Therefore no local annual fact pack or prior research result could be reused.
+
+3. Primary-source retrieval:
+   - SEC 2025 Form 10-K: https://www.sec.gov/Archives/edgar/data/1839839/000183983926000006/jbi-20260103.htm
+   - SEC accession: 0001839839-26-000006; filed 2026-03-04; actual fiscal year ended 2026-01-03.
+   - SEC inline XBRL instance: jbi-20260103_htm.xml.
+   - Federal Reserve H.10 CNY per USD on 2025-12-31: 6.9931.
+   - Valuation snapshot was supplied by config/input.json: market cap CNY 4,721,531,002.6744995 on 2026-08-03; PE TTM 17.1; source Yahoo Finance yfinance.
+
+4. Model decision:
+   - Confirmed ordinary_operating / applicable.
+   - JBI manufactures building components and supplies installation/project services. Cash, receivables, inventory, PP&E, goodwill/intangibles, operating liabilities, and financing debt have ordinary operating-company meanings.
+
+5. Financial extraction (USD millions, before translation):
+   - Assets 1,305.0; liabilities 732.5; equity attributable to parent 572.5; NCI 0.
+   - Revenue 884.2; cost of revenue 541.2; gross profit 343.0; operating income 111.5; net income attributable to common shareholders 53.8.
+   - CFO 139.5; capex 25.5; operating FCF 114.0; financing cash flow -69.4; share repurchases 15.9; cash dividends 0.
+   - Cash 194.4; current plus long-term debt 545.7.
+   - All result.json financial amounts translated at 6.9931 CNY/USD.
+
+6. Owner earnback assumptions:
+   - Cash receives 100% weight.
+   - Current and long-term interest-bearing debt is deducted at 100%.
+   - Discounted detachable net cash = (194.4 - 545.7) USDm × 6.9931 = CNY -2,456,676,030.
+   - Operating business price = market cap - discounted net cash = CNY 7,178,207,032.6744995.
+   - Operating FCF = (139.5 - 25.5) USDm × 6.9931 = CNY 797,213,400.
+   - Deducted FY2025 stock compensation of USD 16.2m (CNY 113,288,220) as an owner dilution cost.
+   - Discounted sustainable cash profit = CNY 683,925,180.
+   - Owner earnback years = 10.4956027978; market cap / cash profit = 6.9035782579.
+
+7. Dividend forecast:
+   - Forecast cash dividend = 0; yield = 0.
+   - Basis: 10-K states no cash dividends have been paid and none are anticipated in the foreseeable future; credit facilities also impose restrictions.
+
+8. Protocol operations:
+   - Initialized outputs/result.json with protocol CLI init.
+   - Populated fields with protocol CLI set calls from populate_result.py; the JSON was not hand-written from scratch.
+   - Final validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   - Final validation status: ok; errors: [].

@@ -1,0 +1,80 @@
+stock-research trace
+company: 浙江科马摩擦材料股份有限公司 (920086.BJ)
+period: 2025-12-31 annual
+generated_at_input: 2026-08-03T11:06:06+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated result fields using protocol set commands; did not construct result.json directly.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   validation result: status=ok, errors=[]
+
+[reuse check]
+- Expected raw filing and annual fact paths from config/input.json were absent in this workspace.
+- No prior annual facts, normalized facts, or stock research result was available for reuse.
+- Returned to public filing sources for the missing core facts.
+
+[source retrieval]
+- Primary filing analyzed: 科马材料：2025年年度报告, announcement date 2026-04-23, 202 pages.
+- Filing download URL used for review:
+  https://file.finance.sina.com.cn/211.154.219.97%3A9494/MRGG/CNSEBJ_STOCK/2026/2026-4/2026-04-23/12164351.PDF
+- The annual report states that the exchange disclosure site is www.bse.cn and identifies the issuer, report period, auditor, and standard unqualified opinion.
+- Code history cross-check: company disclosed that the former NEEQ code 874308 changed to BSE code 920086 before listing; company identity matched.
+- Market cap and PE TTM were reused from config/input.json as instructed: Tencent qt.gtimg.cn snapshot at 20260731153759.
+
+[key filing facts]
+- Revenue: 276,258,289.12
+- Cost of sales: 137,838,422.59
+- Gross profit: 138,419,866.53
+- Parent net profit: 89,715,673.48
+- Total assets: 729,924,637.00
+- Total liabilities: 81,461,053.58
+- Total equity: 648,463,583.42
+- Parent equity: 648,316,923.67
+- Operating cash flow: 73,820,064.43
+- Capital expenditure cash out: 8,846,801.40
+- Operating free cash flow: 64,973,263.03
+- Cash: 63,830,207.56
+- Restricted cash: 2,838,351.21
+- Current portion of non-current assets: 32,827,356.19
+- Debt investments: 82,841,137.01
+- IPO net proceeds after period end: 206,168,000.00
+- Proposed 2025 annual cash dividend after period end: 41,840,000.00
+
+[model decision]
+- statement_model=ordinary_operating
+- owner_earnback_applicability=applicable
+- Reason: manufacturing and direct-sale model; assets are production equipment, land, inventory, receivables, and corporate cash. No bank deposits from customers, insurance reserves, regulated presale cash, project advances, concession rights, or holding-company look-through structure.
+- Special time handling: 2025 balance sheet predates the 2026 IPO, while the valuation is post-IPO. IPO net proceeds and the annual dividend were modeled as explicit post-balance-sheet adjustments.
+
+[calculations]
+- gross_margin = 138,419,866.53 / 276,258,289.12 = 0.50105887
+- net_margin = 89,715,673.48 / 276,258,289.12 = 0.32475139
+- operating_free_cash_flow = 73,820,064.43 - 8,846,801.40 = 64,973,263.03
+- normalized sustainable cash profit = 62,000,000.00
+  Rationale: rounded down from 2025 FCF for working-capital variability, unusually low current-year capex relative to 2024, and maintenance-capex/policy-income uncertainty.
+- discounted detachable net cash:
+  unrestricted cash: (63,830,207.56 - 2,838,351.21) * 100% = 60,991,856.35
+  deposits/debt investments: (32,827,356.19 + 82,841,137.01) * 95% = 109,885,068.54
+  IPO net proceeds: 206,168,000.00 * 30% = 61,850,400.00
+  proposed dividend: -41,840,000.00 * 100% = -41,840,000.00
+  total = 190,887,324.89
+- operating_business_price = 1,787,000,000.00 - 190,887,324.89 = 1,596,112,675.11
+- owner_earnback_years = 1,596,112,675.11 / 62,000,000.00 = 25.74375282
+- market_cap_to_cash_profit = 1,787,000,000.00 / 62,000,000.00 = 28.82258065
+- forecast_dividend_yield = 41,840,000.00 / 1,787,000,000.00 = 0.02341354
+
+[judgment boundaries]
+- Filing facts, market snapshot facts, and analyst assumptions are separately identified in result.json/report.md.
+- The 30% IPO proceeds discount is an analyst assumption, not a company-disclosed value.
+- The 62 million sustainable cash profit is a normalization estimate, not management guidance.
+- No target price, ranking label, or buy/sell recommendation was produced.
+
+[limitations]
+- No 2026 interim report was available in the workspace to bridge operations from 2025-12-31 to 2026-07-31.
+- Post-IPO cash usage beyond the annual report's disclosed net proceeds and proposed dividend was not estimated.
+- PE TTM and market cap were not independently reconstructed from exchange trade data.

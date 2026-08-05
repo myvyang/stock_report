@@ -1,0 +1,63 @@
+stock-research trace
+company: 02266.HK / Lai Si Enterprise Holding Limited
+period: 2025-12-31 annual
+generated for task date: 2026-08-05 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because the skill routes reuse decisions through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All result fields after initialization were populated with protocol set/append commands.
+
+2. Reuse check
+- Searched the input-declared annual-review, normalized-facts and raw-filing paths.
+- No existing facts package, normalized facts, metadata, or prior research result existed; only config/input.json was present.
+- Downloaded the official HKEX annual report to stock_report/data/raw/filings/02266.HK/2025-12-31/annual-report-2025.pdf.
+- Source URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042902729.pdf
+- Extracted a local text working copy with pypdf because pdftotext was unavailable.
+
+3. Company/model identity check
+- Input hint said financial_brokerage. Official annual report pp.8, 92-94 says the group provides fitting-out, construction, and repair/maintenance services.
+- Overrode the hint with statement_model=construction_project and owner_earnback_applicability=requires_special_model.
+- Kept all ordinary owner-earnback numeric fields null as required by result-contract.md.
+
+4. Primary annual-report facts (MOP'000 unless stated)
+- Revenue 196,670; cost of sales 153,706; gross profit 42,964.
+- Profit before tax 8,071; net profit 8,032; parent net profit 7,982.
+- Total assets 216,450; liabilities 89,697; equity 126,753; parent equity 126,695; NCI 58.
+- OCF 21,189; PPE purchases 10,649; financing cash flow -4,288; dividend paid 10,300.
+- Cash/bank 33,986; pledged deposits 1,092; borrowings 38,493 balance-sheet amount, of which financing-liability reconciliation excluding overdraft was 36,767.
+- Net trade receivables 23,365 on gross 44,334 and allowance 20,969.
+- Net contract assets 44,573 on gross 78,545 and allowance 33,972.
+- Proposed final dividend 6,000 total, MOP1.50 cents/share.
+- Backlog 192.1m MOP; five largest customers 68.2% of revenue; largest 22.3%.
+
+5. Currency normalization to CNY absolute yuan
+- Financial statements are presented in MOP, while result contract requires CNY.
+- P&L/cash-flow cross-rate: 2025 average MOP/EUR 9.070 and CNY/EUR 8.114, therefore 1 MOP = 8.114/9.070 = 0.8945975744 CNY.
+- Balance-sheet/dividend cross-rate: year-end MOP/EUR 9.400 and CNY/EUR 8.226, therefore 1 MOP = 8.226/9.400 = 0.8751063830 CNY.
+- Cross-rate source: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0401/2026040102412.pdf
+- This is a display normalization and is recorded as a limitation; original evidence remains MOP.
+
+6. Formula checks used
+- gross_margin = 42,964 / 196,670 = 0.2184573143.
+- net_margin = 7,982 / 196,670 = 0.0405857528.
+- operating_free_cash_flow = CNY OCF 18,955,628.00 - capex 9,526,569.57 = 9,429,058.43.
+- forecast dividend = MOP6,000,000 * 0.8751063830 = CNY5,250,638.30.
+- forecast dividend yield = 5,250,638.30 / 137,648,000.7171631 = 0.0381454018.
+- Ordinary discounted cash, cash profit, operating price and payback ratios intentionally remain null.
+
+7. Valuation input provenance
+- Market cap CNY137,648,000.7171631; timestamp 2026/08/03 09:20:05; PE TTM 20.66.
+- Source is Tencent qt.gtimg.cn as supplied by config/input.json; not independently reconstructed from shares and price.
+
+8. Validation
+- Checked the post-report AGM event using HKEX announcement dated 2026-06-23; resolution 2 approving the final dividend passed with 300,002,000 votes for and zero against.
+- AGM source: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0623/2026062300941.pdf
+- Updated result/report to describe the dividend as shareholder-approved rather than merely proposed.
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Outcome: status=ok, errors=[].
+- Ran independent assertions for model override, required null owner-earnback fields, gross margin, net margin, dividend yield, and OCF-capex arithmetic.
+- Outcome: independent checks PASS.

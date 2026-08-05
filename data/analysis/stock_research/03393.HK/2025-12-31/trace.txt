@@ -1,0 +1,79 @@
+stock-research trace
+company=03393.HK Wasion Holdings Limited
+period=2025-12-31 annual
+generated_at=2026-08-05T04:22:16+08:00
+
+1. Protocol initialization
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+status: completed
+
+2. Skill and contracts read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+3. Reuse check
+- No annual facts package or prior research result existed for 03393.HK/2025-12-31.
+- Official annual report downloaded from Wasion Holdings investor relations:
+  https://manager.wisdomir.com/files/437/2026/0422/20260430113555_50789954_en.pdf
+- Local source: stock_report/data/raw/filings/03393.HK/2025-12-31/annual-report-2025.pdf
+- Text extraction used pypdf because pdftotext was unavailable.
+
+4. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Filing facts: manufacture and sale of smart metering, smart distribution, data-center power distribution, storage products and system solutions.
+- No brokerage client money, proprietary trading or repo-financing business.
+- Final model: ordinary_operating / applicable.
+
+5. Core reported figures (RMB)
+revenue=10,073,525,000
+cost_of_sales=6,476,605,000
+gross_profit=3,596,920,000
+operating_profit=1,850,511,000 (profit before tax + finance costs - share of associate profit)
+net_profit=1,481,104,000
+parent_net_profit=1,058,246,000
+total_assets=17,582,912,000
+total_liabilities=9,267,423,000
+total_equity=8,315,489,000
+parent_equity=6,235,758,000
+minority_interest=2,079,731,000
+operating_cash_flow=1,407,697,000
+PPE_cash_capex=339,875,000
+intangible_cash_capex=184,389,000
+cash_flow_capex=524,264,000
+
+6. Formula calculations
+gross_margin = 3,596,920,000 / 10,073,525,000 = 0.3570666673
+net_margin = 1,058,246,000 / 10,073,525,000 = 0.1050522037
+operating_free_cash_flow = 1,407,697,000 - 524,264,000 = 883,433,000
+parent_profit_share = 1,058,246,000 / 1,481,104,000 = 0.7144981041
+discounted_sustainable_cash_profit = 883,433,000 * 0.7144981041 = 631,211,204
+
+discounted cash components:
+  cash_and_bank_balances: 3,015,242,000 * 80% = 2,412,193,600
+  pledged_deposits: 416,832,000 * 0% = 0
+  FVOCI_and_FVTPL_investments: 313,247,000 * 50% = 156,623,500
+  bank_borrowings: -2,486,901,000
+  lease_liabilities: -22,073,000
+discounted_detachable_net_cash = 59,843,100
+
+market_cap=16,646,856,704.73218
+operating_business_price = 16,646,856,704.73218 - 59,843,100 = 16,587,013,604.73218
+owner_earnback_years = 16,587,013,604.73218 / 631,211,204 = 26.2781
+market_cap_to_cash_profit = 16,646,856,704.73218 / 631,211,204 = 26.3729
+forecast_cash_dividend=420,468,000
+forecast_dividend_yield = 420,468,000 / 16,646,856,704.73218 = 0.0252581017
+
+7. Protocol population
+- All result.json mutations were made through protocol set/append commands after initialization.
+- Evidence entries point to the official 2025 annual report and the supplied market snapshot.
+
+8. Limitations
+- Parent-attributable cash flow is not separately disclosed; cash profit uses parent profit share as a conservative proxy.
+- Market snapshot was supplied by the task and not independently reconstructed.
+- Forecast dividend uses the proposed 2025 final dividend only and remains subject to shareholder approval.
+
+9. Validation
+- command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- output: {"status":"ok","errors":[]}

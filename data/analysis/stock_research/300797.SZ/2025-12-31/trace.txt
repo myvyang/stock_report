@@ -1,0 +1,56 @@
+stock-research trace
+company: 钢研纳克 (300797.SZ)
+period: 2025-12-31 annual
+task_created_at: 2026-08-01T01:17:31+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json using:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar and narrative fields with protocol `set`; populated arrays with protocol `append`.
+5. Validated outputs/result.json using protocol `validate`; final status: ok, errors: [].
+
+[reuse audit]
+- Expected annual facts, normalized facts, raw filing metadata, and historical stock-research paths were absent under /workspace/stock_report.
+- /root/aicode sync-source paths for 300797.SZ were also absent.
+- No prior company facts or conclusions were available to reuse.
+- Retained the market-cap and PE snapshot supplied in config/input.json.
+
+[sources]
+- Steel Research NCS 2025 annual report, announced 2026-04-27; audited by Pan-China Certified Public Accountants LLP with an unmodified opinion. Read from the public Sina disclosure mirror of the issuer's designated filing.
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12201550&stockid=300797
+- Steel Research NCS 2025 annual report summary, announcement 2026-006.
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12201533&stockid=300797
+- Tencent qt.gtimg.cn quote snapshot supplied by config/input.json: market cap CNY 4,577,000,000, PE TTM 28.04, timestamp 20260731114306.
+
+[model decision]
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Basis: revenue comes from inspection/testing services, analytical instruments, reference materials, corrosion protection, and extensions; balance-sheet items represent ordinary working capital, labs, equipment, leases, and borrowings rather than deposits, insurance reserves, regulated presale cash, concession rights, or an investment-holding structure.
+
+[reported facts used]
+- Revenue 1,177,747,976.20; cost of sales 610,937,354.52; operating profit 147,371,521.02; consolidated net profit 135,926,736.42; parent net profit 155,716,786.59; recurring parent net profit 109,545,107.05.
+- Total assets 2,225,118,113.16; total liabilities 914,396,594.23; parent equity 1,324,545,988.05; minority interest -13,824,469.12.
+- Operating cash flow 210,526,783.85; capex cash paid 104,613,617.40; financing cash flow -66,133,828.73; dividend/profit/interest cash paid 47,496,514.90.
+- Cash 290,218,028.71, including restricted guarantee deposit 583,830.20; end cash equivalents 289,634,198.51.
+- Short-term borrowings 1,341,629.05; long-term borrowings 57,401,264.20; current portion of non-current liabilities 67,436,272.46; lease liabilities 46,346,140.18.
+- 2025 dividend proposal: 382,728,210 shares x CNY 0.129 = CNY 49,371,939.09.
+
+[derived calculations]
+- Gross profit = revenue - cost = 566,810,621.68.
+- Gross margin = gross profit / revenue = 0.4812664790.
+- Net margin = parent net profit / revenue = 0.1322157115.
+- Operating free cash flow = operating cash flow - capex = 105,913,166.45.
+- Financing and lease deductions = 1,341,629.05 + 57,401,264.20 + 67,436,272.46 + 46,346,140.18 = 172,525,305.89.
+- Discounted detachable cash = 289,634,198.51 x 50% - 172,525,305.89 = -27,708,206.635.
+- Sustainable cash-profit base = min(105,913,166.45 FCF, 109,545,107.05 recurring parent profit) x 90% = 95,321,849.805.
+- Operating business price = 4,577,000,000 - (-27,708,206.635) = 4,604,708,206.635.
+- Owner earnback = 4,604,708,206.635 / 95,321,849.805 = 48.30695393 years.
+- Market cap / cash profit = 4,577,000,000 / 95,321,849.805 = 48.01627339.
+- Forecast dividend yield = 49,371,939.09 / 4,577,000,000 = 0.0107869651.
+
+[judgment boundaries]
+- Fact: reported statement values, business mix, dividend proposal, audit matters, and subsidiary results.
+- Derived: margins, free cash flow, aggregated debt, dividend amount/yield, and payback ratios.
+- Judgment: 50% cash haircut and 10% sustainable-profit haircut. These are deliberately conservative to preserve operating liquidity and allow for receivables, lab ramp-up, and capex volatility.
+- Limitation: the annual report was not present as a local raw filing; the public disclosure mirror and annual summary were used. The supplied Tencent valuation snapshot was not independently reconstructed.

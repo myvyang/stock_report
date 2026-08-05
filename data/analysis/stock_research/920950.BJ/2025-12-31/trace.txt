@@ -1,0 +1,59 @@
+stock-research trace
+company: 迅安科技 (920950.BJ)
+period: 2025-12-31 annual
+generated_at_input: 2026-08-03T11:48:33+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated structured fields with repeated protocol `set` commands; complex JSON was not authored from an empty file.
+5. Final validation command and result are recorded below after generation.
+
+[reuse check]
+- No annual facts package, normalized facts, raw filing metadata, or prior stock-research result existed for 920950.BJ/2025-12-31.
+- Returned to public disclosure and downloaded the annual-report PDF.
+
+[source acquisition]
+- Annual report summary: https://dataclouds.cninfo.com.cn/sjother2/bse_onmarket/2026/20260422/c9d6bfb23e3411f186aafa163e296ac0.pdf
+- Full annual report mirror of the BSE disclosure (announcement id 12143425): http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSEBJ_STOCK/2026/2026-4/2026-04-22/12143425.PDF
+- Local full PDF: stock_report/data/raw/filings/920950.BJ/2025-12-31/annual-report-2025-full.pdf
+- Local extracted text: stock_report/data/raw/filings/920950.BJ/2025-12-31/annual-report-2025-full.txt
+- Market cap/PE: config/input.json, Tencent qt.gtimg.cn snapshot at 2026-07-31 15:38:20.
+
+[key annual-report locations]
+- PDF pp. 11-14: products, R&D, procurement, production, ODM/direct-sales model and industry position.
+- PDF pp. 14-20: operating review, asset changes, profit composition, product/region/customer split and cash-flow discussion.
+- PDF pp. 31-33: market, overseas certification, competition, related-party purchase and FX risks.
+- PDF pp. 41 and 157: 2025 annual dividend proposal, CNY 0.36/share, total CNY 26,395,200, pending shareholder approval at disclosure.
+- PDF pp. 64-77: audit report and consolidated financial statements.
+- PDF pp. 119-121: cash, wealth-management products and receivable concentration.
+- PDF pp. 140-148: revenue/cost notes, expenses, disposal gain and cash-flow reconciliation.
+- PDF p. 136: no assets with ownership or use restrictions (extracted text line near 5606).
+
+[calculations]
+- gross_profit = 189,523,493.43 - 111,753,610.97 = 77,769,882.46.
+- gross_margin = 77,769,882.46 / 189,523,493.43 = 0.4103442853.
+- net_margin = 42,348,256.25 / 189,523,493.43 = 0.2234459458.
+- operating_free_cash_flow = 23,903,740.47 - 23,587,705.77 = 316,034.70.
+- discounted net cash = cash 39,899,753.10 + wealth-management products 112,075,528.77 * 95% - lease liabilities (643,319.92 + 707,426.92) = 145,020,758.59.
+- sustainable cash profit = parent net profit 42,348,256.25 - disposal gain 11,469,032.03 * (1 - 15% estimated tax) = 32,599,579.02.
+- D&A proxy = fixed-asset depreciation 8,205,809.17 + ROU depreciation 759,701.47 + intangible amortization 638,686.16 + long-term deferred expense amortization 660,147.83 = 10,264,344.63. It is added back and offset by an equal maintenance-capex assumption, net zero adjustment.
+- operating business price = 932,000,000 - 145,020,758.59 = 786,979,241.41.
+- owner earnback years = 786,979,241.41 / 32,599,579.02 = 24.14077927.
+- market cap / cash profit = 932,000,000 / 32,599,579.02 = 28.58932624.
+- forecast dividend yield = 26,395,200 / 932,000,000 = 0.0283210300.
+
+[judgment boundaries]
+- FACT: 2025 revenue fell 15.16%; parent net profit fell 28.69%; OCF fell 63.26%; disposal gain was CNY 11.469m; inventory rose 30.68%; no bank debt or restricted assets were reported.
+- INFERENCE: ordinary_operating is applicable because the business and balance-sheet structure are those of a manufacturer, not a special financial-statement model.
+- JUDGMENT: wealth-management products receive a 5% haircut; the disposal gain tax effect uses 15%; normalized maintenance capex is proxied by D&A. These assumptions drive owner earnback and are explicitly disclosed.
+
+[data quality]
+- Marked complete because identity, period, market data, all three statements, asset/liability explanations, owner-earnback components, dividend forecast, business story and evidence are present.
+- Limitations: market quote is later than reporting date; dividend was a proposal at disclosure; maintenance capex lacks a long-cycle split; customer identities are withheld.
+
+[final validation]
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+result: {"status":"ok","errors":[]}

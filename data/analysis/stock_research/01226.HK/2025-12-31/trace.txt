@@ -1,0 +1,64 @@
+stock-research trace
+company: 01226.HK / 中國投融資集團有限公司
+requested_period: 2025-12-31
+actual_annual_period_used: 2026-03-31
+generated_for_task_date: 2026-08-03 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full as requested.
+3. Read references/data-reuse.md because the skill routes source-reuse decisions through it.
+4. Ran protocol init:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result.json only through protocol set/append commands.
+6. Ran protocol validate after population; result: {"status":"ok","errors":[]}.
+
+[local-source-check]
+- Searched stock_report for 01226.HK raw filings, annual facts, normalized facts and prior research.
+- No company-specific filing or fact package existed locally; only the general user evaluation note was present.
+- Therefore fetched the primary public disclosure rather than inventing missing fields.
+
+[primary-research]
+- HKEX annual results announcement URL:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0617/2026061701682.pdf
+- Announcement date: 2026-06-17.
+- Audited reporting period: year ended 2026-03-31.
+- Key source pages used: consolidated profit or loss (p.2), statement of financial position (p.3), revenue/segment notes (pp.5-6), dividend/EPS/investment/broker notes (p.7), investment review and significant investments (pp.8-15), liquidity/gearing/governance (pp.15-17).
+- FX source: China Foreign Exchange Trade System central parity released by Xinhua on 2026-03-31:
+  https://www.news.cn/20260331/7cf35f61d87445dd891b997444399623/c.html
+- Conversion used for every filing amount in result.json: HKD 1 = CNY 0.88295.
+- Market cap, PE TTM, quote timestamp and quote provider were reused unchanged from config/input.json.
+
+[model-review]
+- Input hint: financial_brokerage.
+- Filing facts: principal activities are investment holding and trading of securities; revenue is dividends and interest; company reports no major customers and no brokerage, underwriting or asset-management fee lines.
+- Override: statement_model=investment_holding.
+- owner_earnback_applicability=requires_special_model.
+- Consequence required by contract: all ordinary discounted-net-cash, cash-profit, operating-business-price and payback fields remain null.
+
+[period-review]
+- Requested period 2025-12-31 does not match the company's 31 March financial year-end.
+- The latest complete audited annual results available by task creation were for 2026-03-31.
+- analysis.period was corrected to 2026-03-31 and the mismatch is disclosed in data_quality.limitations and report.md.
+
+[data-decisions]
+- Gross profit and gross margin: null because an investment holding company has no meaningful cost-of-sales/gross-margin model in the announcement.
+- Net margin: null because accounting revenue excludes realised and unrealised investment gains, making net profit/revenue economically misleading.
+- Cash-flow fields: null because the annual results announcement does not include a consolidated cash-flow statement and no complete 2025/26 annual report was available in the searched HKEX company title record.
+- Forecast dividend: CNY 0 and yield 0, based on nil dividends for FY2025 and FY2026 and no current positive dividend guidance.
+- Data quality: complete under the special-model minimum contract; limitations explicitly record period, cash-flow, PE-quality and cross-date/FX constraints.
+
+[key-cross-checks]
+- HKD total assets: 302,730,000.
+- HKD total liabilities: 9,811,000.
+- HKD equity: 292,919,000; arithmetic check assets - liabilities = equity.
+- HKD revenue: 4,171,000.
+- HKD parent net profit: 139,532,000.
+- HKD listed equity unrealised gain: 111,693,000, about 80.0% of parent net profit.
+- CNY equity in result.json: 292,919,000 * 0.88295 = 258,632,831.05.
+- Input market cap / report-date CNY equity: approximately 1.208; disclosed only as a cross-date approximation.
+
+[final-files]
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

@@ -1,0 +1,89 @@
+stock-research trace
+company=603486.SH 科沃斯
+period=2025-12-31 annual
+generated_at=2026-07-31T16:21:48+08:00
+
+[protocol]
+1. Read stock-research/SKILL.md.
+2. Read result-contract.md, report-contract.md, and data-reuse.md.
+3. Ran protocol init with config/input.json -> outputs/result.json.
+4. Populated initialized paths with protocol set commands.
+5. Ran protocol validate; status=ok, errors=[].
+
+[reuse audit]
+- No raw filing, annual facts, normalized facts, or prior stock-research result existed in workspace.
+- Downloaded full 262-page 2025 annual report PDF from Sina disclosure mirror (announcement id 12191589).
+- Cross-checked identity, audit opinion, main financials, business summary and dividend proposal against SSE annual-report summary:
+  https://www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-25/603486_20260425_2Q1O.pdf
+- Checked approval of dividend proposal against SSE 2025 annual shareholders' meeting resolution dated 2026-05-16.
+
+[primary extraction]
+Annual report pages 97-111:
+assets=17432001519.22
+liabilities=8388924825.99
+equity=9043076693.23
+parent_equity=9043287195.51
+revenue=19039662854.51
+cost_of_sales=9743874978.73
+gross_profit=9295787875.78
+operating_profit=1897073163.20
+net_profit=1758057608.98
+parent_net_profit=1758313596.60
+operating_cash_flow=3386757987.75
+capex=683537130.15
+operating_free_cash_flow=2703220857.60
+
+Annual report pages 154-193:
+cash=6528159871.66
+trading_financial_assets=100000000.00
+restricted_cash=3344793.93
+cash_abroad=2675668484.33
+short_borrowing=12900743.61
+bond_payable=1064561673.18
+current_lease_liability=4446406.60
+noncurrent_lease_liability=3464741.57
+inventory=3252831144.09
+accounts_receivable=2352378298.43
+
+Annual report pages 51-53:
+2025_dividend=532608755.20
+2024_dividend=258883004.25
+three_year_dividend_total=961288684.45
+2023_dividend_inferred=961288684.45-532608755.20-258883004.25=169796925.00
+
+[formula checks]
+gross_margin=(19039662854.51-9743874978.73)/19039662854.51
+             =0.48823279838582173
+net_margin=1758313596.60/19039662854.51
+          =0.0923500384453237
+operating_fcf=3386757987.75-683537130.15
+             =2703220857.60
+financing_and_lease_debt=12900743.61+1064561673.18+4446406.60+3464741.57
+                        =1085373564.96
+discounted_net_cash=6528159871.66*0.90+100000000*0.90-1085373564.96
+                   =4879970319.534
+normalized_profit=1758313596.60-138644378.40
+                 =1619669218.20 (equals disclosed parent net profit ex non-recurring items)
+discounted_cash_profit=1619669218.20*0.80
+                      =1295735374.56
+operating_business_price=34849000000-4879970319.534
+                        =29969029680.466
+owner_earnback_years=29969029680.466/1295735374.56
+                    =23.12897391617694
+market_cap_to_cash_profit=34849000000/1295735374.56
+                         =26.89515211532591
+forecast_dividend_yield=532608755.20/34849000000
+                       =0.015283329656518121
+
+[judgment log]
+- statement_model=ordinary_operating; products are manufactured/sold through ordinary channels and no special financial-statement structure was identified.
+- Cash discount=90% to allow for foreign remittance, platform settlement, term-product liquidity and operating buffer.
+- Long-term equity/financial investments excluded from detachable cash because realization and tax constraints were not sufficiently evidenced.
+- Sustainable profit starts from disclosed ex-nonrecurring parent profit, then takes a 20% haircut because 2025 earnings rose sharply from 2023-2024.
+- 2025 FCF was not used as sustainable profit because accounts receivable fell and operating payables rose materially; that release cannot recur indefinitely.
+
+[limitations]
+- Full annual report was obtained through an announcement mirror; SSE summary served as primary cross-check.
+- IDC/AVC/Euromonitor industry claims are quoted by the company; underlying paid datasets were not independently accessed.
+- 2023 dividend is inferred from the disclosed three-year aggregate.
+- Owner earnback is assumption-sensitive and is not a target price or investment recommendation.

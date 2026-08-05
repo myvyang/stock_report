@@ -1,0 +1,30 @@
+stock-research trace
+task_company=00411.HK LAM SOON (HK)
+research_cutoff=2025-12-31
+latest_complete_annual_period=2025-06-30
+post_annual_update=interim six months ended 2025-12-31
+
+1. Read SKILL.md, result-contract.md, report-contract.md and data-reuse.md.
+2. Checked configured reusable paths. No annual facts package, normalized facts, raw filing metadata, or prior stock-research result existed in the workspace.
+3. Initialized outputs/result.json with protocol CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Re-identified statement model from official filings. Overrode input hint financial_brokerage with ordinary_operating because revenue and assets arise from food/home-care manufacturing and distribution, not capital-market activities.
+5. Core sources:
+   - Lam Soon (Hong Kong) Limited Annual Report 2025, published 2025-10-14, HKEX/company PDF.
+   - HKEX announcement of final results for year ended 2025-06-30, dated 2025-09-16.
+   - Lam Soon 2025/26 interim-results announcement for six months ended 2025-12-31.
+   - config/input.json Tencent qt.gtimg.cn market snapshot dated 2026-07-31.
+6. Annual source facts (HKD): revenue 4,829,184,000; gross profit 1,118,530,000; parent profit 302,953,000; total assets 3,806,413,000; liabilities 666,187,000; equity 3,140,226,000; OCF 229,264,000; capex 59,371,000; operating FCF 169,893,000; cash and deposits 1,915,615,000.
+7. Interim check (HKD): revenue 2,668,918,000; gross profit 613,228,000; profit 175,998,000; cash and deposits 1,965,175,000; interim DPS 0.15.
+8. Currency normalization: applied HKD1=CNY0.866 consistently to market cap and filing amounts. This is an analysis approximation based on July 2026 ECB EUR/HKD and EUR/CNY cross-rates, disclosed as a limitation.
+9. Owner earnback assumptions:
+   - Counted 75% of cash and deposits; retained 25% operating liquidity buffer.
+   - Deducted 100% of lease liabilities.
+   - Discounted detachable net cash CNY 1,233,502,904.50.
+   - Sustainable cash profit set to HKD150,000,000 / CNY129,900,000, below FY2025 FCF because FY2025 margin benefited from raw-material relief and subsequent interim profit declined.
+   - Operating business price CNY760,840,608.51; owner earnback 5.857126 years; market cap/cash profit 15.352914.
+10. Populated result fields exclusively through protocol CLI set commands, not by directly writing result JSON.
+11. Validated outputs/result.json with protocol CLI. Final validation status: ok; errors: [].
+
+data_quality=complete
+known_limitations=fiscal-period mismatch; approximate FX conversion; no authoritative market-share/utilization/maintenance-capex split; detachable-cash and sustainable-profit estimates require judgment.

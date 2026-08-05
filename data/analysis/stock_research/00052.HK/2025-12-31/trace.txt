@@ -1,0 +1,88 @@
+stock-research protocol trace
+generated_at=2026-08-05T05:45:15+08:00
+query=00052.HK
+requested_period=2025-12-31
+requested_report_type=annual
+
+[skill_and_contract]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+
+[local_reuse_check]
+annual_facts=absent
+normalized_facts=absent
+raw_filing_metadata=absent
+prior_stock_research=present
+decision=reuse prior official-filing extraction; repair shell-expanded HKD text; refresh input market snapshot and derived ratios
+
+[protocol]
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+mutation=top-level structured fields written with protocol set commands
+validation=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+validation_errors=[]
+
+[model_review]
+input_hint=financial_brokerage/requires_special_model
+verified_model=ordinary_operating/applicable
+reason=FY2025 annual report identifies fast-food restaurant operations and property investment; food and beverage sales HKD3,093.665m were 99.8% of revenue; no brokerage client funds, proprietary financial assets or repo financing
+
+[period_review]
+finding=Fairwood Holdings year-end is 31 March; no annual report exists for 2025-12-31
+primary_period=audited year ended 2025-03-31
+trend_check=unaudited six months ended 2025-09-30
+quality_status=partial
+
+[sources]
+annual_report=https://www1.hkexnews.hk/listedco/listconews/sehk/2025/0729/2025072900803.pdf
+annual_results=https://www1.hkexnews.hk/listedco/listconews/sehk/2025/0630/2025063000851.pdf
+interim_report=https://www.hkexnews.hk/listedco/listconews/sehk/2025/1229/2025122900581.pdf
+market_cap=Tencent qt.gtimg.cn input snapshot at 2026-08-03 09:36:26
+fx=https://www.exchangerates.org.uk/HKD-CNY-spot-exchange-rates-history-2025.html
+
+[currency]
+financial_statement_currency=HKD
+output_currency=CNY
+conversion_rate=1 HKD * 0.9323 CNY
+conversion_date=2025-03-31
+market_cap_already_in_CNY=true
+
+[core_calculations]
+gross_margin=237206/3100070=0.0765163367
+net_margin=35540/3100070=0.0114642573
+total_assets_HKD=2105329k
+total_liabilities_HKD=1453294k
+cash_capex_HKD=163015k+8168k=171183k
+operating_free_cash_flow_HKD=586452k-171183k=415269k
+IFRS16_warning=lease principal HKD436633k is financing cash flow but a real restaurant cash cost
+
+[discounted_cash]
+unrestricted_cash_HKD=(545653k-435k)*50%=272609k
+investment_property_HKD=21090k*50%=10545k
+bank_borrowings_HKD=5419k deduction
+discounted_net_cash_HKD=277735k
+discounted_net_cash_CNY=258932340.50
+discounted_net_cash_to_market_cap=0.5162690668
+
+[cash_profit]
+normalized_base_HKD=40000000
+discount=25% for margin pressure, Mainland loss, impairments and capex variability
+discounted_sustainable_cash_profit_HKD=32000000
+discounted_sustainable_cash_profit_CNY=29833600
+operating_business_price_CNY=501546299.6131182-258932340.50=242613959.1131182
+owner_earnback_years=8.1322387882
+market_cap_to_cash_profit=16.8114575382
+
+[dividend]
+FY2025_DPS_HKD=0.22
+shares=129553000
+forecast_cash_dividend_CNY=26572097.62
+forecast_dividend_yield=0.0529803483
+
+[limitations]
+1=no annual filing for requested 2025-12-31 period
+2=market cap date is about 16 months after audited balance-sheet date
+3=financials converted at period-end FX while input market cap is already CNY
+4=discounted cash and sustainable profit are analytical judgments, not company guidance

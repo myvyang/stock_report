@@ -1,0 +1,55 @@
+stock-research trace
+company: GRAND PHARMA (00512.HK)
+period: 2025-12-31 annual
+generated_at: 2026-08-03T18:03:57+08:00
+
+1. Read required protocol instructions:
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Checked reusable local data.
+   No raw filing, annual facts package, normalized facts, or prior stock-research result existed for 00512.HK/2025-12-31.
+
+3. Located primary disclosure.
+   - HKEX 2025 Annual Report, published 2026-04-29:
+     https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042904316.pdf
+   - HKEX 2025 Results Announcement, published 2026-03-26:
+     https://www.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032602978.pdf
+   Saved annual report to:
+   stock_report/data/raw/filings/00512.HK/2025-12-31/2025-annual-report.pdf
+
+4. Reconciled analysis model.
+   Input hint financial_brokerage conflicts with annual-report facts. The group researches, manufactures, and sells pharmaceuticals, medical devices, and amino-acid products. No brokerage client funds, repo funding, or securities intermediation balance-sheet model was found. Overrode model to ordinary_operating; ordinary owner earnback is applicable, with separate caution for associates and intangible assets.
+
+5. Extracted core HKD figures from audited annual report (HK$000 converted to absolute HKD):
+   revenue 12,283,271,000; cost of sales 5,502,910,000; gross profit 6,780,361,000;
+   parent net profit 1,240,871,000; total assets 27,166,804,000; total liabilities 9,987,119,000;
+   total equity 17,179,685,000; parent equity 17,017,039,000;
+   operating cash flow 1,649,523,000; PPE purchases 726,153,000; intangible purchases 795,953,000;
+   proposed 2025 dividend 591,806,000.
+
+6. Currency normalization.
+   Applied 1 HKD = 0.8983 CNY, a 2025-12-31 public historical reference rate, to all filing amounts. Market-cap amount was already supplied in CNY. This conversion is an analytical normalization, not the company's transaction-date accounting rate.
+
+7. Owner earnback calculation.
+   - Discounted detachable net cash: zero. Cash plus pledged deposits and 50%-discounted FVTPL assets remain below bank/other borrowings plus lease liabilities.
+   - Normalized maintenance investment: current-year PPE depreciation plus intangible amortization, HKD 542.837m, used as a proxy because full current-year intangible purchases appear project/growth-heavy and cannot be separated precisely.
+   - Pre-haircut normalized cash profit: OCF less normalized maintenance investment = HKD 1,106.686m.
+   - Prudence haircut: 10% for receivable growth and capitalized-R&D/product-right uncertainty.
+   - Discounted sustainable cash profit: HKD 996.017m, CNY 894.722m.
+   - Operating business price: CNY 15,757,074,219.10.
+   - Owner earnback years and market-cap/cash-profit: 17.611131.
+   - Sensitivity: reported OCF less all PPE and intangible purchases = HKD 127.417m / CNY 114.459m.
+
+8. Dividend forecast.
+   Used board-proposed final dividend of HKD 0.169 per share / HKD 591.806m total; no interim dividend. Converted forecast cash dividend CNY 531.619m; yield 3.3738% on supplied market cap. Proposal remains subject to shareholder approval.
+
+9. Protocol operations.
+   Initialized outputs/result.json using protocol CLI, populated fields using protocol set/append commands, and validated using:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Validation status: ok; errors: none.
+
+10. Data-quality judgment.
+    status=complete because company identity, period, market data, audited three-statement figures, model, asset/liability explanations, dividend forecast, owner-earnback components, business story, risks, and evidence are present. Limitations explicitly retain FX normalization, maintenance-capex estimation, and supplied market-snapshot dependence.

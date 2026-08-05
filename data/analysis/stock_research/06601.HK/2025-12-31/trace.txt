@@ -1,0 +1,55 @@
+stock-research trace
+task: 06601.HK / 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Instructions read
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+- /workspace/AGENTS.md
+
+2. Local reuse audit
+- Checked configured raw filing, annual review, normalized facts, and historical stock research paths.
+- No 06601.HK filing or fact package existed locally; public primary-source retrieval was required.
+
+3. Primary sources retrieved and reviewed
+- HKEX annual report: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0429/2026042903715.pdf
+- Reviewed business and revenue mix (pp. 9-13), risks/dividend (pp. 21-23), audited statements (pp. 66-71), and notes on business identity, financial assets, inventory, receivables, deposits, payables, contract liabilities, borrowing, leases and dividends (pp. 72, 100, 104, 106-112, 116-117).
+- Market cap and PE reused from config/input.json: Tencent qt.gtimg.cn, 2026/08/03 09:38:45.
+
+4. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Filing fact: subsidiaries manufacture and trade household insecticides/repellents, cleaning, air care, personal care and pet products, and operate pet stores.
+- Resolution: input hint rejected as a stock-master misclassification; analysis_model set to ordinary_operating / applicable.
+
+5. Key audited facts (CNY)
+- Revenue 1,988,232,000; gross profit 1,045,928,000; parent net profit 223,685,000.
+- Total assets 3,882,110,000; total liabilities 863,223,000; parent equity 3,023,847,000.
+- Operating cash flow 268,064,000.
+- Capital expenditure 28,500,000 from MD&A; direct PP&E purchase/deposit cash line 6,996,000, disclosed as a limitation.
+- Cash 1,430,526,000; time deposits 1,405,985,000; amortised-cost investments 240,333,000; FVTPL assets 143,666,000.
+- Borrowing 10,000,000; lease liabilities 49,364,000.
+- 2025 attributable dividend basis: interim 69,467,000 + proposed final 109,466,000 = 178,933,000.
+
+6. Research estimates
+- Discounted detachable net cash: 2,212,438,220.
+- Haircuts: cash 70%; time deposits 75%; amortised-cost investments 60%; FVTPL assets 50%; borrowing and leases deducted 100%; rounding adjustment -87,530.
+- Discounted sustainable cash profit: 145,000,000, starting from parent net profit and removing approximate after-tax interest/investment/fair-value income plus a cash-conversion buffer.
+- Operating business price: 2,529,282,013.1778717 - 2,212,438,220 = 316,843,793.1778717.
+- Owner earnback: 316,843,793.1778717 / 145,000,000 = 2.1851296081 years.
+- Market cap/cash profit: 17.4433242288.
+- Forecast dividend yield: 178,933,000 / 2,529,282,013.1778717 = 0.0707445785.
+
+7. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields using repeated protocol set commands; complex result JSON was not handwritten from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result before handoff: status ok, errors [].
+
+8. Data-quality decision
+- status: complete.
+- Core ordinary-company statements, owner-earnback fields, dividend forecast, business story, asset/liability explanations and primary evidence are present.
+- Limitations retained in result.json: market quote source, haircut judgment, capex definition difference, distribution friction and future payout uncertainty.

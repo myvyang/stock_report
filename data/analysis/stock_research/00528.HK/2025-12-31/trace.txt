@@ -1,0 +1,68 @@
+stock-research trace
+company: 00528.HK KINGDOM HOLDING
+period: 2025-12-31 annual
+generated_for_input_at: 2026-08-03T15:21:56+08:00
+
+1. Read required instructions
+- /workspace/AGENTS.md
+- /workspace/.agents/skills/stock-research/SKILL.md
+- /workspace/.agents/skills/stock-research/references/result-contract.md
+- /workspace/.agents/skills/stock-research/references/report-contract.md
+- /workspace/.agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No existing filing, annual facts package, normalized facts, or prior stock-research result existed for 00528.HK/2025-12-31.
+- Therefore fetched the official HKEX annual report.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: stock-research-result-v1 skeleton created.
+
+4. Primary source retrieval
+- HKEX title search identified ANNUAL REPORT 2025, released 2026-04-20.
+- Official source: https://www.hkexnews.hk/listedco/listconews/sehk/2026/0420/2026042000455_c.pdf
+- Saved: stock_report/data/raw/filings/00528.HK/2025-12-31/annual-report-2025.pdf
+- Extracted text for local verification: stock_report/data/raw/filings/00528.HK/2025-12-31/annual-report-2025.txt
+
+5. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Annual report pp.107 and 145 states the Group is principally engaged in manufacture and sale of linen yarn and operates as a single business unit.
+- No brokerage, investment banking, asset management, proprietary trading, or client-money business found.
+- Override: ordinary_operating / applicable.
+
+6. Core audited facts (RMB)
+- Revenue 2,677,106,000; cost of sales 2,409,284,000; gross profit 267,822,000.
+- Net profit 61,181,000; parent net profit 62,370,000.
+- Total assets 3,108,855,000; total liabilities 1,619,066,000; total equity 1,489,789,000; parent equity 1,428,335,000; NCI 61,454,000.
+- Operating cash flow 702,434,000; capex 46,374,000; operating FCF 656,060,000; financing cash flow -320,793,000; dividends paid 25,601,000.
+- Cash and equivalents 562,793,000; pledged deposits 51,545,000; interest-bearing borrowings 771,566,000.
+- Proposed 2025 final dividend 34,124,000 (HKD 0.06/share).
+- Sources: annual report PDF pp.100, 102-106, 155 and MD&A pp.11-21.
+
+7. Calculations
+- gross_margin = 267,822,000 / 2,677,106,000 = 0.1000416143269562.
+- net_margin = 62,370,000 / 2,677,106,000 = 0.02329753397885627.
+- operating FCF = 702,434,000 - 46,374,000 = 656,060,000.
+- detachable net cash = max(0, 562,793,000 - 771,566,000); pledged deposits excluded = 0.
+- 2021-2025 parent-profit mean = (88,223,000 + 175,696,000 + 163,611,000 - 45,380,000 + 62,370,000) / 5 = 88,904,000.
+- sustainable distributable cash profit = 70,000,000 after 18,904,000 cycle/retention haircut.
+- operating business price = 682,553,420.5561876 - 0 = 682,553,420.5561876.
+- owner earnback years = 682,553,420.5561876 / 70,000,000 = 9.75076315080268.
+- forecast dividend yield = 34,124,000 / 682,553,420.5561876 = 0.04999462192446848.
+
+8. Cash-flow quality adjustment
+- Did not annualize 2025 operating FCF.
+- Annual report cash-flow bridge includes inventory decrease 392,396,000, receivables decrease 94,836,000, and trade-payables increase 215,075,000.
+- These working-capital releases are not assumed recurring.
+
+9. Protocol population
+- Used repeated protocol `set` commands to populate initialized paths and subsections.
+- Complex result JSON was not handwritten from scratch.
+
+10. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result before report completion: {"status":"ok","errors":[]}
+
+11. Output scope
+- Required outputs created: outputs/result.json, outputs/report.md, outputs/trace.txt.
+- No buy/sell recommendation or target price included.

@@ -1,0 +1,65 @@
+stock-research trace
+task_created_at=2026-08-05T00:49:39+08:00
+period=2025-12-31
+query=SFBS
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- config/input.json existed.
+- No local annual facts package, normalized facts, prior research result, or raw filing existed for SFBS/2025-12-31.
+- Result: official filing retrieval was required.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initial model hint was ordinary_operating/applicable.
+
+4. Primary-source retrieval and model verification
+- Retrieved SEC Form 10-K HTML to stock_report/data/raw/filings/SFBS/2025-12-31/sfbs20251231_10k.htm
+- SEC accession: 0001171843-26-001150; filed 2026-02-27; report period 2025-12-31.
+- Filing identifies SFBS as a bank holding company whose principal business is accepting deposits and making loans/investments.
+- Overrode input hint with statement_model=financial_bank and owner_earnback_applicability=requires_special_model.
+
+5. Key extracted USD facts
+- Total assets: 17,727,190,000
+- Total liabilities: 15,876,843,000
+- Total equity: 1,850,347,000
+- Parent equity: 1,849,847,000
+- Net loans: 13,525,229,000
+- Deposits: 14,219,034,000
+- Net interest income: 535,209,000
+- Parent net income: 276,541,000
+- NIM: 3.12%; efficiency ratio: 32.89%; ROA: 1.56%; ROE: 16.05%
+- NPL: 168,800,000 / 1.23% of loans; net charge-offs: 28,100,000; ACL: 171,683,000 / 1.25% of loans
+- Bank capital ratios: CET1 11.65%; Tier 1 11.66%; total capital 12.93%; leverage 10.26%
+- Quarterly dividend raised to USD 0.38 on 2025-12-15.
+
+6. Currency normalization
+- Protocol requires CNY absolute yuan.
+- Applied research conversion assumption: CNY 7.20 per USD to financial statement and dividend amounts.
+- Market cap was already supplied in CNY and was not reconverted.
+- This is disclosed as a limitation, not presented as an official exchange-rate observation.
+
+7. Dividend scenario
+- Annualized scenario: USD 0.38 * 4 * 54,624,955 year-end shares * 7.20 = CNY 597,815,507.52.
+- Forecast dividend yield: 597,815,507.52 / 33,018,346,052.266113 = 0.01810555581959475.
+- Scenario is conditional on board approval and regulatory/capital constraints.
+
+8. Owner earnback treatment
+- All ordinary owner-earnback sorting fields retained as null.
+- No detachable cash or ordinary free-cash-flow profit was constructed.
+- Alternative bank lens documented: P/B (~2.48x), ROE, NIM, efficiency, credit quality, regulatory capital, dividend capacity.
+
+9. Protocol population and validation
+- Used protocol set commands for every populated section; did not hand-write result.json from scratch.
+- Final validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]
+
+10. Output files
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

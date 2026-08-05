@@ -1,0 +1,77 @@
+task=stock-research
+company=四方科技
+code=603339.SH
+period=2025-12-31
+generated_at=2026-07-31T16:50:31+08:00
+
+[protocol]
+skill=.agents/skills/stock-research/SKILL.md
+result_contract=.agents/skills/stock-research/references/result-contract.md
+report_contract=.agents/skills/stock-research/references/report-contract.md
+data_reuse=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+populate=protocol set commands, executed by populate_result.sh
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_result={"status":"ok","errors":[]}
+
+[source_1]
+type=primary_filing
+title=四方科技集团股份有限公司2025年年度报告
+disclosure_date=2026-04-22
+source_url=https://stockmc.xueqiu.com/202604/603339_20260422_TCP0.pdf
+local_working_copy=/tmp/sifang-research/annual-report.pdf
+audit_opinion=天健会计师事务所（特殊普通合伙）标准无保留意见
+pages_used=2,6-7,20-26,30-31,41,57,63-72,104-105,128-129,154-155,173
+facts_used=business description; segment revenue and margin; balance sheet; income statement; cash flow; cash restrictions; structured deposits; construction in progress; dividend proposal; operating working-capital reconciliation; risks
+
+[source_2]
+type=task_input_market_snapshot
+path=config/input.json
+provider=Tencent qt.gtimg.cn
+timestamp=20260731114326
+market_cap=3918000000.0
+pe_ttm=22.86
+
+[key_calculations]
+gross_profit=1690868587.27-1330059591.73=360808995.54
+gross_margin=360808995.54/1690868587.27=0.21338677544571685
+net_margin=154409339.13/1690868587.27=0.09131953854515823
+operating_free_cash_flow=558853535.09-211426232.43=347427302.66
+forecast_cash_dividend=302684419*0.155=46916084.945
+forecast_dividend_yield=46916084.945/3918000000=0.011974498454568657
+
+[cash_discount]
+nonrestricted_cash=888127868.24-43000010.25=845127857.99
+discounted_nonrestricted_cash=845127857.99*0.80=676102286.392
+discounted_structured_deposits=401719986.31*0.90=361547987.679
+interest_bearing_debt=200000+11613511.25+43363428.75=55176940
+operating_cash_reserve=250000000
+discounted_detachable_net_cash=676102286.392+361547987.679-55176940-250000000=732473334.071
+assumption_note=80% cash discount, 90% structured-deposit discount and CNY250m operating reserve are analyst assumptions.
+
+[sustainable_cash_profit]
+parent_net_profit=154409339.13
+less_investment_income=-9285208.90
+less_fair_value_gain=-1719986.31
+add_depreciation_and_amortization=73467274.74+3968011.25+6332079.66=83767365.65
+less_estimated_maintenance_capex=-100000000
+discounted_sustainable_cash_profit=127171509.57
+assumption_note=CNY100m maintenance capex is an analyst estimate anchored to D&A and the existing manufacturing asset base; disclosed capex includes growth projects.
+
+[owner_earnback]
+operating_business_price=3918000000-732473334.071=3185526665.929
+owner_earnback_years=3185526665.929/127171509.57=25.04905915405185
+market_cap_to_cash_profit=3918000000/127171509.57=30.808787386795828
+
+[cash_flow_normalization]
+reported_operating_cash_flow=558853535.09
+inventory_decrease=52153185.57
+increase_in_operating_payables=272770793.46
+contract_liability_2025=692145665.56
+contract_liability_2024=490970578.89
+interpretation=2025 OCF was materially boosted by working-capital movements and is not treated as recurring distributable cash profit.
+
+[output]
+result=outputs/result.json
+report=outputs/report.md
+trace=outputs/trace.txt

@@ -1,0 +1,87 @@
+stock-research trace — CENTA — generated 2026-08-05 Asia/Shanghai
+
+1. Read config/input.json.
+   - Query/code: CENTA.
+   - Requested annual period: 2025-12-31.
+   - Input market cap: CNY 16,006,650,211.114014 as of 2026-08-03.
+   - Input PE TTM: 13.785455.
+   - Market source: Yahoo Finance yfinance.
+
+2. Read required skill and contracts.
+   - .agents/skills/stock-research/SKILL.md
+   - references/result-contract.md
+   - references/report-contract.md
+   - references/data-reuse.md
+
+3. Checked reusable local data.
+   - No CENTA raw filing, annual facts, normalized facts, or prior stock-research output was present under the configured stock_report paths.
+   - Public official evidence therefore had to be obtained.
+
+4. Initialized the protocol skeleton (not hand-written from scratch).
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+5. Primary filing evidence.
+   - Central Garden & Pet Company FY2025 Form 10-K, filed 2025-11-26, fiscal year ended 2025-09-27.
+   - SEC URL: https://www.sec.gov/Archives/edgar/data/887733/000088773325000041/cent-20250927.htm
+   - SEC XBRL Companyfacts: https://data.sec.gov/api/xbrl/companyfacts/CIK0000887733.json
+   - Period resolution: input says 2025-12-31, but issuer FY2025 ended 2025-09-27; the 10-K period is used and the mismatch is disclosed.
+
+6. Financial statement model review.
+   - Business is branded/private-label pet and garden product manufacturing, marketing, and distribution.
+   - Balance sheet contains ordinary cash, receivables, inventory, PP&E, goodwill/intangibles, trade liabilities, leases, and corporate debt.
+   - No financial-institution customer funds, insurance reserves, property-development restricted cash, construction contract assets, or concession rights were identified.
+   - Model confirmed: ordinary_operating; owner earnback applicable.
+
+7. Source figures in USD.
+   Balance sheet at 2025-09-27:
+   - Total assets 3,625,643,000.
+   - Total liabilities 2,040,710,000 (assets less total equity; components reconcile).
+   - Total equity 1,584,933,000; parent equity 1,583,268,000; NCI 1,665,000.
+   - Cash 882,488,000; receivables 325,297,000; inventory 722,106,000.
+   - PP&E 363,188,000; goodwill 554,692,000; intangibles 447,643,000.
+   - Current liabilities 538,758,000; noncurrent debt 1,191,641,000; current debt 62,000.
+   FY2025 income/cash flow:
+   - Revenue 3,129,064,000; COGS 2,131,728,000; gross profit 997,336,000.
+   - Operating income 250,042,000; consolidated net income 163,963,000; parent net income 162,843,000.
+   - CFO 332,506,000; capex 41,418,000; operating FCF 291,088,000.
+   - Stock compensation 21,060,000; financing cash flow -156,643,000.
+   - Repurchases 155,066,000; NCI distributions 1,346,000; combined cash out 156,412,000.
+
+8. Currency conversion.
+   - Used USD/CNY 7.1328, the 2025-09-26 observation in Federal Reserve H.10 released 2025-09-29.
+   - URL: https://www.federalreserve.gov/releases/h10/20250929/
+   - All financial statement amounts in outputs/result.json are CNY absolute yuan.
+
+9. Formula and judgment record.
+   - Gross margin = 997,336 / 3,129,064 = 31.8733%.
+   - Net margin = 162,843 / 3,129,064 = 5.2042%.
+   - Discounted detachable cash = cash × 90% - interest-bearing debt × 100%
+     = CNY -2,835,029,792.64.
+   - Operating FCF = CFO - capex = USD 291,088,000.
+   - Economic owner cash before sustainability haircut = FCF - stock compensation
+     = USD 270,028,000.
+   - Discounted sustainable cash profit = USD 270,028,000 × 90% × 7.1328
+     = CNY 1,733,450,146.56.
+   - Operating business price = market cap - discounted net cash
+     = CNY 18,841,680,003.754013.
+   - Owner earnback = operating business price / discounted cash profit
+     = 10.8694674843 years.
+   - Market cap / cash profit = 9.2339835921.
+   - No receivables, inventory, goodwill, intangibles, PP&E, or lease ROU assets were counted as detachable cash.
+
+10. Dividend basis.
+    - 10-K states the company has never paid cash dividends on common or Class A common stock and does not currently intend to do so in the foreseeable future.
+    - Forecast cash dividend = 0; forecast dividend yield = 0.
+    - Repurchases are discussed separately and are not mislabeled as dividends.
+
+11. Protocol population and validation.
+    - Populated initialized result with repeated protocol `set` commands.
+    - Validation command:
+      PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    - Validation result: status=ok, errors=[].
+
+12. Data-quality limitations retained in result.json.
+    - Fiscal-period mismatch is explicit.
+    - Currency conversion basis is explicit.
+    - Market cap/PE are reused from input and not independently reconstructed.
+    - Sustainable cash profit is an analyst scenario based on one fiscal year, not company guidance.

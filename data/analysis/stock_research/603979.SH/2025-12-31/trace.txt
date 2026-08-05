@@ -1,0 +1,67 @@
+[2026-07-31 Asia/Shanghai] Stock research trace: 603979.SH 金诚信, period 2025-12-31
+
+1. Instructions and protocol
+- Read /workspace/.agents/skills/stock-research/SKILL.md in full.
+- Read result-contract.md, report-contract.md, and linked data-reuse.md in full.
+- Read /workspace/AGENTS.md instructions supplied for this task.
+- Confirmed rule: special-model companies must leave ordinary owner-earnback ranking fields null.
+
+2. Local data reuse audit
+- Checked configured annual filing, annual review, normalized facts, and prior stock research paths.
+- No 603979.SH 2025 filing, facts package, normalized facts, or prior research existed under /workspace/stock_report.
+- Checked stock_report/data/notes/user_stock_evaluations.md; no user evaluation for 603979.SH.
+- Therefore public-source supplementation was required.
+
+3. Official-source identification
+- Located company investor-relations periodic-report page: https://www.jchxmc.com/investor/report
+- Located official SSE annual-report PDF: https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-28/603979_20260428_V5JH.pdf
+- Located official company homepage for business cross-check: https://www.jchxmc.com/
+- Direct terminal download from static.sse.com.cn stalled; used the web-indexed annual-report text mirror to inspect the official filing contents and retained the SSE PDF as the evidence URL.
+- Market cap and PE TTM were reused from config/input.json as explicitly supplied task data.
+
+4. Protocol initialization
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- This created the stock-research-result-v1 skeleton. The complex JSON result was not hand-written from scratch.
+
+5. Financial extraction and calculations
+- Revenue: 13,893,968,306.98
+- Cost of sales: 9,195,347,943.34
+- Gross profit: 4,698,620,363.64
+- Gross margin: 4,698,620,363.64 / 13,893,968,306.98 = 0.338176
+- Operating profit: 3,214,497,474.30
+- Net profit: 2,262,137,460.99
+- Parent net profit: 2,338,703,276.64
+- Parent net margin: 2,338,703,276.64 / 13,893,968,306.98 = 0.168329
+- Total assets: 22,228,058,269.92
+- Total liabilities: 11,076,888,266.61
+- Total equity: 11,151,170,003.31
+- Parent equity: 11,141,060,493.85
+- Minority interest: 10,109,509.46
+- Operating cash flow: 4,377,465,066.62
+- Cash capex proxy: 1,428,724,723.45 (cash paid to acquire/build fixed, intangible and other long-term assets)
+- Simplified operating free cash flow: 4,377,465,066.62 - 1,428,724,723.45 = 2,948,740,343.17
+- Financing cash flow: 1,787,413,855.66
+- Dividend cash out during 2025: 280,700,011.80
+- Forecast annual dividend: 411,700,400.00 from 2025 year-end share-count estimate and RMB 0.66/share proposal.
+- Forecast dividend yield: 411,700,400 / 45,799,000,000 = 0.0089893.
+
+6. Analysis-model review
+- Input hint classified the company as construction_project / requires_special_model.
+- Filing review showed material evolution: mining-service revenue was 47.60% of 2025 revenue, while own-resource revenue was 46.18%; resource output and copper price were the main growth driver.
+- Retained statement_model=construction_project because mining service remains a core project business and no standalone mining enum exists in the protocol.
+- Expanded special handling to cover the mixed economics of project working capital plus mine reserves, commodity prices, mine life, sustaining/growth capex, country risk, and debt service.
+- Kept all ordinary owner-earnback figures null as required. No synthetic discounted cash profit or payback number was created.
+
+7. Result construction through protocol CLI
+- Used protocol `set` commands for sources, analysis model, metrics, financial statements, asset/liability explanation rows, owner-earnback interpretation, dividends, business story, risks, evidence, and data quality.
+- Asset and liability rows use absolute CNY amounts and explain the real underlying items.
+- data_quality.status set to complete; limitations explicitly record market-data reuse, capex split limitations, dividend share-count sensitivity, and special-model null fields.
+
+8. Validation
+- Ran: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation response: {"status":"ok","errors":[]}
+
+9. Human-readable report
+- Created outputs/report.md following report-contract.md.
+- Distinguished reported facts, analytical inference, and unresolved limitations.
+- Did not provide a buy/sell recommendation, target price, ranking label, or unsupported certainty.

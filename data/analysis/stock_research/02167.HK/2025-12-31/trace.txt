@@ -1,0 +1,61 @@
+TI CLOUD 02167.HK stock research trace
+generated_at: 2026-08-04T13:21:27+08:00
+period: 2025-12-31 annual
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because no existing annual facts package was available.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Source discovery and acquisition
+- Existing annual review and filing files for 02167.HK/2025-12-31 were absent.
+- Located official 2025 annual report through TI Cloud investor relations and HKEX title search.
+- Official annual report URL:
+  https://resource-new.ti-net.com.cn/2026/04/27/2fb499ef-bed3-4195-b8f2-5cac6c89d1e9.pdf
+- Saved PDF to stock_report/data/raw/filings/02167.HK/2025-12-31/annual-report-2025.pdf.
+- Extracted text locally to annual-report-2025.txt using pypdf in an isolated /tmp virtual environment.
+- Market cap and PE reused exactly from config/input.json: Tencent qt.gtimg.cn, 2026/08/03 09:20:05.
+- Dividend conversion used 1 HKD = 0.86647 CNY, the China Foreign Exchange Trade System central parity reported for 2026-07-15, as a close-date approximation because the input did not include an FX rate.
+
+3. Model verification
+- Input hint financial_brokerage was rejected.
+- Annual report describes AI-native/cloud-native customer contact software and services under SaaS and VPC models.
+- No interest-bearing bank or other borrowing; financial investments are deposits, certificates of deposit, principal-protected debt investment, structured deposits and a small unlisted equity interest.
+- Final model: ordinary_operating; owner earnback applicability: applicable.
+
+4. Key audited facts (annual report page references)
+- Income statement p.144: revenue RMB549,685k; cost RMB272,520k; gross profit RMB277,165k; profit before tax RMB60,534k; profit RMB60,822k.
+- Balance sheet pp.146-147: assets RMB707,355k; liabilities RMB159,355k; equity RMB548,000k.
+- Cash flow pp.150-151: CFO RMB42,514k; PPE purchases RMB946k; intangible purchases RMB895k; financing cash flow RMB-23,125k; dividends paid RMB15,870k; buybacks RMB509k.
+- Notes 21-22 pp.206-208: financial investments RMB109,774k; cash equivalents RMB158,617k; term deposits RMB138,995k; restricted cash RMB19,585k.
+- MD&A pp.11-16: SaaS RMB517,438k; AI-related revenue RMB55.8m; no interest-bearing bank or other borrowing; receivable and restricted cash movements.
+- Directors' report p.27: proposed final dividend HKD0.10 per share.
+
+5. Formula checks
+- gross_margin = 277,165,000 / 549,685,000 = 0.5042224.
+- net_margin = 60,822,000 / 549,685,000 = 0.1106470.
+- capex = 946,000 + 895,000 = 1,841,000.
+- operating_free_cash_flow = 42,514,000 - 1,841,000 = 40,673,000.
+- discounted net cash = 158,617,000 + 138,995,000*95% + 40,248,000*90% + 25,554,000*80% + 40,106,000*70% - 8,301,000 = 367,101,850.
+- sustainable cash profit before prudence haircut = 60,822,000 - 8,996,000 - 288,000 + 10,638,000 - 1,841,000 - 1,206,000 = 59,129,000.
+- discounted sustainable cash profit = 59,129,000 * 80% = 47,303,200.
+- operating business price = 468,355,925.4401922 - 367,101,850 = 101,254,075.4401922.
+- owner earnback years = 101,254,075.4401922 / 47,303,200 = 2.1405333.
+- market cap / cash profit = 468,355,925.4401922 / 47,303,200 = 9.9011468.
+- forecast dividend = 174,000,400 * HKD0.10 * 0.86647 = RMB15,076,612.6588.
+- forecast yield = 15,076,612.6588 / 468,355,925.4401922 = 0.0321905.
+
+6. Protocol operations and validation
+- All result fields were written with protocol set/append commands; the complex result object was not hand-written.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial validation status: ok, errors: [].
+- Final validation rerun after report and trace creation.
+
+7. Important analytical limitations
+- Owner earnback discounts are judgment, not reported values.
+- VIE cash upstreaming and RMB cross-border distribution may limit detachability.
+- One-year profit includes lower R&D expense and impairment reversal; cash conversion trails earnings.
+- Dividend RMB amount is an FX approximation; proposed dividend depends on record-date eligible shares.

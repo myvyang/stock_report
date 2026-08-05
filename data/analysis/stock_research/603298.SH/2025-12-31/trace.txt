@@ -1,0 +1,84 @@
+stock-research trace
+company=603298.SH 杭叉集团
+period=2025-12-31
+generated_for_task=2026-07-31 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the skill routes reuse decisions through it.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated scalar fields with protocol set and list fields with protocol append; the complex result object was not handwritten from scratch.
+6. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+[local reuse audit]
+Expected annual fact paths from config/input.json did not exist at task start:
+- stock_report/data/analysis/annual_review/603298.SH/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/603298.SH/2025-12-31/annual_facts.md
+- stock_report/data/raw/filings/603298.SH/2025-12-31/metadata.json
+No prior stock-research result for this company/period was available. Therefore core facts were reacquired from public filing materials.
+
+[source retrieval]
+- Located 杭叉集团股份有限公司2025年年度报告, disclosed 2026-04-22; audit report 天健审〔2026〕7708号, standard unqualified opinion.
+- Located 2025年度财务决算报告 for cross-checking main statements and ratios.
+- Downloaded annual-report PDF from the announcement download endpoint to:
+  stock_report/data/raw/filings/603298.SH/2025-12-31/annual-report-2025.pdf
+- The runtime had no pdftotext, pypdf, PyPDF2, pdfplumber, or fitz. Filing fields were therefore extracted/cross-checked through the searchable announcement text. This parser limitation is disclosed in result.json and report.md.
+- Market cap and PE were retained from task input: Tencent qt.gtimg.cn, timestamp 20260731114325.
+
+[statement model]
+Confirmed ordinary_operating. Filing states the company belongs to special-purpose equipment manufacturing and mainly develops, produces, and sells forklifts and other industrial vehicles. Receivables, inventory, factories/equipment, supplier payables, and customer advances form a conventional manufacturing operating cycle. Ordinary owner-earnback treatment is applicable.
+
+[key reported facts, CNY]
+revenue=17,738,651,997.86
+cost_of_sales=13,342,717,775.81
+gross_profit=4,395,934,222.05
+operating_profit=2,602,058,617.30
+net_profit=2,317,636,045.39
+parent_net_profit=2,191,315,695.90
+operating_cash_flow=1,683,901,243.07
+capital_expenditure=551,712,726.19
+operating_free_cash_flow=1,132,188,516.88
+total_assets=19,709,344,651.12
+total_liabilities=7,340,264,993.54
+total_equity=12,369,079,657.58
+parent_equity=11,608,341,434.37
+minority_interest=760,738,223.21
+
+[formulas]
+gross_margin=(17,738,651,997.86-13,342,717,775.81)/17,738,651,997.86=0.2478167012
+net_margin=2,191,315,695.90/17,738,651,997.86=0.1235333833
+operating_free_cash_flow=1,683,901,243.07-551,712,726.19=1,132,188,516.88
+
+[owner earnback assumptions]
+unrestricted_cash=4,377,218,636.29-52,810,684.91=4,324,407,951.38; weight=90%
+trading_financial_assets=100,347,215.23; weight=70%
+other_noncurrent_financial_assets=28,104,279.77; weight=50%
+long_term_equity_investments=3,036,220,631.75; weight=30%
+financing_and_lease_liabilities=1,619,989,393.84; weight=100% deduction
+discounted_detachable_net_cash=3,267,139,142.47
+
+sustainable_cash_profit starts from 2025 operating FCF 1,132,188,516.88.
+Normalization adjustment=167,811,483.12 for growth-related working-capital/capex pressure, with a conservative residual haircut versus accounting profit.
+discounted_sustainable_cash_profit=1,300,000,000.00
+
+market_cap=36,884,000,000.00
+operating_business_price=36,884,000,000.00-3,267,139,142.47=33,616,860,857.53
+owner_earnback_years=33,616,860,857.53/1,300,000,000.00=25.8591
+market_cap_to_cash_profit=36,884,000,000.00/1,300,000,000.00=28.3723
+
+[dividend]
+2025 interim dividend implemented=261,962,409.80
+2025 final dividend proposed=523,924,819.60
+2025 aggregate=785,887,229.40
+payout_ratio=35.86%
+forecast basis=mechanical continuation of 2025 aggregate; not company guidance.
+forecast_yield=785,887,229.40/36,884,000,000.00=0.0213069957
+
+[quality]
+data_quality.status=complete
+incomplete_reasons=[]
+Known limitations are retained in outputs/result.json. No ranking label, recommendation, or target price was produced.

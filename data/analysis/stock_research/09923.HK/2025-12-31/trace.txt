@@ -1,0 +1,53 @@
+stock-research trace
+company: YEAHKA (09923.HK)
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- No raw filing, annual facts package, normalized facts, or prior stock-research result existed for 09923.HK/2025-12-31.
+- Downloaded official 2025 annual report from HKEX:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0427/2026042701176.pdf
+- Local copy: stock_report/data/raw/filings/09923.HK/2025-12-31/2025-annual-report.pdf
+- Annual results announcement cross-check:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032600710.pdf
+
+3. Protocol
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All result fields were populated using protocol set/append commands; result.json was not hand-written from scratch.
+
+4. Model review
+- Input hint financial_brokerage rejected.
+- Annual report note 1.1 identifies one-stop payment, merchant solutions, and in-store e-commerce; no brokerage business.
+- Selected platform_financial_mixed / requires_special_model because restricted merchant settlement cash, settlement receivables/payables, loan receivables, and loan-facilitation guarantees are operating structures.
+- Ordinary owner-earnback fields intentionally remain null under the result contract.
+
+5. Key extraction (annual report page references)
+- pp.112-113: revenue 3,310,530k; cost 2,522,378k; gross profit 788,152k; operating profit 131,986k; net profit 84,339k; parent net profit 92,244k.
+- pp.114-115: assets 8,229,334k; liabilities 5,320,805k; equity 2,908,529k; parent equity 2,988,231k; NCI -79,702k.
+- pp.118-119: CFO 222,848k; PPE/intangible purchases 21,541k; financing cash flow 179,383k; buyback 5,123k; former-NCI dividend 5,418k.
+- p.196 note 24: restricted cash 1,581,173k mainly consumer payments collected on behalf of merchants.
+- pp.128-130 note 3.1(b): maximum loan-facilitation guarantee exposure 582,363k.
+- p.31: no 2025 final dividend; 2024 nil.
+
+6. Calculations
+- gross_margin = 788,152,000 / 3,310,530,000 = 0.2380742661.
+- net_margin = 92,244,000 / 3,310,530,000 = 0.0278638164 (parent profit / revenue).
+- operating_free_cash_flow = 222,848,000 - 21,541,000 = 201,307,000.
+- forecast_dividend_yield = 0 / 1,953,087,482.175827 = 0.
+- market cap / 2025 parent profit = approximately 21.17x, used only as narrative context, not owner-earnback.
+
+7. Limitations
+- Market cap and PE snapshot came from config/input.json and was not independently reconstructed historically.
+- PDF text utility was unavailable locally; official HKEX indexed document text and page references were used, while the original PDF was retained locally.
+- GPV, fee rate, and position statements are management disclosures; no independent market-share dataset was available.
+
+8. Validation
+- Protocol validate: status=ok, errors=[].
+- Independent cross-checks passed: balance sheet equation, margin formulas, free-cash-flow formula, special-model null fields, complete-status requirements.

@@ -1,0 +1,66 @@
+stock-research trace
+company=600642.SH 申能股份
+period=2025-12-31
+generated_for_input=2026-07-31T16:41:21+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because the skill requires reuse-first research.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields with protocol `set` commands; did not construct result.json from scratch.
+
+[reuse audit]
+- Expected annual facts, normalized facts, raw filing metadata and prior stock research paths were absent in /workspace.
+- Only config/input.json and stock_report/data/notes/user_stock_evaluations.md were present.
+- Therefore supplemented the missing annual filing from public disclosure.
+
+[sources]
+1. 申能股份有限公司2025年年度报告, disclosed 2026-04-27.
+   Reproducible filing mirror:
+   https://stockmc.xueqiu.com/202604/600642_20260427_ICB0.pdf
+   PDF size observed: 1,540,840 bytes; 267 pages.
+   Relevant pages:
+   - pp. 6-14: headline financials, business narrative, revenue/cost and segment margins
+   - pp. 22-24: generation, installed capacity and utilization hours
+   - pp. 94-98: audit opinion and key audit matters
+   - pp. 98-107: consolidated balance sheet, income statement and cash flow statement
+   - pp. 150-151: cash and deposits at group finance company
+   - pp. 168-170: long-term equity investments and investee earnings/dividends
+   - p. 185: short-term borrowings
+   - p. 192: long-term borrowings and pledged power/heat fee rights
+   - pp. 206-207: revenue/cost disaggregation and prior dividend
+2. 申能股份有限公司2025年度权益分派实施公告.
+   Search/reproduction page:
+   https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12434266&stockid=600642
+   Key fact: RMB 0.46/share on 4,894,079,376 shares; RMB 2,251,276,512.96 total.
+3. config/input.json.
+   Tencent qt.gtimg.cn snapshot at 20260731114348:
+   market cap RMB 41,110,000,000; PE TTM 10.85.
+
+[model review]
+- Hint reviewed against annual filing.
+- Confirmed statement_model=utility_concession and owner_earnback_applicability=requires_special_model.
+- Evidence: RMB 49.63bn fixed assets, RMB 8.23bn construction in progress, RMB 4.40bn right-of-use assets; project debt and lease financing are bound to long-lived infrastructure; some loans pledge fixed assets and electricity/heat fee rights.
+- Ordinary detachable-net-cash fields deliberately remain null per result contract.
+- Special model should use project-level remaining operating periods, volume, tariff, fuel/operating cost, maintenance and expansion capex, debt service, lease payments, taxes and minority leakage.
+
+[calculations]
+gross_profit = 28,029,356,985.68 - 21,705,995,726.46 = 6,323,361,259.22
+gross_margin = 6,323,361,259.22 / 28,029,356,985.68 = 0.2255977996
+net_margin = 4,013,390,354.76 / 28,029,356,985.68 = 0.1431852453
+operating_free_cash_flow = 8,696,194,340.50 - 5,064,590,180.31 = 3,631,604,160.19
+forecast_dividend_yield = 2,251,276,512.96 / 41,110,000,000 = 0.0547622601
+minority_interest_ratio = 8,650,232,879.37 / 50,348,219,853.63 = 0.1718081171
+
+[quality]
+- Core annual figures are from audited annual-report statements; audit opinion is standard unmodified.
+- The filing PDF was obtained through a reproducible mirror because no local filing/facts package existed.
+- No project-level remaining-term DCF was produced because the filing lacks sufficiently granular forward tariff, maintenance-capex and debt-amortization inputs.
+- Dividend yield is a static yield using an implemented 2025 distribution divided by the supplied 2026-07-31 market cap; it is not a forecast commitment for later years.
+
+[validation]
+Command:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Expected final status: ok, errors=[]

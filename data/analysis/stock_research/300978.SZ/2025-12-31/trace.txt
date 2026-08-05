@@ -1,0 +1,70 @@
+stock-research trace
+company=300978.SZ 东箭科技
+period=2025-12-31 annual
+generated_context=2026-07-31 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Local reuse audit
+- config/input.json exists.
+- No local annual facts package, normalized facts, raw filing archive, or prior stock-research output existed for 300978.SZ/2025-12-31.
+- Decision: return to public annual filing instead of fabricating missing fields.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result: stock-research-result-v1 skeleton created.
+
+4. Sources inspected
+- Guangdong Dongjian Automotive Technology Co., Ltd. 2025 Annual Report, disclosed 2026-04-28. Announcement full text and PDF mirror inspected; core statements, business discussion, segment data, assets/liabilities, cash flow, dividends, and risks extracted.
+- Annual report PDF mirror: http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESZ_STOCK/2026/2026-4/2026-04-28/12234221.PDF
+- Announcement full text: https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12234221&stockid=300978
+- 2025 annual shareholders meeting resolution and 2025 annual dividend implementation information used to confirm the RMB 0.30/share annual distribution was approved and implemented in June 2026.
+- Market data reused from config/input.json: market cap RMB 3,551,000,000; PE TTM 28.47; timestamp 20260731114318; source Tencent qt.gtimg.cn.
+
+5. Statement model confirmation
+- ordinary_operating / applicable.
+- Basis: revenue is predominantly automotive components; receivables, inventory, fixed assets and supplier liabilities are ordinary operating items. Cash, financial products and borrowings are separable. No customer funds, insurance reserves, regulated presale cash, project advances or concession rights were found.
+
+6. Key reported numbers (CNY)
+- Revenue 2,034,473,790.47
+- Cost of sales 1,449,545,554.48
+- Gross profit 584,928,235.99
+- Parent net profit 142,443,897.61
+- Recurring parent net profit 154,147,358.05
+- Operating cash flow 318,764,907.45
+- Capital expenditure proxy 75,634,020.70
+- Operating free cash flow 243,130,886.75
+- Total assets 2,680,479,705.20
+- Total liabilities 946,489,412.89
+- Total equity 1,733,990,292.31
+- Parent equity 1,658,004,931.41
+
+7. Owner earnback calculations
+- Cash base uses year-end cash and cash equivalents, not headline monetary funds: 379,823,746.45 * 90% = 341,841,371.805.
+- Trading financial assets: 240,876,230.76 * 80% = 192,700,984.608.
+- Financing debt deducted at 100%: short-term borrowings 270,239,156.77 + current non-current liabilities 10,746,586.11 + long-term borrowings 7,350,000.00 = 288,335,742.88.
+- Discounted detachable net cash = 246,206,613.533.
+- Sustainable cash profit base = recurring parent net profit 154,147,358.05; 10% sustainability/distribution haircut applied because 2025 FCF included receivables and inventory release.
+- Discounted sustainable cash profit = 138,732,622.245.
+- Operating business price = 3,551,000,000 - 246,206,613.533 = 3,304,793,386.467.
+- Owner earnback years = 3,304,793,386.467 / 138,732,622.245 = 23.8213142157.
+- Market cap to cash profit = 25.5959985657.
+
+8. Dividend calculation
+- 2025 annual distribution: 422,702,739 shares * RMB 0.30 = RMB 126,810,821.70.
+- Forecast dividend yield for the annual scheme = 126,810,821.70 / 3,551,000,000 = 3.57112987%.
+- The annual report also records two 2025 interim distributions of RMB 0.05/share each; these are described separately and are not added to the annual-scheme forward yield.
+
+9. Protocol updates and validation
+- All result fields were populated with protocol set commands; the complex result object was not handwritten from scratch.
+- Final validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed validation status: ok, errors=[].
+
+10. Limitations
+- No prebuilt local facts package was available.
+- Authoritative comparable market-share data was unavailable, so no absolute industry rank is claimed.
+- Discounts are explicit research assumptions, not reported accounting values.

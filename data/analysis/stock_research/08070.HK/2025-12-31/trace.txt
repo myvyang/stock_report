@@ -1,0 +1,65 @@
+Stock research trace
+company: KEEN OCEAN (08070.HK)
+period: 2025-12-31
+generated_at: 2026-08-04T16:35:53+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+- config/input.json was present.
+- No local annual facts package, normalized facts, filing metadata, or prior stock-research result existed for 08070.HK/2025-12-31.
+- Therefore fetched the official 2025 annual report from HKEX:
+  https://www.hkexnews.hk/listedco/listconews/gem/2026/0429/2026042900417.pdf
+- Saved local source copy:
+  stock_report/data/raw/filings/08070.HK/2025-12-31/annual-report-2025.pdf
+
+3. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Annual report evidence: group manufactures and sells transformers, switching-mode power supplies, electric healthcare products, and electronic parts/components.
+- Balance sheet contains ordinary manufacturing working capital, bank deposits, bank borrowings, and lease liabilities; no brokerage client money, proprietary financial assets, or repo financing.
+- Override: ordinary_operating / applicable.
+
+4. Core source facts (HKD'000)
+- Revenue 388,467; cost of sales 293,633; gross profit 94,834; operating profit 49,549; parent net profit 40,955.
+- Total assets 278,935; total liabilities 152,703; total equity 126,232; parent equity 126,257; NCI -25.
+- Operating cash flow 30,458; capex 11,512; operating free cash flow 18,946; financing cash flow -9,306; 2025 dividends paid 0.
+- Cash 13,680; short-term deposits 59,675; pledged deposits 10,443; bank loans/overdrafts 13,479; lease liabilities 1,577.
+- Customer A revenue 81,150; Customer B revenue 181,502; combined concentration 67.61%.
+- 2025 gross margin 24.4% versus 19.6% in 2024.
+- Board did not recommend a dividend for 2025.
+
+5. Currency normalization
+- Protocol requires absolute CNY yuan.
+- Applied a uniform approximate conversion of HKD 1 = CNY 0.92 to all annual-report amounts.
+- Ratios remain based on original currency and are unaffected by conversion.
+- Market cap CNY 189,266,000.98609927 and PE TTM 5.37 were reused from the input market snapshot.
+
+6. Owner earnback calculations (CNY)
+- Discounted cash: bank cash 12,585,600 * 80% = 10,068,480.
+- Discounted short-term deposits: 54,901,000 * 70% = 38,430,700.
+- Pledged deposits: 9,607,560 * 0% = 0.
+- Less bank debt: 12,400,680.
+- Less lease liabilities: 1,450,840.
+- Discounted detachable net cash = 34,647,660.
+- Sustainable cash profit: parent profit 37,678,600 + depreciation 5,190,640 - capex 10,591,040 - cycle/product-mix normalization 7,278,200 = 25,000,000.
+- Operating business price = 189,266,000.98609927 - 34,647,660 = 154,618,340.98609927.
+- Owner earnback years = 154,618,340.98609927 / 25,000,000 = 6.184733639.
+- Market cap to cash profit = 189,266,000.98609927 / 25,000,000 = 7.570640039.
+- Forecast cash dividend = 0; forecast dividend yield = 0.
+
+7. Protocol actions
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields with repeated protocol `set` commands; the complex JSON was not handwritten from scratch.
+- Validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[].
+
+8. Output status
+- outputs/result.json: complete
+- outputs/report.md: created
+- outputs/trace.txt: created

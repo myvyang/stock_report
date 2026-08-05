@@ -1,0 +1,56 @@
+task=stock-research
+company=000543.SZ 皖能电力
+period=2025-12-31
+report_type=annual
+generated_input_at=2026-07-31T20:26:22+08:00
+
+[protocol]
+initialized outputs/result.json with:
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+populated fields with protocol set commands; complex JSON was not handwritten from scratch.
+
+[source discovery]
+No pre-existing annual facts, normalized facts, filing metadata, or annual-review trace was present under the input paths.
+Official annual report located at:
+https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-24/3b3f544c-c39a-4da0-8493-880d50c9247f.PDF
+Downloaded copy:
+stock_report/data/raw/filings/000543.SZ/2025-12-31/annual-report-2025.pdf
+
+[source priority]
+Core statements, business facts, dividend proposal, risks: Shenzhen Stock Exchange annual report.
+Market capitalization and PE TTM: config/input.json snapshot attributed to Tencent qt.gtimg.cn.
+
+[extracted annual-report anchors]
+pp.81-84: consolidated balance sheet.
+pp.86-87: consolidated income statement.
+pp.89-90: consolidated cash-flow statement.
+pp.15-16: revenue/cost composition.
+pp.20-21: cash-flow discussion.
+pp.24-26: major subsidiaries/associate and outlook risks.
+pp.44-45, 224: 2025 dividend proposal.
+
+[calculations]
+gross_profit=27305760344.59-22863271346.52=4442488998.07
+gross_margin=4442488998.07/27305760344.59=0.1626923905
+net_margin=2149137046.85/27305760344.59=0.0787045313
+operating_free_cash_flow=5390412751.81-3247320956.20=2143091795.61
+minority_interest_ratio=8813398722.99/26177957208.99=0.3366744533
+forecast_dividend_yield=859141202.45/18090000000=0.0474926038
+interest_bearing_debt=3951260584.69+6481344709.57+20752822051.08+5050000000=36235673445.34
+dividend_cash_out_observation=2024_parent_dividend_723129402.59+2025_subsidiary_minority_dividends_651048808.68=1374178211.27; this reconciles the structured field and excludes interest from the cash-flow statement's combined dividend-and-interest line.
+
+[model decision]
+statement_model=utility_concession
+owner_earnback_applicability=requires_special_model
+Reason: power-generation fixed assets, construction in progress, project debt, working cash, minority interests, and material associate holdings are the business itself. Cash cannot be treated as detachable net cash. Ordinary earnback sortable fields remain null by contract.
+
+[limitations]
+The annual report does not split capital expenditure into maintenance versus growth capex.
+No project-by-project remaining life, volume, tariff, fuel/carbon cost, maintenance capex, or debt amortization model was built.
+Market snapshot was not cross-checked with a second quote source.
+
+[validation]
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]
+Confirmed all ordinary owner-earnback sortable fields are null because applicability is requires_special_model.

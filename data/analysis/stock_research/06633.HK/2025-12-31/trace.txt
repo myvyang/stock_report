@@ -1,0 +1,66 @@
+stock-research trace
+company: QINGCI GAMES / 06633.HK
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked raw filing, annual review, normalized facts and prior stock research paths for 06633.HK/2025-12-31.
+- No pre-existing filing metadata, facts package or prior research result was available.
+- Downloaded the official 2025 Annual Report into:
+  stock_report/data/raw/filings/06633.HK/2025-12-31/2025-annual-report.pdf
+
+3. Primary sources
+- HKEX 2025 Annual Results Announcement, published 2026-03-26:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0326/2026032601141.pdf
+- HKEX 2025 Annual Report, published 2026-04-20:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0420/2026042000690.pdf
+- Market snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026/08/03 09:20:05.
+
+4. Model override
+- Input hint classified the company as financial_brokerage.
+- Audited filing identifies the group as a mobile-game developer/operator and information-service provider.
+- Revenue consists principally of game operations; the balance sheet has no client money, repo financing, brokerage receivables or securities-customer liabilities.
+- Overrode model to ordinary_operating and applicability to applicable.
+
+5. Core extraction (RMB'000 converted to absolute RMB)
+- Revenue 456,077; cost of sales 194,790; gross profit 261,287.
+- Operating profit 125,868; net profit 123,339; parent net profit 121,749.
+- Total assets 2,051,427; liabilities 151,369; equity 1,900,058; parent equity 1,908,384; NCI -8,326.
+- Cash 444,310; short-term FVTPL investments 1,273,075; long-term FVTPL investments 148,055; equity-method investments 31,034.
+- Borrowings 10,000; lease liabilities 9,756; contract liabilities 44,461.
+- Operating cash flow 23,281; PPE purchases/capital expenditure 3,165; operating FCF 20,116; financing cash flow -20,575.
+- No dividend paid or declared; no share buyback cash out.
+
+6. Computations
+- gross_margin = 261,287,000 / 456,077,000 = 0.5729010671.
+- net_margin = 121,749,000 / 456,077,000 = 0.2669483442.
+- discounted detachable net cash:
+  444,310,000 * 70% + 1,273,075,000 * 60% - 10,000,000 - 9,756,000
+  = 1,055,106,000.
+- operating business price:
+  1,593,938,039.304614 - 1,055,106,000 = 538,832,039.304614.
+- operating FCF = 23,281,000 - 3,165,000 = 20,116,000.
+- discounted sustainable cash profit = 20,116,000 * 50% = 10,058,000.
+- owner earnback years = 538,832,039.304614 / 10,058,000 = 53.5725.
+- market cap / cash profit = 1,593,938,039.304614 / 10,058,000 = 158.4747.
+- forecast dividend = 0; forecast dividend yield = 0.
+
+7. Judgment basis
+- Cash discount retains working capital and funding for announced R&D/global launches.
+- Short-term investment discount reflects fund/wealth-product market risk despite disclosed liquidity.
+- Long-term investments were excluded from detachable cash due to valuation and liquidity uncertainty.
+- Cash profit starts from audited operating cash flow, not net profit, because 2025 FVTPL gain of RMB134.537m exceeded parent profit of RMB121.749m.
+- A further 50% sustainability haircut reflects MAU -52%, MPU -39%, mature product decline and announced 2026-2028 concentrated investment.
+
+8. Validation
+- Populated result fields via protocol set/append commands; no complex JSON was hand-written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]

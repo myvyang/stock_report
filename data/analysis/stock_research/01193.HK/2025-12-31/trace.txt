@@ -1,0 +1,64 @@
+[2026-08-03 Asia/Shanghai] Stock research trace — 01193.HK — FY2025
+
+1. Read instructions and contracts
+- Read /workspace/AGENTS.md.
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md, references/report-contract.md and references/data-reuse.md.
+- Confirmed required output currency is CNY absolute yuan and special-model ordinary earnback metrics must remain null.
+
+2. Checked reusable local data
+- config/input.json was present.
+- No raw filing, annual facts package, normalized facts or prior stock-research output existed for 01193.HK/2025-12-31.
+- Therefore returned to primary public filing sources.
+
+3. Identified and obtained primary filings
+- HKEX issuer title search identified:
+  * 2025 Annual Report, released 2026-04-30:
+    https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0430/2026043001092.pdf
+  * FY2025 Final Results, released 2026-03-27:
+    https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0327/2026032700694.pdf
+- Downloaded annual report to stock_report/data/raw/filings/01193.HK/2025-12-31/annual-report-2025.pdf.
+- Extracted local text to annual-report-2025.txt for page-level review.
+
+4. Corrected analysis model
+- Input hint said financial_brokerage, but the annual report describes city gas distribution, gas connection, comprehensive services, design/construction and gas stations.
+- Core operating asset is a 332,247 km city gas network; cash, borrowing and capital expenditure support the network.
+- Set statement_model=utility_concession and owner_earnback_applicability=requires_special_model.
+- Kept discounted net cash, discounted cash profit, operating business price, owner earnback years and market-cap/cash-profit metrics null as required by contract.
+
+5. Extracted and checked core FY2025 facts (HKD unless stated)
+- Revenue HK$97,732.605m; cost of sales HK$80,312.837m; gross profit HK$17,419.768m.
+- Profit attributable to owners HK$3,546.793m; total profit HK$5,097.584m.
+- Total assets HK$136,407.044m; total equity HK$68,028.198m; parent equity HK$44,176.114m; NCI HK$23,852.084m.
+- Bank balances and cash HK$7,692.509m; borrowings HK$23,700.953m.
+- Operating cash flow HK$6,575.111m.
+- Capital expenditure definition used: PPE HK$3,210.946m + right-of-use assets HK$44.429m + intangible assets HK$14.643m = HK$3,270.018m.
+- Operating free cash flow: HK$6,575.111m - HK$3,270.018m = HK$3,305.093m.
+- Full-year dividend HK$0.95/share; issued shares approximately 2,314.013m.
+- Gross gas sales volume 40,183m m3; connected customers 62,719,021; pipeline 332,247 km; paid new household connections down 20.1%.
+
+6. Currency normalization
+- Source: Hong Kong Inland Revenue Department, 2025/26 Average Exchange Rates of Major Foreign Currencies for Profits Tax Purposes.
+- December 2025 year-ended rate: HK$100 = RMB91.6403, therefore 1 HKD = 0.916403 CNY.
+- Applied this single rate to all structured financial statement amounts for protocol consistency.
+- Recorded the single-rate simplification as a data-quality limitation.
+- Input market cap was used as supplied and treated by protocol as CNY; no FX override was made.
+
+7. Dividend forecast convention
+- Mechanical baseline: FY2025 dividend HK$0.95/share maintained, multiplied by approximately 2,314.013m shares and converted at 0.916403.
+- Forecast cash dividend = RMB2,014,539,919.30.
+- Forecast dividend yield = 6.0487% against supplied market cap RMB33,305,172,605.52.
+- This is not management guidance; limitation disclosed.
+
+8. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields through repeated protocol `set` commands; did not hand-write the complex JSON object.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: {"status":"ok","errors":[]}.
+
+9. Final output state
+- outputs/result.json: protocol-valid, data_quality.status=complete.
+- outputs/report.md: operating story, special-model treatment, cash/dividend analysis, risks and primary links.
+- outputs/trace.txt: this reproducibility record.

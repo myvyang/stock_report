@@ -1,0 +1,69 @@
+stock-research trace — OBK — period 2025-12-31
+generated_at: 2026-08-05T05:35:51+08:00
+
+1. Protocol initialization
+   Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+   Result: initialized stock-research-result-v1.
+
+2. Required contracts read
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/SKILL.md
+
+3. Local reuse audit
+   Expected paths under stock_report/data/analysis/annual_review/OBK/2025-12-31 and stock_report/data/raw/filings/OBK/2025-12-31 were absent.
+   Decision: retrieve and verify primary public disclosures; record missing local pack as a limitation.
+
+4. Primary documents used
+   - SEC Form 10-K, fiscal year ended 2025-12-31, accession 0001516912-26-000011, filed 2026-02-25:
+     https://www.sec.gov/Archives/edgar/data/1516912/000151691226000011/obnk-20251231.htm
+   - SEC Companyfacts, CIK 0001516912:
+     https://data.sec.gov/api/xbrl/companyfacts/CIK0001516912.json
+   - Origin Bancorp official annual-report index and official Q2 2026 results/dividend announcements:
+     https://ir.origin.bank/financial-information/annual-reports/
+     https://www.origin.bank/news/origin-bancorp-inc-reports-earnings-for-second-quarter-2026/
+     https://ir.origin.bank/news-and-events/news-releases
+   - Market valuation snapshot: config/input.json, source field Yahoo Finance yfinance, dated 2026-08-03.
+
+5. Analysis-model override
+   Input hint: ordinary_operating / applicable.
+   Verified model: financial_bank / requires_special_model.
+   Basis: Origin Bancorp is a financial holding company whose principal subsidiary accepts deposits and originates loans. Deposits, loans, securities and regulatory cash are operating assets/liabilities, not detachable net cash. Ordinary owner-earnback fields were left null.
+
+6. Key USD facts extracted from 10-K
+   Total assets: 9,724,722,000
+   Total liabilities: 8,478,037,000
+   Stockholders' equity: 1,246,685,000
+   Net loans: 7,574,135,000; gross LHFI: 7,670,917,000
+   Deposits: 8,307,247,000
+   Cash and cash equivalents: 424,217,000
+   Total securities: 1,133,950,000
+   Net interest income: 330,993,000
+   Noninterest income: 59,834,000
+   Provision for credit losses: 46,284,000
+   Net income: 75,197,000
+   Cash dividends paid: 18,872,000
+   NIM-FTE: 3.61%; 2024: 3.22%
+   Nonperforming LHFI: 81,184,000; NPL ratio: 1.06%
+   Nonperforming assets: 81,878,000; NPA/assets: 0.84%
+   Allowance for loan credit losses: 96,782,000; allowance/NPL: 119.21%
+   Company CET1: 13.54%; Bank CET1: 12.62%
+   Deposits above FDIC insurance limit: 3,930,000,000, including 860,000,000 collateralized public deposits.
+
+7. Currency treatment
+   Protocol requires CNY absolute yuan. A uniform presentation rate of CNY 7.14 per USD was applied to filing amounts.
+   This is an explicit conversion assumption, not a claim that the filing used CNY. Ratios were calculated from USD source values.
+
+8. Derived metrics
+   Display revenue = net interest income + noninterest income = USD 390,827,000 = CNY 2,790,504,780.
+   2025 approximate ROA = 75,197,000 / average(9,724,722,000, 9,678,702,000) = 0.7751%.
+   2025 approximate ROE = 75,197,000 / average(1,246,685,000, 1,145,245,000) = 6.2876%.
+   Market cap / year-end book equity = 11,393,607,616.53 / 8,901,330,900 = 1.2800x.
+   Forecast dividend: USD 0.25 quarterly x 4 x 30,983,713 shares x 7.14 = CNY 221,223,710.82.
+   Forecast dividend yield = 221,223,710.82 / 11,393,607,616.53 = 1.94165%.
+
+9. Protocol population
+   outputs/result.json was populated with repeated protocol `set` commands for analysis sources, model, metrics, financials, asset analysis, owner earnback, dividend, business, risks, evidence and data quality. It was not hand-written as a complex JSON object.
+
+10. Final validation
+    See final command output from protocol validate. Any validation errors were corrected before completion.

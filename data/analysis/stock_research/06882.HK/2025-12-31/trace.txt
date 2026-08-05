@@ -1,0 +1,82 @@
+stock-research trace
+company: EGL Holdings Company Limited (06882.HK)
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because the selected skill routes source reuse through it.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated scalar/object-array fields using protocol set/append commands; did not construct result.json by hand.
+
+2. Reuse check
+- No files were present in the supplied 2025 annual filing, annual review, normalized facts, or prior stock-research paths.
+- Downloaded official annual report to:
+  stock_report/data/raw/filings/06882.HK/2025-12-31/annual-report-2025.pdf
+- Official URL:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042800984.pdf
+- HKEX release date: 2026-04-28; audited financial statements approved 2026-03-27.
+
+3. Model verification
+- Input hint: financial_brokerage / requires_special_model.
+- Annual report pp.15-17 states businesses are package tours, FIT/ancillary travel products and hotel ownership/development/management.
+- No brokerage customer funds, proprietary securities portfolio or repo financing found.
+- Override: ordinary_operating / applicable.
+- Important qualification: contract liabilities are customer performance obligations; hotel assets and debt are operating/funding structure, not detachable cash.
+
+4. Source financials (HK$'000)
+- Revenue 1,511,904; cost of sales 1,186,659; gross profit 325,245.
+- Operating profit used 60,806 = gross profit 325,245 + other income 6,483 - selling 99,966 - administrative 175,763 - other operating 34 + share of associates 4,841.
+- Net profit 34,908; parent net profit 34,724.
+- Total assets 732,860 = non-current assets 480,087 + current assets 252,773.
+- Total liabilities 628,251 = total assets 732,860 - total equity 104,609.
+- Parent equity 106,141; minority interest -1,532.
+- Operating cash flow 98,439; capex 6,781; operating FCF 91,658; financing cash flow -110,484; dividend cash out 30,147.
+- Source: audited statements, annual report pp.89-96.
+
+5. Currency conversion
+- Contract requires absolute CNY yuan.
+- Rate: 2025-12-31 central parity, HKD 1 = CNY 0.90322.
+- SAFE historical-rate entry point: https://www.safe.gov.cn/safe/rmbhlzjj/
+- Conversion formula for filing values: HK$'000 * 1,000 * 0.90322.
+- Market cap was accepted directly as CNY per task input.
+
+6. Margin formulas
+- Gross margin = 325,245 / 1,511,904 = 0.2151227856.
+- Net margin = parent net profit 34,724 / revenue 1,511,904 = 0.0229670667.
+
+7. Owner earnback
+- Cash at banks/on hand: HK$152.841m * 0.90322 * 90% = CNY124.244m.
+- Pledged deposits: HK$9.093m, discount 0%; excluded as restricted.
+- Bank borrowings: HK$218.692m * 0.90322 = CNY197.527m, deducted 100%.
+- Related company loan: HK$90.532m * 0.90322 = CNY81.770m, deducted 100%.
+- Discounted detachable net cash = 124.244 - 197.527 - 81.770 = CNY -155.053m.
+- Lease liabilities treated as operating-location obligations and not added again to financing debt in this net-cash calculation.
+- Normalized pre-discount cash profit:
+  operating cash flow HK$98.439m
+  less release of deposits/prepayments/other receivables HK$26.959m
+  less capex HK$6.781m
+  = HK$64.699m = CNY58.438m.
+- Apply approximately 50% sustainability discount for 50.9% parent-profit decline, Japan demand cycle and explicit going-concern uncertainty.
+- Discounted sustainable cash profit = CNY29.219m.
+- Operating business price = market cap CNY198.841m - discounted net cash CNY(-155.053m) = CNY353.894m.
+- Owner earnback years = 353.894 / 29.219 = 12.11 years.
+- Market cap / cash profit = 198.841 / 29.219 = 6.81x.
+
+8. Dividend
+- Shares: 502,450,000.
+- Proposed/approved 2025 final dividend: HK$0.035 per share.
+- Forecast cash dividend = 502.45m * 0.035 * 0.90322 = CNY15.884m.
+- Forecast yield = CNY15.884m / CNY198.841m = 0.0798819.
+- Historical special dividend: HK$0.06 per share / HK$30.147m paid; not extrapolated.
+
+9. Key uncertainty evidence
+- Annual report pp.98-100: current net liabilities HK$179.314m and conditions that may cast significant doubt on going concern.
+- Measures include expected travel recovery, related-company loan maturity extension and additional standby credit.
+- Annual report pp.15-17: package-tour revenue -9.6%, gross profit -28.7%; hotel occupancy 91.1% and 93.8%.
+
+10. Validation
+- Initial completed validation: status ok, errors [].
+- Final validation is run again after report/trace creation and its status recorded in the task handoff.

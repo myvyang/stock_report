@@ -1,0 +1,86 @@
+stock-research trace
+company=康农种业
+code=920403.BJ
+period=2025-12-31
+generated_for_input=2026-08-03T11:34:12+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Read references/data-reuse.md because the task supplied reusable long-term data paths.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated the initialized skeleton using protocol set commands; result.json was not authored as a complex object from scratch.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse audit]
+- No annual facts, normalized facts, raw filing metadata, or prior stock-research result existed under the workspace paths in config/input.json.
+- No matching 920403.BJ/2025-12-31 artifacts existed under /root/aicode/stock_report.
+- Reuse was therefore unavailable; the full annual report was retrieved and analyzed.
+
+[primary documents]
+- Full 2025 annual report, disclosure date 2026-04-27, 153 pages:
+  http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSEBJ_STOCK/2026/2026-4/2026-04-27/12233110.PDF
+- Local copy:
+  stock_report/data/raw/filings/920403.BJ/2025-12-31/annual-report-2025.pdf
+- Extracted text used for exact lookup:
+  stock_report/data/raw/filings/920403.BJ/2025-12-31/annual-report-2025.txt
+- Annual dividend implementation announcement: disclosed 2026-06-11; implementation 2026-06-24; RMB 0.20 per pre-transfer share.
+- Market snapshot: config/input.json; Tencent qt.gtimg.cn; market cap RMB 2,064,000,000; PE TTM 24.47; timestamp 20260731153820.
+
+[model decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=The audited business is hybrid corn seed R&D, outsourced seed production organization, processing, and distribution sales. Balance-sheet items are ordinary cash, receivables, inventory, fixed assets, operating return/discount obligations, and grants. No financial, property-development, construction-project, concession, or investment-holding economics were identified.
+
+[audited financial facts, CNY]
+revenue=361657066.94
+cost_of_sales=217715682.42
+gross_profit=143941384.52
+operating_profit=76459267.40
+parent_net_profit=75934130.11
+operating_cash_flow=65153630.51
+capital_expenditure=30934050.71
+operating_free_cash_flow=34219579.80
+total_assets=967964948.00
+total_liabilities=411559847.74
+parent_equity=556405100.26
+cash=270244049.40
+interest_bearing_debt=0
+accounts_receivable=151260431.27
+inventory_net=281017836.86
+inventory_impairment_charge=18704889.27
+return_cost_asset=74079031.25
+estimated_return_and_discount_liability=255000072.60
+
+[formula audit]
+gross_margin=(361657066.94-217715682.42)/361657066.94=0.39800517583658973
+net_margin=75934130.11/361657066.94=0.20996169313787447
+2025_fcf=65153630.51-30934050.71=34219579.80
+2024_fcf=93211428.04-45356272.21=47855155.83
+two_year_average_fcf=(34219579.80+47855155.83)/2=41037367.815
+discounted_cash_profit=41037367.815*0.90=36933631.0335
+discounted_detachable_net_cash=270244049.40*0.50-0=135122024.70
+operating_business_price=2064000000-135122024.70=1928877975.30
+owner_earnback_years=1928877975.30/36933631.0335=52.22551699697344
+market_cap_to_cash_profit=2064000000/36933631.0335=55.88402608256646
+forecast_dividend_yield=19872216/2064000000=0.009628011627906977
+
+[judgment audit]
+- Cash haircut: 50%. This is deliberately conservative because seed procurement is seasonal and year-end balances include RMB 281.02m inventory, RMB 74.08m return-cost asset, and RMB 255.00m estimated return/discount liabilities. The haircut is an analyst assumption, not a reported restriction.
+- Sustainable cash-profit haircut: 10% from the two-year average FCF. This buffers inventory realization, return estimates, product iteration, and maintenance/growth-capex classification uncertainty.
+- No receivables, inventory, grants, or fixed assets were included in detachable net cash.
+- Dividend forecast uses an implemented distribution, not an analyst growth forecast.
+
+[data quality]
+status=complete
+limitations:
+- No authoritative national market-share figure was found in the annual report.
+- Year-end working-capital balances may not represent the normal intra-year level because sales are concentrated in Q4.
+- Market cap and PE use the supplied Tencent snapshot and were not independently recomputed from exchange history.
+- Owner-earnback haircuts are transparent research judgments and should be sensitivity-tested.
+
+[validation]
+protocol_validate_status=ok
+protocol_validate_errors=[]

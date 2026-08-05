@@ -1,0 +1,77 @@
+stock-research trace
+company=CDW Corporation
+period=2025-12-31
+generated_at=2026-08-05T05:20:19+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full as requested.
+3. Read references/data-reuse.md because no local fact package was present.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields through repeated protocol set commands; did not construct result.json directly.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   status=ok, errors=[]
+
+[local reuse audit]
+config/input.json existed.
+No files existed under stock_report/data/raw/filings/CDW/2025-12-31.
+No files existed under stock_report/data/analysis/annual_review/CDW/2025-12-31.
+No prior stock-research outputs existed for CDW/2025-12-31.
+Conclusion: official filing retrieval was required.
+
+[primary sources]
+SEC 2025 Form 10-K, accession 0001402057-26-000011, filed 2026-02-20:
+https://www.sec.gov/Archives/edgar/data/1402057/000140205726000011/cdw-20251231.htm
+Used for business description, customer/segment/category mix, all three financial statements, receivables, contract liabilities, debt, capital allocation and risks.
+
+CDW corporate overview:
+https://www.cdw.com/content/cdw/en/about/overview.html
+Used to cross-check customer count, offering and 2025 sales.
+
+CDW Investor Relations dividend history / FAQ:
+https://investor.cdw.com/stock-info/dividend-history/default.aspx
+https://investor.cdw.com/resources/investor-faqs/default.aspx
+Used for 2026 quarterly dividend and board-discretion caveat.
+
+Federal Reserve H.10 China spot exchange rate:
+https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+2025-12-31 USD/CNY=7.1875.
+
+Market snapshot supplied by config/input.json:
+date=2026-08-03
+market_cap_CNY=127424078185.60547
+pe_ttm=18.02561
+source=Yahoo Finance yfinance
+
+[model decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+Reason: CDW is a product reseller and IT solutions integrator. Receivables, inventory and supplier payables are operating working capital; debt is ordinary financing. It is not a bank, broker, insurer, property developer, construction contractor, concession utility or investment holding platform.
+
+[source USD figures, millions]
+balance sheet 2025: assets=16028.2; liabilities=13422.1; equity=2606.1; cash=618.7; AR_current_net=6312.4; inventory=563.4; goodwill=4662.3; intangibles=1186.4; current_debt=1007.5; long_term_debt=4622.3.
+income statement 2025: revenue=22424.1; cost_of_sales=17550.7; gross_profit=4873.4; operating_income=1655.6; net_income=1066.6.
+cash flow 2025: CFO=1205.2; capex=117.1; FCF=1088.1; financing_CF=-1184.5; repurchases=653.0; dividends_paid=328.6.
+FCF history: 2023=1598.7-148.2=1450.5; 2024=1277.3-122.6=1154.7; 2025=1205.2-117.1=1088.1.
+
+[calculations]
+All CNY financial amounts = USD amount * 1,000,000 * 7.1875.
+gross_margin=4873.4/22424.1=0.21732867762808764.
+net_margin=1066.6/22424.1=0.0475648966959655.
+net_debt=(1007.5+4622.3-618.7)*7.1875 million CNY=36017281250.
+discounted_detachable_net_cash=-36017281250.
+three_year_FCF_median=1154.7 million USD=8299406250 CNY.
+discounted_sustainable_cash_profit=8299406250*0.90=7469465625.
+operating_business_price=127424078185.60547-(-36017281250)=163441359435.60547.
+owner_earnback_years=163441359435.60547/7469465625=21.881265359676313.
+market_cap_to_cash_profit=127424078185.60547/7469465625=17.059329888221484.
+forecast_dividend=129.4m shares*USD2.52*7.1875=2343757500 CNY.
+forecast_dividend_yield=2343757500/127424078185.60547=0.01839336437330228.
+
+[judgment flags]
+Cash profit uses the three-year reported FCF median, then a subjective 10% haircut for receivables growth, margin pressure and working-capital reversal risk.
+No receivables, inventory, goodwill or intangible assets are treated as detachable cash.
+Forecast dividend annualizes the declared USD0.63 quarterly rate; it is not company guidance and remains subject to board approval.
+The same period-end FX rate is used for balance-sheet and flow items to keep protocol formulas consistent; CNY values are analytical translations, not reconstructed GAAP currency translation.

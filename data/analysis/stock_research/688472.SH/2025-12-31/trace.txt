@@ -1,0 +1,54 @@
+stock-research trace
+company=688472.SH 阿特斯
+period=2025-12-31
+generated_for_task=2026-08-01 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized result via protocol CLI
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse audit
+- No raw filing, annual facts, normalized facts, or historical stock-research result existed under the paths declared in config/input.json.
+- Only stock_report/data/notes/user_stock_evaluations.md existed and contained no company-specific facts used here.
+
+4. Primary/near-primary evidence obtained
+- 2025 annual report, disclosed 2026-04-28. Web-readable copy used for extraction; report states KPMG Huazhen issued an unmodified audit opinion.
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12235980&stockid=688472
+- SSE-hosted announcement on 2025 non-operating fund occupation, announcement 2026-025.
+  https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-28/688472_20260428_FKZ6.pdf
+- Market-cap/PE snapshot was supplied in config/input.json: Tencent qt.gtimg.cn, 2026-07-31 11:43:28.
+
+5. Model review
+- Input hint: utility_concession / requires_special_model.
+- Financial and business facts: 2025 principal revenue is entirely classified as photovoltaic industry; products are modules, battery-storage systems, photovoltaic systems, and construction contracts. No dominant concession-life or regulated-tariff economics found.
+- Override: ordinary_operating / applicable.
+
+6. Key calculations (CNY)
+- Gross profit = 40,255,735,859.24 - 36,083,104,777.71 = 4,172,631,081.53.
+- Gross margin = 4,172,631,081.53 / 40,255,735,859.24 = 0.10365308178988969.
+- Parent net margin = 1,015,771,417.47 / 40,255,735,859.24 = 0.025232961111971514.
+- Operating free cash flow = 7,075,155,179.27 - 6,811,791,557.32 = 263,363,621.95.
+- Forecast dividend yield = 355,513,213.89 / 38,472,000,000 = 0.00924083005536494.
+- Discounted detachable net cash = 0: identifiable cash/investments are constrained by restricted funds, debt, working capital, and construction commitments.
+- Discounted sustainable cash profit = 0: continuing-operation net loss, cash-flow improvement partly from collections/subsidies, and maintenance capex not separable from expansion capex.
+- Operating business price = 38,472,000,000 - 0 = 38,472,000,000.
+- Owner earnback years and market-cap/cash-profit are null because sustainable cash profit is not positive.
+
+7. Protocol population
+- All result fields were populated using repeated protocol CLI `set` operations; result.json was not authored as a complex object from scratch.
+
+8. Validation
+PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=[]
+
+9. Known limitations
+- Market quote is input-supplied rather than audited.
+- Maintenance versus expansion capex is unavailable.
+- Fund-occupation repayment commitment was identified, but actual cash settlement was not independently verified.
+- Overseas restructuring created discontinued-operation profit, reducing comparability with future continuing operations.

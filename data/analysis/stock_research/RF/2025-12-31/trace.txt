@@ -1,0 +1,27 @@
+Stock research trace — RF — period 2025-12-31
+Generated: 2026-08-04 Asia/Shanghai
+
+1. Read stock-research/SKILL.md, result-contract.md, report-contract.md, and data-reuse.md in full.
+2. Ran protocol init:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Checked configured raw filing, annual review, normalized facts, and historical stock-research paths. No reusable RF files were present in the workspace.
+4. Identified issuer by ticker, name, SEC CIK 0001281761, and filing accession 0001281761-26-000019. Avoided the similarly named Regional Management Corp search result.
+5. Downloaded and parsed Regions Financial Corporation 2025 Form 10-K filed 2026-02-24 from SEC EDGAR. Used audited statements for balance sheet and income statement, and MD&A/notes for deposits, loans, net interest margin, asset quality, liquidity, regulatory capital, dividends and repurchases.
+6. Used Regions official 4Q25/full-year release as cross-check. Used official 2Q26 release and 2026-07-15 dividend declaration for the latest dividend run rate and post-period capital context.
+7. Overrode input analysis_model_hint:
+   ordinary_operating/applicable -> financial_bank/not_applicable.
+   Reason: deposits, loans, securities and regulatory liquidity/capital are operating structure, not detachable net cash.
+8. Currency normalization: fixed research conversion of USD 1 = CNY 6.80 for all filing and forecast monetary amounts. The input market cap was already supplied in CNY and was not reconverted.
+9. Bank revenue convention in result.json: revenue = net interest income + non-interest income = USD 7,526m. Gross profit/margin, operating cash flow, capex and ordinary free cash flow remain null because they are not comparable to ordinary operating-company measures.
+10. Dividend forecast: quarterly USD 0.30 x 4 x approximately 853m recent common shares = USD 1,023.6m = CNY 6,960.48m. Yield = CNY 6,960.48m / CNY 178,228.838m = 3.90547%. Share count is estimated from the recent USD 226m quarterly common dividend at USD 0.265 per share; ongoing repurchases can change actual total cash paid.
+11. Ordinary owner earnback fields were intentionally left null per contract. Interpretation points to NIM, deposit franchise, credit quality, allowance coverage, CET1, AOCI, tangible book value and distributions.
+12. Populated result.json only through protocol CLI set operations after initialization; did not hand-write the complex JSON object.
+13. Ran protocol validate after population; status returned ok with zero errors.
+
+Primary sources:
+- https://www.sec.gov/Archives/edgar/data/1281761/000128176126000019/0001281761-26-000019-index.htm
+- https://www.sec.gov/Archives/edgar/data/1281761/000128176126000019/rf-20251231.htm
+- https://ir.regions.com/news-events/press-releases/news-details/2026/Regions-Reports-Strong-Earnings-Growth-in-2025-New-Annual-Records-in-Wealth-Management-and-Treasury-Management-Income/default.aspx
+- https://ir.regions.com/news-events/press-releases/news-details/2026/Regions-Reports-Earnings-of-549-Million-and-EPS-of-0-64-in-2Q-2026/default.aspx
+- https://ir.regions.com/news-events/press-releases/news-details/2026/Regions-Financial-Corp--Announces-13-Increase-in-Common-Stock-Dividend-and-Declares-Preferred-Stock-Dividends/default.aspx
+- config/input.json (Yahoo Finance yfinance market snapshot)

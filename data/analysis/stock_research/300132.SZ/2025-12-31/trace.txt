@@ -1,0 +1,80 @@
+stock-research trace
+company=300132.SZ 青松股份
+period=2025-12-31
+generated_at=2026-07-31T17:11:44+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields only through protocol set commands.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: {"status":"ok","errors":[]}
+
+[source acquisition]
+- No annual facts package, normalized facts, raw filing, or historical stock-research output existed in the workspace at task start.
+- Located the 2025 annual report through the company's official periodic-report page:
+  https://www.sz300132.com/36.html
+- Downloaded annual-report PDF from the company-page-linked disclosure host:
+  https://announcement.valueonline.cn/20260429/202604291777364684879052782.pdf
+- Local PDF:
+  stock_report/data/raw/filings/300132.SZ/2025-12-31/2025-annual-report.pdf
+- SHA256:
+  b9bcc808ea2fa091b7d85c27826805a8f21de48e8ed6ae9ac4a956adce996178
+- PDF is 179 pages. Text was extracted locally to:
+  stock_report/data/raw/filings/300132.SZ/2025-12-31/2025-annual-report.txt
+- PDF parser was installed only in isolated temporary venv /tmp/stockresearch-venv because no system PDF text extractor was present; project dependencies were not changed.
+
+[primary evidence locations]
+- Company identity, audit status, headline financial data: annual report PDF pp. 1, 5-7, 90-94.
+- Business model, procurement, production, direct sales, industry position: pp. 10-23.
+- Revenue mix, margins, costs, customers, suppliers: pp. 33-36.
+- Cash-flow discussion and asset/liability changes: pp. 40-43.
+- Dividend proposal and distributable-profit constraint: pp. 62-63.
+- Consolidated balance sheet: pp. 94-96.
+- Consolidated income statement: pp. 99-100.
+- Consolidated cash-flow statement: pp. 101-103.
+- Restricted cash, borrowings, lease liabilities: notes pp. 149, 153-154.
+- Unpaid capital commitment: note p. 174.
+- Market cap and PE: config/input.json, Tencent qt.gtimg.cn snapshot at 20260731114324.
+
+[model classification]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Revenue is almost entirely cosmetics ODM manufacturing. Assets and liabilities are ordinary operating cash, receivables, inventory, production assets, supplier payables and bank debt. No financial-institution, property-development, construction-project, concession or investment-holding balance-sheet model was identified.
+
+[calculations]
+revenue=2219297124.02
+cost_of_sales=1763319586.65
+gross_profit=455977537.37
+gross_margin=455977537.37/2219297124.02=0.2054603381
+parent_net_profit=153227660.72
+net_margin=153227660.72/2219297124.02=0.0690433287
+operating_cash_flow=337206117.79
+capital_expenditure=52855135.02
+operating_free_cash_flow=337206117.79-52855135.02=284350982.77
+
+discounted_cash=587830567.68*0.90=529047510.912
+discounted_trading_financial_assets=166025637.67*0.85=141121792.0195
+bank_debt=10000000+37359471.01+85119318.80=132478789.81
+operating_cash_reserve=200000000
+unpaid_capital_commitment=24000000
+discounted_detachable_net_cash=529047510.912+141121792.0195-132478789.81-200000000-24000000=313690513.1215
+
+recurring_profit_base=2025 parent net profit excluding non-recurring items=123553302.53
+sustainability_haircut=10%
+discounted_sustainable_cash_profit=123553302.53*0.90=111197972.277
+market_cap=3270000000
+operating_business_price=3270000000-313690513.1215=2956309486.8785
+owner_earnback_years=2956309486.8785/111197972.277=26.5860017619
+market_cap_to_cash_profit=3270000000/111197972.277=29.4070110546
+discounted_net_cash_to_market_cap=313690513.1215/3270000000=0.0959298205
+
+[judgment boundaries]
+- The CNY 200m operating cash reserve, cash/investment discounts, and 10% profit haircut are analyst assumptions, not company disclosures.
+- 2025 free cash flow was not used as sustainable cash profit because it benefited from customer collections, higher supplier payables, and a land disposal cycle.
+- Lease liabilities were treated as matched operating obligations alongside right-of-use assets and ongoing occupancy expense; they were not deducted again from detachable net cash.
+- Forecast dividend is zero because parent-company distributable profit remained negative and the 2025 proposal paid no dividend. This is not a permanent dividend forecast or company commitment.
+- No investment recommendation or target price was produced.

@@ -1,0 +1,61 @@
+stock-research trace
+company: 600633.SH 浙数文化
+period: 2025-12-31 annual
+generated_for_input: 2026-07-31T22:26:36+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions through that reference.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Local reuse audit
+- Checked the configured raw filing, annual review, normalized facts, prior stock research, and /root/aicode sync locations.
+- No 600633.SH/2025-12-31 annual facts package or prior stock research result was present.
+- Decision: return to the original annual filing rather than infer missing facts from third-party summaries.
+
+3. Sources acquired and used
+- Primary filing: 浙报数字文化集团股份有限公司2025年年度报告, disclosure id 1225055136, published 2026-03-31 on the CSRC-designated disclosure platform.
+  URL: https://static.cninfo.com.cn/finalpage/2026-03-31/1225055136.PDF
+  Local PDF: stock_report/data/raw/filings/600633.SH/2025-12-31/annual-report-2025.pdf
+  Local extracted text: stock_report/data/raw/filings/600633.SH/2025-12-31/annual-report-2025.txt
+- Market snapshot: config/input.json, Tencent qt.gtimg.cn, market cap CNY 13,885,000,000, timestamp 20260731114342, PE TTM 23.58.
+- Search was used only to locate the official filing and confirm the company investor/disclosure context; core financial numbers were taken from the filing.
+
+4. Statement model review
+- Input hint ordinary_operating was tested against the filing.
+- Consolidated revenue comes from online games, online social, technology information services and digital marketing. The group has conventional customers, operating costs, receivables, prepayments, fixed assets and operating cash flow.
+- Financial assets and associates are material, but deposits/customer funds/insurance reserves are not the business model. Classification retained as ordinary_operating/applicable.
+- Special handling: strategic and venture investments were discounted for liquidity and governance constraints; they were not equated to cash at book value.
+
+5. Core filing facts
+- Revenue 3,081,253,892.66; cost of sales 1,561,691,620.59; gross profit computed 1,519,562,272.07.
+- Parent net profit 572,603,097.79; operating profit 613,615,481.28.
+- Total assets 13,014,648,863.87; liabilities 1,771,283,056.73; equity 11,243,365,807.14; parent equity 10,247,651,957.46; minority interest 995,713,849.68.
+- Operating cash flow 619,727,151.93; capital expenditure 181,295,681.97; operating FCF computed 438,431,469.96.
+- Cash and cash equivalents 952,349,796.02; monetary funds 1,230,073,717.64; time deposits 250,000,000.
+- Long-term equity investments 2,579,678,333.74; Zhejiang Publishing investment 1,195,308,769.99; trading financial assets 196,882,006.35; other non-current financial assets 504,667,726.14.
+- Short-term debt 467,554,747.77; current and long-term lease liabilities 192,980,094; trading financial liability 20,622,800; other non-current liability with possible repurchase cash obligation 140,000,000.
+- Annual dividend proposal 215,572,660.24 plus disclosed interim dividend gives full-year expected dividend about 317,018,618; the annual report states full-year payout ratio 55.36%.
+
+6. Calculations and judgments
+- Gross margin = 1,519,562,272.07 / 3,081,253,892.66 = 0.4931636032.
+- Parent net margin = 572,603,097.79 / 3,081,253,892.66 = 0.1858344420.
+- Sustainable cash profit: 619,727,151.93 OCF - 181,295,681.97 capex - 38,431,469.96 buffer = 400,000,000.
+- The buffer reflects the filing's statement that OCF improvement mainly came from digital marketing and the simultaneous fall in group/game gross margins.
+- Discounted detachable net cash/investment assets = 1,360,246,787.057. See owner_earnback.cash_breakdown in result.json for every haircut.
+- Operating business price = 13,885,000,000 - 1,360,246,787.057 = 12,524,753,212.943.
+- Owner earnback years = 12,524,753,212.943 / 400,000,000 = 31.3118830324.
+- Market cap/cash profit = 13,885,000,000 / 400,000,000 = 34.7125.
+- Forecast dividend yield = 317,018,618 / 13,885,000,000 = 0.0228317334.
+
+7. Protocol population and validation
+- Populated result.json using repeated protocol `set` operations; the complex result was not handwritten from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].
+
+8. Data quality
+- Marked complete because identity, model, valuation, three statements, asset/liability explanations, dividend forecast, owner earnback bridge, evidence and limitations are present.
+- Main limitations: the market snapshot was supplied rather than reconstructed; investment haircuts are judgments; normalized cash profit relies on one annual FCF observation and a stated buffer.

@@ -1,0 +1,58 @@
+stock-research trace
+task: 00300.HK / MIDEA GROUP / annual / 2025-12-31
+generated_at: 2026-08-03T15:22:54+08:00
+
+1. Read protocol and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Reuse check
+- Checked stock_report/data/analysis/annual_review/00300.HK/2025-12-31 and raw filing directory.
+- No reusable facts.json, annual_facts.md, extraction trace, or filing metadata existed at task start.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- The initialized financial_brokerage hint was treated as unverified input, not fact.
+
+4. Primary-source acquisition
+- Downloaded official company annual report to stock_report/data/raw/filings/00300.HK/2025-12-31/2025-annual-report.pdf
+- Official URL: https://www.midea.com.cn/content/dam/mideacn-aem/%E6%8A%95%E8%B5%84%E8%80%85%E5%85%B3%E7%B3%BB/2025%E5%B9%B4%E5%BA%A6%E6%8A%A5%E5%91%8A.pdf.coredownload.inline.pdf
+- Cross-check: Shenzhen Stock Exchange annual report summary, https://disc.static.szse.cn/disc/disk03/finalpage/2026-03-31/e0e9a792-05da-42dd-bbb9-04768cabf358.PDF
+- PDF: 276 pages. Extracted locally for searching; source PDF retained.
+
+5. Model verification
+- Annual report revenue mix: smart home CNY 299,927,239,000; commercial and industrial solutions CNY 122,752,958,000.
+- Conclusion: ordinary_operating; ordinary owner earnback model applicable.
+- Overrode erroneous financial_brokerage hint.
+
+6. Core extraction (all CNY, converted from report unit CNY thousand)
+- Total assets 608,791,766,000; liabilities 372,367,543,000; equity 236,424,223,000; parent equity 223,221,305,000.
+- Revenue 456,451,731,000; cost 335,989,528,000; operating profit 52,978,773,000; parent net profit 43,945,411,000.
+- CFO 53,345,930,000; capex 11,141,889,000; operating FCF 42,204,041,000.
+- 2024 CFO 60,511,572,000; capex 7,839,636,000; comparable FCF 52,671,936,000.
+- Dividend plan 32,360,630,265; repurchases 11,605,319,584.
+
+7. Calculations
+- Gross margin = (456,451,731,000 - 335,989,528,000) / 456,451,731,000 = 0.2639100584.
+- Net margin = 43,945,411,000 / 456,451,731,000 = 0.0962761405.
+- Discounted cash: cash 85,247,150,000 * 70% = 59,673,005,000.
+- Discounted fixed-income products: (209,650,953,000 + 1,427,134,000) * 70% = 147,754,660,900.
+- Discounted trading financial assets: 710,717,000 * 50% = 355,358,500.
+- Debt deducted at 100%: short borrowings + total long borrowings + bonds + lease liabilities = 67,480,997,000.
+- Discounted detachable net cash = 140,302,027,400.
+- Sustainable cash profit = average(42,204,041,000, 52,671,936,000) * 90% = 42,694,189,650.
+- Operating business price = 651,927,574,887.6232 - 140,302,027,400 = 511,625,547,487.6232.
+- Owner earnback = 11.9835 years; market cap/cash profit = 15.2697 years.
+- Forecast dividend yield = 32,360,630,265 / 651,927,574,887.6232 = 0.0496383824.
+
+8. Structured output
+- Every field was populated through protocol `set`; no complex JSON object was hand-written from scratch.
+- Final command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation: status=ok, errors=[]
+
+9. Limitations
+- Market cap and PE TTM are task-input snapshots and were not independently reconstructed.
+- Detachable-cash discounts are explicit research assumptions, not company guidance or immediately distributable balances.
+- The annual report aggregates pledged assets; exact instrument-level encumbrance cannot be mapped.
+- 2025 dividend is used as a near-term forecast anchor, not a promise for 2026.

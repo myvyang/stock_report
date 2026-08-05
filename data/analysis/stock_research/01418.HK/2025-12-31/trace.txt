@@ -1,0 +1,61 @@
+stock-research trace
+generated_at=2026-08-04T22:29:18+08:00
+company=01418.HK SINOMAX GROUP
+period=2025-12-31 annual
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Initialized protocol result
+- PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+3. Reuse check
+- Requested annual facts, normalized facts, raw filing metadata and prior stock-research outputs were absent from the workspace.
+- Proceeded to primary-source annual report rather than fabricating a fact pack.
+
+4. Primary sources
+- Sinomax Group Limited 2025 Annual Report, published 2026-04-29:
+  https://www.sinomax.com/group/wp-content/uploads/2026/04/2026042901608_c.pdf
+- HKEX title-search record confirms 2025 Annual Report released 2026-04-29 and annual results released 2026-03-24.
+- PBOC 2025-12-26 RMB central parity announcement, HKD/CNY=0.90486:
+  https://www.pbc.gov.cn/zhengcehuobisi/125207/125217/125925/2025122609114878612/index.html
+- Tencent qt.gtimg.cn market-cap snapshot supplied in config/input.json.
+
+5. Model verification
+- Input hint financial_brokerage rejected.
+- Annual report p.173: group manufactures and sells health and household products.
+- Annual report pp.207-208: China, North America, Europe/other overseas operating segments.
+- Final model: ordinary_operating; owner earnback applicable.
+
+6. Key extraction (annual report figures in HK$000)
+- Revenue 4,696,685; cost 3,594,429; gross profit 1,102,256; operating profit 167,157.
+- Net profit 84,846; parent net profit 60,300.
+- Assets 3,244,028; liabilities 2,164,788; equity 1,079,240; parent equity 1,031,957.
+- Cash 367,825; restricted deposits 2,588; bank borrowings 695,611; lease liabilities 364,480.
+- OCF 207,045; PPE capex 92,784; intangible capex 35,880; operating FCF 78,381.
+- Total 2025 DPS 1.0 HK cent; total shareholder dividend baseline HK$17.5m.
+
+7. Currency normalization
+- All protocol monetary fields converted to absolute CNY using 0.90486 CNY/HKD.
+- Limitation: single near-year-end rate used for both statements of position and flows; no average-rate restatement.
+
+8. Owner earnback judgement
+- Cash discounted to 80%: CNY266,264,103.60.
+- Restricted cash given zero detachable value.
+- Full bank debt CNY629,430,569.46 and lease debt CNY329,803,372.80 deducted.
+- Discounted detachable net cash = CNY-692,969,838.66.
+- Sustainable cash profit normalized to CNY60,000,000 using parent profit CNY54,563,058 and operating FCF CNY70,923,831.66, with caution for HK$45.08m impairment, HK$84.954m step-acquisition remeasurement gain and acquired-business loss.
+- Operating business price = CNY896,215,714.72.
+- Owner earnback years = 14.9369; market cap/cash profit = 3.3874.
+
+9. Dividend forecast
+- Mechanical continuation of FY2025 total HK$17.5m = CNY15,835,050.
+- Forecast yield = 7.7911% on supplied market cap.
+- This is a baseline, not guidance.
+
+10. Protocol population and validation
+- Populated initialized result exclusively through protocol set commands.
+- PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation status: ok; errors: none.

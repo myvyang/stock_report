@@ -1,0 +1,94 @@
+PFIS stock-research trace
+generated_at=2026-08-05T05:46:01+08:00
+period=2025-12-31
+report_type=annual
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated all result fields with protocol `set` commands; the initialized complex object was not manually replaced.
+3. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse-check]
+- Checked stock_report/data/analysis/annual_review/PFIS/2025-12-31, stock_report/data/normalized/facts/PFIS/2025-12-31, and raw filing paths.
+- No pre-existing PFIS annual fact pack, normalized fact pack, or filing was available.
+- Downloaded the official SEC 2025 Form 10-K to stock_report/data/raw/filings/PFIS/2025-12-31/pfis-20251231x10k.htm.
+- Used SEC Companyfacts XBRL for deterministic cross-checking of audited statement values.
+
+[identity-and-model]
+- SEC Form 10-K identifies Peoples Financial Services Corp. as the bank holding company for Peoples Security Bank and Trust Company.
+- Overrode input hint ordinary_operating/applicable with financial_bank/not_applicable.
+- Reason: customer deposits, loans, securities, liquidity and wholesale funding are operating balance-sheet items. They cannot be converted to detachable net cash under the ordinary owner-earnback formula.
+- Required ordinary owner-earnback sorting fields remain null.
+
+[primary-sources]
+1. SEC Form 10-K, accession 0001104659-26-028106:
+   https://www.sec.gov/Archives/edgar/data/1056943/000110465926028106/pfis-20251231x10k.htm
+   Used for audited balance sheet, income statement, asset quality, regulatory capital, business, risks, dividends and subsequent events.
+2. SEC-filed full-year earnings release, filed 2026-01-30:
+   https://www.sec.gov/Archives/edgar/data/1056943/000110465926008627/pfis-20260130xex99d1.htm
+   Used to cross-check NIM, ROAA, ROAE, efficiency ratio, balance-sheet trends and merger normalization.
+3. SEC Companyfacts API for CIK 0001056943:
+   https://data.sec.gov/api/xbrl/companyfacts/CIK0001056943.json
+   Used to cross-check 2025 audited XBRL facts.
+4. Market snapshot from config/input.json: Yahoo Finance yfinance, dated 2026-08-03.
+
+[key-usd-facts]
+total_assets=5270578000
+total_liabilities=4750731000
+stockholders_equity=519847000
+net_income=59187000
+net_interest_income=165962000
+noninterest_income=21727000
+noninterest_expense=115357000
+gross_loans=4066896000
+net_loans=4027889000
+allowance_for_credit_losses=39007000
+total_deposits=4434069000
+cash_and_cash_equivalents=268984000
+investment_securities=587208000
+goodwill=75986000
+finite_lived_intangibles_net=27700000
+2025_common_dividends_paid=24642000
+2025_dividend_per_share=2.47
+
+[special-bank-metrics]
+fte_net_interest_margin_2025=3.58%
+roaa_2025=1.17%
+roae_2025=11.89%
+efficiency_ratio_2025=56.45%
+nonperforming_assets=12070000
+nonperforming_assets_to_assets=0.23%
+allowance_to_loans=0.96%
+bank_cet1_ratio=13.06%
+bank_total_capital_ratio=14.01%
+bank_tier1_leverage_ratio=10.22%
+holding_company_cet1_ratio=11.03%
+holding_company_total_capital_ratio=14.31%
+holding_company_tier1_leverage_ratio=8.84%
+
+[currency-normalization]
+- Result contract requires absolute CNY amounts.
+- Applied USD/CNY=6.7666 from project FX configuration, manual snapshot dated 2026-07-21.
+- Ratios were calculated in a common currency and are unaffected by conversion.
+- Input market cap was already supplied in CNY: 4753058954.967773.
+
+[dividend-forecast]
+- Subsequent-events note: 2026 Q1 dividend declared at USD 0.625/share.
+- Simple annualization: USD 0.625 * 4 = USD 2.50/share.
+- Shares outstanding at 2026-02-28: 9,999,049.
+- Forecast USD cash dividend: 24,997,622.50.
+- Forecast CNY cash dividend: 169,148,912.4085.
+- Forecast dividend yield: 0.03558737941420019.
+- This is a scenario estimate, not company guidance.
+
+[normalization-judgments]
+- Revenue, gross profit, gross margin, net margin, operating cash flow, capex and operating free cash flow were left null because ordinary-company meanings are not economically comparable for a bank.
+- 2025 earnings were not treated as a clean growth run-rate: 2024 included only six months of FNCB operations, USD 16.2m merger costs and USD 14.3m Day-1 provision; 2025 also benefited from purchase-accounting accretion.
+- No ordinary discounted net cash or cash-profit adjustment was produced.
+
+[quality]
+- Company, period, market data, special model, audited balance sheet/equity/net income, dividend forecast, assets, liabilities, business narrative and evidence are present.
+- Core claims are supported by SEC filings.
+- data_quality.status=complete; incomplete_reasons=[]

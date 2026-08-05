@@ -1,0 +1,53 @@
+stock-research trace
+company: 豪迈科技 (002595.SZ)
+period: 2025-12-31 annual
+generated_at: 2026-08-01 Asia/Shanghai
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- Expected annual facts, normalized facts, raw filing metadata and historical stock research files were absent under /workspace/stock_report.
+- Sync target /root/aicode/stock_report also had no matching 002595.SZ/2025-12-31 material.
+- Therefore fetched the official annual filing rather than inventing missing fields.
+
+3. Filing acquisition
+- Queried CNINFO announcement API for 豪迈科技 2025年年度报告.
+- Full report announcement ID: 1225056602.
+- Official URL: https://static.cninfo.com.cn/finalpage/2026-03-31/1225056602.PDF
+- Saved to stock_report/data/raw/filings/002595.SZ/2025-12-31/annual-report-2025.pdf.
+- System pdfinfo/pdftotext were unavailable; created temporary venv /tmp/himile-pdf-env and used pypdf for read-only text extraction to /tmp/himile2025.txt (159 pages). Temporary extraction is not an output artifact.
+
+4. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated top-level sections and nested corrections using repeated protocol set commands.
+- Did not construct or overwrite the complete result object by hand.
+
+5. Model classification
+- Confirmed ordinary_operating/applicable from business and statements: manufacturing and direct sales of tire molds, large cast/machined components and CNC machine tools; no special financial-statement model.
+
+6. Core reported facts (CNY)
+- Revenue 11,078,445,744.05; cost 7,360,557,264.12; gross profit 3,717,888,479.93.
+- Parent net profit 2,393,328,872.70; operating cash flow 1,033,723,042.98.
+- Capex 912,500,248.82; operating FCF 121,222,794.16.
+- Assets 14,766,821,128.89; liabilities 2,730,699,850.08; parent equity 12,026,670,875.68.
+
+7. Owner earnback assumptions
+- Detachable cash: unrestricted cash equivalents 80%; structured deposits and term deposits 90%; entrusted loans 50%; interest-bearing and lease debt deducted 100%.
+- Discounted detachable net cash: 1,581,207,878.82.
+- Sustainable cash profit: average 2023-2025 OCF 1,259,319,629.71 less maintenance-capex proxy 386,303,180.30, then 85% sustainability factor = 742,063,982.00.
+- Market cap 60,912,000,000.00; operating business price 59,330,792,121.18; earnback 79.95 years.
+- Maintenance capex proxy is 2025 fixed-asset depreciation + right-of-use depreciation + intangible amortization. This is judgment, not a reported company metric.
+
+8. Dividend
+- 2025 annual distribution implemented in 2026: CNY 800,000,000, or CNY 10 per 10 pre-transfer shares.
+- Forecast yield against input market cap: 1.3134%.
+
+9. Quality notes
+- Market cap and PE were accepted from input and not independently verified.
+- Industry-position claims are company statements without independent market-share confirmation.
+- Result marked complete because all required ordinary-company fields, formula inputs, breakdowns, evidence and limitations are present.

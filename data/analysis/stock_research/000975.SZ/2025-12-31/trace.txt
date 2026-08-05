@@ -1,0 +1,53 @@
+stock-research trace
+company: 山金国际 (000975.SZ)
+period: 2025-12-31 annual
+generated_at: 2026-07-31T18:33:12+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read result-contract.md, report-contract.md, and referenced data-reuse.md completely.
+3. Local reuse check: no 000975.SZ filing, annual facts, normalized facts, or prior stock-research files existed under stock_report; only the user evaluation note existed.
+4. Created outputs/ directory and initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated initialized paths with repeated protocol set commands. The result was not constructed as an independent handwritten JSON document.
+6. Final validation command recorded below after execution.
+
+[validation]
+Initial validation identified one schema error: asset_analysis.assets.2.amount was null. The annual-report balance sheet was rechecked, and the exact inventory balance RMB 1,159,555,036.01 was inserted through the protocol CLI.
+Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+Final output:
+  {"status":"ok","errors":[]}
+Additional checks passed: JSON parse, gross-margin formula, net-margin formula, free-cash-flow subtraction, operating-business-price formula, earnback formula, dividend-yield formula, balance-sheet equation, and equity split.
+
+[primary evidence]
+- 山金国际黄金股份有限公司2025年年度报告, disclosed 2026-03-06. Full report text mirror used to inspect the exchange-disclosed filing; audited statements pages 75-83 and business tables pages 20-21.
+  https://stock.stockstar.com/notice/SN2026030500038201.shtml
+- 深交所静态披露：山金国际黄金股份有限公司2025年年度报告摘要, disclosed 2026-03-06.
+  https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-03-06/c28a3899-2d67-4ba1-93c5-17f3b72846be.PDF
+- 山金国际关于2025年度利润分配预案的公告（与年报同日披露）: cash dividend RMB 1,331,945,921.28, RMB 4.8 per 10 shares.
+- Market-cap snapshot supplied in config/input.json: Tencent qt.gtimg.cn, 2026-07-31 11:43:39, market cap RMB 64,794,000,000.00001, PE TTM 17.65.
+
+[model verification]
+statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+Reason: mining and metals trading are ordinary operating activities. Mining rights, mine facilities, inventory, receivables, payables and borrowings have normal operating-company economic meaning; there are no customer deposits, insurance reserves, regulated presale cash, concession accounting or comparable special-model structures.
+
+[financial calculations]
+gross_profit = 17,098,604,999.31 - 11,657,498,206.52 = 5,441,106,792.79
+gross_margin = 5,441,106,792.79 / 17,098,604,999.31 = 0.3182193397
+net_margin = parent net profit 2,971,658,678.29 / revenue 17,098,604,999.31 = 0.1737953873
+operating_free_cash_flow = CFO 4,680,085,595.12 - capex 1,292,993,007.80 = 3,387,092,587.32
+interest-bearing debt = short-term borrowings 5,000,937.50 + current non-current liabilities 207,911,073.22 + long-term borrowings 1,187,989,881.84 + lease liabilities 13,604,165.30 = 1,414,506,057.86
+discounted cash = cash equivalents 4,704,175,579.10 * 0.80 = 3,763,340,463.28
+discounted detachable net cash = 3,763,340,463.28 - 1,414,506,057.86 = 2,348,834,405.42
+discounted sustainable cash profit = 2,800,000,000.00; judgment anchored to parent profit 2,971,658,678.29 and reduced by 171,658,678.29 for cyclicality. It is below reported free cash flow.
+operating business price = 64,794,000,000.00001 - 2,348,834,405.42 = 62,445,165,594.58
+owner earnback years = 62,445,165,594.58 / 2,800,000,000 = 22.3018448552
+market cap / cash profit = 64,794,000,000.00001 / 2,800,000,000 = 23.1407142857
+forecast dividend yield = 1,331,945,921.28 / 64,794,000,000.00001 = 0.0205566244
+
+[judgment boundaries]
+- Fact: 2025 gold output fell 5.47% while profit increased in a sharply stronger gold-price environment.
+- Inference: 2025 free cash flow should not be fully capitalized as a permanent run rate.
+- Judgment: sustainable distributable cash profit is set at RMB 2.8bn and cash equivalents receive a 20% haircut.
+- Limitation: no mine-by-mine sustaining capex or reserve-life DCF was produced; market PE was not independently cross-checked.

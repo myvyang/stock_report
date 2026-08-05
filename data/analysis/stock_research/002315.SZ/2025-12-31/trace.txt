@@ -1,0 +1,53 @@
+task=stock_research
+company=002315.SZ 焦点科技
+period=2025-12-31
+generated_for=2026-07-31 Asia/Shanghai
+
+[protocol]
+initialized=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+population_method=protocol set/append commands; result.json was not handwritten from scratch
+validation=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok
+
+[skill_and_contracts]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+
+[source_reuse]
+annual_review_result=stock_report/data/analysis/annual_review/002315.SZ/2025-12-31/result.json
+annual_review_report=stock_report/data/analysis/annual_review/002315.SZ/2025-12-31/report.md
+reuse_scope=verified cash, deposit, bank-certificate, investment-asset, financing-debt, operating-cash-flow, capex, and paired operating-NOPAT facts
+raw_filing=stock_report/data/raw/filings/002315.SZ/2025-12-31/annual-report.pdf
+raw_filing_sha256=452aa46755e702c410163a5bb56ddf5f081655b29273c29951353504f3048c1b
+official_url=https://static.cninfo.com.cn/finalpage/2026-03-20/1225018374.PDF
+
+[model]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=B2B contributes 91.36% of revenue; insurance agency is 5.27% and loans/advances are CNY 44.84m, so financial activities do not dominate the statement model. Contract liabilities are prepaid service obligations, not financing debt.
+
+[key_formulas]
+gross_profit=1913609947.68-396106527.20=1517503420.48
+gross_margin=1517503420.48/1913609947.68=0.7930056082
+net_margin=503575870.32/1913609947.68=0.2631549188
+discounted_net_cash=342727607.32+1473526907.70*0.95+744162967.95*0.95+157003461.77*0.80+4000072.23*0.50-15007163.00=2562128631.7185
+discounted_net_cash_to_market_cap=2562128631.7185/11213000000=0.2284962661
+discounted_cash_profit=458476832.26*0.90=412629149.034
+operating_business_price=11213000000-2562128631.7185=8650871368.2815
+owner_earnback_years=8650871368.2815/412629149.034=20.9652453990
+market_cap_to_cash_profit=11213000000/412629149.034=27.1745222708
+forecast_dividend_yield=222065108.30/11213000000=0.0198042547
+
+[judgment_notes]
+necessary_cash=25% of annual operating cash outflow, reused from annual ROIC review
+strategic_equity_investments=excluded from detachable cash because annual report describes them as not held for sale
+contract_liabilities=not deducted as financing debt; their service obligation is reflected by retaining necessary cash and by not annualizing the unusually high 2025 free cash flow
+profit_base=paired operating NOPAT from annual ROIC review, not reported free cash flow
+profit_haircut=10% for interest-income allocation uncertainty, cross-border cyclicality, equity incentive economics, and one-year sustainability
+dividend_forecast=2025 annual board proposal, not an unconditional future payment
+
+[data_quality]
+status=complete
+limitations=market quote is an input snapshot; cash-interest allocation is estimated; dividend is a proposal; strategic investments lack a clear exit value; free cash flow benefited from contract-liability growth

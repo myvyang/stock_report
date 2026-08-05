@@ -1,0 +1,62 @@
+stock-research trace
+generated_at: 2026-08-04T15:09:38+08:00
+query: 01765.HK
+
+1. Read protocol and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No local annual facts, normalized facts, raw filing metadata, or prior stock-research outputs existed for this issuer/period.
+- Downloaded the revised 2025 annual report from HKEX to:
+  stock_report/data/raw/filings/01765.HK/2025-12-31/annual-report-2025-revised.pdf
+- Official source:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2025/1230/2025123002084.pdf
+
+3. Identity and period correction
+- Annual report identifies issuer as XJ International Holdings Co., Ltd. / 希教国际控股有限公司, stock code 1765.
+- Business is private higher education, not financial brokerage.
+- Overrode analysis_model_hint from financial_brokerage to ordinary_operating.
+- Input period 2025-12-31 does not match issuer fiscal year end; analysis.period set to audited reporting date 2025-08-31.
+
+4. Primary annual-report evidence used
+- pp. 1-4: school portfolio and overview.
+- pp. 14-20: management discussion, student and operating review.
+- p. 39: no final dividend due to funding arrangements.
+- pp. 55-65: contractual arrangements and education regulation.
+- pp. 114-119: unmodified auditor opinion and key audit matter.
+- pp. 120-121: income statement.
+- pp. 122-124: statement of financial position.
+- pp. 126-128: cash flow statement.
+- pp. 135-137: going-concern basis and post-period bond redemption context.
+- pp. 175-180: segment and disaggregated revenue data.
+- pp. 208-211: goodwill and impairment.
+- p. 220: cash, time deposits, pledged and restricted balances.
+
+5. Calculations (RMB absolute yuan)
+- gross_margin = 1,667,804,000 / 3,960,345,000 = 0.4211261342
+- net_margin = 384,777,000 / 3,960,345,000 = 0.0971574460
+- capex = 701,767,000 PPE + 88,810,000 prepaid land lease + 166,424,000 land held for development + 21,947,000 intangibles = 978,948,000
+- operating_free_cash_flow = 1,418,540,000 - 978,948,000 = 439,592,000
+- discounted_sustainable_cash_profit = 440,000,000 (rounded single-year FCF anchor)
+- discounted_detachable_net_cash = 0 because non-restricted cash and time deposits do not exceed bank/other borrowings plus convertible bonds, with net current liabilities also present.
+- operating_business_price = 1,096,942,726.715207 - 0 = 1,096,942,726.715207
+- owner_earnback_years = 1,096,942,726.715207 / 440,000,000 = 2.4930516516
+- forecast_cash_dividend = 0; forecast_dividend_yield = 0 / market_cap = 0
+
+6. Important interpretation choices
+- Contract liabilities treated as prepaid education-service obligations, not detachable cash.
+- Restricted and pledged deposits assigned zero detachable value.
+- Current-year FCF used instead of reported net profit because reported profit contains material convertible-bond fair-value gain, restructuring expense, goodwill impairment and disposal gain.
+- Owner earnback is a static scenario, not a forecast or investment recommendation.
+- Data-quality status set complete because contract minimum fields and primary evidence are present; limitations explicitly record period mismatch, quote-source limitation, single-year cash-profit anchor, and post-period capital-structure changes.
+
+7. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields using repeated protocol set commands.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation result: status=ok, errors=[]

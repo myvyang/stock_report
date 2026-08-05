@@ -1,0 +1,30 @@
+2026-08-05 stock-research trace — WWW / FY2025
+
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md in full.
+2. Inspected configured stock_report paths. No existing raw filing, annual facts package, normalized facts, or prior stock-research result was present for WWW/2025-12-31.
+3. Initialized outputs/result.json using:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Identified official filing:
+   SEC Form 10-K accession 0001628280-26-012614, filed 2026-02-27.
+   Fiscal 2025 ended 2026-01-03 and contained 53 weeks. Input period 2025-12-31 is treated as a routing/reporting period, not the audited balance-sheet date.
+5. Direct curl downloads from SEC and Wolverine sites returned HTTP 403. Used the accessible SEC HTML through the web retrieval channel. No raw local filing was saved.
+6. Extracted audited USD figures from the 10-K: revenue 1,874.3m; COGS 987.6m; gross profit 886.7m; operating profit 150.2m; net income 101.0m; parent net income 95.8m; assets 1,709.3m; liabilities 1,286.2m; total equity 423.1m; parent equity 408.0m; CFO 140.0m; capex 14.5m; financing cash flow -77.7m; dividends plus buybacks 47.8m; cash 206.3m; debt 621.7m.
+7. Confirmed ordinary_operating model: branded footwear/apparel design, sourcing, marketing, licensing and sales. No special financial-statement model applies.
+8. Translation: used rounded USD/CNY 6.80, based on SAFE/CFETS midpoint context close to the valuation date. Exact 2026-08-03 midpoint was not independently retrieved. All result.json monetary values are CNY absolute yuan.
+9. Owner earnback:
+   discounted detachable net cash = cash 206.3m - debt 621.7m = -415.4m USD = -2,824.72m CNY.
+   operating business price = CNY 10,888.264677m - (-2,824.72m) = CNY 13,712.984677m.
+   FY2025 FCF = CFO 140.0m - capex 14.5m = 125.5m USD.
+   sustainable cash profit = FCF 125.5m - stock compensation 24.4m = 101.1m USD = CNY 687.48m.
+   owner earnback = 13,712.984677 / 687.48 = 19.9467 years.
+   market cap / cash profit = 10,888.264677 / 687.48 = 15.8379x.
+10. Dividend forecast assumes annual dividend remains USD0.40/share and approximately 80.8m year-end shares outstanding: USD32.32m = CNY219.776m, yield about 2.0184%.
+11. Populated result.json exclusively through protocol CLI set operations after protocol initialization; did not construct result.json manually.
+12. Validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status ok, errors [].
+
+Primary URLs:
+- https://www.sec.gov/Archives/edgar/data/110471/000162828026012614/www-20260103.htm
+- https://investors.wolverineworldwide.com/news/news-details/2026/Wolverine-Worldwide-Reports-Fourth-Quarter-and-Full-Year-2025-Results-02-26-2026/default.aspx
+- https://www.safe.gov.cn/AppStructured/hlw/RMBQuery.do

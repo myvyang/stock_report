@@ -1,0 +1,63 @@
+stock-research trace
+company: 优彩资源 (002998.SZ)
+period: 2025-12-31 annual
+generated_for_input: 2026-08-01T02:06:05+08:00
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- config/input.json found.
+- Referenced raw filing metadata, annual facts JSON/MD and normalized facts did not exist locally.
+- No prior stock-research result existed for this company/period.
+- Therefore returned to public primary filing.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Result skeleton created successfully.
+
+4. Primary evidence retrieved
+- Shenzhen Stock Exchange annual report PDF:
+  https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-13/89041e6c-f4a9-45f8-ac8f-8308ecd77b34.PDF
+- Filing date: 2026-04-13; audit report date: 2026-04-10.
+- Relevant annual-report locations: business and capacity pp.11-18; audited statements pp.85-94; cash-flow reconciliation pp.183-184.
+- Dividend proposal cross-check mirror:
+  https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12082004&stockid=002998
+- Market-cap/PE snapshot reused exactly from config/input.json (Tencent qt.gtimg.cn, 2026-07-31 11:43:12).
+
+5. Model decision
+- statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- Reason: 99.31% of revenue is textile/chemical-fiber manufacturing; assets are plant, inventory and trade receivables; liabilities are operating payables and convertible bonds. No special financial-statement model applies.
+
+6. Core calculations (CNY)
+- Gross profit = 2,717,925,779.40 - 2,504,928,725.90 = 212,997,053.50
+- Gross margin = 212,997,053.50 / 2,717,925,779.40 = 0.0783675018
+- Net margin = 52,056,675.93 / 2,717,925,779.40 = 0.0191530896
+- Operating FCF = 256,843,530.91 - 46,400,275.49 = 210,443,255.42
+- Discounted net cash = 263,341,280.67 + 277,197,160.00 * 0.90 - 424,419,636.69 = 88,399,087.98
+- Recurring earnings baseline = 52,056,675.93 - 5,316,171.40 = 46,740,504.53
+- Discounted sustainable cash profit = 46,740,504.53 * 0.80 = 37,392,403.624
+- Operating business price = 2,615,000,000.00 - 88,399,087.98 = 2,526,600,912.02
+- Owner earnback years = 2,526,600,912.02 / 37,392,403.624 = 67.56989835
+- Market-cap/cash-profit = 2,615,000,000.00 / 37,392,403.624 = 69.93399051
+- Forecast dividend = (352,092,361 - 15,000) * 0.17 = 59,853,151.37
+- Forecast dividend yield = 59,853,151.37 / 2,615,000,000.00 = 0.0228883944
+
+7. Judgment notes
+- 2025 operating cash flow is not treated as sustainable cash profit: inventory reduction added 164,932,387.26 while operating receivables consumed 141,561,955.94; 2024 OCF was negative.
+- Maintenance capex is assumed broadly to offset depreciation for this asset-heavy manufacturer, so adjusted net income is used as the base rather than EBITDA-like cash earnings.
+- The extra 20% haircut reflects declining profit, thin margins, cyclicality and meaningful policy-linked recurring other income.
+- Trading financial assets received a 10% haircut because product-by-product maturity and underlying risks were not fully verified.
+
+8. Protocol population
+- Used protocol `set` for scalar/object fields and protocol `append` for asset, liability, cash breakdown, profit adjustments, dividend history, risks and evidence.
+- Report and trace are human-readable companion outputs.
+
+9. Final validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Outcome: status=ok, errors=[]
+- data_quality.status=complete; incomplete_reasons=[]

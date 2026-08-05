@@ -1,0 +1,73 @@
+task=stock_research
+company=300130.SZ 新国都
+period=2025-12-31
+created_at=2026-07-31T18:18:16+08:00
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+[reuse_check]
+config/input.json=present
+annual_facts_json=absent
+annual_facts_md=absent
+normalized_facts_json=absent
+prior_stock_research_result=absent
+decision=No reusable annual fact pack or prior research existed; return to official annual filing.
+
+[primary_sources]
+annual_report=https://www.xgd.com/static/upload/file/20260401/1775027429849390.pdf
+annual_report_title=深圳市新国都股份有限公司2025年年度报告
+annual_report_disclosure=company website; report identifies Shenzhen Stock Exchange and CNINFO as disclosure venues
+market_snapshot=config/input.json; Tencent qt.gtimg.cn; 20260731114300
+local_copy=stock_report/data/raw/filings/300130.SZ/2025-12-31/2025-annual-report.pdf
+
+[model_review]
+input_hint=ordinary_operating/applicable
+confirmed=ordinary_operating/applicable
+reason=Revenue comes from acquiring/value-added payment services and payment terminals. Consolidated statements do not contain bank/insurance/broker customer liabilities. Payment reserve funds are separately disclosed as restricted cash and excluded from detachable cash.
+
+[key_extraction]
+revenue=3179898428.81
+cost_of_sales=2087394798.70
+gross_profit=1092503630.11
+parent_net_profit=468814770.93
+operating_cash_flow=405586312.27
+capital_expenditure=44539510.14
+operating_free_cash_flow=361046802.13
+total_assets=6146906105.48
+total_liabilities=1743123956.64
+parent_equity=4402927873.99
+cash=3150188130.38
+restricted_cash=738999975.03
+payment_reserve_fund=623278166.91
+trading_financial_assets=967830627.29
+short_term_borrowings=54798210.00
+current_noncurrent_liabilities=26464903.84
+lease_liabilities=13467061.93
+forecast_cash_dividend=170189736.90
+
+[calculations]
+gross_margin=(3179898428.81-2087394798.70)/3179898428.81=0.3435655743629657
+net_margin=468814770.93/3179898428.81=0.14743073762435946
+unrestricted_cash=3150188130.38-738999975.03=2411188155.35
+discounted_detachable_net_cash=2411188155.35*0.50+967830627.29*0.90-(54798210.00+26464903.84+13467061.93)=1981911466.47
+discounted_sustainable_cash_profit=350000000.00
+operating_business_price=10966000000.00-1981911466.47=8984088533.53
+owner_earnback_years=8984088533.53/350000000.00=25.668824381514288
+market_cap_to_cash_profit=10966000000.00/350000000.00=31.33142857142857
+forecast_dividend_yield=170189736.90/10966000000.00=0.015519764444647092
+
+[judgment_boundaries]
+cash_haircut=Unrestricted cash included at 50% to preserve operating/payment/overseas liquidity; subjective conservative assumption.
+financial_asset_haircut=Trading financial assets included at 90%; subjective liquidity/valuation haircut.
+cash_profit=2025 operating free cash flow of 361046802.13 reduced to 350000000 because acquiring margin contracted, OCF declined, and future headquarters capex may rise.
+ranking_labels=none
+recommendation=none
+
+[validation]
+initial_validate=status ok; errors=[]
+final_validate=status ok; errors=[]; result JSON parsed successfully; report.md and trace.txt are non-empty

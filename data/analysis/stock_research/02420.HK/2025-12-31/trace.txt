@@ -1,0 +1,61 @@
+stock-research trace
+company: ZIBUYU / 02420.HK
+period: 2025-12-31 annual
+generated context date: 2026-08-04 Asia/Shanghai
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated initialized paths through repeated protocol `set` commands. The JSON was not authored from an empty object.
+3. Validation after population:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: {"status":"ok","errors":[]}
+
+[local reuse audit]
+- Expected annual facts, normalized facts, raw filing metadata, prior stock-research outputs: absent at task start.
+- Existing stock_report content relevant to issuer: none.
+- Action: fetched the official annual report because no reusable fact package existed.
+
+[primary filing]
+- Title: Zibuyu Group Limited Annual Report 2025
+- Issuer / code: Zibuyu Group Limited / 02420
+- Published: 2026-04-10
+- HKEX URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0410/2026041001033.pdf
+- Local PDF: stock_report/data/raw/filings/02420.HK/2025-12-31/2025-annual-report.pdf
+- Local extracted text: stock_report/data/raw/filings/02420.HK/2025-12-31/2025-annual-report.txt
+- Text extraction: pypdf in temporary venv /tmp/zibuyu-pdf-venv; 348 PDF pages.
+
+[model verification]
+- Input hint: financial_brokerage / requires_special_model.
+- Filing facts: self-designed apparel, footwear and other products; outsourced OEM production; sales through Amazon, TikTok, Temu, other third-party platforms and self-operated stores. Balance sheet contains ordinary inventory, receivables, cash, payables and bank loans, not brokerage client money or securities financing balances.
+- Resolution: override hint with ordinary_operating / applicable.
+
+[reported facts, CNY]
+- Revenue 4,660,244,000; cost of sales 1,172,988,000; gross profit 3,487,256,000; operating profit 272,583,000; attributable net profit 269,215,000. Source: annual report PDF p.220.
+- Total assets 1,453,205,000; total liabilities 632,780,000; equity attributable to shareholders 820,425,000; no minority interest. Source: PDF pp.221-222.
+- Operating cash flow 147,446,000. PPE purchases 2,621,000; intangible purchases 4,052,000; capex 6,673,000. Financing cash flow -24,674,000. Dividend plus repurchase cash out 53,523,000 + 6,002,000 = 59,525,000. Source: PDF pp.224-225.
+- Cash equivalents 541,798,000; term deposits 14,058,000; restricted cash 561,000; borrowings 185,910,000. Source: PDF pp.284-285, 297.
+- Net inventory 648,786,000; gross inventory 730,162,000; provision 81,376,000; 2025 write-down expense 65,209,000. Source: PDF pp.213-214, 279-280.
+- Amazon revenue 4,264,308,000; North America revenue 4,540,186,000. Source: PDF pp.22-23.
+- Proposed FY2025 final dividend HKD0.23/share, total HKD112,624,000, annual-report CNY equivalent 99,511,000. Source: PDF p.268.
+- Market cap 1,720,600,008.9645386; PE TTM 6.71; timestamp 2026/08/03 09:38:07. Source: config/input.json / Tencent qt.gtimg.cn.
+
+[calculations]
+- Gross margin = 3,487,256,000 / 4,660,244,000 = 0.7482990161.
+- Net margin = 269,215,000 / 4,660,244,000 = 0.0577684344.
+- FY2025 operating FCF = 147,446,000 - 6,673,000 = 140,773,000.
+- FY2024 operating FCF = 261,868,000 - 4,108,000 = 257,760,000.
+- Two-year mean = (140,773,000 + 257,760,000) / 2 = 199,266,500.
+- Discounted sustainable cash profit = 199,266,500 * 0.90 = 179,339,850. The 10% haircut is analyst judgment for inventory expansion and platform/geographic concentration.
+- Discounted detachable net cash = (541,798,000 + 14,058,000) * 0.80 - 185,910,000 = 258,774,800. Restricted cash excluded; lease liabilities remain with operating assets.
+- Operating business price = 1,720,600,008.9645386 - 258,774,800 = 1,461,825,208.9645386.
+- Owner earnback years = 1,461,825,208.9645386 / 179,339,850 = 8.151145487.
+- Market cap / cash profit = 1,720,600,008.9645386 / 179,339,850 = 9.594075210.
+- Forecast dividend yield = 99,511,000 / 1,720,600,008.9645386 = 0.0578350572.
+
+[quality and limitations]
+- Core annual financials are audited and sourced to the official HKEX annual report.
+- Market snapshot is accepted from task input and not independently recalculated.
+- Cash and profit haircuts are explicit analyst judgments, not reported facts.
+- Only two annual FCF observations are used for normalization; rapid growth makes working-capital needs uncertain.
+- Final data_quality.status: complete; incomplete_reasons: [].

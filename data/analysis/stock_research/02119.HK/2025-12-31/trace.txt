@@ -1,0 +1,103 @@
+stock-research trace
+company: 02119.HK / Tsit Wing International Holdings Limited
+period: 2025-12-31 annual
+generated context date: 2026-08-04 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because local-data reuse was relevant.
+4. Ran protocol init with config/input.json -> outputs/result.json.
+5. Populated result fields only through protocol set/append commands.
+6. Ran protocol validate; final status: ok, errors: [].
+
+[local reuse check]
+- Expected annual facts, normalized facts, filing metadata and raw filing directory were absent.
+- stock_report contained only data/notes/user_stock_evaluations.md.
+- Therefore returned to public primary filings as allowed by data-reuse.md.
+
+[primary sources]
+- HKEX annual report 2025, released 2026-03-27:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0327/2026032701466.pdf
+- HKEX annual results announcement, released 2026-03-12:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0312/2026031201180.pdf
+- CFETS-authorised RMB central parity for 2025-12-31, Xinhua republication:
+  https://www1.xinhuanet.com/20251231/fe9f6466f6884589b5287e6ee946baed/c.html
+- Market cap and PE TTM were reused exactly from config/input.json (Tencent qt.gtimg.cn).
+
+[model verification]
+- Input hint said financial_brokerage.
+- Annual report note 1 says subsidiaries process/distribute coffee, tea and complementary products/services, distribute frozen food, and sell/provide coffee and tea machine solutions.
+- Statement structure contains ordinary PPE, inventory, trade receivables, cash, trade payables, small bank borrowings and leases; no brokerage client money/repo/self-trading balance-sheet model.
+- Overrode hint with statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+
+[currency]
+- Result contract requires CNY absolute yuan.
+- Filing currency is HKD and source numbers are HK$'000.
+- Conversion rate used for all filing values: 1 HKD = 0.90322 CNY, CFETS central parity dated 2025-12-31.
+- Formula: reported HK$'000 * 1,000 * 0.90322.
+- Limitation: year-end rate also used for income statement and cash flow rather than an annual average rate.
+
+[reported facts in HK$'000]
+income statement 2025:
+- revenue 789,157
+- cost of sales 566,744
+- gross profit 222,413
+- profit before tax 50,045
+- finance costs 1,559
+- net profit / parent net profit 42,728
+
+balance sheet 2025:
+- PPE 206,106; investment property 1,097; PPE deposits 6,718
+- inventory 197,384; trade receivables 114,182; cash 153,274
+- total current assets 497,583; total non-current assets 216,651; total assets 714,234
+- trade payables 95,842; accruals/other payables 51,299
+- bank borrowings 7,199; current leases 10,974; non-current leases 7,365
+- total current liabilities 166,673; non-current liabilities 19,671; total liabilities 186,344
+- total equity and parent equity 527,890; minority interest nil
+
+cash flow 2025:
+- operating cash flow 44,355
+- PPE purchases 13,987; PPE purchase deposits 10,583; cash capex total 24,570
+- operating free cash flow 19,785
+- financing cash flow -39,541
+- dividends paid 29,262
+
+cash flow 2024 used only for normalisation:
+- operating cash flow 77,132
+- PPE purchases 14,571; PPE purchase deposits 13,519; cash capex 28,090
+- operating free cash flow 49,042
+
+[calculations]
+- gross margin = 222,413 / 789,157 = 0.2818361872
+- net margin = 42,728 / 789,157 = 0.0541438522
+- 2025 CNY FCF = (44,355 - 13,987 - 10,583) * 1,000 * 0.90322 = 17,870,207.70
+- 2024 CNY FCF = (77,132 - 14,571 - 13,519) * 1,000 * 0.90322 = 44,289,719.24
+- two-year average FCF = 31,079,963.47
+- discounted sustainable cash profit = average FCF * 80% = 24,866,369.176
+
+[cash discount]
+- cash CNY 138,440,142.28 * 80% = 110,752,113.824
+- less bank borrowings CNY 6,502,280.78
+- less lease liabilities CNY 16,564,151.58
+- discounted detachable net cash = CNY 87,685,681.464
+- judgment: 20% of cash retained for operating liquidity; debt and leases deducted at 100%.
+
+[earnback]
+- input market cap = CNY 285,223,863.48605156
+- operating business price = market cap - discounted net cash = CNY 197,538,182.02205154
+- owner earnback years = operating business price / discounted sustainable cash profit = 7.9439897568
+- market cap / discounted cash profit = 11.4702657822
+- discounted net cash / market cap = 0.3074275777
+
+[dividend]
+- 2025 interim HK$13.694m + proposed final HK$9.802m = HK$23.496m
+- converted forecast/historical annual cash dividend = CNY 21,222,057.12
+- forecast dividend yield against input market cap = 0.0744049143
+- 2024 regular dividend history excludes the HK13.87 cents/share special dividend.
+
+[quality and judgment boundaries]
+- Facts: financial statements, business descriptions, dividends and management explanations are sourced to HKEX annual report/results.
+- Calculations: margins, currency conversion, FCF, dividend yield and earnback ratios are deterministic from stated inputs.
+- Judgments: 80% cash recognition, 20% sustainable-profit haircut, two-year averaging, and interpretation of market position.
+- Data quality marked complete because all ordinary-company minimum fields, asset/liability rows, dividend forecast, evidence and earnback components are present; limitations remain explicitly disclosed.

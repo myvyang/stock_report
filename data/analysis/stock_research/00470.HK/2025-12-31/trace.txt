@@ -1,0 +1,61 @@
+stock-research trace
+company: WUXI LEAD / 00470.HK / A-share 300450
+period: 2025-12-31 annual
+generated_at: 2026-08-03T16:30:13+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md (consulted after local-data check)
+
+2. Initialized result
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Outcome: stock-research-result-v1 skeleton created.
+
+3. Reuse check
+- No annual facts, normalized facts, filing metadata, or prior stock-research result existed under the input-declared 00470.HK/2025-12-31 paths.
+- Only stock_report/data/notes/user_stock_evaluations.md existed locally.
+- Therefore returned to official public filing.
+
+4. Primary sources
+- HKEX issuer title search for stock 00470: https://www1.hkexnews.hk/search/titlesearch.xhtml?category=0&lang=EN&market=SEHK&stockId=1000291285
+- Audited 2025 Annual Report, published 2026-04-28: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0428/2026042803795.pdf
+- Input market snapshot: Tencent qt.gtimg.cn, 2026/07/31 16:08:41, market cap RMB 41,193,512,833.62329, PE TTM 27.66.
+
+5. Model verification and override
+- Input hint: financial_brokerage / requires_special_model.
+- Filing facts: company manufactures lithium-ion battery, PV, 3C, logistics, and automotive intelligent equipment; revenue is generally recognized on signed customer acceptance.
+- No brokerage customer funds, proprietary trading book, margin financing, or repo funding model was identified.
+- Final model: ordinary_operating / applicable.
+
+6. Extracted audited facts (RMB)
+- Revenue 14,358,016,000; cost of sales 9,950,545,000; gross profit 4,407,471,000.
+- Net profit 1,559,837,000; parent net profit 1,563,778,000.
+- Total assets 38,981,051,000; total liabilities 25,861,135,000; total equity 13,119,916,000; parent equity 13,139,927,000.
+- Cash 4,993,148,000; time deposits 254,699,000; restricted deposits 808,843,000; FVTPL assets 1,572,220,000.
+- Inventory 14,956,690,000; bills/trade/other receivables 8,379,408,000; contract assets 902,344,000; contract liabilities 12,873,255,000.
+- Borrowings 3,047,357,000; lease liabilities 650,924,000.
+- Operating cash flow 4,949,322,000; capex 555,378,000; operating free cash flow 4,393,944,000.
+- Proposed 2025 final dividend 477,301,000 / RMB0.287 per share, subject to shareholder approval.
+
+7. Research calculations
+- Gross margin = 4,407,471,000 / 14,358,016,000 = 0.3069693612.
+- Net margin = 1,563,778,000 / 14,358,016,000 = 0.1089132370.
+- Discounted detachable net cash = cash 4,993,148,000 + time deposits 254,699,000 + 90% FVTPL 1,414,998,000 - borrowings 3,047,357,000 - lease liabilities 650,924,000 = 2,965,192,000.
+- Sustainable cash profit bridge = parent profit 1,563,778,000 + depreciation/amortization 530,297,000 - capex 555,378,000 - cycle/acceptance haircut 288,697,000 = 1,250,000,000.
+- Operating business price = 41,193,512,833.62329 - 2,965,192,000 = 38,228,320,833.62329.
+- Owner earnback = 38,228,320,833.62329 / 1,250,000,000 = 30.5826566669 years.
+- Market cap / cash profit = 32.9548102669.
+- Forecast dividend yield = 477,301,000 / 41,193,512,833.62329 = 0.0115868001.
+
+8. Protocol population and validation
+- Populated result fields using repeated protocol `set` commands; the complex result was not authored as a standalone JSON from scratch.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed-result validation: status ok, errors [].
+
+9. Judgment boundaries
+- Facts: audited financial statement values, revenue mix, customer concentration, cash-flow movements, and proposed dividend.
+- Inference: contract liabilities and inventory represent project delivery/acceptance economics; 2025 operating cash flow is not fully repeatable because of working-capital movements.
+- Subjective judgment: 90% haircut on FVTPL assets and RMB288.697m cycle/acceptance haircut used to derive RMB1.25bn sustainable cash profit.
+- Limitation: market cap/PE copied from supplied snapshot and not independently rebuilt from A/H share counts and FX.

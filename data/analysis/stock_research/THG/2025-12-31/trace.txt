@@ -1,0 +1,64 @@
+stock-research trace
+task: THG / Hanover Insurance Group Inc / annual / 2025-12-31
+generated_at: 2026-08-04T17:21:35+08:00
+
+1. Read required instructions
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+
+2. Local reuse check
+- config/input.json exists.
+- No local raw filing, annual facts, normalized facts, or prior THG research result existed under the paths supplied in input.
+- Therefore fetched and reviewed primary public disclosures.
+
+3. Protocol initialization
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Skeleton created successfully; it initially inherited ordinary_operating/applicable from the non-authoritative input hint.
+
+4. Primary sources reviewed
+- SEC annual report / 2025 Form 10-K, filed 2026-02-20:
+  https://www.sec.gov/Archives/edgar/data/944695/000119312526125014/thg_2025_ars.pdf
+- SEC inline 10-K:
+  https://www.sec.gov/Archives/edgar/data/944695/000119312526060983/thg-20251231.htm
+- Company Q4 and full-year 2025 earnings release, dated 2026-02-03:
+  https://s2.q4cdn.com/114114621/files/doc_earnings/2025/q4/earnings-result/THG-Q4-2025-Press-Release-vFinal.pdf
+- Federal Reserve H.10 USD/CNY series, observation 2025-12-31 = 7.1875 CNY per USD:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Market cap, date, PE TTM and market source were reused from config/input.json (Yahoo Finance yfinance).
+
+5. Analysis-model decision
+- Overrode input hint ordinary_operating/applicable.
+- Final model: financial_insurance / not_applicable.
+- Reason: investment assets and cash support loss reserves, unearned premiums, liquidity and statutory capital; they are not detachable net cash.
+- Per result contract, discounted net cash, discounted cash profit, operating business price, owner earnback years and market-cap-to-cash-profit remain null.
+
+6. Key source facts in USD millions
+- Revenue 6,594.4; premiums earned 6,161.1; net income 662.5; pretax continuing income 843.8.
+- Assets 16,945.9; liabilities 13,374.4; equity 3,571.5.
+- Investments 10,382.7; cash 1,122.7; loss and LAE reserves 7,755.2; unearned premiums 3,440.4.
+- Operating cash flow 1,178.1; capex 7.7; dividends paid 130.6; common-stock repurchases 129.2.
+- Net premiums written 6,322.1; combined ratio 91.6%; catastrophe losses 276.3; net investment income 454.4.
+- Statutory capital and surplus 3,340; year-end book value per share USD 100.90.
+
+7. Conversion and calculations
+- All result.json monetary fields use absolute CNY yuan at USD/CNY 7.1875.
+- Net margin = 662.5 / 6,594.4 = 0.1004640301.
+- Forecast dividend = USD 0.95 x 4 x 35.4m shares = USD 134.52m = CNY 966,862,500.
+- Forecast dividend yield = CNY 966,862,500 / CNY 54,660,340,366.00488 = 0.0176885562.
+- Report-only P/B approximation = market cap / converted 2025 year-end equity = 2.1293x.
+- Insurance cash flow warning: OCF less capex was recorded per contract, but explicitly not treated as distributable cash profit.
+
+8. Protocol population
+- Used protocol set commands to populate the initialized skeleton by path/section.
+- Did not construct result.json manually from scratch.
+
+9. Validation
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final status: ok
+- Final errors: []
+
+10. Data-quality decision
+- status = complete under the special-model minimum requirements.
+- incomplete_reasons = [].
+- Limitations recorded: FX timing mismatch with market cap, dividend forecast is mechanical, insurance OCF is not ordinary free cash flow, and ordinary gross-margin/earnback fields are not meaningful.

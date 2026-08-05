@@ -1,0 +1,91 @@
+stock-research trace
+company: 000893.SZ 亚钾国际
+period: 2025-12-31 annual
+generated_for: 2026-08-01 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full.
+- Read references/data-reuse.md because the skill routes reuse decisions there.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked the input-declared raw filing and annual review paths.
+- No 2025 annual facts package, normalized facts, prior research result, or raw filing existed locally.
+- Therefore returned to official disclosure instead of relying on a third-party financial table.
+
+3. Official source retrieval
+- Located Shenzhen Stock Exchange full annual report:
+  https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-28/4e35b829-f163-4534-ba76-e17fdefc4147.PDF
+- Downloaded it to stock_report/data/raw/filings/000893.SZ/2025-12-31/2025-annual-report.pdf.
+- Located CNINFO annual report summary:
+  https://static.cninfo.com.cn/finalpage/2026-04-28/1225213240.PDF
+- Extracted the full report locally for page-level searches. Core figures were checked against the audited consolidated statements and notes, not copied from media reports.
+
+4. Statement model decision
+- Confirmed ordinary_operating/applicable.
+- Reason: business is potash mining, processing and sales; cash, financial debt, working capital, mining rights and production assets retain ordinary operating-company meaning. There are no customer deposits, insurance reserves, regulated presale cash, brokerage client funds, or concession-accounting structures.
+- Special handling retained for mining maintenance capex, commodity cyclicality and overseas mining rights.
+
+5. Audited 2025 figures captured (CNY)
+- Revenue: 5,325,028,086.27
+- Cost of sales: 2,206,235,114.35
+- Gross profit: 3,118,792,971.92
+- Operating profit: 1,900,233,200.82
+- Net profit: 1,668,606,184.77
+- Parent net profit: 1,672,578,453.76
+- Total assets: 20,025,355,795.52
+- Total liabilities: 6,657,108,657.79
+- Total equity: 13,368,247,137.73
+- Parent equity: 13,361,737,907.71
+- Minority interest: 6,509,230.02
+- Operating cash flow: 2,282,120,279.75
+- Capital expenditure (cash paid to acquire long-term assets): 1,885,373,745.40
+- Operating free cash flow: 396,746,534.35
+- Financing cash flow: -62,568,848.77
+
+6. Formula calculations
+- Gross margin = 3,118,792,971.92 / 5,325,028,086.27 = 0.5856857319.
+- Net margin = 1,672,578,453.76 / 5,325,028,086.27 = 0.3140975835.
+- Forecast dividend = 913,507,158 shares * CNY 0.11 = 100,485,787.38.
+- Forecast dividend yield = 100,485,787.38 / 47,311,000,000 = 0.0021239413.
+
+7. Discounted detachable net cash
+- Cash and cash equivalents: 1,292,330,851.63, haircut 100%.
+- Financing liabilities: 4,154,596,782.82, deducted 100%. This reconciles short-term borrowings, long-term borrowings including current portions, lease liabilities, and the shareholder long-term loan.
+- Discounted detachable net cash = 1,292,330,851.63 - 4,154,596,782.82 = -2,862,265,931.19.
+- Did not treat inventory, mining rights, fixed assets, construction in progress, contract liabilities or equity-method investments as detachable cash.
+
+8. Discounted sustainable cash profit
+- Starting parent net profit: +1,672,578,453.76.
+- Add back parent-profit impact of one-off 2# shaft impairment: +169,554,400.00 (company impairment announcement figure).
+- Remove equity-method investment income not evidenced by current cash dividends: -64,186,914.28.
+- Add depreciation and amortization: +731,584,792.39.
+- Estimated maintenance capex: -900,000,000.00. This is analyst judgment; company did not disclose maintenance capex separately. It is above 2025 D&A and below total growth-inclusive capex.
+- Pre-reserve cash profit: 1,609,530,731.87.
+- Commodity-cycle and Laos operating reserve: 25%, or -402,382,682.97. This is analyst judgment.
+- Discounted sustainable cash profit: 1,207,148,048.90.
+
+9. Owner earnback formulas
+- Input market cap: 47,311,000,000.00; timestamp 20260731114254; source Tencent qt.gtimg.cn; PE TTM 25.99.
+- Operating business price = 47,311,000,000 - (-2,862,265,931.19) = 50,173,265,931.19.
+- Owner earnback years = 50,173,265,931.19 / 1,207,148,048.9025 = 41.56347349.
+- Market cap / cash profit = 47,311,000,000 / 1,207,148,048.9025 = 39.19237582.
+
+10. Key uncertainty checks
+- 2# main inclined shaft flooding caused construction delay and CNY 311.683 million impairment; this supports both the one-off accounting adjustment and a continuing operational-risk reserve.
+- 2025 capex was CNY 1.885 billion and year-end capital commitments were approximately CNY 1.264 billion, so distributable cash is constrained despite strong CFO.
+- Proposed payout was only 6.01% of parent net income; parent-company retained earnings were CNY 182.706 million versus consolidated retained earnings CNY 5.927 billion.
+- Core overseas fixed and intangible assets with carrying value CNY 15.398 billion were restricted/pledged for financing.
+
+11. Protocol writes and validation
+- Populated outputs/result.json with repeated protocol set and append commands; did not hand-write the initialized result object.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].
+
+12. Output files
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

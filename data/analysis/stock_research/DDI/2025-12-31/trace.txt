@@ -1,0 +1,50 @@
+2026-08-04 stock-research trace — DDI — FY2025
+
+1. Read skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Initialized protocol result
+- Command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Initial status: partial
+
+3. Reuse check
+- No local raw filing, annual facts, normalized facts, or prior stock-research result existed for DDI/2025-12-31.
+- Returned to official public sources as required by data-reuse rules.
+
+4. Primary sources
+- SEC Form 20-F filed 2026-03-31: https://www.sec.gov/Archives/edgar/data/1799567/000162828026022395/ddi-20251231.htm
+- Company FY2025 results release dated 2026-02-11: https://ir.doubledowninteractive.com/news-releases/news-release-details/doubledown-interactive-reports-record-fourth-quarter-and-full
+- Federal Reserve G.5A 2025 average USD/CNY: https://www.federalreserve.gov/releases/g5a/current/
+- Market cap and PE: config/input.json, Yahoo Finance yfinance attribution; no raw quote snapshot supplied.
+
+5. Model decision
+- Confirmed ordinary_operating / applicable.
+- Reason: revenue comes from virtual-chip sales and real-money gaming; customer deposits produce only small contract liabilities. Cash and borrowings are not the business balance sheet itself.
+
+6. Translation
+- Used USD/CNY 7.1875 for every financial-statement amount for a consistent CNY display.
+- Limitation: balance sheet would conventionally use a period-end rate; this result is an analytical comparison, not translated statutory accounts.
+
+7. Key source values (USD thousands)
+- Assets 1,040,541; liabilities 90,156; equity 950,385; parent equity 950,197; NCI 188.
+- Revenue 359,938; cost of revenue 101,564; operating profit 126,960; profit 102,653; parent profit 102,498.
+- OCF 136,770; PP&E purchases 190; intangible purchases 102; operating FCF 136,478.
+- Cash 388,891; short-term investments 101,142; related-party borrowing 34,846; lease liabilities 4,753.
+
+8. Owner earnback calculations
+- Discounted net cash USD000 = cash 388,891 * 90% + short-term investments 101,142 * 90% - borrowing 34,846 - leases 4,753 = 401,430.7.
+- Discounted net cash CNY = 2,885,283,156.25.
+- Base cash profit USD000 = FCF 136,478 - interest received 18,051 * 75% = 122,939.75.
+- Discounted cash profit USD000 = 122,939.75 * 85% = 104,498.7875; CNY = 751,085,035.16.
+- Operating business price = 3,872,196,825.58 - 2,885,283,156.25 = 986,913,669.33.
+- Owner earnback = 986,913,669.33 / 751,085,035.16 = 1.31398 years.
+- Market cap / discounted cash profit = 5.15547.
+- Dividend forecast = 0 because Form 20-F states no current intention to pay common-share dividends for the foreseeable future.
+
+9. Protocol updates and validation
+- Populated result branches exclusively through protocol CLI `set` operations after protocol initialization.
+- Validation command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status ok, errors [].

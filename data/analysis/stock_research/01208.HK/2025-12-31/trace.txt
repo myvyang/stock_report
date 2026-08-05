@@ -1,0 +1,92 @@
+stock-research trace
+company=MMG Limited
+code=01208.HK
+period=2025-12-31
+generated_for_input=2026-08-03T17:09:03+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Read references/data-reuse.md because local fact reuse was evaluated.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields through protocol `set` commands; no complex result object was written from scratch.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   final validation status=ok, errors=[]
+
+[local-material-check]
+The configured annual facts, normalized facts, prior stock research result and raw filing metadata did not exist at task start. No historical conclusion was reused.
+Downloaded official preliminary annual results PDF to:
+stock_report/data/raw/filings/01208.HK/2025-12-31/2025-annual-results.pdf
+
+[model-resolution]
+Input hint=financial_brokerage/requires_special_model.
+Official disclosure says MMG and subsidiaries explore, develop and mine copper, zinc, gold, silver, molybdenum, lead and cobalt deposits.
+Resolved model=ordinary_operating/applicable.
+Reason: operating assets are mines, processing infrastructure, inventory and project financing, not brokerage customer money or trading assets. Mining cyclicality, finite mine lives, capex and non-controlling ownership receive explicit adjustments.
+
+[primary-sources]
+1. MMG Limited, 2025 Annual Results, published 2026-03-03:
+   https://www.mmg.com/wp-content/uploads/2026/03/e_2026-03-03_2025-Annual-Results.pdf
+   Used for financial statements, mine results, debt, capex, dividends, impairment and business identity.
+2. MMG Limited, Fourth Quarter Production Report 2025, published 2026-01-22:
+   https://www.mmg.com/wp-content/uploads/2026/01/e_2026-01-22_4QTR-Production-Report.pdf
+   Used for annual production totals.
+3. SAFE/CFETS, currency conversion rate at 2025-12-31:
+   https://www.safe.gov.cn/big5/big5/www.safe.gov.cn%3A443/safe/2025/1231/26980.html
+   USD/CNY=7.0288.
+4. Tencent qt.gtimg.cn market snapshot supplied in config/input.json.
+   market_cap_CNY=92724407727.10564; date=2026/07/31 16:08:45; pe_ttm=27.19.
+
+[reported-usd-million]
+revenue=6218.0
+operating_expenses=2737.7
+EBIT=1999.1
+profit_after_tax=955.2
+parent_net_profit=509.4
+operating_cash_flow=2689.5
+PP&E_capex=1079.6
+intangible_capex=2.0
+financing_cash_flow=-1472.2
+NCI_dividends_paid=695.3
+total_assets=15300.5
+total_liabilities=8400.6
+total_equity=6899.9
+parent_equity=3959.9
+NCI_equity=2940.0
+cash=328.6
+borrowings_ex_finance_prepayments=3278.9
+convertible_bond_debt=401.1
+net_debt=3351.4
+
+[conversion]
+All USD statement amounts were multiplied by 7.0288 million CNY per USD million.
+This is a uniform comparison convention. A full accounting translation would normally use average rates for annual flows and closing rates for balances.
+
+[derived-formulas]
+gross_profit_proxy=(6218.0-2737.7)*7.0288m=24462332640 CNY
+gross_margin_proxy=3480.3/6218.0=0.5597137343
+parent_net_margin=509.4/6218.0=0.0819234481
+operating_FCF=(2689.5-1079.6-2.0)*7.0288m=11301607520 CNY
+discounted_net_cash=(328.6-3278.9-401.1)*7.0288m=-23556320320 CNY
+discounted_cash_profit=509.4*7.0288m*70%=2506329504 CNY
+operating_business_price=92724407727.10564-(-23556320320)=116280728047.10564 CNY
+owner_earnback_years=116280728047.10564/2506329504=46.3948287
+market_cap_to_cash_profit=92724407727.10564/2506329504=36.9960963
+discounted_net_cash_to_market_cap=-23556320320/92724407727.10564=-0.2540466
+forecast_dividend=0; forecast_yield=0/market_cap=0
+
+[judgment-vs-fact]
+Fact: 2025 parent net profit was USD509.4m; sales and prices both improved; Las Bambas production was its second-highest annual result.
+Judgment: apply a 30% cycle haircut to parent net profit. This is a conservative normalization assumption, not management guidance.
+Fact: consolidated operating FCF was USD1607.9m before financing, and USD695.3m was paid to NCI.
+Judgment: do not use consolidated FCF directly as parent distributable cash because mine-level capex split and ownership allocation are incomplete.
+Fact: no 2024 or 2025 interim/final dividend was recommended.
+Judgment: forecast zero dividend as base case while debt and expansion needs remain; this is not a certainty.
+
+[limitations]
+- Traditional accounting gross profit was not disclosed; revenue less site operating expenses is explicitly a proxy.
+- No complete mine-by-mine split between sustaining and growth capex was available in the preliminary annual results.
+- Owner cash profit is not a mine DCF and does not model reserves, grades and closure dates individually.
+- Market cap and PE are third-party snapshot inputs and the TTM earnings period differs from FY2025.

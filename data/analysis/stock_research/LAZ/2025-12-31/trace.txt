@@ -1,0 +1,68 @@
+stock-research trace
+company=LAZ / Lazard, Inc.
+period=2025-12-31
+generated_at=2026-08-05T03:03:38+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated fields exclusively with protocol `set` commands.
+4. Validation result: status=ok, errors=[].
+
+[local reuse]
+- No existing LAZ annual facts, normalized facts, raw filing, or prior stock-research result existed in workspace or configured sync target.
+- Downloaded SEC 2025 Form 10-K to stock_report/data/raw/filings/LAZ/2025-12-31/laz-20251231.htm.
+- SEC companyfacts JSON was used as an extraction aid; reported numbers were checked against the 10-K contexts for FY2025 / 2025-12-31.
+
+[primary sources]
+- SEC 10-K accession 0001311370-26-000008, filed 2026-02-23:
+  https://www.sec.gov/Archives/edgar/data/1311370/000131137026000008/laz-20251231.htm
+- Lazard FY2025 results, published 2026-01-29:
+  https://www.lazard.com/news-announcements/lazard-reports-fourth-quarter-and-full-year-2025-results/
+- Lazard 2025 annual shareholder letter:
+  https://lazard.com/news-announcements/2025-annual-letter-to-shareholders/
+- Federal Reserve H.10, release 2025-12-29; 2025-12-26 CNY per USD=7.0063:
+  https://www.federalreserve.gov/releases/h10/20251229/
+- Market cap, date and PE TTM: config/input.json, source labelled Yahoo Finance yfinance.
+
+[model decision]
+Input hint ordinary_operating/applicable was overridden.
+Selected statement_model=financial_brokerage and owner_earnback_applicability=requires_special_model.
+Reason: Lazard's economics are regulated financial advisory and asset management; cash/investments support liquidity, deferred compensation, seed investments and regulatory capital. GAAP has no comparable gross profit. Ordinary detachable-cash and cash-profit payback figures would create false precision.
+
+[conversion]
+All USD statement amounts multiplied by 7.0063 to meet the CNY absolute-yuan contract.
+Balance-sheet and income/cash-flow amounts use the same rate for protocol consistency. This is a disclosed limitation because annual flows would conventionally use an average rate.
+
+[key source values, USD]
+total_assets=4,940,734,000
+total_liabilities=3,951,604,000
+total_equity_including_redeemable_NCI=989,130,000
+parent_equity=873,655,000
+net_revenue=3,098,847,000
+operating_income=327,598,000
+net_income_attributable_to_parent=236,831,000
+operating_cash_flow=519,325,000
+capital_expenditure=31,946,000
+operating_free_cash_flow=487,379,000 (OCF-capex)
+cash_and_equivalents=1,469,416,000
+long_term_debt=1,688,086,000
+2025_common_dividends_paid=186,579,000
+2025_common_stock_repurchases=91,011,000
+
+[formula checks]
+net_margin=236,831,000 / 3,098,847,000 = 0.0764255221
+year-end estimated shares outstanding=111,728,757 issued - 17,822,122 treasury = 93,906,635
+forecast dividend USD=93,906,635 * 2.00 = 187,813,270
+forecast dividend CNY=187,813,270 * 7.0063 = 1,315,876,113.6
+forecast dividend yield=1,315,876,113.6 / 27,868,940,879.50415 = 0.0472165813
+operating FCF CNY=(519,325,000-31,946,000)*7.0063=3,414,723,487.7
+
+[null fields]
+gross_margin, cost_of_sales and gross_profit are null because Lazard does not report a comparable gross-profit construct.
+discounted_net_cash, discounted_cash_profit, operating_business_price, owner_earnback_years and market_cap_to_cash_profit are null because the ordinary owner-earnback model requires_special_model.
+
+[quality]
+data_quality.status=complete under the special-model minimum threshold.
+Known limitations are recorded in outputs/result.json and outputs/report.md.

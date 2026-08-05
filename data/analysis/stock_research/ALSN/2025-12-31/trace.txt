@@ -1,0 +1,50 @@
+stock-research trace: ALSN / 2025-12-31
+generated_at: 2026-08-05 Asia/Shanghai
+
+1. Read required skill and contracts
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse audit
+   - No ALSN raw filing, annual facts, normalized facts, or prior stock-research output existed in workspace.
+   - Research therefore returned to official SEC and company IR sources.
+
+3. Primary sources
+   - SEC 2025 Form 10-K filed 2026-02-24:
+     https://www.sec.gov/Archives/edgar/data/1411207/000119312526065627/alsn-20251231.htm
+   - SEC XBRL balance sheet R2, income statement R4, cash flow R5.
+   - Allison Q1 2026 results for post-acquisition cash/debt:
+     https://ir.allisontransmission.com/news-releases/news-release-details/allison-announces-first-quarter-2026-results
+   - Allison dividend releases dated 2026-02-26 and 2026-05-06.
+   - Federal Reserve H.10 release dated 2025-12-29; 2025-12-26 USD/CNY 7.0063.
+   - Market cap and PE copied from config/input.json (Yahoo Finance yfinance).
+
+4. Model decision
+   - Confirmed ordinary_operating and owner_earnback applicable.
+   - Manufacturing assets and liabilities are ordinary operating items.
+   - Special handling required because 2025-12-31 cash was acquisition funding and Dana off-highway acquisition closed 2026-01-01.
+
+5. Currency and calculations
+   - All USD financial amounts translated at CNY 7.0063 per USD.
+   - Gross margin = 1,463 / 3,010 = 48.6047%.
+   - Net margin = 623 / 3,010 = 20.6977%.
+   - Operating FCF = (836 - 175) USD million = 661 USD million = CNY 4,631,164,300.
+   - Sustainable cash profit = (661 - 27 stock compensation) * 90% * 7.0063 = CNY 3,997,794,780.
+   - Discounted net cash uses Q1 2026: (311 * 50% - 4,292) * 7.0063 = CNY -28,981,559,950.
+   - Operating business price = 64,102,541,218.56738 - (-28,981,559,950) = CNY 93,084,101,168.56738.
+   - Owner earnback = 93,084,101,168.56738 / 3,997,794,780 = 23.2839 years.
+   - Market cap / cash profit = 16.0345.
+   - Forecast dividend = 82,828,704 shares * USD 1.16 * 7.0063 = CNY 673,174,388.65; yield = 1.05015%.
+
+6. Protocol operations
+   - Initialized outputs/result.json with protocol init.
+   - Populated each top-level research section with protocol set.
+   - Protocol validate returned status=ok, errors=[].
+
+7. Material limitations
+   - Post-acquisition Q1 2026 leverage is combined with pre-acquisition FY2025 profit; not fully like-for-like.
+   - A 10% sustainability haircut is an explicit analytical judgment, not company guidance.
+   - Market cap/PE were not independently verified against exchange-native data.
+   - Dividend forecast annualizes announced quarterly rate; future declarations remain discretionary.

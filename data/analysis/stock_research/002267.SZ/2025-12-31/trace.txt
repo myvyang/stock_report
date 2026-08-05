@@ -1,0 +1,50 @@
+task=stock_research
+company=陕西省天然气股份有限公司
+code=002267.SZ
+period=2025-12-31
+generated_at=2026-07-31T18:17:32+08:00
+
+[protocol]
+init: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+population: all result fields were populated through protocol set commands; the initialized JSON was not replaced by a hand-written object
+validate: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validate_result: status=ok, errors=[]
+
+[sources]
+1. Official annual report
+   title=陕西省天然气股份有限公司2025年年度报告
+   publisher=深圳证券交易所披露系统
+   publication_date=2026-04-28
+   url=https://disc.static.szse.cn/download/disc/disk03/finalpage/2026-04-28/a57a38df-881c-4609-b9f0-b3944a2ab170.PDF
+   used_for=business model, operating data, audited statements, asset/liability interpretation, dividends, customer/supplier concentration, risks
+2. Market snapshot
+   file=config/input.json
+   source=Tencent qt.gtimg.cn
+   timestamp=20260731114321
+   used_for=market cap 8163000000 yuan and PE TTM 16.45
+
+[model_review]
+input_hint=ordinary_operating/applicable
+final_model=utility_concession/requires_special_model
+reason=Annual report says long-distance pipeline construction and operation is the core business; fixed assets plus construction in progress are 11,296,509,780.38 yuan, and intangible assets include 30-year concessions. These assets, construction debt, operating cash and service obligations are economically linked. Ordinary detachable-net-cash payback would be misleading.
+ordinary_owner_earnback_fields=all null as required by contract
+
+[calculations]
+gross_profit=8595287340.35-7373016679.32=1222270661.03
+gross_margin=1222270661.03/8595287340.35=0.1422024216
+net_margin=583929118.68/8595287340.35=0.067936 (rounded)
+operating_free_cash_flow=1296166009.75-727259479.67=568906530.08
+minority_interest_ratio=257133381.37/6873247571.39=0.0374107558
+interest_bearing_debt=456406782.55+791772735.03+1180824968.54+1521043752.64=3950048238.76
+fixed_assets_plus_cip=9911234244.89+1385275535.49=11296509780.38
+payables_and_notes=412865657.40+1139024478.18=1551890135.58
+forecast_cash_dividend=1112075445/10*2.00=222415089.00
+forecast_dividend_yield=222415089.00/8163000000.00=0.0272461888
+
+[quality_checks]
+identity=confirmed by official annual report
+audit_opinion=standard unqualified opinion
+balance_sheet_check=14614047432.55-7740799861.16=6873247571.39
+income_statement_check=revenue-cost_of_sales=gross_profit
+special_model_rule=ordinary owner earnback metrics remain null
+known_limitations=maintenance versus expansion capex is not disclosed; detailed remaining concession periods are not split; dividend is the annual proposal at report date; market snapshot calculation was not independently reconstructed

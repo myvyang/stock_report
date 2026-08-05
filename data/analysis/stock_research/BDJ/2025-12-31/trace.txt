@@ -1,0 +1,82 @@
+task=stock_research
+query=BDJ
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-04T18:45:20+08:00
+
+[protocol]
+initialized=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+population_method=protocol set commands; result JSON was not hand-written from scratch
+validation=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[local_reuse]
+checked=stock_report/data/raw/filings/BDJ/2025-12-31
+checked=stock_report/data/analysis/annual_review/BDJ/2025-12-31/facts.json
+checked=stock_report/data/normalized/facts/BDJ/2025-12-31/annual-facts.json
+result=no local filing, annual facts package, or normalized facts were present
+action=obtained official public sources because required core facts were absent
+
+[sources]
+1=https://www.blackrock.com/us/individual/literature/annual-report/ar-retail-equity-trust.pdf
+  title=BlackRock 2025 Annual Report to Shareholders
+  use=audited BDJ strategy, portfolio, assets, liabilities, operations, distributions, NAV, returns, expenses, shares and risks
+  key_pages=8-10,98,101,104,117,146,152,178
+2=https://www.blackrock.com/us/individual/products/240225/blackrock-enhanced-equity-dividend-trust-usd-fund
+  title=BlackRock Enhanced Equity Dividend Trust official product page
+  use=fund identity, investment approach and current fund characteristics cross-check
+3=https://fred.stlouisfed.org/series/DEXCHUS/
+  title=FRED Chinese Yuan Renminbi to U.S. Dollar Spot Exchange Rate
+  use=2025-12-31 conversion rate, 6.9931 CNY per USD
+4=config/input.json
+  use=company identity; market cap CNY 11677542732.773438 as of 2026-08-03; Yahoo Finance yfinance PE TTM 6.229299
+
+[model_decision]
+input_hint=ordinary_operating/applicable
+final_model=investment_holding/requires_special_model
+reason=BDJ is a registered closed-end investment company. Its securities and derivatives are the operating assets; they cannot be treated as detachable cash. Revenue, gross margin, operating cash flow, capex and ordinary owner-earnback metrics have no comparable operating-company meaning.
+ordinary_owner_earnback_fields=null
+special_model=NAV per share; market-price premium/discount to NAV; NAV total return; expense ratio; portfolio and option exposure; distribution composition and coverage
+
+[currency]
+financial_statement_currency=USD
+structured_output_currency=CNY
+conversion_rate=6.9931
+conversion_date=2025-12-31
+method=USD statement amount multiplied by 6.9931
+limitation=market cap is dated 2026-08-03 while financial amounts and FX conversion are dated 2025-12-31
+
+[key_facts_usd]
+total_assets=1749377887
+total_liabilities=26782248
+net_assets=1722595639
+unaffiliated_investments=1704923662
+affiliated_investments=42181863
+options_written_liability=21073724
+shares_outstanding=176944689
+total_investment_income=44222361
+net_expenses_after_waivers=14595693
+net_investment_income=29626668
+net_realized_gain=152831617
+net_change_unrealized_appreciation=94963482
+increase_from_operations=277421767
+distributions=151434573
+return_of_capital=0
+nav_per_share=9.74
+market_price_per_share=9.48
+discount_to_nav=-0.0267
+nav_total_return=0.1875
+market_price_total_return=0.2591
+net_expense_ratio=0.0088
+option_overwrite_ratio=0.504
+monthly_distribution_per_share=0.0619
+
+[forecast_distribution]
+formula=0.0619 USD/share/month * 12 * 176944689 shares * 6.9931 CNY/USD
+forecast_cash_dividend_cny=919134706.77
+forecast_dividend_yield=919134706.77 / 11677542732.773438 = 0.0787095991
+interpretation=mechanical annualization only; not a promise and depends materially on future realized gains
+
+[quality]
+status=complete
+limitations=PE TTM is retained from input but economically weak for a closed-end fund; no same-date official NAV for 2026-08-03 was used; forecast distribution is mechanical; cross-date FX comparability is limited
+

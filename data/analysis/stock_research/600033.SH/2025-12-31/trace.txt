@@ -1,18 +1,19 @@
-运行时间：2026-07-27 Asia/Shanghai
-公司：福建高速 600033.SH
+运行时间：2026-07-31 Asia/Shanghai
+公司：福建高速（600033.SH）
 报告期：2025-12-31 年报
 
-读取的技能和契约：
+已读取的技能与协议：
 - .agents/skills/stock-research/SKILL.md
 - .agents/skills/stock-research/references/result-contract.md
 - .agents/skills/stock-research/references/report-contract.md
 - .agents/skills/stock-research/references/data-reuse.md
 
 协议 CLI：
-- 已运行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- 已运行：PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- 已运行 PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- 通过 protocol set/append 写入和更新结构化字段。
+- 已运行 PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
 
-复用的本地事实和研究文件：
+复用的本地资料：
 - config/input.json
 - stock_report/data/analysis/annual_review/600033.SH/2025-12-31/facts.json
 - stock_report/data/analysis/annual_review/600033.SH/2025-12-31/annual_facts.md
@@ -21,29 +22,30 @@
 - stock_report/data/raw/filings/600033.SH/2025-12-31/600033_2025_annual_report.txt
 - stock_report/data/analysis/stock_research/600033.SH/2025-12-31/result.json
 - stock_report/data/analysis/stock_research/600033.SH/2025-12-31/report.md
-- stock_report/data/analysis/stock_research/600033.SH/2025-12-31/trace.txt
 
-关键数据来源：
-- 核心三表、分业务收入成本、分红预案、货币资金、应付债券、租赁负债、投资资产、应收股利、收费权期限和罗宁减值，来自福建高速2025年年度报告和年度事实包。
-- 市值97.43亿元和PE 10.27倍来自 config/input.json 的 2026-07-24 批次输入快照。
-- 行业车流和政策背景复用历史研究中已核查的交通运输部、福建省交通运输厅和新华社/交通运输部政策资料。
+关键取数与计算：
+- 市值 9,880,000,000 元、PE TTM 10.32 倍、行情时间 20260731114341，来自本次 config/input.json，来源 Tencent qt.gtimg.cn。
+- 营收 3,049,016,105.68 元、营业成本 1,347,628,541.84 元、毛利 1,701,387,563.84 元、归母净利润 948,283,788.91 元，来自 2025 年年度报告。
+- 毛利率 = 1,701,387,563.84 / 3,049,016,105.68 = 55.80%。
+- 净利率 = 948,283,788.91 / 3,049,016,105.68 = 31.10%。
+- 经营现金流 2,785,399,912.72 元，购建长期资产支付现金 700,215,437.90 元，机械相减的经营自由现金流为 2,085,184,474.82 元。
+- 2025 年度分红预案 332,072,400 元；预测分红率 = 332,072,400 / 9,880,000,000 = 3.36%。
 
-本次重算和调整：
-- 将旧 stock_research 结果迁移到 stock-research-result-v1 协议字段。
-- 删除旧结果中的 investment_case_type 榜单标签，不在最终结果中输出标签。
-- 毛利率按毛利/营收重算：1,701,387,563.84 / 3,049,016,105.68 = 55.80%。
-- 净利率按归母净利润/营收重算：948,283,788.91 / 3,049,016,105.68 = 31.10%。
-- 经营业务购买价按 9,743,000,000 - 1,442,691,282.029 = 8,300,308,717.971 元。
-- 控股回本年按 8,300,308,717.971 / 748,000,000 = 11.10 年。
-- 市值/现金利润按 9,743,000,000 / 748,000,000 = 13.03 倍。
-- 预测分红率按 332,072,400 / 9,743,000,000 = 3.41%。
+模型复核：
+- 确认为 utility_concession，普通 owner earnback 口径 requires_special_model。
+- 年报显示公司收入几乎全部来自有限期限高速收费权，路产按收费权剩余期限内预计车流量采用工作量法折旧。
+- 泉厦、福泉、罗宁当前折旧预测所依据的剩余收费期分别约至 2035 年 9 月、2036 年 1 月和 2028 年 3 月。
+- 旧研究结果曾按普通经营公司口径计算折后净现金、折后现金利润和 11.10 年回本。本次依 result-contract 撤销这些数字，不将其写入 metrics 或 owner_earnback。
+- 特殊模型应逐路段预测通行费、运营养护、维持及扩建资本开支、税费、债务和租赁服务，再按上市公司归属比例折现；公开资料不足以可靠完成，未伪造结果。
 
-仍无法公开确认的项目：
-- 子公司层现金逐户可上收比例、经营留存要求和少数股东分配路径；已使用折扣处理。
-- 收费权到期后的续期、补偿或停止收费安排；只能在风险和利润折扣中反映。
-- 其他权益工具投资实际出售路径、税费和监管限制；未纳入主口径可剥离净现金。
+仍存在但不妨碍消费的限制：
+- 缺少分路段逐年现金流和未来资本开支计划，不能输出专项模型折现值。
+- 收费权到期后的续期、补偿或停止收费安排未明确。
+- 子公司现金经营留存及少数股东分配路径未逐户披露。
+- 战略股权实际出售路径、税费和监管限制未核实。
+- 市值和 PE 是输入快照，不是实时行情。
 
-写入文件：
+输出：
 - outputs/result.json
 - outputs/report.md
 - outputs/trace.txt

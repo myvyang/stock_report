@@ -1,0 +1,89 @@
+stock-research trace
+company=WRB
+period=2025-12-31
+generated_at=2026-08-04T12:32:44+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Read references/data-reuse.md because the task required deciding whether existing annual facts could be reused.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated initialized fields using repeated protocol `set` commands; did not construct result.json directly.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   status=ok, errors=[]
+
+[reuse-check]
+Expected annual facts, normalized facts, raw filing metadata, and historical stock-research outputs under stock_report/ were absent for WRB/2025-12-31.
+No prior conclusion was reused.
+
+[primary-sources]
+SEC 2025 Form 10-K, filed 2026-02-27, accession 0000011544-26-000005:
+https://www.sec.gov/Archives/edgar/data/11544/000001154426000005/wrb-20251231.htm
+SEC companyfacts XBRL, CIK 0000011544:
+https://data.sec.gov/api/xbrl/companyfacts/CIK0000011544.json
+WRB dividend announcement, 2026-06-03:
+https://ir.berkley.com/news/news-details/2026/W--R--Berkley-Corporation-Declares-Special-Dividend-Increases-Regular-Quarterly-Cash-Dividend-11-1-and-Increases-Share-Repurchase-Authorization/default.aspx
+Federal Reserve H.10 CNY per USD history (2025-12-31 = 6.9931):
+https://www.federalreserve.gov/RELEASES/H10/hist/dat00_ch.htm
+WRB 2026-06-10 Form 8-K, accession 0000011544-26-000016 (leadership event):
+https://www.sec.gov/Archives/edgar/data/11544/000001154426000016/wrb-20260609.htm
+
+[market-source]
+Market cap, market-cap date and PE TTM were reused exactly from config/input.json.
+source=Yahoo Finance yfinance
+market_cap_cny=181632860088.6621
+market_cap_date=2026-08-03
+pe_ttm=14.925925
+These market fields were not independently recalculated.
+
+[model-decision]
+Input hint ordinary_operating/applicable was rejected based on filing facts.
+Selected statement_model=financial_insurance.
+Selected owner_earnback_applicability=requires_special_model.
+Reason: invested assets and cash support loss reserves, unearned premiums, liquidity and regulatory capital. Operating cash flow also includes changes in insurance reserves and premium liabilities. Ordinary detachable-net-cash and cash-profit payback calculations would misstate economic substance.
+All ordinary owner-earnback numeric fields remain null as required by the result contract.
+
+[currency]
+All USD filing amounts were multiplied by 6.9931 CNY/USD, the Federal Reserve H.10 rate for 2025-12-31.
+Ratios remain dimensionless.
+Market cap was already supplied in CNY and was not converted.
+
+[key-usd-facts]
+total_assets=44071071000
+total_liabilities=34359177000
+total_equity=9711894000
+parent_equity=9700818000
+parent_net_income=1779403000
+total_revenue=14707856000
+net_premiums_earned=12446938000
+net_premiums_written=12711327000
+net_investment_income=1429067000
+operating_cash_flow=3582616000
+net_additions_ppe=169994000
+investments=30687429000
+cash=2539938000
+loss_reserves=22207773000
+unearned_premiums=6721570000
+combined_ratio=0.907
+loss_ratio=0.624
+expense_ratio=0.283
+BIC_statutory_capital_surplus=9857138000
+BIC_RBC_ratio=3.97
+2026_unapproved_dividend_capacity=1400000000
+
+[dividend-forecast]
+Regular annualized dividend: USD 0.10 x 4 = USD 0.40/share.
+Declared 2026 special dividend: USD 0.50/share.
+Forecast total: USD 0.90/share.
+Shares: 377155799 (2025 year-end).
+Forecast cash dividend: USD 339440219.10 = CNY 2373739396.19.
+Forecast yield on supplied market cap: 0.013068887397519892.
+No additional undeclared special dividend was assumed.
+
+[limitations]
+Special insurance metrics are described in report.md and evidence because result-v1 has no dedicated fields for combined ratio, investment yield, reserve development or RBC.
+The 2025 year-end FX rate is a translation convention, not the average rate at which income was earned.
+Market valuation and financial statement amounts have different observation dates.
+The dividend forecast is scenario-based; special dividends are discretionary.

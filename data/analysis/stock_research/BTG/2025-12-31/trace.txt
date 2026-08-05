@@ -1,0 +1,94 @@
+stock-research trace: BTG / B2Gold Corp / 2025-12-31 annual
+generated_at=2026-08-04 Asia/Shanghai
+
+1. Protocol initialization
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+result: initialized stock-research-result-v1 skeleton from task input.
+
+2. Local reuse audit
+checked:
+- stock_report/data/analysis/annual_review/BTG/2025-12-31/facts.json
+- stock_report/data/analysis/annual_review/BTG/2025-12-31/annual_facts.md
+- stock_report/data/raw/filings/BTG/2025-12-31/metadata.json
+- /root/aicode/stock_report paths matching BTG/2025-12-31
+result: no reusable local annual fact pack, raw filing metadata, or prior research result found.
+
+3. Primary sources
+- SEC Form 40-F cover: https://www.sec.gov/Archives/edgar/data/1429937/000110465926026310/tm266740d1_40f.htm
+- Audited consolidated financial statements, Exhibit 99.2: https://www.sec.gov/Archives/edgar/data/1429937/000110465926026310/tm266740d1_ex99-2.htm
+- 2025 MD&A, Exhibit 99.3: https://www.sec.gov/Archives/edgar/data/1429937/000110465926026310/tm266740d1_ex99-3.htm
+- Company 2025 results/2026 guidance release: https://www.b2gold.com/news-media/news-releases/news-details/2026/B2Gold-Reports-Q4-and-Full-Year-2025-Results--2026-Guidance-Achieved-2025-Gold-Production-and-Cost-Guidance-Record-Annual-Revenue-in-2025-of-Over-3-Billion-Gold-Production-for-2026-Anticipated-to-be-Between-820000-and-970000-oz-Q1-2026-Dividend-of-US/default.aspx
+- Federal Reserve 2025 annual average FX: https://www.federalreserve.gov/Releases/g5a/current/
+- Market cap and PE: config/input.json, Yahoo Finance yfinance snapshot dated 2026-08-03.
+
+4. Model classification
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason: B2Gold directly develops and operates gold mines. Mining interests, inventory, mine restoration provisions and debt are identifiable operating assets and obligations; balance sheet is not itself a banking, insurance, property-development, concession, or holding-company business model. Ordinary owner earnback is usable only after maintenance capital and exploration deductions.
+
+5. Currency conversion
+source currency=USD
+output currency=CNY
+fx=7.1875 CNY per USD (Federal Reserve 2025 annual average)
+method: all statement and forecast USD amounts multiplied by 7.1875 for consistent comparison. No separate closing rate was used for balance-sheet items; recorded as a limitation.
+
+6. Key audited facts (USD thousands unless noted)
+revenue=3,061,238
+cost_of_sales=1,530,455
+gross_profit=1,530,783
+operating_income=1,382,259
+net_income=426,699
+parent_net_income=401,908
+operating_cash_flow=895,836
+mining_interest_expenditures=862,829 (sum of Fekola 222,670; Masbate 41,257; Otjikoto 24,005; Goose 471,453; Fekola Regional 20,845; Gramalote 31,920; other exploration 50,679)
+total_assets=5,879,316
+total_liabilities=2,237,800
+total_equity=3,641,516
+parent_equity=3,593,565
+cash=380,424
+long_term_investments=286,066
+interest_bearing_debt=598,310 (current 33,870 + long-term 564,440)
+
+7. Formula checks
+gross_margin=1,530,783 / 3,061,238 = 0.500054
+net_margin=401,908 / 3,061,238 = 0.131289
+reported operating FCF=(895,836 - 862,829) * 7.1875 = CNY 237,237,812
+
+detachable net cash:
+cash: 380,424,000 * 7.1875 * 100% = CNY 2,734,297,500
+long-term investments: 286,066,000 * 7.1875 * 50% = CNY 1,028,049,688
+interest-bearing debt: 598,310,000 * 7.1875 * -100% = CNY -4,300,353,125
+discounted_detachable_net_cash=CNY -538,005,938
+
+sustainable cash profit:
+operating cash flow=USD 895.836m
+less disclosed sustaining capital=USD 258.305m
+less disclosed sustaining mine exploration=USD 11.433m
+base sustainable cash profit=USD 626.098m = CNY 4,500,079,375
+cyclical haircut=25% due to elevated 2025 realized gold price and operating/tax volatility
+discounted sustainable cash profit=CNY 3,375,059,531
+
+market_cap=CNY 33,716,828,200.262695
+operating_business_price=market_cap - discounted_net_cash = CNY 34,254,834,138
+owner_earnback_years=34,254,834,138 / 3,375,059,531 = 10.1494
+market_cap_to_cash_profit=33,716,828,200.262695 / 3,375,059,531 = 9.99
+
+dividend forecast:
+Q1 2026 declared dividend=USD 0.02/share; company indicated expected annualized USD 0.08/share.
+shares at 2025-12-31=1,340,621,856
+forecast_cash_dividend=0.08 * 1,340,621,856 * 7.1875 = CNY 770,858,067
+forecast_yield=770,858,067 / 33,716,828,200.262695 = 0.0228627
+
+8. Judgment flags
+- The 25% sustainable-profit haircut is analyst judgment, not company guidance.
+- Long-term investments receive a 50% haircut; associate investments are excluded from detachable cash.
+- Prepaid gold sales and gold-stream obligations are treated as operating delivery constraints, not interest-bearing debt, and are discussed in liabilities/risks.
+- Yahoo market snapshot was supplied by the task and not independently reconstructed.
+
+9. Output construction
+outputs/result.json initialized and populated exclusively through protocol CLI init/set commands; complex JSON was not drafted as a standalone object.
+outputs/report.md and outputs/trace.txt written from the same facts and formulas.
+
+10. Validation
+command: PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+result: status=ok; errors=[]

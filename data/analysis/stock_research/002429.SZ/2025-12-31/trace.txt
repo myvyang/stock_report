@@ -1,0 +1,74 @@
+stock-research trace
+company=兆驰股份 002429.SZ
+period=2025-12-31
+generated_for_input=2026-07-31T20:46:21+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md.
+3. Read references/data-reuse.md because no local annual facts were initially present.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated fields with protocol set commands; complex JSON was not authored as a replacement skeleton.
+6. Validated with protocol validate; final status recorded below.
+
+[source discovery]
+- No pre-existing raw filing, annual facts, normalized facts, or stock-research output for 002429.SZ/2025-12-31 was present in /workspace or the listed sync target.
+- Downloaded official filing PDF to stock_report/data/raw/filings/002429.SZ/2025-12-31/annual_report_2025.pdf.
+- Official filing URL: https://static.cninfo.com.cn/finalpage/2026-04-24/1225172227.PDF
+- Filing title: 深圳市兆驰股份有限公司2025年年度报告全文; disclosure date 2026-04-24.
+- Market cap and PE were reused exactly from config/input.json: CNY 33,862,000,000; PE TTM 28.74; Tencent qt.gtimg.cn; timestamp 20260731114251.
+- Dividend implementation used company disclosure: CNY 393,843,832.81, CNY 0.87 per 10 shares, approved and implemented in 2026.
+
+[model decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=Revenue is electronic manufacturing and operating services. Assets are cash, receivables, inventory and production equipment; liabilities are trade payables and financing. No customer deposits, insurance reserves, regulated presale cash, project settlement structure or concession right makes the ordinary model inapplicable.
+
+[reported facts]
+revenue=17807142308.74
+cost_of_sales=14584429446.45
+gross_profit=3222712862.29
+operating_profit=1535101817.53
+net_profit=1466735314.06
+parent_net_profit=1303300688.25
+non_recurring_profit=173228622.21
+operating_cash_flow=3303516290.51
+capital_expenditure=684483298.01
+operating_free_cash_flow=2619032992.50
+total_assets=27055452254.86
+total_liabilities=9744984905.59
+total_equity=17310467349.27
+parent_equity=16705105876.12
+minority_interest=605361473.15
+cash=4485665084.72
+restricted_cash=491947389.20
+shareholder_asset_transfer_receivable_gross=2261137702.74
+
+[calculations]
+gross_margin=(17807142308.74-14584429446.45)/17807142308.74=0.1809786661113079
+net_margin=1303300688.25/17807142308.74=0.0731897721517237
+unrestricted_cash=4485665084.72-491947389.20=3993717695.52
+financing_debt=1542942009.60+610053538.18+1903020395.00+83813046.35+250000000.00=4389828989.13
+discounted_trading_financial_assets=115982755.45*0.50=57991377.725
+discounted_detachable_net_cash=3993717695.52+57991377.725-4389828989.13=-338119915.885
+core_parent_profit=1303300688.25-173228622.21=1130072066.04
+discounted_sustainable_cash_profit=1130072066.04*0.90=1017064859.436
+operating_business_price=33862000000-(-338119915.885)=34200119915.885
+owner_earnback_years=34200119915.885/1017064859.436=33.6262919701
+market_cap_to_cash_profit=33862000000/1017064859.436=33.2938452114
+forecast_dividend_yield=393843832.81/33862000000=0.0116308497079
+
+[judgment boundaries]
+- Restricted cash excluded in full.
+- Trading fund discounted 50% for valuation and exit uncertainty.
+- Shareholder asset-transfer receivable included at 0% because repayment was extended to 2027-12-31 and is not cash on demand.
+- Financing liabilities deducted in full.
+- Sustainable profit starts with audited parent net profit, removes disclosed non-recurring profit, then applies a 10% judgmental haircut for capital intensity, working-capital volatility and overseas ramp-up.
+- 2025 operating free cash flow was not annualized because it materially exceeds profit and 2024 operating cash flow was much lower.
+
+[quality]
+core_fields=complete
+evidence=official_filing_plus_company_dividend_disclosure_plus_input_market_snapshot
+limitations=market date is seven months after balance-sheet date; industry shares not independently audited; 10% profit haircut is analyst judgment.
+validation=ok; protocol returned status=ok and errors=[] after all three outputs were created

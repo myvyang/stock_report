@@ -1,0 +1,41 @@
+stock-research trace
+task: 01100.HK / FY2025 annual
+generated_at: 2026-08-03 Asia/Shanghai
+
+1. Read stock-research/SKILL.md, result-contract.md, report-contract.md and data-reuse.md.
+2. Checked configured annual-review, normalized-facts, raw-filing and prior stock-research paths. No reusable local filing or facts package existed.
+3. Identified the issuer from official disclosures as Mainland Headwear Holdings Limited / 飞达帽业控股有限公司, not a brokerage.
+4. Retrieved official 2025 annual report from:
+   https://mainlandsewing.com.cn/image/catalog/Annoucement/e/2026041600668.pdf
+   Official annual results press release:
+   https://www.mainlandsewing.com.cn/image/catalog/177693552387993100.pdf
+5. Overrode input analysis_model_hint financial_brokerage with ordinary_operating because the audited statements and segment note show manufacturing and trading operations with ordinary working capital and bank debt.
+6. Initialized outputs/result.json using:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+7. Populated result fields only through protocol set/append commands.
+8. Source currency is HKD. Converted statement amounts to CNY at 1 HKD = 0.918 CNY for protocol consistency. Ratios were calculated from source-currency figures. Market cap and PE were retained from config/input.json.
+9. Operating free cash flow = operating cash flow HKD190.250m - PPE purchases HKD49.854m - intangible purchases HKD24.692m = HKD115.704m.
+10. Discounted detachable net cash calculation (CNY):
+    cash/short deposits 159,922,944 * 85% = 135,934,502.4
+    listed securities 4,351,320 * 70% = 3,045,924
+    other amortised-cost assets 37,680,228 * 50% = 18,840,114
+    unlisted FVPL assets 38,215,422 * 30% = 11,464,626.6
+    insurance surrender value 6,689,466 * 50% = 3,344,733
+    investment properties 49,829,040 * 50% = 24,914,520
+    less bank debt 128,844,054
+    less lease liabilities 44,650,602
+    result = 24,049,764
+11. Discounted sustainable cash profit calculation (CNY):
+    parent net profit 108,753,624
+    less FVPL gain 5,915,592
+    less 20% cyclicality/trading-loss/reinvestment reserve 20,567,606.4
+    result = 82,270,425.6
+12. Earnback calculations:
+    operating business price = 535,356,089.78927135 - 24,049,764 = 511,306,325.78927135
+    owner earnback years = 511,306,325.78927135 / 82,270,425.6 = 6.2149468908
+    market cap / cash profit = 535,356,089.78927135 / 82,270,425.6 = 6.5072726424
+13. Forecast dividend assumes FY2025 DPS HKD0.09 is maintained: 429,164,448 shares * HKD0.09 * 0.918 = CNY35,457,750; yield = 6.6232%.
+14. Ran protocol validation after report generation:
+    PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+    result: status=ok, errors=[]
+15. Arithmetic cross-checks passed: cash breakdown sum CNY24,049,764.00; profit adjustment sum CNY82,270,425.60; evidence items=11; data_quality.status=complete.

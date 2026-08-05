@@ -1,0 +1,60 @@
+CKX stock-research trace
+generated_at=2026-08-04T17:09:23+08:00
+period=2025-12-31
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md and references/report-contract.md in full.
+3. Read references/data-reuse.md because no local fact package was present.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields using protocol set commands only; no complex JSON object was handwritten directly into the file.
+6. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   outcome={"status":"ok","errors":[]}
+
+[local_reuse]
+- config/input.json found and used.
+- No CKX raw filing, annual facts, normalized facts, or prior stock-research output existed under stock_report at task start.
+- Therefore returned to primary public sources.
+
+[primary_sources]
+- SEC FY2025 Form 10-K, accession 0001437749-26-010434, filed 2026-03-31:
+  https://www.sec.gov/Archives/edgar/data/352955/000143774926010434/ckx20251231_10k.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/352955/0001437749-26-010434-index.htm
+- Federal Reserve H.10 Data Download Program, China spot exchange rate:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Market snapshot supplied in config/input.json: Yahoo Finance yfinance, 2026-08-03.
+
+[currency]
+- Filing currency: USD.
+- Output currency required by protocol: CNY absolute yuan.
+- Translation rate: 1 USD = 7.1875 CNY at 2025-12-31 from Federal Reserve H.10.
+- Input market cap already supplied in CNY and was not translated again.
+
+[model_decision]
+- Input hint: ordinary_operating / applicable.
+- Overridden to: investment_holding / requires_special_model.
+- Basis: CKX earns from ownership of land, timber and mineral rights; these assets are the business itself. FY2025 net income was dominated by land-sale gain and year-end cash contained the related proceeds. Ordinary market-cap-minus-cash divided by earnings would double count the same asset realization.
+- Consequence: all ordinary owner-earnback sorting fields remain null. Recommended analytic model is bottom-up NAV plus verified shareholder distributions.
+
+[key_usd_facts]
+- Cash and cash equivalents: 18,010,108.
+- Total assets: 22,285,768.
+- Total liabilities: 840,356.
+- Stockholders' equity / parent equity: 21,445,412.
+- Debt: zero.
+- Revenue: 838,543; direct segment costs: 64,698; derived gross profit: 773,845.
+- Operating income: 3,641,163; net income: 3,009,972.
+- Gain on sale of land: 3,557,868.
+- Operating cash flow: 459,630.
+- No fixed-asset purchase line was reported; capex set to zero and operating FCF equals OCF.
+- Financing cash outflow: 147,614, stock withheld for employee taxes.
+- Remaining managed land: 7,023 net acres.
+
+[judgment_and_limitations]
+- Gross profit is derived as revenue less the three directly reported segment cost lines; it is not a separately labeled GAAP subtotal in the filing.
+- Forecast dividend is zero because the company states it does not currently pay dividends regularly and no declaration supports a positive forecast. This is a baseline, not a claim that a special distribution cannot occur.
+- PE TTM 7.5 is retained from input but is economically distorted by the one-time land-sale gain.
+- No oil and gas reserve information or current market appraisal of remaining land was available; therefore no NAV discount, detachable cash amount, sustainable cash profit, or earnback years were fabricated.

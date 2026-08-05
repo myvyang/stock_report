@@ -1,0 +1,62 @@
+stock-research trace — 601339.SH — period 2025-12-31
+generated_at: 2026-07-31T18:54:01+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md.
+- Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked stock_report/data/analysis/annual_review/601339.SH/2025-12-31 and stock_report/data/analysis/stock_research/601339.SH/2025-12-31.
+- No annual facts, normalized facts, prior research output, or local filing was present.
+- Therefore retrieved the 2025 annual report disclosed by SSE on 2026-04-16. Direct SSE CDN access returned anti-bot HTML; an exact mirrored PDF (bulletin id 12093482) was downloaded from Sina's filing archive, and its identity was checked against company code 601339, report title, period, page count, and the SSE announcement URL found in the announcement index.
+- Local evidence copy: stock_report/data/raw/filings/601339.SH/2025-12-31/annual_report_2025.pdf
+- Extracted text: stock_report/data/raw/filings/601339.SH/2025-12-31/annual_report_2025.txt
+- Official announcement URL: https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-16/601339_20260416_U50B.pdf
+- Mirror used for byte retrieval: http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESH_STOCK/2026/2026-4/2026-04-16/12093482.PDF
+
+3. Key extracted facts
+- Audit opinion: standard unmodified opinion, annual report page 2 / audit report pages 59-61.
+- Revenue 7,860,604,375.02; cost of sales 6,786,433,570.69; operating profit 737,863,709.28; parent net profit 656,131,927.81; annual report pages 66-68.
+- Deducted parent net profit 612,447,603.78; annual report page 6.
+- Operating cash flow 1,087,885,412.50; capex cash paid 147,787,602.30; financing cash flow -1,279,736,615.44; annual report pages 70-71.
+- Total assets 13,391,880,470.53; liabilities 4,190,940,330.30; parent equity 9,200,940,140.23; annual report pages 62-64.
+- Cash, deposits, restricted assets, debt, long-term equity investments: annual report pages 20-23, 100, 108-110, 117-121, 131 and 138.
+- Business model and segment economics: annual report pages 9-16 and 26-27.
+- Dividend proposal: 374,892,250.00; annual report page 2. 2025 interim cash dividend 224,935,350.00 and 2024 annual cash dividend 389,887,940.00; annual report pages 39-40.
+- 2025 annual dividend implementation was cross-checked against the later implementation announcement disclosed after shareholder approval.
+
+4. Analysis-model decision
+- Confirmed ordinary_operating/applicable.
+- Reason: core activity is yarn manufacturing and direct sales; inventory, receivables, plant and bank borrowing describe an ordinary operating manufacturer. The equity-accounted bank investment is an investment asset, not the reporting model of the consolidated operating company.
+
+5. Calculation trace
+- Gross profit = 7,860,604,375.02 - 6,786,433,570.69 = 1,074,170,804.33.
+- Gross margin = 1,074,170,804.33 / 7,860,604,375.02 = 0.1366524447.
+- Net margin = 656,131,927.81 / 7,860,604,375.02 = 0.0834709262.
+- Operating FCF = 1,087,885,412.50 - 147,787,602.30 = 940,097,810.20.
+- Discounted cash assets:
+  non-restricted cash 1,668,953,337.96 × 90% = 1,502,058,004.164;
+  restricted cash 128,476,095.23 × 50% = 64,238,047.615;
+  large CDs 581,465,730.56 × 95% = 552,392,444.032;
+  trading financial assets 10,366,371.27 × 50% = 5,183,185.635.
+- Interest-bearing bank debt = 1,448,407,778.71 + 1,061,600,000.00 + 997,000,000.00 = 3,507,007,778.71. Accrued interest and lease liabilities were not added to avoid mixing financing principal definitions; this is immaterial to the rounded conclusion.
+- Discounted detachable net cash = 1,502,058,004.164 + 64,238,047.615 + 552,392,444.032 + 5,183,185.635 - 3,507,007,778.71 = -1,383,136,097.264.
+- Sustainable cash profit = 612,447,603.78 × 90% = 551,202,843.402. The 10% haircut reflects cyclical recovery, flat revenue, reliance on utilization/cost improvement, and lower Q4 earnings.
+- Operating business price = 12,102,000,000 - (-1,383,136,097.264) = 13,485,136,097.264.
+- Owner earnback years = 13,485,136,097.264 / 551,202,843.402 = 24.465.
+- Market cap / cash profit = 12,102,000,000 / 551,202,843.402 = 21.956.
+- Forecast dividend yield = 374,892,250 / 12,102,000,000 = 0.0309777103.
+
+6. Protocol population and validation
+- Populated result paths using repeated protocol `set` commands; the initialized object was not replaced by a hand-written JSON document.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final validation status: ok; errors: [].
+
+7. Limitations recorded
+- Market cap and PE are from the user-provided Tencent snapshot, not an exchange tick archive.
+- Sustainable cash profit and discount rates are analyst estimates, not company guidance.
+- Long-term equity investments are excluded from detachable cash; this is conservative but their realizable value was not independently appraised.
+- Overseas cash remittance was not verified account by account.

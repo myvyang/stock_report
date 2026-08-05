@@ -1,0 +1,72 @@
+stock-research trace
+company=三峰环境
+code=601827.SH
+period=2025-12-31
+generated_for_input_created_at=2026-07-31T15:32:19+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md completely.
+2. Read references/result-contract.md and references/report-contract.md completely.
+3. Read references/data-reuse.md because the skill routes reuse decisions through it.
+4. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+5. Populated result fields exclusively through protocol set commands; did not hand-write the initialized JSON.
+6. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse audit]
+- config/input.json existed and was used.
+- No annual facts package, normalized facts, raw filing cache, or prior stock-research result for 601827.SH/2025-12-31 existed under the workspace stock_report tree.
+- Therefore returned to original public filings as required by data-reuse.md.
+
+[primary sources]
+1. 重庆三峰环境集团股份有限公司2025年年度报告
+   disclosure_date=2026-03-31
+   cninfo_announcement_id=1225054792
+   url=https://static.cninfo.com.cn/finalpage/2026-03-31/1225054792.PDF
+   used_for=business model, operating data, three statements, asset/liability notes, BOT terms, risks
+2. 重庆三峰环境集团股份有限公司2025年年度股东会会议资料
+   disclosure_date=2026-04-10
+   cninfo_announcement_id=1225086947
+   url=https://static.cninfo.com.cn/finalpage/2026-04-10/1225086947.PDF
+   used_for=audited financial summary, cash-flow explanation, 2025 profit distribution plan
+3. Tencent qt.gtimg.cn snapshot supplied in config/input.json
+   timestamp=2026-07-31 11:43:30 Asia/Shanghai
+   used_for=market cap 13,961,000,000.000002 yuan and PE TTM 11.16
+
+[model decision]
+input_hint=ordinary_operating/applicable
+final_model=utility_concession/requires_special_model
+reason=BOT/PPP concession assets and matching project financing are the business itself. BOT concession carrying amount was 15,259,409,394.64 yuan; in-construction PPP was 262,833,859.30 yuan. Projects typically run for 25-30 years, then transfer to the grantor without compensation. Restricted intangible assets had carrying value 8,896,018,851.82 yuan. Ordinary detachable-net-cash owner earnback would misstate the economics.
+special_model_focus=remaining concession terms; waste volume and utilization; treatment fees, tariffs and subsidy duration; maintenance capex; project debt service; transfer obligations
+
+[core calculations]
+gross_profit=5,559,083,928.61-3,487,933,804.07=2,071,150,124.54
+gross_margin=2,071,150,124.54/5,559,083,928.61=0.37257040029217053
+net_margin=1,230,956,812.23/5,559,083,928.61=0.22143159341323165
+operating_free_cash_flow=2,355,411,673.51-467,761,446.79=1,887,650,226.72
+forecast_cash_dividend=1,671,933,300*0.266=444,734,257.80
+forecast_dividend_yield=444,734,257.80/13,961,000,000.000002=0.031855472946064035
+2024_cash_dividend=1,671,933,300*0.245=409,623,658.50
+forecast_payout_ratio=444,734,257.80/1,230,956,812.23=0.3612915200447365
+
+[null policy]
+Because owner_earnback_applicability is not applicable under the ordinary formula, the following were intentionally left null:
+- metrics.discounted_net_cash
+- metrics.discounted_net_cash_to_market_cap
+- metrics.discounted_cash_profit
+- metrics.operating_business_price
+- metrics.owner_earnback_years
+- metrics.market_cap_to_cash_profit
+- owner_earnback ordinary-formula numeric fields
+
+[judgment boundaries]
+- Facts are sourced to filings or the supplied market snapshot.
+- Inferences about cash detachability and cash-flow durability are identified as inferences in report.md.
+- No buy/sell recommendation, target price, ranking label, or unsupported deterministic conclusion is provided.
+- Mechanical operating free cash flow is not treated as distributable sustainable cash profit.
+- No project-level DCF was produced because project-by-project remaining terms, tariffs, maintenance capex, debt schedules, and transfer cash costs were not disclosed in sufficient detail.
+
+[validation]
+status=ok
+errors=[]

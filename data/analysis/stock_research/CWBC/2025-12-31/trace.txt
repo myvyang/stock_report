@@ -1,0 +1,91 @@
+stock-research trace
+generated_for=CWBC
+period=2025-12-31
+report_type=annual
+generated_at=2026-08-05 Asia/Shanghai
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated scalar and list fields only through protocol `set` and `append` commands.
+3. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+4. Validation result: status=ok, errors=[]
+
+[local_reuse]
+- Checked paths under stock_report/data for CWBC/2025-12-31.
+- No raw filing, annual facts package, normalized facts, or prior research result was present.
+- Research therefore returned to primary filings and regulator data.
+
+[primary_sources]
+- SEC 2025 Form 10-K, accession 0001628280-26-016895, filed 2026-03-11:
+  https://www.sec.gov/Archives/edgar/data/1127371/000162828026016895/cvcy-20251231.htm
+- SEC Companyfacts XBRL, CIK 0001127371:
+  https://data.sec.gov/api/xbrl/companyfacts/CIK0001127371.json
+- SEC Q1 2026 Form 10-Q (post-merger share count and quarterly dividend):
+  https://www.sec.gov/Archives/edgar/data/1127371/000162828026032457/cvcy-20260331.htm
+- SEC-hosted 2025 annual report (post-merger scale disclosure):
+  https://www.sec.gov/Archives/edgar/data/1127371/000162828026024923/cwbcannualreporttosharehol.pdf
+- Federal Reserve H.10 release dated 2025-12-29:
+  https://www.federalreserve.gov/releases/h10/20251229/
+- Valuation snapshot: config/input.json, Yahoo Finance yfinance, dated 2026-08-03.
+
+[model_decision]
+- Input hint ordinary_operating/applicable was overridden.
+- Confirmed statement_model=financial_bank.
+- Confirmed owner_earnback_applicability=requires_special_model.
+- Reason: customer deposits fund loans and securities; these balance-sheet items are the business itself. Detachable net cash and ordinary free-cash-flow earnback are economically invalid.
+- Required ordinary owner-earnback sorting fields remain null.
+
+[currency]
+- Filing amounts are USD.
+- Result contract requires absolute CNY yuan.
+- Conversion rate used: 1 USD = 7.0063 CNY, Federal Reserve H.10 observation for 2025-12-26, the nearest reported observation found before year-end.
+- Input market cap was already supplied as a CNY amount and was not converted again.
+
+[key_extractions_usd]
+total_assets=3690317000
+total_liabilities=3280729000
+stockholders_equity=409588000
+parent_net_income=38168000
+net_loans=2510786000
+investment_securities=763324000
+deposits=3095274000
+cash_and_due_from_banks=27627000
+interest_bearing_deposits_in_banks=91357000
+goodwill=96828000
+finite_lived_intangibles=8266000
+other_borrowings=73000000
+junior_subordinated_debenture=69526000
+common_dividends_paid=9162000
+common_dividend_per_share=0.48
+post_merger_shares_at_2026-05-07=27134206
+
+[special_bank_metrics]
+net_interest_margin_2025=4.15%
+return_on_average_assets_2025=1.07%
+return_on_average_equity_2025=9.92%
+loan_to_deposit_ratio_2025=82.09%
+nonperforming_assets_to_assets=0.19%
+nonperforming_loans_to_loans=0.27%
+allowance_to_nonperforming_loans=432.37%
+allowance_to_loans=1.18%
+holding_company_CET1=11.56%
+holding_company_total_capital_ratio=13.97%
+real_estate_related_loans_to_total_loans=76.1%
+
+[calculations]
+forecast_dividend_usd=27134206*0.48=13024418.88
+forecast_dividend_cny=13024418.88*7.0063=91252986.00
+forecast_dividend_yield=91252986.00/4583033968.019348=0.0199110429
+2025_cash_dividend_payout=9162000/38168000=0.2400440159
+
+[comparability_warning]
+- The 2025 financial statements exclude United Security Bancshares.
+- The USB merger closed on 2026-04-01 and the 2026-08-03 market capitalization reflects the expanded post-merger share base/business.
+- Consequently, the supplied market cap and PE TTM cannot be cleanly paired with the 2025 annual figures to infer an owner earnback period.
+
+[outputs]
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

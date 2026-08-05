@@ -1,86 +1,66 @@
-task: stock_research
-company: 002233.SZ 塔牌集团
-period: 2025-12-31
-report_type: annual
-generated_at: 2026-07-27 Asia/Shanghai
+stock-research trace
+company=002233.SZ 塔牌集团
+period=2025-12-31
+generated_for=2026-07-31 Asia/Shanghai
 
-skill_used:
-- stock-research
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar fields with protocol set and list fields with protocol append.
+5. Validated result with protocol validate; status=ok, errors=[].
 
-contracts_read:
-- .agents/skills/stock-research/references/result-contract.md
-- .agents/skills/stock-research/references/report-contract.md
+[sources reused]
+- config/input.json: company identity, period, market cap 8,877,000,000 yuan, quote timestamp 20260731114315, PE TTM 21.23, Tencent source.
+- stock_report/data/analysis/annual_review/002233.SZ/2025-12-31/facts.json: annual fact pack v1, three statements, asset/liability categories, three-year profit/cash conversion.
+- stock_report/data/analysis/annual_review/002233.SZ/2025-12-31/annual_facts.md: human-readable cross-check.
+- stock_report/data/raw/filings/002233.SZ/2025-12-31/002233_2025_annual_report.txt: direct checks of business mix, capacity, volumes, industry position, risks and dividend proposal.
+- Primary filing URL: https://static.cninfo.com.cn/finalpage/2026-03-19/1225017027.PDF
 
-input_read:
-- config/input.json
+[model decision]
+statement_model=ordinary_operating
+owner_earnback_applicability=applicable
+reason=The business is overwhelmingly cement manufacturing and sales. Financial assets are deployment of proprietary idle cash, not customer funds, regulated project cash, deposits or concession-linked financing. Ordinary owner earnback is therefore usable, but financial assets require risk/liquidity haircuts and their earnings must not be double counted in sustainable operating cash profit.
 
-local_sources_read:
-- stock_report/data/analysis/annual_review/002233.SZ/2025-12-31/facts.json
-- stock_report/data/analysis/annual_review/002233.SZ/2025-12-31/annual_facts.md
-- stock_report/data/analysis/stock_research/002233.SZ/2025-12-31/result.json
-- stock_report/data/analysis/stock_research/002233.SZ/2025-12-31/report.md
-- stock_report/data/analysis/stock_research/002233.SZ/2025-12-31/trace.txt
-- stock_report/data/raw/filings/002233.SZ/2025-12-31/002233_2025_annual_report.txt
+[financial calculations]
+gross_profit=4,106,877,852.48-3,100,366,380.44=1,006,511,472.04
+gross_margin=1,006,511,472.04/4,106,877,852.48=0.24507947598982105
+net_margin=634,042,181.17/4,106,877,852.48=0.15438544898215661
+operating_fcf=778,436,676.10-343,396,731.15=435,039,944.95
 
-protocol_cli:
-- Initialized outputs/result.json with:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- Validated outputs/result.json with:
-  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-- Validation result: {"status":"ok","errors":[]}
+[discounted detachable net cash]
+unrestricted_cash=(1,309,219,784.69-36,680,934.12)*100%=1,272,538,850.57
+trading_financial_assets=3,484,494,682.14*70%=2,439,146,277.498
+current_portion_noncurrent_assets=693,134,555.58*95%=658,477,827.801
+other_current_assets=532,838,353.07*60%=319,703,011.842
+debt_investments=993,928,086.48*75%=745,446,064.86
+other_noncurrent_financial_assets=428,495,103.97*40%=171,398,041.588
+less_financing_and_lease_liabilities=(3,247,587.49+26,861,138.69)*100%=30,108,726.18
+discounted_detachable_net_cash=5,576,601,347.979
+discounted_net_cash_to_market_cap=5,576,601,347.979/8,877,000,000=0.6282078796867184
 
-reuse_boundary:
-- Reused annual fact pack as the primary source for core financial statements, asset/liability items, business summary, and cash conversion.
-- Reused prior stock_research output only for verifiable owner_earnback split, prior external-source trail, and previously extracted operating details.
-- Did not reuse prior investment_case_type/liquidation_watch label because the current result contract prohibits list labels in final structured output.
-- Did not re-extract full 8-10 year cement-cycle history; used 2023-2025 deducted nonrecurring parent net profit series from the fact pack/prior research.
+[sustainable cash profit]
+2023 deducted parent profit=639,629,613.06
+2024 deducted parent profit=341,231,854.06
+2025 deducted parent profit=377,054,231.63
+three_year_median=377,054,231.63
+cycle_and_capex_factor=85%
+discounted_sustainable_cash_profit=320,496,096.8855
+Rationale: exclude investment/fair-value income already represented by detachable assets; use the three-year median rather than 2025 headline profit; add 15% buffer for weak cement demand, cycle risk and inability to cleanly split maintenance from expansion capex.
 
-market_data:
-- market_cap: 8501000000.000001 CNY
-- market_cap_date: 2026-07-24
-- pe_ttm: 13.41
-- source: AH Note published stock payload from config/input.json.
+[earnback]
+operating_business_price=8,877,000,000-5,576,601,347.979=3,300,398,652.021001
+owner_earnback_years=3,300,398,652.021001/320,496,096.8855=10.297781109016428
+market_cap_to_cash_profit=8,877,000,000/320,496,096.8855=27.69768520198667
 
-key_financials:
-- revenue: 4106877852.48
-- cost_of_sales: 3100366380.44
-- gross_profit: 1006511472.04
-- gross_margin: 0.24507947598982105
-- parent_net_profit: 634042181.17
-- net_margin: 0.15438544898215661
-- operating_cash_flow: 778436676.10
-- capital_expenditure: 343396731.15
-- operating_free_cash_flow: 435039944.95
+[dividend]
+forecast_cash_dividend=563,592,243.84
+forecast_dividend_yield=563,592,243.84/8,877,000,000=0.06348904402838797
+basis=2025 annual report board proposal, CNY 4.80 per 10 shares on estimated 1,174,150,508-share base; shareholder approval required and final base may change. Buyback excluded from forecast cash dividend yield.
 
-owner_earnback_formula:
-- discounted_detachable_net_cash: 4053517533.1195
-- operating_business_price = market_cap - discounted_detachable_net_cash = 4447482466.880501
-- discounted_sustainable_cash_profit: 245085250.5595
-- owner_earnback_years = operating_business_price / discounted_sustainable_cash_profit = 18.14667531696598
-- market_cap_to_cash_profit = market_cap / discounted_sustainable_cash_profit = 34.6858898305518
-- discounted_net_cash_to_market_cap = discounted_detachable_net_cash / market_cap = 0.47682831821191624
-
-cash_profit_basis:
-- 2023 deducted nonrecurring parent net profit: 639629613.06
-- 2024 deducted nonrecurring parent net profit: 341231854.06
-- 2025 deducted nonrecurring parent net profit: 377054231.63
-- median: 377054231.63
-- haircut: 0.65
-- discounted_sustainable_cash_profit: 245085250.5595
-- rationale: avoid double counting financial-asset returns after deducting discounted detachable financial assets from market capitalization.
-
-dividend:
-- 2025 annual report profit distribution proposal: cash dividend 563592243.84 CNY.
-- other cash distribution/buyback amount disclosed: 54095268.22 CNY.
-- forecast_dividend_yield = 563592243.84 / 8501000000.000001 = 0.06629717019644747.
-
-main_limitations:
-- Market cap is from batch input snapshot, not an annual-report field.
-- Public annual report does not allow full item-by-item mapping from wealth-management products to every balance-sheet account.
-- Trust products, other non-current financial assets, and part of trading financial assets cannot be publicly verified item by item for final exit price and timing.
-- No full 8-10 year cement-cycle dataset was re-extracted in this task.
-
-outputs:
-- outputs/result.json
-- outputs/report.md
-- outputs/trace.txt
+[limitations]
+- No full 8-10 year cement-cycle extraction.
+- Wealth-management product categories cannot be mapped one-for-one to balance-sheet accounts.
+- Haircuts and 15% profit buffer are analytical assumptions, not reported facts.
+- Market quote is the supplied Tencent snapshot; the annual dividend is a proposal at the filing date.

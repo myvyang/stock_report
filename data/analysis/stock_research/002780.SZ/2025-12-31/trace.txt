@@ -1,0 +1,67 @@
+[2026-08-01 Asia/Shanghai] Stock research trace: 002780.SZ / 2025 annual
+
+1. Read required instructions
+   - .agents/skills/stock-research/SKILL.md
+   - .agents/skills/stock-research/references/result-contract.md
+   - .agents/skills/stock-research/references/report-contract.md
+   - /workspace/AGENTS.md
+
+2. Data reuse check
+   - config/input.json present.
+   - No annual facts, normalized facts, prior stock-research result, or raw filing existed in the workspace at task start.
+   - Therefore fetched the disclosed 2025 annual-report PDF and saved it as:
+     stock_report/data/raw/filings/002780.SZ/2025-12-31/annual_report_2025.pdf
+   - PDF publication date: 2026-04-29. Audit report date: 2026-04-27.
+   - Source download mirror used to obtain the filing document:
+     http://file.finance.sina.com.cn/211.154.219.97:9494/MRGG/CNSESZ_STOCK/2026/2026-4/2026-04-29/12265926.PDF
+   - The annual report itself identifies Shenzhen Stock Exchange / CNINFO as designated disclosure channels.
+
+3. Protocol initialization
+   Command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+4. Statement model conclusion
+   - ordinary_operating / applicable.
+   - Reason: outdoor product brand operation and retail, with ordinary cash, inventory, receivables, leases and bank debt. No special financial/developer/project/concession balance-sheet model.
+
+5. Core extracted figures (annual report, CNY)
+   - Revenue 955,618,657.72
+   - Cost of sales 390,237,582.03
+   - Gross profit 565,381,075.69
+   - Parent net profit 53,351,191.65
+   - Recurring parent net profit 46,954,489.55
+   - Operating cash flow 74,838,555.37
+   - Capital expenditure 17,805,164.37
+   - Operating free cash flow 57,033,391.00
+   - Total assets 1,224,275,847.92
+   - Total liabilities 486,460,898.13
+   - Parent equity 790,040,053.77
+   - Inventory net 539,996,905.64; gross 675,878,550.27; allowance 135,881,644.63
+   - Cash and cash equivalents 132,213,324.75
+   - Trading financial assets 4,617,550.00
+   - Interest-bearing bank debt used in cash bridge 153,703,449.13
+   - Proposed 2025 cash dividend 8,268,085.65
+
+6. Owner earnback judgments
+   - Discounted detachable net cash:
+     132,213,324.75 + 4,617,550.00 * 80% - 153,703,388.13 = -17,796,023.38.
+   - Inventory, long-term equity investments, fixed assets and leased-store assets excluded from detachable cash.
+   - Lease liabilities remain part of operating economics and were not double-counted as net-cash debt.
+   - Sustainable distributable cash profit starts from recurring parent profit 46,954,489.55, then applies a roughly 25% sustainability haircut and rounds to 35,000,000.00, due to the single turnaround year and material inventory impairment. 2025 FCF 57,033,391.00 is used as a cash-conversion cross-check.
+   - Operating business price: 2,095,000,000 - (-17,796,023.38) = 2,112,796,023.38.
+   - Owner earnback: 2,112,796,023.38 / 35,000,000 = 60.3656 years.
+
+7. Result population
+   - Used protocol `set` commands for all populated JSON sections; did not hand-write result.json.
+   - Population commands were executed through the protocol CLI; the temporary command driver was removed after validation.
+
+8. Validation
+   Command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: status=ok, errors=[]
+
+9. Known limitations
+   - No sufficiently authoritative market-share data; industry position is qualitative.
+   - Dividend is a board proposal, not an implemented payment.
+   - Sustainable cash profit includes an explicit research haircut and needs future-year validation.
+   - Input PE TTM is retained even though it differs from market cap / FY2025 parent net profit.

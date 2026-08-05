@@ -2,55 +2,65 @@ task: stock research
 company: 601921.SH 浙版传媒
 period: 2025-12-31
 timezone: Asia/Shanghai
-created_at: 2026-07-27T03:14:29+08:00
+input_created_at: 2026-07-31T12:56:14+08:00
 
 protocol:
-- Read stock-research skill: /workspace/.agents/skills/stock-research/SKILL.md
-- Read result contract: /workspace/.agents/skills/stock-research/references/result-contract.md
-- Read report contract: /workspace/.agents/skills/stock-research/references/report-contract.md
+- Read /workspace/.agents/skills/stock-research/SKILL.md completely.
+- Read result-contract.md, report-contract.md and data-reuse.md.
 - Initialized outputs/result.json with:
   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-- Populated outputs/result.json using protocol set commands.
-- Validated outputs/result.json with:
+- Populated reusable sections and all updated fields through protocol set commands.
+- First validation found that the reusable asset/liability rows carried the old field name "interpretation" but the current validator requires "explanation".
+- Added explanation to every asset_analysis asset/liability row through protocol set commands.
+- Final validation:
   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-- Validation status: ok
+- Final validation status: ok
 
 files_read:
 - config/input.json
+- stock_report/data/raw/filings/601921.SH/2025-12-31/metadata.json
+- stock_report/data/raw/filings/601921.SH/2025-12-31/annual-report.pdf
 - stock_report/data/analysis/annual_review/601921.SH/2025-12-31/facts.json
 - stock_report/data/analysis/annual_review/601921.SH/2025-12-31/annual_facts.md
-- stock_report/data/analysis/annual_review/601921.SH/2025-12-31/report.md
+- stock_report/data/analysis/annual_review/601921.SH/2025-12-31/extraction_trace.txt
 - stock_report/data/analysis/annual_review/601921.SH/2025-12-31/result.json
+- stock_report/data/analysis/annual_review/601921.SH/2025-12-31/report.md
+- stock_report/data/normalized/facts/601921.SH/2025-12-31/annual-facts.json
 - stock_report/data/analysis/stock_research/601921.SH/2025-12-31/result.json
 - stock_report/data/analysis/stock_research/601921.SH/2025-12-31/report.md
 - stock_report/data/analysis/stock_research/601921.SH/2025-12-31/trace.txt
-- stock_report/data/notes/user_stock_evaluations.md
-- stock_report/data/raw/filings/601921.SH/2025-12-31/annual-report.pdf
 
 source_reuse:
-- Reused annual fact pack for core financial statement figures, business segments, asset/liability categories, cash flow and annual filing source.
-- Reused prior stock_research/owner_earnback figures for discounted detachable net cash, discounted sustainable cash profit and payback years, but rewrote them into stock-research-result-v1 fields and removed old ranking label fields.
-- User evaluation file had no row for 601921.SH.
+- Reused the official-filing-derived annual fact pack for business, statements, asset/liability categories, cash flow and evidence.
+- Reused the same-period prior research assumptions for discounted detachable net cash, sustainable cash profit, dividend history and business interpretation.
+- Replaced the prior market snapshot with the current input market cap, timestamp and PE; recalculated all market-dependent ratios.
+- Did not redownload the annual report.
 
-key_sources:
-- Official annual report: https://static.cninfo.com.cn/finalpage/2026-03-31/1225057743.PDF
-- National Press and Publication Administration 2024 statistical bulletin: https://www.nppa.gov.cn/xxgk/fdzdgknr/tjxx/202512/P020251218382424228218.pdf
-- Lianhe Ratings 2025前三季度出版行业运行分析: https://www.lhratings.com/file/g0b9dd7dcaf.pdf
-- 浙江省数字教材服务平台: https://book.zjeav.com/
+analysis_model:
+- statement_model: ordinary_operating
+- owner_earnback_applicability: applicable
+- reason: publishing and distribution are ordinary operating activities; receivables, inventory, fixed assets and trade liabilities have normal operating substance, and no customer funds, insurance reserves, regulated presale cash or concession assets require a special statement model.
 
 main_calculations:
-- gross_margin = 3,093,804,686.41 / 10,543,646,426.30 = 29.34%
-- net_margin = 1,285,695,925.95 / 10,543,646,426.30 = 12.19%
-- forecast_dividend_yield = 711,111,111.36 / 15,622,000,000.00 = 4.55%
-- operating_business_price = 15,622,000,000.00 - 7,128,324,539.296 = 8,493,675,460.704
-- owner_earnback_years = 8,493,675,460.704 / 604,331,295.112 = 14.05
-- market_cap_to_cash_profit = 15,622,000,000.00 / 604,331,295.112 = 25.85
+- gross_margin = 3,093,804,686.41 / 10,543,646,426.30 = 29.3428%
+- net_margin = 1,285,695,925.95 / 10,543,646,426.30 = 12.1940%
+- forecast_dividend_yield = 711,111,111.36 / 16,289,000,000.00 = 4.3656%
+- discounted_net_cash_to_market_cap = 7,128,324,539.296 / 16,289,000,000.00 = 43.7616%
+- operating_business_price = 16,289,000,000.00 - 7,128,324,539.296 = 9,160,675,460.704
+- owner_earnback_years = 9,160,675,460.704 / 604,331,295.112 = 15.1584
+- market_cap_to_cash_profit = 16,289,000,000.00 / 604,331,295.112 = 26.9538
+
+key_judgement_assumptions:
+- Necessary operating cash retained at 25% of annual operating cash outflow; only excess cash is detachable.
+- Low-risk wealth management products are included at a 70.1619% haircut because individual capital-protection and underlying-asset terms are not fully disclosed.
+- Sustainable cash profit starts from the three-year median deducted parent profit, then deducts maintenance capex, working-capital reinvestment and a cash-conversion/business-downturn haircut.
+- Long-term equity investments, investment property and other non-current financial assets are not treated as detachable cash.
+- 2025 annual dividend includes a 488,888,889.06 yuan annual distribution proposal; final implementation remains subject to shareholder approval and implementation disclosure.
 
 limitations:
-- Public annual report does not disclose each wealth management product's capital protection clause or underlying assets; discounted net cash depends on haircut assumptions.
-- 2023 capex was not directly available from the current annual report main cash flow table; sustainable cash profit uses 2024/2025 capex evidence and three-year deducted profit.
-- Long-term equity investments, investment properties and other non-current financial assets were not treated as detachable cash because exit path and cash equivalence were not proven.
-- Market cap and PE are from the 2026-07-24 input snapshot and were not refreshed as real-time market data.
+- 2023 capex is not directly presented in the current annual report main cash flow table.
+- Wealth management product terms and underlying assets are not disclosed item by item.
+- The market quote is the input snapshot at 2026-07-31 11:43:48, not a continuously refreshed quote.
 
 outputs:
 - outputs/result.json

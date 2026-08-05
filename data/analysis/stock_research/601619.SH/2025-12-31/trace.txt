@@ -1,0 +1,48 @@
+stock-research trace
+company=嘉泽新能
+code=601619.SH
+period=2025-12-31
+generated_at=2026-07-31T21:17:08+08:00
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md.
+2. Read references/result-contract.md, references/report-contract.md, and references/data-reuse.md.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated fields with protocol set/append commands; did not construct result.json by hand.
+5. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+[reuse check]
+No filing metadata, annual facts package, normalized facts, or prior stock-research result existed under the input stock_report paths. Public disclosures were therefore retrieved and checked.
+
+[primary sources]
+- 嘉泽新能源股份有限公司2025年年度报告, disclosed 2026-03-28, audited by ShineWing with an unmodified opinion.
+  Accessible full-text mirror used for extraction: https://vip.stock.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12032599
+- 上海证券交易所2025年度股东会决议公告, disclosed 2026-04-18:
+  https://big5.sse.com.cn/site/cht/www.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-04-18/601619_20260418_MN9H.pdf
+- Market snapshot supplied by config/input.json: Tencent qt.gtimg.cn, timestamp 20260731114319.
+
+[key extracted facts]
+- Revenue 2,499,467,130.66; cost of sales 1,065,186,607.65; parent net profit 714,231,358.07.
+- Total assets 22,811,389,583.83; total liabilities 14,857,466,501.58; parent equity 7,925,401,540.58.
+- Operating cash flow 2,749,879,510.44; cash paid to acquire long-term assets 1,626,661,473.86; mechanical operating FCF 1,123,218,036.58.
+- Cash 1,135,977,322.91; accounts receivable 2,845,721,956.83; fixed assets 11,726,888,765.33; construction in progress 2,579,566,020.87; right-of-use assets 1,699,966,675.51.
+- Long-term borrowings 2,997,165,350.38; long-term payables 7,637,600,408.52; lease liabilities 1,876,438,173.79.
+- 2025 total cash dividend 233,017,554.18, 32.62% of parent net profit.
+
+[calculations]
+gross_profit = revenue - cost_of_sales = 1,434,280,523.01
+gross_margin = gross_profit / revenue = 0.5738345207329328
+net_margin = parent_net_profit / revenue = 0.28575345092911975
+operating_free_cash_flow = operating_cash_flow - capital_expenditure = 1,123,218,036.58
+forecast_dividend_yield = 233,017,554.18 / 13,545,000,000 = 0.017203215517165006
+
+[model decision]
+Input hint ordinary_operating/applicable was overridden. The company is a capital-intensive renewable power operator whose power stations, construction in progress, right-of-use assets, receivables, charging rights, project loans, and finance leases form one economic system. Classified statement_model=utility_concession and owner_earnback_applicability=requires_special_model. All ordinary owner-earnback sorting numbers remain null by contract.
+
+[limitations]
+- Market cap and PE were reused from input and not independently reconstructed from exchange trade data.
+- Annual report does not split maintenance from growth capex.
+- The dividend forecast is a mechanical carry-forward of the 2025 distribution, not company guidance.
+- Consolidated cash flow combines interest, parent/minority dividends, and related cash outflow, so dividend_and_buyback_cash_out was not inferred from that aggregate line.

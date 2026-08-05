@@ -1,0 +1,57 @@
+stock-research trace
+company: CHU KONG PIPE (01938.HK)
+period: 2025-12-31
+generated_at: 2026-08-04 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read result-contract.md, report-contract.md and data-reuse.md completely.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated result fields only through protocol set/append commands.
+
+2. Reuse audit
+- Checked stock_report paths supplied by config/input.json.
+- No raw filing, annual facts, normalized facts, or prior stock-research artifacts existed for 01938.HK/2025-12-31 in the workspace.
+- Therefore retrieved the official 2025 annual report from HKEX and extracted the filing for research.
+
+3. Primary source
+- HKEX Annual Report 2025, published 2026-04-23:
+  https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042302216.pdf
+- Market snapshot reused from config/input.json:
+  market cap CNY 178,322,984.92908478; PE TTM 0.76; timestamp 2026/08/03 09:20:05; source Tencent qt.gtimg.cn.
+
+4. Model verification
+- Rejected input hint financial_brokerage: annual report describes manufacture and sale of seam-welded steel pipes, related manufacturing services, and property development/investment. No brokerage customer funds, proprietary financial assets, repo financing, investment banking or asset management business was found.
+- Selected ordinary_operating with owner earnback applicable.
+- Added special handling for property tail assets because completed properties held for sale were RMB1,701.124m, 28.7% of total assets; they were not treated as detachable cash.
+
+5. Core annual-report facts (RMB)
+- Revenue 2,352,000,000; cost of sales/services 1,916,473,000; gross profit 435,527,000.
+- Profit before tax 95,080,000; income tax credit 151,232,000; parent net profit 246,312,000.
+- Total assets 5,920,622,000; total liabilities 4,425,589,000; total/parent equity 1,495,033,000.
+- Operating cash flow 154,119,000; capex 30,923,000; operating FCF 123,196,000; financing cash flow -197,651,000.
+- Cash 21,453,000; pledged/restricted balances 4,704,000; interest-bearing borrowings 1,714,587,000; due to director 53,340,000.
+- Audit opinion unmodified; separate material uncertainty related to going concern due to net current liabilities of RMB292,400,000 and related matters.
+- 2025 and 2024 dividend: nil.
+
+6. Calculations
+- Gross margin = 435,527,000 / 2,352,000,000 = 0.1851730442.
+- Net margin = 246,312,000 / 2,352,000,000 = 0.1047244898.
+- Discounted detachable net cash = 21,453,000 - 1,714,587,000 - 53,340,000 = -1,746,474,000. Restricted deposits receive zero weight.
+- Sustainable cash profit bridge = 246,312,000 - 151,232,000 + 83,742,000 - 93,581,000 - 30,923,000 = 54,318,000; additional prudence discount 4,318,000 gives 50,000,000.
+- Operating business price = 178,322,984.92908478 - (-1,746,474,000) = 1,924,796,984.9290848.
+- Owner earnback years = 1,924,796,984.9290848 / 50,000,000 = 38.4959396986.
+- Market cap / cash profit = 178,322,984.92908478 / 50,000,000 = 3.5664596986.
+- Forecast dividend = 0; forecast yield = 0.
+
+7. Judgment boundaries
+- Sustainable cash profit is an analyst normalization, not company guidance.
+- Actual 2025 FCF was not directly extrapolated because it included material working-capital movements.
+- No market-share claim was made because the filing did not provide verifiable market share.
+- Market-cap currency conversion inputs could not be independently reconstructed from the supplied snapshot.
+
+8. Validation
+- Protocol validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Initial completed result validation status: ok; errors: [].

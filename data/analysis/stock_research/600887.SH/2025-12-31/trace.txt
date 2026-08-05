@@ -1,0 +1,50 @@
+[2026-07-31 Asia/Shanghai] Stock research trace: 600887.SH / 2025-12-31 annual
+
+1. Read required skill and contracts
+- .agents/skills/stock-research/SKILL.md
+- .agents/skills/stock-research/references/result-contract.md
+- .agents/skills/stock-research/references/report-contract.md
+- .agents/skills/stock-research/references/data-reuse.md
+
+2. Reuse check
+- No raw filing, annual facts, normalized facts, or prior stock-research output existed under the paths in config/input.json.
+- Returned to the primary filing source instead of inventing an annual facts package.
+
+3. Primary sources reviewed
+- Inner Mongolia Yili Industrial Group Co., Ltd. 2025 Annual Report, company investor-relations site, published 2026-04-30:
+  https://www.yili.com/uploads/2026-04-30/85ed8e5f-8d6f-49b4-9f10-c5d217f83ff31777526591734.pdf
+- Relevant annual-report areas: audit opinion and dividend proposal; business/industry/operating model; product/channel breakdown; consolidated balance sheet, income statement and cash-flow statement; notes on cash, deposits, restricted assets, borrowings and short-term bonds; disclosed risks.
+- Market-cap snapshot was taken from config/input.json: Tencent qt.gtimg.cn, timestamp 20260731114328, market cap CNY 171,544,000,000, PE TTM 14.19.
+
+4. Analysis-model decision
+- Confirmed ordinary_operating / applicable.
+- Reason: revenue and operating assets arise from manufacturing and selling branded dairy/food products. There are no customer deposits, insurance reserves, regulated presale cash, concession rights, or comparable balance-sheet-as-business features.
+- Dealer/supplier finance subsidiaries exist, but are ancillary to the dairy operating model. Their loans/receivables were not counted as detachable cash.
+
+5. Key calculations (CNY)
+- Gross profit = 115,636,231,250.05 - 75,653,843,800.99 = 39,982,387,449.06.
+- Gross margin = 39,982,387,449.06 / 115,636,231,250.05 = 0.34576003573311465.
+- Net margin = 11,565,166,497.81 / 115,636,231,250.05 = 0.1000133467926818.
+- Operating free cash flow = 14,343,920,490.32 - 3,036,644,156.68 = 11,307,276,333.64.
+- Cash pool before discount = cash equivalents 17,677,587,920.54 + current-maturity certificates 10,872,708,266.94 + deposits in other current assets 13,553,651,021.36 = 42,103,947,208.84.
+- Discounted cash pool = 42,103,947,208.84 * 0.90 = 37,893,552,487.956.
+- Financing liabilities = short borrowings 45,630,626,027.83 + current non-current liabilities 4,414,707,476.52 + short-term bonds 9,043,394,520.53 + long-term borrowings 472,479,632.72 + lease liabilities 288,520,048.50 = 59,849,727,706.10.
+- Discounted detachable net cash = 37,893,552,487.956 - 59,849,727,706.10 = -21,956,175,218.144.
+- Sustainable distributable cash profit = parent net profit 11,565,166,497.81 - non-recurring profit 496,844,802.69 - prudence buffer 568,321,695.12 = 10,500,000,000.
+- Operating business price = 171,544,000,000 - (-21,956,175,218.144) = 193,500,175,218.144.
+- Owner earnback = 193,500,175,218.144 / 10,500,000,000 = 18.4285881160 years.
+- Market cap / cash profit = 16.3375238095.
+- Forecast dividend yield = 8,728,997,720.46 / 171,544,000,000 = 0.05088489087616005.
+
+6. Protocol operations
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated fields with repeated protocol `set` calls; the result was not hand-written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+
+7. Known limitations
+- Market cap and PE are accepted from the supplied Tencent snapshot.
+- The final 2025 dividend includes a board proposal and may change with registered share count.
+- CNY 10.5bn sustainable cash profit includes an explicit analyst prudence adjustment and is not company guidance.
+- No independent 2025 market-share dataset was obtained; the report does not assert a quantified number-one share.

@@ -1,0 +1,64 @@
+stock-research trace
+company: 00887.HK / 英皇钟表珠宝有限公司
+period: 2025-12-31 annual
+task_created_at: 2026-08-03T12:38:47+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated result.json only through protocol set/append commands.
+4. Initial populated validation: status=ok, errors=[].
+
+[reuse and source audit]
+- No pre-existing annual facts, normalized facts or stock-research outputs existed for 00887.HK/2025-12-31.
+- Downloaded official HKEX 2025 annual report to:
+  stock_report/data/raw/filings/00887.HK/2025-12-31/annual-report-2025.pdf
+- Official filing URL:
+  https://www.hkexnews.hk/listedco/listconews/sehk/2026/0416/2026041600772.pdf
+- Extracted a local text copy for deterministic searching:
+  stock_report/data/raw/filings/00887.HK/2025-12-31/annual-report-2025.txt
+- Used HKEX/company announcement indexes to verify the 2026-07-21 positive profit alert.
+- Used the 2025-12-31 RMB central parity quote of HKD 1 = CNY 0.90322 for all filing amount conversions.
+- Retained valuation.market_cap and valuation.pe_ttm from input, sourced to Tencent qt.gtimg.cn at 2026/07/31 16:08:44.
+
+[model review]
+- Input hint: financial_brokerage / requires_special_model.
+- Filing fact: revenue comes from retail sales of watches and jewellery, jewellery wholesale and commission income; assets are dominated by inventory, cash/deposits and retail property/ROU assets.
+- No brokerage client money, proprietary securities portfolio or repo financing was found.
+- Override: ordinary_operating / applicable.
+
+[key filing facts, HKD thousand]
+- Revenue 5,765,299; cost of sales 3,985,799; gross profit 1,779,500.
+- Profit before tax 531,401; finance costs 20,699; net profit 431,290; parent net profit 458,436.
+- Total assets 6,919,021; total liabilities 1,033,223; total equity 5,885,798; parent equity 5,617,361; NCI 268,437.
+- Operating cash flow 1,096,708.
+- Capex defined as PPE purchase 110,261 plus equipment acquisition deposits 18,681 = 128,942.
+- Operating free cash flow = 1,096,708 - 128,942 = 967,766.
+- Cash equivalents 1,292,104; time deposits 318,167; pledged deposits 195,518.
+- Inventory 3,078,227; gold loans 207,745; lease liabilities 405,727.
+- 2025 dividend: interim 39,912 plus proposed final 82,726 = 122,638.
+
+[conversion]
+- CNY amount = HKD amount x 0.90322.
+- Ratios use unrounded absolute CNY amounts in result.json.
+
+[owner earnback assumptions]
+- Unpledged cash and time deposits: HKD 1,610,271 thousand; apply 80% availability.
+- Pledged deposits: 0% availability because they secure gold loans.
+- Gold loans: deduct 100%.
+- Discounted detachable net cash = CNY 975,903,739.196.
+- Sustainable cash profit starts from 2025 parent net profit and applies a 20% cyclical/expansion haircut = CNY 331,254,851.136.
+- Operating business price = market cap - discounted net cash = CNY 740,902,346.749.
+- Owner earnback = operating business price / discounted cash profit = 2.23665 years.
+- Market cap / discounted cash profit = 5.18273.
+- Lease liabilities were not deducted again from detachable net cash; the report separately tests cash conversion using total 2025 lease cash outflow of HKD 409,018 thousand.
+
+[data quality]
+- status=complete.
+- Important limitations are preserved in result.json: Tencent valuation not independently reconstructed; 20% cash/profit discounts are judgment; 2026 H1 alert is unaudited; no independent market-share evidence.
+
+[required outputs]
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt

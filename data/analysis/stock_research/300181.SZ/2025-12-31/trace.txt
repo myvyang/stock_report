@@ -1,0 +1,77 @@
+stock-research trace
+company: 300181.SZ 佐力药业
+period: 2025-12-31 annual
+generated_for_task_date: 2026-08-01 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md and references/report-contract.md completely.
+- Read references/data-reuse.md because the skill requires reuse checks.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- Populated initialized paths through repeated protocol `set` calls, driven by outputs/protocol-updates.json; result was not authored as a standalone JSON object.
+
+2. Local reuse audit
+- Searched stock_report/data/analysis/annual_review/300181.SZ/2025-12-31,
+  stock_report/data/normalized/facts/300181.SZ/2025-12-31, and
+  stock_report/data/analysis/stock_research/300181.SZ/2025-12-31.
+- No local annual facts, normalized facts, historical research result, report, or trace existed.
+- Downloaded the official annual report PDF to stock_report/data/raw/filings/300181.SZ/2025-12-31/2025-annual-report.pdf.
+
+3. Primary sources
+- Shenzhen Stock Exchange annual report PDF:
+  https://disc.static.szse.cn/disc/disk03/finalpage/2026-04-27/98eb906c-a352-4c39-b736-7079f8a3a749.PDF
+  Published 2026-04-27; 195 pages.
+- Audit report embedded in annual report; report date 2026-04-23; standard unmodified opinion.
+- Market-cap snapshot came only from config/input.json:
+  CNY 10,114,000,000; PE TTM 15.55; timestamp 20260731114324;
+  source Tencent qt.gtimg.cn.
+
+4. Extracted statement facts (CNY)
+- Total assets 4,711,670,899.58; liabilities 1,470,340,597.40;
+  total equity 3,241,330,302.18; parent equity 3,180,077,388.97;
+  minority interest 61,252,913.21.
+- Revenue 3,040,763,497.87; cost of sales 1,167,641,885.34;
+  gross profit 1,873,121,612.53; operating profit 766,929,828.88;
+  net profit 642,436,652.80; parent net profit 631,933,709.00.
+- Operating cash flow 411,801,734.92; purchases of long-term assets
+  287,143,322.97; operating FCF 124,658,411.95;
+  financing cash flow -117,208,874.14.
+- Cash and equivalents 658,895,427.05; restricted/non-equivalent cash
+  21,984,848.66; other equity investments 411,379,771.50.
+- Debt used in earnback: short borrowing 660,090,043.25 + long borrowing
+  11,659,125.00 + lease liability 17,070,953.59 + current maturity
+  3,191,009.04 = 692,011,130.88.
+
+5. Formula trace
+- Gross margin = (3,040,763,497.87 - 1,167,641,885.34) /
+  3,040,763,497.87 = 0.6160037155.
+- Net margin = 631,933,709 / 3,040,763,497.87 = 0.2078207363.
+- Discounted detachable net cash = 658,895,427.05 * 90% +
+  411,379,771.50 * 50% - 692,011,130.88 = 106,684,639.215.
+- Sustainable cash profit = operating cash flow 411,801,734.92 - estimated
+  maintenance capex 111,801,734.92 = 300,000,000. This is an analyst estimate.
+- Operating business price = 10,114,000,000 - 106,684,639.215
+  = 10,007,315,360.785.
+- Owner earnback years = 10,007,315,360.785 / 300,000,000
+  = 33.3577178693.
+- Market cap / cash profit = 10,114,000,000 / 300,000,000
+  = 33.7133333333.
+- Forecast dividend yield = 242,626,041.35 / 10,114,000,000
+  = 0.0239891281.
+
+6. Judgment boundaries
+- ordinary_operating was confirmed from disclosed business and statement structure.
+- Receivables, receivable financing, inventories, fixed assets, construction in
+  progress, and R&D assets were treated as operating assets, not detachable cash.
+- Maintenance capex is not disclosed separately. The CNY 111.8m estimate uses
+  reported depreciation/amortization as an anchor plus a safety buffer.
+- The 50% haircut on other equity investments reflects price, timing, and control
+  constraints; it is not a reported impairment value.
+- 2025 dividend CNY 242,626,041.35 is a board proposal based on 693,217,261
+  eligible shares and may change with the implementation-date share base.
+
+7. Validation
+- Command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Result: status=ok, errors=[]

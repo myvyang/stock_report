@@ -1,0 +1,75 @@
+task=stock_research
+company=603966.SH 法兰泰克
+period=2025-12-31
+report_type=annual
+generated_for=2026-07-31 Asia/Shanghai
+
+[protocol]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+mutation=all structured fields populated with protocol set commands
+
+[local_reuse_check]
+annual_facts_json=missing
+annual_facts_md=missing
+normalized_facts_json=missing
+raw_filing_metadata=missing
+decision=no reusable filing/facts package; research returned to public annual report
+
+[sources]
+1=法兰泰克2025年年度报告全文；披露日2026-04-18；标准无保留意见；核心业务与三张表来源
+1_url=https://money.finance.sina.com.cn/corp/view/vCB_AllBulletinDetail.php?id=12105942&stockid=603966
+1_note=网页为新浪转载的交易所披露全文，财务数字按年报合并口径复核
+2=法兰泰克2025年年度权益分派实施公告；披露日2026-05-21
+2_url=http://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-05-21/603966_20260521_T70D.pdf
+3=config/input.json；Tencent qt.gtimg.cn；市值快照20260731114342
+
+[model_check]
+statement_model=ordinary_operating
+applicability=applicable
+reason=定制制造、安装调试和服务形成的普通经营业务；存货、应收和合同负债属于订单履约链条，不是特殊金融或工程施工财报模型
+
+[key_reported_facts]
+revenue=2427631879.64
+cost_of_sales=1845956468.65
+parent_net_profit=234617768.70
+deducted_parent_net_profit=201627704.68
+operating_cash_flow=450005255.10
+capital_expenditure=122057789.49
+total_assets=4383589363.10
+total_liabilities=2286129815.29
+parent_equity=2079541698.97
+
+[calculations]
+gross_profit=2427631879.64-1845956468.65=581675410.99
+gross_margin=581675410.99/2427631879.64=0.23960610167809215
+net_margin=234617768.70/2427631879.64=0.09664470575942186
+operating_free_cash_flow=450005255.10-122057789.49=327947465.61
+discounted_net_cash=364684519.45+146750611.51*0.90+50848630.14*0.90+142096485.90*0.50-221687891.33=391884188.555
+discounted_cash_profit=201627704.68*0.90=181464934.212
+operating_business_price=4111000000-391884188.555=3719115811.445
+owner_earnback_years=3719115811.445/181464934.212=20.494955830419936
+market_cap_to_cash_profit=4111000000/181464934.212=22.65451459176814
+forecast_dividend_yield=111627900/4111000000=0.027153466309900266
+
+[judgment_notes]
+cash=use cash_and_cash_equivalents rather than total monetary funds to avoid treating restricted/non-equivalent balances as detachable
+private_fund=50_percent haircut for valuation, liquidity and exit uncertainty
+cash_profit=deducted parent profit receives additional 10_percent haircut because gross margin declined and 2025 OCF benefited from contract-liability growth
+single_year_fcf=not used as sustainable denominator
+
+[limitations]
+no local annual facts package was available
+market cap and PE were accepted from supplied Tencent snapshot
+discount assumptions are analyst judgments, not reported values
+only 2025 implemented dividend was recorded in dividend history
+
+[validation]
+command=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+status=ok
+errors=0
+json_parse=ok
+report_result_consistency=checked

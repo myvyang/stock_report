@@ -1,0 +1,88 @@
+stock-research trace
+company: 浙江京新药业股份有限公司 (002020.SZ)
+period: 2025-12-31 annual
+generated_at: 2026-07-31T17:28:29+08:00
+
+[protocol]
+1. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. Populated fields exclusively through protocol `set` commands.
+3. Validated with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+4. Validation result: status=ok, errors=[]
+
+[source discovery and reuse]
+- Checked configured annual-review, normalized-facts and prior stock-research paths. No 2025 fact package or prior research files existed.
+- Downloaded full 2025 annual report to:
+  stock_report/data/raw/filings/002020.SZ/2025-12-31/2025-annual-report.pdf
+- Source URL: https://www.cnpharm.com/upload/resources/file/2026/04/24/187971.pdf
+- Annual report states official disclosure venues are Shenzhen Stock Exchange and CNINFO; audit firm is BDO China Shu Lun Pan CPAs (立信), report no. 信会师报字[2026]第ZA11818号.
+- Market cap and PE reused from config/input.json: CNY 11,701,000,000; timestamp 20260731114248; Tencent qt.gtimg.cn; PE TTM 15.4.
+
+[financial statement extraction]
+Annual report pages 70-72, 74-75, 77-78 unless otherwise noted.
+- revenue = 4,069,361,419.58
+- cost_of_sales = 2,028,631,031.74
+- gross_profit = 2,040,730,387.84
+- operating_profit = 862,654,942.40
+- net_profit = 766,667,967.92
+- parent_net_profit = 757,979,439.23
+- total_assets = 8,123,531,433.86
+- total_liabilities = 2,253,263,932.12
+- total_equity = 5,870,267,501.74 (assets - liabilities)
+- parent_equity = 5,833,037,935.52
+- minority_interest = 37,229,566.22
+- operating_cash_flow = 781,347,072.84
+- capital_expenditure = 202,850,821.93
+- operating_free_cash_flow = 578,496,250.91
+- financing_cash_flow = -915,748,924.09
+- dividend_and_buyback_cash_out = 284,853,745.75 actual dividend + 608,722,200.00 repurchase consideration = 893,575,945.75
+
+[formula checks]
+- gross_margin = (4,069,361,419.58 - 2,028,631,031.74) / 4,069,361,419.58 = 0.5014866406362658
+- net_margin = 757,979,439.23 / 4,069,361,419.58 = 0.1862649593085864
+- forecast_dividend_yield = 287,308,435.75 / 11,701,000,000 = 0.024554177912144263
+
+[analysis model]
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: revenues arise from medicine and medical-device manufacturing/sales. Deposits, insurance reserves, regulated presale cash, concession rights or customer funds are absent. Inventory, receivables and manufacturing assets have ordinary operating-company meanings.
+
+[discounted detachable net cash]
+1. Cash and cash equivalents:
+   book cash 530,714,027.95 less restricted cash 18,082,096.22
+   = 512,631,931.73; haircut 0%; discounted = 512,631,931.73.
+2. Trading financial assets:
+   318,956,349.46, entirely wealth-management products; haircut 5%; discounted = 303,008,531.987.
+3. Term deposits and accrued interest:
+   current 723,723,925.79 + non-current 930,112,317.82
+   = 1,653,836,243.61; haircut 0%; discounted = 1,653,836,243.61.
+4. Financing and lease liabilities deducted at 100%:
+   short-term borrowings 284,392,113.86
+   + current portion of non-current liabilities 6,626,905.31
+   + lease liabilities 22,627,740.86
+   = 313,646,760.03.
+5. Discounted detachable net cash:
+   512,631,931.73 + 303,008,531.987 + 1,653,836,243.61 - 313,646,760.03
+   = 2,155,829,947.297.
+6. Excluded from detachable cash: other non-current financial assets, long-term equity investments, investment property, goodwill, receivables, inventory and production assets. These are strategic, illiquid or operationally required.
+
+[discounted sustainable cash profit]
+1. OCF 781,347,072.84 - all capex 202,850,821.93 = OCF-based FCF 578,496,250.91.
+2. Applied additional 10% sustainability haircut for procurement-policy/pricing, product mix, working-capital and capex variability.
+3. Discounted sustainable cash profit = 578,496,250.91 * 0.90 = 520,646,625.819.
+4. R&D was fully expensed (capitalized R&D=0), so no additional R&D deduction was necessary.
+
+[owner earnback]
+- operating_business_price = 11,701,000,000 - 2,155,829,947.297 = 9,545,170,052.703
+- owner_earnback_years = 9,545,170,052.703 / 520,646,625.819 = 18.333298593240716
+- market_cap_to_cash_profit = 11,701,000,000 / 520,646,625.819 = 22.4739764357328
+- discounted_net_cash_to_market_cap = 2,155,829,947.297 / 11,701,000,000 = 0.18424322257046405
+
+[dividend]
+- 2025 profit distribution proposal: CNY 3.50 per 10 eligible shares on 820,881,245 shares; forecast_cash_dividend=287,308,435.75.
+- 2024 distribution actually paid on 2025-05-29: 284,853,745.75.
+- Buybacks were intended for employee stock plans/incentives and are not treated as recurring cash dividends.
+
+[data-quality judgment]
+- status=complete: identity, period, valuation snapshot, three statements, asset/liability explanations, dividend forecast, owner-earnback rows and evidence are present.
+- limitations: single-year cash-profit base; maintenance versus growth capex unavailable; segment profit and verifiable market share unavailable; Tencent market snapshot not independently reconstructed from exchange trade data.

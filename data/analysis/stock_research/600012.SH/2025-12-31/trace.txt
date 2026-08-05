@@ -1,0 +1,49 @@
+stock-research trace
+company: 600012.SH 安徽皖通高速公路股份有限公司（输入展示名 XD皖通高，报告采用法定简称皖通高速）
+period: 2025-12-31 annual
+generated_at_input: 2026-07-31T21:58:46+08:00
+
+[protocol]
+1. Read SKILL.md, result-contract.md, report-contract.md, and data-reuse.md.
+2. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+3. Populated result fields using protocol set/append commands; no complex result JSON was authored from scratch.
+4. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   result: {"status":"ok","errors":[]}
+
+[reuse audit]
+- No pre-existing raw filing metadata, annual facts package, normalized facts, or historical stock-research output existed for 600012.SH/2025-12-31.
+- Downloaded official annual report to stock_report/data/raw/filings/600012.SH/2025-12-31/annual-report-2025.pdf.
+- Official PDF URL: https://star.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-03-28/600012_20260328_EBPM.pdf
+
+[source map]
+- Annual report pp. 2, 72-73: 2025 dividend proposal RMB 1,127,670,646.74; RMB 0.66/share; 60.06% payout. 2024 dividend RMB 1,031,989,500 implemented in July 2025.
+- Annual report pp. 9-10: revenue, parent net profit, operating cash flow, total assets, parent equity, restated comparisons.
+- Annual report pp. 21-27: project traffic/toll revenue, toll-road revenue and margin, construction-service accounting, toll-road cost composition.
+- Annual report pp. 125-126: consolidated interest-bearing debt RMB 14.625bn, +77.27%, RMB 1.510bn due within one year.
+- Annual report pp. 136-141: consolidated balance sheet, income statement and cash flow statement.
+- Annual report p. 158: BOT toll-road concession accounting model.
+- Annual report p. 199: RMB 905.6m prepaid for Shandong Hi-Speed stake at year-end and remaining RMB 2.113bn paid in January 2026.
+- Annual report pp. 273-274: road-by-road concession periods, including Henning temporary five-year extension and Guangxuan term pending later assessment.
+- config/input.json: market cap RMB 28.909bn, timestamp 20260731114324, PE TTM 15.52, source Tencent qt.gtimg.cn.
+
+[calculations]
+- gross_profit = 6,721,574,180.34 - 3,730,302,006.68 = 2,991,272,173.66
+- gross_margin = 2,991,272,173.66 / 6,721,574,180.34 = 0.4450255392
+- net_margin = 1,877,443,900.82 / 6,721,574,180.34 = 0.2793161022
+- operating_free_cash_flow = 3,539,492,972.51 - 2,201,936,196.80 = 1,337,556,775.71
+- forecast_dividend_yield = 1,127,670,646.74 / 28,909,000,000 = 0.0390075979
+- interest-bearing debt book subtotal = short borrowings + current portion of non-current liabilities + long borrowings + bonds = RMB 13,823,729,267.49; annual-report debt chapter uses a broader RMB 14.625bn definition.
+
+[model decision]
+- statement_model: utility_concession
+- owner_earnback_applicability: requires_special_model
+- Rationale: concession rights expire, project cash is tied to capex/debt service, and major concession extensions are not finally determined.
+- All ordinary owner-earnback fields remain null by contract.
+- Required special model: road-by-road remaining-concession cash flow after operating costs, tax, maintenance/expansion capex, and debt service.
+
+[limitations]
+- Market snapshot was accepted from task input and not independently reconstructed.
+- No road-by-road DCF was produced, so no synthetic special-model payback number was inserted.
+- dividend_and_buyback_cash_out remains null because the cash-flow statement combines dividends, profit distributions, and interest.

@@ -1,0 +1,67 @@
+stock-research trace
+company=600499.SH 科达制造
+period=2025-12-31
+generated_for=2026-08-01 Asia/Shanghai
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md completely.
+- Read references/result-contract.md, references/report-contract.md, and referenced data-reuse.md.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+
+2. Reuse audit
+- Checked stock_report annual_review, raw filing, normalized facts, stock_research paths and /root/aicode sync target.
+- No reusable 600499.SH/2025-12-31 filing, fact pack, normalized facts, or prior research result was present.
+- Read stock_report/data/notes/user_stock_evaluations.md; it contained no 600499.SH note.
+
+3. Primary-source retrieval
+- Located company investor page and 2025 annual-report presentation:
+  https://www.kedachina.com/investor/finance.html
+- Determined that company-hosted PDF 20260331110816913.pdf was a one-page infographic, not the full audited filing; excluded it as the core statement source.
+- Located and downloaded the 271-page 2025 annual report corresponding to announcement id 12030520, published 2026-03-28.
+- Parsed the PDF read-only with pypdf in a temporary virtual environment because pdfinfo/pdftotext/PyMuPDF were unavailable.
+- Core annual-report checks: pp. 88-99 consolidated statements; pp. 23-25 operating analysis; pp. 31-33 balance-sheet changes; pp. 148-149 cash notes; pp. 164-165 inventory; pp. 171+ long-term investments; pp. 199-204 revenue, investment income and impairments; p. 256 subsequent events and dividend proposal.
+- Cross-checked business highlights against company news:
+  https://www.kedachina.com/news/index5058.html
+- Checked material post-balance-sheet transaction against SSE filing:
+  https://static.sse.com.cn/stock/disclosure/announcement/c/202605/600499_20260512_Y7VS.pdf
+
+4. Model decision
+- Confirmed statement_model=ordinary_operating and owner_earnback_applicability=applicable.
+- Reason: manufacturing and operating assets/obligations dominate; company is not a bank, broker, insurer, developer, construction contractor, concession utility, or pure holding platform.
+- Special handling retained for consolidated minority interests, equity-method investment income, and the proposed acquisition of the remaining 51.55% of Tefo International.
+
+5. Key reported inputs (CNY yuan)
+- Revenue 17,389,470,200; cost of sales 12,537,135,100; gross profit 4,852,335,100.
+- Parent net profit 1,308,863,400; consolidated net profit 2,166,790,700.
+- Total assets 29,362,423,100; liabilities 13,487,066,100; parent equity 12,592,762,800; minority interest 3,282,594,200.
+- Operating cash flow 1,819,109,800; capex 1,580,354,100; operating free cash flow 238,755,700.
+- Cash and cash equivalents 2,387,413,900; trading financial assets 579,465,900.
+- Interest-bearing financing proxy 6,220,983,700 = short borrowings 1,391,535,400 + current non-current liabilities 1,117,653,700 + long borrowings 3,665,770,400 + lease liabilities 46,024,200.
+- Investment income cash receipts 605,134,300.
+- Dividend proposal 571,765,958.70.
+- Market cap 31,549,000,000 and PE TTM 20.37 from input Tencent snapshot dated 2026-07-31 11:43:32.
+
+6. Derived calculations
+- gross_margin=(17,389,470,200-12,537,135,100)/17,389,470,200=0.2790386966.
+- net_margin=1,308,863,400/17,389,470,200=0.0752675835.
+- minority_interest_ratio=3,282,594,200/15,875,357,000=0.2067729375.
+- discounted_net_cash=2,387,413,900*70% + 579,465,900*90% - 6,220,983,700 = -4,028,274,660.
+- cash_profit_before_minority=238,755,700 + 605,134,300 = 843,890,000.
+- discounted_cash_profit=843,890,000*(1-0.2067729375)=669,396,386 rounded.
+- operating_business_price=31,549,000,000-(-4,028,274,660)=35,577,274,660.
+- owner_earnback_years=35,577,274,660/669,396,386=53.1482921.
+- market_cap_to_cash_profit=31,549,000,000/669,396,386=47.1305204.
+- forecast_dividend_yield=571,765,958.70/31,549,000,000=0.0181231088.
+
+7. Judgment boundaries
+- 70% cash discount is a conservative inference reflecting offshore/subsidiary dispersion, expansion needs, restrictions and minority interests; it is not a reported accounting figure.
+- Capex was deducted in full because maintenance versus growth capex could not be reliably split from the annual report.
+- Minority attribution uses the period-end minority equity ratio as a proxy, not a subsidiary-by-subsidiary cash-flow attribution.
+- Proposed Tefo International acquisition was disclosed as a subsequent material transaction but excluded from 2025 static calculations.
+
+8. Output construction and validation
+- All result.json mutations were made through protocol CLI set/append commands after protocol init; no complex JSON object was hand-written from scratch.
+- Final validation command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Validation result: status=ok, errors=[]

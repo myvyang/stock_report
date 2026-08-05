@@ -1,0 +1,72 @@
+stock-research trace
+company=01258.HK CHINFMINING / China Nonferrous Mining Corporation Limited
+period=2025-12-31
+generated_at=2026-08-03T15:18:31+08:00
+
+[skill_and_contract]
+read=.agents/skills/stock-research/SKILL.md
+read=.agents/skills/stock-research/references/result-contract.md
+read=.agents/skills/stock-research/references/report-contract.md
+read=.agents/skills/stock-research/references/data-reuse.md
+
+[reuse_check]
+missing=stock_report/data/analysis/annual_review/01258.HK/2025-12-31/facts.json
+missing=stock_report/data/analysis/annual_review/01258.HK/2025-12-31/annual_facts.md
+missing=stock_report/data/raw/filings/01258.HK/2025-12-31/metadata.json
+decision=no reusable annual fact pack or historical research result; retrieve official filing
+
+[primary_sources]
+annual_report=https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0424/2026042401244.pdf
+annual_report_release=2026-04-24
+annual_results=https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0325/2026032500043.pdf
+annual_results_release=2026-03-25
+company_financial_reports=https://cnmcl.net/en/investor-relations/financial-reports/
+fx_source=https://www.stats.gov.cn/english/PressRelease/202602/t20260228_1962661.html
+market_source=Tencent qt.gtimg.cn from config/input.json
+
+[model_review]
+input_hint=financial_brokerage/requires_special_model
+confirmed_model=ordinary_operating/applicable
+reason=annual report identifies copper-cobalt mining, ore processing, hydrometallurgy, pyrometallurgy, copper product sales and toll processing; balance sheet contains mining PPE, mining rights, inventories and operating receivables/payables, not brokerage client funds or repo financing
+
+[currency]
+reporting_currency=USD
+output_currency=CNY
+usd_cny=7.1429
+method=all financial statement amounts multiplied by 7.1429; this is a research-display simplification and year-end balance sheet translation does not represent accounting closing-rate translation
+
+[financial_extraction_usd_thousand]
+annual_report_p105 revenue=3420059 cost_of_sales=2357521 gross_profit=1062538 operating_profit=817985 net_profit=583212 parent_net_profit=404311
+annual_report_p106-107 total_assets=4803261 total_liabilities=1390691 total_equity=3412570 parent_equity=2486009 minority_interest=926561 cash=1476212 borrowings=24516 lease_liabilities=65833
+annual_report_p110 operating_cash_flow=938657
+annual_report_p111 financing_cash_flow=-209605 dividend_paid_to_company_shareholders=167370 purchases_of_ppe=242040
+annual_report_p15 total_capital_expenditure=314934
+
+[derived_metrics]
+gross_margin=1062538/3420059=0.3106782661
+net_margin=404311/3420059=0.1182175512
+operating_fcf_cny=(938657-314934)*1000*7.1429=4455191016.70
+parent_profit_share=404311/583212=0.6932487672
+parent_equity_share=2486009/3412570=0.7284858626
+discounted_cash_profit=4455191016.70*0.6932487672*0.75=2316416759.88
+cash_after_operating_buffer=(1476212*0.70)*1000*7.1429
+financing_deduction=(24516+65833)*1000*7.1429
+discounted_net_cash=((1476212*0.70)-24516-65833)*1000*7.1429*0.7284858626=4906898950.53
+operating_business_price=49514592566.97714-4906898950.53=44607693616.45
+owner_earnback_years=44607693616.45/2316416759.88=19.2571968866
+market_cap_to_cash_profit=49514592566.97714/2316416759.88=21.3755112744
+forecast_dividend=162000*1000*7.1429=1157149800.00
+forecast_dividend_yield=1157149800/49514592566.97714=0.0233698742
+
+[judgment_notes]
+cash_haircut=70% retained; 30% reserved for mining/smelting working capital, taxes, rehabilitation and expansion liquidity
+debt_treatment=100% of borrowings and lease liabilities deducted
+minority_treatment=net cash allocated using parent equity/total equity; free cash flow allocated using parent net profit/consolidated net profit
+capex_treatment=full management-disclosed capex deducted because maintenance/growth split is unavailable
+sustainability_haircut=75% retained after capex and parent allocation to buffer commodity cycle, sulfuric acid pricing, inventory release and mine disruption
+
+[protocol]
+init=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+population=protocol set and append commands only; complex JSON was not hand-written
+validate=PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+validation_status=ok

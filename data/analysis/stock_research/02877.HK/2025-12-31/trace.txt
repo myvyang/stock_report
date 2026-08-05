@@ -1,0 +1,85 @@
+stock-research trace
+company: 02877.HK / China Shineway Pharmaceutical Group Limited
+period: 2025-12-31 annual
+generated_at: 2026-08-04 Asia/Shanghai
+
+[protocol]
+1. Read .agents/skills/stock-research/SKILL.md in full.
+2. Read references/result-contract.md, references/report-contract.md and references/data-reuse.md in full.
+3. Initialized outputs/result.json with:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+4. Populated scalar/object/list fields only through protocol set/append commands.
+5. Final validation command:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   Result: {"status":"ok","errors":[]}
+
+[reuse audit]
+- Configured local annual-review path did not exist in /workspace.
+- Configured local raw-filing path did not exist in /workspace.
+- Configured sync target /root/aicode/stock_report contained no 02877.HK files.
+- No prior stock-research result was available for reuse.
+
+[primary filing]
+- Title: Annual Report 2025, China Shineway Pharmaceutical Group Limited.
+- Issuer stock code: 2877.
+- HKEX publication date: 2026-04-23.
+- Direct URL: https://www1.hkexnews.hk/listedco/listconews/sehk/2026/0423/2026042301206.pdf
+- Local temporary download: /tmp/shineway2877/annual-report-2025.pdf
+- Text extraction: pypdf in isolated temporary virtual environment; 121 PDF pages.
+- Audited by Deloitte Touche Tohmatsu; auditor report dated 2026-03-27.
+
+[model verification]
+- Input hint said financial_brokerage/requires_special_model.
+- Filing note 1 identifies subsidiaries' principal activity as research, development, manufacturing and trading of Chinese pharmaceutical products.
+- Segment note states there is one reportable segment with the same pharmaceutical activities.
+- Balance sheet has ordinary operating-company cash, bank products, receivables, inventory, PPE, trade payables and modest bank debt; no brokerage client money, repo financing or securities dealing structure.
+- Override: statement_model=ordinary_operating; owner_earnback_applicability=applicable.
+
+[financial statement extraction; RMB]
+- Revenue 3,135,419,000; cost of sales 869,212,000; gross profit 2,266,207,000.
+- Investment income 393,313,000; R&D cost 103,102,000; finance cost 5,685,000.
+- Profit before tax 1,269,266,000; net/parent profit 949,948,000.
+- Operating profit proxy 881,638,000 = PBT 1,269,266,000 + finance cost 5,685,000 - investment income 393,313,000. This proxy still includes other income including government funds.
+- Total assets 10,777,135,000; total liabilities 2,715,321,000; total/parent equity 8,061,814,000; minority interest zero.
+- Operating cash flow 1,172,033,000; PPE purchases 197,905,000; operating FCF 974,128,000.
+- Financing cash flow -375,013,000; cash dividends paid 355,038,000.
+- Source pages: annual report pp.63-68.
+
+[asset extraction; RMB]
+- Bank balances and cash 7,189,047,000; RMB balance in PRC 4,201,162,000, subject to exchange restrictions (note 21).
+- Bank financial products at FVTPL 376,640,000, redeemable at bank quoted buying prices (note 20).
+- Inventory 691,298,000 (note 18).
+- Net trade receivables and bank bills 1,000,087,000; over-90-day past-due balance 270,484,000 (note 19).
+- PPE 1,248,527,000; intangible assets 15,722,000; goodwill 165,956,000; DTA 42,697,000.
+- Bank debt 325,051,000; lease liabilities 9,851,000.
+- Post-balance-sheet 2026 first interim dividend 324,822,000 paid 2026-05-19 (note 12).
+
+[owner earnback calculations; RMB]
+- Adjusted cash base = 7,189,047,000 - 324,822,000 = 6,864,225,000.
+- Discounted adjusted cash = 6,864,225,000 * 70% = 4,804,957,500.
+- Discounted financial products = 376,640,000 * 50% = 188,320,000.
+- Less bank debt and leases = 325,051,000 + 9,851,000 = 334,902,000.
+- Discounted detachable net cash = 4,658,375,500.
+- Sustainable cash profit bridge:
+  949,948,000 parent profit
+  - 294,985,000 estimated after-tax investment income (393,313,000 * 75%)
+  - 125,938,000 estimated after-tax enterprise development funds (167,917,000 * 75%, rounded)
+  - 47,036,000 capex less depreciation/amortisation (197,905,000 - 150,869,000)
+  - 31,989,000 prudence/rounding buffer
+  = 450,000,000.
+- Market cap = 5,730,879,876.858593 from supplied Tencent snapshot.
+- Operating business price = 5,730,879,876.858593 - 4,658,375,500 = 1,072,504,376.858593.
+- Owner earnback years = 1,072,504,376.858593 / 450,000,000 = 2.383343059685762.
+- Market cap/cash profit = 12.735288615241318.
+
+[dividend]
+- 2025-profit-related dividend per share = RMB0.11 + RMB0.43 = RMB0.54.
+- Eligible shares = 755,400,000; cash amount = 407,916,000; payout ratio reported by issuer 42.9%.
+- Forecast assumes same nominal RMB0.54 per share: 407,916,000 / 5,730,879,876.858593 = 0.0711785988827253.
+- This is an analyst baseline, not announced guidance.
+
+[known limitations]
+- Market-cap snapshot was supplied in the task and was not independently re-performed from HKD price and FX.
+- 25% tax applied to investment income and government funds is a simplifying estimate, not a traced tax-note allocation.
+- National market share is not disclosed in the annual report.
+- Cash haircut is analytical judgment covering PRC remittance limits, working-capital retention and date mismatch; it is not a quoted liquidation discount.

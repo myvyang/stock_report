@@ -1,0 +1,74 @@
+stock-research trace — FPH — period 2025-12-31
+generated for task created_at: 2026-08-04T18:26:37+08:00
+
+1. Protocol and contracts
+- Read .agents/skills/stock-research/SKILL.md in full.
+- Read references/result-contract.md and references/report-contract.md in full as requested.
+- Read references/data-reuse.md because local fact reuse boundaries applied.
+- Initialized outputs/result.json with:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+- All result mutations used protocol set/append commands; result.json was not authored as a complex object from scratch.
+
+2. Local reuse audit
+- Checked stock_report/data/analysis/annual_review/FPH/2025-12-31, raw filing directory, and normalized facts path.
+- No FPH annual fact package or raw filing was present in the workspace, so primary public filings were required.
+
+3. Primary sources
+- SEC 2025 Form 10-K, filed 2026-03-06:
+  https://www.sec.gov/Archives/edgar/data/1574197/000157419726000005/fph-20251231.htm
+- SEC filing index:
+  https://www.sec.gov/Archives/edgar/data/1574197/000157419726000005/0001574197-26-000005-index.htm
+- Five Point 2025 year-end results release, 2026-01-29:
+  https://ir.fivepoint.com/news-releases/2026/01-29-2026-211033188
+- Federal Reserve H.10 USD/CNY series:
+  https://www.federalreserve.gov/datadownload/Preview.aspx?pi=400&preview=H10%2FH10%2FRXI_N.A.CH&rel=H10
+- Market cap and PE were supplied by config/input.json from Yahoo Finance yfinance.
+
+4. Model classification decision
+- Input hint: ordinary_operating / applicable.
+- Filing fact: Note 1 describes Five Point as an owner and developer of mixed-use planned communities in California; it also manages land banks.
+- Balance-sheet fact: inventory USD 2,443.279m / total assets USD 3,249.003m = 75.20%.
+- Cash-flow fact: horizontal development is capitalized to inventory and cash occurs unevenly around land sales, reimbursements, and venture distributions.
+- Override: real_estate_developer / requires_special_model.
+- Consequence: all ordinary owner-earnback fields remain null under the result contract.
+
+5. Currency translation
+- One consistent rate was used for all 2025 filing amounts: USD 1 = CNY 7.1875, the Federal Reserve H.10 observation dated 2025-12-31.
+- This is a presentation conversion, not a restatement under accounting translation rules. Using a yearly average for income/cash flow would alter CNY display amounts but not margins or model classification.
+- SEC tables are in USD thousands; formula: reported_thousands * 1,000 * 7.1875.
+
+6. Core calculations
+- Total assets: 3,249,003 * 1,000 * 7.1875 = CNY 23,352,209,062.50.
+- Total liabilities: 860,407 * 1,000 * 7.1875 = CNY 6,184,175,312.50.
+- Total equity/capital: 2,318,441 * 1,000 * 7.1875 = CNY 16,663,794,687.50.
+- Parent members' capital: 843,245 * 1,000 * 7.1875 = CNY 6,060,823,437.50.
+- NCI: 1,475,196 * 1,000 * 7.1875 = CNY 10,602,971,250.00.
+- NCI ratio: 1,475,196 / 2,318,441 = 0.6362879193.
+- Revenue: 110,020 * 1,000 * 7.1875 = CNY 790,768,750.00.
+- Direct costs: (29,719 + 20,389 + 6,683) * 1,000 * 7.1875 = CNY 408,185,312.50.
+- Gross profit: (110,020 - 56,791) * 1,000 * 7.1875 = CNY 382,583,437.50.
+- Gross margin: 53,229 / 110,020 = 0.4838120342.
+- Operating profit: (110,020 - 117,408) * 1,000 * 7.1875 = CNY -53,101,250.00.
+- Consolidated net income: 183,534 * 1,000 * 7.1875 = CNY 1,319,150,625.00.
+- Parent net income: 70,966 * 1,000 * 7.1875 = CNY 510,068,125.00.
+- Protocol net margin: 70,966 / 110,020 = 0.6450281767. Interpretation is limited because Great Park equity income is in the numerator but its revenue is excluded from consolidated revenue.
+- Operating cash flow: 105,230 * 1,000 * 7.1875 = CNY 756,340,625.00.
+- Fixed-asset purchases: 217 * 1,000 * 7.1875 = CNY 1,559,687.50.
+- Mechanical operating FCF: (105,230 - 217) * 1,000 * 7.1875 = CNY 754,780,937.50.
+- This FCF is explicitly not treated as distributable cash because real-estate development spend is included in inventory/operating cash flow; 2025 inventory change used USD 141.797m of operating cash.
+- Forecast dividend: zero; yield = 0 / CNY 5,179,859,059.368164 = 0.
+
+7. Dividend evidence
+- 10-K lines 749-752: management states it does not intend to pay Class A distributions for the foreseeable future and plans to retain earnings.
+- Tax distributions to noncontrolling operating-company partners were excluded from Class A dividend history.
+
+8. Important limitations
+- No parcel-level remaining sales schedule, remaining infrastructure budget, entitlement probability, or discounted project cash-flow model was produced.
+- Market cap/PE were accepted from the supplied yfinance snapshot and were not reconstructed from exchange data.
+- Great Park is equity-method accounted; San Francisco is a consolidated VIE with substantial NCI. Consolidated assets cannot be assigned wholly to Class A shareholders.
+- The ordinary owner-earnback numeric output is intentionally null, not missing.
+
+9. Validation
+- Final command:
+  PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+- Final protocol response: status=ok, errors=[]
