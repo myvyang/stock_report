@@ -1,58 +1,74 @@
 stock-research trace
 company: 601163.SH 三角轮胎
 period: 2025-12-31 annual
-generated_at: 2026-07-31T14:48:43+08:00
+task_created_at: 2026-08-13T21:19:29+08:00
+
+[skill_and_contracts]
+- read .agents/skills/stock-research/SKILL.md
+- read references/owner-value-method.md
+- read references/result-contract.md
+- read references/report-contract.md
+- read references/data-reuse.md because SKILL.md directly routes reuse decisions there
 
 [protocol]
-initialized outputs/result.json with:
-PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-reused prior same-period stock research as a fact/analysis baseline, then updated fields through protocol set commands.
-final validation command:
-PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+1. initialized only through CLI:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
+2. populated research inputs through repeated protocol set commands; no protocol-derived field was written manually.
+3. computed A, G, history values, coverage, residual sign and conditional years only through:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol compute-owner-value --result outputs/result.json
+4. after semantic correction, recomputed all protocol-derived fields and validated through:
+   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
+   structural validation: ok; errors: []
+   data_quality.status: partial
 
-[sources]
-1. config/input.json
-   - market cap CNY 10,560,000,000
-   - quote timestamp 20260731114343
-   - source Tencent qt.gtimg.cn
-   - PE TTM 10.83
-2. stock_report/data/raw/filings/601163.SH/2025-12-31/metadata.json
-   - company official-site annual-report PDF metadata
-3. stock_report/data/analysis/annual_review/601163.SH/2025-12-31/facts.json
-   - statements, business, assets/liabilities, cash conversion and evidence
-4. stock_report/data/raw/filings/601163.SH/2025-12-31/601163_2025_annual_report.txt
-   - used indirectly through the verified annual fact pack and prior same-period research
-5. stock_report/data/analysis/stock_research/601163.SH/2025-12-31/result.json
-   - reused same-filing financial facts, asset classifications, haircuts and explanations; stale market snapshot replaced
+[formal_sources]
+- research_inputs/research/companies/triangle-tyre/2025/ideal-tables.md
+  latest 2025 ideal statements; four-way closure; domestic/overseas decomposition; required versus sedimented funds.
+- stock_report/data/analysis/annual_review/601163.SH/2025-12-31/facts.json
+  audited statement facts and asset/liability notes.
+- stock_report/data/raw/filings/601163.SH/2025-12-31/601163_2025_annual_report.txt
+  local company annual report text used for cross-checking.
+- company official annual reports for 2021, 2022, 2023 and 2024
+  historical operating cash flow, long-term asset cash purchase, revenue and deducted profit.
+- config/input.json
+  market cap CNY 10,455,999,755.859375 at 2026-08-13, source Yahoo Finance yfinance close CNY13.07 x 800,000,000 shares.
 
-[model]
-statement_model: ordinary_operating
-owner_earnback_applicability: applicable
-reason: core activity is tire manufacturing and sales; production assets, inventory, receivables and own funds form an ordinary manufacturing balance sheet. No customer deposits, reserves, regulated project cash, concession rights or other special-model structure was identified.
+[historical_report_urls]
+- 2021 https://www.triangle.com.cn/Public/Uploads/uploadfile/files/20220427/20220427092706_62689bea40bc6.pdf
+- 2022 https://www.triangle.com.cn/Public/Uploads/uploadfile/files/20230427/20230427093525_6449d15df131d.PDF
+- 2023 https://www.triangle.com.cn/Public/Uploads/uploadfile/files/20240428/20240428080025_662d9199b299f.pdf
+- 2024 https://www.triangle.com.cn/Public/Uploads/uploadfile/files/20250427/20250427084520_680d7e205a35b.pdf
+- 2025 https://www.triangle.com.cn/Public/Uploads/uploadfile/files/20260429/20260429075349_69f1488d2dbc2.pdf
 
-[calculations]
-gross_margin = 1,965,808,347.53 / 9,820,936,611.28 = 0.2001650581
-net_margin = 922,888,822.03 / 9,820,936,611.28 = 0.0939715690
-operating_free_cash_flow = 864,389,677.18 - 92,079,175.38 = 772,310,501.80
-discounted_detachable_net_cash:
-  cash 2,610,539,857.45 at 100%
-  current term deposits 1,187,288,997.81 at 90%
-  negotiable certificates of deposit 7,624,974,842.11 at 90%
-  non-current term deposits 252,089,251.14 at 90%
-  listed shares 1,064,360.64 at 50%
-  less short-term borrowing 1,146,098,436.08 at 100%
-  total = 9,622,891,383.644
-discounted_net_cash_to_market_cap = 9,622,891,383.644 / 10,560,000,000 = 0.9112586538
-discounted_sustainable_cash_profit = CNY 700,000,000
-  cross-check: 2025 deducted parent profit CNY 718,251,477.87
-  cross-check: 2025 FCF CNY 772,310,501.80
-  cross-check: 2024-2025 average FCF about CNY 722,492,550.62
-operating_business_price = 10,560,000,000 - 9,622,891,383.644 = 937,108,616.356
-owner_earnback_years = 937,108,616.356 / 700,000,000 = 1.3387265948
-market_cap_to_cash_profit = 10,560,000,000 / 700,000,000 = 15.0857142857
-forecast_dividend_yield = 320,000,000 / 10,560,000,000 = 0.0303030303
+[fact_estimate_adjustment_separation]
+- financial facts: source amounts, audited cash flows, capex, income, balance sheet and dividend facts.
+- historical proxies: 2021-2025 operating cash flow less cash paid to acquire long-term operating assets remains only in the human report as a cross-check. These values are not actual G and are not stored in actual_history.
+- actual_history: only 2025, built from the complete 2025 ideal statements; protocol-derived actual value CNY634,924,757.326509.
+- ideal table 2 v3 estimate split: canonical source still has only combined sedimented funds of about CNY12.7bn. The result explicitly estimates CNY992,005,144.46 required operating funds and CNY11,707,994,855.54 remaining sedimented funds; exact sum CNY12.7bn, closure difference zero. This is not a filing fact.
+- valuation adjustments: cash takeable ratio 62%; term deposits and NCD realization 90%; listed stock realization 50%; parent ratio applied consistently.
+- normalized estimate: maintenance asset cash input CNY400,000,000; normal working capital increase zero; takeable-asset income excluded.
+- future judgments: five-year direction and invalidation conditions; no DCF or target price.
+
+[financing_consistency]
+- short-term borrowing stays with the operating business.
+- borrowing principal is not claimed against A.
+- after-tax financing cost remains in normalized G.
+
+[protocol_output_unrounded]
+- A = CNY 9,775,826,175.522064
+- G = CNY 704,916,462.8585651
+- A/M = 0.9349489674618486
+- M-A = CNY 680,173,580.3373108
+- residual_sign = +
+- conditional_years_basis = residual_market_price
+- conditional_years = 0.9648995535997026
 
 [limitations]
-- term-deposit and negotiable-CD instrument-level maturity, bank, rate and early-withdrawal restrictions are not disclosed.
-- 2023 capex is not directly included in the annual-report three-year table; sustainable cash profit relies mainly on 2024-2025 FCF and 2025 deducted profit.
-- market valuation is a point-in-time input snapshot and can differ from current pricing.
+- instrument-level term-deposit/NCD restrictions are undisclosed.
+- the CNY992 million operating cash safety buffer is an estimate.
+- CNY400 million maintenance spending is an estimate because maintenance and expansion capex are not separately disclosed.
+- only 2025 has complete ideal statements; actual_history therefore has one year, below the three-year contract threshold.
+- 2021-2024 cash proxies are cross-checks in report.md and must not be interpreted as actual G history.
+- the canonical ideal table 2 does not directly separate required operating funds; the displayed split is a labeled v3 estimate.
+- result remains partial and must not enter complete comparable screening.
+- market value is a point-in-time input snapshot.
