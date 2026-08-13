@@ -1,74 +1,17 @@
-stock-research trace
-company: 601163.SH 三角轮胎
-period: 2025-12-31 annual
-task_created_at: 2026-08-13T21:19:29+08:00
-
-[skill_and_contracts]
-- read .agents/skills/stock-research/SKILL.md
-- read references/owner-value-method.md
-- read references/result-contract.md
-- read references/report-contract.md
-- read references/data-reuse.md because SKILL.md directly routes reuse decisions there
-
-[protocol]
-1. initialized only through CLI:
-   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol init --input config/input.json --output outputs/result.json
-2. populated research inputs through repeated protocol set commands; no protocol-derived field was written manually.
-3. computed A, G, history values, coverage, residual sign and conditional years only through:
-   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol compute-owner-value --result outputs/result.json
-4. after semantic correction, recomputed all protocol-derived fields and validated through:
-   PYTHONPATH=src python3 -m stock_analysis.stock_research.protocol validate --result outputs/result.json
-   structural validation: ok; errors: []
-   data_quality.status: partial
-
-[formal_sources]
-- research_inputs/research/companies/triangle-tyre/2025/ideal-tables.md
-  latest 2025 ideal statements; four-way closure; domestic/overseas decomposition; required versus sedimented funds.
-- stock_report/data/analysis/annual_review/601163.SH/2025-12-31/facts.json
-  audited statement facts and asset/liability notes.
-- stock_report/data/raw/filings/601163.SH/2025-12-31/601163_2025_annual_report.txt
-  local company annual report text used for cross-checking.
-- company official annual reports for 2021, 2022, 2023 and 2024
-  historical operating cash flow, long-term asset cash purchase, revenue and deducted profit.
-- config/input.json
-  market cap CNY 10,455,999,755.859375 at 2026-08-13, source Yahoo Finance yfinance close CNY13.07 x 800,000,000 shares.
-
-[historical_report_urls]
-- 2021 https://www.triangle.com.cn/Public/Uploads/uploadfile/files/20220427/20220427092706_62689bea40bc6.pdf
-- 2022 https://www.triangle.com.cn/Public/Uploads/uploadfile/files/20230427/20230427093525_6449d15df131d.PDF
-- 2023 https://www.triangle.com.cn/Public/Uploads/uploadfile/files/20240428/20240428080025_662d9199b299f.pdf
-- 2024 https://www.triangle.com.cn/Public/Uploads/uploadfile/files/20250427/20250427084520_680d7e205a35b.pdf
-- 2025 https://www.triangle.com.cn/Public/Uploads/uploadfile/files/20260429/20260429075349_69f1488d2dbc2.pdf
-
-[fact_estimate_adjustment_separation]
-- financial facts: source amounts, audited cash flows, capex, income, balance sheet and dividend facts.
-- historical proxies: 2021-2025 operating cash flow less cash paid to acquire long-term operating assets remains only in the human report as a cross-check. These values are not actual G and are not stored in actual_history.
-- actual_history: only 2025, built from the complete 2025 ideal statements; protocol-derived actual value CNY634,924,757.326509.
-- ideal table 2 v3 estimate split: canonical source still has only combined sedimented funds of about CNY12.7bn. The result explicitly estimates CNY992,005,144.46 required operating funds and CNY11,707,994,855.54 remaining sedimented funds; exact sum CNY12.7bn, closure difference zero. This is not a filing fact.
-- valuation adjustments: cash takeable ratio 62%; term deposits and NCD realization 90%; listed stock realization 50%; parent ratio applied consistently.
-- normalized estimate: maintenance asset cash input CNY400,000,000; normal working capital increase zero; takeable-asset income excluded.
-- future judgments: five-year direction and invalidation conditions; no DCF or target price.
-
-[financing_consistency]
-- short-term borrowing stays with the operating business.
-- borrowing principal is not claimed against A.
-- after-tax financing cost remains in normalized G.
-
-[protocol_output_unrounded]
-- A = CNY 9,775,826,175.522064
-- G = CNY 704,916,462.8585651
-- A/M = 0.9349489674618486
-- M-A = CNY 680,173,580.3373108
-- residual_sign = +
-- conditional_years_basis = residual_market_price
-- conditional_years = 0.9648995535997026
-
-[limitations]
-- instrument-level term-deposit/NCD restrictions are undisclosed.
-- the CNY992 million operating cash safety buffer is an estimate.
-- CNY400 million maintenance spending is an estimate because maintenance and expansion capex are not separately disclosed.
-- only 2025 has complete ideal statements; actual_history therefore has one year, below the three-year contract threshold.
-- 2021-2024 cash proxies are cross-checks in report.md and must not be interpreted as actual G history.
-- the canonical ideal table 2 does not directly separate required operating funds; the displayed split is a labeled v3 estimate.
-- result remains partial and must not enter complete comparable screening.
-- market value is a point-in-time input snapshot.
+2026-08-13T22:32:10+08:00 protocol init: outputs/result.json (stock-research-result-v4)
+2026-08-13T22:33:00+08:00 source inventory: 2025 annual report, annual facts, existing 2025 ideal tables, 2021-2024 reviewed trend data, market snapshot
+2026-08-13T22:34:00+08:00 analysis materials completed before report writing: outputs/analysis-materials.md
+2026-08-13T22:34:30+08:00 ideal statement semantic review: limited; 2025 reviewed, four bridges ok, required/sedimented funds separated by calibrated estimate; 2021-2024 complete ideal statements unavailable
+2026-08-13T22:34:45+08:00 protocol compute-owner-value: passed; derived A, G, A/M, residual sign, conditional years, annual payout rate, arithmetic mean, correction factor and dividend-adjusted years
+2026-08-13T22:34:48+08:00 protocol check-analysis-readiness: passed; materials sha256=6cb31c4abaec5885da0fa46b735537c3552695e4be626f428cd5954e36e79ef7
+2026-08-13T22:34:49+08:00 protocol validate before report: passed
+2026-08-13T22:36:00+08:00 report written only after readiness passed: outputs/report.md
+2026-08-13T22:36:10+08:00 result status: partial; reason=2021-2024 lack complete calibrated ideal statements, so five-year actual G and dividend sequence cannot be produced without upgrading cash-flow proxies
+2026-08-13T22:40:00+08:00 manual semantic review correction started in existing run; no new run initialized
+2026-08-13T22:41:00+08:00 analysis materials corrected before report rewrite: cycle_profile=cyclical, target historical horizon=10 years, complete-cycle requirement at least 8 years; only 2025 has complete ideal statements
+2026-08-13T22:41:10+08:00 ideal table tail row renamed to 运输、保理等附随业务; disclosed as a named combined tail item below 5%, not a standalone material business
+2026-08-13T22:41:20+08:00 dividend-adjustment disclosure corrected: 2025 remains protocol-computed single-year observation, not normal behavior and not comparable with cyclical companies having complete 8-10 year history
+2026-08-13T22:41:30+08:00 protocol compute-owner-value rerun: passed; A, actual G, normalized G and dividend formulas retained at unrounded precision; no OCF-capex proxy entered actual G
+2026-08-13T22:41:31+08:00 protocol check-analysis-readiness rerun after materials change: passed; result materials hash refreshed
+2026-08-13T22:42:00+08:00 report updated only after corrected readiness passed
+2026-08-13T22:42:10+08:00 protocol validate after report update: passed; readiness=ready; materials hash matches; data_quality=partial
