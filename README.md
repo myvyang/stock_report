@@ -2,7 +2,13 @@
 
 面向上市公司财报研究的数据仓库。项目保存官方原始财报、结构化原始报表、标准化事实和可复核分析结果，首个研究对象是 `stock_analysis` 产出的 A 股 ROIC Top50。
 
-## 当前目标
+## 当前角色
+
+本仓库是公司研究的内部成果与追溯仓，不是读者入口。当前公司研究由`stock_analysis`统一Runner生成，已校验的`result.json`与`report.md`写入`data/analysis/stock_research/<code>/<period>/`；AH Note监听这些成果并形成唯一公开页面。
+
+原始PDF、接口响应、历史资产结构复核和旧协议报告继续保留，不覆盖、不伪装为当前协议。当前协议为`stock-research-analysis-v2`，其公式、自审与估值口径由上游公司研究Bundle负责，本仓库只保存和追溯，不在发布层重新解释。
+
+## 历史资产复核目标
 
 默认对每家公司使用最近年报：
 
