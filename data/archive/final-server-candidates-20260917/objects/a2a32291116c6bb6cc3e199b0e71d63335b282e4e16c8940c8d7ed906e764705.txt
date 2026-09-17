@@ -1,0 +1,48 @@
+run_dir: /Users/haha/aicode/stock_report/data/agent_runs/asset_structure_review/2026-07-19T13-24-08+08-00-002056-sz-横店东磁
+company: 002056.SZ 横店东磁
+period: 2025-12-31
+analysis_basis: annual
+
+inputs read:
+- config/input.json
+- config/skills/financial-report-analysis/SKILL.md
+- config/skills/financial-report-analysis/references/analysis-habits.md
+- config/skills/financial-report-analysis/references/report-output-contract.md
+- config/skills/a-share-price-fetch/SKILL.md
+- annual_review evidence: /Users/haha/aicode/stock_report/data/analysis/annual_review/002056.SZ/2025-12-31/result.json
+- annual PDF: /Users/haha/aicode/stock_report/data/raw/filings/002056.SZ/2025-12-31/annual-report.pdf
+
+price fetch:
+- command: python3 config/skills/a-share-price-fetch/scripts/fetch_a_share_price.py 002056.SZ
+- saved: work/market_price.json
+- price: 24.04 CNY, quote_time: 2026-07-17T16:14:18+08:00, source: tencent
+
+PDF extraction:
+- pypdf text saved to work/annual-report-pypdf.txt because pdftotext was unavailable.
+- main statements checked: balance sheet PDF p80-p82, income statement PDF p84-p86, cash flow statement PDF p87-p88.
+- key notes checked: monetary funds p118-p119 and p157-p158, receivables p119-p127, inventory p128-p129, investment assets p129-p132, fixed/CIP/ROU/intangible/goodwill p132-p139, liabilities p141-p146, income and cash flow notes p151-p158, fair value and related-party borrowing p169-p176.
+
+classification highlights:
+- funds assets = cash and cash equivalents + term deposits and interest = 5694318288.70.
+- restricted settlement deposits and pledged term deposits excluding frozen bank deposits = 3580173160.35 classified as operating assets.
+- trading financial assets/liabilities are forward FX contracts and classified as other.
+- other payables split into financing borrowings, investment equity-transfer payable, and operating residual by note composition.
+- long payables split into financing fiscal bureau borrowing and other employee reform compensation.
+
+outputs generated:
+- outputs/result.json
+- outputs/report.md
+- outputs/trace.txt
+
+readback validation:
+- outputs/result.json was re-read after generation.
+- asset item sum = total_assets, diff 0.00.
+- four asset categories = summary fields, all diffs 0.00.
+- liability item sum = total_liabilities, diff 0.00.
+- four liability categories = summary fields, all diffs 0.00.
+- total_equity = total_assets - total_liabilities, diff 0.00.
+- net_funds, net_operating_assets, net_investment_assets and other_net_assets formulas all match.
+- equity reconciliation difference = 0.00.
+- gross profit 2025 = operating_revenue - operating_cost, diff 0.00.
+- gross profit 2024 = operating_revenue - operating_cost, diff 0.00.
+- outputs/report.md was re-read after generation.

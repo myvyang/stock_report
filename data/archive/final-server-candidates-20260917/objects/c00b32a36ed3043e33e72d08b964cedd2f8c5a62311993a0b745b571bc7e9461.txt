@@ -1,0 +1,28 @@
+run_dir: /Users/haha/aicode/stock_report/data/agent_runs/asset_structure_review/2026-07-19T12-38-14+08-00-300360-sz-炬华科技
+company: 300360.SZ 炬华科技
+period: 2025-12-31
+analysis_basis: annual
+
+steps:
+1. Read config/skills/financial-report-analysis/SKILL.md completely.
+2. Read config/skills/a-share-price-fetch/SKILL.md completely.
+3. Read related financial-report-analysis references: analysis-habits.md and report-output-contract.md.
+4. Read config/input.json and confirmed annual mode.
+5. Ran price skill script:
+   python3 config/skills/a-share-price-fetch/scripts/fetch_a_share_price.py 300360.SZ
+   Saved raw output to work/market_price.json.
+6. Read annual_review evidence from:
+   /Users/haha/aicode/stock_report/data/analysis/annual_review/300360.SZ/2025-12-31/result.json
+7. Extracted local annual report PDF text with pypdf to work/annual-report-text.txt.
+8. Checked consolidated balance sheet pages 80-83, consolidated income statement pages 85-86, consolidated cash flow statement pages 88-89.
+9. Checked notes for monetary funds, trading financial assets, receivables, inventory, long-term equity investment, other non-current financial assets, investment property, fixed assets, construction in progress, intangible assets, goodwill, deferred tax, payables, contract liabilities, deferred income, lease liability movement, revenue by product, and cash flow details.
+10. Classified assets and liabilities without adding parent and child rows twice.
+
+key judgments:
+- Monetary funds split into cash and cash equivalents, 3-month-plus deposits, and operating guarantees.
+- Goodwill classified as other assets, not operating assets.
+- Other non-current financial assets classified as investment assets because the annual report identifies them as non-current FVTPL financial assets but does not provide evidence that they are low-risk cash equivalents.
+- 2025 year-end financing liabilities are zero. The single short-term borrowing and lease liability amounts shown in pypdf text are prior-period amounts; this is confirmed by current liability total and financing liability movement table.
+
+validation:
+- outputs/result.json was generated and then re-read for formula validation.

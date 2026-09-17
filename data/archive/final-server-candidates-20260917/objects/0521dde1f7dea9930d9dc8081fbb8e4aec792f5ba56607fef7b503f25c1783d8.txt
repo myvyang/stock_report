@@ -1,0 +1,29 @@
+2026-08-28 研究折算阶段阻断记录
+
+公司：哔哩哔哩（09626.HK）
+目标年度：2025（annual）
+
+已确认 config/materials.json 中 accepted_base_recast.status=accepted 且 immutable=true；未重新提取或修改 facts.json、business-allocation.json、base-recast.json、base-recast-review.json。
+
+研究草稿已通过协议工具逐项录入业务拆分、经营必需资金及价值流量，并多次 compile。一般性缺项、数值加总、现金与账户初始化错误均已逐项修复。最后一次 compile 仍有以下实质错误：
+
+1. 经济净资产桥缺少 -92,995 千元。该金额等于 2025 年商誉新增。定向回查 materials/prepared-filings/2025/candidates/015.md 与 A.md 显示：被投资方并表时确认商誉约 93.0 百万元，商誉附注明确新增 92,995 千元；但锁定 facts.json 只保存商誉期初、期末余额，没有保存“并表新增商誉 92,995 千元”的原子流量事实。研究层若用两期余额差作为 goodwill_and_worthless_asset_adjustment，会触发“cannot use a balance-sheet delta as a named economic cause”，且违反不得用存量差反命名原因的研究契约。
+
+2. 利润表 Others, net 为 124,822 千元，超过经营利润 1,124,451 千元的 3%（约 33,734 千元）。现有锁定事实和准备材料只披露该总额，未提供具名构成。保留原名并使用 other_named_nonoperating 会触发“material generic change must be split into concrete economic causes”；将其猜测为投资、公允价值或其他原因则违反披露边界。
+
+3. account_view 的剩余差额由第 1 项未入账的并表新增商誉引起；不能用残差流量修平。
+
+结论：基础事实与研究折算校验契约发生实质冲突，需退回基础阶段补录并表新增商誉的直接原子事实，并确认 Others, net 是否存在可取得的具名拆分或由基础审阅明确批准披露限制。所有年度 recast-statements.json 未获批准，故未初始化公司理解、未写 outputs/report.md，也未生成 completion.json。
+
+2026-08-28 修复请求复核
+
+收到针对同一运行的 research-recast 修复请求后，重新读取 input、materials、研究草稿、trace 和 filing rewrite review，并复核锁定文件 SHA-256 未变化。当前工作区不存在 report.md、report review、company-understanding.json 或已批准 recast-statements.json，符合此前停在研究折算阶段门的状态。
+
+重新核对准备材料后，基础层回退事项不变：
+
+- candidates/015.md P132-P133 明确披露被投资方由 29.9% 增至 56.6% 后并表，确认无形资产 246.0 百万元及商誉约 93.0 百万元；商誉附注明确本年新增 92,995 千元。锁定 facts.json 仍只有 bal24-goodwill 与 bal25-goodwill 两个存量事实，没有并表新增商誉的流量原子事实。该缺项同时造成经济净资产桥 -92,995 千元缺口和 account_view 流量合计不等于经济权益变化。
+- statements.md P088 对 Others, net 只披露 124,822 千元总额；准备材料与锁定事实均无具名构成。该数额超过经营利润 3%，研究层既不能降低重要性，也不能把它猜测为投资价值变化、政府补助或其他具体原因。
+
+本次 input 已含人民币市值 48,927,000,501.64552 元、时点 2026-08-28T10:07:41+08:00 和来源 Tencent_qt.gtimg.cn_CFETS_HKDCNY_0.86535，不存在需要补取市值的错误；由于研究折算未批准，尚未进入 company-understanding 的 market、analysis.sources_used 或 evidence 入库阶段。
+
+修复结论：这不是研究草稿可合法修复的业务分类或公式错误，而是锁定基础事实缺少已披露原子流量、以及重大不透明损益缺少构成所形成的阶段契约冲突。已按请求退回 base-recast 阶段；研究层未修改 facts.json、base-recast.json 或 base-recast-review.json，未生成或编辑 recast-three-statements.md，未继续写公司理解和报告。

@@ -1,0 +1,55 @@
+603393.SH 新天然气 2025年度公司研究追踪
+研究模式：annual；目标年度：2025；requested_years=1
+执行日期：2026-08-14 Asia/Shanghai
+
+1. 初始化
+- 读取 config/input.json。
+- 按 stock-research 协议初始化 outputs/research-state.json，并设定 ordinary_operating / cyclical / annual / 2025 / 1年。
+- 输入内原始尝试：2026-08-14 21:16:02，cninfo，失败，错误为 annual report not found。
+
+2. 法定披露获取
+- 搜索确认公司为新疆鑫泰天然气股份有限公司（603393，新天然气）。
+- 上交所法定公告日期：2026-03-28；公告地址：https://static.sse.com.cn/disclosure/listedinfo/announcement/c/new/2026-03-28/603393_20260328_OAL4.pdf
+- 首次直接请求上交所静态地址返回反爬HTML（gzip内容，非PDF），未作为证据。
+- 通过新浪公告镜像取得与公告编号对应的211页PDF：12031057.PDF。
+- 本地PDF：stock_report/data/raw/filings/603393.SH/2025-12-31/603393_2025_annual.pdf
+- SHA256：840ab0d53f8db1e9c456f975a1eda11607cba3953e4d9047da30e5a1c5c7931b
+- 用pypdf逐页提取文本并插入“PDF PAGE”页界，形成同目录603393_2025_annual.txt。
+- 补查2026-07-29《关于2025年年度报告的信息披露监管问询函的回复公告》及年审会计师回复，重点复核其他非流动资产、喀什北减值和资金支付。
+
+3. 事实提取
+- 合并资产负债表：年报p67-69；合并利润表：p71-73；合并现金流量表：p75-76。
+- 收入成本分解：p162；其他非流动资产：p149；借款与负债：p154-158；现金流补充资料：p171。
+- 原子经济分类保存至 outputs/evidence/2025/facts.json；每项含来源、页码、全文行号、金额、符号和口径。
+- 业务收入与成本直接使用年报六类分解，合计覆盖营业收入及营业成本100%。
+
+4. 折算与估计
+- 九类经济项目逐项重分类；期末正资产加商誉与总资产一致，负项目与总负债一致，经济净资产与所有者权益一致。
+- 期初经济净资产扣除期初商誉0.385亿元；期末商誉为零。
+- 经营必需资金3亿元为显式估计，其他现金、交易性金融资产及大额存单列沉淀资金。
+- 表1除收入成本外，分业务期间费用、耗损、税、资产和资本投入按收入占比分配；公司总额以合并披露校准。
+- 资产耗损采用年报p171折旧、油气折耗及摊销合计；资本现金投入采用现金流量表37.064亿元。
+- 利润桥、经济净资产桥、现金桥、经营资产桥均闭合；文件：outputs/evidence/2025/recast-statements.json。
+
+5. 理解与成文顺序
+- 先完成 evidence、recast-statements、company-understanding、analysis-materials 和 report-thesis。
+- research-state finish-analysis 后，understanding readiness 检查通过，才渲染折算三表并写报告。
+- annual模式未生成outputs/longitudinal-history.json，符合输入要求。
+
+6. 关键限制
+- 2023-2024只使用公开摘要与2025年年报比较数理解历史，没有声称完成逐年折算。
+- 当前市值约109.84亿元来自网页行情抓取附近时点，不是2025-12-31法定事实。
+- 三塘湖、庆阳和喀什北等项目的未来投资、审批和回报仍属最大不确定性。
+
+7. 独立审阅修复（同一运行）
+- 读取outputs/report-review.json；失败项为因果公司历史和重大主张证据定位。
+- 新增历史证据`history-inquiry-2023`：公司2023-03-15重大资产重组问询回复，30页，SHA256 `18c813c4478d67637a1f63d6a262d4f9c14b89a952ca7258f62270c3b5efb5e5`。p1确认2018年通过要约收购取得亚美能源控制权，p6披露潘庄收入主体地位，p8及p12-14解释马必持续钻井和产量爬坡。
+- 将2025年年报问询回复完整73页PDF及文本落地，SHA256 `2647f472838ee518f2a1e2490691bf6f9a9275c86f2a5513189a84a6326810de`。p2-15定位喀什北交割、付款和诉讼，p22-23定位二区会计处理，p25-37定位减值，p49-58定位其他非流动资产和会计师核查。
+- 在facts.json新增material_claims，在recast-statements.json新增evidence_notes；随后更新company-understanding.json、analysis-materials.md和report-thesis.md，最后重写report.md。
+- 重大主张定位：三塘湖18.9亿吨见年报p14；三笔贷款与担保抵押见p155；财务费用及增幅见p16；喀什北减值见p166及问询回复p25、p30、p37；付款真实性核查见问询回复p58。
+- 市值来源补记为`market-web`：集思录公司页https://www.jisilu.cn/data/stock/603393，网页抓取时现价25.91元、总市值109.84亿元，观察时点约2026-07-31，仅用于市场关系。
+- 本次仍为annual模式，未生成longitudinal-history.json；未写入result.json。
+## 8. 报告生成时序门禁修复（2026-08-14）
+
+- 独立校验指出 `report.md` 的文件生成时间早于最后一次分析 readiness 检查。原因是 readiness 检查会回写 `company-understanding.json`，而此前报告未在该回写后重新生成。
+- 本次按 annual 模式跳过连续历史账本：先执行 research-state 校验、understanding readiness 检查及 understanding validate，再实际重写 `report.md`；报告重写后不再执行会回写理解文件的 readiness 检查。

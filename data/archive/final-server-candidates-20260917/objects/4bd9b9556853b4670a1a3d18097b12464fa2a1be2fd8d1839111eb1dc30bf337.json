@@ -1,0 +1,58 @@
+{
+  "schema_version": "stock-research-base-recast-review-v2",
+  "year": 2025,
+  "inputs": {
+    "facts_path": "inputs/2025/facts.json",
+    "facts_sha256": "e2fe05c512c3bef72dc5e8cd18afa2785ffec0040bb680b1d9f95ccc9eee4ae0",
+    "base_path": "inputs/2025/base-recast.json",
+    "base_sha256": "bb3e3b8718ea160e806987592ef52d3aa8bf667a192cd6b54c0c5fd7177acb4a",
+    "allocations_path": "inputs/2025/business-allocation.json",
+    "allocations_sha256": "aca907c791aa8fae548eb8763c433f1757f7ce56a136e918e7cece9d7ad79661",
+    "rewrite_root": "inputs/2025/filing-rewrite",
+    "rewrite_tree_sha256": "bd14cfce5646e37df138c831b1b5f3b94f38be3f53a7102b734e6b956c8810c8"
+  },
+  "dimensions": [
+    {
+      "dimension_id": "source_completeness",
+      "passed": false,
+      "reason": "归属于母公司股东的净利润是表1的展示控制量，但其来源事实 i_pnp 未被折算表任何带 fact_id 的组件承接；不能视为可排除的小计或重复披露。",
+      "issues": [
+        "2025年：表1 parent_net_profit 为1,758,171,535.84元，与事实账本 i_pnp 一致但无事实ID、来源或映射；i_pnp 是利润归属原始行，未被唯一映射承接。"
+      ]
+    },
+    {
+      "dimension_id": "amount_sign_scope",
+      "passed": true,
+      "reason": "抽样及逐表核对：利润表各组成项、资产负债表经济类别的期初期末组件、现金桥及权益变动均与事实账本金额及方向一致；公司为合并口径、期间为2025年度/2025年末，未见错位。",
+      "issues": []
+    },
+    {
+      "dimension_id": "economic_classification",
+      "passed": true,
+      "reason": "经营营运资本、经营资产、资金性资产、外部投资、税项净额及各融资/经营负债类别均保留组成原始报表项目；对无法从材料进一步判断的其他流动资产、其他应付款等未伪造具体经济解释。",
+      "issues": []
+    },
+    {
+      "dimension_id": "opaque_items",
+      "passed": true,
+      "reason": "笼统项目仍以原始报表名称作为组件列示，未将其他流动资产、其他应收款、其他应付款、其他非流动资产等改写为无披露支持的具体原因；在建工程差额虽被标为未解释，但其在闭合处理上另有问题。",
+      "issues": []
+    },
+    {
+      "dimension_id": "closure",
+      "passed": false,
+      "reason": "利润、经济资产负债及现金桥的计算差额均接近零，但经营资产滚动的披露状态错误：材料明确为 partial 且存在在建工程未解释差额，折算表却以该差额作为 named_adjustment 后标记 complete、disclosure_gap为0。",
+      "issues": [
+        "2025年：表3 operating_asset_rollforward 将83,422,997.35元“在建工程未解释差额”计入 named_adjustments，并声明 disclosure_status=complete、disclosure_gap=0；A文档明确该全账户桥为partial，不能将不完整披露差额处理为已完整闭合。"
+      ]
+    },
+    {
+      "dimension_id": "bounded_estimates",
+      "passed": true,
+      "reason": "五类产品收入直接披露、毛利由收入减成本公式得出；其余业务字段均明确标为 constrained_estimate，按收入占比分配已锁定的公司总量。逐字段加总至公司总量，最大仅为浮点舍入差3.8e-06元；未引入营运必需资金、变现/释放率或未来判断。",
+      "issues": []
+    }
+  ],
+  "status": "rejected",
+  "reviewed_at": "2026-08-27T23:47:18+08:00"
+}

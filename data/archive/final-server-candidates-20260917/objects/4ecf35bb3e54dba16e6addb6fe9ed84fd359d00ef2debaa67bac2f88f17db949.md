@@ -1,0 +1,47 @@
+# 2025年首版折算三表（RMB亿元）
+
+## 折算表1：经营
+
+| 业务 | 收入 | 毛利率 | 经营利润 | 资金转资产 | 经营资产 | 周转资金 | 存货 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 木制工艺品及配饰（公司共同经营） | 5.6 | 62% | 2.2 | 0.41 | 2.6 | 2.9 | 3.1 |
+| **公司合计** | **5.6** | **62%** | **2.2** | **0.41** | **2.6** | **2.9** | **3.1** |
+
+## 折算表2：经济资产负债
+
+| 项目 | 期初 | 变化 | 期末 |
+|---|---:|---:|---:|
+| working_capital | 2.5 | 0.32 | 2.9 |
+| operating_assets | 2.5 | 0.029 | 2.6 |
+| funds_assets | 3.6 | 0.61 | 4.3 |
+| external_investments | 0.81 | 0 | 0.81 |
+| tax_net_assets | -0.55 | -0.01 | -0.56 |
+| financing_liabilities | -0.12 | -0.087 | -0.21 |
+| asset_related_liabilities | 0 | 0 | 0 |
+| long_term_operating_liabilities | 0 | 0 | 0 |
+| declared_dividend_payable | 0 | 0 | 0 |
+| other_funding_liabilities | 0 | 0 | 0 |
+| named_special_net_items | 0 | 0 | 0 |
+| goodwill | 0 | 0 | 0 |
+| **净资产合计** | **8.8** | **0.86** | **9.7** |
+
+## 折算表3：当期流量
+
+| 项目 | 金额 |
+|---|---:|
+| Revenue | 5.6 |
+| Cost of sales | -2.1 |
+| Other income and other net gain | 0.45 |
+| Administrative expenses | -0.45 |
+| Selling and distribution expenses | -0.97 |
+| Other operating expenses | -0.31 |
+| Finance costs | 0 |
+| Income tax | -0.45 |
+| Profit for the year | 1.7 |
+| Exchange differences on translation from functional currency to presentation currency | 0.015 |
+| Exchange differences arising on translation of foreign operations | 0.033 |
+| Dividends approved in respect of previous year | -0.9 |
+| 经营现金流 | 1.8 |
+| 投资现金流 | -0.41 |
+| 融资现金流 | -1 |
+| 汇率及其他现金变化 | 0.05 |

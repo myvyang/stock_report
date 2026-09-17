@@ -1,0 +1,45 @@
+asset_structure_review trace
+run_dir: /Users/haha/aicode/stock_report/data/agent_runs/asset_structure_review/2026-07-19T13-36-08+08-00-600186-sh-莲花控股
+company: 600186.SH 莲花控股
+period: 2025-12-31 annual
+
+Read skills:
+- config/skills/financial-report-analysis/SKILL.md
+- config/skills/financial-report-analysis/references/analysis-habits.md
+- config/skills/financial-report-analysis/references/report-output-contract.md
+- config/skills/financial-report-analysis/references/item-dictionary-and-formulas.md
+- config/skills/a-share-price-fetch/SKILL.md
+
+Inputs and local sources:
+- config/input.json
+- annual_review result: /Users/haha/aicode/stock_report/data/analysis/annual_review/600186.SH/2025-12-31/result.json
+- annual_review evidence pack: /Users/haha/aicode/stock_analysis/data/outputs/roic_verification_agent_runs/2026-07-15T12-09-21+08-00-600186-sh-莲花控股/work/roic_evidence_pack.json
+- annual filing PDF: /Users/haha/aicode/stock_report/data/raw/filings/600186.SH/2025-12-31/annual-report.pdf
+
+PDF extraction:
+- pdftotext was unavailable; used pypdf 6.7.5 to extract work/annual-report-pypdf-pages.txt from the local PDF.
+- Main statement pages checked: consolidated balance sheet pages 74-76, consolidated income statement pages 78-79, consolidated cash flow pages 82-84.
+- Note pages checked include monetary funds/trading financial assets pages 112 and 166-167; receivables/prepayments/other receivables/inventory pages 113-126; current tax/prepaid assets page 128; investment property/fixed assets/right-of-use/intangible/goodwill/DTA/other noncurrent assets pages 132-141; restricted assets and financing/operating liabilities pages 142-152; revenue/cost pages 156-157; cash flow item notes pages 163-166.
+
+Price:
+- Ran config/skills/a-share-price-fetch/scripts/fetch_a_share_price.py 600186.SH > work/market_price.json
+- Source: tencent https://qt.gtimg.cn/q=sh600186
+- Price: 8.93, quote_time: 2026-07-17T16:14:53+08:00, fetched_at: 2026-07-19T13:37:31+08:00
+
+Key classification judgments:
+- Cash and cash equivalents: funds.
+- Trading financial assets: funds, because they are separable financial assets not in core operation.
+- Bill guarantee deposits: operating assets, because tied to bank acceptance notes and supplier settlement.
+- Loan guarantee deposits and in-transit funds: other assets, because not cash equivalents and use is restricted.
+- Long-term equity investment current balance treated as zero per main balance sheet and annual_review structured balance row; page 131 note shows the Zhejiang Lotus investment was transferred out.
+- Long-term payable and the current portion of long-term payable treated as financing liabilities because the note and cash flow refer to lease payments / financing lease company borrowings.
+
+Validation result:
+- asset item total = total_assets, diff 0.00 yuan
+- liability item total = total_liabilities, diff 0.00 yuan
+- asset category formula diff 0.00 yuan
+- liability category formula diff 0.00 yuan
+- total_equity = total_assets - total_liabilities, diff 0.00 yuan
+- total_equity = net_funds + net_operating_assets + net_investment_assets + other_net_assets, diff 0.00 yuan
+- gross_profit = operating_revenue - operating_cost for 2025 and 2024, diff 0.00 yuan
+

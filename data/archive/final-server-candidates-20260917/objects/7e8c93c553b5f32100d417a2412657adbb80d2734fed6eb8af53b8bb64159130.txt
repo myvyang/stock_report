@@ -1,0 +1,27 @@
+开发科技 920029.BJ 2025 年报资产结构复核 trace
+run_dir: /Users/haha/aicode/stock_report/data/agent_runs/asset_structure_review/2026-07-19T12-38-23+08-00-920029-bj-开发科技
+input: /Users/haha/aicode/stock_report/data/agent_runs/asset_structure_review/2026-07-19T12-38-23+08-00-920029-bj-开发科技/config/input.json
+
+执行步骤:
+1. 完整读取 financial-report-analysis 与 a-share-price-fetch skill。
+2. 读取 config/input.json，确认 analysis_basis=annual，period=2025-12-31。
+3. 先读取 annual_review result.json 和 report.md，取得 ROIC 复核 evidence 中的现金、理财、融资负债、经营现金流、资本开支等证据。
+4. 运行价格脚本: python3 config/skills/a-share-price-fetch/scripts/fetch_a_share_price.py 920029.BJ，输出保存 work/market_price.json。
+5. 本机无 pdftotext，改用 pypdf 提取本地年报 PDF 到 work/annual-report.txt，没有联网下载。
+6. 定向核对 PDF: 合并资产负债表 p91-p93，合并利润表 p96-p97，合并现金流量表 p100；附注 p165-p217。
+7. 生成 outputs/result.json、outputs/report.md。
+
+关键分类:
+- 货币资金拆分为现金及现金等价物 2,580,762,587.10，银行存款应计利息 1,887,416.65，银行保函保证金 35,007,303.82。
+- 交易性金融资产 100,000,000.00 和其他流动资产债权投资 40,006,000.00 归为资金类资产。
+- 银行保函保证金归为经营资产，因保证期内不能随时支付。
+- 衍生金融资产/负债为外汇远期合约，列为其他。
+- 预计负债按规则列为其他负债，附注说明主要因 Ducati Energia Romania s.a. 产品质量赔偿申请。
+
+最终重新读取 result.json 校验结果:
+- 资产明细合计 = 4,681,345,004.97，与 total_assets 差额 0.00。
+- 负债明细合计 = 950,930,498.13，与 total_liabilities 差额 0.00。
+- 四类资产、四类负债、净资金、净经营资产、净投资资产、其他净资产与 summary 一致。
+- 净资金 + 净经营资产 + 净投资资产 + 其他净资产 = 3,730,414,506.84，与所有者权益合计差额 0.00。
+- 2025 毛利 = 3,020,483,237.81 - 1,833,275,437.37 = 1,187,207,800.44。
+- 2024 毛利 = 2,932,727,944.85 - 1,875,938,928.77 = 1,056,789,016.08。
