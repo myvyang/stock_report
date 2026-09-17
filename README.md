@@ -4,6 +4,8 @@
 
 ## 当前角色
 
+2026-09-17保留规则更新：完整分析成果与获取方法长期入Git，公开可重取的财报原件默认作为缓存。见[成果保留与服务器退出](docs/artifact-retention.md)。下文原始PDF的LFS说明保留为历史维护规则。
+
 本仓库是公司研究的内部成果与追溯仓，不是读者入口。当前公司研究由`stock_analysis`统一Runner生成，已校验的`result.json`与`report.md`写入`data/analysis/stock_research/<code>/<period>/`；AH Note监听这些成果并形成唯一公开页面。
 
 原始PDF、接口响应、历史资产结构复核和旧协议报告继续保留，不覆盖、不伪装为当前协议。当前协议为`stock-research-analysis-v2`，其公式、自审与估值口径由上游公司研究Bundle负责，本仓库只保存和追溯，不在发布层重新解释。
