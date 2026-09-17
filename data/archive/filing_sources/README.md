@@ -5,3 +5,5 @@
 文件来自交易所或监管机构域名。原PDF和已知索引的哈希逐份核对，未逐一联网重新下载；官方链接未来仍可能失效。因此本轮只删除PDF，原提取全文、metadata和filing-index继续保留，后续可据来源重新下载并验证SHA-256。不以“同一个URL”代替版本一致性。
 
 脚本：`scripts/retire_filing_pdfs.py inventory --root <stock_research_store>`生成清单；只有清单已经推送并复核后才执行prune，并提供明确根目录确认。prune再次核对PDF和文本哈希，只删除清单里的PDF。
+
+执行回执：`20260917-cleanup-receipt.json`。清单与GitHub原件SHA-256一致后，删除4,584份PDF，无执行拒绝；清理后逐项确认提取全文、metadata及filing-index仍全部存在。原PDF不能从Git恢复，需要按记录的官方URL重新下载；未逐一联网验证URL未来可用性。
